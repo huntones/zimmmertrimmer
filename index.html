@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random 60s MP3 Cutter &amp; Volume Normalizer</title>
+<style>
+  :root {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c;
+    --ink:#eef1f6; --muted:#8b93a4; --accent:#ff5a3c; --accent-dim:#c9412b;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:radial-gradient(1100px 500px at 80% -10%,rgba(255,90,60,0.10),transparent 60%),var(--bg);
+    color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 20px 64px;}
+  .langbar{display:flex;justify-content:flex-end;margin-bottom:8px;}
+  html[dir=rtl] .langbar{justify-content:flex-start;}
+  .langtoggle{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;}
+  .langtoggle button{background:var(--panel);color:var(--muted);border:none;cursor:pointer;
+    font-family:var(--mono);font-size:12.5px;padding:7px 15px;transition:all .12s;}
+  .langtoggle button.active{background:var(--accent);color:#14100e;font-weight:700;}
+  header{margin-bottom:28px;}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:0.18em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 10px;direction:ltr;}
+  html[dir=rtl] .eyebrow{text-align:right;} html[dir=ltr] .eyebrow{text-align:left;}
+  h1{font-size:clamp(26px,5vw,40px);font-weight:700;line-height:1.08;margin:0 0 8px;letter-spacing:-0.02em;}
+  h1 .mark{color:var(--accent);white-space:nowrap;}
+  .sub{color:var(--muted);max-width:62ch;margin:0;}
+  .engine{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);
+    font-size:12.5px;padding:7px 13px;border:1px solid var(--line);border-radius:999px;
+    background:var(--panel);color:var(--muted);direction:ltr;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 0 3px rgba(232,184,75,0.15);}
+  .dot.ready{background:var(--ok);box-shadow:0 0 0 3px rgba(78,201,138,0.15);}
+  .dot.busy{background:var(--accent);box-shadow:0 0 0 3px rgba(255,90,60,0.15);animation:pulse 1s ease-in-out infinite;}
+  @keyframes pulse{50%{opacity:0.35;}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:18px;}
+  .panel h2{font-family:var(--mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 16px;display:flex;align-items:center;gap:10px;direction:ltr;}
+  html[dir=rtl] .panel h2{justify-content:flex-end;} html[dir=ltr] .panel h2{justify-content:flex-start;}
+  .panel h2 .n{color:var(--accent);border:1px solid var(--accent-dim);border-radius:6px;padding:1px 7px;font-size:11px;}
+  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:30px 20px;text-align:center;
+    cursor:pointer;transition:border-color .15s,background .15s;background:var(--panel-2);}
+  .drop:hover,.drop.over{border-color:var(--accent);background:#1f242f;}
+  .drop strong{color:var(--ink);} .drop span{color:var(--muted);font-size:14px;}
+  .drop .big{font-size:15px;display:block;margin-bottom:4px;}
+  input[type=file]{display:none;}
+  .filecount{margin-top:12px;font-family:var(--mono);font-size:13px;color:var(--muted);text-align:center;}
+  .filecount b{color:var(--accent);}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media (max-width:560px){.controls{grid-template-columns:1fr;}}
+  .field label{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:0.06em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
+  .seg{display:flex;gap:8px;}
+  .seg button{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
+    font-family:var(--mono);font-size:14px;padding:11px 0;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .seg button:hover{border-color:var(--muted);}
+  .seg button.active{background:var(--accent);border-color:var(--accent);color:#14100e;font-weight:700;}
+  .num{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
+    font-family:var(--mono);font-size:15px;padding:11px 13px;border-radius:9px;}
+  .num:focus{outline:none;border-color:var(--accent);}
+  .hint{color:var(--muted);font-size:12px;margin-top:7px;}
+  .go{width:100%;margin-top:20px;background:var(--accent);color:#14100e;border:none;font-family:var(--sans);
+    font-weight:700;font-size:17px;padding:16px;border-radius:12px;cursor:pointer;transition:transform .08s,background .15s;}
+  .go:hover:not(:disabled){background:#ff6e53;} .go:active:not(:disabled){transform:translateY(1px);}
+  .go:disabled{opacity:0.4;cursor:not-allowed;}
+  .progwrap{margin-top:18px;display:none;} .progwrap.show{display:block;}
+  .bar{height:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;overflow:hidden;}
+  .bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent-dim),var(--accent));transition:width .2s ease;}
+  .progtext{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-top:9px;direction:ltr;}
+  .log{margin-top:14px;background:#0a0c10;border:1px solid var(--line);border-radius:10px;padding:14px;
+    height:230px;overflow-y:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;direction:ltr;text-align:left;}
+  .log .l{white-space:pre-wrap;word-break:break-word;}
+  .log .ok{color:var(--ok);} .log .err{color:var(--err);} .log .warn{color:var(--warn);}
+  .log .head{color:var(--accent);} .log .dim{color:var(--muted);}
+  .results{margin-top:14px;display:grid;gap:8px;}
+  .result{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--panel-2);
+    border:1px solid var(--line);border-radius:9px;padding:11px 14px;}
+  .result .name{font-family:var(--mono);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;}
+  .result a{flex-shrink:0;color:var(--accent);text-decoration:none;font-family:var(--mono);font-size:12.5px;
+    border:1px solid var(--accent-dim);padding:5px 11px;border-radius:7px;}
+  .result a:hover{background:var(--accent);color:#14100e;}
+  .dlall{width:100%;margin-top:8px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
+    font-family:var(--mono);font-size:13px;padding:12px;border-radius:9px;cursor:pointer;}
+  .dlall:hover{border-color:var(--accent);color:var(--accent);}
+  footer{margin-top:32px;text-align:center;color:var(--muted);font-size:12.5px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="langbar"><div class="langtoggle" id="langToggle">
+    <button data-lang="he" class="active">עברית</button>
+    <button data-lang="en">EN</button>
+  </div></div>
+  <header>
+    <p class="eyebrow" data-i18n="eyebrow"></p>
+    <h1 data-i18n-html="title"></h1>
+    <p class="sub" data-i18n="sub"></p>
+    <div class="engine" id="engine">
+      <span class="dot" id="dot"></span>
+      <span id="engineText" data-i18n="engineLoading"></span>
+    </div>
+  </header>
+  <section class="panel">
+    <h2><span class="n">01</span> <span data-i18n="step1"></span></h2>
+    <div class="drop" id="drop"><label for="fileInput" style="cursor:pointer;">
+      <span class="big"><strong data-i18n="dropBig"></strong> <span data-i18n="dropBig2"></span></span>
+      <span data-i18n="dropSmall"></span>
+    </label></div>
+    <input type="file" id="fileInput" accept="audio/mpeg,.mp3" multiple>
+    <div class="filecount" id="fileCount" data-i18n="noFiles"></div>
+  </section>
+  <section class="panel">
+    <h2><span class="n">02</span> <span data-i18n="step2"></span></h2>
+    <div class="controls">
+      <div class="field">
+        <label data-i18n="volLabel"></label>
+        <div class="seg" id="dbSeg">
+          <button data-db="89">89</button>
+          <button data-db="90" class="active">90</button>
+          <button data-db="91">91</button>
+        </div>
+        <p class="hint" data-i18n="volHint"></p>
+      </div>
+      <div class="field">
+        <label data-i18n="lenLabel"></label>
+        <input class="num" id="clipLen" type="number" value="60" min="1" step="1">
+        <p class="hint" data-i18n="lenHint"></p>
+      </div>
+    </div>
+    <button class="go" id="startBtn" disabled data-i18n="start"></button>
+  </section>
+  <section class="panel">
+    <h2><span class="n">03</span> <span data-i18n="step3"></span></h2>
+    <div class="progwrap" id="progWrap">
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="progtext"><span id="statusText" data-i18n="idle"></span><span id="pctText">0%</span></div>
+    </div>
+    <div class="log" id="log"></div>
+    <div class="results" id="results"></div>
+    <button class="dlall" id="dlAll" style="display:none;" data-i18n="dlAll"></button>
+  </section>
+  <footer data-i18n="footer"></footer>
+</div>
+
+<!-- Local engine files (in ./vendor). No external network needed at runtime. -->
+<script src="./vendor/ffmpeg.js"></script>
+<script src="./vendor/util.js"></script>
+<script>
+(function () {
+  const FFmpeg = (window.FFmpegWASM && window.FFmpegWASM.FFmpeg);
+  const fetchFile = (window.FFmpegUtil && window.FFmpegUtil.fetchFile);
+
+  const I18N = {
+    he: {
+      dir:'rtl',
+      eyebrow:'ffmpeg · רץ בדפדפן שלך',
+      title:'חותך <span class="mark">אקראי</span> 60 שניות ומאזן ווליום',
+      sub:'חותך קטע אקראי של 60 שניות מכל שיר ומאזן את כל השירים לעוצמה אחידה (89 / 90 / 91 dB), בדומה ל־MP3Gain. הכול קורה מקומית בדפדפן — שום קובץ לא עולה לאינטרנט.',
+      engineLoading:'טוען מנוע…', engineReady:'המנוע מוכן', engineWorking:'עובד…', engineFailed:'טעינת המנוע נכשלה',
+      step1:'קבצי מקור', dropBig:'גררו לכאן קבצי MP3', dropBig2:'או לחצו לבחירה',
+      dropSmall:'הקבצים המקוריים לא משתנים · אפשר לבחור כמה שירים יחד',
+      noFiles:'לא נבחרו קבצים', filesSel:n=>`נבחרו <b>${n}</b> קבצים`,
+      step2:'הגדרות', volLabel:'יעד ווליום (dB)',
+      volHint:'איזון EBU R128 אמיתי, לא סתם הגברה. ללא clipping.',
+      lenLabel:'אורך חיתוך (שניות)', lenHint:'שירים קצרים מהאורך הזה ידולגו.',
+      start:'התחל', processing:'מעבד…',
+      step3:'התקדמות ולוג', idle:'ממתין', waiting:'ממתין להתחלה…', dlAll:'⬇ הורדת כל הקבצים',
+      footer:'כל העיבוד מתבצע במחשב שלך.',
+      errNoEngine:'שגיאה: לא ניתן לטעון את מנוע האודיו.',
+      errFile:'אם פתחת בלחיצה כפולה, הדפדפן חוסם את המנוע. הריצו דרך start.bat או שרת מקומי.',
+      errMissing:'ודאו שתיקיית vendor/ קיימת ליד הקובץ.',
+      runStart:t=>`=== התחלה ${t} ===`, runInfo:(n,db,c)=>`קבצים: ${n} | יעד: ${db} dB | אורך: ${c}s`,
+      procFile:(i,n,name)=>`\nמעבד קובץ ${i}/${n}: ${name}`, errDur:'  שגיאה: לא ניתן לקרוא את אורך הקובץ (פגום?)',
+      skipShort:(d,c)=>`  דילוג: קצר מדי (${d}s < ${c}s)`, cutStart:s=>`  נקודת חיתוך: ${s}s`,
+      exportOk:name=>`  יוצא בהצלחה -> ${name}`, errProc:'  שגיאה: העיבוד נכשל', errUnexpected:'  שגיאה: לא צפויה',
+      done:(ok,sk,er)=>`\n=== הסתיים: ${ok} תקין, ${sk} דולגו, ${er} שגיאות ===`,
+      doneStatus:(ok,sk,er)=>`הסתיים: ${ok} תקין, ${sk} דולגו, ${er} שגיאות`,
+      statusFile:(i,n)=>`מעבד קובץ ${i}/${n}`, download:'⬇ הורדה',
+    },
+    en: {
+      dir:'ltr',
+      eyebrow:'ffmpeg · runs in your browser',
+      title:'Random 60s MP3 <span class="mark">Cutter</span> &amp; Volume Normalizer',
+      sub:'Cuts a random 60-second clip from each song and balances every track to one uniform loudness (89 / 90 / 91 dB), like MP3Gain. Everything runs locally in your browser — no file is ever uploaded.',
+      engineLoading:'Loading engine…', engineReady:'Engine ready', engineWorking:'Working…', engineFailed:'Engine failed to load',
+      step1:'Source files', dropBig:'Drop MP3 files here', dropBig2:'or click to choose',
+      dropSmall:'Originals are never changed · pick several songs at once',
+      noFiles:'No files selected', filesSel:n=>`<b>${n}</b> files selected`,
+      step2:'Settings', volLabel:'Volume target (dB)',
+      volHint:'Real EBU R128 balancing, not just gain. No clipping.',
+      lenLabel:'Clip length (seconds)', lenHint:'Songs shorter than this are skipped.',
+      start:'Start', processing:'Processing…',
+      step3:'Progress & log', idle:'Idle', waiting:'Waiting to start…', dlAll:'⬇ Download all files',
+      footer:'All processing happens on your machine.',
+      errNoEngine:'ERROR: could not load the audio engine.',
+      errFile:'If you opened this file directly, the browser blocks the engine. Run it via start.bat or a local server.',
+      errMissing:'Make sure the vendor/ folder sits next to this file.',
+      runStart:t=>`=== Run started ${t} ===`, runInfo:(n,db,c)=>`Files: ${n} | Target: ${db} dB | Clip: ${c}s`,
+      procFile:(i,n,name)=>`\nProcessing file ${i}/${n}: ${name}`, errDur:'  ERROR: could not read duration (corrupt?)',
+      skipShort:(d,c)=>`  SKIP: too short (${d}s < ${c}s)`, cutStart:s=>`  Cut start time: ${s}s`,
+      exportOk:name=>`  Export success -> ${name}`, errProc:'  ERROR: processing failed', errUnexpected:'  ERROR: unexpected',
+      done:(ok,sk,er)=>`\n=== Done: ${ok} ok, ${sk} skipped, ${er} errors ===`,
+      doneStatus:(ok,sk,er)=>`Done: ${ok} ok, ${sk} skipped, ${er} errors`,
+      statusFile:(i,n)=>`Processing file ${i}/${n}`, download:'⬇ Download',
+    },
+  };
+
+  const DB_TO_LUFS = { '89': -17, '90': -16, '91': -15 };
+  const TRUE_PEAK = -1.0, LRA = 11;
+
+  const el = id => document.getElementById(id);
+  const dot = el('dot'), engineText = el('engineText');
+  const drop = el('drop'), fileInput = el('fileInput'), fileCount = el('fileCount');
+  const startBtn = el('startBtn'), clipLen = el('clipLen');
+  const progWrap = el('progWrap'), barFill = el('barFill');
+  const statusText = el('statusText'), pctText = el('pctText');
+  const logBox = el('log'), results = el('results'), dlAll = el('dlAll');
+  const langToggleEl = el('langToggle');
+
+  let ffmpeg = null, ready = false, busy = false;
+  let files = [], targetDb = '90', outputs = [];
+  let lang = 'he', t = I18N.he;
+
+  function applyLang(l) {
+    lang = l; t = I18N[l];
+    document.documentElement.lang = l; document.documentElement.dir = t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(node => {
+      const k = node.getAttribute('data-i18n');
+      if (typeof t[k] === 'string') node.textContent = t[k];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(node => {
+      const k = node.getAttribute('data-i18n-html'); if (t[k]) node.innerHTML = t[k];
+    });
+    if (ready) engineText.textContent = busy ? t.engineWorking : t.engineReady;
+    else engineText.textContent = t.engineLoading;
+    if (files.length) fileCount.innerHTML = t.filesSel(files.length);
+    else fileCount.textContent = t.noFiles;
+    if (!logBox.hasChildNodes()) log(t.waiting, 'dim');
+    [...langToggleEl.children].forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+  }
+
+  function clearLog() { logBox.innerHTML = ''; }
+  function log(msg, cls='') {
+    const s = document.createElement('span'); s.className = 'l ' + cls; s.textContent = msg;
+    logBox.appendChild(s); logBox.appendChild(document.createTextNode('\n'));
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  langToggleEl.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (b) applyLang(b.dataset.lang);
+  });
+  el('dbSeg').addEventListener('click', e => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    [...el('dbSeg').children].forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); targetDb = btn.dataset.db;
+  });
+
+  function acceptFiles(list) {
+    const arr = [...list].filter(f => /\.mp3$/i.test(f.name) || f.type === 'audio/mpeg');
+    if (!arr.length) return;
+    files = arr; fileCount.innerHTML = t.filesSel(files.length); maybeEnable();
+  }
+  fileInput.addEventListener('change', e => acceptFiles(e.target.files));
+  ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => acceptFiles(e.dataTransfer.files));
+  function maybeEnable() { startBtn.disabled = !(ready && files.length && !busy); }
+
+  async function loadEngine() {
+    if (!FFmpeg || !fetchFile) {
+      dot.style.background = 'var(--err)'; engineText.textContent = t.engineFailed;
+      clearLog(); log(t.errNoEngine, 'err'); log(t.errMissing, 'warn'); return;
+    }
+    ffmpeg = new FFmpeg();
+    try {
+      // NOTE: the UMD ffmpeg.js resolves these URLs relative to its own
+      // location (the vendor/ folder), so we pass absolute URLs built from
+      // the page location to avoid a doubled "vendor/vendor/" path.
+      const dir = location.href.replace(/[^/]*$/, '') + 'vendor/';
+      await ffmpeg.load({
+        coreURL: dir + 'ffmpeg-core.js',
+        wasmURL: dir + 'ffmpeg-core.wasm',
+      });
+      ready = true; dot.classList.add('ready'); engineText.textContent = t.engineReady; maybeEnable();
+    } catch (err) {
+      dot.style.background = 'var(--err)'; engineText.textContent = t.engineFailed;
+      clearLog(); log(t.errNoEngine, 'err');
+      if (location.protocol === 'file:') log(t.errFile, 'warn');
+      else log(t.errMissing, 'warn');
+      console.error(err);
+    }
+  }
+
+  async function getDuration(inName) {
+    let dur = null;
+    const handler = ({ message }) => {
+      const m = message.match(/Duration:\s*(\d+):(\d+):(\d+\.?\d*)/);
+      if (m) dur = (+m[1])*3600 + (+m[2])*60 + parseFloat(m[3]);
+    };
+    ffmpeg.on('log', handler);
+    try { await ffmpeg.exec(['-i', inName, '-f', 'null', '-']); } catch (_) {}
+    ffmpeg.off('log', handler);
+    return dur;
+  }
+
+  async function processOne(file, i, total) {
+    const stem = file.name.replace(/\.[^.]+$/, '');
+    const safeIn = `in_${i}.mp3`, clip = parseFloat(clipLen.value);
+    const outName = `${stem}_${Math.round(clip)}sec.mp3`;
+    statusText.textContent = t.statusFile(i+1, total);
+    log(t.procFile(i+1, total, file.name), 'head');
+    await ffmpeg.writeFile(safeIn, await fetchFile(file));
+    const dur = await getDuration(safeIn);
+    if (dur == null) { log(t.errDur, 'err'); await ffmpeg.deleteFile(safeIn).catch(()=>{}); return {status:'error'}; }
+    if (dur < clip) { log(t.skipShort(dur.toFixed(1), clip), 'warn'); await ffmpeg.deleteFile(safeIn).catch(()=>{}); return {status:'skip'}; }
+    const start = Math.random() * (dur - clip);
+    log(t.cutStart(start.toFixed(1)), 'dim');
+    const I = DB_TO_LUFS[targetDb];
+    const af = `loudnorm=I=${I}:TP=${TRUE_PEAK}:LRA=${LRA}`;
+    try {
+      await ffmpeg.exec(['-ss', start.toFixed(3), '-t', clip.toFixed(3), '-i', safeIn,
+        '-af', af, '-c:a', 'libmp3lame', '-b:a', '320k', '-ar', '44100', outName]);
+      const data = await ffmpeg.readFile(outName);
+      const blob = new Blob([data.buffer], { type: 'audio/mpeg' });
+      const url = URL.createObjectURL(blob);
+      outputs.push({ name: outName, url }); addResult(outName, url);
+      log(t.exportOk(outName), 'ok');
+      await ffmpeg.deleteFile(safeIn).catch(()=>{}); await ffmpeg.deleteFile(outName).catch(()=>{});
+      return { status: 'ok' };
+    } catch (err) {
+      log(t.errProc, 'err'); console.error(err);
+      await ffmpeg.deleteFile(safeIn).catch(()=>{}); return { status: 'error' };
+    }
+  }
+
+  function addResult(name, url) {
+    const row = document.createElement('div'); row.className = 'result';
+    const nm = document.createElement('span'); nm.className = 'name'; nm.textContent = name; nm.title = name;
+    const a = document.createElement('a'); a.href = url; a.download = name; a.textContent = t.download;
+    row.appendChild(nm); row.appendChild(a); results.appendChild(row);
+  }
+
+  startBtn.addEventListener('click', async () => {
+    if (busy || !ready || !files.length) return;
+    busy = true; maybeEnable(); startBtn.textContent = t.processing;
+    dot.className = 'dot busy'; engineText.textContent = t.engineWorking;
+    progWrap.classList.add('show'); results.innerHTML = ''; outputs = []; dlAll.style.display = 'none'; clearLog();
+    const total = files.length;
+    log(t.runStart(new Date().toLocaleString()), 'head');
+    log(t.runInfo(total, targetDb, clipLen.value), 'dim');
+    let ok=0, skip=0, err=0;
+    for (let i=0; i<total; i++) {
+      let r;
+      try { r = await processOne(files[i], i, total); }
+      catch (e) { r = {status:'error'}; log(t.errUnexpected, 'err'); }
+      if (r.status === 'ok') ok++; else if (r.status === 'skip') skip++; else err++;
+      const pct = Math.round(((i+1)/total)*100);
+      barFill.style.width = pct + '%'; pctText.textContent = pct + '%';
+    }
+    log(t.done(ok, skip, err), 'head');
+    statusText.textContent = t.doneStatus(ok, skip, err);
+    if (outputs.length) dlAll.style.display = 'block';
+    busy = false; maybeEnable(); startBtn.textContent = t.start;
+    dot.className = 'dot ready'; engineText.textContent = t.engineReady;
+  });
+
+  dlAll.addEventListener('click', () => {
+    outputs.forEach((o, idx) => setTimeout(() => {
+      const a = document.createElement('a'); a.href = o.url; a.download = o.name;
+      document.body.appendChild(a); a.click(); a.remove();
+    }, idx * 350));
+  });
+
+  applyLang('he');
+  loadEngine();
+})();
+</script>
+</body>
+</html>
