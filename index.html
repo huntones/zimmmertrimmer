@@ -3,380 +3,708 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Random 60s MP3 Cutter &amp; Volume Normalizer</title>
+<title>AudioCut — The Fast Audio Studio in Your Browser</title>
+<meta name="description" content="Cut, normalize, convert and batch-process audio right in your browser. BPM & key detection, master presets, ZIP export. Nothing gets uploaded.">
 <style>
   :root {
-    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c;
-    --ink:#eef1f6; --muted:#8b93a4; --accent:#ff5a3c; --accent-dim:#c9412b;
-    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#8b2fe0 0%,#3b6ff6 52%,#22d3a0 100%);
+    --grad-h:linear-gradient(105deg,#7d22d6 0%,#2f63ec 52%,#16c493 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#8b2fe0 0%,#3b6ff6 52%,#22d3a0 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
     --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
   }
-  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
-  body{background:radial-gradient(1100px 500px at 80% -10%,rgba(255,90,60,0.10),transparent 60%),var(--bg);
-    color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:860px;margin:0 auto;padding:32px 20px 64px;}
-  .langbar{display:flex;justify-content:flex-end;margin-bottom:8px;}
-  html[dir=rtl] .langbar{justify-content:flex-start;}
-  .langtoggle{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;}
-  .langtoggle button{background:var(--panel);color:var(--muted);border:none;cursor:pointer;
-    font-family:var(--mono);font-size:12.5px;padding:7px 15px;transition:all .12s;}
-  .langtoggle button.active{background:var(--accent);color:#14100e;font-weight:700;}
-  header{margin-bottom:28px;}
-  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:0.18em;text-transform:uppercase;
-    color:var(--accent);margin:0 0 10px;direction:ltr;}
-  html[dir=rtl] .eyebrow{text-align:right;} html[dir=ltr] .eyebrow{text-align:left;}
-  h1{font-size:clamp(26px,5vw,40px);font-weight:700;line-height:1.08;margin:0 0 8px;letter-spacing:-0.02em;}
-  h1 .mark{color:var(--accent);white-space:nowrap;}
-  .sub{color:var(--muted);max-width:62ch;margin:0;}
-  .engine{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);
-    font-size:12.5px;padding:7px 13px;border:1px solid var(--line);border-radius:999px;
-    background:var(--panel);color:var(--muted);direction:ltr;}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 0 3px rgba(232,184,75,0.15);}
-  .dot.ready{background:var(--ok);box-shadow:0 0 0 3px rgba(78,201,138,0.15);}
-  .dot.busy{background:var(--accent);box-shadow:0 0 0 3px rgba(255,90,60,0.15);animation:pulse 1s ease-in-out infinite;}
-  @keyframes pulse{50%{opacity:0.35;}}
-  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:18px;}
-  .panel h2{font-family:var(--mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;
-    color:var(--muted);margin:0 0 16px;display:flex;align-items:center;gap:10px;direction:ltr;}
-  html[dir=rtl] .panel h2{justify-content:flex-end;} html[dir=ltr] .panel h2{justify-content:flex-start;}
-  .panel h2 .n{color:var(--accent);border:1px solid var(--accent-dim);border-radius:6px;padding:1px 7px;font-size:11px;}
-  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:30px 20px;text-align:center;
-    cursor:pointer;transition:border-color .15s,background .15s;background:var(--panel-2);}
-  .drop:hover,.drop.over{border-color:var(--accent);background:#1f242f;}
-  .drop strong{color:var(--ink);} .drop span{color:var(--muted);font-size:14px;}
-  .drop .big{font-size:15px;display:block;margin-bottom:4px;}
-  input[type=file]{display:none;}
-  .filecount{margin-top:12px;font-family:var(--mono);font-size:13px;color:var(--muted);text-align:center;}
-  .filecount b{color:var(--accent);}
-  .controls{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-  @media (max-width:560px){.controls{grid-template-columns:1fr;}}
-  .field label{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:0.06em;
-    text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
-  .seg{display:flex;gap:8px;}
-  .seg button{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
-    font-family:var(--mono);font-size:14px;padding:11px 0;border-radius:9px;cursor:pointer;transition:all .12s;}
-  .seg button:hover{border-color:var(--muted);}
-  .seg button.active{background:var(--accent);border-color:var(--accent);color:#14100e;font-weight:700;}
-  .num{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
-    font-family:var(--mono);font-size:15px;padding:11px 13px;border-radius:9px;}
-  .num:focus{outline:none;border-color:var(--accent);}
-  .hint{color:var(--muted);font-size:12px;margin-top:7px;}
-  .go{width:100%;margin-top:20px;background:var(--accent);color:#14100e;border:none;font-family:var(--sans);
-    font-weight:700;font-size:17px;padding:16px;border-radius:12px;cursor:pointer;transition:transform .08s,background .15s;}
-  .go:hover:not(:disabled){background:#ff6e53;} .go:active:not(:disabled){transform:translateY(1px);}
-  .go:disabled{opacity:0.4;cursor:not-allowed;}
-  .progwrap{margin-top:18px;display:none;} .progwrap.show{display:block;}
-  .bar{height:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;overflow:hidden;}
-  .bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent-dim),var(--accent));transition:width .2s ease;}
-  .progtext{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-top:9px;direction:ltr;}
-  .log{margin-top:14px;background:#0a0c10;border:1px solid var(--line);border-radius:10px;padding:14px;
-    height:230px;overflow-y:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;direction:ltr;text-align:left;}
-  .log .l{white-space:pre-wrap;word-break:break-word;}
-  .log .ok{color:var(--ok);} .log .err{color:var(--err);} .log .warn{color:var(--warn);}
-  .log .head{color:var(--accent);} .log .dim{color:var(--muted);}
-  .results{margin-top:14px;display:grid;gap:8px;}
-  .result{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--panel-2);
-    border:1px solid var(--line);border-radius:9px;padding:11px 14px;}
-  .result .name{font-family:var(--mono);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;}
-  .result a{flex-shrink:0;color:var(--accent);text-decoration:none;font-family:var(--mono);font-size:12.5px;
-    border:1px solid var(--accent-dim);padding:5px 11px;border-radius:7px;}
-  .result a:hover{background:var(--accent);color:#14100e;}
-  .dlall{width:100%;margin-top:8px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
-    font-family:var(--mono);font-size:13px;padding:12px;border-radius:9px;cursor:pointer;}
-  .dlall:hover{border-color:var(--accent);color:var(--accent);}
-  footer{margin-top:32px;text-align:center;color:var(--muted);font-size:12.5px;}
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#9a45f0 0%,#4d7bff 52%,#2fe0ad 100%);
+    --grad-h:linear-gradient(105deg,#a659ff 0%,#5d89ff 52%,#48e9bd 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#9a45f0 0%,#4d7bff 52%,#2fe0ad 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;overflow-x:hidden;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px;}
+  .gtext{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+
+  /* ---------- top bar ---------- */
+  .nav{position:sticky;top:0;z-index:50;backdrop-filter:saturate(1.4) blur(10px);
+    background:color-mix(in srgb,var(--bg) 78%,transparent);border-bottom:1px solid transparent;
+    transition:border-color .2s,background .2s;}
+  .nav.scrolled{border-bottom-color:var(--line);}
+  .nav .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;height:64px;}
+  .brand{display:flex;align-items:center;gap:11px;}
+  .brand .logo{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);flex-shrink:0;}
+  .brand .logo svg{width:21px;height:21px;}
+  .brand b{font-size:18px;font-weight:700;letter-spacing:-0.01em;}
+  .navtools{display:flex;align-items:center;gap:8px;}
+  .navlinks{display:flex;gap:4px;margin-inline-end:6px;}
+  .navlinks a{padding:8px 12px;border-radius:9px;font-size:13.5px;color:var(--muted);transition:color .12s,background .12s;}
+  .navlinks a:hover{color:var(--ink);background:var(--panel-2);}
+  .pillbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:999px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;font-size:13.5px;
+    box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s,background .12s;}
+  .pillbtn:hover{border-color:var(--accent);}
+  .pillbtn:active{transform:scale(0.97);}
+  .iconbtn{width:38px;height:38px;padding:0;justify-content:center;font-size:15px;line-height:1;}
+
+  /* ---------- gradient CTA button ---------- */
+  .cta{display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 26px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .cta:hover{filter:brightness(1.06);} .cta:active{transform:translateY(1px);}
+  .cta.sm{padding:10px 18px;font-size:14px;}
+  .cta.lg{padding:16px 34px;font-size:16.5px;}
+  .cta svg{width:18px;height:18px;}
+  .ghost{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:999px;font-size:15px;
+    font-weight:600;background:var(--panel);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s;}
+  .ghost:hover{border-color:var(--accent);} .ghost:active{transform:translateY(1px);}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;text-align:center;padding:74px 0 30px;overflow:hidden;}
+  .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;z-index:-1;pointer-events:none;}
+  .orb.a{width:420px;height:420px;background:radial-gradient(circle,#8b2fe0,transparent 66%);top:-120px;inset-inline-start:-90px;}
+  .orb.b{width:460px;height:460px;background:radial-gradient(circle,#22d3a0,transparent 66%);top:-60px;inset-inline-end:-120px;opacity:.4;}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-family:var(--mono);color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);padding:6px 14px;border-radius:999px;box-shadow:var(--shadow-sm);margin-bottom:22px;}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px var(--success-soft);}
+  h1.big{font-size:clamp(34px,6vw,58px);line-height:1.05;letter-spacing:-0.025em;margin:0 auto 18px;max-width:16ch;font-weight:700;}
+  .sub{font-size:clamp(16px,2.3vw,19px);color:var(--muted);max-width:56ch;margin:0 auto 30px;line-height:1.6;}
+  .herobtns{display:flex;gap:13px;justify-content:center;flex-wrap:wrap;margin-bottom:18px;}
+  .trust{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;font-size:12.5px;font-family:var(--mono);color:var(--faint);}
+  .trust span{display:inline-flex;align-items:center;gap:6px;}
+  .trust svg{width:14px;height:14px;color:var(--success);}
+
+  /* app preview strip under hero */
+  .heroshot{margin:44px auto 0;max-width:820px;border-radius:18px;border:1px solid var(--line);background:var(--panel);
+    box-shadow:var(--shadow-lg);overflow:hidden;}
+  .heroshot .chromebar{display:flex;align-items:center;gap:7px;padding:11px 15px;border-bottom:1px solid var(--line);background:var(--panel-2);}
+  .heroshot .chromebar i{width:11px;height:11px;border-radius:50%;background:var(--line);}
+  .heroshot .chromebar i:nth-child(1){background:#ff6058;} .heroshot .chromebar i:nth-child(2){background:#ffbd2e;} .heroshot .chromebar i:nth-child(3){background:#28c941;}
+  .heroshot .chromebar .u{margin-inline-start:10px;font-family:var(--mono);font-size:11.5px;color:var(--faint);direction:ltr;}
+  .fauxdrop{margin:26px;border:1.6px dashed var(--line);border-radius:14px;padding:34px 20px;text-align:center;background:var(--panel-2);}
+  .fauxdrop .cloud{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
+  .fauxdrop .cloud svg{width:26px;height:26px;}
+  .fauxdrop .big{font-size:15.5px;font-weight:600;}
+  .fauxrows{padding:0 26px 26px;display:flex;flex-direction:column;gap:8px;}
+  .fauxrow{display:flex;align-items:center;gap:11px;padding:11px 14px;border:1px solid var(--line-2);border-radius:11px;background:var(--panel);}
+  .fauxrow .fico{width:26px;height:26px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
+  .fauxrow .fico svg{width:14px;height:14px;}
+  .fauxrow .fn{flex:1;min-width:0;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;text-align:start;}
+  .fauxrow .tag{font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--panel-2);color:var(--muted);white-space:nowrap;}
+  .fauxrow .tag.g{background:var(--success-soft);color:var(--success-dim);}
+  .fauxrow .tag.p{background:var(--accent-soft);color:var(--accent);}
+
+  /* ---------- section frame ---------- */
+  section{padding:56px 0;}
+  .shead{text-align:center;max-width:60ch;margin:0 auto 38px;}
+  .kicker{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+  .shead h2{font-size:clamp(26px,3.6vw,36px);line-height:1.12;letter-spacing:-0.02em;margin:0 0 12px;font-weight:700;}
+  .shead p{font-size:16px;color:var(--muted);margin:0;line-height:1.6;}
+
+  /* generic card + grids */
+  .grid{display:grid;gap:16px;}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  .g4{grid-template-columns:repeat(4,1fr);}
+  .g2{grid-template-columns:repeat(2,1fr);}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow);
+    transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
+  .card.hov:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:var(--shadow-lg);}
+  .ico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:23px;
+    background:var(--grad-soft);margin-bottom:14px;}
+  .card h3{font-size:16.5px;font-weight:700;margin:0 0 6px;letter-spacing:-0.01em;}
+  .card p{font-size:13.7px;color:var(--muted);margin:0;line-height:1.55;}
+  .soonrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:26px;}
+  .soonchip{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);
+    background:var(--panel);border:1px dashed var(--line);border-radius:999px;padding:8px 15px;}
+  .soonchip b{font-weight:600;color:var(--ink-2);}
+  .soonchip .lbl{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--warn);
+    background:var(--warm-soft);border:1px solid var(--warm-line);border-radius:6px;padding:1px 6px;}
+
+  /* ---------- steps ---------- */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative;}
+  .step{text-align:center;padding:26px 20px;}
+  .step .num{width:54px;height:54px;margin:0 auto 16px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    font-size:26px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);position:relative;}
+  .step .num small{position:absolute;top:-8px;inset-inline-end:-8px;width:24px;height:24px;border-radius:50%;background:var(--grad);
+    color:#fff;font-family:var(--mono);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px var(--grad-shadow);}
+  .step h3{font-size:17px;margin:0 0 6px;font-weight:700;}
+  .step p{font-size:13.7px;color:var(--muted);margin:0;}
+
+  /* ---------- presets ---------- */
+  .presetgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .preset{position:relative;border-radius:15px;padding:20px;border:1px solid var(--line);background:var(--panel);
+    overflow:hidden;transition:transform .16s,border-color .16s;cursor:default;}
+  .preset:hover{transform:translateY(-3px);border-color:var(--accent);}
+  .preset::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--grad);}
+  .preset .pemoji{font-size:22px;}
+  .preset h4{margin:10px 0 4px;font-size:16px;font-weight:700;}
+  .preset p{margin:0;font-size:13px;color:var(--muted);}
+
+  /* ---------- batch showcase ---------- */
+  .batchbox{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:30px;box-shadow:var(--shadow);
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:center;}
+  .bstep{text-align:center;}
+  .bstep .bi{font-size:28px;margin-bottom:8px;}
+  .bstep .bt{font-size:14px;font-weight:600;}
+  .bstep .bs{font-size:12px;color:var(--muted);font-family:var(--mono);}
+  .bbar{grid-column:1/-1;height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bbar i{display:block;height:100%;width:72%;background:var(--grad);border-radius:999px;}
+
+  /* ---------- formats ---------- */
+  .fmts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .fmt{font-family:var(--mono);font-size:13px;font-weight:600;padding:9px 16px;border-radius:10px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);box-shadow:var(--shadow-sm);}
+
+  /* ---------- comparison ---------- */
+  .cmp{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);}
+  .cmp th,.cmp td{padding:14px 18px;text-align:start;border-bottom:1px solid var(--line-2);font-size:14px;}
+  .cmp thead th{font-size:13px;color:var(--muted);font-weight:600;background:var(--panel-2);}
+  .cmp thead th:nth-child(2){color:var(--accent);}
+  .cmp tr:last-child td{border-bottom:none;}
+  .cmp td:not(:first-child),.cmp th:not(:first-child){text-align:center;width:22%;}
+  .cmp .yes{color:var(--success);font-weight:700;} .cmp .no{color:var(--faint);}
+
+  /* ---------- use cases ---------- */
+  .uses{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;}
+  .use{display:inline-flex;align-items:center;gap:9px;padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;
+    background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-sm);}
+  .use .e{font-size:17px;}
+
+  /* ---------- faq ---------- */
+  .faq{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px;}
+  details.q{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:4px 20px;box-shadow:var(--shadow-sm);transition:border-color .15s;}
+  details.q[open]{border-color:var(--accent);}
+  details.q summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:16px 0;font-size:15.5px;font-weight:600;}
+  details.q summary::-webkit-details-marker{display:none;}
+  details.q summary .chev{width:20px;height:20px;flex-shrink:0;color:var(--muted);transition:transform .2s;}
+  details.q[open] summary .chev{transform:rotate(180deg);}
+  details.q .ans{padding:0 0 18px;font-size:14px;color:var(--muted);line-height:1.65;}
+
+  /* ---------- final CTA ---------- */
+  .final{text-align:center;background:var(--grad-soft);border:1px solid var(--line);border-radius:24px;padding:56px 30px;box-shadow:var(--shadow);}
+  .final h2{font-size:clamp(26px,4vw,38px);letter-spacing:-0.02em;margin:0 0 12px;font-weight:700;}
+  .final p{font-size:16.5px;color:var(--muted);margin:0 auto 26px;max-width:46ch;}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line);margin-top:56px;padding:34px 0;}
+  footer .row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  footer .muted{font-size:13px;color:var(--muted);}
+  footer .links{display:flex;gap:18px;font-size:13.5px;}
+  footer .links a{color:var(--muted);} footer .links a:hover{color:var(--ink);}
+
+  /* ---------- reveal ---------- */
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease;}
+  .reveal.in{opacity:1;transform:none;}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:860px){
+    .navlinks{display:none;}
+    .g4{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:repeat(2,1fr);}
+    .presetgrid{grid-template-columns:repeat(2,1fr);}
+    .batchbox{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:560px){
+    .g4,.g3,.g2,.presetgrid,.steps{grid-template-columns:1fr;}
+    .hero{padding:52px 0 20px;}
+    .brand b{font-size:16px;}
+    .cmp th:not(:first-child),.cmp td:not(:first-child){width:auto;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;} .reveal{transition:none;opacity:1;transform:none;} .card.hov:hover,.preset:hover{transform:none;}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="langbar"><div class="langtoggle" id="langToggle">
-    <button data-lang="he" class="active">עברית</button>
-    <button data-lang="en">EN</button>
-  </div></div>
-  <header>
-    <p class="eyebrow" data-i18n="eyebrow"></p>
-    <h1 data-i18n-html="title"></h1>
-    <p class="sub" data-i18n="sub"></p>
-    <div class="engine" id="engine">
-      <span class="dot" id="dot"></span>
-      <span id="engineText" data-i18n="engineLoading"></span>
-    </div>
-  </header>
-  <section class="panel">
-    <h2><span class="n">01</span> <span data-i18n="step1"></span></h2>
-    <div class="drop" id="drop"><label for="fileInput" style="cursor:pointer;">
-      <span class="big"><strong data-i18n="dropBig"></strong> <span data-i18n="dropBig2"></span></span>
-      <span data-i18n="dropSmall"></span>
-    </label></div>
-    <input type="file" id="fileInput" accept="audio/mpeg,.mp3" multiple>
-    <div class="filecount" id="fileCount" data-i18n="noFiles"></div>
-  </section>
-  <section class="panel">
-    <h2><span class="n">02</span> <span data-i18n="step2"></span></h2>
-    <div class="controls">
-      <div class="field">
-        <label data-i18n="volLabel"></label>
-        <div class="seg" id="dbSeg">
-          <button data-db="89">89</button>
-          <button data-db="90" class="active">90</button>
-          <button data-db="91">91</button>
-        </div>
-        <p class="hint" data-i18n="volHint"></p>
-      </div>
-      <div class="field">
-        <label data-i18n="lenLabel"></label>
-        <input class="num" id="clipLen" type="number" value="60" min="1" step="1">
-        <p class="hint" data-i18n="lenHint"></p>
-      </div>
-    </div>
-    <button class="go" id="startBtn" disabled data-i18n="start"></button>
-  </section>
-  <section class="panel">
-    <h2><span class="n">03</span> <span data-i18n="step3"></span></h2>
-    <div class="progwrap" id="progWrap">
-      <div class="bar"><i id="barFill"></i></div>
-      <div class="progtext"><span id="statusText" data-i18n="idle"></span><span id="pctText">0%</span></div>
-    </div>
-    <div class="log" id="log"></div>
-    <div class="results" id="results"></div>
-    <button class="dlall" id="dlAll" style="display:none;" data-i18n="dlAll"></button>
-  </section>
-  <footer data-i18n="footer"></footer>
-</div>
 
-<!-- Local engine files (in ./vendor). No external network needed at runtime. -->
-<script src="./vendor/ffmpeg.js"></script>
-<script src="./vendor/util.js"></script>
+<!-- ===================== NAV ===================== -->
+<header class="nav" id="nav">
+  <div class="wrap bar">
+    <a class="brand" href="#top" aria-label="AudioCut">
+      <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M9 18V5l12-2v11"/></svg></span>
+      <b>AudioCut</b>
+    </a>
+    <nav class="navtools">
+      <div class="navlinks">
+        <a href="#tools" data-i18n="navTools"></a>
+        <a href="#presets" data-i18n="navPresets"></a>
+        <a href="#why" data-i18n="navWhy"></a>
+        <a href="#faq" data-i18n="navFaq"></a>
+      </div>
+      <button class="pillbtn iconbtn" id="langBtn" type="button" title="עברית / English"><span id="langIco">EN</span></button>
+      <button class="pillbtn iconbtn" id="themeToggle" type="button" aria-label="Toggle theme"><span id="themeIco">🌙</span></button>
+      <a class="cta sm" href="./app.html"><span data-i18n="navOpen"></span></a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <span class="orb a"></span><span class="orb b"></span>
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span><span data-i18n="heroBadge"></span></span>
+    <h1 class="big"><span data-i18n="heroT1"></span> <span class="gtext" data-i18n="heroT2"></span></h1>
+    <p class="sub" data-i18n="heroSub"></p>
+    <div class="herobtns">
+      <a class="cta lg" href="./app.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span data-i18n="heroCta"></span>
+      </a>
+      <a class="ghost" href="#tools"><span data-i18n="heroCta2"></span></a>
+    </div>
+    <div class="trust">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="trust1"></span></span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="trust2"></span></span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="trust3"></span></span>
+    </div>
+
+    <!-- app preview -->
+    <div class="heroshot reveal">
+      <div class="chromebar"><i></i><i></i><i></i><span class="u">localhost:7000/app.html</span></div>
+      <div class="fauxdrop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A5 5 0 0 1 9 6a6 6 0 0 1 11.4 2A4.5 4.5 0 0 1 19 17H7"/><polyline points="8 13 12 9 16 13"/><line x1="12" y1="9" x2="12" y2="19"/></svg></div>
+        <div class="big" data-i18n="shotDrop"></div>
+      </div>
+      <div class="fauxrows">
+        <div class="fauxrow"><span class="fico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v11"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span class="fn">interview_final.wav</span><span class="tag p">BPM 92</span><span class="tag">A min</span><span class="tag g">✓ -14 LUFS</span></div>
+        <div class="fauxrow"><span class="fico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v11"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span class="fn">show_intro.mp3</span><span class="tag p">BPM 128</span><span class="tag">F maj</span><span class="tag g">✓ 90 dB</span></div>
+        <div class="fauxrow"><span class="fico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v11"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span class="fn">quiz_round_03.flac</span><span class="tag p">BPM 100</span><span class="tag">G maj</span><span class="tag g">✓ Radio</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HOW IT WORKS ===================== -->
+<section id="how">
+  <div class="wrap">
+    <div class="shead reveal">
+      <div class="kicker" data-i18n="kHow"></div>
+      <h2 data-i18n="howH"></h2>
+      <p data-i18n="howP"></p>
+    </div>
+    <div class="steps reveal" id="stepsGrid"></div>
+  </div>
+</section>
+
+<!-- ===================== TOOLS ===================== -->
+<section id="tools">
+  <div class="wrap">
+    <div class="shead reveal">
+      <div class="kicker" data-i18n="kTools"></div>
+      <h2 data-i18n="toolsH"></h2>
+      <p data-i18n="toolsP"></p>
+    </div>
+    <div class="grid g4 reveal" id="toolsGrid"></div>
+    <div class="soonrow reveal" id="soonRow"></div>
+  </div>
+</section>
+
+<!-- ===================== PRESETS ===================== -->
+<section id="presets">
+  <div class="wrap">
+    <div class="shead reveal">
+      <div class="kicker" data-i18n="kPresets"></div>
+      <h2 data-i18n="presH"></h2>
+      <p data-i18n="presP"></p>
+    </div>
+    <div class="presetgrid reveal" id="presetGrid"></div>
+    <div style="text-align:center;margin-top:28px" class="reveal"><a class="cta" href="./app.html"><span data-i18n="presCta"></span></a></div>
+  </div>
+</section>
+
+<!-- ===================== BATCH ===================== -->
+<section id="batch">
+  <div class="wrap">
+    <div class="shead reveal">
+      <div class="kicker" data-i18n="kBatch"></div>
+      <h2 data-i18n="batchH"></h2>
+      <p data-i18n="batchP"></p>
+    </div>
+    <div class="batchbox reveal">
+      <div class="bstep"><div class="bi">📁</div><div class="bt" data-i18n="b1t"></div><div class="bs" data-i18n="b1s"></div></div>
+      <div class="bstep"><div class="bi">🎧</div><div class="bt" data-i18n="b2t"></div><div class="bs">120 files</div></div>
+      <div class="bstep"><div class="bi">⚙️</div><div class="bt" data-i18n="b3t"></div><div class="bs">86 / 120</div></div>
+      <div class="bstep"><div class="bi">📦</div><div class="bt" data-i18n="b4t"></div><div class="bs">output.zip</div></div>
+      <div class="bbar"><i></i></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FORMATS ===================== -->
+<section id="formats">
+  <div class="wrap">
+    <div class="shead reveal">
+      <div class="kicker" data-i18n="kFmt"></div>
+      <h2 data-i18n="fmtH"></h2>
+      <p data-i18n="fmtP"></p>
+    </div>
+    <div class="fmts reveal" id="fmtGrid"></div>
+  </div>
+</section>
+
+<!-- ===================== WHY ===================== -->
+<section id="why">
+  <div class="wrap">
+    <div class="shead reveal">
+      <div class="kicker" data-i18n="kWhy"></div>
+      <h2 data-i18n="whyH"></h2>
+      <p data-i18n="whyP"></p>
+    </div>
+    <div class="grid g3 reveal" id="whyGrid"></div>
+  </div>
+</section>
+
+<!-- ===================== COMPARISON ===================== -->
+<section id="compare">
+  <div class="wrap">
+    <div class="shead reveal">
+      <div class="kicker" data-i18n="kCmp"></div>
+      <h2 data-i18n="cmpH"></h2>
+    </div>
+    <div class="reveal" style="overflow-x:auto">
+      <table class="cmp">
+        <thead><tr><th data-i18n="cmpFeat"></th><th>AudioCut</th><th data-i18n="cmpOther"></th></tr></thead>
+        <tbody id="cmpBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== USE CASES ===================== -->
+<section id="uses">
+  <div class="wrap">
+    <div class="shead reveal">
+      <div class="kicker" data-i18n="kUse"></div>
+      <h2 data-i18n="useH"></h2>
+      <p data-i18n="useP"></p>
+    </div>
+    <div class="uses reveal" id="useGrid"></div>
+  </div>
+</section>
+
+<!-- ===================== FAQ ===================== -->
+<section id="faq">
+  <div class="wrap">
+    <div class="shead reveal">
+      <div class="kicker" data-i18n="kFaq"></div>
+      <h2 data-i18n="faqH"></h2>
+    </div>
+    <div class="faq reveal" id="faqList"></div>
+  </div>
+</section>
+
+<!-- ===================== FINAL CTA ===================== -->
+<section id="start">
+  <div class="wrap">
+    <div class="final reveal">
+      <h2 data-i18n="finalH"></h2>
+      <p data-i18n="finalP"></p>
+      <a class="cta lg" href="./app.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span data-i18n="heroCta"></span>
+      </a>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="wrap row">
+    <div class="brand"><span class="logo" style="width:30px;height:30px;border-radius:9px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M9 18V5l12-2v11"/></svg></span><span class="muted" data-i18n="footNote"></span></div>
+    <div class="links">
+      <a href="./app.html" data-i18n="navOpen"></a>
+      <a href="#tools" data-i18n="navTools"></a>
+      <a href="#faq" data-i18n="navFaq"></a>
+    </div>
+  </div>
+</footer>
+
 <script>
-(function () {
-  const FFmpeg = (window.FFmpegWASM && window.FFmpegWASM.FFmpeg);
-  const fetchFile = (window.FFmpegUtil && window.FFmpegUtil.fetchFile);
+  const el = id => document.getElementById(id);
 
-  const I18N = {
-    he: {
-      dir:'rtl',
-      eyebrow:'ffmpeg · רץ בדפדפן שלך',
-      title:'חותך <span class="mark">אקראי</span> 60 שניות ומאזן ווליום',
-      sub:'חותך קטע אקראי של 60 שניות מכל שיר ומאזן את כל השירים לעוצמה אחידה (89 / 90 / 91 dB), בדומה ל־MP3Gain. הכול קורה מקומית בדפדפן — שום קובץ לא עולה לאינטרנט.',
-      engineLoading:'טוען מנוע…', engineReady:'המנוע מוכן', engineWorking:'עובד…', engineFailed:'טעינת המנוע נכשלה',
-      step1:'קבצי מקור', dropBig:'גררו לכאן קבצי MP3', dropBig2:'או לחצו לבחירה',
-      dropSmall:'הקבצים המקוריים לא משתנים · אפשר לבחור כמה שירים יחד',
-      noFiles:'לא נבחרו קבצים', filesSel:n=>`נבחרו <b>${n}</b> קבצים`,
-      step2:'הגדרות', volLabel:'יעד ווליום (dB)',
-      volHint:'איזון EBU R128 אמיתי, לא סתם הגברה. ללא clipping.',
-      lenLabel:'אורך חיתוך (שניות)', lenHint:'שירים קצרים מהאורך הזה ידולגו.',
-      start:'התחל', processing:'מעבד…',
-      step3:'התקדמות ולוג', idle:'ממתין', waiting:'ממתין להתחלה…', dlAll:'⬇ הורדת כל הקבצים',
-      footer:'כל העיבוד מתבצע במחשב שלך.',
-      errNoEngine:'שגיאה: לא ניתן לטעון את מנוע האודיו.',
-      errFile:'אם פתחת בלחיצה כפולה, הדפדפן חוסם את המנוע. הריצו דרך start.bat או שרת מקומי.',
-      errMissing:'ודאו שתיקיית vendor/ קיימת ליד הקובץ.',
-      runStart:t=>`=== התחלה ${t} ===`, runInfo:(n,db,c)=>`קבצים: ${n} | יעד: ${db} dB | אורך: ${c}s`,
-      procFile:(i,n,name)=>`\nמעבד קובץ ${i}/${n}: ${name}`, errDur:'  שגיאה: לא ניתן לקרוא את אורך הקובץ (פגום?)',
-      skipShort:(d,c)=>`  דילוג: קצר מדי (${d}s < ${c}s)`, cutStart:s=>`  נקודת חיתוך: ${s}s`,
-      exportOk:name=>`  יוצא בהצלחה -> ${name}`, errProc:'  שגיאה: העיבוד נכשל', errUnexpected:'  שגיאה: לא צפויה',
-      done:(ok,sk,er)=>`\n=== הסתיים: ${ok} תקין, ${sk} דולגו, ${er} שגיאות ===`,
-      doneStatus:(ok,sk,er)=>`הסתיים: ${ok} תקין, ${sk} דולגו, ${er} שגיאות`,
-      statusFile:(i,n)=>`מעבד קובץ ${i}/${n}`, download:'⬇ הורדה',
+  /* ---------------- i18n content ---------------- */
+  const STR = {
+    he:{
+      navTools:'כלים', navPresets:'פריסטים', navWhy:'למה אנחנו', navFaq:'שאלות', navOpen:'פתחו את העורך',
+      heroBadge:'רץ 100% בדפדפן שלכם',
+      heroT1:'עורכים אודיו', heroT2:'תוך שניות',
+      heroSub:'חותכים, מנרמלים עוצמה, ממירים פורמטים, מזהים BPM וסולם — ומעבדים מאות קבצים בבת אחת. הכול בדפדפן, שום קובץ לא עולה לשרת.',
+      heroCta:'פתחו את העורך', heroCta2:'לכל הכלים',
+      trust1:'בלי העלאות', trust2:'עובד גם אופליין', trust3:'ללא התקנה',
+      shotDrop:'גררו קבצי אודיו לכאן',
+      kHow:'איך זה עובד', howH:'שלושה שלבים, זהו', howP:'בלי הרשמה, בלי התקנה. פותחים ומתחילים לעבוד.',
+      kTools:'הכלים', toolsH:'סטודיו שלם בכרטיסייה אחת', toolsP:'כל מה שצריך לעיבוד מהיר של אודיו — הכול רץ מקומית אצלכם.',
+      soonLbl:'בקרוב', soonTitle:'עוד בדרך:',
+      kPresets:'פריסטים למאסטרינג', presH:'אופי לצליל — בלחיצה', presP:'לא צריך להבין באודיו. בוחרים אווירה, והקובץ מקבל עיבוד תואם.',
+      presCta:'נסו את הפריסטים בעורך',
+      kBatch:'עיבוד באצ׳', batchH:'מאות קבצים, קליק אחד', batchP:'גוררים תיקייה שלמה, מקבלים ZIP מסודר עם כל הקבצים המעובדים.',
+      b1t:'העלאה', b1s:'תיקייה', b2t:'קבצים', b3t:'מעבד…', b4t:'הורדת ZIP',
+      kFmt:'פורמטים', fmtH:'נכנס כמעט הכול, יוצא בדיוק מה שצריך', fmtP:'קלט: MP3, WAV, FLAC, AAC, M4A · פלט: MP3, AAC, M4A, WAV, FLAC.',
+      kWhy:'למה AudioCut', whyH:'מהיר, פרטי, בכל מקום', whyP:'הכלי היחיד שבו הקבצים שלכם פשוט לא עוזבים את המחשב.',
+      kCmp:'השוואה', cmpH:'איך זה מול כלים אחרים', cmpFeat:'יכולת', cmpOther:'כלים אחרים',
+      kUse:'למי זה מתאים', useH:'נבנה בשביל אנשי אודיו', useP:'ממי שמכין פרק פודקאסט ועד מנחה חידון מוזיקה.',
+      kFaq:'שאלות נפוצות', faqH:'כל מה ששאלתם',
+      finalH:'מוכנים לערוך?', finalP:'העלו את הקובץ הראשון שלכם — זה לוקח פחות מחמש שניות.',
+      footNote:'AudioCut · רץ מקומית בדפדפן · הקבצים שלכם נשארים אצלכם.'
     },
-    en: {
-      dir:'ltr',
-      eyebrow:'ffmpeg · runs in your browser',
-      title:'Random 60s MP3 <span class="mark">Cutter</span> &amp; Volume Normalizer',
-      sub:'Cuts a random 60-second clip from each song and balances every track to one uniform loudness (89 / 90 / 91 dB), like MP3Gain. Everything runs locally in your browser — no file is ever uploaded.',
-      engineLoading:'Loading engine…', engineReady:'Engine ready', engineWorking:'Working…', engineFailed:'Engine failed to load',
-      step1:'Source files', dropBig:'Drop MP3 files here', dropBig2:'or click to choose',
-      dropSmall:'Originals are never changed · pick several songs at once',
-      noFiles:'No files selected', filesSel:n=>`<b>${n}</b> files selected`,
-      step2:'Settings', volLabel:'Volume target (dB)',
-      volHint:'Real EBU R128 balancing, not just gain. No clipping.',
-      lenLabel:'Clip length (seconds)', lenHint:'Songs shorter than this are skipped.',
-      start:'Start', processing:'Processing…',
-      step3:'Progress & log', idle:'Idle', waiting:'Waiting to start…', dlAll:'⬇ Download all files',
-      footer:'All processing happens on your machine.',
-      errNoEngine:'ERROR: could not load the audio engine.',
-      errFile:'If you opened this file directly, the browser blocks the engine. Run it via start.bat or a local server.',
-      errMissing:'Make sure the vendor/ folder sits next to this file.',
-      runStart:t=>`=== Run started ${t} ===`, runInfo:(n,db,c)=>`Files: ${n} | Target: ${db} dB | Clip: ${c}s`,
-      procFile:(i,n,name)=>`\nProcessing file ${i}/${n}: ${name}`, errDur:'  ERROR: could not read duration (corrupt?)',
-      skipShort:(d,c)=>`  SKIP: too short (${d}s < ${c}s)`, cutStart:s=>`  Cut start time: ${s}s`,
-      exportOk:name=>`  Export success -> ${name}`, errProc:'  ERROR: processing failed', errUnexpected:'  ERROR: unexpected',
-      done:(ok,sk,er)=>`\n=== Done: ${ok} ok, ${sk} skipped, ${er} errors ===`,
-      doneStatus:(ok,sk,er)=>`Done: ${ok} ok, ${sk} skipped, ${er} errors`,
-      statusFile:(i,n)=>`Processing file ${i}/${n}`, download:'⬇ Download',
-    },
+    en:{
+      navTools:'Tools', navPresets:'Presets', navWhy:'Why us', navFaq:'FAQ', navOpen:'Open the Editor',
+      heroBadge:'Runs 100% in your browser',
+      heroT1:'Edit your audio', heroT2:'in seconds',
+      heroSub:'Cut, normalize loudness, convert formats, detect BPM & key — and batch-process hundreds of files at once. All in your browser. Nothing ever gets uploaded.',
+      heroCta:'Open the Editor', heroCta2:'See all tools',
+      trust1:'No uploads', trust2:'Works offline', trust3:'No install',
+      shotDrop:'Drag & drop audio files here',
+      kHow:'How it works', howH:'Three steps, that’s it', howP:'No sign-up, no install. Open it and start working.',
+      kTools:'The tools', toolsH:'A full studio in one tab', toolsP:'Everything you need to process audio fast — all running locally on your machine.',
+      soonLbl:'Soon', soonTitle:'On the way:',
+      kPresets:'Master presets', presH:'Give it character — in one click', presP:'You don’t need to know audio. Pick a vibe and the file gets a matching treatment.',
+      presCta:'Try the presets in the editor',
+      kBatch:'Batch processing', batchH:'Hundreds of files, one click', batchP:'Drop a whole folder and get back one tidy ZIP with every processed file.',
+      b1t:'Upload', b1s:'folder', b2t:'Files', b3t:'Processing…', b4t:'Download ZIP',
+      kFmt:'Formats', fmtH:'Almost anything in, exactly what you need out', fmtP:'In: MP3, WAV, FLAC, AAC, M4A · Out: MP3, AAC, M4A, WAV, FLAC.',
+      kWhy:'Why AudioCut', whyH:'Fast, private, everywhere', whyP:'The one tool where your files simply never leave your computer.',
+      kCmp:'Comparison', cmpH:'How it stacks up', cmpFeat:'Feature', cmpOther:'Other tools',
+      kUse:'Who it’s for', useH:'Built for audio people', useP:'From cutting a podcast episode to hosting a music quiz.',
+      kFaq:'FAQ', faqH:'Everything you asked',
+      finalH:'Ready to edit?', finalP:'Upload your first file — it takes less than five seconds.',
+      footNote:'AudioCut · Runs locally in your browser · Your files stay with you.'
+    }
   };
 
-  const DB_TO_LUFS = { '89': -17, '90': -16, '91': -15 };
-  const TRUE_PEAK = -1.0, LRA = 11;
+  const DATA = {
+    steps:[
+      {i:'📤', he:['העלאה','הוסיפו קבצי אודיו או גררו תיקייה שלמה.'], en:['Upload','Add your audio files, or drop a whole folder.']},
+      {i:'✂️', he:['עריכה','חותכים, מנרמלים עוצמה, בוחרים פריסט.'], en:['Edit','Trim, normalize loudness, pick a preset.']},
+      {i:'⬇️', he:['הורדה','מקבלים מיד MP3, WAV או ZIP.'], en:['Download','Get them instantly as MP3, WAV or ZIP.']}
+    ],
+    tools:[
+      {i:'✂️', he:['חותך אודיו','קטע באורך לבחירה (15–90 שנ׳), מנקודה אקראית או מוגדרת.'], en:['Audio Cutter','Grab a clip of any length (15–90s), from a random or chosen start.']},
+      {i:'🎚️', he:['נרמול עוצמה','מיישרים את כל הקבצים לאותה עוצמה (dB / LUFS).'], en:['Volume Normalizer','Match every file to the exact same loudness (dB / LUFS).']},
+      {i:'🔊', he:['עוצמת סטרימינג','בלחיצה — יעד עוצמה מותאם לסטרימינג ולשידור.'], en:['Streaming Loudness','One click to a streaming- and broadcast-safe target.']},
+      {i:'🎵', he:['ממיר פורמטים','ייצוא ל-MP3, AAC, M4A, WAV או FLAC בביטרייט שתבחרו.'], en:['Format Converter','Export to MP3, AAC, M4A, WAV or FLAC at your bitrate.']},
+      {i:'🎛️', he:['פריסטים למאסטרינג','חם, פאנץ׳, בהיר, טבעי, רדיו, סטרימינג — אופי בלחיצה.'], en:['Master Presets','Warm, Punch, Bright, Natural, Radio, Streaming — instant character.']},
+      {i:'⚡', he:['עיבוד באצ׳','גוררים מאות קבצים, מקבלים ZIP אחד מסודר.'], en:['Batch Processing','Drop hundreds of files, get one tidy ZIP.']},
+      {i:'🎼', he:['זיהוי BPM','זיהוי טמפו אוטומטי לכל רצועה, מיד עם הטעינה.'], en:['BPM Detector','Automatic tempo detection for every track on load.']},
+      {i:'🎹', he:['זיהוי סולם','מציאת הסולם המוזיקלי של כל קובץ.'], en:['Key Detector','Find the musical key & scale of each file.']}
+    ],
+    soon:[
+      {he:'Fade In / Out', en:'Fade In / Out'},
+      {he:'מיזוג אודיו', en:'Merge Audio'},
+      {he:'הסרת ווקאל', en:'Vocal Remover'}
+    ],
+    presets:[
+      {e:'🎧', he:['חם','בס עגול, גבהים רכים ונעימים.'], en:['Warm','Rounded lows and a smooth, easy top end.']},
+      {e:'🥁', he:['פאנץ׳','אטאק חד יותר, יותר נוכחות ואנרגיה.'], en:['Punch','Tighter transients, more impact and energy.']},
+      {e:'✨', he:['בהיר','גבהים פתוחים ואווריריים.'], en:['Bright','An open, airy high end.']},
+      {e:'🌿', he:['טבעי','שקוף, כמעט בלי צביעה.'], en:['Natural','Transparent, with minimal coloring.']},
+      {e:'📻', he:['רדיו','רועש, אחיד, תחושת שידור.'], en:['Radio','Loud, consistent, broadcast-ready feel.']},
+      {e:'🎵', he:['סטרימינג','מותאם לעוצמת ספוטיפיי ויוטיוב.'], en:['Streaming','Optimized for Spotify & YouTube loudness.']}
+    ],
+    formats:['MP3','WAV','AAC','M4A','FLAC'],
+    why:[
+      {i:'⚡', he:['מהיר במיוחד','רץ על מנוע FFmpeg ב-WebAssembly, ישירות אצלכם — בלי המתנה לשרת.'], en:['Super fast','Runs on an FFmpeg WebAssembly engine, right on your machine — no server wait.']},
+      {i:'🔒', he:['פרטי באמת','הקבצים לא עוזבים את המחשב. בלי שרת, בלי העלאות, בלי אחסון.'], en:['Truly private','Files never leave your device. No server, no uploads, no storage.']},
+      {i:'🌍', he:['עובד בכל מקום','Windows, Mac, Linux — כל דפדפן מודרני.'], en:['Works everywhere','Windows, Mac, Linux — any modern browser.']},
+      {i:'🎵', he:['איכות גבוהה','עד 320kbps ב-MP3, או WAV/FLAC ללא אובדן.'], en:['High quality','Up to 320 kbps MP3, or lossless WAV/FLAC.']},
+      {i:'📂', he:['באצ׳ אמיתי','מאות קבצים בבת אחת, עם התקדמות חיה ו-ZIP בסוף.'], en:['Real batching','Hundreds of files at once, with live progress and a ZIP at the end.']},
+      {i:'🌓', he:['דו-לשוני וערכות נושא','עברית ואנגלית, מצב בהיר וכהה.'], en:['Bilingual & themed','Hebrew & English, light and dark mode.']}
+    ],
+    compare:[
+      {he:'עיבוד באצ׳', en:'Batch editing', ac:true, other:false},
+      {he:'נרמול עוצמה (LUFS)', en:'Loudness normalize (LUFS)', ac:true, other:false},
+      {he:'פריסטים למאסטרינג', en:'Master presets', ac:true, other:false},
+      {he:'זיהוי BPM וסולם', en:'BPM & key detection', ac:true, other:false},
+      {he:'הקבצים לא עולים לשרת', en:'Files never uploaded', ac:true, other:false},
+      {he:'עובד אופליין', en:'Works offline', ac:true, other:false}
+    ],
+    uses:[
+      {e:'🎙️', he:'פודקאסטרים', en:'Podcasters'},
+      {e:'🎧', he:'תקליטנים', en:'DJs'},
+      {e:'🎤', he:'מוזיקאים', en:'Musicians'},
+      {e:'📻', he:'רדיו', en:'Radio'},
+      {e:'🎵', he:'חידוני מוזיקה', en:'Music quizzes'},
+      {e:'🎬', he:'עורכי וידאו', en:'Video editors'},
+      {e:'🎮', he:'סטרימרים', en:'Streamers'},
+      {e:'🎓', he:'מורים', en:'Teachers'}
+    ],
+    faq:[
+      {he:['אפשר לערוך כמה קבצים יחד?','בהחלט. גוררים כמה קבצים או תיקייה שלמה, מגדירים פעם אחת, ומקבלים את כולם ב-ZIP מסודר.'],
+       en:['Can I edit multiple files at once?','Absolutely. Drop several files or a whole folder, set it once, and get them all back in a tidy ZIP.']},
+      {he:['AudioCut מוריד באיכות?','לא בלי צורך. אפשר לייצא עד 320kbps ב-MP3, או בפורמט ללא אובדן כמו WAV ו-FLAC.'],
+       en:['Does AudioCut reduce quality?','Not unnecessarily. Export up to 320 kbps MP3, or lossless formats like WAV and FLAC.']},
+      {he:['זה בחינם?','כן. הכלי חינמי לגמרי ורץ מקומית בדפדפן שלכם.'],
+       en:['Is it free?','Yes. It’s completely free and runs locally in your browser.']},
+      {he:['אתם שומרים את הקבצים שלי?','אנחנו אפילו לא מקבלים אותם. כל העיבוד קורה בתוך הדפדפן — שום דבר לא נשלח לשרת.'],
+       en:['Do you keep my files?','We never even receive them. All processing happens inside your browser — nothing is sent to a server.']},
+      {he:['אילו פורמטים נתמכים?','קלט: MP3, WAV, FLAC, AAC, M4A. פלט: MP3, AAC, M4A, WAV, FLAC.'],
+       en:['Which formats are supported?','In: MP3, WAV, FLAC, AAC, M4A. Out: MP3, AAC, M4A, WAV, FLAC.']},
+      {he:['צריך אינטרנט?','רק כדי לטעון את העמוד. אחרי זה העיבוד עובד גם בלי חיבור.'],
+       en:['Do I need internet?','Only to load the page. After that, processing works with no connection.']}
+    ]
+  };
 
-  const el = id => document.getElementById(id);
-  const dot = el('dot'), engineText = el('engineText');
-  const drop = el('drop'), fileInput = el('fileInput'), fileCount = el('fileCount');
-  const startBtn = el('startBtn'), clipLen = el('clipLen');
-  const progWrap = el('progWrap'), barFill = el('barFill');
-  const statusText = el('statusText'), pctText = el('pctText');
-  const logBox = el('log'), results = el('results'), dlAll = el('dlAll');
-  const langToggleEl = el('langToggle');
+  let lang = 'he';
+  const chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 
-  let ffmpeg = null, ready = false, busy = false;
-  let files = [], targetDb = '90', outputs = [];
-  let lang = 'he', t = I18N.he;
+  function render(){
+    const L = lang, S = STR[L];
+    // static strings
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(S[k]!=null) n.textContent=S[k]; });
 
-  function applyLang(l) {
-    lang = l; t = I18N[l];
-    document.documentElement.lang = l; document.documentElement.dir = t.dir;
-    document.querySelectorAll('[data-i18n]').forEach(node => {
-      const k = node.getAttribute('data-i18n');
-      if (typeof t[k] === 'string') node.textContent = t[k];
+    el('stepsGrid').innerHTML = DATA.steps.map((s,i)=>{
+      const [t,d]=s[L]; return `<div class="step"><div class="num">${s.i}<small>${i+1}</small></div><h3>${t}</h3><p>${d}</p></div>`;
+    }).join('');
+
+    el('toolsGrid').innerHTML = DATA.tools.map(t=>{
+      const [h,p]=t[L]; return `<div class="card hov"><div class="ico">${t.i}</div><h3>${h}</h3><p>${p}</p></div>`;
+    }).join('');
+
+    el('soonRow').innerHTML = `<span class="soonchip"><b>${S.soonTitle}</b></span>` + DATA.soon.map(s=>
+      `<span class="soonchip"><span class="lbl">${S.soonLbl}</span> ${s[L]}</span>`).join('');
+
+    el('presetGrid').innerHTML = DATA.presets.map(p=>{
+      const [h,d]=p[L]; return `<div class="preset"><div class="pemoji">${p.e}</div><h4>${h}</h4><p>${d}</p></div>`;
+    }).join('');
+
+    el('fmtGrid').innerHTML = DATA.formats.map(f=>`<span class="fmt">${f}</span>`).join('');
+
+    el('whyGrid').innerHTML = DATA.why.map(w=>{
+      const [h,p]=w[L]; return `<div class="card hov"><div class="ico">${w.i}</div><h3>${h}</h3><p>${p}</p></div>`;
+    }).join('');
+
+    const y='<span class="yes">✓</span>', n='<span class="no">—</span>';
+    el('cmpBody').innerHTML = DATA.compare.map(c=>
+      `<tr><td>${c[L]}</td><td>${c.ac?y:n}</td><td>${c.other?y:n}</td></tr>`).join('');
+
+    el('useGrid').innerHTML = DATA.uses.map(u=>
+      `<span class="use"><span class="e">${u.e}</span>${u[L]}</span>`).join('');
+
+    el('faqList').innerHTML = DATA.faq.map(f=>{
+      const [q,a]=f[L]; return `<details class="q"><summary>${q}${chev}</summary><div class="ans">${a}</div></details>`;
+    }).join('');
+  }
+
+  function applyLang(l, persist){
+    lang = l;
+    document.documentElement.lang = l;
+    document.documentElement.dir = (l==='he') ? 'rtl' : 'ltr';
+    el('langIco').textContent = (l==='he') ? 'EN' : 'עב';
+    if(persist){ try{ localStorage.setItem('ac_lang', l); }catch(_){} }
+    render();
+    revealScan();
+  }
+
+  /* ---------------- auto language by region (IL -> he, else en) ----------------
+     Offline-first: instant guess from timezone / browser locale, then confirm by
+     IP via a tiny free endpoint. A manual toggle (persist=true) always wins. */
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen = ls('ac_lang');                    // 1) explicit choice wins forever
+    if(chosen){ applyLang(chosen, false); return; }
+    const cc = ls('ac_country');                     // 2) cached country from a prior lookup
+    if(cc){ applyLang(cc==='IL' ? 'he' : 'en', false); return; }
+    let tz=''; try{ tz = Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe = (navigator.language||'').toLowerCase().indexOf('he')===0;
+    applyLang((tz==='Asia/Jerusalem' || navHe) ? 'he' : 'en', false);  // 3) instant offline guess
+    geoLang();                                        // 4) confirm by IP when online
+  }
+  function geoLang(){
+    if(!('fetch' in window)) return;
+    const ctrl = ('AbortController' in window) ? new AbortController() : null;
+    const timer = ctrl ? setTimeout(()=>{ try{ ctrl.abort(); }catch(_){} }, 2200) : null;
+    fetch('https://api.country.is/', ctrl ? {signal:ctrl.signal} : undefined)
+      .then(r=> r.ok ? r.json() : Promise.reject())
+      .then(d=>{
+        const country = d && d.country;
+        if(!country) return;
+        try{ localStorage.setItem('ac_country', country); }catch(_){}
+        if(ls('ac_lang')) return;                     // user picked in the meantime
+        applyLang(country==='IL' ? 'he' : 'en', false);
+      })
+      .catch(()=>{})
+      .finally(()=>{ if(timer) clearTimeout(timer); });
+  }
+
+  /* ---------------- theme (shares 'theme' key with the app) ---------------- */
+  function applyTheme(t){
+    const dark = (t==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    el('themeIco').textContent = dark ? '☀️' : '🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  /* ---------------- scroll reveal ---------------- */
+  let io;
+  function revealScan(){
+    document.querySelectorAll('.reveal').forEach(n=>{
+      if(n.classList.contains('in')) return;
+      if(io) io.observe(n);
     });
-    document.querySelectorAll('[data-i18n-html]').forEach(node => {
-      const k = node.getAttribute('data-i18n-html'); if (t[k]) node.innerHTML = t[k];
+  }
+
+  /* ---------------- init ---------------- */
+  (function init(){
+    let savedTheme='light'; try{ savedTheme=localStorage.getItem('theme')||'light'; }catch(_){}
+    applyTheme(savedTheme);
+
+    el('themeToggle').addEventListener('click',()=>{
+      applyTheme(document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark');
     });
-    if (ready) engineText.textContent = busy ? t.engineWorking : t.engineReady;
-    else engineText.textContent = t.engineLoading;
-    if (files.length) fileCount.innerHTML = t.filesSel(files.length);
-    else fileCount.textContent = t.noFiles;
-    if (!logBox.hasChildNodes()) log(t.waiting, 'dim');
-    [...langToggleEl.children].forEach(b => b.classList.toggle('active', b.dataset.lang === l));
-  }
+    el('langBtn').addEventListener('click',()=>applyLang(lang==='he'?'en':'he', true));
 
-  function clearLog() { logBox.innerHTML = ''; }
-  function log(msg, cls='') {
-    const s = document.createElement('span'); s.className = 'l ' + cls; s.textContent = msg;
-    logBox.appendChild(s); logBox.appendChild(document.createTextNode('\n'));
-    logBox.scrollTop = logBox.scrollHeight;
-  }
-
-  langToggleEl.addEventListener('click', e => {
-    const b = e.target.closest('button'); if (b) applyLang(b.dataset.lang);
-  });
-  el('dbSeg').addEventListener('click', e => {
-    const btn = e.target.closest('button'); if (!btn) return;
-    [...el('dbSeg').children].forEach(b => b.classList.remove('active'));
-    btn.classList.add('active'); targetDb = btn.dataset.db;
-  });
-
-  function acceptFiles(list) {
-    const arr = [...list].filter(f => /\.mp3$/i.test(f.name) || f.type === 'audio/mpeg');
-    if (!arr.length) return;
-    files = arr; fileCount.innerHTML = t.filesSel(files.length); maybeEnable();
-  }
-  fileInput.addEventListener('change', e => acceptFiles(e.target.files));
-  ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
-  ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
-  drop.addEventListener('drop', e => acceptFiles(e.dataTransfer.files));
-  function maybeEnable() { startBtn.disabled = !(ready && files.length && !busy); }
-
-  async function loadEngine() {
-    if (!FFmpeg || !fetchFile) {
-      dot.style.background = 'var(--err)'; engineText.textContent = t.engineFailed;
-      clearLog(); log(t.errNoEngine, 'err'); log(t.errMissing, 'warn'); return;
+    // observer for reveal-on-scroll
+    if('IntersectionObserver' in window){
+      io = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+      },{rootMargin:'0px 0px -8% 0px', threshold:0.05});
+    } else {
+      document.querySelectorAll('.reveal').forEach(n=>n.classList.add('in'));
     }
-    ffmpeg = new FFmpeg();
-    try {
-      // NOTE: the UMD ffmpeg.js resolves these URLs relative to its own
-      // location (the vendor/ folder), so we pass absolute URLs built from
-      // the page location to avoid a doubled "vendor/vendor/" path.
-      const dir = location.href.replace(/[^/]*$/, '') + 'vendor/';
-      await ffmpeg.load({
-        coreURL: dir + 'ffmpeg-core.js',
-        wasmURL: dir + 'ffmpeg-core.wasm',
-      });
-      ready = true; dot.classList.add('ready'); engineText.textContent = t.engineReady; maybeEnable();
-    } catch (err) {
-      dot.style.background = 'var(--err)'; engineText.textContent = t.engineFailed;
-      clearLog(); log(t.errNoEngine, 'err');
-      if (location.protocol === 'file:') log(t.errFile, 'warn');
-      else log(t.errMissing, 'warn');
-      console.error(err);
-    }
-  }
 
-  async function getDuration(inName) {
-    let dur = null;
-    const handler = ({ message }) => {
-      const m = message.match(/Duration:\s*(\d+):(\d+):(\d+\.?\d*)/);
-      if (m) dur = (+m[1])*3600 + (+m[2])*60 + parseFloat(m[3]);
-    };
-    ffmpeg.on('log', handler);
-    try { await ffmpeg.exec(['-i', inName, '-f', 'null', '-']); } catch (_) {}
-    ffmpeg.off('log', handler);
-    return dur;
-  }
+    detectLang(); // picks language by region, then renders + scans reveals
 
-  async function processOne(file, i, total) {
-    const stem = file.name.replace(/\.[^.]+$/, '');
-    const safeIn = `in_${i}.mp3`, clip = parseFloat(clipLen.value);
-    const outName = `${stem}_${Math.round(clip)}sec.mp3`;
-    statusText.textContent = t.statusFile(i+1, total);
-    log(t.procFile(i+1, total, file.name), 'head');
-    await ffmpeg.writeFile(safeIn, await fetchFile(file));
-    const dur = await getDuration(safeIn);
-    if (dur == null) { log(t.errDur, 'err'); await ffmpeg.deleteFile(safeIn).catch(()=>{}); return {status:'error'}; }
-    if (dur < clip) { log(t.skipShort(dur.toFixed(1), clip), 'warn'); await ffmpeg.deleteFile(safeIn).catch(()=>{}); return {status:'skip'}; }
-    const start = Math.random() * (dur - clip);
-    log(t.cutStart(start.toFixed(1)), 'dim');
-    const I = DB_TO_LUFS[targetDb];
-    const af = `loudnorm=I=${I}:TP=${TRUE_PEAK}:LRA=${LRA}`;
-    try {
-      await ffmpeg.exec(['-ss', start.toFixed(3), '-t', clip.toFixed(3), '-i', safeIn,
-        '-af', af, '-c:a', 'libmp3lame', '-b:a', '320k', '-ar', '44100', outName]);
-      const data = await ffmpeg.readFile(outName);
-      const blob = new Blob([data.buffer], { type: 'audio/mpeg' });
-      const url = URL.createObjectURL(blob);
-      outputs.push({ name: outName, url }); addResult(outName, url);
-      log(t.exportOk(outName), 'ok');
-      await ffmpeg.deleteFile(safeIn).catch(()=>{}); await ffmpeg.deleteFile(outName).catch(()=>{});
-      return { status: 'ok' };
-    } catch (err) {
-      log(t.errProc, 'err'); console.error(err);
-      await ffmpeg.deleteFile(safeIn).catch(()=>{}); return { status: 'error' };
-    }
-  }
-
-  function addResult(name, url) {
-    const row = document.createElement('div'); row.className = 'result';
-    const nm = document.createElement('span'); nm.className = 'name'; nm.textContent = name; nm.title = name;
-    const a = document.createElement('a'); a.href = url; a.download = name; a.textContent = t.download;
-    row.appendChild(nm); row.appendChild(a); results.appendChild(row);
-  }
-
-  startBtn.addEventListener('click', async () => {
-    if (busy || !ready || !files.length) return;
-    busy = true; maybeEnable(); startBtn.textContent = t.processing;
-    dot.className = 'dot busy'; engineText.textContent = t.engineWorking;
-    progWrap.classList.add('show'); results.innerHTML = ''; outputs = []; dlAll.style.display = 'none'; clearLog();
-    const total = files.length;
-    log(t.runStart(new Date().toLocaleString()), 'head');
-    log(t.runInfo(total, targetDb, clipLen.value), 'dim');
-    let ok=0, skip=0, err=0;
-    for (let i=0; i<total; i++) {
-      let r;
-      try { r = await processOne(files[i], i, total); }
-      catch (e) { r = {status:'error'}; log(t.errUnexpected, 'err'); }
-      if (r.status === 'ok') ok++; else if (r.status === 'skip') skip++; else err++;
-      const pct = Math.round(((i+1)/total)*100);
-      barFill.style.width = pct + '%'; pctText.textContent = pct + '%';
-    }
-    log(t.done(ok, skip, err), 'head');
-    statusText.textContent = t.doneStatus(ok, skip, err);
-    if (outputs.length) dlAll.style.display = 'block';
-    busy = false; maybeEnable(); startBtn.textContent = t.start;
-    dot.className = 'dot ready'; engineText.textContent = t.engineReady;
-  });
-
-  dlAll.addEventListener('click', () => {
-    outputs.forEach((o, idx) => setTimeout(() => {
-      const a = document.createElement('a'); a.href = o.url; a.download = o.name;
-      document.body.appendChild(a); a.click(); a.remove();
-    }, idx * 350));
-  });
-
-  applyLang('he');
-  loadEngine();
-})();
+    // sticky nav border
+    const nav = el('nav');
+    const onScroll=()=>{ nav.classList.toggle('scrolled', window.scrollY>8); };
+    onScroll(); window.addEventListener('scroll',onScroll,{passive:true});
+  })();
 </script>
 </body>
 </html>
