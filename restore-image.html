@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — שחזור תמונות AI</title>
+<meta name="description" content="Restore and enhance old or damaged photos with AI — sharpen detail, remove scratches and noise, fix blur, revive faded colors and bring back lost detail. Before/after compare, adjustable strength, all in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:34px 20px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:26px;height:26px;}
+  .drop .big{font-size:15.5px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:12px;color:var(--faint);margin:6px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13.5px;padding:10px 22px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .sizenote{margin-top:12px;font-size:11.5px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  /* selected-image preview */
+  .prevcard{overflow:hidden;}
+  .pv{background:var(--panel-2);display:flex;align-items:center;justify-content:center;max-height:420px;overflow:hidden;
+    border-bottom:1px solid var(--line-2);}
+  .pv img{max-width:100%;max-height:420px;display:block;}
+  .pvmeta{display:flex;align-items:center;gap:12px;padding:12px 14px;}
+  .pvmeta .pn{flex:1;min-width:0;}
+  .pvmeta .pn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .pvmeta .pn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .pvmeta .rm{width:32px;height:32px;flex-shrink:0;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .pvmeta .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .pvmeta .rm svg{width:16px;height:16px;}
+
+  /* options side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:18px;}
+  .opt > label{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:9px;}
+  .opt > label .val{font-family:var(--mono);font-size:12px;color:var(--accent-dim);background:var(--accent-soft);padding:2px 9px;border-radius:999px;}
+
+  /* strength slider */
+  .rng{width:100%;-webkit-appearance:none;appearance:none;height:7px;border-radius:999px;background:var(--panel-2);
+    border:1px solid var(--line-2);outline:none;cursor:pointer;margin:2px 0 12px;}
+  .rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;cursor:pointer;
+    background:linear-gradient(180deg,#fff 0,#f0f0f5 100%);border:2px solid var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.22);}
+  .rng::-moz-range-thumb{width:18px;height:18px;border-radius:50%;cursor:pointer;background:#fff;border:2px solid var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.22);}
+  .spresets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .schip{padding:8px 6px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);
+    font-size:12px;font-weight:600;cursor:pointer;transition:border-color .12s,background .12s,transform .08s;text-align:center;}
+  .schip:hover{border-color:var(--accent);} .schip:active{transform:scale(.97);}
+  .schip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+
+  /* enhancement toggles */
+  .tog{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line-2);cursor:pointer;}
+  .tog:first-of-type{border-top:none;padding-top:2px;}
+  .tog .tx{flex:1;min-width:0;}
+  .tog .tx .tt{font-size:13px;font-weight:600;color:var(--ink);}
+  .tog .tx .td{font-size:11px;color:var(--faint);line-height:1.35;}
+  .switch{direction:ltr;width:40px;height:23px;border-radius:999px;background:var(--line);position:relative;flex-shrink:0;transition:background .16s;}
+  .switch i{position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;transition:transform .16s;box-shadow:0 1px 3px rgba(0,0,0,.35);}
+  .switch.on{background:var(--accent);}
+  .switch.on i{transform:translateX(17px);}
+
+  .convbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:6px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .convbtn:hover{filter:brightness(1.05);} .convbtn:active{transform:translateY(1px);}
+  .convbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .convbtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+
+  /* progress */
+  .prog{padding:18px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;}
+  .prog .lbl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .prog .lbl .pct{font-family:var(--mono);}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+
+  /* results */
+  .results{padding:22px;display:none;margin-top:18px;}
+  .results.show{display:block;}
+  .results .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .results .ok svg{width:28px;height:28px;}
+  .results h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .results .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+
+  /* before / after compare slider */
+  .cmp{position:relative;max-width:620px;margin:0 auto 18px;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+    background:#000;user-select:none;touch-action:none;--pos:50%;}
+  .cmp img{display:block;width:100%;pointer-events:none;}
+  .cmp .cmp-after{position:absolute;inset:0;clip-path:inset(0 0 0 var(--pos));}
+  .cmp .cmp-after img{position:absolute;inset:0;width:100%;height:100%;}
+  .cmp .cmp-line{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;background:#fff;transform:translateX(-1px);
+    box-shadow:0 0 0 1px rgba(0,0,0,.18);}
+  .cmp .cmp-h{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;
+    background:#fff;color:#111;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.28);}
+  .cmp .cmp-h svg{width:18px;height:18px;}
+  .cmp .cmp-range{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;}
+  .cmp .cmp-tag{position:absolute;top:10px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;color:#fff;background:rgba(0,0,0,.5);padding:3px 9px;border-radius:999px;pointer-events:none;}
+  .cmp .cmp-tag.l{left:10px;} .cmp .cmp-tag.r{right:10px;}
+  .rdims{text-align:center;font-family:var(--mono);font-size:11.5px;color:var(--faint);margin:0 0 18px;}
+
+  .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .row2 a,.row2 button{flex:1;min-width:160px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 a:hover,.row2 button:hover{border-color:var(--accent);} .row2 *:active{transform:translateY(1px);}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .row2 svg{width:16px;height:16px;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid" id="composer">
+    <!-- main: upload / preview -->
+    <div class="col">
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="sizenote" data-i18n="sizeNote"></div>
+      </div>
+      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp">
+
+      <div class="card prevcard" id="prevCard" style="display:none">
+        <div class="pv"><img id="pvImg" alt=""></div>
+        <div class="pvmeta">
+          <span class="pn"><div class="nm" id="pvName"></div><div class="sz" id="pvSize"></div></span>
+          <button class="rm" id="pvRm" type="button" title="remove">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- side: options -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="optTitle"></h3>
+
+        <div class="opt">
+          <label><span data-i18n="strengthLbl"></span><span class="val" id="strVal">60%</span></label>
+          <input type="range" class="rng" id="strRange" min="10" max="100" step="5" value="60">
+          <div class="spresets" id="spresets">
+            <button type="button" class="schip" data-str="35" data-i18n="presetLight"></button>
+            <button type="button" class="schip on" data-str="60" data-i18n="presetBalanced"></button>
+            <button type="button" class="schip" data-str="90" data-i18n="presetStrong"></button>
+          </div>
+        </div>
+
+        <div class="opt">
+          <label><span data-i18n="enhLbl"></span></label>
+          <div class="tog" data-opt="denoise">
+            <span class="tx"><span class="tt" data-i18n="denoiseT"></span><span class="td" data-i18n="denoiseD"></span></span>
+            <span class="switch on" id="sw-denoise"><i></i></span>
+          </div>
+          <div class="tog" data-opt="color">
+            <span class="tx"><span class="tt" data-i18n="colorT"></span><span class="td" data-i18n="colorD"></span></span>
+            <span class="switch on" id="sw-color"><i></i></span>
+          </div>
+          <div class="tog" data-opt="sharpen">
+            <span class="tx"><span class="tt" data-i18n="sharpT"></span><span class="td" data-i18n="sharpD"></span></span>
+            <span class="switch on" id="sw-sharpen"><i></i></span>
+          </div>
+          <div class="tog" data-opt="upscale">
+            <span class="tx"><span class="tt" data-i18n="upscaleT"></span><span class="td" data-i18n="upscaleD"></span></span>
+            <span class="switch" id="sw-upscale"><i></i></span>
+          </div>
+        </div>
+
+        <button class="convbtn" id="convBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+          <span data-i18n="goBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="nm" id="progName" data-i18n="working"></span><span class="pct" id="progPct">0%</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <!-- results -->
+  <div class="card results" id="resultsCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" data-i18n="readySub"></p>
+
+    <div id="cmpWrap"></div>
+    <div class="rdims" id="rdims"></div>
+
+    <div class="row2">
+      <button id="dlBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="dlBtn"></span>
+      </button>
+      <button id="againBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="againBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'שחזור תמונות AI',
+      pageTitle:'שחזרו ושפרו תמונות ישנות ופגומות — עם AI',
+      pageSub:'העלו תמונה ישנה, דהויה או מטושטשת, וה־AI ישחזר אותה: חידוד פרטים, הסרת רעש ושריטות, תיקון טשטוש, החייאת צבעים ושחזור פרטים שאבדו. עם השוואת לפני/אחרי ובחירת עוצמה. הכול רץ בדפדפן שלכם — התמונה לא עוזבת את המחשב.',
+      dropBig:'גררו תמונה לכאן', or2:'או', choose:'בחרו תמונה',
+      sizeNote:'JPG · PNG · WEBP', remove:'הסרה',
+      optTitle:'הגדרות שחזור',
+      strengthLbl:'עוצמת השחזור',
+      presetLight:'עדין', presetBalanced:'מאוזן', presetStrong:'חזק',
+      enhLbl:'מה לשפר',
+      denoiseT:'הסרת רעש ושריטות', denoiseD:'ניקוי גרעיניות, רעש ושריטות דקות',
+      colorT:'שיפור צבע', colorD:'איזון לבן, ניגודיות והחייאת צבעים',
+      sharpT:'חידוד וחדות', sharpD:'הגברת חדות והבלטת פרטים',
+      upscaleT:'שדרוג רזולוציה ×2', upscaleD:'הכפלת הרזולוציה ושחזור פרטים',
+      goBtn:'שחזרו את התמונה', working:'מעבד…',
+      stepDenoise:'מסיר רעש ושריטות…', stepColor:'משפר צבעים וניגודיות…',
+      stepUpscale:'משדרג רזולוציה…', stepSharpen:'מחדד ומבליט פרטים…', stepEncode:'מסיים…',
+      readyTitle:'התמונה שוחזרה!', readySub:'גררו את המחוון להשוואת לפני ואחרי, ואז הורידו באיכות גבוהה.',
+      before:'לפני', after:'אחרי',
+      dlBtn:'הורדה באיכות גבוהה', againBtn:'תמונה נוספת',
+      errNoFile:'צריך לבחור תמונה קודם', errLoad:'לא הצלחנו לטעון את התמונה',
+      errNoOpt:'בחרו לפחות שיפור אחד', failed:'העיבוד נכשל',
+      seam:'כל העיבוד רץ מקומית בדפדפן שלכם בעזרת עיבוד תמונה חכם — התמונה לעולם לא נשלחת לשום שרת.',
+      foot:'KOLKLI · שחזור תמונות AI · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הקישור הועתק ✓',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'AI Photo Restoration',
+      pageTitle:'Restore & enhance old, damaged photos — with AI',
+      pageSub:'Drop an old, faded or blurry photo and the AI brings it back: sharpen detail, remove noise and scratches, fix blur, revive colors and restore lost detail. With a before/after compare and adjustable strength. Everything runs in your browser — your photo never leaves your machine.',
+      dropBig:'Drag a photo here', or2:'or', choose:'Choose a photo',
+      sizeNote:'JPG · PNG · WEBP', remove:'Remove',
+      optTitle:'Restoration settings',
+      strengthLbl:'Restoration strength',
+      presetLight:'Light', presetBalanced:'Balanced', presetStrong:'Strong',
+      enhLbl:'What to enhance',
+      denoiseT:'Remove noise & scratches', denoiseD:'Clean grain, noise and fine scratches',
+      colorT:'Enhance color', colorD:'White balance, contrast & revive colors',
+      sharpT:'Sharpen & clarity', sharpD:'Boost sharpness and bring out detail',
+      upscaleT:'Upscale ×2', upscaleD:'Double resolution & restore detail',
+      goBtn:'Restore photo', working:'Processing…',
+      stepDenoise:'Removing noise & scratches…', stepColor:'Enhancing colors & contrast…',
+      stepUpscale:'Upscaling…', stepSharpen:'Sharpening detail…', stepEncode:'Finishing…',
+      readyTitle:'Photo restored!', readySub:'Drag the slider to compare before and after, then download in high quality.',
+      before:'before', after:'after',
+      dlBtn:'Download high quality', againBtn:'New photo',
+      errNoFile:'Choose a photo first', errLoad:'Could not load the image',
+      errNoOpt:'Enable at least one enhancement', failed:'Processing failed',
+      seam:'All processing runs locally in your browser with smart image processing — your photo is never sent to any server.',
+      foot:'KOLKLI · AI Photo Restoration · Private and fast, right in your browser',
+      copied:'Link copied ✓',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'AI-восстановление фото',
+      pageTitle:'Восстанавливайте старые, повреждённые фото — с помощью AI',
+      pageSub:'Перетащите старое, выцветшее или размытое фото, и AI вернёт его к жизни: повысит резкость деталей, уберёт шум и царапины, исправит размытие, оживит цвета и восстановит утраченные детали. С сравнением до/после и регулируемой силой. Всё работает в вашем браузере — ваше фото никогда не покидает устройство.',
+      dropBig:'Перетащите фото сюда', or2:'или', choose:'Выбрать фото',
+      sizeNote:'JPG · PNG · WEBP', remove:'Удалить',
+      optTitle:'Настройки восстановления',
+      strengthLbl:'Сила восстановления',
+      presetLight:'Слабо', presetBalanced:'Сбалансированно', presetStrong:'Сильно',
+      enhLbl:'Что улучшить',
+      denoiseT:'Убрать шум и царапины', denoiseD:'Очистка зерна, шума и мелких царапин',
+      colorT:'Улучшить цвет', colorD:'Баланс белого, контраст и оживление цветов',
+      sharpT:'Резкость и чёткость', sharpD:'Повышение резкости и проявление деталей',
+      upscaleT:'Увеличение ×2', upscaleD:'Удвоение разрешения и восстановление деталей',
+      goBtn:'Восстановить фото', working:'Обработка…',
+      stepDenoise:'Удаление шума и царапин…', stepColor:'Улучшение цветов и контраста…',
+      stepUpscale:'Увеличение…', stepSharpen:'Повышение резкости деталей…', stepEncode:'Завершение…',
+      readyTitle:'Фото восстановлено!', readySub:'Перетащите ползунок, чтобы сравнить до и после, затем скачайте в высоком качестве.',
+      before:'до', after:'после',
+      dlBtn:'Скачать в высоком качестве', againBtn:'Новое фото',
+      errNoFile:'Сначала выберите фото', errLoad:'Не удалось загрузить изображение',
+      errNoOpt:'Включите хотя бы одно улучшение', failed:'Обработка не удалась',
+      seam:'Вся обработка выполняется локально в вашем браузере с умной обработкой изображений — ваше фото никогда не отправляется на сервер.',
+      foot:'KOLKLI · AI-восстановление фото · Приватно и быстро, прямо в браузере',
+      copied:'Ссылка скопирована ✓',
+    },
+  };
+
+  const ICON = {
+    slider:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/><polyline points="9 6 15 12 9 18"/></svg>',
+  };
+
+  // ---- processing limits ----
+  const MAXPROC = 2400;   // longest side used for the restoration passes
+  const MAXOUT  = 4800;   // cap for the 2x upscale output
+
+  let lang='he', t=I18N.he;
+  let src=null;     // {file,name,size,url,w,h}
+  let strength=0.6;
+  let opts={ denoise:true, color:true, sharpen:true, upscale:false };
+  let result=null;  // {blob,url,w,h,origURL,name}
+  let busy=false;
+
+  function baseName(name){ return String(name||'photo').replace(/\.[^.\/\\]+$/,''); }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+  const microYield = () => new Promise(r=>setTimeout(r,0));
+  function clamp(v,a,b){ return v<a?a:v>b?b:v; }
+  function loadImage(url){ return new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=url; }); }
+
+  // ---- intake (single image) ----
+  function setImage(file){
+    if(!file || !/^image\//.test(file.type)) return;
+    clearImage();
+    const url=URL.createObjectURL(file);
+    src={ file, name:file.name, size:file.size, url, w:0, h:0 };
+    const im=new Image();
+    im.onload=()=>{ if(src){ src.w=im.naturalWidth; src.h=im.naturalHeight; renderPreview(); } };
+    im.src=url;
+    renderPreview();
+  }
+  function clearImage(){
+    if(src&&src.url) URL.revokeObjectURL(src.url);
+    src=null; renderPreview();
+  }
+  function renderPreview(){
+    const has=!!src;
+    el('drop').style.display = has? 'none' : '';
+    el('prevCard').style.display = has? '' : 'none';
+    el('convBtn').disabled = !has || busy;
+    if(has){
+      el('pvImg').src=src.url;
+      el('pvName').textContent=src.name;
+      el('pvName').title=src.name;
+      el('pvSize').textContent = fmtBytes(src.size) + (src.w? '  ·  '+src.w+'×'+src.h : '');
+    }
+  }
+
+  // ---- strength + toggles ----
+  function setStrength(pct){
+    strength = clamp(pct,10,100)/100;
+    el('strRange').value=Math.round(pct);
+    el('strVal').textContent=Math.round(pct)+'%';
+    document.querySelectorAll('#spresets .schip').forEach(b=>{
+      b.classList.toggle('on', +b.getAttribute('data-str')===Math.round(pct));
+    });
+  }
+  function toggleOpt(key){
+    opts[key]=!opts[key];
+    el('sw-'+key).classList.toggle('on', opts[key]);
+  }
+
+  // =========================================================
+  //  Restoration engine — smart canvas image processing
+  //  (denoise / color revive / sharpen / upscale), all local.
+  // =========================================================
+
+  // split RGBA data into three Float32 planes (alpha is left untouched on merge)
+  function splitPlanes(data, N){
+    const R=new Float32Array(N), G=new Float32Array(N), B=new Float32Array(N);
+    for(let i=0,j=0;i<N;i++,j+=4){ R[i]=data[j]; G[i]=data[j+1]; B[i]=data[j+2]; }
+    return [R,G,B];
+  }
+  function mergePlanes(data, R, G, B, N){
+    for(let i=0,j=0;i<N;i++,j+=4){ data[j]=R[i]; data[j+1]=G[i]; data[j+2]=B[i]; data[j+3]=255; }
+  }
+
+  // fast separable box blur on a single plane (linear time, sliding window)
+  function boxBlurPlane(src, w, h, r){
+    const tmp=new Float32Array(w*h), out=new Float32Array(w*h);
+    const norm=1/(2*r+1);
+    for(let y=0;y<h;y++){
+      const o=y*w; let sum=0;
+      for(let i=-r;i<=r;i++) sum+=src[o+clamp(i,0,w-1)];
+      for(let x=0;x<w;x++){
+        tmp[o+x]=sum*norm;
+        sum += src[o+clamp(x+r+1,0,w-1)] - src[o+clamp(x-r,0,w-1)];
+      }
+    }
+    for(let x=0;x<w;x++){
+      let sum=0;
+      for(let i=-r;i<=r;i++) sum+=tmp[clamp(i,0,h-1)*w+x];
+      for(let y=0;y<h;y++){
+        out[y*w+x]=sum*norm;
+        sum += tmp[clamp(y+r+1,0,h-1)*w+x] - tmp[clamp(y-r,0,h-1)*w+x];
+      }
+    }
+    return out;
+  }
+
+  // median of 9 (sorting network) — kills speckle noise & fine scratches
+  function med9(a){
+    const s=(i,j)=>{ if(a[i]>a[j]){ const t2=a[i]; a[i]=a[j]; a[j]=t2; } };
+    s(1,2);s(4,5);s(7,8);s(0,1);s(3,4);s(6,7);s(1,2);s(4,5);s(7,8);
+    s(0,3);s(5,8);s(4,7);s(3,6);s(1,4);s(2,5);s(4,7);s(4,2);s(6,4);s(4,2);
+    return a[4];
+  }
+
+  async function denoise(R, G, B, w, h, amount, prog){
+    const oR=new Float32Array(w*h), oG=new Float32Array(w*h), oB=new Float32Array(w*h);
+    const a=new Float32Array(9);
+    const BAND=Math.max(4, Math.round(60000/w));
+    const median=(src,out)=>{
+      for(let y=yb;y<y2;y++){
+        const ym=clamp(y-1,0,h-1)*w, yy=y*w, yp=clamp(y+1,0,h-1)*w;
+        for(let x=0;x<w;x++){
+          const xm=clamp(x-1,0,w-1), xp=clamp(x+1,0,w-1);
+          a[0]=src[ym+xm];a[1]=src[ym+x];a[2]=src[ym+xp];
+          a[3]=src[yy+xm];a[4]=src[yy+x];a[5]=src[yy+xp];
+          a[6]=src[yp+xm];a[7]=src[yp+x];a[8]=src[yp+xp];
+          out[yy+x]=med9(a);
+        }
+      }
+    };
+    let yb=0,y2=0;
+    for(yb=0;yb<h;yb+=BAND){
+      y2=Math.min(h,yb+BAND);
+      median(R,oR); median(G,oG); median(B,oB);
+      prog(y2/h); await microYield();
+    }
+    for(let i=0;i<w*h;i++){
+      R[i]+=(oR[i]-R[i])*amount; G[i]+=(oG[i]-G[i])*amount; B[i]+=(oB[i]-B[i])*amount;
+    }
+  }
+
+  function colorStats(R, G, B, w, h){
+    let sr=0,sg=0,sb=0,n=0;
+    const hist=new Uint32Array(256);
+    const step=Math.max(1, Math.floor(Math.sqrt(w*h/250000)));
+    for(let y=0;y<h;y+=step){
+      for(let x=0;x<w;x+=step){
+        const i=y*w+x, r=R[i], g=G[i], b=B[i];
+        sr+=r; sg+=g; sb+=b; n++;
+        hist[clamp((r*0.299+g*0.587+b*0.114)|0,0,255)]++;
+      }
+    }
+    const loT=n*0.005, hiT=n*0.005;
+    let acc=0, lo=0, hi=255;
+    for(let v=0;v<256;v++){ acc+=hist[v]; if(acc>=loT){ lo=v; break; } }
+    acc=0; for(let v=255;v>=0;v--){ acc+=hist[v]; if(acc>=hiT){ hi=v; break; } }
+    const ar=Math.max(1,sr/n), ag=Math.max(1,sg/n), ab=Math.max(1,sb/n);
+    return { ar, ag, ab, gray:(ar+ag+ab)/3, lo, hi };
+  }
+
+  async function enhanceColor(R, G, B, w, h, s, prog){
+    const st=colorStats(R,G,B,w,h);
+    const wb=0.65*s;
+    let gR=clamp(st.gray/st.ar,0.5,2), gG=clamp(st.gray/st.ag,0.5,2), gB=clamp(st.gray/st.ab,0.5,2);
+    gR=1+(gR-1)*wb; gG=1+(gG-1)*wb; gB=1+(gB-1)*wb;
+    const lo=st.lo, hi=st.hi>st.lo?st.hi:st.lo+1;
+    const cs=255/(hi-lo), cbl=s, sat=1+0.5*s;
+    const BAND=Math.max(4, Math.round(60000/w));
+    for(let yb=0;yb<h;yb+=BAND){
+      const y2=Math.min(h,yb+BAND);
+      for(let i=yb*w,end=y2*w;i<end;i++){
+        let r=R[i]*gR, g=G[i]*gG, b=B[i]*gB;
+        r+=((r-lo)*cs - r)*cbl; g+=((g-lo)*cs - g)*cbl; b+=((b-lo)*cs - b)*cbl;
+        const gy=r*0.299+g*0.587+b*0.114;
+        r=gy+(r-gy)*sat; g=gy+(g-gy)*sat; b=gy+(b-gy)*sat;
+        R[i]=clamp(r,0,255); G[i]=clamp(g,0,255); B[i]=clamp(b,0,255);
+      }
+      prog(y2/h); await microYield();
+    }
+  }
+
+  async function sharpen(R, G, B, w, h, amount, prog){
+    const bR=boxBlurPlane(R,w,h,1), bG=boxBlurPlane(G,w,h,1), bB=boxBlurPlane(B,w,h,1);
+    const BAND=Math.max(4, Math.round(60000/w));
+    for(let yb=0;yb<h;yb+=BAND){
+      const y2=Math.min(h,yb+BAND);
+      for(let i=yb*w,end=y2*w;i<end;i++){
+        R[i]=clamp(R[i]+(R[i]-bR[i])*amount,0,255);
+        G[i]=clamp(G[i]+(G[i]-bG[i])*amount,0,255);
+        B[i]=clamp(B[i]+(B[i]-bB[i])*amount,0,255);
+      }
+      prog(y2/h); await microYield();
+    }
+  }
+
+  function baseCanvas(img){
+    let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+    const scale=Math.min(1, MAXPROC/Math.max(w,h));
+    const cw=Math.max(1,Math.round(w*scale)), ch=Math.max(1,Math.round(h*scale));
+    const c=document.createElement('canvas'); c.width=cw; c.height=ch;
+    const ctx=c.getContext('2d',{willReadFrequently:true});
+    ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,cw,ch);   // flatten any transparency onto white
+    ctx.drawImage(img,0,0,cw,ch);
+    return c;
+  }
+
+  function setProg(p){ p=Math.round(p); el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+  function stepProg(a,b){ return f=>setProg(a+(b-a)*clamp(f,0,1)); }
+
+  // ---- run ----
+  async function run(){
+    el('optErr').textContent='';
+    if(busy) return;
+    if(!src){ el('optErr').textContent=t.errNoFile; return; }
+    if(!opts.denoise && !opts.color && !opts.sharpen && !opts.upscale){ el('optErr').textContent=t.errNoOpt; return; }
+
+    busy=true; el('convBtn').disabled=true;
+    el('composer').style.display='none';
+    const prog=el('progCard'); prog.classList.add('show');
+    el('progName').textContent=t.working; setProg(2);
+
+    try{
+      const img=await loadImage(src.url).catch(()=>{ throw new Error('load'); });
+      let canvas=baseCanvas(img);
+      let ctx=canvas.getContext('2d',{willReadFrequently:true});
+      let w=canvas.width, h=canvas.height, N=w*h;
+      let data=ctx.getImageData(0,0,w,h);
+      let [R,G,B]=splitPlanes(data.data,N);
+      const s=strength;
+
+      if(opts.denoise){
+        el('progName').textContent=t.stepDenoise;
+        await denoise(R,G,B,w,h,0.8*s, stepProg(5,36));
+      }
+      if(opts.color){
+        el('progName').textContent=t.stepColor;
+        await enhanceColor(R,G,B,w,h,s, stepProg(opts.denoise?36:5,58));
+      }
+      // write the denoise/color result back to the base canvas
+      mergePlanes(data.data,R,G,B,N); ctx.putImageData(data,0,0);
+
+      if(opts.upscale){
+        el('progName').textContent=t.stepUpscale; setProg(62);
+        const scale=Math.min(2, MAXOUT/Math.max(w,h));
+        if(scale>1.02){
+          const uc=document.createElement('canvas');
+          uc.width=Math.round(w*scale); uc.height=Math.round(h*scale);
+          const uctx=uc.getContext('2d',{willReadFrequently:true});
+          uctx.imageSmoothingEnabled=true; uctx.imageSmoothingQuality='high';
+          uctx.drawImage(canvas,0,0,uc.width,uc.height);
+          canvas=uc; ctx=uctx; w=uc.width; h=uc.height; N=w*h;
+        }
+        await microYield();
+      }
+
+      if(opts.sharpen){
+        el('progName').textContent=t.stepSharpen;
+        data=ctx.getImageData(0,0,w,h);
+        [R,G,B]=splitPlanes(data.data,N);
+        await sharpen(R,G,B,w,h,1.1*s, stepProg(66,90));
+        mergePlanes(data.data,R,G,B,N); ctx.putImageData(data,0,0);
+      }
+
+      el('progName').textContent=t.stepEncode; setProg(94);
+      const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.95));
+      if(!blob) throw new Error('encode');
+      setProg(100); await sleep(140);
+      prog.classList.remove('show');
+
+      clearResult();
+      result={ blob, url:URL.createObjectURL(blob), w, h, origURL:src.url, name:baseName(src.name)+'-restored.jpg' };
+      showResult();
+    }catch(err){
+      console.error(err);
+      prog.classList.remove('show'); el('composer').style.display='';
+      el('optErr').textContent = (err&&err.message==='load') ? t.errLoad : t.failed;
+    }finally{
+      busy=false; el('convBtn').disabled=!src;
+    }
+  }
+
+  // ---- results ----
+  function showResult(){
+    if(!result) return;
+    el('cmpWrap').innerHTML = `
+      <div class="cmp" id="cmp" dir="ltr">
+        <img class="cmp-orig" src="${result.origURL}" alt="">
+        <div class="cmp-after" id="cmpAfter"><img src="${result.url}" alt=""></div>
+        <div class="cmp-line" id="cmpLine"><span class="cmp-h">${ICON.slider}</span></div>
+        <input type="range" min="0" max="100" value="50" class="cmp-range" id="cmpRange">
+        <span class="cmp-tag l">${t.before}</span><span class="cmp-tag r">${t.after}</span>
+      </div>`;
+    const cmp=el('cmp'), range=el('cmpRange');
+    range.addEventListener('input',()=>{ cmp.style.setProperty('--pos', range.value+'%'); });
+    el('rdims').textContent = `${result.w}×${result.h}  ·  ${fmtBytes(result.blob.size)}`;
+    el('resultsCard').classList.add('show');
+    el('resultsCard').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function download(){
+    if(!result) return;
+    const a=document.createElement('a'); a.href=result.url; a.download=result.name;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>a.remove(),400);
+  }
+  function clearResult(){
+    if(result&&result.url) URL.revokeObjectURL(result.url);
+    result=null;
+  }
+  function reset(){
+    clearResult();
+    clearImage();
+    el('resultsCard').classList.remove('show');
+    el('cmpWrap').innerHTML=''; el('rdims').textContent='';
+    el('optErr').textContent='';
+    el('composer').style.display='';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- i18n + theme (mirrors the other pages; header syncs via its observer) ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    el('pvRm').title=t.remove;
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    if(result) showResult();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ if(input.files&&input.files[0]) setImage(input.files[0]); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer&&e.dataTransfer.files[0]) setImage(e.dataTransfer.files[0]); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('pvRm').addEventListener('click',reset);
+
+  el('strRange').addEventListener('input',()=>setStrength(+el('strRange').value));
+  el('spresets').addEventListener('click',e=>{ const b=e.target.closest('[data-str]'); if(b) setStrength(+b.getAttribute('data-str')); });
+  document.querySelectorAll('.tog[data-opt]').forEach(row=>{
+    row.addEventListener('click',()=>toggleOpt(row.getAttribute('data-opt')));
+  });
+
+  el('convBtn').addEventListener('click',run);
+  el('dlBtn').addEventListener('click',download);
+  el('againBtn').addEventListener('click',reset);
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  setStrength(60);
+  renderPreview();
+})();
+</script>
+</body>
+</html>

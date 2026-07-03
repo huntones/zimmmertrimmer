@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — הורדת קבצים</title>
+<meta name="description" content="Download the files shared with you.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 60px;}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;}
+  .brand{display:flex;align-items:center;gap:11px;}
+  .brand .logo{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);flex-shrink:0;}
+  .brand .logo svg{width:21px;height:21px;}
+  .brand b{font-size:18px;font-weight:700;letter-spacing:-0.01em;}
+  .toolbtns{display:flex;align-items:center;gap:9px;}
+  .pillbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:999px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;font-size:13.5px;
+    box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s,background .12s;}
+  .pillbtn:hover{border-color:var(--accent);} .pillbtn:active{transform:scale(0.97);}
+  .iconbtn{width:38px;height:38px;padding:0;justify-content:center;font-size:15px;line-height:1;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:26px;}
+  .dhead{text-align:center;border-bottom:1px solid var(--line-2);padding-bottom:20px;margin-bottom:20px;}
+  .dhead .ava{width:56px;height:56px;margin:0 auto 12px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad-soft);color:var(--accent);}
+  .dhead .ava svg{width:28px;height:28px;}
+  .dhead h1{font-size:20px;margin:0 0 4px;font-weight:700;}
+  .dhead .who{font-size:13.5px;color:var(--muted);}
+  .msgbox{background:var(--panel-2);border:1px solid var(--line-2);border-radius:12px;padding:13px 15px;font-size:14px;color:var(--ink-2);
+    line-height:1.6;margin-bottom:18px;white-space:pre-wrap;word-break:break-word;}
+  .metarow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;}
+  .chip svg{width:13px;height:13px;color:var(--accent);}
+
+  .flist{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+  .frow{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel);
+    transition:border-color .12s;}
+  .frow:hover{border-color:var(--accent);}
+  .frow .fico{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);cursor:pointer;overflow:hidden;}
+  .frow .fico.image{color:var(--info);background:var(--info-soft);} .frow .fico.video{color:#e5484d;background:var(--danger-soft);}
+  .frow .fico.doc{color:var(--info-dim);background:var(--info-soft);}
+  .frow .fico img{width:100%;height:100%;object-fit:cover;}
+  .frow .fico svg{width:18px;height:18px;}
+  .frow .fn{flex:1;min-width:0;}
+  .frow .fn .nm{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .frow .fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .frow .act{display:flex;gap:6px;flex-shrink:0;}
+  .frow .act button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .frow .act button:hover{border-color:var(--accent);color:var(--accent);}
+  .frow .act svg{width:16px;height:16px;}
+
+  .dlall{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:14px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .dlall:hover{filter:brightness(1.05);} .dlall:active{transform:translateY(1px);} .dlall:disabled{opacity:.6;cursor:default;}
+  .dlall svg{width:17px;height:17px;}
+
+  /* states */
+  .state{text-align:center;padding:20px 10px;}
+  .state .si{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;}
+  .state .si.warn{background:var(--warm-soft);color:var(--warn);} .state .si.lock{background:var(--accent-soft);color:var(--accent);}
+  .state .si svg{width:32px;height:32px;}
+  .state h2{font-size:19px;margin:0 0 8px;}
+  .state p{font-size:14px;color:var(--muted);margin:0 auto 18px;max-width:44ch;line-height:1.6;}
+  .pwform{display:flex;gap:8px;max-width:340px;margin:0 auto;}
+  .pwform input{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:14px;padding:11px 13px;}
+  .pwform input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .pwform.bad input{border-color:var(--danger);}
+  .pwform button{border:none;color:#fff;cursor:pointer;border-radius:10px;padding:0 18px;font-weight:600;font-size:14px;
+    background:var(--grad-btn);box-shadow:0 4px 12px var(--grad-btn-glow);}
+  .pwerr{font-size:12px;color:var(--danger);margin-top:10px;min-height:14px;}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:18px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+  .hidden{display:none !important;}
+
+  /* preview modal */
+  .pv{position:fixed;inset:0;background:rgba(6,8,16,.86);display:none;flex-direction:column;z-index:80;}
+  .pv.show{display:flex;}
+  .pvbar{display:flex;align-items:center;gap:12px;padding:14px 18px;color:#fff;}
+  .pvbar .pvt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:14.5px;}
+  .pvbar button{background:rgba(255,255,255,.12);border:none;color:#fff;cursor:pointer;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;}
+  .pvbody{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 20px 26px;min-height:0;}
+  .pvbody img,.pvbody video{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;}
+  .pvbody iframe{width:min(760px,100%);height:100%;border:none;border-radius:8px;background:#fff;}
+  .pvbody audio{width:min(520px,100%);}
+
+  footer{margin-top:30px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+  <div class="card">
+    <!-- loading -->
+    <div class="state" id="loadingState">
+      <div class="si lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg></div>
+      <p data-i18n="loading"></p>
+    </div>
+
+    <!-- expired / not found -->
+    <div class="state hidden" id="expiredState">
+      <div class="si warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
+      <h2 data-i18n="expiredTitle"></h2>
+      <p data-i18n="expiredBody"></p>
+    </div>
+
+    <!-- password gate -->
+    <div class="state hidden" id="pwState">
+      <div class="si lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <h2 data-i18n="pwTitle"></h2>
+      <p data-i18n="pwSub"></p>
+      <form class="pwform" id="pwForm">
+        <input id="pwInput" type="password" dir="ltr" data-i18n-ph="pwPh" autocomplete="off">
+        <button type="submit" data-i18n="unlock"></button>
+      </form>
+      <div class="pwerr" id="pwErr"></div>
+    </div>
+
+    <!-- transfer -->
+    <div class="hidden" id="transferView">
+      <div class="dhead">
+        <div class="ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></div>
+        <h1 data-i18n="gotFiles"></h1>
+        <div class="who" id="whoLine"></div>
+      </div>
+      <div class="msgbox hidden" id="msgBox"></div>
+      <div class="metarow" id="metaRow"></div>
+      <div class="flist" id="flist"></div>
+      <button class="dlall" id="dlAllBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        <span id="dlAllLbl"></span>
+      </button>
+      <div class="seam">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        <span data-i18n="seam"></span>
+      </div>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+
+<div class="pv" id="pv">
+  <div class="pvbar"><div class="pvt" id="pvTitle"></div><button id="pvClose" type="button" data-i18n="close"></button></div>
+  <div class="pvbody" id="pvBody"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./vendor/jszip.min.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{ dir:'rtl', langIco:'EN',
+      loading:'טוען את הקבצים…',
+      expiredTitle:'הקישור לא זמין', expiredBody:'הקישור פג תוקף, נמחק, או לא קיים במכשיר הזה. בקשו מהשולח קישור חדש.',
+      pwTitle:'הקישור מוגן בסיסמה', pwSub:'הזינו את הסיסמה שקיבלתם מהשולח כדי לראות את הקבצים.',
+      pwPh:'סיסמה', unlock:'פתיחה', pwWrong:'סיסמה שגויה',
+      gotFiles:'שותפו איתך קבצים', fromSomeone:'מישהו שיתף איתך קבצים דרך KOLKLI', fromNamed:n=>`מאת ${n}`,
+      dlAll:n=>`הורדת הכל (${n})`, dlAllZip:'הורדת הכל כ‑ZIP', zipping:'יוצר ZIP…',
+      chipExpiry:d=>`פג תוקף בעוד ${d}`, chipFiles:n=>`${n} קבצים`, chipTotal:s=>`${s} בסך הכול`,
+      day:'יום', days:d=>`${d} ימים`, today:'היום',
+      preview:'תצוגה מקדימה', download:'הורדה', close:'סגור',
+      copied:'הועתק ✓',
+      seam:'הדגמה מקומית: הקבצים נטענים מהדפדפן הזה (IndexedDB). עם חיבור השרת הקישור יעבוד מכל מכשיר.',
+      foot:'KOLKLI · הורדת קבצים · הדגמה מקומית',
+    },
+    en:{ dir:'ltr', langIco:'עב',
+      loading:'Loading files…',
+      expiredTitle:'Link unavailable', expiredBody:'This link has expired, was deleted, or doesn’t exist on this device. Ask the sender for a new one.',
+      pwTitle:'This link is password protected', pwSub:'Enter the password you received from the sender to see the files.',
+      pwPh:'Password', unlock:'Unlock', pwWrong:'Wrong password',
+      gotFiles:'Files shared with you', fromSomeone:'Someone shared files with you via KOLKLI', fromNamed:n=>`From ${n}`,
+      dlAll:n=>`Download all (${n})`, dlAllZip:'Download all as ZIP', zipping:'Zipping…',
+      chipExpiry:d=>`Expires in ${d}`, chipFiles:n=>`${n} files`, chipTotal:s=>`${s} total`,
+      day:'1 day', days:d=>`${d} days`, today:'today',
+      preview:'Preview', download:'Download', close:'Close',
+      copied:'Copied ✓',
+      seam:'Local demo: files load from this browser (IndexedDB). Once the server is connected, the link will work from any device.',
+      foot:'KOLKLI · File download · Local demo',
+    },
+    ru:{
+      dir:'ltr',
+      loading:'Загрузка файлов…',
+      expiredTitle:'Ссылка недоступна', expiredBody:'Эта ссылка истекла, была удалена или не существует на этом устройстве. Попросите отправителя прислать новую.',
+      pwTitle:'Эта ссылка защищена паролем', pwSub:'Введите пароль, полученный от отправителя, чтобы увидеть файлы.',
+      pwPh:'Пароль', unlock:'Разблокировать', pwWrong:'Неверный пароль',
+      gotFiles:'Файлы, которыми с вами поделились', fromSomeone:'Кто-то поделился с вами файлами через KOLKLI', fromNamed:n=>`От ${n}`,
+      dlAll:n=>`Скачать всё (${n})`, dlAllZip:'Скачать всё как ZIP', zipping:'Упаковка в ZIP…',
+      chipExpiry:d=>`Истекает через ${d}`, chipFiles:n=>`Файлов: ${n}`, chipTotal:s=>`Всего ${s}`,
+      day:'1 день', days:d=>`${d} дн.`, today:'сегодня',
+      preview:'Просмотр', download:'Скачать', close:'Закрыть',
+      copied:'Скопировано ✓',
+      seam:'Локальная демонстрация: файлы загружаются из этого браузера (IndexedDB). После подключения сервера ссылка будет работать с любого устройства.',
+      foot:'KOLKLI · Скачивание файлов · Локальная демонстрация',
+    },
+  };
+
+  const TYPES = {
+    image:['jpg','jpeg','png','gif','heic','heif','webp','bmp','svg','avif'],
+    video:['mp4','mov','avi','webm','mkv','m4v'],
+    audio:['mp3','wav','aac','m4a','flac','ogg','oga','opus'],
+    doc:['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','rtf'],
+  };
+  function kindOf(ext){ ext=(ext||'').toLowerCase(); for(const k in TYPES){ if(TYPES[k].includes(ext)) return k; } return 'doc'; }
+  const ICON = {
+    image:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>',
+    video:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>',
+    audio:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>',
+    dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>',
+    eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+  };
+
+  let lang='he', t=I18N.he;
+  let record=null, key=null;
+
+  function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  async function hashPass(str){
+    try{ if(window.crypto && crypto.subtle){ const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); } }catch(_){}
+    let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; } return 'x'+(h>>>0).toString(16);
+  }
+  function toast(msg){ const el2=el('toast'); el2.textContent=msg; el2.classList.add('show'); clearTimeout(el2._t); el2._t=setTimeout(()=>el2.classList.remove('show'),1800); }
+
+  // ---- IndexedDB (demo store) ----
+  function idb(){ return new Promise((res,rej)=>{ const r=indexedDB.open('audiocut',1); r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains('transfers')) r.result.createObjectStore('transfers'); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+  async function idbGet(k){ const db=await idb(); return new Promise((res,rej)=>{ const tx=db.transaction('transfers','readonly'); const rq=tx.objectStore('transfers').get(k); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); }); }
+  async function idbPut(k,v){ const db=await idb(); return new Promise((res,rej)=>{ const tx=db.transaction('transfers','readwrite'); tx.objectStore('transfers').put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+  async function idbDel(k){ const db=await idb(); return new Promise((res,rej)=>{ const tx=db.transaction('transfers','readwrite'); tx.objectStore('transfers').delete(k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+
+  function show(stateId){ ['loadingState','expiredState','pwState','transferView'].forEach(s=>el(s).classList.toggle('hidden', s!==stateId)); }
+
+  function expiryText(){
+    const ms=record.expiresAt-Date.now(); const days=Math.ceil(ms/86400000);
+    if(days<=0) return t.today; return days===1? t.day : t.days(days);
+  }
+
+  function triggerDownload(blob, name){
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click();
+    a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+  }
+  async function bumpDownloads(){
+    try{
+      record.downloads=(record.downloads||0)+1; await idbPut(key, record);
+      try{ if('BroadcastChannel'in window){ const bc=new BroadcastChannel('audiocut_dl'); bc.postMessage({token:(key||'').replace(/^t_/,''), downloads:record.downloads}); bc.close(); } }catch(_){}
+    }catch(_){}
+  }
+
+  function renderTransfer(){
+    el('whoLine').textContent = record.sender ? t.fromNamed(record.sender) : t.fromSomeone;
+    if(record.message){ el('msgBox').textContent=record.message; el('msgBox').classList.remove('hidden'); }
+    const total=record.files.reduce((a,f)=>a+(f.size||0),0);
+    el('metaRow').innerHTML =
+      `<span class="chip">${ICON_clock()} ${t.chipExpiry(expiryText())}</span>`+
+      `<span class="chip">${ICON.doc} ${t.chipFiles(record.files.length)}</span>`+
+      `<span class="chip">${t.chipTotal(fmtBytes(total))}</span>`;
+
+    el('flist').innerHTML = record.files.map((f,i)=>{
+      const kind=kindOf(extOf(f.name));
+      const previewable = kind==='image'||kind==='video'||kind==='audio'||extOf(f.name)==='pdf';
+      return `<div class="frow">
+        <span class="fico ${kind}" ${previewable?`data-pv="${i}"`:''}>${ICON[kind]}</span>
+        <span class="fn"><div class="nm" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div><div class="sz">${fmtBytes(f.size)}</div></span>
+        <span class="act">
+          ${previewable?`<button data-pv="${i}" title="${escapeHtml(t.preview)}">${ICON.eye}</button>`:''}
+          <button data-dl="${i}" title="${escapeHtml(t.download)}">${ICON.dl}</button>
+        </span>
+      </div>`;
+    }).join('');
+    el('dlAllLbl').textContent = t.dlAll(record.files.length);
+    show('transferView');
+  }
+  function ICON_clock(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'; }
+
+  function downloadOne(i){ const f=record.files[i]; triggerDownload(f.blob, f.name); bumpDownloads(); }
+  async function downloadAll(){
+    if(!window.JSZip){ record.files.forEach((f,i)=>downloadOne(i)); return; }
+    const btn=el('dlAllBtn'); const lbl=el('dlAllLbl'); btn.disabled=true; lbl.textContent=t.zipping;
+    const zip=new JSZip(); const used=new Set();
+    record.files.forEach(f=>{ let n=f.name,i=2; while(used.has(n)){ const dot=f.name.lastIndexOf('.'); n = dot>0? f.name.slice(0,dot)+' ('+i+')'+f.name.slice(dot) : f.name+' ('+i+')'; i++; } used.add(n); zip.file(n, f.blob); });
+    const blob=await zip.generateAsync({type:'blob'});
+    triggerDownload(blob, 'appload-files.zip'); bumpDownloads();
+    btn.disabled=false; lbl.textContent=t.dlAll(record.files.length);
+  }
+
+  // ---- preview ----
+  function openPreview(i){
+    const f=record.files[i], kind=kindOf(extOf(f.name)), url=URL.createObjectURL(f.blob);
+    el('pvTitle').textContent=f.name;
+    const body=el('pvBody');
+    if(kind==='image') body.innerHTML=`<img src="${url}" alt="">`;
+    else if(kind==='video') body.innerHTML=`<video src="${url}" controls autoplay playsinline></video>`;
+    else if(kind==='audio') body.innerHTML=`<audio src="${url}" controls autoplay></audio>`;
+    else body.innerHTML=`<iframe src="${url}"></iframe>`;
+    el('pv').classList.add('show');
+  }
+  function closePreview(){ el('pv').classList.remove('show'); el('pvBody').innerHTML=''; }
+
+  // ---- unlock ----
+  async function tryUnlock(e){
+    e.preventDefault();
+    const val=el('pwInput').value;
+    if(await hashPass(val)===record.password){ el('pwForm').classList.remove('bad'); el('pwErr').textContent=''; renderTransfer(); }
+    else { el('pwForm').classList.add('bad'); el('pwErr').textContent=t.pwWrong; }
+  }
+
+  // ---- i18n + theme ----
+  function applyStatic(){
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
+  }
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    applyStatic();
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    if(record && !el('transferView').classList.contains('hidden')) renderTransfer();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); el('themeIco').textContent=dark?'☀️':'🌙'; try{ localStorage.setItem('theme',dark?'dark':'light'); }catch(_){} }
+
+  // ---- events ----
+  el('flist').addEventListener('click',e=>{
+    const pv=e.target.closest('[data-pv]'); if(pv){ openPreview(+pv.getAttribute('data-pv')); return; }
+    const dl=e.target.closest('[data-dl]'); if(dl){ downloadOne(+dl.getAttribute('data-dl')); }
+  });
+  el('dlAllBtn').addEventListener('click',downloadAll);
+  el('pwForm').addEventListener('submit',tryUnlock);
+  el('pvClose').addEventListener('click',closePreview);
+  el('pv').addEventListener('click',e=>{ if(e.target===el('pv')) closePreview(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePreview(); });
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  async function init(){
+    applyTheme(ls('theme')||'light');
+    applyLang(detectLang());
+    const token=(location.search.match(/[?&]t=([^&]+)/)||[])[1];
+    if(!token){ show('expiredState'); return; }
+    key='t_'+decodeURIComponent(token);
+    try{ record=await idbGet(key); }catch(_){ record=null; }
+    if(!record){ show('expiredState'); return; }
+    if(Date.now() > record.expiresAt){ try{ await idbDel(key); }catch(_){}; show('expiredState'); return; }
+    if(record.password){ show('pwState'); setTimeout(()=>el('pwInput').focus(),40); return; }
+    renderTransfer();
+  }
+  init();
+})();
+</script>
+</body>
+</html>

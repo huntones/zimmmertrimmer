@@ -1,0 +1,4 @@
+# local dev server artifacts
+server.log
+__pycache__/
+*.pyc

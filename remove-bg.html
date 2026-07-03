@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — הסרת רקע AI</title>
+<meta name="description" content="Remove the background from any image automatically with AI — right in your browser. Download a transparent PNG or WEBP, or drop in a new background: white, a solid color, a gradient, or your own image. Private and fast, nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --checker:#c9cede;
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+    --checker:#3a4150;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* checkerboard for transparency */
+  .checker{background-color:var(--panel-2);
+    background-image:
+      linear-gradient(45deg,var(--checker) 25%,transparent 25%),
+      linear-gradient(-45deg,var(--checker) 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,var(--checker) 75%),
+      linear-gradient(-45deg,transparent 75%,var(--checker) 75%);
+    background-size:22px 22px;
+    background-position:0 0,0 11px,11px -11px,-11px 0;}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:30px 20px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:26px;height:26px;}
+  .drop .big{font-size:15.5px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:12px;color:var(--faint);margin:6px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13.5px;padding:10px 22px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .sizenote{margin-top:12px;font-size:11.5px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  /* file list */
+  .files{display:flex;flex-direction:column;}
+  .flist{display:flex;flex-direction:column;gap:8px;padding:14px;}
+  .frow{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line-2);border-radius:11px;background:var(--panel);}
+  .frow .fthumb{width:40px;height:40px;border-radius:9px;flex-shrink:0;object-fit:cover;border:1px solid var(--line-2);}
+  .frow .fn{flex:1;min-width:0;}
+  .frow .fn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .frow .fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .frow .rm{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .frow .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .frow .rm svg{width:15px;height:15px;}
+  .ftot{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--line-2);
+    font-size:13px;color:var(--muted);}
+  .ftot b{color:var(--ink);font-family:var(--mono);}
+
+  /* options side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+
+  /* output-background swatches */
+  .bgopts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .swatch{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 4px 7px;border-radius:11px;
+    border:1px solid var(--line);background:var(--panel-2);cursor:pointer;transition:border-color .12s,background .12s,transform .08s;}
+  .swatch:hover{border-color:var(--accent);}
+  .swatch:active{transform:scale(.96);}
+  .swatch.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
+  .swatch .dot{width:26px;height:26px;border-radius:8px;border:1px solid var(--line-2);overflow:hidden;
+    display:flex;align-items:center;justify-content:center;}
+  .swatch .dot svg{width:14px;height:14px;color:var(--faint);}
+  .swatch small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.03em;}
+  .swatch.on small{color:var(--accent-dim);}
+  .swatch .picker{position:absolute;inset:0;opacity:0;cursor:pointer;}
+
+  /* contextual controls for gradient / image backgrounds */
+  .bgextra{display:none;flex-direction:column;gap:10px;margin-top:10px;}
+  .ce-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .ce-lbl{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);}
+  .ce-val{color:var(--accent-dim);}
+  .ce-colors{display:inline-flex;gap:8px;}
+  .ce-colors input[type=color]{width:40px;height:30px;padding:0;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);cursor:pointer;}
+  .ce-range{flex:1;max-width:150px;accent-color:var(--accent);cursor:pointer;}
+  .bgimg-choose{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:10px;
+    border:1.4px dashed var(--line);background:var(--panel-2);color:var(--muted);font-weight:600;font-size:12.5px;cursor:pointer;
+    transition:border-color .12s,color .12s;}
+  .bgimg-choose:hover{border-color:var(--accent);color:var(--accent);}
+  .bgimg-choose svg{width:16px;height:16px;}
+  .bgimg-row{display:flex;align-items:center;gap:9px;}
+  .bgimg-thumb{width:38px;height:38px;border-radius:9px;object-fit:cover;border:1px solid var(--line);flex-shrink:0;}
+  .bgimg-change{flex:1;padding:8px 12px;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);
+    font-weight:600;font-size:12.5px;cursor:pointer;transition:border-color .12s;}
+  .bgimg-change:hover{border-color:var(--accent);}
+  .bgimg-rm{width:32px;height:32px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .bgimg-rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .bgimg-rm svg{width:15px;height:15px;}
+
+  select.inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;cursor:pointer;transition:border-color .12s,box-shadow .12s;}
+  select.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+
+  .convbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .convbtn:hover{filter:brightness(1.05);} .convbtn:active{transform:translateY(1px);}
+  .convbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .convbtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+
+  /* progress */
+  .prog{padding:16px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;}
+  .prog .lbl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+
+  /* results */
+  .results{padding:22px;display:none;margin-top:18px;}
+  .results.show{display:block;}
+  .results .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .results .ok svg{width:28px;height:28px;}
+  .results h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .results .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+
+  /* before / after compare slider */
+  .cmp{position:relative;max-width:520px;margin:0 auto 20px;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+    background:#000;user-select:none;touch-action:none;--pos:50%;}
+  .cmp img{display:block;width:100%;pointer-events:none;}
+  .cmp .cmp-after{position:absolute;inset:0;clip-path:inset(0 0 0 var(--pos));}
+  .cmp .cmp-after img{position:absolute;inset:0;width:100%;height:100%;}
+  .cmp .cmp-line{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;background:#fff;transform:translateX(-1px);
+    box-shadow:0 0 0 1px rgba(0,0,0,.18);}
+  .cmp .cmp-h{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;
+    background:#fff;color:#111;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.28);}
+  .cmp .cmp-h svg{width:18px;height:18px;}
+  .cmp .cmp-range{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;}
+  .cmp .cmp-tag{position:absolute;top:10px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;color:#fff;background:rgba(0,0,0,.5);padding:3px 9px;border-radius:999px;pointer-events:none;}
+  .cmp .cmp-tag.l{left:10px;} .cmp .cmp-tag.r{right:10px;}
+
+  .rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:18px;}
+  .rcard{border:1px solid var(--line-2);border-radius:12px;overflow:hidden;background:var(--panel);}
+  .rcard.err{border-color:var(--danger);}
+  .rprev{aspect-ratio:1;display:flex;align-items:center;justify-content:center;}
+  .rprev img{max-width:100%;max-height:100%;display:block;}
+  .rcard .rmeta{display:flex;align-items:center;gap:9px;padding:9px 11px;}
+  .rcard .rn{flex:1;min-width:0;}
+  .rcard .rn .nm{font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rcard .rn .sz{font-family:var(--mono);font-size:10.5px;color:var(--faint);}
+  .rcard.err .rn .sz{color:var(--danger);}
+  .rcard .dlbtn{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    width:34px;height:34px;border-radius:9px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
+  .rcard .dlbtn:hover{filter:brightness(1.05);} .rcard .dlbtn svg{width:16px;height:16px;}
+  .rprev.err{background:var(--danger-soft);color:var(--danger);}
+  .rprev.err svg{width:26px;height:26px;}
+
+  .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .row2 a,.row2 button{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 a:hover,.row2 button:hover{border-color:var(--accent);} .row2 *:active{transform:translateY(1px);}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .row2 svg{width:15px;height:15px;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid" id="composer">
+    <!-- main: upload + files -->
+    <div class="col">
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="sizenote" data-i18n="sizeNote"></div>
+      </div>
+      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple>
+      <input type="file" id="bgImgInput" accept="image/png,image/jpeg,image/webp">
+
+      <div class="card files" id="filesCard" style="display:none">
+        <div class="flist" id="flist"></div>
+        <div class="ftot"><span data-i18n="totalLbl"></span> <b id="totalVal">0</b></div>
+      </div>
+    </div>
+
+    <!-- side: options -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="optTitle"></h3>
+
+        <div class="opt">
+          <label data-i18n="outLbl"></label>
+          <div class="bgopts" id="bgopts"></div>
+          <div class="bgextra" id="bgExtra"></div>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="formatLbl"></label>
+          <select class="inp" id="format">
+            <option value="image/png" data-i18n="fmtPng"></option>
+            <option value="image/webp" data-i18n="fmtWebp"></option>
+          </select>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="qualityLbl"></label>
+          <select class="inp" id="quality">
+            <option value="isnet_fp16" data-i18n="qBalanced"></option>
+            <option value="isnet_quint8" data-i18n="qFast"></option>
+            <option value="isnet" data-i18n="qBest"></option>
+          </select>
+        </div>
+
+        <button class="convbtn" id="convBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 5.4L20 8l-4 4 1 6-5-3-5 3 1-6-4-4 5.6-.6L12 2z"/></svg>
+          <span data-i18n="goBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="nm" id="progName" data-i18n="working"></span><span id="progPct">0%</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <!-- results -->
+  <div class="card results" id="resultsCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" id="readySub"></p>
+
+    <div id="cmpWrap"></div>
+    <div class="rgrid" id="rgrid"></div>
+
+    <div class="row2">
+      <button id="dlAllBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="dlAll"></span>
+      </button>
+      <button id="againBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="againBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'AI · הסרת רקע',
+      pageTitle:'הסירו את הרקע מכל תמונה — אוטומטית',
+      pageSub:'גררו תמונה, וה־AI יזהה את הנושא ויסיר את הרקע בשנייה. הורידו PNG או WEBP שקוף, או החליפו לרקע חדש — לבן, צבע אחיד, גרדיאנט או תמונה משלכם. הכול רץ בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      dropBig:'גררו תמונות לכאן', or2:'או', choose:'בחרו תמונות',
+      sizeNote:'PNG · JPG · WEBP', remove:'הסרה',
+      totalLbl:'סה״כ', optTitle:'הגדרות',
+      outLbl:'רקע התוצאה',
+      bgTransparent:'שקוף', bgWhite:'לבן', bgBlack:'שחור', bgCustom:'צבע',
+      bgGradient:'גרדיאנט', bgImage:'תמונה',
+      gradColors:'צבעי הגרדיאנט', gradAngle:'זווית',
+      chooseImg:'בחרו תמונת רקע', changeImg:'החלפת תמונה',
+      formatLbl:'פורמט הפלט', fmtPng:'PNG', fmtWebp:'WEBP',
+      qualityLbl:'איכות המודל',
+      qFast:'מהיר', qBalanced:'מאוזן', qBest:'איכות מרבית',
+      goBtn:'הסירו רקע', working:'מסיר רקע…', dlModel:'מוריד מודל AI…',
+      readyTitle:'הרקע הוסר!', readySub:n=>`${n} ${n===1?'תמונה מוכנה':'תמונות מוכנות'} להורדה.`,
+      dlAll:'הורדת הכול', againBtn:'תמונה נוספת', download:'הורדה',
+      before:'לפני', after:'אחרי',
+      failed:'העיבוד נכשל', errNoFiles:'צריך לצרף לפחות תמונה אחת',
+      errEngine:'לא הצלחנו לטעון את מנוע הסרת הרקע. בדקו את החיבור לאינטרנט ונסו שוב.',
+      seam:'בהרצה הראשונה מורד לדפדפן מודל AI (פעם אחת, נשמר במטמון). מרגע זה הכול רץ מקומית — התמונות שלכם אף פעם לא נשלחות לשרת.',
+      foot:'KOLKLI · הסרת רקע AI · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הקישור הועתק ✓',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'AI · Remove background',
+      pageTitle:'Remove the background from any image — automatically',
+      pageSub:'Drop an image and the AI finds the subject and cuts the background in a second. Download a transparent PNG or WEBP, or swap in a new background — white, a solid color, a gradient, or your own image. Everything runs in your browser — nothing leaves your machine.',
+      dropBig:'Drag images here', or2:'or', choose:'Choose images',
+      sizeNote:'PNG · JPG · WEBP', remove:'Remove',
+      totalLbl:'Total', optTitle:'Options',
+      outLbl:'Result background',
+      bgTransparent:'Transparent', bgWhite:'White', bgBlack:'Black', bgCustom:'Color',
+      bgGradient:'Gradient', bgImage:'Image',
+      gradColors:'Gradient colors', gradAngle:'Angle',
+      chooseImg:'Choose background image', changeImg:'Change image',
+      formatLbl:'Output format', fmtPng:'PNG', fmtWebp:'WEBP',
+      qualityLbl:'Model quality',
+      qFast:'Fast', qBalanced:'Balanced', qBest:'Best',
+      goBtn:'Remove background', working:'Removing background…', dlModel:'Downloading AI model…',
+      readyTitle:'Background removed!', readySub:n=>`${n} ${n===1?'image':'images'} ready to download.`,
+      dlAll:'Download all', againBtn:'New image', download:'Download',
+      before:'before', after:'after',
+      failed:'Processing failed', errNoFiles:'Add at least one image',
+      errEngine:'Could not load the background-removal engine. Check your connection and try again.',
+      seam:'On the first run a small AI model is downloaded to your browser (once, then cached). From then on everything runs locally — your images are never sent to a server.',
+      foot:'KOLKLI · AI Remove background · Private and fast, right in your browser',
+      copied:'Link copied ✓',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'AI · Удаление фона',
+      pageTitle:'Удаляйте фон с любого изображения — автоматически',
+      pageSub:'Перетащите изображение, и AI найдёт объект и вырежет фон за секунду. Скачайте прозрачный PNG или WEBP либо замените фон — белый, сплошной цвет, градиент или своё изображение. Всё работает в вашем браузере — ничего не покидает устройство.',
+      dropBig:'Перетащите изображения сюда', or2:'или', choose:'Выбрать изображения',
+      sizeNote:'PNG · JPG · WEBP', remove:'Удалить',
+      totalLbl:'Всего', optTitle:'Параметры',
+      outLbl:'Фон результата',
+      bgTransparent:'Прозрачный', bgWhite:'Белый', bgBlack:'Чёрный', bgCustom:'Цвет',
+      bgGradient:'Градиент', bgImage:'Изображение',
+      gradColors:'Цвета градиента', gradAngle:'Угол',
+      chooseImg:'Выбрать фоновое изображение', changeImg:'Сменить изображение',
+      formatLbl:'Формат вывода', fmtPng:'PNG', fmtWebp:'WEBP',
+      qualityLbl:'Качество модели',
+      qFast:'Быстро', qBalanced:'Сбалансированно', qBest:'Лучшее',
+      goBtn:'Удалить фон', working:'Удаление фона…', dlModel:'Загрузка AI-модели…',
+      readyTitle:'Фон удалён!', readySub:n=>`Готово к скачиванию: ${n}.`,
+      dlAll:'Скачать всё', againBtn:'Новое изображение', download:'Скачать',
+      before:'до', after:'после',
+      failed:'Обработка не удалась', errNoFiles:'Добавьте хотя бы одно изображение',
+      errEngine:'Не удалось загрузить движок удаления фона. Проверьте соединение и попробуйте снова.',
+      seam:'При первом запуске небольшая AI-модель загружается в ваш браузер (один раз, затем кэшируется). Далее всё работает локально — ваши изображения никогда не отправляются на сервер.',
+      foot:'KOLKLI · AI-удаление фона · Приватно и быстро, прямо в браузере',
+      copied:'Ссылка скопирована ✓',
+    },
+  };
+
+  // output-background presets. "transparent" keeps the PNG alpha; the rest flatten
+  // the cut-out onto a solid color, a gradient, or an uploaded background image.
+  const BGS = [
+    { id:'transparent', key:'bgTransparent' },
+    { id:'white', key:'bgWhite', color:'#ffffff' },
+    { id:'black', key:'bgBlack', color:'#111318' },
+    { id:'custom', key:'bgCustom', color:'#3b82f6', custom:true },
+    { id:'gradient', key:'bgGradient' },
+    { id:'image', key:'bgImage' },
+  ];
+
+  const ICON = {
+    trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+    warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>',
+    dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+    slider:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/><polyline points="9 6 15 12 9 18" transform="translate(0)"/></svg>',
+    upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+    img:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+  };
+
+  // pinned so the model/wasm assets resolve from the same CDN folder as the module
+  const LIB_VER = '1.7.0';
+  const LIB_URL = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@' + LIB_VER + '/dist/index.mjs';
+  const LIB_ASSETS = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@' + LIB_VER + '/dist/';
+
+  let lang='he', t=I18N.he;
+  let files=[];                    // {id,file,name,size,url}
+  let uid=1;
+  let outMode='transparent';       // 'transparent' | 'color' | 'gradient' | 'image'
+  let outColor='#ffffff';
+  let outFormat='image/png';       // 'image/png' | 'image/webp'
+  let gradColors=['#7b34ff','#3f85ff'];
+  let gradAngle=105;
+  let bgImageURL='', bgImageBitmap=null;
+  let curBg='transparent';
+  let results=[];                  // {base, ok, cutBlob, cutURL, origURL, w, h}
+  let engine=null;
+
+  function baseName(name){ return String(name||'image').replace(/\.[^.\/\\]+$/,''); }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function totalBytes(){ return files.reduce((a,f)=>a+f.size,0); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+  function gradCss(){ return `linear-gradient(${gradAngle}deg,${gradColors[0]},${gradColors[1]})`; }
+  function outName(r){ return r.base + (outFormat==='image/webp' ? '.webp' : '.png'); }
+  function resultsShown(){ return el('resultsCard').classList.contains('show'); }
+
+  // CSS `background` shorthand value for the current output mode (previews only)
+  function bgValue(){
+    if(outMode==='color') return outColor;
+    if(outMode==='gradient') return gradCss();
+    if(outMode==='image' && bgImageURL) return `#0b0d12 center/cover url('${bgImageURL}')`;
+    return '';
+  }
+
+  // ---- background-color picker ----
+  function renderBgs(){
+    el('bgopts').innerHTML = BGS.map(b=>{
+      let dotStyle='', dotInner='';
+      if(b.id==='transparent'){
+        dotStyle='background-image:linear-gradient(45deg,var(--checker) 25%,transparent 25%),linear-gradient(-45deg,var(--checker) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--checker) 75%),linear-gradient(-45deg,transparent 75%,var(--checker) 75%);background-size:12px 12px;background-position:0 0,0 6px,6px -6px,-6px 0;';
+      } else if(b.id==='gradient'){
+        dotStyle=`background:${gradCss()};`;
+      } else if(b.id==='image'){
+        if(bgImageURL) dotStyle=`background:#0b0d12 center/cover url('${bgImageURL}');`;
+        else dotInner=ICON.img;
+      } else {
+        dotStyle=`background:${b.id==='custom'?outColor:b.color};`;
+      }
+      const picker = b.custom ? `<input type="color" class="picker" id="bgPicker" value="${outColor}">` : '';
+      return `<button type="button" class="swatch ${b.id===curBg?'on':''}" data-bg="${b.id}">
+        <span class="dot" style="${dotStyle}">${dotInner}</span><small data-i18n="${b.key}">${t[b.key]}</small>${picker}</button>`;
+    }).join('');
+  }
+
+  // contextual controls shown under the swatches for the gradient / image modes
+  function renderBgExtra(){
+    const box=el('bgExtra'); if(!box) return;
+    if(curBg==='gradient'){
+      box.style.display='flex';
+      box.innerHTML =
+        `<div class="ce-row"><span class="ce-lbl">${t.gradColors}</span>`+
+        `<span class="ce-colors"><input type="color" id="grad1" value="${gradColors[0]}"><input type="color" id="grad2" value="${gradColors[1]}"></span></div>`+
+        `<div class="ce-row"><span class="ce-lbl">${t.gradAngle} <span class="ce-val" id="gradAngleVal">${gradAngle}°</span></span>`+
+        `<input type="range" class="ce-range" id="gradAngle" min="0" max="360" step="15" value="${gradAngle}"></div>`;
+    } else if(curBg==='image'){
+      box.style.display='flex';
+      box.innerHTML = bgImageURL
+        ? `<div class="bgimg-row"><img class="bgimg-thumb" src="${bgImageURL}" alt="">`+
+          `<button type="button" class="bgimg-change" id="bgImgChange">${t.changeImg}</button>`+
+          `<button type="button" class="bgimg-rm" id="bgImgRm" title="${escapeHtml(t.remove)}">${ICON.trash}</button></div>`
+        : `<button type="button" class="bgimg-choose" id="bgImgChoose">${ICON.upload}<span>${t.chooseImg}</span></button>`;
+    } else {
+      box.style.display='none'; box.innerHTML='';
+    }
+  }
+
+  function selectBg(id){
+    curBg=id;
+    const spec=BGS.find(b=>b.id===id);
+    if(id==='transparent') outMode='transparent';
+    else if(id==='gradient') outMode='gradient';
+    else if(id==='image') outMode='image';
+    else { outMode='color'; outColor = spec.custom ? (el('bgPicker')?el('bgPicker').value:outColor) : spec.color; }
+    renderBgs(); renderBgExtra();
+    if(resultsShown()) refreshPreviews();
+  }
+
+  async function setBgImage(file){
+    if(bgImageURL) URL.revokeObjectURL(bgImageURL);
+    if(bgImageBitmap && bgImageBitmap.close) bgImageBitmap.close();
+    bgImageURL=URL.createObjectURL(file);
+    bgImageBitmap=await createImageBitmap(file).catch(()=>null);
+    curBg='image'; outMode='image';
+    renderBgs(); renderBgExtra();
+    if(resultsShown()) refreshPreviews();
+  }
+  function clearBgImage(){
+    if(bgImageURL) URL.revokeObjectURL(bgImageURL);
+    if(bgImageBitmap && bgImageBitmap.close) bgImageBitmap.close();
+    bgImageURL=''; bgImageBitmap=null;
+    renderBgs(); renderBgExtra();
+    if(resultsShown()) refreshPreviews();
+  }
+
+  // ---- intake ----
+  function addFiles(list){
+    Array.from(list||[]).forEach(file=>{
+      if(!/^image\//.test(file.type)) return;
+      files.push({ id:'f'+(uid++), file, name:file.name, size:file.size, url:URL.createObjectURL(file) });
+    });
+    renderFiles();
+  }
+  function removeFile(id){
+    const f=files.find(x=>x.id===id); if(f&&f.url) URL.revokeObjectURL(f.url);
+    files=files.filter(x=>x.id!==id); renderFiles();
+  }
+  function renderFiles(){
+    const card=el('filesCard'), list=el('flist');
+    card.style.display = files.length? '' : 'none';
+    list.innerHTML = files.map(f=>`
+      <div class="frow">
+        <img class="fthumb" src="${f.url}" alt="">
+        <span class="fn"><div class="nm" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div><div class="sz">${fmtBytes(f.size)}</div></span>
+        <button class="rm" data-rm="${f.id}" title="${escapeHtml(t.remove)}">${ICON.trash}</button>
+      </div>`).join('');
+    el('totalVal').textContent = fmtBytes(totalBytes());
+    el('convBtn').disabled = files.length===0;
+  }
+
+  // ---- engine ----
+  async function getEngine(){
+    if(engine) return engine;
+    const mod = await import(LIB_URL);
+    engine = mod.default || mod.removeBackground || mod;
+    if(typeof engine!=='function') throw new Error('bad module');
+    return engine;
+  }
+
+  // paint the chosen output background, then draw the cut-out on top.
+  function fillGradient(ctx,w,h){
+    const rad = gradAngle*Math.PI/180;         // CSS angle: 0deg = up, clockwise
+    const x = Math.sin(rad), y = -Math.cos(rad);
+    const cx=w/2, cy=h/2, half=(Math.abs(w*x)+Math.abs(h*y))/2;
+    const g=ctx.createLinearGradient(cx-x*half,cy-y*half,cx+x*half,cy+y*half);
+    g.addColorStop(0,gradColors[0]); g.addColorStop(1,gradColors[1]);
+    ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+  }
+  function drawCover(ctx,bmp,w,h){          // mirrors CSS background-size:cover, centered
+    const s=Math.max(w/bmp.width,h/bmp.height), dw=bmp.width*s, dh=bmp.height*s;
+    ctx.drawImage(bmp,(w-dw)/2,(h-dh)/2,dw,dh);
+  }
+
+  // flatten the transparent cut-out onto the selected background and encode to PNG/WEBP.
+  async function compose(cutBlob){
+    if(outMode==='transparent' && outFormat==='image/png') return cutBlob;   // already a PNG
+    const bmp = await createImageBitmap(cutBlob);
+    const c=document.createElement('canvas'); c.width=bmp.width; c.height=bmp.height;
+    const ctx=c.getContext('2d');
+    if(outMode==='color'){ ctx.fillStyle=outColor; ctx.fillRect(0,0,c.width,c.height); }
+    else if(outMode==='gradient'){ fillGradient(ctx,c.width,c.height); }
+    else if(outMode==='image' && bgImageBitmap){ drawCover(ctx,bgImageBitmap,c.width,c.height); }
+    ctx.drawImage(bmp,0,0); bmp.close&&bmp.close();
+    const q = outFormat==='image/webp' ? 0.92 : undefined;
+    return await new Promise(r=>c.toBlob(r,outFormat,q));
+  }
+
+  // ---- run ----
+  async function run(){
+    el('optErr').textContent='';
+    if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
+
+    let removeBackground;
+    el('composer').style.display='none';
+    const prog=el('progCard'); prog.classList.add('show');
+    el('progName').textContent=t.dlModel; setProg(0);
+
+    try{ removeBackground = await getEngine(); }
+    catch(err){
+      prog.classList.remove('show'); el('composer').style.display='';
+      el('optErr').textContent=t.errEngine; return;
+    }
+
+    clearResults(); results=[];
+    for(let i=0;i<files.length;i++){
+      const it=files[i];
+      const tag = `${it.name}  ·  ${i+1}/${files.length}`;
+      el('progName').textContent=tag; setProg(Math.round(i/files.length*100));
+      try{
+        const cutBlob = await removeBackground(it.file, {
+          publicPath: LIB_ASSETS,
+          model: el('quality').value || 'isnet_fp16',
+          output:{ format:'image/png' },
+          progress:(key,cur,tot)=>{
+            const slice=100/files.length;
+            if(String(key).indexOf('fetch')===0){
+              const pct = tot? Math.round(cur/tot*100) : 0;
+              el('progName').textContent = `${tag} · ${t.dlModel} ${pct}%`;
+              setProg(Math.round(i*slice + 0.55*slice*(pct/100)));
+            } else {
+              el('progName').textContent = `${tag} · ${t.working}`;
+              setProg(Math.round(i*slice + 0.85*slice));
+            }
+          },
+        });
+        const bmp = await createImageBitmap(cutBlob).catch(()=>null);
+        results.push({ base: baseName(it.name)+'-nobg', ok:true, cutBlob,
+          cutURL:URL.createObjectURL(cutBlob), origURL:it.url,
+          w:bmp?bmp.width:0, h:bmp?bmp.height:0 });
+        if(bmp&&bmp.close) bmp.close();
+      }catch(err){
+        results.push({ base: baseName(it.name)+'-nobg', ok:false, origURL:it.url });
+      }
+      setProg(Math.round((i+1)/files.length*100));
+    }
+    await sleep(160);
+    prog.classList.remove('show');
+
+    if(!results.some(r=>r.ok)){ el('optErr').textContent=t.failed; el('composer').style.display=''; return; }
+    showResults();
+  }
+  function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+
+  // ---- results ----
+  function previewBg(){ return outMode==='transparent' ? 'checker' : ''; }
+  function previewStyle(){ const v=bgValue(); return v?`background:${v};`:''; }
+
+  function showResults(){
+    const okCount=results.filter(r=>r.ok).length;
+    el('readySub').textContent = t.readySub(okCount);
+
+    // before/after slider — shown for the first successful cut-out
+    const first = results.find(r=>r.ok);
+    if(first){
+      el('cmpWrap').innerHTML = `
+        <div class="cmp" id="cmp" dir="ltr">
+          <img class="cmp-orig" src="${first.origURL}" alt="">
+          <div class="cmp-after ${previewBg()}" id="cmpAfter" style="${previewStyle()}"><img id="cmpCut" src="${first.cutURL}" alt=""></div>
+          <div class="cmp-line" id="cmpLine"><span class="cmp-h">${ICON.slider}</span></div>
+          <input type="range" min="0" max="100" value="50" class="cmp-range" id="cmpRange">
+          <span class="cmp-tag l">${t.before}</span><span class="cmp-tag r">${t.after}</span>
+        </div>`;
+      const cmp=el('cmp'), range=el('cmpRange');
+      range.addEventListener('input',()=>{ cmp.style.setProperty('--pos', range.value+'%'); });
+    } else { el('cmpWrap').innerHTML=''; }
+
+    el('rgrid').innerHTML = results.map((r,i)=>{
+      const nm = outName(r);
+      if(!r.ok){
+        return `<div class="rcard err">
+          <div class="rprev err">${ICON.warn}</div>
+          <div class="rmeta"><span class="rn"><div class="nm" title="${escapeHtml(nm)}">${escapeHtml(nm)}</div><div class="sz">${escapeHtml(t.failed)}</div></span></div></div>`;
+      }
+      return `<div class="rcard">
+        <div class="rprev ${previewBg()}" style="${previewStyle()}"><img src="${r.cutURL}" alt=""></div>
+        <div class="rmeta"><span class="rn"><div class="nm" title="${escapeHtml(nm)}">${escapeHtml(nm)}</div><div class="sz">${r.w?`${r.w}×${r.h}`:''}</div></span>
+        <button class="dlbtn" data-dl="${i}" title="${escapeHtml(t.download)}">${ICON.dl}</button></div></div>`;
+    }).join('');
+
+    el('resultsCard').classList.add('show');
+    el('resultsCard').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  // re-skin previews when the output background changes (no reprocessing needed)
+  function refreshPreviews(){
+    const checker = outMode==='transparent';
+    const v = bgValue();
+    document.querySelectorAll('.rprev:not(.err)').forEach(p=>{
+      p.classList.toggle('checker', checker);
+      p.style.background = v;
+    });
+    const after=el('cmpAfter');
+    if(after){ after.classList.toggle('checker', checker); after.style.background = v; }
+  }
+
+  // update result filenames in place when only the output format changes
+  function updateNames(){
+    document.querySelectorAll('#rgrid .rcard').forEach((card,i)=>{
+      const r=results[i]; if(!r) return;
+      const nm=card.querySelector('.rn .nm'); if(!nm) return;
+      const n=outName(r); nm.textContent=n; nm.title=n;
+    });
+  }
+
+  async function download(r){
+    if(!r||!r.ok) return;
+    const blob = await compose(r.cutBlob);
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=outName(r);
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
+  }
+  async function downloadAll(){ for(const r of results){ if(r.ok){ await download(r); await sleep(300); } } }
+
+  function clearResults(){
+    results.forEach(r=>{ if(r.cutURL) URL.revokeObjectURL(r.cutURL); });
+    results=[];
+  }
+  function reset(){
+    clearResults();
+    files.forEach(f=>{ if(f.url) URL.revokeObjectURL(f.url); });
+    files=[];
+    el('resultsCard').classList.remove('show');
+    el('cmpWrap').innerHTML=''; el('rgrid').innerHTML='';
+    el('optErr').textContent='';
+    el('composer').style.display=''; renderFiles();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- i18n + theme (mirrors the other pages; header stays in sync via its observer) ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderBgs(); renderBgExtra(); renderFiles();
+    if(resultsShown()) showResults();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('flist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeFile(b.getAttribute('data-rm')); });
+  el('bgopts').addEventListener('click',e=>{ const b=e.target.closest('[data-bg]'); if(b) selectBg(b.getAttribute('data-bg')); });
+  el('bgopts').addEventListener('input',e=>{ if(e.target.id==='bgPicker'){ outColor=e.target.value; curBg='custom'; outMode='color'; renderBgs(); if(resultsShown()) refreshPreviews(); } });
+
+  // gradient color / angle controls
+  el('bgExtra').addEventListener('input',e=>{
+    const id=e.target.id;
+    if(id==='grad1'){ gradColors[0]=e.target.value; renderBgs(); if(resultsShown()) refreshPreviews(); }
+    else if(id==='grad2'){ gradColors[1]=e.target.value; renderBgs(); if(resultsShown()) refreshPreviews(); }
+    else if(id==='gradAngle'){ gradAngle=+e.target.value; const v=el('gradAngleVal'); if(v) v.textContent=gradAngle+'°'; renderBgs(); if(resultsShown()) refreshPreviews(); }
+  });
+  el('bgExtra').addEventListener('click',e=>{
+    if(e.target.closest('#bgImgChoose')||e.target.closest('#bgImgChange')) el('bgImgInput').click();
+    else if(e.target.closest('#bgImgRm')) clearBgImage();
+  });
+  el('bgImgInput').addEventListener('change',()=>{
+    const f=el('bgImgInput').files&&el('bgImgInput').files[0]; el('bgImgInput').value='';
+    if(f&&/^image\//.test(f.type)) setBgImage(f);
+  });
+
+  el('format').addEventListener('change',()=>{ outFormat=el('format').value; if(resultsShown()) updateNames(); });
+  el('rgrid').addEventListener('click',e=>{ const b=e.target.closest('[data-dl]'); if(b) download(results[+b.getAttribute('data-dl')]); });
+
+  el('convBtn').addEventListener('click',run);
+  el('dlAllBtn').addEventListener('click',downloadAll);
+  el('againBtn').addEventListener('click',reset);
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  renderBgs(); renderBgExtra(); renderFiles();
+})();
+</script>
+</body>
+</html>

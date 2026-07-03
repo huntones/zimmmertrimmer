@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — הסרת אובייקטים AI</title>
+<meta name="description" content="AI Object Remover — brush over any unwanted object, person, wire, blemish or text and let AI fill the background in naturally. Undo/redo, adjustable brush, before/after compare and a high-quality download. Runs entirely in your browser — nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:30px 20px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:26px;height:26px;}
+  .drop .big{font-size:15.5px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:12px;color:var(--faint);margin:6px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13.5px;padding:10px 22px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .sizenote{margin-top:12px;font-size:11.5px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  /* editor stage */
+  .stageCard{padding:0;overflow:hidden;}
+  .stagebar{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line-2);flex-wrap:wrap;}
+  .tbtn{height:36px;min-width:36px;padding:0 9px;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;font-weight:600;transition:all .12s;}
+  .tbtn:hover:not(:disabled){border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .tbtn:disabled{opacity:.4;cursor:not-allowed;}
+  .tbtn.on{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
+  .tbtn svg{width:17px;height:17px;}
+  .stagebar .fname{flex:1;min-width:0;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-family:var(--mono);padding:0 4px;text-align:end;}
+  .stagebar .sep{width:1px;height:22px;background:var(--line);margin:0 2px;}
+  .stagewrap{position:relative;
+    background-color:var(--panel-2);
+    background-image:
+      linear-gradient(45deg,rgba(128,128,128,.12) 25%,transparent 25%,transparent 75%,rgba(128,128,128,.12) 75%),
+      linear-gradient(45deg,rgba(128,128,128,.12) 25%,transparent 25%,transparent 75%,rgba(128,128,128,.12) 75%);
+    background-size:22px 22px;background-position:0 0,11px 11px;}
+  canvas#stage{display:block;width:100%;height:540px;touch-action:none;cursor:none;}
+  @media (max-width:840px){ canvas#stage{height:400px;} }
+  .brushcur{position:absolute;border:1.5px solid #fff;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);
+    box-shadow:0 0 0 1.5px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.35);display:none;z-index:4;}
+  .brushcur.erase{border-style:dashed;}
+  .stagehint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);pointer-events:none;z-index:5;
+    background:rgba(15,17,26,.78);color:#fff;font-size:11.5px;font-family:var(--mono);padding:6px 13px;border-radius:999px;
+    box-shadow:0 4px 14px rgba(0,0,0,.28);white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis;}
+
+  /* options side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+  .opt > label .val{font-family:var(--mono);font-size:12px;color:var(--accent-dim);font-weight:600;}
+
+  /* segmented toggle */
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:12px;padding:4px;}
+  .seg button{border:none;background:transparent;color:var(--muted);font-family:var(--sans);font-size:13px;font-weight:600;
+    padding:9px 6px;border-radius:9px;cursor:pointer;transition:background .12s,color .12s;display:inline-flex;align-items:center;justify-content:center;gap:7px;}
+  .seg button svg{width:15px;height:15px;}
+  .seg button.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+
+  /* range slider */
+  .rangewrap{display:flex;align-items:center;gap:11px;}
+  input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;
+    background:var(--panel-2);border:1px solid var(--line-2);cursor:pointer;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:var(--grad-btn);border:2px solid var(--panel);box-shadow:var(--shadow-sm);cursor:pointer;}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#5d43f5;border:2px solid var(--panel);cursor:pointer;}
+
+  .inp,select.inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  select.inp{cursor:pointer;}
+  .inp:focus,select.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .hint{font-size:11px;color:var(--faint);font-family:var(--mono);margin-top:8px;line-height:1.5;}
+
+  .convbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:6px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .convbtn:hover:not(:disabled){filter:brightness(1.05);} .convbtn:active:not(:disabled){transform:translateY(1px);}
+  .convbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .convbtn svg{width:17px;height:17px;}
+  .convbtn .spin{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;
+    animation:spin .7s linear infinite;display:none;}
+  .convbtn.busy .spin{display:inline-block;} .convbtn.busy .mi{display:none;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+
+  .divide{height:1px;background:var(--line-2);margin:16px 0;}
+
+  .row2{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
+  .row2 a,.row2 button{flex:1;min-width:130px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 a:hover,.row2 button:hover{border-color:var(--accent);} .row2 *:active{transform:translateY(1px);}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .row2 svg{width:15px;height:15px;}
+
+  /* progress */
+  .prog{padding:16px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;}
+  .prog .lbl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+
+  /* before / after compare card */
+  .compare{padding:20px;display:none;margin-top:18px;}
+  .compare.show{display:block;}
+  .compare .chead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;}
+  .compare .chead h3{font-size:16px;margin:0;font-weight:700;}
+  .compare .close{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .compare .close:hover{border-color:var(--danger);color:var(--danger);}
+  .compare .close svg{width:16px;height:16px;}
+  .cmp{position:relative;max-width:560px;margin:0 auto;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+    background:#000;user-select:none;touch-action:none;--pos:50%;}
+  .cmp img{display:block;width:100%;pointer-events:none;}
+  .cmp .cmp-after{position:absolute;inset:0;clip-path:inset(0 0 0 var(--pos));}
+  .cmp .cmp-after img{position:absolute;inset:0;width:100%;height:100%;}
+  .cmp .cmp-line{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;background:#fff;transform:translateX(-1px);
+    box-shadow:0 0 0 1px rgba(0,0,0,.18);}
+  .cmp .cmp-h{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;
+    background:#fff;color:#111;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.28);}
+  .cmp .cmp-h svg{width:18px;height:18px;}
+  .cmp .cmp-range{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;}
+  .cmp .cmp-tag{position:absolute;top:10px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;color:#fff;background:rgba(0,0,0,.5);padding:3px 9px;border-radius:999px;pointer-events:none;}
+  .cmp .cmp-tag.l{left:10px;} .cmp .cmp-tag.r{right:10px;}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid" id="composer">
+    <!-- main: upload / editor stage -->
+    <div class="col">
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="sizenote" data-i18n="sizeNote"></div>
+      </div>
+      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/bmp">
+
+      <div class="card stageCard" id="stageCard" style="display:none">
+        <div class="stagebar">
+          <button class="tbtn on" id="brushBtn" type="button" title=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg><span data-i18n="tBrush"></span></button>
+          <button class="tbtn" id="eraseBtn" type="button" title=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16a2 2 0 0 1 0-3L13 3a2 2 0 0 1 3 0l5 5a2 2 0 0 1 0 3l-9 9"/><path d="m6 13 6 6"/></svg><span data-i18n="tErase"></span></button>
+          <div class="sep"></div>
+          <button class="tbtn" id="undoBtn" type="button" disabled title=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg></button>
+          <button class="tbtn" id="redoBtn" type="button" disabled title=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg></button>
+          <button class="tbtn" id="clearBtn" type="button" disabled title=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          <div class="sep"></div>
+          <button class="tbtn" id="cmpBtn" type="button" title=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 7l-3 5 3 5"/><path d="M19 7l3 5-3 5"/></svg></button>
+          <button class="tbtn" id="resetBtn" type="button" title=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+          <span class="fname" id="fname"></span>
+        </div>
+        <div class="stagewrap" id="stagewrap">
+          <canvas id="stage"></canvas>
+          <div class="brushcur" id="brushCur"></div>
+          <div class="stagehint" id="stageHint"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- side: options -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="optTitle"></h3>
+
+        <div class="opt">
+          <label data-i18n="toolLbl"></label>
+          <div class="seg" id="toolSeg">
+            <button type="button" data-tool="brush" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg><span data-i18n="tBrush"></span></button>
+            <button type="button" data-tool="erase"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16a2 2 0 0 1 0-3L13 3a2 2 0 0 1 3 0l5 5a2 2 0 0 1 0 3l-9 9"/><path d="m6 13 6 6"/></svg><span data-i18n="tErase"></span></button>
+          </div>
+        </div>
+
+        <div class="opt">
+          <label><span data-i18n="brushLbl"></span><span class="val" id="brushVal">44 px</span></label>
+          <div class="rangewrap">
+            <input type="range" id="brushSize" min="6" max="160" step="1" value="44">
+          </div>
+        </div>
+
+        <button class="convbtn" id="removeBtn" type="button" disabled>
+          <span class="spin"></span>
+          <svg class="mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17l-1.9-5.6L4.5 10l5.6-1.9z"/><path d="M5 20l1.5 1.5"/><path d="M19 20l-1.5 1.5"/></svg>
+          <span data-i18n="removeBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+
+        <div class="divide"></div>
+
+        <div class="opt">
+          <label data-i18n="fmtLbl"></label>
+          <select class="inp" id="fmt">
+            <option value="keep" data-i18n="keepOrig"></option>
+            <option value="image/png">PNG</option>
+            <option value="image/jpeg">JPG</option>
+            <option value="image/webp">WEBP</option>
+          </select>
+        </div>
+
+        <div class="opt" id="qualityOpt" style="display:none">
+          <label><span data-i18n="qLbl"></span><span class="val" id="qVal">92%</span></label>
+          <div class="rangewrap">
+            <input type="range" id="quality" min="30" max="100" step="1" value="92">
+          </div>
+        </div>
+
+        <div class="row2">
+          <button id="dlBtn" class="primary" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span data-i18n="dl"></span>
+          </button>
+          <button id="newBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+            <span data-i18n="newImage"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="nm" id="progName" data-i18n="working"></span><span id="progPct">0%</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <!-- before / after compare -->
+  <div class="card compare" id="compareCard">
+    <div class="chead">
+      <h3 data-i18n="cmpTitle"></h3>
+      <button class="close" id="cmpClose" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    </div>
+    <div id="cmpWrap"></div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   Content-aware fill (multi-scale PatchMatch) — kept fully self
+   contained so it can be stringified into a Web Worker verbatim
+   (fn.toString()) AND called directly on the main thread as a
+   fallback. It must NOT reference anything outside its own body.
+   ============================================================ */
+function inpaintCore(msg, onProgress){
+  onProgress = onProgress || function(){};
+  var W = msg.width|0, H = msg.height|0;
+  var src = msg.rgba;            // Uint8ClampedArray|Uint8Array, W*H*4
+  var holeF = msg.mask;          // Uint8Array, W*H, >127 = remove
+  var out = new Uint8ClampedArray(src.length);
+  out.set(src);
+
+  // hole bounding box
+  var any=false, minx=W, miny=H, maxx=-1, maxy=-1;
+  for(var y=0;y<H;y++){ for(var x=0;x<W;x++){ if(holeF[y*W+x]>127){ any=true;
+    if(x<minx)minx=x; if(x>maxx)maxx=x; if(y<miny)miny=y; if(y>maxy)maxy=y; } } }
+  if(!any) return out;
+
+  // ---- compute-resolution working copy (float RGB) ----
+  var COMPUTE_MAX = 700;
+  var scale = Math.min(1, COMPUTE_MAX / Math.max(W,H));
+  var cw = Math.max(2, Math.round(W*scale));
+  var ch = Math.max(2, Math.round(H*scale));
+  var est = new Float32Array(cw*ch*3);   // running estimate (known fixed, hole synthesized)
+  var hole = new Uint8Array(cw*ch);
+  for(var yy=0; yy<ch; yy++){
+    var sy0=Math.floor(yy/ch*H), sy1=Math.max(sy0+1, Math.floor((yy+1)/ch*H));
+    for(var xx=0; xx<cw; xx++){
+      var sx0=Math.floor(xx/cw*W), sx1=Math.max(sx0+1, Math.floor((xx+1)/cw*W));
+      var r=0,g=0,b=0,cnt=0,hc=0,tot=0;
+      for(var sy=sy0; sy<sy1 && sy<H; sy++){ for(var sx=sx0; sx<sx1 && sx<W; sx++){
+        var si=(sy*W+sx); tot++; if(holeF[si]>127){ hc++; } else { r+=src[si*4]; g+=src[si*4+1]; b+=src[si*4+2]; cnt++; }
+      }}
+      var di=yy*cw+xx;
+      if(cnt>0){ est[di*3]=r/cnt; est[di*3+1]=g/cnt; est[di*3+2]=b/cnt; }
+      hole[di] = (hc*2 >= tot) ? 1 : 0;   // majority-hole block
+    }
+  }
+
+  var R = 2;                     // patch radius (5x5)
+
+  // ---- pyramid sizes (coarse first) ----
+  var sizes=[[cw,ch]], lw=cw, lh=ch;
+  while(Math.min(lw,lh) > 26 && sizes.length < 6){
+    lw=Math.max(2,Math.round(lw/2)); lh=Math.max(2,Math.round(lh/2)); sizes.push([lw,lh]);
+  }
+  sizes.reverse();
+
+  // build a coarser level by resampling the fine (cw,ch) estimate; hole where majority hole
+  function makeLevel(w,h){
+    var e=new Float32Array(w*h*3), ho=new Uint8Array(w*h);
+    for(var y=0;y<h;y++){ var fy0=Math.floor(y/h*ch), fy1=Math.max(fy0+1,Math.floor((y+1)/h*ch));
+      for(var x=0;x<w;x++){ var fx0=Math.floor(x/w*cw), fx1=Math.max(fx0+1,Math.floor((x+1)/w*cw));
+        var r=0,g=0,b=0,c=0,hh=0,t=0;
+        for(var fy=fy0;fy<fy1&&fy<ch;fy++){ for(var fx=fx0;fx<fx1&&fx<cw;fx++){
+          var fi=fy*cw+fx; t++; if(hole[fi]){ hh++; } else { r+=est[fi*3];g+=est[fi*3+1];b+=est[fi*3+2];c++; }
+        }}
+        var di=y*w+x; if(c>0){ e[di*3]=r/c;e[di*3+1]=g/c;e[di*3+2]=b/c; }
+        ho[di]=(hh*2>=t)?1:0;
+      }
+    }
+    return {w:w,h:h,est:e,hole:ho};
+  }
+
+  // smear known colours inward to seed the hole (coarsest level only)
+  function nearestFill(lev){
+    var w=lev.w,h=lev.h,e=lev.est,ho=lev.hole;
+    var filled=new Uint8Array(w*h); var rem=0;
+    for(var i=0;i<w*h;i++){ filled[i]=ho[i]?0:1; if(!filled[i]) rem++; }
+    var guard=0;
+    while(rem>0 && guard++<4000){
+      var set=[];
+      for(var y=0;y<h;y++){ for(var x=0;x<w;x++){ var idx=y*w+x; if(filled[idx]) continue;
+        var r=0,g=0,b=0,c=0;
+        for(var dy=-1;dy<=1;dy++){ for(var dx=-1;dx<=1;dx++){ var nx=x+dx,ny=y+dy;
+          if(nx<0||ny<0||nx>=w||ny>=h) continue; var ni=ny*w+nx;
+          if(filled[ni]){ r+=e[ni*3];g+=e[ni*3+1];b+=e[ni*3+2];c++; } }}
+        if(c>0) set.push(idx, r/c, g/c, b/c);
+      }}
+      if(!set.length) break;
+      for(var k=0;k<set.length;k+=4){ var id=set[k]; e[id*3]=set[k+1];e[id*3+1]=set[k+2];e[id*3+2]=set[k+3]; filled[id]=1; rem--; }
+    }
+  }
+
+  // seed a finer level's hole from the (filled) coarser estimate via bilinear upsampling
+  function upsampleInto(prev, lev){
+    var w=lev.w,h=lev.h,e=lev.est,ho=lev.hole, pw=prev.w,ph=prev.h,pe=prev.est;
+    for(var y=0;y<h;y++){ for(var x=0;x<w;x++){ var idx=y*w+x; if(!ho[idx]) continue;
+      var fx=(x+0.5)/w*pw-0.5, fy=(y+0.5)/h*ph-0.5;
+      var x0=Math.floor(fx), y0=Math.floor(fy), tx=fx-x0, ty=fy-y0;
+      var x1=x0+1, y1=y0+1;
+      if(x0<0)x0=0; if(y0<0)y0=0; if(x1>pw-1)x1=pw-1; if(y1>ph-1)y1=ph-1;
+      if(x0>pw-1)x0=pw-1; if(y0>ph-1)y0=ph-1;
+      for(var ch3=0;ch3<3;ch3++){
+        var a=pe[(y0*pw+x0)*3+ch3], b2=pe[(y0*pw+x1)*3+ch3], c2=pe[(y1*pw+x0)*3+ch3], d=pe[(y1*pw+x1)*3+ch3];
+        var top=a+(b2-a)*tx, bot=c2+(d-c2)*tx; e[idx*3+ch3]=top+(bot-top)*ty;
+      }
+    }}
+  }
+
+  function patchDist(e,w,tx,ty,sx,sy,R,cut){
+    var d=0;
+    for(var dy=-R;dy<=R;dy++){
+      var tb=((ty+dy)*w)*3, sb=((sy+dy)*w)*3;
+      for(var dx=-R;dx<=R;dx++){
+        var ti=tb+(tx+dx)*3, si=sb+(sx+dx)*3;
+        var dr=e[ti]-e[si], dg=e[ti+1]-e[si+1], db=e[ti+2]-e[si+2];
+        d+=dr*dr+dg*dg+db*db;
+      }
+      if(d>cut) return d;
+    }
+    return d;
+  }
+
+  function solveLevel(lev, li, nl){
+    var w=lev.w,h=lev.h,e=lev.est,ho=lev.hole;
+    var x0=R,y0=R,x1=w-1-R,y1=h-1-R;
+    if(x1<x0||y1<y0) return;
+    // integral image of hole for fast patch-hole tests
+    var iw=w+1, integ=new Int32Array(iw*(h+1));
+    for(var y=0;y<h;y++){ var row=0; for(var x=0;x<w;x++){ row+=ho[y*w+x]; integ[(y+1)*iw+(x+1)]=integ[y*iw+(x+1)]+row; } }
+    function holeIn(ax,ay,bx,by){ return integ[(by+1)*iw+(bx+1)]-integ[ay*iw+(bx+1)]-integ[(by+1)*iw+ax]+integ[ay*iw+ax]; }
+
+    var sourceOk=new Uint8Array(w*h), sources=[], isT=new Uint8Array(w*h), targets=[];
+    for(var y=y0;y<=y1;y++){ for(var x=x0;x<=x1;x++){
+      var hn=holeIn(x-R,y-R,x+R,y+R);
+      if(hn===0){ sourceOk[y*w+x]=1; sources.push(y*w+x); }
+      else { isT[y*w+x]=1; targets.push(y*w+x); }   // patch overlaps hole -> optimise it
+    }}
+    if(!sources.length || !targets.length) return;
+
+    var nx=new Int32Array(w*h), ny=new Int32Array(w*h), nd=new Float32Array(w*h);
+    var i,idx,tx,ty,s;
+    for(i=0;i<targets.length;i++){ idx=targets[i]; tx=idx%w; ty=(idx/w)|0;
+      s=sources[(Math.random()*sources.length)|0];
+      nx[idx]=s%w; ny[idx]=(s/w)|0; nd[idx]=patchDist(e,w,tx,ty,nx[idx],ny[idx],R,1e20);
+    }
+
+    var emIters = li<2 ? 6 : (li<nl-1 ? 4 : 3);
+    for(var em=0; em<emIters; em++){
+      for(var it=0; it<2; it++){
+        var rev = (((em<<1)+it)&1)===1;
+        var n=targets.length;
+        for(var k=0;k<n;k++){
+          var ti = rev ? targets[n-1-k] : targets[k];
+          tx=ti%w; ty=(ti/w)|0;
+          var bx=nx[ti], by=ny[ti], bd=nd[ti];
+          var d1x=rev?1:-1, d1y=0, d2x=0, d2y=rev?1:-1;
+          // propagate from horizontal neighbour
+          var hxn=tx+d1x, hyn=ty; var hni=hyn*w+hxn;
+          if(hxn>=0&&hxn<w&&isT[hni]){ var csx=nx[hni]-d1x, csy=ny[hni];
+            if(csx>=R&&csy>=R&&csx<=x1&&csy<=y1&&sourceOk[csy*w+csx]){ var dd=patchDist(e,w,tx,ty,csx,csy,R,bd); if(dd<bd){bd=dd;bx=csx;by=csy;} } }
+          // propagate from vertical neighbour
+          var vxn=tx, vyn=ty+d2y; var vni=vyn*w+vxn;
+          if(vyn>=0&&vyn<h&&isT[vni]){ var cs2x=nx[vni], cs2y=ny[vni]-d2y;
+            if(cs2x>=R&&cs2y>=R&&cs2x<=x1&&cs2y<=y1&&sourceOk[cs2y*w+cs2x]){ var dd2=patchDist(e,w,tx,ty,cs2x,cs2y,R,bd); if(dd2<bd){bd=dd2;bx=cs2x;by=cs2y;} } }
+          // random search, shrinking window
+          var rad=Math.max(w,h);
+          while(rad>=1){
+            var rx=bx+(((Math.random()*2-1)*rad)|0), ry=by+(((Math.random()*2-1)*rad)|0);
+            if(rx>=R&&ry>=R&&rx<=x1&&ry<=y1&&sourceOk[ry*w+rx]){
+              var dr=patchDist(e,w,tx,ty,rx,ry,R,bd); if(dr<bd){bd=dr;bx=rx;by=ry;}
+            }
+            rad=(rad/2)|0;
+          }
+          nx[ti]=bx; ny[ti]=by; nd[ti]=bd;
+        }
+      }
+      // vote: rebuild hole pixels from all overlapping matched patches
+      var accR=new Float32Array(w*h),accG=new Float32Array(w*h),accB=new Float32Array(w*h),accW=new Float32Array(w*h);
+      for(var t2=0;t2<targets.length;t2++){ var tti=targets[t2]; var ttx=tti%w, tty=(tti/w)|0, ssx=nx[tti], ssy=ny[tti];
+        var wgt=1/(1+nd[tti]*0.0008);
+        for(var dy=-R;dy<=R;dy++){ var py=tty+dy; if(py<0||py>=h) continue;
+          for(var dx=-R;dx<=R;dx++){ var px=ttx+dx; if(px<0||px>=w) continue; var pi=py*w+px; if(!ho[pi]) continue;
+            var si2=((ssy+dy)*w+(ssx+dx))*3;
+            accR[pi]+=e[si2]*wgt; accG[pi]+=e[si2+1]*wgt; accB[pi]+=e[si2+2]*wgt; accW[pi]+=wgt;
+          }}
+      }
+      for(i=0;i<w*h;i++){ if(ho[i]&&accW[i]>0){ e[i*3]=accR[i]/accW[i]; e[i*3+1]=accG[i]/accW[i]; e[i*3+2]=accB[i]/accW[i]; } }
+      onProgress((li + (em+1)/emIters)/nl);
+    }
+  }
+
+  // ---- run coarse -> fine ----
+  var prev=null;
+  for(var li=0; li<sizes.length; li++){
+    var w=sizes[li][0], h=sizes[li][1];
+    var lev = (li===sizes.length-1) ? {w:cw,h:ch,est:est,hole:hole} : makeLevel(w,h);
+    if(prev===null) nearestFill(lev); else upsampleInto(prev, lev);
+    solveLevel(lev, li, sizes.length);
+    prev = lev;
+  }
+
+  // ---- feathered composite back to full resolution ----
+  var fw=prev.w, fh=prev.h, fe=prev.est;
+  // build a soft alpha from the full-res mask (blur a couple of times)
+  var alpha=new Float32Array(W*H);
+  for(var i=0;i<W*H;i++) alpha[i]=holeF[i]>127?1:0;
+  var F=Math.max(1, Math.round(2*Math.max(W,H)/Math.max(1,Math.max(fw,fh))));
+  boxBlur(alpha, W, H, F); boxBlur(alpha, W, H, F);
+  for(var y=0;y<H;y++){ for(var x=0;x<W;x++){
+    var a=alpha[y*W+x]; if(a<=0.004) continue; if(a>1)a=1;
+    var gx=(x+0.5)/W*fw-0.5, gy=(y+0.5)/H*fh-0.5;
+    var gx0=Math.floor(gx), gy0=Math.floor(gy), fx=gx-gx0, fy=gy-gy0, gx1=gx0+1, gy1=gy0+1;
+    if(gx0<0)gx0=0; if(gy0<0)gy0=0; if(gx1>fw-1)gx1=fw-1; if(gy1>fh-1)gy1=fh-1;
+    if(gx0>fw-1)gx0=fw-1; if(gy0>fh-1)gy0=fh-1;
+    var oi=(y*W+x)*4;
+    for(var c=0;c<3;c++){
+      var p00=fe[(gy0*fw+gx0)*3+c], p01=fe[(gy0*fw+gx1)*3+c], p10=fe[(gy1*fw+gx0)*3+c], p11=fe[(gy1*fw+gx1)*3+c];
+      var tp=p00+(p01-p00)*fx, bt=p10+(p11-p10)*fx, val=tp+(bt-tp)*fy;
+      out[oi+c]=out[oi+c]*(1-a)+val*a;
+    }
+  }}
+  return out;
+
+  function boxBlur(a, w, h, r){
+    if(r<1) return; var tmp=new Float32Array(w*h), inv=1/(2*r+1);
+    for(var y=0;y<h;y++){ var s=0; for(var x=-r;x<=r;x++) s+=a[y*w+Math.min(w-1,Math.max(0,x))];
+      for(var x2=0;x2<w;x2++){ tmp[y*w+x2]=s*inv;
+        var add=Math.min(w-1,x2+r+1), sub=Math.max(0,x2-r); s+=a[y*w+add]-a[y*w+sub]; } }
+    for(var x3=0;x3<w;x3++){ var s2=0; for(var y=-r;y<=r;y++) s2+=tmp[Math.min(h-1,Math.max(0,y))*w+x3];
+      for(var y2=0;y2<h;y2++){ a[y2*w+x3]=s2*inv;
+        var add2=Math.min(h-1,y2+r+1), sub2=Math.max(0,y2-r); s2+=tmp[add2*w+x3]-tmp[sub2*w+x3]; } }
+  }
+}
+</script>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'הסרת אובייקטים AI',
+      pageTitle:'מחקו כל אובייקט מהתמונה — וה־AI ישלים את הרקע',
+      pageSub:'העלו תמונה, צבעו במברשת מעל מה שרוצים להסיר — אדם ברקע, חפץ, כבל, טקסט או כל אלמנט מפריע — וה־AI ישלים את אזור הרקע בצורה טבעית. אפשר לבטל ולשחזר, לכוונן את גודל המברשת, להשוות לפני/אחרי ולהוריד באיכות גבוהה. הכול רץ בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      dropBig:'גררו תמונה לכאן', or2:'או', choose:'בחרו תמונה',
+      sizeNote:'PNG · JPG · WEBP · BMP',
+      optTitle:'הגדרות',
+      toolLbl:'כלי', tBrush:'מברשת', tErase:'מחיקה',
+      brushLbl:'גודל מברשת',
+      removeBtn:'הסירו את מה שסימנתם', working:'ה־AI משלים את הרקע…',
+      undo:'ביטול', redo:'שחזור', clear:'ניקוי הסימון', compare:'השוואת לפני/אחרי', reset:'איפוס לתמונה המקורית',
+      fmtLbl:'פורמט הורדה', keepOrig:'כמו המקור', qLbl:'איכות (JPG / WEBP)',
+      dl:'הורדה', newImage:'תמונה חדשה',
+      cmpTitle:'לפני / אחרי',
+      before:'לפני', after:'אחרי',
+      hint:'צבעו מעל האובייקט להסרה · [ ] משנים גודל מברשת · Ctrl+Z לביטול',
+      seam:'הכול קורה מקומית: התמונה מעובדת ישירות בדפדפן שלכם — שום קובץ לא נשלח לשרת, וכלום לא עוזב את המחשב. אזורים גדולים? הסירו בכמה מריחות קטנות לתוצאה טבעית יותר.',
+      foot:'KOLKLI · הסרת אובייקטים AI · פרטי ומהיר, ישירות בדפדפן',
+      errNoFile:'צריך לצרף תמונה', errDecode:'לא הצלחנו לפענח את התמונה',
+      errNoMask:'קודם צבעו במברשת מעל מה שרוצים להסיר',
+      errEngine:'משהו השתבש בהסרה. נסו שוב או עם אזור קטן יותר.',
+      removed:'הוסר ✓', dlName:'התמונה הורדה ✓',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'AI Object Remover',
+      pageTitle:'Erase any object — and let AI fill the background',
+      pageSub:'Upload a photo, brush over whatever you want gone — a person in the background, an object, a wire, text or any distraction — and AI fills the background back in naturally. Undo/redo, tune the brush, compare before/after and download in high quality. Everything runs in your browser — nothing leaves your machine.',
+      dropBig:'Drag an image here', or2:'or', choose:'Choose image',
+      sizeNote:'PNG · JPG · WEBP · BMP',
+      optTitle:'Options',
+      toolLbl:'Tool', tBrush:'Brush', tErase:'Erase',
+      brushLbl:'Brush size',
+      removeBtn:'Remove selection', working:'AI is filling the background…',
+      undo:'Undo', redo:'Redo', clear:'Clear selection', compare:'Before / after', reset:'Reset to original',
+      fmtLbl:'Download format', keepOrig:'Keep original', qLbl:'Quality (JPG / WEBP)',
+      dl:'Download', newImage:'New image',
+      cmpTitle:'Before / after',
+      before:'before', after:'after',
+      hint:'Paint over the object to remove · [ ] resize brush · Ctrl+Z to undo',
+      seam:'Everything is local: the image is processed right in your browser — no file is sent to a server, and nothing leaves your machine. Large area? Remove it in a few smaller strokes for a more natural result.',
+      foot:'KOLKLI · AI Object Remover · Private and fast, right in your browser',
+      errNoFile:'Add an image', errDecode:'We could not decode the image',
+      errNoMask:'First brush over what you want to remove',
+      errEngine:'Something went wrong. Try again, or a smaller area.',
+      removed:'Removed ✓', dlName:'Image downloaded ✓',
+    },
+    ru:{
+      dir:'ltr',
+
+      kick:'AI-удаление объектов',
+      pageTitle:'Сотрите любой объект — а AI заполнит фон',
+      pageSub:'Загрузите фото, закрасьте всё, что нужно убрать — человека на фоне, объект, провод, текст или любую помеху — и AI естественно восстановит фон. Отмена/повтор, настройка кисти, сравнение до/после и скачивание в высоком качестве. Всё работает в вашем браузере — ничего не покидает устройство.',
+      dropBig:'Перетащите изображение сюда', or2:'или', choose:'Выбрать изображение',
+      sizeNote:'PNG · JPG · WEBP · BMP',
+      optTitle:'Параметры',
+      toolLbl:'Инструмент', tBrush:'Кисть', tErase:'Ластик',
+      brushLbl:'Размер кисти',
+      removeBtn:'Удалить выделенное', working:'AI заполняет фон…',
+      undo:'Отменить', redo:'Повторить', clear:'Очистить выделение', compare:'До / после', reset:'Вернуть оригинал',
+      fmtLbl:'Формат скачивания', keepOrig:'Как в оригинале', qLbl:'Качество (JPG / WEBP)',
+      dl:'Скачать', newImage:'Новое изображение',
+      cmpTitle:'До / после',
+      before:'до', after:'после',
+      hint:'Закрасьте объект для удаления · [ ] размер кисти · Ctrl+Z отменить',
+      seam:'Всё локально: изображение обрабатывается прямо в вашем браузере — ни один файл не отправляется на сервер, ничего не покидает устройство. Большая область? Удаляйте её несколькими мазками для более естественного результата.',
+      foot:'KOLKLI · AI-удаление объектов · Приватно и быстро, прямо в браузере',
+      errNoFile:'Добавьте изображение', errDecode:'Не удалось декодировать изображение',
+      errNoMask:'Сначала закрасьте то, что нужно удалить',
+      errEngine:'Что-то пошло не так. Попробуйте снова или меньшую область.',
+      removed:'Удалено ✓', dlName:'Изображение скачано ✓',
+    },
+  };
+
+  const EXT = { 'image/png':'png', 'image/jpeg':'jpg', 'image/webp':'webp' };
+  // mask overlay colour (fixed so it reads well in both themes)
+  const AR=138, AG=79, AB=255;
+  const WORK_MAX = 1800;      // cap working (== export) resolution
+  const HIST_CAP = 20;
+
+  let lang='he', t=I18N.he;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  // --- editor state ---
+  let W=0, H=0;                     // working resolution
+  let imgCanvas=null, imgCtx=null;  // current image pixels
+  let maskCanvas=null, maskCtx=null;// RGBA overlay of the mask
+  let maskImg=null, md=null;        // maskCanvas ImageData + its data
+  let maskU8=null;                  // 0/255 mask (source of truth)
+  let maskCount=0;
+  let originalImgData=null;         // first-loaded image (for reset + compare "before")
+  let lastImgData=null;             // ImageData matching imgCanvas right now
+  let srcName='image.png';
+  let tool='brush';                 // 'brush' | 'erase'
+  let brushPx=44;                   // on-screen diameter
+  let busy=false;
+  let painting=false, lastPt=null, strokeBefore=0;
+  const view={scale:1,ox:0,oy:0,w:1,h:1};
+
+  // --- history: entries share the image ImageData (only changes on removal/reset) ---
+  let history=[], hidx=-1;
+
+  const stage=el('stage'), sctx=stage.getContext('2d');
+  const wrap=el('stagewrap'), cur=el('brushCur');
+
+  // --- helpers ---
+  function baseName(n){ return String(n||'image').replace(/\.[^.\/\\]+$/,''); }
+  function clamp(v,a,b){ return v<a?a:v>b?b:v; }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1900); }
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+  // ---- intake ----
+  function loadFile(file){
+    if(!file){ return; }
+    if(!/^image\//i.test(file.type) && !/\.(jpe?g|png|webp|bmp)$/i.test(file.name)){ el('optErr').textContent=t.errDecode; return; }
+    el('optErr').textContent='';
+    srcName=file.name||'image.png';
+    const url=URL.createObjectURL(file);
+    const done = bmp=>{
+      let nw=bmp.width||bmp.naturalWidth, nh=bmp.height||bmp.naturalHeight;
+      const s=Math.min(1, WORK_MAX/Math.max(nw,nh));
+      W=Math.max(1,Math.round(nw*s)); H=Math.max(1,Math.round(nh*s));
+      imgCanvas=document.createElement('canvas'); imgCanvas.width=W; imgCanvas.height=H;
+      imgCtx=imgCanvas.getContext('2d',{willReadFrequently:true}); imgCtx.imageSmoothingQuality='high';
+      imgCtx.drawImage(bmp,0,0,W,H);
+      if(bmp.close) bmp.close();
+      URL.revokeObjectURL(url);
+      maskCanvas=document.createElement('canvas'); maskCanvas.width=W; maskCanvas.height=H;
+      maskCtx=maskCanvas.getContext('2d');
+      maskImg=maskCtx.createImageData(W,H); md=maskImg.data;
+      maskU8=new Uint8Array(W*H); maskCount=0;
+      originalImgData=imgCtx.getImageData(0,0,W,H);
+      lastImgData=imgCtx.getImageData(0,0,W,H);
+      history=[]; hidx=-1; pushHistory();
+      el('drop').style.display='none';
+      el('stageCard').style.display='';
+      el('fname').textContent=srcName;
+      el('dlBtn').disabled=false;
+      hideCompare();
+      syncTitles(); updateButtons();
+      requestAnimationFrame(resizeStage);
+    };
+    if(window.createImageBitmap){
+      createImageBitmap(file).then(done).catch(()=>{
+        const im=new Image(); im.onload=()=>done(im); im.onerror=()=>{ el('optErr').textContent=t.errDecode; URL.revokeObjectURL(url); }; im.src=url;
+      });
+    } else {
+      const im=new Image(); im.onload=()=>done(im); im.onerror=()=>{ el('optErr').textContent=t.errDecode; }; im.src=url;
+    }
+  }
+
+  // ---- stage sizing & view ----
+  function resizeStage(){
+    const rect=stage.getBoundingClientRect();
+    if(rect.width<2){ return; }
+    stage.width=Math.max(1,Math.round(rect.width*dpr));
+    stage.height=Math.max(1,Math.round(rect.height*dpr));
+    render();
+  }
+  function computeView(){
+    const pad=16*dpr;
+    const availW=stage.width-pad*2, availH=stage.height-pad*2;
+    const scale=Math.min(availW/W, availH/H);
+    const w=W*scale, h=H*scale;
+    view.scale=scale; view.w=w; view.h=h; view.ox=(stage.width-w)/2; view.oy=(stage.height-h)/2;
+  }
+  function render(){
+    if(!imgCanvas || stage.width<2){ return; }
+    computeView();
+    sctx.setTransform(1,0,0,1,0,0);
+    sctx.clearRect(0,0,stage.width,stage.height);
+    sctx.imageSmoothingEnabled=true; sctx.imageSmoothingQuality='high';
+    sctx.drawImage(imgCanvas, view.ox, view.oy, view.w, view.h);
+    if(maskCount>0){
+      sctx.globalAlpha=0.5; sctx.imageSmoothingEnabled=false;
+      sctx.drawImage(maskCanvas, view.ox, view.oy, view.w, view.h);
+      sctx.globalAlpha=1; sctx.imageSmoothingEnabled=true;
+    }
+  }
+
+  // ---- painting ----
+  function evToImg(e){
+    const rect=stage.getBoundingClientRect();
+    const px=(e.clientX-rect.left)/rect.width*stage.width;
+    const py=(e.clientY-rect.top)/rect.height*stage.height;
+    return { x:(px-view.ox)/view.scale, y:(py-view.oy)/view.scale };
+  }
+  function imgRadius(){ return Math.max(1,(brushPx/2)*dpr/view.scale); }
+  function stamp(ix,iy,r,add){
+    const r2=r*r;
+    const x0=Math.max(0,Math.floor(ix-r)), x1=Math.min(W-1,Math.ceil(ix+r));
+    const y0=Math.max(0,Math.floor(iy-r)), y1=Math.min(H-1,Math.ceil(iy+r));
+    for(let y=y0;y<=y1;y++){ for(let x=x0;x<=x1;x++){
+      const dx=x-ix, dy=y-iy; if(dx*dx+dy*dy>r2) continue;
+      const i=y*W+x, p=i*4;
+      if(add){ if(maskU8[i]!==255){ maskU8[i]=255; maskCount++; md[p]=AR; md[p+1]=AG; md[p+2]=AB; md[p+3]=255; } }
+      else { if(maskU8[i]!==0){ maskU8[i]=0; maskCount--; md[p+3]=0; } }
+    }}
+  }
+  function stampLine(x0,y0,x1,y1,r,add){
+    const dist=Math.hypot(x1-x0,y1-y0), step=Math.max(1,r*0.35), n=Math.max(1,Math.ceil(dist/step));
+    for(let i=0;i<=n;i++){ const k=i/n; stamp(x0+(x1-x0)*k, y0+(y1-y0)*k, r, add); }
+  }
+  function flushMask(){ maskCtx.putImageData(maskImg,0,0); }
+
+  function moveCursor(e){
+    const rect=wrap.getBoundingClientRect();
+    cur.style.left=(e.clientX-rect.left)+'px';
+    cur.style.top=(e.clientY-rect.top)+'px';
+    cur.style.width=brushPx+'px'; cur.style.height=brushPx+'px';
+    cur.style.display='block';
+    cur.classList.toggle('erase', tool==='erase');
+  }
+
+  function onDown(e){
+    if(!imgCanvas || busy || compareOn) return;
+    e.preventDefault();
+    stage.setPointerCapture && stage.setPointerCapture(e.pointerId);
+    painting=true; strokeBefore=maskCount;
+    const p=evToImg(e); lastPt=p;
+    stamp(p.x,p.y,imgRadius(),tool==='brush'); flushMask(); render();
+  }
+  function onMove(e){
+    moveCursor(e);
+    if(!painting) return;
+    const p=evToImg(e);
+    stampLine(lastPt.x,lastPt.y,p.x,p.y,imgRadius(),tool==='brush');
+    lastPt=p; flushMask(); render();
+  }
+  function onUp(){
+    if(!painting) return;
+    painting=false;
+    if(maskCount!==strokeBefore) pushHistory();
+    updateButtons();
+  }
+
+  // ---- history ----
+  function pushHistory(){
+    if(hidx<history.length-1) history=history.slice(0,hidx+1);
+    history.push({ img:lastImgData, mask:maskU8.slice() });
+    if(history.length>HIST_CAP){ history.shift(); }
+    hidx=history.length-1;
+    updateButtons();
+  }
+  function restore(entry){
+    imgCtx.putImageData(entry.img,0,0);
+    lastImgData=entry.img;
+    maskU8.set(entry.mask);
+    // rebuild overlay + count from mask
+    maskCount=0;
+    for(let i=0;i<maskU8.length;i++){ const p=i*4;
+      if(maskU8[i]===255){ maskCount++; md[p]=AR; md[p+1]=AG; md[p+2]=AB; md[p+3]=255; } else { md[p+3]=0; } }
+    flushMask(); render(); updateButtons();
+    if(compareOn) buildCompare();
+  }
+  function undo(){ if(hidx>0){ hidx--; restore(history[hidx]); } }
+  function redo(){ if(hidx<history.length-1){ hidx++; restore(history[hidx]); } }
+
+  function updateButtons(){
+    el('undoBtn').disabled = hidx<=0;
+    el('redoBtn').disabled = hidx>=history.length-1;
+    el('clearBtn').disabled = maskCount===0;
+    el('removeBtn').disabled = maskCount===0 || busy;
+  }
+
+  // ---- the AI fill ----
+  let _worker=null, _workerBad=false, _core=null;
+  function core(){ if(!_core) _core=inpaintCore; return _core; }
+  function getWorker(){
+    if(_workerBad) return null;
+    if(_worker) return _worker;
+    try{
+      const src = inpaintCore.toString() +
+        '\nself.onmessage=function(e){var d=e.data;var out=inpaintCore(d,function(p){self.postMessage({t:"p",p:p});});self.postMessage({t:"d",rgba:out},[out.buffer]);};';
+      const blob=new Blob([src],{type:'text/javascript'});
+      _worker=new Worker(URL.createObjectURL(blob));
+      return _worker;
+    }catch(err){ _workerBad=true; return null; }
+  }
+  function runInpaint(rgba, mask, onProg){
+    return new Promise((resolve,reject)=>{
+      const w=getWorker();
+      if(w){
+        const handle=(e)=>{
+          const d=e.data;
+          if(d.t==='p'){ onProg&&onProg(d.p); return; }
+          if(d.t==='d'){ w.removeEventListener('message',handle); w.removeEventListener('error',onErr); resolve(new Uint8ClampedArray(d.rgba)); }
+        };
+        const onErr=()=>{ w.removeEventListener('message',handle); w.removeEventListener('error',onErr); _workerBad=true; _worker=null;
+          // fall back to main thread
+          mainThread(); };
+        w.addEventListener('message',handle); w.addEventListener('error',onErr);
+        const rc=new Uint8ClampedArray(rgba), mc=new Uint8Array(mask);
+        try{ w.postMessage({width:W,height:H,rgba:rc,mask:mc},[rc.buffer,mc.buffer]); }
+        catch(err){ mainThread(); }
+      } else { mainThread(); }
+      function mainThread(){
+        setTimeout(()=>{
+          try{ const out=core()({width:W,height:H,rgba:new Uint8ClampedArray(rgba),mask:new Uint8Array(mask)}, p=>onProg&&onProg(p)); resolve(out); }
+          catch(err){ reject(err); }
+        },16);
+      }
+    });
+  }
+
+  async function runRemoval(){
+    if(!imgCanvas || busy) return;
+    el('optErr').textContent='';
+    if(maskCount===0){ el('optErr').textContent=t.errNoMask; return; }
+    busy=true; updateButtons();
+    const btn=el('removeBtn'); btn.classList.add('busy'); btn.disabled=true;
+    hideCompare();
+    const prog=el('progCard'); prog.classList.add('show'); setProg(3); el('progName').textContent=t.working;
+    try{
+      const curImg=imgCtx.getImageData(0,0,W,H);
+      const filled=await runInpaint(curImg.data, maskU8, p=>setProg(clamp(Math.round(3+p*93),3,96)));
+      setProg(99);
+      imgCtx.putImageData(new ImageData(filled,W,H),0,0);
+      lastImgData=imgCtx.getImageData(0,0,W,H);
+      // clear the mask (selection consumed)
+      maskU8.fill(0); maskCount=0;
+      for(let i=0;i<md.length;i+=4) md[i+3]=0; flushMask();
+      pushHistory();
+      render();
+      toast(t.removed);
+    }catch(err){
+      el('optErr').textContent=t.errEngine;
+    }
+    prog.classList.remove('show'); setProg(0);
+    btn.classList.remove('busy'); busy=false; updateButtons();
+  }
+  function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+
+  // ---- clear / reset / new ----
+  function clearMask(){
+    if(maskCount===0) return;
+    maskU8.fill(0); maskCount=0;
+    for(let i=0;i<md.length;i+=4) md[i+3]=0; flushMask(); render();
+    pushHistory();
+  }
+  function resetImage(){
+    if(!originalImgData) return;
+    imgCtx.putImageData(originalImgData,0,0);
+    lastImgData=imgCtx.getImageData(0,0,W,H);
+    maskU8.fill(0); maskCount=0;
+    for(let i=0;i<md.length;i+=4) md[i+3]=0; flushMask();
+    pushHistory(); render(); hideCompare();
+    toast(t.reset||'');
+  }
+  function newImage(){
+    imgCanvas=null; imgCtx=null; maskU8=null; maskCount=0; history=[]; hidx=-1;
+    originalImgData=null; lastImgData=null;
+    el('stageCard').style.display='none';
+    el('drop').style.display='';
+    el('dlBtn').disabled=true;
+    el('optErr').textContent='';
+    hideCompare();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- before / after compare ----
+  let compareOn=false;
+  function toggleCompare(){ compareOn ? hideCompare() : showCompare(); }
+  function showCompare(){
+    if(!imgCanvas) return;
+    compareOn=true; el('cmpBtn').classList.add('on');
+    buildCompare();
+    el('compareCard').classList.add('show');
+    el('compareCard').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function hideCompare(){ compareOn=false; el('cmpBtn').classList.remove('on'); el('compareCard').classList.remove('show'); }
+  function buildCompare(){
+    const oc=document.createElement('canvas'); oc.width=W; oc.height=H; oc.getContext('2d').putImageData(originalImgData,0,0);
+    const beforeURL=oc.toDataURL('image/png');
+    const afterURL=imgCanvas.toDataURL('image/png');
+    el('cmpWrap').innerHTML =
+      '<div class="cmp" id="cmp" dir="ltr">'+
+        '<img src="'+beforeURL+'" alt="">'+
+        '<div class="cmp-after" id="cmpAfter"><img src="'+afterURL+'" alt=""></div>'+
+        '<div class="cmp-line"><span class="cmp-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/><polyline points="9 6 3 12 9 18"/></svg></span></div>'+
+        '<input type="range" min="0" max="100" value="50" class="cmp-range" id="cmpRange">'+
+        '<span class="cmp-tag l">'+t.before+'</span><span class="cmp-tag r">'+t.after+'</span>'+
+      '</div>';
+    const cmp=el('cmp'), range=el('cmpRange');
+    range.addEventListener('input',()=>{ cmp.style.setProperty('--pos', range.value+'%'); });
+  }
+
+  // ---- download ----
+  function download(){
+    if(!imgCanvas) return;
+    let fmt=el('fmt').value;
+    if(fmt==='keep'){ fmt = /\.png$/i.test(srcName)?'image/png' : /\.webp$/i.test(srcName)?'image/webp' : 'image/jpeg'; }
+    const q=(+el('quality').value)/100;
+    imgCanvas.toBlob(blob=>{
+      if(!blob){ return; }
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+      a.download=baseName(srcName)+'-cleaned.'+(EXT[fmt]||'png');
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
+      toast(t.dlName);
+    }, fmt, (fmt==='image/jpeg'||fmt==='image/webp')?q:undefined);
+  }
+  function syncFmtUI(){
+    const f=el('fmt').value;
+    const showQ = f==='image/jpeg' || f==='image/webp' || (f==='keep' && /\.(jpe?g|webp)$/i.test(srcName));
+    el('qualityOpt').style.display = showQ ? '' : 'none';
+  }
+
+  // ---- tool switching ----
+  function setTool(tl){
+    tool=tl;
+    el('brushBtn').classList.toggle('on', tl==='brush');
+    el('eraseBtn').classList.toggle('on', tl==='erase');
+    document.querySelectorAll('#toolSeg button').forEach(b=>b.classList.toggle('on', b.getAttribute('data-tool')===tl));
+    cur.classList.toggle('erase', tl==='erase');
+  }
+  function setBrush(v){ brushPx=clamp(+v,6,160); el('brushSize').value=brushPx; el('brushVal').textContent=brushPx+' px'; cur.style.width=brushPx+'px'; cur.style.height=brushPx+'px'; }
+
+  // ---- titles / i18n ----
+  function syncTitles(){
+    el('brushBtn').title=t.tBrush; el('eraseBtn').title=t.tErase;
+    el('undoBtn').title=t.undo; el('redoBtn').title=t.redo; el('clearBtn').title=t.clear;
+    el('cmpBtn').title=t.compare; el('resetBtn').title=t.reset;
+    el('stageHint').textContent=t.hint;
+  }
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    syncTitles();
+    if(compareOn) buildCompare();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ if(input.files&&input.files[0]) loadFile(input.files[0]); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer&&e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  stage.addEventListener('pointerdown',onDown);
+  stage.addEventListener('pointermove',onMove);
+  window.addEventListener('pointerup',onUp);
+  stage.addEventListener('pointerleave',()=>{ cur.style.display='none'; });
+  stage.addEventListener('pointerenter',()=>{ if(imgCanvas&&!compareOn) cur.style.display='block'; });
+
+  el('brushBtn').addEventListener('click',()=>setTool('brush'));
+  el('eraseBtn').addEventListener('click',()=>setTool('erase'));
+  el('toolSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-tool]'); if(b) setTool(b.getAttribute('data-tool')); });
+  el('brushSize').addEventListener('input',e=>setBrush(e.target.value));
+  el('undoBtn').addEventListener('click',undo);
+  el('redoBtn').addEventListener('click',redo);
+  el('clearBtn').addEventListener('click',clearMask);
+  el('cmpBtn').addEventListener('click',toggleCompare);
+  el('cmpClose').addEventListener('click',hideCompare);
+  el('resetBtn').addEventListener('click',resetImage);
+  el('removeBtn').addEventListener('click',runRemoval);
+  el('dlBtn').addEventListener('click',download);
+  el('newBtn').addEventListener('click',newImage);
+  el('fmt').addEventListener('change',syncFmtUI);
+
+  window.addEventListener('keydown',e=>{
+    if(!imgCanvas) return;
+    const meta=e.ctrlKey||e.metaKey;
+    if(meta && (e.key==='z'||e.key==='Z')){ e.preventDefault(); if(e.shiftKey) redo(); else undo(); }
+    else if(meta && (e.key==='y'||e.key==='Y')){ e.preventDefault(); redo(); }
+    else if(e.key==='['){ setBrush(brushPx-6); }
+    else if(e.key===']'){ setBrush(brushPx+6); }
+    else if(e.key==='b'||e.key==='B'){ setTool('brush'); }
+    else if(e.key==='e'||e.key==='E'){ setTool('erase'); }
+  });
+
+  window.addEventListener('resize',()=>{ if(imgCanvas) resizeStage(); });
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  setBrush(44); syncFmtUI();
+})();
+</script>
+</body>
+</html>

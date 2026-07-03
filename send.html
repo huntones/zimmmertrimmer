@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — שליחת קבצים גדולים</title>
+<meta name="description" content="Send large files with a shareable link — set an expiry, add a password and a message. Recipient gets a clean download page.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+
+  /* header */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:11px;}
+  .brand .logo{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);flex-shrink:0;}
+  .brand .logo svg{width:21px;height:21px;}
+  .brand b{font-size:18px;font-weight:700;letter-spacing:-0.01em;}
+  .toolbtns{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+  .pillbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:999px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;font-size:13.5px;
+    box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s,background .12s;}
+  .pillbtn:hover{border-color:var(--accent);}
+  .pillbtn:active{transform:scale(0.97);}
+  .iconbtn{width:38px;height:38px;padding:0;justify-content:center;font-size:15px;line-height:1;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:42px 28px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:73px;height:73px;margin:0 auto 17px;border-radius:20px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:36px;height:36px;}
+  .drop .big{font-size:22px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:17px;color:var(--faint);margin:8px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:19px;padding:14px 31px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .sizenote{margin-top:17px;font-size:16px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  /* file list */
+  .files{display:flex;flex-direction:column;}
+  .flist{display:flex;flex-direction:column;gap:8px;padding:14px;}
+  .frow{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line-2);border-radius:11px;background:var(--panel);}
+  .frow .fico{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
+  .frow .fico.image{color:var(--info);background:var(--info-soft);} .frow .fico.video{color:#e5484d;background:var(--danger-soft);}
+  .frow .fico.audio{color:var(--accent);} .frow .fico.doc{color:var(--info-dim);background:var(--info-soft);}
+  .frow .fico svg{width:17px;height:17px;}
+  .frow .fn{flex:1;min-width:0;}
+  .frow .fn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .frow .fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .frow .rm{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .frow .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .frow .rm svg{width:15px;height:15px;}
+  .ftot{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--line-2);
+    font-size:13px;color:var(--muted);}
+  .ftot b{color:var(--ink);font-family:var(--mono);}
+  .flist.empty-hint{color:var(--faint);font-size:13px;text-align:center;padding:22px;}
+
+  /* options side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+  .seg{display:flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:4px;}
+  .segbtn{flex:1;height:36px;border:none;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;
+    font-size:13px;font-weight:600;transition:color .14s,background .14s,box-shadow .14s;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
+  .segbtn.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  .segbtn svg{width:14px;height:14px;}
+  .inp,.ta{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .inp:focus,.ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .ta{resize:vertical;min-height:64px;}
+  .inp[dir=ltr]{text-align:start;}
+  select.inp{cursor:pointer;}
+  .chkline{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);cursor:pointer;margin-bottom:8px;}
+  .chkline input{accent-color:var(--accent);width:15px;height:15px;}
+  .hidden{display:none !important;}
+
+  .sendbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .sendbtn:hover{filter:brightness(1.05);} .sendbtn:active{transform:translateY(1px);}
+  .sendbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .sendbtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+
+  /* progress */
+  .prog{padding:16px;display:none;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+
+  /* share result */
+  .share{padding:22px;display:none;}
+  .share.show{display:block;}
+  .share .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .share .ok svg{width:28px;height:28px;}
+  .share h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .share .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+  .linkrow{display:flex;gap:8px;margin-bottom:14px;}
+  .linkrow .lk{flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;
+    font-family:var(--mono);font-size:12.5px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;}
+  .copybtn{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13px;padding:0 16px;border-radius:10px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
+  .copybtn:hover{filter:brightness(1.05);} .copybtn svg{width:15px;height:15px;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:18px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;}
+  .chip svg{width:13px;height:13px;color:var(--accent);}
+  .share .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .share .row2 a,.share .row2 button{flex:1;min-width:130px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .share .row2 a:hover,.share .row2 button:hover{border-color:var(--accent);} .share .row2 *:active{transform:translateY(1px);}
+  .share .row2 .del{color:var(--danger);border-color:var(--danger);background:transparent;}
+  .share .row2 .del:hover{background:var(--danger-soft);}
+  .share .row2 svg{width:15px;height:15px;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  /* qr + live stats */
+  .qrwrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin:0 0 18px;}
+  .qrbox{width:172px;height:172px;padding:10px;border-radius:14px;background:#fff;border:1px solid var(--line);
+    box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;}
+  .qrbox img{width:100%;height:100%;image-rendering:pixelated;display:block;}
+  .qrdl{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--accent-dim);
+    background:var(--accent-soft);border:1px solid transparent;border-radius:999px;padding:7px 14px;cursor:pointer;transition:filter .12s;}
+  .qrdl:hover{filter:brightness(0.97);} .qrdl svg{width:14px;height:14px;}
+  .statline{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 16px;font-size:12.5px;color:var(--muted);}
+  .statline .dot{width:8px;height:8px;border-radius:50%;background:var(--faint);flex-shrink:0;}
+  .statline.live .dot{background:var(--success);box-shadow:0 0 0 3px var(--success-soft);animation:pulse 1.6s ease-in-out infinite;}
+  .statline b{color:var(--ink);font-family:var(--mono);}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid" id="composer">
+    <!-- main: upload + files -->
+    <div class="col">
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="sizenote" data-i18n="sizeNote"></div>
+      </div>
+      <input type="file" id="fileInput" multiple>
+
+      <div class="card files" id="filesCard" style="display:none">
+        <div class="flist" id="flist"></div>
+        <div class="ftot"><span data-i18n="totalLbl"></span> <b id="totalVal">0</b></div>
+      </div>
+    </div>
+
+    <!-- side: options -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="optTitle"></h3>
+
+        <div class="opt">
+          <label data-i18n="methodLbl"></label>
+          <div class="seg">
+            <button class="segbtn on" id="mLink" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+              <span data-i18n="mLink"></span>
+            </button>
+            <button class="segbtn" id="mEmail" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+              <span data-i18n="mEmail"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="opt hidden" id="emailOpt">
+          <label data-i18n="toLbl"></label>
+          <input class="inp" id="recipients" type="text" dir="ltr" data-i18n-ph="toPh">
+        </div>
+
+        <div class="opt">
+          <label data-i18n="msgLbl"></label>
+          <textarea class="ta" id="message" data-i18n-ph="msgPh"></textarea>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="expiryLbl"></label>
+          <select class="inp" id="expiry">
+            <option value="1" data-i18n="exp1"></option>
+            <option value="3" data-i18n="exp3"></option>
+            <option value="7" selected data-i18n="exp7"></option>
+            <option value="30" data-i18n="exp30"></option>
+          </select>
+        </div>
+
+        <div class="opt">
+          <label class="chkline"><input type="checkbox" id="pwToggle"><span data-i18n="pwChk"></span></label>
+          <input class="inp hidden" id="password" type="text" dir="ltr" data-i18n-ph="pwPh">
+        </div>
+
+        <div class="opt">
+          <label class="chkline"><input type="checkbox" id="notifyToggle"><span data-i18n="notifyChk"></span></label>
+        </div>
+
+        <button class="sendbtn" id="sendBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          <span data-i18n="sendBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span data-i18n="uploading"></span><span id="progPct">0%</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <!-- share result -->
+  <div class="card share" id="shareCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" data-i18n="readySub"></p>
+    <div class="linkrow">
+      <div class="lk" id="shareLink"></div>
+      <button class="copybtn" id="copyBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copy"></span></button>
+    </div>
+    <div class="chips" id="shareChips"></div>
+
+    <div class="qrwrap" id="qrWrap">
+      <div class="qrbox" id="qrBox"></div>
+      <button class="qrdl" id="qrDlBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        <span data-i18n="qrDl"></span>
+      </button>
+    </div>
+
+    <div class="statline" id="statLine"></div>
+
+    <div class="row2">
+      <a id="previewLink" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span data-i18n="previewBtn"></span>
+      </a>
+      <button id="emailBtn" class="hidden" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+        <span data-i18n="emailBtn"></span>
+      </button>
+      <button id="againBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="againBtn"></span>
+      </button>
+      <button id="delBtn" class="del" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        <span data-i18n="delBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./vendor/qrcode.min.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      toFiles:'הקבצים שלי', signin:'התחברות',
+      kick:'שליחת קבצים גדולים',
+      pageTitle:'שלחו קבצים גדולים בקישור אחד',
+      pageSub:'גררו קבצים, הגדירו תוקף וסיסמה, וקבלו קישור הורדה מסודר לנמען. הכול נשאר במחשב שלכם עד שתחליטו לשלוח.',
+      dropBig:'גררו קבצים לכאן', or2:'או', choose:'בחרו קבצים',
+      sizeNote:'עד 2GB בשליחה (חבילת Free)', remove:'הסרה',
+      totalLbl:'סה״כ', optTitle:'הגדרות שליחה',
+      methodLbl:'איך לשלוח', mLink:'קישור', mEmail:'אימייל',
+      toLbl:'נמענים (מופרדים בפסיק)', toPh:'a@mail.com, b@mail.com',
+      msgLbl:'הודעה אישית (לא חובה)', msgPh:'כמה מילים לנמען…',
+      expiryLbl:'תוקף הקישור',
+      exp1:'יום אחד', exp3:'3 ימים', exp7:'7 ימים', exp30:'30 יום',
+      pwChk:'להגן בסיסמה', pwPh:'סיסמה לקישור',
+      sendBtn:'צרו קישור שליחה',
+      uploading:'מעלה קבצים…',
+      readyTitle:'הקישור מוכן!', readySub:'העתיקו ושלחו לנמען. אפשר גם לראות איך נראה עמוד ההורדה שלו.',
+      copy:'העתקה', copied:'הקישור הועתק ✓',
+      previewBtn:'עמוד ההורדה של הנמען', againBtn:'שליחה נוספת', delBtn:'מחיקת הקישור', emailBtn:'פתיחת אימייל',
+      notifyChk:'הודיעו לי כשמורידים', qrDl:'הורדת קוד QR',
+      statWaiting:'הקישור מוכן — עדיין לא בוצעו הורדות',
+      statDownloads:n=> n===1?'הורדה אחת עד כה':`${n} הורדות עד כה`,
+      notifTitle:'הקבצים שלכם הורדו', notifBody:'הנמען פתח את הקישור והוריד את הקבצים.',
+      notifOn:'נעדכן אתכם כאן ברגע שיבצעו הורדה', notifBlocked:'ההתראות חסומות בדפדפן — אפשר לאפשר בהגדרות האתר',
+      emailSubject:'שיתפתי איתך קבצים', emailBodyLead:'שלום, שיתפתי איתך קבצים דרך KOLKLI. אפשר להוריד כאן:', emailBodyExpiry:d=>`הקישור פג בעוד ${d}.`,
+      chipExpiry:d=>`פג תוקף בעוד ${d}`, chipFiles:n=>`${n} קבצים`, chipPw:'מוגן בסיסמה',
+      day:'יום', days:d=>`${d} ימים`,
+      seam:'זו הדגמה מקומית: הקבצים נשמרים בדפדפן הזה (IndexedDB) והקישור עובד באותו מחשב. עם חיבור השרת הקישור יעבוד לכל אחד, בכל מקום.',
+      foot:'KOLKLI · שליחת קבצים · הדגמה מקומית עד לחיבור השרת',
+      errNoFiles:'צריך לצרף לפחות קובץ אחד', errNoEmail:'הזינו לפחות נמען אחד', errNoPw:'הזינו סיסמה או בטלו את ההגנה',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      toFiles:'My files', signin:'Sign in',
+      kick:'Send large files',
+      pageTitle:'Send large files with one link',
+      pageSub:'Drop files, set an expiry and a password, and get a clean download link for your recipient. Nothing leaves your machine until you send.',
+      dropBig:'Drag files here', or2:'or', choose:'Choose files',
+      sizeNote:'Up to 2GB per send (Free plan)', remove:'Remove',
+      totalLbl:'Total', optTitle:'Send options',
+      methodLbl:'How to send', mLink:'Link', mEmail:'Email',
+      toLbl:'Recipients (comma separated)', toPh:'a@mail.com, b@mail.com',
+      msgLbl:'Personal message (optional)', msgPh:'A few words for the recipient…',
+      expiryLbl:'Link expiry',
+      exp1:'1 day', exp3:'3 days', exp7:'7 days', exp30:'30 days',
+      pwChk:'Protect with a password', pwPh:'Link password',
+      sendBtn:'Create share link',
+      uploading:'Uploading files…',
+      readyTitle:'Your link is ready!', readySub:'Copy and send it to your recipient. You can also preview their download page.',
+      copy:'Copy', copied:'Link copied ✓',
+      previewBtn:'Recipient download page', againBtn:'Send another', delBtn:'Delete link', emailBtn:'Open email',
+      notifyChk:'Notify me when downloaded', qrDl:'Download QR code',
+      statWaiting:'Link ready — no downloads yet',
+      statDownloads:n=> n===1?'1 download so far':`${n} downloads so far`,
+      notifTitle:'Your files were downloaded', notifBody:'The recipient opened your link and downloaded the files.',
+      notifOn:'We’ll alert you here the moment they download', notifBlocked:'Notifications are blocked — enable them in your browser site settings',
+      emailSubject:'I shared files with you', emailBodyLead:'Hi, I shared files with you via KOLKLI. You can download them here:', emailBodyExpiry:d=>`The link expires in ${d}.`,
+      chipExpiry:d=>`Expires in ${d}`, chipFiles:n=>`${n} files`, chipPw:'Password protected',
+      day:'1 day', days:d=>`${d} days`,
+      seam:'This is a local demo: files are stored in this browser (IndexedDB) and the link works on this machine. Once the server is connected, the link will work for anyone, anywhere.',
+      foot:'KOLKLI · File sending · Local demo until the server is connected',
+      errNoFiles:'Attach at least one file', errNoEmail:'Enter at least one recipient', errNoPw:'Enter a password or turn protection off',
+    },
+    ru:{
+      dir:'ltr',
+      toFiles:'Мои файлы', signin:'Вход',
+      kick:'Отправка больших файлов',
+      pageTitle:'Отправляйте большие файлы одной ссылкой',
+      pageSub:'Перетащите файлы, задайте срок действия и пароль — и получите чистую ссылку для скачивания для получателя. Ничего не покидает ваше устройство, пока вы не отправите.',
+      dropBig:'Перетащите файлы сюда', or2:'или', choose:'Выбрать файлы',
+      sizeNote:'До 2 ГБ за отправку (бесплатный план)', remove:'Удалить',
+      totalLbl:'Всего', optTitle:'Параметры отправки',
+      methodLbl:'Как отправить', mLink:'Ссылка', mEmail:'Эл. почта',
+      toLbl:'Получатели (через запятую)', toPh:'a@mail.com, b@mail.com',
+      msgLbl:'Личное сообщение (необязательно)', msgPh:'Несколько слов для получателя…',
+      expiryLbl:'Срок действия ссылки',
+      exp1:'1 день', exp3:'3 дня', exp7:'7 дней', exp30:'30 дней',
+      pwChk:'Защитить паролем', pwPh:'Пароль ссылки',
+      sendBtn:'Создать ссылку',
+      uploading:'Загрузка файлов…',
+      readyTitle:'Ваша ссылка готова!', readySub:'Скопируйте и отправьте её получателю. Также можно посмотреть страницу его скачивания.',
+      copy:'Копировать', copied:'Ссылка скопирована ✓',
+      previewBtn:'Страница скачивания получателя', againBtn:'Отправить ещё', delBtn:'Удалить ссылку', emailBtn:'Открыть e-mail',
+      notifyChk:'Уведомить меня о скачивании', qrDl:'Скачать QR-код',
+      statWaiting:'Ссылка готова — скачиваний ещё нет',
+      statDownloads:n=> n===1?'1 скачивание':`Скачиваний: ${n}`,
+      notifTitle:'Ваши файлы скачали', notifBody:'Получатель открыл ссылку и скачал файлы.',
+      notifOn:'Мы сообщим здесь, как только начнётся скачивание', notifBlocked:'Уведомления заблокированы — включите их в настройках сайта',
+      emailSubject:'Я поделился с вами файлами', emailBodyLead:'Здравствуйте! Я поделился с вами файлами через KOLKLI. Скачать можно здесь:', emailBodyExpiry:d=>`Ссылка действует ещё ${d}.`,
+      chipExpiry:d=>`Истекает через ${d}`, chipFiles:n=>`Файлов: ${n}`, chipPw:'Защищено паролем',
+      day:'1 день', days:d=>`${d} дн.`,
+      seam:'Это локальная демонстрация: файлы хранятся в этом браузере (IndexedDB), и ссылка работает на этом устройстве. После подключения сервера ссылка будет работать для всех и везде.',
+      foot:'KOLKLI · Отправка файлов · Локальная демонстрация до подключения сервера',
+      errNoFiles:'Прикрепите хотя бы один файл', errNoEmail:'Введите хотя бы одного получателя', errNoPw:'Введите пароль или отключите защиту',
+    },
+  };
+
+  const TYPES = {
+    image:['jpg','jpeg','png','gif','heic','heif','webp','bmp','svg','avif'],
+    video:['mp4','mov','avi','webm','mkv','m4v'],
+    audio:['mp3','wav','aac','m4a','flac','ogg','oga','opus'],
+    doc:['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','rtf'],
+  };
+  function kindOf(ext){ ext=(ext||'').toLowerCase(); for(const k in TYPES){ if(TYPES[k].includes(ext)) return k; } return 'doc'; }
+  const ICON = {
+    image:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>',
+    video:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>',
+    audio:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>',
+    trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  };
+
+  let lang='he', t=I18N.he;
+  let files=[];   // {id,file,name,ext,kind,size}
+  let method='link';
+  let uid=1;
+
+  function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function totalBytes(){ return files.reduce((a,f)=>a+f.size,0); }
+  function randToken(){
+    if(window.crypto && crypto.getRandomValues){ const a=new Uint8Array(9); crypto.getRandomValues(a); return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+    return Math.random().toString(36).slice(2)+Date.now().toString(36);
+  }
+  async function hashPass(str){
+    try{ if(window.crypto && crypto.subtle){ const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); } }catch(_){}
+    let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; } return 'x'+(h>>>0).toString(16);
+  }
+
+  // ---- IndexedDB (demo store; the server replaces this) ----
+  function idb(){ return new Promise((res,rej)=>{ const r=indexedDB.open('audiocut',1); r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains('transfers')) r.result.createObjectStore('transfers'); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+  async function idbPut(key,val){ const db=await idb(); return new Promise((res,rej)=>{ const tx=db.transaction('transfers','readwrite'); tx.objectStore('transfers').put(val,key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+  async function idbGet(key){ const db=await idb(); return new Promise((res,rej)=>{ const tx=db.transaction('transfers','readonly'); const rq=tx.objectStore('transfers').get(key); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); }); }
+  async function idbDel(key){ const db=await idb(); return new Promise((res,rej)=>{ const tx=db.transaction('transfers','readwrite'); tx.objectStore('transfers').delete(key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+
+  // ---- intake ----
+  function addFiles(list){
+    Array.from(list||[]).forEach(file=>{
+      const ext=extOf(file.name);
+      files.push({ id:'f'+(uid++), file, name:file.name, ext, kind:kindOf(ext), size:file.size });
+    });
+    renderFiles();
+  }
+  function removeFile(id){ files=files.filter(f=>f.id!==id); renderFiles(); }
+
+  function renderFiles(){
+    const card=el('filesCard'), list=el('flist');
+    card.style.display = files.length? '' : 'none';
+    list.innerHTML = files.map(f=>`
+      <div class="frow">
+        <span class="fico ${f.kind}">${ICON[f.kind]}</span>
+        <span class="fn"><div class="nm" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div><div class="sz">${fmtBytes(f.size)}</div></span>
+        <button class="rm" data-rm="${f.id}" title="${escapeHtml(t.remove)}">${ICON.trash}</button>
+      </div>`).join('');
+    el('totalVal').textContent = fmtBytes(totalBytes());
+    el('sendBtn').disabled = files.length===0;
+  }
+
+  function expiryText(days){ days=+days; return days===1 ? t.day : t.days(days); }
+
+  function toast(msg){ const el2=el('toast'); el2.textContent=msg; el2.classList.add('show'); clearTimeout(el2._t); el2._t=setTimeout(()=>el2.classList.remove('show'),1800); }
+
+  // ---- create link ----
+  async function createLink(){
+    el('optErr').textContent='';
+    if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
+    if(method==='email' && !el('recipients').value.trim()){ el('optErr').textContent=t.errNoEmail; return; }
+    const pwOn=el('pwToggle').checked, pwVal=el('password').value;
+    if(pwOn && !pwVal){ el('optErr').textContent=t.errNoPw; return; }
+    const notifyOn=el('notifyToggle').checked;
+
+    // fake-but-real progress while we write blobs to IndexedDB
+    el('composer').style.display='none';
+    const prog=el('progCard'); prog.classList.add('show');
+    const days=+el('expiry').value;
+    const token=randToken();
+    const record={
+      token, createdAt:Date.now(), expiresAt:Date.now()+days*86400000,
+      sender:'', message:el('message').value.trim(),
+      recipients:method==='email'? el('recipients').value.trim() : '',
+      password: pwOn? await hashPass(pwVal) : null,
+      notify: notifyOn,
+      downloads:0,
+      files: files.map(f=>({ name:f.name, size:f.size, type:f.file.type||'', blob:f.file })),
+    };
+
+    const total=Math.max(totalBytes(),1); let done=0;
+    // animate progress proportional to file sizes (purely visual for the demo)
+    for(let i=0;i<files.length;i++){
+      await new Promise(r=>setTimeout(r, 120));
+      done+=files[i].size; setProg(Math.min(99, Math.round(done/total*100)));
+    }
+    await idbPut('t_'+token, record);
+    setProg(100);
+    await new Promise(r=>setTimeout(r,200));
+
+    prog.classList.remove('show');
+    showShare(token, days, pwOn, notifyOn);
+    if(method==='email' && record.recipients){ openMailto(); }
+  }
+  function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+
+  let currentToken=null, currentUrl='', currentDays=7, statTimer=null, notifyEnabled=false, lastNotifiedCount=0, bc=null;
+  function showShare(token, days, pwOn, notifyOn){
+    currentToken=token; currentDays=days;
+    const url=new URL('download.html?t='+token, location.href).href;
+    currentUrl=url;
+    el('shareLink').textContent=url;
+    el('previewLink').href=url;
+    el('shareChips').innerHTML =
+      `<span class="chip">${clockSvg()} ${t.chipExpiry(expiryText(days))}</span>`+
+      `<span class="chip">${fileSvg()} ${t.chipFiles(files.length)}</span>`+
+      (pwOn? `<span class="chip">${lockSvg()} ${t.chipPw}</span>` : '');
+    renderQR(url);
+    el('emailBtn').classList.toggle('hidden', !(method==='email' && el('recipients').value.trim()));
+    lastNotifiedCount=0;
+    updateStat(0);
+    startStatWatch(notifyOn);
+    el('shareCard').classList.add('show');
+    el('shareCard').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  // ---- QR code ----
+  function renderQR(url){
+    const box=el('qrBox'), wrap=el('qrWrap');
+    try{
+      const qr=qrcode(0,'M'); qr.addData(url); qr.make();
+      box.innerHTML=qr.createImgTag(5,10);
+      const img=box.querySelector('img'); if(img) img.alt='QR';
+      box._png=qr.createDataURL(8,10);
+      wrap.style.display='';
+    }catch(_){ wrap.style.display='none'; }
+  }
+  function downloadQR(){
+    const png=el('qrBox')._png; if(!png) return;
+    const a=document.createElement('a'); a.href=png; a.download='kolkli-qr.png'; document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  // ---- email delivery (opens the sender's mail app, prefilled) ----
+  function buildMailto(){
+    const to=encodeURIComponent(el('recipients').value.trim());
+    const msg=el('message').value.trim();
+    const subject=encodeURIComponent(t.emailSubject);
+    const body=encodeURIComponent((msg? msg+'\n\n':'')+t.emailBodyLead+'\n'+currentUrl+'\n\n'+t.emailBodyExpiry(expiryText(currentDays)));
+    return 'mailto:'+to+'?subject='+subject+'&body='+body;
+  }
+  function openMailto(){ const a=document.createElement('a'); a.href=buildMailto(); a.style.display='none'; document.body.appendChild(a); a.click(); a.remove(); }
+
+  // ---- live download stats + notifications ----
+  function updateStat(count){
+    const line=el('statLine');
+    line.classList.toggle('live', count>0);
+    line.innerHTML=`<span class="dot"></span><span>${count>0? t.statDownloads(count) : t.statWaiting}</span>`;
+    line.dataset.count=count;
+  }
+  function fireNotify(){
+    const count=+el('statLine').dataset.count||0;
+    if(count<=lastNotifiedCount) return; lastNotifiedCount=count;
+    try{ if('Notification'in window && Notification.permission==='granted') new Notification(t.notifTitle,{body:t.notifBody}); }catch(_){}
+    toast(t.notifTitle);
+  }
+  function onDownloadCount(count){
+    const prev=+el('statLine').dataset.count||0;
+    if(count===prev) return;
+    updateStat(count);
+    if(count>prev && notifyEnabled) fireNotify();
+  }
+  function ensureBC(){
+    if(bc || !('BroadcastChannel'in window)) return;
+    try{ bc=new BroadcastChannel('audiocut_dl'); bc.onmessage=e=>{ const d=e.data||{}; if(d.token && d.token===currentToken && typeof d.downloads==='number') onDownloadCount(d.downloads); }; }catch(_){}
+  }
+  function startStatWatch(notifyOn){
+    notifyEnabled=!!notifyOn; ensureBC(); stopStatWatch();
+    statTimer=setInterval(async()=>{
+      if(!currentToken) return;
+      let rec=null; try{ rec=await idbGet('t_'+currentToken); }catch(_){}
+      if(rec) onDownloadCount(rec.downloads||0);
+    },4000);
+  }
+  function stopStatWatch(){ if(statTimer){ clearInterval(statTimer); statTimer=null; } }
+  function clockSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'; }
+  function fileSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>'; }
+  function lockSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'; }
+
+  function reset(){
+    files=[]; currentToken=null;
+    stopStatWatch(); notifyEnabled=false; lastNotifiedCount=0;
+    el('shareCard').classList.remove('show');
+    el('message').value=''; el('recipients').value=''; el('password').value='';
+    el('pwToggle').checked=false; el('password').classList.add('hidden');
+    el('notifyToggle').checked=false; el('emailBtn').classList.add('hidden');
+    el('composer').style.display=''; renderFiles();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderFiles();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    el('themeIco').textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('flist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeFile(b.getAttribute('data-rm')); });
+
+  el('mLink').addEventListener('click',()=>{ method='link'; el('mLink').classList.add('on'); el('mEmail').classList.remove('on'); el('emailOpt').classList.add('hidden'); });
+  el('mEmail').addEventListener('click',()=>{ method='email'; el('mEmail').classList.add('on'); el('mLink').classList.remove('on'); el('emailOpt').classList.remove('hidden'); });
+  el('pwToggle').addEventListener('change',e=>{ el('password').classList.toggle('hidden', !e.target.checked); if(e.target.checked) el('password').focus(); });
+  el('notifyToggle').addEventListener('change',e=>{
+    if(!e.target.checked) return;
+    if('Notification'in window){
+      if(Notification.permission==='granted') toast(t.notifOn);
+      else if(Notification.permission==='denied') toast(t.notifBlocked);
+      else Notification.requestPermission().then(p=>{ toast(p==='granted'? t.notifOn : t.notifBlocked); });
+    } else { toast(t.notifOn); }
+  });
+  el('qrDlBtn').addEventListener('click',downloadQR);
+  el('emailBtn').addEventListener('click',openMailto);
+
+  el('sendBtn').addEventListener('click',createLink);
+  el('againBtn').addEventListener('click',reset);
+  el('delBtn').addEventListener('click',async()=>{ if(currentToken){ await idbDel('t_'+currentToken); } reset(); });
+  el('copyBtn').addEventListener('click',()=>{
+    const url=el('shareLink').textContent;
+    const done=()=>toast(t.copied);
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done).catch(fallbackCopy); }
+    else fallbackCopy();
+    function fallbackCopy(){ const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(_){}; ta.remove(); done(); }
+  });
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  renderFiles();
+})();
+</script>
+</body>
+</html>

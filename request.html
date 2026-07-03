@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — Kolkli Request</title>
+<meta name="description" content="Create upload links and receive files directly from your clients into an organized folder.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1040px;margin:0 auto;padding:22px 20px 60px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 18px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  /* tabs */
+  .tabs{display:inline-flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:18px;box-shadow:var(--shadow-sm);}
+  .tab{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border:none;border-radius:9px;background:transparent;
+    color:var(--muted);cursor:pointer;font-size:13.5px;font-weight:600;transition:color .14s,background .14s,box-shadow .14s;}
+  .tab.on{background:var(--accent-soft);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  .tab svg{width:16px;height:16px;}
+  .tab .count{font-family:var(--mono);font-size:11px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--muted);}
+  .tab.on .count{background:var(--panel);color:var(--accent-dim);}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .hidden{display:none !important;}
+
+  /* form */
+  .form{padding:20px;}
+  .form h3{font-size:15px;margin:0 0 16px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label,.optlbl{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+  .optlbl .req{color:var(--danger);}
+  .hint{font-size:11px;color:var(--faint);margin-top:6px;}
+  .inp,.ta{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .inp:focus,.ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .ta{resize:vertical;min-height:64px;}
+  .inp[dir=ltr]{text-align:start;}
+  select.inp{cursor:pointer;}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:520px){ .two{grid-template-columns:1fr;} }
+  .chkline{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);cursor:pointer;margin-bottom:8px;}
+  .chkline input{accent-color:var(--accent);width:15px;height:15px;}
+
+  /* type toggle chips */
+  .typechips{display:flex;flex-wrap:wrap;gap:8px;}
+  .tchip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:7px 13px;transition:all .12s;user-select:none;}
+  .tchip svg{width:15px;height:15px;}
+  .tchip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dim);}
+
+  .primary{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .primary:hover{filter:brightness(1.05);} .primary:active{transform:translateY(1px);}
+  .primary:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .primary svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+
+  /* live client preview */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side .plabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:10px;}
+  .pvcard{border:1px solid var(--line-2);border-radius:14px;overflow:hidden;background:var(--panel-2);}
+  .pvcard .pv-top{background:var(--grad-soft);padding:16px;text-align:center;border-bottom:1px solid var(--line-2);}
+  .pvcard .pv-ava{width:46px;height:46px;margin:0 auto 10px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:#fff;color:var(--accent);box-shadow:var(--shadow-sm);}
+  .pvcard .pv-ava svg{width:23px;height:23px;}
+  .pvcard .pv-name{font-size:15px;font-weight:700;color:var(--ink);word-break:break-word;}
+  .pvcard .pv-desc{font-size:12px;color:var(--muted);margin-top:4px;white-space:pre-wrap;word-break:break-word;}
+  .pvcard .pv-body{padding:14px;}
+  .pvcard .pv-drop{border:1.4px dashed var(--line);border-radius:11px;padding:18px;text-align:center;color:var(--faint);font-size:12px;background:var(--panel);}
+  .pvcard .pv-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+
+  /* chips */
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-family:var(--mono);color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:5px 11px;}
+  .chip svg{width:13px;height:13px;color:var(--accent);}
+  .chip.warn{background:var(--warm-soft);border-color:var(--warm-line);color:var(--warn);}
+  .chip.warn svg{color:var(--warn);}
+
+  /* share panel */
+  .share{padding:22px;display:none;}
+  .share.show{display:block;}
+  .share .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .share .ok svg{width:28px;height:28px;}
+  .share h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .share .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+  .linkrow{display:flex;gap:8px;margin-bottom:14px;}
+  .linkrow .lk{flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;
+    font-family:var(--mono);font-size:12.5px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;}
+  .copybtn{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13px;padding:0 16px;border-radius:10px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
+  .copybtn:hover{filter:brightness(1.05);} .copybtn svg{width:15px;height:15px;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:18px;}
+  .qrwrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin:0 0 18px;}
+  .qrbox{width:172px;height:172px;padding:10px;border-radius:14px;background:#fff;border:1px solid var(--line);
+    box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;}
+  .qrbox img{width:100%;height:100%;image-rendering:pixelated;display:block;}
+  .qrdl{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--accent-dim);
+    background:var(--accent-soft);border:1px solid transparent;border-radius:999px;padding:7px 14px;cursor:pointer;transition:filter .12s;}
+  .qrdl:hover{filter:brightness(0.97);} .qrdl svg{width:14px;height:14px;}
+  .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .row2 a,.row2 button{flex:1;min-width:130px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 a:hover,.row2 button:hover{border-color:var(--accent);} .row2 *:active{transform:translateY(1px);}
+  .row2 svg{width:15px;height:15px;}
+  .row2 .wa{color:#1c9a41;} .row2 .wa svg{color:#25d366;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  /* manage view */
+  .mgbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .mgbar h3{font-size:17px;margin:0;font-weight:700;}
+  .btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);cursor:pointer;font-size:13.5px;font-weight:600;box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s;}
+  .btn:hover{border-color:var(--accent);} .btn:active{transform:translateY(1px);} .btn svg{width:16px;height:16px;}
+  .btn.grad{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+
+  .reqlist{display:flex;flex-direction:column;gap:12px;}
+  .rcard{display:flex;align-items:center;gap:16px;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow-sm);flex-wrap:wrap;}
+  .rcard.unseen{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .rc-main{flex:1;min-width:200px;}
+  .rc-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px;}
+  .rc-name{font-size:15.5px;font-weight:700;color:var(--ink);}
+  .badge{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:999px;}
+  .badge.b-active{background:var(--success-soft);color:var(--success-dim);}
+  .badge.b-expired{background:var(--warm-soft);color:var(--warn);}
+  .badge.b-closed{background:var(--panel-2);color:var(--faint);border:1px solid var(--line);}
+  .newbadge{font-family:var(--mono);font-size:10px;font-weight:700;background:var(--grad);color:#fff;padding:3px 9px;border-radius:999px;}
+  .rc-meta{display:flex;flex-wrap:wrap;gap:7px;align-items:center;}
+  .rc-actions{display:flex;gap:7px;flex-wrap:wrap;}
+  .minibtn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:9px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);cursor:pointer;font-size:12.5px;font-weight:600;transition:all .12s;}
+  .minibtn:hover{border-color:var(--accent);color:var(--accent-dim);} .minibtn svg{width:14px;height:14px;}
+  .minibtn.danger:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .minibtn.go{color:var(--accent-dim);border-color:var(--accent);background:var(--accent-soft);}
+
+  .empty{text-align:center;padding:48px 20px;color:var(--muted);}
+  .empty .ei{width:66px;height:66px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
+  .empty .ei svg{width:32px;height:32px;} .empty h3{font-size:18px;color:var(--ink);margin:0 0 6px;} .empty p{margin:0 auto 18px;max-width:42ch;font-size:14px;}
+
+  /* received view */
+  .rvhead{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .backbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);cursor:pointer;font-size:13px;font-weight:600;box-shadow:var(--shadow-sm);}
+  .backbtn:hover{border-color:var(--accent);} .backbtn svg{width:15px;height:15px;}
+  .rvhead h3{font-size:18px;margin:0;font-weight:700;flex:1;min-width:150px;}
+  .rvtools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .filterchips{display:flex;gap:6px;flex-wrap:wrap;}
+  .fchip{font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 12px;transition:all .12s;}
+  .fchip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dim);}
+  .sortsel{height:34px;padding:0 10px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);font-size:12.5px;font-family:var(--sans);cursor:pointer;}
+
+  .subgroup{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-sm);margin-bottom:14px;overflow:hidden;}
+  .sg-head{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line-2);background:var(--panel-2);flex-wrap:wrap;}
+  .sg-ava{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--grad);color:#fff;font-weight:700;font-size:15px;}
+  .sg-id{flex:1;min-width:160px;}
+  .sg-name{font-size:14.5px;font-weight:700;color:var(--ink);}
+  .sg-when{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .sg-contact{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .sg-note{font-size:12.5px;color:var(--ink-2);background:var(--panel);border:1px solid var(--line-2);border-radius:9px;padding:8px 11px;margin-top:9px;width:100%;white-space:pre-wrap;word-break:break-word;}
+  .sg-files{display:flex;flex-direction:column;}
+  .frow{display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--line-2);}
+  .frow:first-child{border-top:none;}
+  .frow .newdot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;box-shadow:0 0 0 3px var(--accent-soft);}
+  .frow .newdot.ph{background:transparent;box-shadow:none;}
+  .frow .fico{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);overflow:hidden;cursor:pointer;}
+  .frow .fico.image{color:var(--info);background:var(--info-soft);} .frow .fico.video{color:#e5484d;background:var(--danger-soft);}
+  .frow .fico.doc{color:var(--info-dim);background:var(--info-soft);}
+  .frow .fico img{width:100%;height:100%;object-fit:cover;} .frow .fico svg{width:18px;height:18px;}
+  .frow .fn{flex:1;min-width:0;}
+  .frow .fn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .frow .fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .frow .act{display:flex;gap:6px;flex-shrink:0;}
+  .frow .act button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .frow .act button:hover{border-color:var(--accent);color:var(--accent);}
+  .frow .act button.del:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .frow .act svg{width:16px;height:16px;}
+
+  /* preview modal */
+  .pv{position:fixed;inset:0;background:rgba(6,8,16,.86);display:none;flex-direction:column;z-index:180;}
+  .pv.show{display:flex;}
+  .pvbar{display:flex;align-items:center;gap:12px;padding:14px 18px;color:#fff;}
+  .pvbar .pvt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:14.5px;}
+  .pvbar button{background:rgba(255,255,255,.12);border:none;color:#fff;cursor:pointer;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;}
+  .pvbody{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 20px 26px;min-height:0;}
+  .pvbody img,.pvbody video{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;}
+  .pvbody iframe{width:min(760px,100%);height:100%;border:none;border-radius:8px;background:#fff;}
+  .pvbody audio{width:min(520px,100%);}
+
+  /* confirm dialog */
+  .cf{position:fixed;inset:0;background:rgba(10,12,22,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+    display:none;align-items:center;justify-content:center;z-index:210;padding:20px;opacity:0;transition:opacity .16s ease;}
+  .cf.show{display:flex;opacity:1;}
+  .cf-box{width:100%;max-width:404px;background:var(--panel);border:1px solid var(--line);border-radius:18px;
+    box-shadow:var(--shadow-lg);padding:26px 24px 22px;text-align:center;
+    transform:translateY(10px) scale(.97);transition:transform .2s cubic-bezier(.2,.9,.3,1);}
+  .cf.show .cf-box{transform:none;}
+  .cf-ico{width:54px;height:54px;margin:0 auto 15px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--danger-soft);color:var(--danger);}
+  .cf-ico.warn{background:var(--warm-soft);color:var(--warn);}
+  .cf-ico svg{width:26px;height:26px;}
+  .cf-box h3{font-size:18.5px;font-weight:700;margin:0 0 8px;color:var(--ink);letter-spacing:-.01em;}
+  .cf-box p{font-size:13.5px;color:var(--muted);margin:0 0 22px;line-height:1.6;}
+  .cf-actions{display:flex;gap:10px;}
+  .cf-actions button{flex:1;height:44px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;
+    font-family:var(--sans);transition:filter .12s,border-color .12s,transform .08s;}
+  .cf-actions button:active{transform:translateY(1px);}
+  .cf-cancel{background:var(--panel-2);border:1px solid var(--line);color:var(--ink-2);}
+  .cf-cancel:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .cf-confirm{border:none;color:#fff;background:var(--danger);box-shadow:0 6px 16px rgba(229,72,77,.30);}
+  .cf-confirm:hover{filter:brightness(1.05);}
+  .cf-confirm.warn{background:var(--warn);box-shadow:0 6px 16px rgba(200,138,4,.28);}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab on" id="tabCreate" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+      <span data-i18n="tabCreate"></span>
+    </button>
+    <button class="tab" id="tabManage" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+      <span data-i18n="tabManage"></span>
+      <span class="count" id="mgCount">0</span>
+    </button>
+  </div>
+
+  <!-- ============ CREATE ============ -->
+  <div id="createView">
+    <div class="grid" id="createGrid">
+      <div class="col">
+        <div class="card form">
+          <h3 data-i18n="formTitle"></h3>
+
+          <div class="opt">
+            <div class="optlbl"><span data-i18n="fName"></span> <span class="req">*</span></div>
+            <input class="inp" id="fName" type="text" data-i18n-ph="fNamePh">
+          </div>
+
+          <div class="opt">
+            <div class="optlbl" data-i18n="fDesc"></div>
+            <textarea class="ta" id="fDesc" data-i18n-ph="fDescPh"></textarea>
+          </div>
+
+          <div class="opt">
+            <div class="optlbl" data-i18n="fFolder"></div>
+            <select class="inp" id="fFolder"></select>
+            <input class="inp hidden" id="fNewFolder" type="text" data-i18n-ph="fNewFolderPh" style="margin-top:8px">
+          </div>
+
+          <div class="opt">
+            <div class="optlbl" data-i18n="fTypes"></div>
+            <div class="typechips" id="fTypes"></div>
+            <div class="hint" data-i18n="fTypesHint"></div>
+          </div>
+
+          <div class="two">
+            <div class="opt">
+              <div class="optlbl" data-i18n="fMaxFile"></div>
+              <select class="inp" id="fMaxFile">
+                <option value="0" data-i18n="noLimit"></option>
+                <option value="25">25 MB</option>
+                <option value="100">100 MB</option>
+                <option value="500">500 MB</option>
+                <option value="2000">2 GB</option>
+              </select>
+            </div>
+            <div class="opt">
+              <div class="optlbl" data-i18n="fMaxCount"></div>
+              <select class="inp" id="fMaxCount">
+                <option value="0" data-i18n="noLimit"></option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="two">
+            <div class="opt">
+              <div class="optlbl" data-i18n="fMaxTotal"></div>
+              <select class="inp" id="fMaxTotal">
+                <option value="0" data-i18n="noLimit"></option>
+                <option value="100">100 MB</option>
+                <option value="500">500 MB</option>
+                <option value="2000">2 GB</option>
+                <option value="5000">5 GB</option>
+              </select>
+            </div>
+            <div class="opt">
+              <div class="optlbl" data-i18n="fExpiry"></div>
+              <select class="inp" id="fExpiry">
+                <option value="0" data-i18n="expNever"></option>
+                <option value="1" data-i18n="exp1"></option>
+                <option value="3" data-i18n="exp3"></option>
+                <option value="7" selected data-i18n="exp7"></option>
+                <option value="30" data-i18n="exp30"></option>
+              </select>
+            </div>
+          </div>
+
+          <div class="opt">
+            <label class="chkline"><input type="checkbox" id="fPwToggle"><span data-i18n="fPw"></span></label>
+            <input class="inp hidden" id="fPassword" type="text" dir="ltr" data-i18n-ph="fPwPh">
+          </div>
+
+          <div class="opt">
+            <div class="optlbl" data-i18n="fThanks"></div>
+            <textarea class="ta" id="fThanks" data-i18n-ph="fThanksPh"></textarea>
+          </div>
+
+          <div class="opt">
+            <label class="chkline"><input type="checkbox" id="fNotify" checked><span data-i18n="fNotify"></span></label>
+          </div>
+
+          <button class="primary" id="createBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+            <span data-i18n="createBtn"></span>
+          </button>
+          <div class="opterr" id="createErr"></div>
+        </div>
+      </div>
+
+      <!-- live preview of the client screen -->
+      <div class="col">
+        <div class="card side">
+          <div class="plabel" data-i18n="previewLabel"></div>
+          <div class="pvcard">
+            <div class="pv-top">
+              <div class="pv-ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+              <div class="pv-name" id="pvName"></div>
+              <div class="pv-desc" id="pvDesc"></div>
+            </div>
+            <div class="pv-body">
+              <div class="pv-drop" data-i18n="previewDrop"></div>
+              <div class="pv-chips" id="pvChips"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- share result -->
+    <div class="card share" id="shareCard">
+      <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <h3 data-i18n="readyTitle"></h3>
+      <p class="subt" data-i18n="readySub"></p>
+      <div class="linkrow">
+        <div class="lk" id="shareLink"></div>
+        <button class="copybtn" id="copyBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copy"></span></button>
+      </div>
+      <div class="chips" id="shareChips"></div>
+      <div class="qrwrap" id="qrWrap">
+        <div class="qrbox" id="qrBox"></div>
+        <button class="qrdl" id="qrDlBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          <span data-i18n="qrDl"></span>
+        </button>
+      </div>
+      <div class="row2">
+        <a id="openClientBtn" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span data-i18n="openClient"></span>
+        </a>
+        <button id="emailShareBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+          <span data-i18n="shareEmail"></span>
+        </button>
+        <a id="waShareBtn" class="wa" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.8 14.01c-.24.68-1.42 1.31-1.96 1.35-.5.05-1.14.24-3.71-.79-3.12-1.26-5.1-4.44-5.26-4.65-.15-.21-1.25-1.66-1.25-3.17s.79-2.25 1.07-2.56c.28-.31.61-.38.81-.38.2 0 .41 0 .58.01.19.01.44-.07.69.53.24.6.83 2.06.9 2.21.07.15.12.32.02.53-.1.21-.15.32-.29.5-.15.18-.31.4-.44.53-.15.15-.3.32-.13.61.17.29.77 1.27 1.66 2.06 1.14 1.02 2.1 1.33 2.4 1.48.29.15.46.12.63-.07.17-.19.72-.84.91-1.13.19-.29.39-.24.65-.15.26.1 1.66.78 1.94.93.29.15.48.22.55.34.07.13.07.72-.17 1.4z"/></svg>
+          <span data-i18n="shareWa"></span>
+        </a>
+        <button id="toManageBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+          <span data-i18n="toManage"></span>
+        </button>
+      </div>
+      <div class="seam">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+        <span data-i18n="seam"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MANAGE ============ -->
+  <div id="manageView" class="hidden">
+    <div class="mgbar">
+      <h3 data-i18n="mgTitle"></h3>
+      <button class="btn grad" id="newReqBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="newReq"></span>
+      </button>
+    </div>
+    <div class="reqlist" id="reqList"></div>
+    <div class="empty hidden" id="mgEmpty">
+      <div class="ei"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+      <h3 data-i18n="mgEmptyTitle"></h3>
+      <p data-i18n="mgEmptyBody"></p>
+      <button class="btn grad" id="emptyNewBtn" type="button"><span data-i18n="newReq"></span></button>
+    </div>
+  </div>
+
+  <!-- ============ RECEIVED FILES ============ -->
+  <div id="receivedView" class="hidden">
+    <div class="rvhead">
+      <button class="backbtn" id="backBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        <span data-i18n="back"></span>
+      </button>
+      <h3 id="rvName"></h3>
+      <span id="rvStatus"></span>
+    </div>
+    <div class="rvtools" id="rvTools">
+      <div class="filterchips" id="rvFilter"></div>
+      <select class="sortsel" id="rvSort">
+        <option value="new" data-i18n="sortNew"></option>
+        <option value="old" data-i18n="sortOld"></option>
+        <option value="name" data-i18n="sortName"></option>
+      </select>
+    </div>
+    <div id="subList"></div>
+    <div class="empty hidden" id="rvEmpty">
+      <div class="ei"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+      <h3 data-i18n="rvEmptyTitle"></h3>
+      <p data-i18n="rvEmptyBody"></p>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+
+<div class="pv" id="pv">
+  <div class="pvbar"><div class="pvt" id="pvTitle"></div><button id="pvClose" type="button" data-i18n="close"></button></div>
+  <div class="pvbody" id="pvBody"></div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="cf" id="cf" role="alertdialog" aria-modal="true" aria-labelledby="cfTitle" aria-describedby="cfMsg">
+  <div class="cf-box">
+    <div class="cf-ico" id="cfIco"></div>
+    <h3 id="cfTitle"></h3>
+    <p id="cfMsg"></p>
+    <div class="cf-actions">
+      <button class="cf-cancel" id="cfCancel" type="button"></button>
+      <button class="cf-confirm" id="cfConfirm" type="button"></button>
+    </div>
+  </div>
+</div>
+
+<script src="./request-store.js"></script>
+<script src="./vendor/qrcode.min.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const KR = window.KR;
+
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'Kolkli Request',
+      pageTitle:'קבלו קבצים ישירות מהלקוחות שלכם',
+      pageSub:'צרו קישור העלאה, שלחו ללקוח, וכל הקבצים נכנסים אוטומטית לתיקייה מסודרת אצלכם. הלקוח לא צריך חשבון או התחברות.',
+      tabCreate:'בקשה חדשה', tabManage:'הבקשות שלי',
+      formTitle:'יצירת בקשת קבצים',
+      fName:'שם הבקשה', fNamePh:'לדוגמה: תמונות לאירוע',
+      fDesc:'הנחיות ללקוח', fDescPh:'מה בדיוק להעלות? כמה מילים שיראה הלקוח…',
+      fFolder:'תיקיית יעד', fNewFolderPh:'שם תיקייה חדשה', newFolderOpt:'＋ תיקייה חדשה…',
+      fTypes:'סוגי קבצים מותרים', fTypesHint:'בלי בחירה — כל סוגי הקבצים מותרים.',
+      fMaxFile:'גודל קובץ מקסימלי', fMaxCount:'מספר קבצים מקסימלי', fMaxTotal:'גודל כולל מקסימלי', fExpiry:'תוקף הקישור',
+      noLimit:'ללא הגבלה',
+      expNever:'ללא תפוגה', exp1:'יום אחד', exp3:'3 ימים', exp7:'7 ימים', exp30:'30 יום',
+      fPw:'להגן בסיסמה', fPwPh:'סיסמה לקישור',
+      fThanks:'הודעת תודה ללקוח (לא חובה)', fThanksPh:'תודה! קיבלנו את הקבצים ונחזור אליך.',
+      fNotify:'הודיעו לי כשמתקבלים קבצים',
+      createBtn:'צרו קישור העלאה',
+      tImage:'תמונות', tVideo:'וידאו', tAudio:'אודיו', tDoc:'מסמכים',
+      previewLabel:'מה שהלקוח יראה', previewDrop:'גררו קבצים לכאן או בחרו מהמכשיר',
+      readyTitle:'הקישור מוכן!', readySub:'שלחו את הקישור ללקוח. כל קובץ שיעלה יופיע כאן אצלכם.',
+      copy:'העתקה', copied:'הקישור הועתק ✓',
+      openClient:'תצוגת הלקוח', shareEmail:'שליחה במייל', shareWa:'וואטסאפ', toManage:'לניהול הבקשות',
+      qrDl:'הורדת קוד QR',
+      seam:'הדגמה מקומית: הבקשות והקבצים נשמרים בדפדפן הזה. עם חיבור השרת הקישור יעבוד לכל לקוח מכל מכשיר.',
+      foot:'KOLKLI · Kolkli Request · הדגמה מקומית עד לחיבור השרת',
+      mgTitle:'הבקשות שלי', newReq:'בקשה חדשה',
+      mgEmptyTitle:'עדיין אין בקשות', mgEmptyBody:'צרו בקשת קבצים ראשונה כדי לקבל קבצים מלקוחות בקישור אחד.',
+      stActive:'פעיל', stExpired:'פג תוקף', stClosed:'נסגר',
+      chipFolder:f=>`תיקייה: ${f}`, chipFiles:n=>`${n} קבצים`, chipSize:s=>s,
+      chipCreated:d=>`נוצר ${d}`, chipExpires:d=>`פג ${d}`, chipExpired:'פג תוקף', chipNoExpiry:'ללא תפוגה',
+      chipExpSoon:d=>`פג בעוד ${d}`,
+      newN:n=> n===1?'חדש':`${n} חדשים`,
+      aFiles:n=>`קבצים (${n})`, aCopy:'העתקת קישור', aClose:'סגירה', aDup:'שכפול', aDel:'מחיקה',
+      confTitleClose:'סגירת הבקשה', confClose:'לסגור את הבקשה? לא יתקבלו קבצים חדשים, אך הקבצים שכבר התקבלו יישמרו.',
+      confTitleDel:'מחיקת הבקשה', confDel:'האם למחוק את הבקשה? כל הקבצים שהתקבלו יימחקו לצמיתות ולא ניתן יהיה לשחזר אותם.', confCancel:'ביטול',
+      dupSuffix:' (עותק)', copiedShort:'הקישור הועתק ✓', closedToast:'הבקשה נסגרה', delToast:'הבקשה נמחקה',
+      back:'חזרה', sortNew:'החדשים ביותר', sortOld:'הישנים ביותר', sortName:'לפי שם לקוח',
+      fAll:'הכל', anonymous:'לקוח ללא שם',
+      rvEmptyTitle:'עדיין לא התקבלו קבצים', rvEmptyBody:'ברגע שלקוח יעלה קבצים דרך הקישור, הם יופיעו כאן.',
+      filePreview:'תצוגה', fileDownload:'הורדה', fileDelete:'מחיקה', close:'סגור',
+      confTitleFileDel:'מחיקת הקובץ', confFileDel:'למחוק את הקובץ? לא ניתן יהיה לשחזר אותו.',
+      notifTitle:'התקבלו קבצים חדשים', notifBody:(n,who)=>`${who} העלה ${n} קבצים.`,
+      newUploadToast:(who)=>`${who} העלה קבצים חדשים`,
+      notifOn:'נעדכן אתכם כאן ברגע שיעלו קבצים', notifBlocked:'ההתראות חסומות בדפדפן — אפשר לאפשר בהגדרות האתר',
+      errName:'צריך לתת שם לבקשה', errPw:'הזינו סיסמה או בטלו את ההגנה',
+      emailSubject:n=>`בקשת העלאת קבצים: ${n}`, emailBody:(n,url,d)=>`שלום,\nאשמח אם תעלו קבצים דרך הקישור הבא:\n${url}\n\nבקשה: ${n}${d?'\n'+d:''}`,
+      waText:(n,url)=>`בקשת העלאת קבצים "${n}": ${url}`,
+      today:'היום', yesterday:'אתמול', dayU:'יום', daysU:d=>`${d} ימים`,
+    },
+    en:{ dir:'ltr',
+      kick:'Kolkli Request',
+      pageTitle:'Receive files directly from your clients',
+      pageSub:'Create an upload link, send it to your client, and every file lands automatically in an organized folder on your side. Your client needs no account and no login.',
+      tabCreate:'New request', tabManage:'My requests',
+      formTitle:'Create a file request',
+      fName:'Request name', fNamePh:'e.g. Event photos',
+      fDesc:'Instructions for the client', fDescPh:'What exactly should they upload? A few words shown to the client…',
+      fFolder:'Target folder', fNewFolderPh:'New folder name', newFolderOpt:'＋ New folder…',
+      fTypes:'Allowed file types', fTypesHint:'Leave empty to allow every file type.',
+      fMaxFile:'Max file size', fMaxCount:'Max number of files', fMaxTotal:'Max total size', fExpiry:'Link expiry',
+      noLimit:'No limit',
+      expNever:'No expiry', exp1:'1 day', exp3:'3 days', exp7:'7 days', exp30:'30 days',
+      fPw:'Protect with a password', fPwPh:'Link password',
+      fThanks:'Thank-you message for the client (optional)', fThanksPh:'Thanks! We got your files and will be in touch.',
+      fNotify:'Notify me when files arrive',
+      createBtn:'Create upload link',
+      tImage:'Images', tVideo:'Video', tAudio:'Audio', tDoc:'Documents',
+      previewLabel:'What your client will see', previewDrop:'Drag files here or pick from your device',
+      readyTitle:'Your link is ready!', readySub:'Send the link to your client. Every file they upload shows up here for you.',
+      copy:'Copy', copied:'Link copied ✓',
+      openClient:'Client view', shareEmail:'Send by email', shareWa:'WhatsApp', toManage:'Manage requests',
+      qrDl:'Download QR code',
+      seam:'This is a local demo: requests and files are stored in this browser. Once the server is connected, the link works for any client on any device.',
+      foot:'KOLKLI · Kolkli Request · Local demo until the server is connected',
+      mgTitle:'My requests', newReq:'New request',
+      mgEmptyTitle:'No requests yet', mgEmptyBody:'Create your first file request to receive files from clients with a single link.',
+      stActive:'Active', stExpired:'Expired', stClosed:'Closed',
+      chipFolder:f=>`Folder: ${f}`, chipFiles:n=>`${n} files`, chipSize:s=>s,
+      chipCreated:d=>`Created ${d}`, chipExpires:d=>`Expires ${d}`, chipExpired:'Expired', chipNoExpiry:'No expiry',
+      chipExpSoon:d=>`Expires in ${d}`,
+      newN:n=> n===1?'new':`${n} new`,
+      aFiles:n=>`Files (${n})`, aCopy:'Copy link', aClose:'Close', aDup:'Duplicate', aDel:'Delete',
+      confTitleClose:'Close request', confClose:'Close this request? No new files will be accepted, but files already received are kept.',
+      confTitleDel:'Delete request', confDel:'Delete this request? Every received file will be permanently removed and cannot be recovered.', confCancel:'Cancel',
+      dupSuffix:' (copy)', copiedShort:'Link copied ✓', closedToast:'Request closed', delToast:'Request deleted',
+      back:'Back', sortNew:'Newest first', sortOld:'Oldest first', sortName:'By client name',
+      fAll:'All', anonymous:'Unnamed client',
+      rvEmptyTitle:'No files received yet', rvEmptyBody:'As soon as a client uploads through the link, their files appear here.',
+      filePreview:'Preview', fileDownload:'Download', fileDelete:'Delete', close:'Close',
+      confTitleFileDel:'Delete file', confFileDel:'Delete this file? It cannot be recovered.',
+      notifTitle:'New files received', notifBody:(n,who)=>`${who} uploaded ${n} files.`,
+      newUploadToast:(who)=>`${who} uploaded new files`,
+      notifOn:'We’ll alert you here the moment files are uploaded', notifBlocked:'Notifications are blocked — enable them in your browser site settings',
+      errName:'Give the request a name', errPw:'Enter a password or turn protection off',
+      emailSubject:n=>`File upload request: ${n}`, emailBody:(n,url,d)=>`Hi,\nPlease upload your files through this link:\n${url}\n\nRequest: ${n}${d?'\n'+d:''}`,
+      waText:(n,url)=>`File upload request "${n}": ${url}`,
+      today:'today', yesterday:'yesterday', dayU:'1 day', daysU:d=>`${d} days`,
+    },
+    ru:{ dir:'ltr',
+      kick:'Kolkli Request',
+      pageTitle:'Получайте файлы напрямую от клиентов',
+      pageSub:'Создайте ссылку для загрузки, отправьте её клиенту — и каждый файл автоматически попадает в упорядоченную папку у вас. Клиенту не нужен аккаунт и вход.',
+      tabCreate:'Новый запрос', tabManage:'Мои запросы',
+      formTitle:'Создать запрос файлов',
+      fName:'Название запроса', fNamePh:'напр. Фото с мероприятия',
+      fDesc:'Инструкции для клиента', fDescPh:'Что именно загрузить? Пара слов, которые увидит клиент…',
+      fFolder:'Целевая папка', fNewFolderPh:'Имя новой папки', newFolderOpt:'＋ Новая папка…',
+      fTypes:'Разрешённые типы файлов', fTypesHint:'Оставьте пустым, чтобы разрешить любые файлы.',
+      fMaxFile:'Макс. размер файла', fMaxCount:'Макс. число файлов', fMaxTotal:'Макс. общий размер', fExpiry:'Срок действия ссылки',
+      noLimit:'Без лимита',
+      expNever:'Без срока', exp1:'1 день', exp3:'3 дня', exp7:'7 дней', exp30:'30 дней',
+      fPw:'Защитить паролем', fPwPh:'Пароль ссылки',
+      fThanks:'Сообщение с благодарностью клиенту (необязательно)', fThanksPh:'Спасибо! Мы получили ваши файлы и свяжемся с вами.',
+      fNotify:'Уведомлять меня о поступлении файлов',
+      createBtn:'Создать ссылку для загрузки',
+      tImage:'Изображения', tVideo:'Видео', tAudio:'Аудио', tDoc:'Документы',
+      previewLabel:'Что увидит ваш клиент', previewDrop:'Перетащите файлы сюда или выберите на устройстве',
+      readyTitle:'Ваша ссылка готова!', readySub:'Отправьте ссылку клиенту. Каждый загруженный файл появится здесь у вас.',
+      copy:'Копировать', copied:'Ссылка скопирована ✓',
+      openClient:'Вид клиента', shareEmail:'Отправить по почте', shareWa:'WhatsApp', toManage:'К управлению запросами',
+      qrDl:'Скачать QR-код',
+      seam:'Это локальная демонстрация: запросы и файлы хранятся в этом браузере. После подключения сервера ссылка работает для любого клиента на любом устройстве.',
+      foot:'KOLKLI · Kolkli Request · Локальная демонстрация до подключения сервера',
+      mgTitle:'Мои запросы', newReq:'Новый запрос',
+      mgEmptyTitle:'Запросов пока нет', mgEmptyBody:'Создайте первый запрос файлов, чтобы получать файлы от клиентов по одной ссылке.',
+      stActive:'Активен', stExpired:'Истёк', stClosed:'Закрыт',
+      chipFolder:f=>`Папка: ${f}`, chipFiles:n=>`${n} файлов`, chipSize:s=>s,
+      chipCreated:d=>`Создан ${d}`, chipExpires:d=>`Истекает ${d}`, chipExpired:'Истёк', chipNoExpiry:'Без срока',
+      chipExpSoon:d=>`Истекает через ${d}`,
+      newN:n=> n===1?'новый':`${n} новых`,
+      aFiles:n=>`Файлы (${n})`, aCopy:'Копировать ссылку', aClose:'Закрыть', aDup:'Дублировать', aDel:'Удалить',
+      confTitleClose:'Закрыть запрос', confClose:'Закрыть этот запрос? Новые файлы приниматься не будут, но уже полученные файлы сохранятся.',
+      confTitleDel:'Удалить запрос', confDel:'Удалить этот запрос? Все полученные файлы будут удалены безвозвратно и не подлежат восстановлению.', confCancel:'Отмена',
+      dupSuffix:' (копия)', copiedShort:'Ссылка скопирована ✓', closedToast:'Запрос закрыт', delToast:'Запрос удалён',
+      back:'Назад', sortNew:'Сначала новые', sortOld:'Сначала старые', sortName:'По имени клиента',
+      fAll:'Все', anonymous:'Клиент без имени',
+      rvEmptyTitle:'Файлы пока не получены', rvEmptyBody:'Как только клиент загрузит файлы по ссылке, они появятся здесь.',
+      filePreview:'Просмотр', fileDownload:'Скачать', fileDelete:'Удалить', close:'Закрыть',
+      confTitleFileDel:'Удалить файл', confFileDel:'Удалить этот файл? Восстановить его будет невозможно.',
+      notifTitle:'Получены новые файлы', notifBody:(n,who)=>`${who} загрузил файлов: ${n}.`,
+      newUploadToast:(who)=>`${who} загрузил новые файлы`,
+      notifOn:'Мы сообщим здесь, как только загрузят файлы', notifBlocked:'Уведомления заблокированы — включите их в настройках сайта',
+      errName:'Дайте запросу название', errPw:'Введите пароль или отключите защиту',
+      emailSubject:n=>`Запрос загрузки файлов: ${n}`, emailBody:(n,url,d)=>`Здравствуйте,\nПожалуйста, загрузите файлы по этой ссылке:\n${url}\n\nЗапрос: ${n}${d?'\n'+d:''}`,
+      waText:(n,url)=>`Запрос загрузки файлов «${n}»: ${url}`,
+      today:'сегодня', yesterday:'вчера', dayU:'1 день', daysU:d=>`${d} дн.`,
+    },
+  };
+
+  const TYPE_KEYS = ['image','video','audio','doc'];
+
+  let lang='he', t=I18N.he;
+  let view='create';
+  let createTypes = {};           // {image:true,...}
+  let lastToken=null;             // request just created (for share panel)
+  let rvToken=null;               // request open in received view
+  let rvSort='new', rvFilter='all';
+  let notifyEnabled=false;
+
+  // ---------- helpers ----------
+  function toast(msg){ const b=el('toast'); b.textContent=msg; b.classList.add('show'); clearTimeout(b._t); b._t=setTimeout(()=>b.classList.remove('show'),1900); }
+  function confirmDialog(opts){
+    return new Promise(resolve=>{
+      const overlay=el('cf'), okBtn=el('cfConfirm'), cancelBtn=el('cfCancel'), ico=el('cfIco');
+      const tone=opts.tone==='warn'?' warn':'';
+      ico.className='cf-ico'+tone; ico.innerHTML=opts.icon||trashSvg();
+      el('cfTitle').textContent=opts.title||''; el('cfMsg').textContent=opts.message||'';
+      okBtn.className='cf-confirm'+tone; okBtn.textContent=opts.confirmLabel||t.aDel;
+      cancelBtn.textContent=opts.cancelLabel||t.confCancel;
+      overlay.classList.add('show');
+      let settled=false;
+      function done(res){ if(settled) return; settled=true; overlay.classList.remove('show');
+        okBtn.onclick=cancelBtn.onclick=overlay.onclick=null; document.removeEventListener('keydown',onKey); resolve(res); }
+      function onKey(e){ if(e.key==='Escape'){ done(false); } else if(e.key==='Enter'){ done(true); } }
+      okBtn.onclick=()=>done(true); cancelBtn.onclick=()=>done(false);
+      overlay.onclick=e=>{ if(e.target===overlay) done(false); };
+      document.addEventListener('keydown',onKey);
+      setTimeout(()=>{ try{ okBtn.focus(); }catch(_){} },30);
+    });
+  }
+  function ls(k){ return KR.ls(k); }
+  function uploadUrl(token){ return new URL('upload.html?req='+token, location.href).href; }
+
+  function daysWord(n){ n=+n; return n===1? t.dayU : t.daysU(n); }
+  function fmtDate(ms){
+    if(!ms) return '';
+    const d=new Date(ms), now=new Date();
+    const sameDay=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+    const yest=new Date(now.getTime()-86400000);
+    if(sameDay(d,now)) return t.today;
+    if(sameDay(d,yest)) return t.yesterday;
+    try{ return d.toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{day:'numeric',month:'short'}); }catch(_){ return d.toISOString().slice(0,10); }
+  }
+  function fmtDateTime(ms){
+    const d=new Date(ms);
+    try{ return d.toLocaleString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
+    catch(_){ return d.toISOString().slice(0,16).replace('T',' '); }
+  }
+  function expiresPhrase(ms){
+    if(!ms) return t.chipNoExpiry;
+    const days=Math.ceil((ms-Date.now())/86400000);
+    if(days<=0) return t.chipExpired;
+    return t.chipExpires(fmtDate(ms));
+  }
+
+  // ---------- tabs / views ----------
+  function setView(v){
+    view=v;
+    el('createView').classList.toggle('hidden', v!=='create');
+    el('manageView').classList.toggle('hidden', v!=='manage');
+    el('receivedView').classList.toggle('hidden', v!=='received');
+    el('tabCreate').classList.toggle('on', v==='create');
+    el('tabManage').classList.toggle('on', v==='manage' || v==='received');
+    if(v==='manage') renderManage();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---------- create ----------
+  function fillFolders(sel){
+    const folders=KR.loadFolders();
+    const cur=sel||folders[0];
+    el('fFolder').innerHTML = folders.map(f=>`<option value="${KR.escapeHtml(f)}"${f===cur?' selected':''}>${KR.escapeHtml(f)}</option>`).join('')
+      + `<option value="__new">${KR.escapeHtml(t.newFolderOpt)}</option>`;
+  }
+  function renderTypeChips(){
+    el('fTypes').innerHTML = TYPE_KEYS.map(k=>{
+      const on=createTypes[k];
+      const iconKind = k==='doc'?'doc':k;
+      return `<span class="tchip${on?' on':''}" data-type="${k}">${KR.FICON[iconKind]}<span data-i18n="${'t'+k.charAt(0).toUpperCase()+k.slice(1)}">${lblForType(k)}</span></span>`;
+    }).join('');
+  }
+  function lblForType(k){ return t['t'+k.charAt(0).toUpperCase()+k.slice(1)]; }
+
+  function renderPreview(){
+    el('pvName').textContent = el('fName').value.trim() || I18N[lang].fNamePh;
+    const desc=el('fDesc').value.trim();
+    el('pvDesc').textContent = desc; el('pvDesc').style.display = desc? '' : 'none';
+    const chips=[];
+    const chosen=TYPE_KEYS.filter(k=>createTypes[k]);
+    if(chosen.length && chosen.length<TYPE_KEYS.length) chips.push(chosen.map(k=>lblForType(k)).join(' · '));
+    const mf=+el('fMaxFile').value; if(mf) chips.push('≤ '+(mf>=1000?(mf/1000)+' GB':mf+' MB'));
+    const mc=+el('fMaxCount').value; if(mc) chips.push('≤ '+mc);
+    const ex=+el('fExpiry').value; if(ex) chips.push(daysWord(ex));
+    if(el('fPwToggle').checked) chips.push('🔒');
+    el('pvChips').innerHTML = chips.map(c=>`<span class="chip">${KR.escapeHtml(c)}</span>`).join('');
+  }
+
+  async function createRequest(){
+    el('createErr').textContent='';
+    const name=el('fName').value.trim();
+    if(!name){ el('createErr').textContent=t.errName; return; }
+    const pwOn=el('fPwToggle').checked, pwVal=el('fPassword').value;
+    if(pwOn && !pwVal){ el('createErr').textContent=t.errPw; return; }
+
+    let folder=el('fFolder').value;
+    if(folder==='__new'){ folder=el('fNewFolder').value.trim() || 'Inbox'; }
+    KR.addFolder(folder);
+
+    const days=+el('fExpiry').value;
+    const req={
+      token: KR.randToken(),
+      name, desc: el('fDesc').value.trim(), folder,
+      types: TYPE_KEYS.filter(k=>createTypes[k]),
+      maxFileMB:+el('fMaxFile').value, maxCount:+el('fMaxCount').value, maxTotalMB:+el('fMaxTotal').value,
+      expiresAt: days? Date.now()+days*86400000 : 0,
+      createdAt: Date.now(),
+      password: pwOn? await KR.hashPass(pwVal) : null,
+      thankYou: el('fThanks').value.trim(),
+      notify: el('fNotify').checked,
+      status:'active', submissions:[], files:[]
+    };
+    KR.upsertRequest(req);
+    lastToken=req.token;
+    showShare(req);
+    updateCount();
+  }
+
+  function showShare(req){
+    const url=uploadUrl(req.token);
+    el('shareLink').textContent=url;
+    el('openClientBtn').href=url;
+    el('waShareBtn').href='https://wa.me/?text='+encodeURIComponent(t.waText(req.name,url));
+    const chips=[];
+    chips.push(`<span class="chip">${clockSvg()} ${req.expiresAt? t.chipExpSoon(daysWord(Math.ceil((req.expiresAt-Date.now())/86400000))) : t.chipNoExpiry}</span>`);
+    chips.push(`<span class="chip">${folderSvg()} ${KR.escapeHtml(req.folder)}</span>`);
+    if(req.types.length) chips.push(`<span class="chip">${req.types.map(k=>lblForType(k)).join(' · ')}</span>`);
+    if(req.password) chips.push(`<span class="chip">${lockSvg()} ${t.fPw}</span>`);
+    el('shareChips').innerHTML=chips.join('');
+    renderQR(url);
+    el('createGrid').classList.add('hidden');
+    el('shareCard').classList.add('show');
+    el('shareCard').scrollIntoView({behavior:'smooth',block:'center'});
+    // owner notification permission
+    if(req.notify) requestNotifyPerm();
+  }
+  function requestNotifyPerm(){
+    if('Notification'in window){
+      if(Notification.permission==='granted'){ notifyEnabled=true; }
+      else if(Notification.permission!=='denied'){ Notification.requestPermission().then(p=>{ notifyEnabled=(p==='granted'); }); }
+    }
+  }
+
+  function renderQR(url){
+    const box=el('qrBox'), wrap=el('qrWrap');
+    try{ const qr=qrcode(0,'M'); qr.addData(url); qr.make(); box.innerHTML=qr.createImgTag(5,10);
+      const img=box.querySelector('img'); if(img) img.alt='QR'; box._png=qr.createDataURL(8,10); wrap.style.display=''; }
+    catch(_){ wrap.style.display='none'; }
+  }
+  function downloadQR(){ const png=el('qrBox')._png; if(!png) return; const a=document.createElement('a'); a.href=png; a.download='kolkli-request-qr.png'; document.body.appendChild(a); a.click(); a.remove(); }
+
+  function resetCreate(){
+    el('fName').value=''; el('fDesc').value=''; el('fThanks').value=''; el('fPassword').value='';
+    el('fPwToggle').checked=false; el('fPassword').classList.add('hidden');
+    el('fNotify').checked=true;
+    el('fMaxFile').value='0'; el('fMaxCount').value='0'; el('fMaxTotal').value='0'; el('fExpiry').value='7';
+    createTypes={}; renderTypeChips(); fillFolders();
+    el('fNewFolder').classList.add('hidden'); el('fNewFolder').value='';
+    el('createErr').textContent=''; lastToken=null;
+    el('shareCard').classList.remove('show'); el('createGrid').classList.remove('hidden');
+    renderPreview();
+  }
+
+  // ---------- manage ----------
+  function updateCount(){ el('mgCount').textContent = KR.loadRequests().length; }
+  function statusLabel(s){ return s==='active'? t.stActive : s==='expired'? t.stExpired : t.stClosed; }
+
+  function reqCardHtml(req){
+    const st=KR.statusOf(req);
+    const unseen=KR.reqUnseen(req);
+    const bytes=KR.reqBytes(req);
+    const chips=[];
+    chips.push(`<span class="chip">${folderSvg()} ${KR.escapeHtml(req.folder)}</span>`);
+    chips.push(`<span class="chip">${fileSvg()} ${t.chipFiles(req.files.length)}</span>`);
+    if(bytes) chips.push(`<span class="chip">${KR.fmtBytes(bytes)}</span>`);
+    chips.push(`<span class="chip">${clockSvg()} ${t.chipCreated(fmtDate(req.createdAt))}</span>`);
+    if(st==='active' && req.expiresAt){
+      const days=Math.ceil((req.expiresAt-Date.now())/86400000);
+      if(days<=2) chips.push(`<span class="chip warn">${clockSvg()} ${t.chipExpSoon(daysWord(days))}</span>`);
+      else chips.push(`<span class="chip">${t.chipExpires(fmtDate(req.expiresAt))}</span>`);
+    } else if(!req.expiresAt){ chips.push(`<span class="chip">${t.chipNoExpiry}</span>`); }
+
+    const actions=[];
+    actions.push(`<button class="minibtn go" data-act="files">${folderSvg()} ${t.aFiles(req.files.length)}</button>`);
+    actions.push(`<button class="minibtn" data-act="copy">${copySvg()} ${t.aCopy}</button>`);
+    if(st==='active') actions.push(`<button class="minibtn" data-act="close">${t.aClose}</button>`);
+    actions.push(`<button class="minibtn" data-act="dup">${t.aDup}</button>`);
+    actions.push(`<button class="minibtn danger" data-act="del">${trashSvg()} ${t.aDel}</button>`);
+
+    return `<div class="rcard${unseen?' unseen':''}" data-token="${req.token}">
+      <div class="rc-main">
+        <div class="rc-top">
+          <span class="rc-name">${KR.escapeHtml(req.name)}</span>
+          <span class="badge b-${st}">${statusLabel(st)}</span>
+          ${unseen?`<span class="newbadge">${t.newN(unseen)}</span>`:''}
+        </div>
+        <div class="rc-meta">${chips.join('')}</div>
+      </div>
+      <div class="rc-actions">${actions.join('')}</div>
+    </div>`;
+  }
+
+  function renderManage(){
+    updateCount();
+    const reqs=KR.loadRequests().slice().sort((a,b)=>b.createdAt-a.createdAt);
+    el('reqList').innerHTML = reqs.map(reqCardHtml).join('');
+    el('mgEmpty').classList.toggle('hidden', reqs.length>0);
+    el('reqList').classList.toggle('hidden', reqs.length===0);
+  }
+
+  function copyLink(token){
+    const url=uploadUrl(token);
+    const done=()=>toast(t.copiedShort);
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done).catch(fb); else fb();
+    function fb(){ const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(_){}; ta.remove(); done(); }
+  }
+  async function closeRequest(token){
+    const ok=await confirmDialog({tone:'warn',icon:lockSvg(),title:t.confTitleClose,message:t.confClose,confirmLabel:t.aClose});
+    if(!ok) return;
+    const req=KR.getRequest(token); if(!req) return; req.status='closed'; KR.upsertRequest(req); renderManage(); toast(t.closedToast);
+  }
+  function duplicateRequest(token){
+    const src=KR.getRequest(token); if(!src) return;
+    const copy=JSON.parse(JSON.stringify(src));
+    copy.token=KR.randToken(); copy.name=src.name+t.dupSuffix; copy.createdAt=Date.now();
+    copy.status='active'; copy.submissions=[]; copy.files=[];
+    if(src.expiresAt){ const span=src.expiresAt-src.createdAt; copy.expiresAt=Date.now()+Math.max(span,86400000); }
+    KR.upsertRequest(copy); renderManage(); updateCount();
+  }
+  async function deleteRequest(token){
+    const ok=await confirmDialog({title:t.confTitleDel,message:t.confDel,confirmLabel:t.aDel});
+    if(!ok) return;
+    KR.deleteRequest(token).then(()=>{ renderManage(); updateCount(); toast(t.delToast); });
+  }
+
+  // ---------- received files ----------
+  function openReceived(token){
+    rvToken=token; rvSort='new'; rvFilter='all'; el('rvSort').value='new';
+    renderReceived(true);
+    setView('received');
+    // mark everything seen (after capturing which were new for the dots)
+    const req=KR.getRequest(token);
+    if(req){ let changed=false; req.files.forEach(f=>{ if(!f.seen){ f.seen=true; changed=true; } }); if(changed){ KR.upsertRequest(req); } }
+  }
+  function renderReceived(freshOpen){
+    const req=KR.getRequest(rvToken); if(!req){ setView('manage'); return; }
+    const st=KR.statusOf(req);
+    el('rvName').textContent=req.name;
+    el('rvStatus').innerHTML=`<span class="badge b-${st}">${statusLabel(st)}</span>`;
+
+    // filter chips
+    el('rvFilter').innerHTML = ['all'].concat(TYPE_KEYS).map(k=>{
+      const lbl = k==='all'? t.fAll : lblForType(k);
+      return `<span class="fchip${rvFilter===k?' on':''}" data-filter="${k}">${KR.escapeHtml(lbl)}</span>`;
+    }).join('');
+
+    const hasFiles=req.files.length>0;
+    el('subList').classList.toggle('hidden', !hasFiles);
+    el('rvTools').classList.toggle('hidden', !hasFiles);
+    el('rvEmpty').classList.toggle('hidden', hasFiles);
+    if(!hasFiles){ el('subList').innerHTML=''; return; }
+
+    // group files by submission
+    let subs=req.submissions.slice();
+    subs.sort((a,b)=> rvSort==='old'? a.at-b.at : rvSort==='name'? (a.name||'').localeCompare(b.name||'') : b.at-a.at);
+
+    const rows=subs.map(sub=>{
+      let files=req.files.filter(f=>f.subId===sub.id);
+      if(rvFilter!=='all') files=files.filter(f=>f.kind===rvFilter);
+      if(!files.length) return '';
+      const bytes=files.reduce((a,f)=>a+(f.size||0),0);
+      const contact=[];
+      if(sub.phone) contact.push(`<span class="chip">${phoneSvg()} ${KR.escapeHtml(sub.phone)}</span>`);
+      if(sub.email) contact.push(`<span class="chip">${mailSvg()} ${KR.escapeHtml(sub.email)}</span>`);
+      contact.push(`<span class="chip">${fileSvg()} ${t.chipFiles(files.length)} · ${KR.fmtBytes(bytes)}</span>`);
+      const name=sub.name? KR.escapeHtml(sub.name) : t.anonymous;
+      const initial=(sub.name||'?').trim().charAt(0).toUpperCase()||'?';
+      const fileRows=files.map(f=>{
+        const isNew=freshOpen && !f.seen;
+        const previewable = f.kind==='image'||f.kind==='video'||f.kind==='audio'||f.ext==='pdf';
+        return `<div class="frow" data-fid="${f.id}">
+          <span class="newdot${isNew?'':' ph'}"></span>
+          <span class="fico ${f.kind}" ${previewable?`data-pv="${f.id}"`:''}>${KR.FICON[f.kind]}</span>
+          <span class="fn"><div class="nm" title="${KR.escapeHtml(f.name)}">${KR.escapeHtml(f.name)}</div><div class="sz">${KR.fmtBytes(f.size)} · ${fmtDateTime(f.at)}</div></span>
+          <span class="act">
+            ${previewable?`<button data-pv="${f.id}" title="${KR.escapeHtml(t.filePreview)}">${eyeSvg()}</button>`:''}
+            <button data-dl="${f.id}" title="${KR.escapeHtml(t.fileDownload)}">${dlSvg()}</button>
+            <button class="del" data-del="${f.id}" title="${KR.escapeHtml(t.fileDelete)}">${trashSvg()}</button>
+          </span>
+        </div>`;
+      }).join('');
+      return `<div class="subgroup">
+        <div class="sg-head">
+          <span class="sg-ava">${KR.escapeHtml(initial)}</span>
+          <div class="sg-id">
+            <div class="sg-name">${name}</div>
+            <div class="sg-when">${fmtDateTime(sub.at)}</div>
+            <div class="sg-contact">${contact.join('')}</div>
+            ${sub.note?`<div class="sg-note">${KR.escapeHtml(sub.note)}</div>`:''}
+          </div>
+        </div>
+        <div class="sg-files">${fileRows}</div>
+      </div>`;
+    }).filter(Boolean).join('');
+
+    el('subList').innerHTML = rows || `<div class="empty"><p>${KR.escapeHtml(t.rvEmptyBody)}</p></div>`;
+  }
+
+  function fileById(id){
+    const req=KR.getRequest(rvToken); if(!req) return null;
+    return req.files.filter(f=>f.id===id)[0]||null;
+  }
+  async function downloadFile(id){
+    const f=fileById(id); if(!f) return;
+    const blob=await KR.getBlob(id); if(!blob) return;
+    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=f.name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+  }
+  async function deleteFile(id){
+    const ok=await confirmDialog({title:t.confTitleFileDel,message:t.confFileDel,confirmLabel:t.fileDelete});
+    if(!ok) return;
+    const req=KR.getRequest(rvToken); if(!req) return;
+    req.files=req.files.filter(f=>f.id!==id);
+    req.submissions=req.submissions.map(s=>({...s,fileIds:(s.fileIds||[]).filter(x=>x!==id)}));
+    KR.upsertRequest(req);
+    KR.delBlob(id).catch(()=>{});
+    renderReceived(false);
+  }
+  async function previewFile(id){
+    const f=fileById(id); if(!f) return;
+    const blob=await KR.getBlob(id); if(!blob) return;
+    const url=URL.createObjectURL(blob);
+    el('pvTitle').textContent=f.name; const body=el('pvBody');
+    if(f.kind==='image') body.innerHTML=`<img src="${url}" alt="">`;
+    else if(f.kind==='video') body.innerHTML=`<video src="${url}" controls autoplay playsinline></video>`;
+    else if(f.kind==='audio') body.innerHTML=`<audio src="${url}" controls autoplay></audio>`;
+    else body.innerHTML=`<iframe src="${url}"></iframe>`;
+    el('pv').classList.add('show');
+  }
+  function closePreview(){ el('pv').classList.remove('show'); el('pvBody').innerHTML=''; }
+
+  // ---------- incoming upload notifications ----------
+  function onIncoming(d){
+    if(!d || d.type!=='upload') return;
+    const req=KR.getRequest(d.token); if(!req) return;
+    const who=(d.who && d.who.trim())? d.who.trim() : t.anonymous;
+    toast(t.newUploadToast(who));
+    if(req.notify){ try{ if('Notification'in window && Notification.permission==='granted') new Notification(t.notifTitle,{body:t.notifBody(d.count||0,who)}); }catch(_){} }
+    if(view==='manage') renderManage();
+    else if(view==='received' && rvToken===d.token) renderReceived(false);
+    updateCount();
+  }
+
+  // ---------- i18n + theme ----------
+  function applyStatic(){
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
+  }
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    applyStatic();
+    KR.lsSet('ac_lang', l);
+    renderTypeChips(); fillFolders(el('fFolder').value && el('fFolder').value!=='__new'? el('fFolder').value : undefined);
+    renderPreview();
+    if(view==='manage') renderManage();
+    if(view==='received') renderReceived(false);
+    if(lastToken){ const r=KR.getRequest(lastToken); if(r) showShare(r); }
+  }
+  function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); const ic=el('themeIco'); if(ic) ic.textContent=dark?'☀️':'🌙'; KR.lsSet('theme',dark?'dark':'light'); }
+
+  // ---------- svg atoms ----------
+  function clockSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'; }
+  function fileSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>'; }
+  function folderSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'; }
+  function lockSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'; }
+  function copySvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'; }
+  function trashSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'; }
+  function eyeSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>'; }
+  function dlSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>'; }
+  function phoneSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>'; }
+  function mailSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>'; }
+
+  // ---------- events ----------
+  el('tabCreate').addEventListener('click',()=>setView('create'));
+  el('tabManage').addEventListener('click',()=>setView('manage'));
+  el('newReqBtn').addEventListener('click',()=>{ resetCreate(); setView('create'); });
+  el('emptyNewBtn').addEventListener('click',()=>{ resetCreate(); setView('create'); });
+  el('toManageBtn').addEventListener('click',()=>setView('manage'));
+  el('backBtn').addEventListener('click',()=>setView('manage'));
+
+  ['fName','fDesc','fMaxFile','fMaxCount','fExpiry'].forEach(id=>el(id).addEventListener('input',renderPreview));
+  el('fPwToggle').addEventListener('change',e=>{ el('fPassword').classList.toggle('hidden',!e.target.checked); if(e.target.checked) el('fPassword').focus(); renderPreview(); });
+  el('fFolder').addEventListener('change',e=>{ el('fNewFolder').classList.toggle('hidden', e.target.value!=='__new'); if(e.target.value==='__new') el('fNewFolder').focus(); });
+  el('fTypes').addEventListener('click',e=>{ const c=e.target.closest('[data-type]'); if(!c) return; const k=c.getAttribute('data-type'); createTypes[k]=!createTypes[k]; c.classList.toggle('on',createTypes[k]); renderPreview(); });
+  el('createBtn').addEventListener('click',createRequest);
+
+  el('copyBtn').addEventListener('click',()=>{ if(lastToken) copyLink(lastToken); toast(t.copied); });
+  el('qrDlBtn').addEventListener('click',downloadQR);
+  el('emailShareBtn').addEventListener('click',()=>{
+    if(!lastToken) return; const req=KR.getRequest(lastToken); const url=uploadUrl(lastToken);
+    const href='mailto:?subject='+encodeURIComponent(t.emailSubject(req.name))+'&body='+encodeURIComponent(t.emailBody(req.name,url,req.desc));
+    const a=document.createElement('a'); a.href=href; a.style.display='none'; document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  el('reqList').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-act]'); const card=e.target.closest('[data-token]'); if(!card) return;
+    const token=card.getAttribute('data-token');
+    if(!btn){ return; }
+    const act=btn.getAttribute('data-act');
+    if(act==='files') openReceived(token);
+    else if(act==='copy') copyLink(token);
+    else if(act==='close') closeRequest(token);
+    else if(act==='dup') duplicateRequest(token);
+    else if(act==='del') deleteRequest(token);
+  });
+
+  el('rvFilter').addEventListener('click',e=>{ const c=e.target.closest('[data-filter]'); if(!c) return; rvFilter=c.getAttribute('data-filter'); renderReceived(false); });
+  el('rvSort').addEventListener('change',e=>{ rvSort=e.target.value; renderReceived(false); });
+  el('subList').addEventListener('click',e=>{
+    const pv=e.target.closest('[data-pv]'); if(pv){ previewFile(pv.getAttribute('data-pv')); return; }
+    const dl=e.target.closest('[data-dl]'); if(dl){ downloadFile(dl.getAttribute('data-dl')); return; }
+    const del=e.target.closest('[data-del]'); if(del){ deleteFile(del.getAttribute('data-del')); }
+  });
+  el('pvClose').addEventListener('click',closePreview);
+  el('pv').addEventListener('click',e=>{ if(e.target===el('pv')) closePreview(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePreview(); });
+
+  window.__setLang=applyLang;
+  const themeBtn=el('themeToggle'); if(themeBtn) themeBtn.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // listen for client uploads (this browser) + poll fallback
+  KR.listen(onIncoming);
+  let lastSig='';
+  setInterval(()=>{
+    const reqs=KR.loadRequests();
+    const sig=reqs.map(r=>r.token+':'+r.files.length+':'+r.status).join('|');
+    if(sig!==lastSig){ lastSig=sig; if(view==='manage') renderManage(); else if(view==='received') renderReceived(false); updateCount(); }
+  },4000);
+
+  // ---------- init ----------
+  applyTheme(ls('theme')||'light');
+  applyLang(KR.detectLang());
+  fillFolders(); renderTypeChips(); renderPreview(); updateCount();
+  requestNotifyPerm();
+  if(/[?&]tab=manage/.test(location.search)) setView('manage');
+})();
+</script>
+</body>
+</html>

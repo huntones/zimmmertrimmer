@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — MP4 ל-MP3</title>
+<meta name="description" content="Extract audio from MP4 and other video files to MP3 or WAV right in your browser. Batch convert, pick a bitrate, and download. Fast, private, nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:30px 20px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:26px;height:26px;}
+  .drop .big{font-size:15.5px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:12px;color:var(--faint);margin:6px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13.5px;padding:10px 22px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .sizenote{margin-top:12px;font-size:11.5px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  /* file list */
+  .files{display:flex;flex-direction:column;}
+  .flist{display:flex;flex-direction:column;gap:8px;padding:14px;}
+  .frow{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line-2);border-radius:11px;background:var(--panel);}
+  .frow .fico{width:56px;height:36px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);overflow:hidden;}
+  .frow .fico svg{width:18px;height:18px;}
+  .frow .fico img{width:100%;height:100%;object-fit:cover;display:block;background:#000;}
+  .frow .fn{flex:1;min-width:0;}
+  .frow .fn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .frow .fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .frow .rm{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .frow .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .frow .rm svg{width:15px;height:15px;}
+  .ftot{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--line-2);
+    font-size:13px;color:var(--muted);}
+  .ftot b{color:var(--ink);font-family:var(--mono);}
+
+  /* options side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+  .opt.dim{opacity:.5;pointer-events:none;}
+
+  /* format picker */
+  .fmts{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;}
+  .fmt{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:11px 4px 9px;border-radius:11px;
+    border:1px solid var(--line);background:var(--panel-2);cursor:pointer;transition:border-color .12s,background .12s,transform .08s;}
+  .fmt:hover{border-color:var(--accent);}
+  .fmt:active{transform:scale(.97);}
+  .fmt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
+  .fmt b{font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--ink);}
+  .fmt small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;}
+  .fmt.on b{color:var(--accent-dim);}
+  .fmt.soon{cursor:not-allowed;opacity:.62;}
+  .fmt.soon:hover{border-color:var(--line);}
+  .fmt .tag{position:absolute;top:-7px;inset-inline-end:-5px;font-family:var(--mono);font-size:8.5px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.04em;color:var(--warn);background:var(--warm-soft);border:1px solid var(--warm-line);
+    border-radius:6px;padding:1px 5px;}
+
+  select.inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;cursor:pointer;transition:border-color .12s,box-shadow .12s;}
+  select.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+
+  .convbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .convbtn:hover{filter:brightness(1.05);} .convbtn:active{transform:translateY(1px);}
+  .convbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .convbtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+  .rtnote{font-size:10.5px;color:var(--faint);font-family:var(--mono);text-align:center;margin-top:6px;line-height:1.45;}
+
+  /* progress */
+  .prog{padding:16px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;}
+  .prog .lbl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+
+  /* results */
+  .results{padding:22px;display:none;margin-top:18px;}
+  .results.show{display:block;}
+  .results .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .results .ok svg{width:28px;height:28px;}
+  .results h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .results .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+  .rlist{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+  .rrow{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel-2);}
+  .rrow .rico{width:44px;height:44px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .rrow.err .rico{background:var(--danger-soft);color:var(--danger);}
+  .rrow .rico svg{width:20px;height:20px;}
+  .rrow .rn{flex:1;min-width:0;}
+  .rrow .rn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rrow .rn .meta{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .rrow .meta em{font-style:normal;color:var(--success-dim);}
+  .rrow.err .rn .meta{color:var(--danger);}
+  .rrow .rplay{width:100%;height:34px;margin-top:9px;display:block;}
+  .dlbtn{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:12.5px;padding:0 15px;height:36px;border-radius:10px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
+  .dlbtn:hover{filter:brightness(1.05);} .dlbtn svg{width:15px;height:15px;}
+  .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .row2 a,.row2 button{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 a:hover,.row2 button:hover{border-color:var(--accent);} .row2 *:active{transform:translateY(1px);}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .row2 svg{width:15px;height:15px;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+<script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid" id="composer">
+    <!-- main: upload + files -->
+    <div class="col">
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="sizenote" data-i18n="sizeNote"></div>
+      </div>
+      <input type="file" id="fileInput" accept="video/*,.mp4,.mkv,.mov,.webm,.avi,.m4v,.wmv,.flv,.3gp,.ogv" multiple>
+
+      <div class="card files" id="filesCard" style="display:none">
+        <div class="flist" id="flist"></div>
+        <div class="ftot"><span data-i18n="totalLbl"></span> <b id="totalVal">0</b></div>
+      </div>
+    </div>
+
+    <!-- side: options -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="optTitle"></h3>
+
+        <div class="opt">
+          <label data-i18n="fmtLbl"></label>
+          <div class="fmts" id="fmts"></div>
+        </div>
+
+        <div class="opt" id="bitrateOpt">
+          <label data-i18n="bitrateLbl"></label>
+          <select class="inp" id="bitrate">
+            <option value="320">320 kbps</option>
+            <option value="256">256 kbps</option>
+            <option value="192" selected>192 kbps</option>
+            <option value="128">128 kbps</option>
+            <option value="96">96 kbps</option>
+          </select>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="chanLbl"></label>
+          <select class="inp" id="channels">
+            <option value="0" data-i18n="keepOrig"></option>
+            <option value="2" data-i18n="stereo"></option>
+            <option value="1" data-i18n="mono"></option>
+          </select>
+        </div>
+
+        <button class="convbtn" id="convBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <span data-i18n="convBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+        <div class="rtnote" data-i18n="rtNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="nm" id="progName" data-i18n="working"></span><span id="progPct">0%</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <!-- results -->
+  <div class="card results" id="resultsCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" id="readySub"></p>
+    <div class="rlist" id="rlist"></div>
+    <div class="row2">
+      <button id="dlAllBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="dlAll"></span>
+      </button>
+      <button id="againBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="againBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'וידאו · MP4 ל-MP3',
+      pageTitle:'חלצו את פס הקול מווידאו ל-MP3',
+      pageSub:'גררו קובצי וידאו, בחרו פורמט ואיכות, וקבלו קובץ אודיו מוכן להורדה. הכול מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      dropBig:'גררו קובצי וידאו לכאן', or2:'או', choose:'בחרו קבצים',
+      sizeNote:'MP4 · MKV · MOV · WEBM · AVI · M4V', remove:'הסרה',
+      totalLbl:'סה״כ', optTitle:'הגדרות המרה',
+      fmtLbl:'פורמט יעד',
+      bitrateLbl:'קצב סיביות (איכות)', chanLbl:'ערוצים',
+      keepOrig:'כמו המקור', stereo:'סטריאו', mono:'מונו',
+      convBtn:'חלצו אודיו', working:'מחלץ…',
+      rtNote:'החילוץ מהיר — הדפדפן מפענח את פס הקול והוא מקודד ל-MP3 במלואו אצלכם, בלי שרת.',
+      readyTitle:'החילוץ הושלם!', readySub:n=>`${n} ${n===1?'קובץ מוכן':'קבצים מוכנים'} להורדה.`,
+      dlAll:'הורדת הכול', againBtn:'המרה נוספת',
+      download:'הורדה', origLbl:'מקור',
+      failed:'החילוץ נכשל — ייתכן שאין פס קול בקובץ',
+      seam:'הכול רץ מקומית בדפדפן — הקבצים אף פעם לא נשלחים לשרת. הדפדפן מפענח את פס הקול דרך מנוע ה-Web Audio, וקידוד ה-MP3 נעשה כאן עם lamejs, ישירות אצלכם.',
+      foot:'KOLKLI · MP4 ל-MP3 · פרטי ומהיר, ישירות בדפדפן',
+      errNoFiles:'צריך לצרף לפחות קובץ וידאו אחד', errDecode:'לא הצלחנו לחלץ אודיו מאף קובץ',
+      errLib:'ספריית קידוד ה-MP3 לא נטענה. בדקו את החיבור ורעננו, או בחרו פורמט WAV.',
+      copied:'הקישור הועתק ✓',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'Video · MP4 to MP3',
+      pageTitle:'Extract audio from video to MP3',
+      pageSub:'Drop video files, pick a format and quality, and get a ready-to-download audio file. Everything runs in your browser — nothing leaves your machine.',
+      dropBig:'Drag video files here', or2:'or', choose:'Choose files',
+      sizeNote:'MP4 · MKV · MOV · WEBM · AVI · M4V', remove:'Remove',
+      totalLbl:'Total', optTitle:'Convert options',
+      fmtLbl:'Target format',
+      bitrateLbl:'Bitrate (quality)', chanLbl:'Channels',
+      keepOrig:'Keep original', stereo:'Stereo', mono:'Mono',
+      convBtn:'Extract audio', working:'Extracting…',
+      rtNote:'Extraction is fast — your browser decodes the audio track and encodes it to MP3 entirely on your machine, no server.',
+      readyTitle:'Extraction done!', readySub:n=>`${n} ${n===1?'file':'files'} ready to download.`,
+      dlAll:'Download all', againBtn:'Convert more',
+      download:'Download', origLbl:'source',
+      failed:'Extraction failed — the file may have no audio track',
+      seam:'Everything runs locally in your browser — files are never uploaded. The audio track is decoded by the built-in Web Audio engine, and MP3 encoding is handled by lamejs, right on your machine.',
+      foot:'KOLKLI · MP4 to MP3 · Private and fast, right in your browser',
+      errNoFiles:'Add at least one video file', errDecode:'We could not extract audio from any file',
+      errLib:'The MP3 encoder failed to load. Check your connection and refresh, or pick the WAV format.',
+      copied:'Link copied ✓',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Видео · MP4 в MP3',
+      pageTitle:'Извлекайте звук из видео в MP3',
+      pageSub:'Перетащите видеофайлы, выберите формат и качество — и получите готовый к скачиванию аудиофайл. Всё работает в вашем браузере — ничего не покидает устройство.',
+      dropBig:'Перетащите видеофайлы сюда', or2:'или', choose:'Выбрать файлы',
+      sizeNote:'MP4 · MKV · MOV · WEBM · AVI · M4V', remove:'Удалить',
+      totalLbl:'Всего', optTitle:'Параметры конвертации',
+      fmtLbl:'Целевой формат',
+      bitrateLbl:'Битрейт (качество)', chanLbl:'Каналы',
+      keepOrig:'Как в оригинале', stereo:'Стерео', mono:'Моно',
+      convBtn:'Извлечь звук', working:'Извлечение…',
+      rtNote:'Извлечение быстрое — ваш браузер декодирует звуковую дорожку и кодирует её в MP3 полностью на вашем устройстве, без сервера.',
+      readyTitle:'Извлечение завершено!', readySub:n=>`Готово к скачиванию: ${n}.`,
+      dlAll:'Скачать всё', againBtn:'Ещё конвертация',
+      download:'Скачать', origLbl:'оригинал',
+      failed:'Извлечение не удалось — в файле может не быть звуковой дорожки',
+      seam:'Всё работает локально в вашем браузере — файлы никогда не загружаются. Звуковую дорожку декодирует встроенный движок Web Audio, а кодирование MP3 выполняет lamejs, прямо на вашем устройстве.',
+      foot:'KOLKLI · MP4 в MP3 · Приватно и быстро, прямо в браузере',
+      errNoFiles:'Добавьте хотя бы один видеофайл', errDecode:'Не удалось извлечь звук ни из одного файла',
+      errLib:'Не удалось загрузить кодировщик MP3. Проверьте соединение и обновите страницу или выберите формат WAV.',
+      copied:'Ссылка скопирована ✓',
+    },
+  };
+
+  // target formats — MP3 (lamejs) and WAV (native) are encoded client-side;
+  // the AAC/OGG containers arrive with the server engine.
+  const FORMATS = [
+    { id:'mp3', label:'MP3', ext:'mp3', sub:'popular',  ready:true  },
+    { id:'wav', label:'WAV', ext:'wav', sub:'lossless', ready:true  },
+    { id:'m4a', label:'M4A', ext:'m4a', sub:'AAC',      ready:false },
+    { id:'ogg', label:'OGG', ext:'ogg', sub:'vorbis',   ready:false },
+  ];
+
+  const ICON = {
+    film:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 3v18M17 3v18M2 9h5M2 15h5M17 9h5M17 15h5"/></svg>',
+    music:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+    warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>',
+    dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  };
+
+  let lang='he', t=I18N.he;
+  let files=[];        // {id,file,name,size,url,thumb,dur,w,h}
+  let fmt=(FORMATS.find(f=>f.ready)||FORMATS[0]).id;
+  let uid=1, running=false;
+  let results=[];      // {name, blob, url, size, srcSize, seconds, kbps, channels, fmtId, thumb, ok}
+
+  function baseName(name){ return String(name||'audio').replace(/\.[^.\/\\]+$/,'') || 'audio'; }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function mmss(s){ if(!s||!isFinite(s)) return '—'; s=Math.round(s); const m=Math.floor(s/60); return m+':'+String(s%60).padStart(2,'0'); }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function totalBytes(){ return files.reduce((a,f)=>a+f.size,0); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+  // ---- format picker ----
+  function renderFmts(){
+    el('fmts').innerHTML = FORMATS.map(f=>`
+      <button type="button" class="fmt ${f.id===fmt?'on':''} ${f.ready?'':'soon'}" data-fmt="${f.id}" ${f.ready?'':'disabled'}>
+        ${f.ready?'':`<span class="tag">${lang==='he'?'בקרוב':'soon'}</span>`}
+        <b>${f.label}</b><small>${f.sub}</small>
+      </button>`).join('');
+    // bitrate only matters for MP3 — WAV is lossless PCM
+    el('bitrateOpt').classList.toggle('dim', fmt!=='mp3');
+  }
+
+  // ---- intake ----
+  function addFiles(list){
+    Array.from(list||[]).forEach(file=>{
+      if(file.type && file.type.indexOf('video')!==0 && !/\.(mp4|webm|mkv|mov|avi|m4v|ogv|3gp|wmv|flv)$/i.test(file.name)) return;
+      const item={ id:'f'+(uid++), file, name:file.name, size:file.size, url:URL.createObjectURL(file), thumb:null, dur:0, w:0, h:0 };
+      files.push(item);
+      makeThumb(item);
+    });
+    renderFiles();
+  }
+  function removeFile(id){
+    const f=files.find(x=>x.id===id); if(f&&f.url) URL.revokeObjectURL(f.url);
+    files=files.filter(x=>x.id!==id); renderFiles();
+  }
+
+  // grab a poster frame + duration for a nicer file row
+  async function makeThumb(item){
+    try{
+      const v=document.createElement('video');
+      v.src=item.url; v.muted=true; v.playsInline=true; v.preload='metadata';
+      await new Promise((res,rej)=>{ v.onloadedmetadata=()=>res(); v.onerror=()=>rej(); });
+      item.dur=v.duration; item.w=v.videoWidth; item.h=v.videoHeight;
+      renderFiles();
+      const seekTo=Math.min(1, (isFinite(v.duration)?v.duration:2)*0.1);
+      await new Promise((res)=>{ v.onseeked=()=>res(); try{ v.currentTime=isFinite(seekTo)?seekTo:0; }catch(_){ res(); } });
+      const w=112, h=Math.max(2,Math.round(w*((v.videoHeight||9)/(v.videoWidth||16))));
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(v,0,0,w,h);
+      item.thumb=c.toDataURL('image/jpeg',0.7);
+      renderFiles();
+    }catch(_){ /* audio-only / no poster: fall back to film icon */ }
+  }
+
+  function renderFiles(){
+    const card=el('filesCard'), list=el('flist');
+    card.style.display = files.length? '' : 'none';
+    list.innerHTML = files.map(f=>{
+      const meta = [fmtBytes(f.size), f.dur?mmss(f.dur):''].filter(Boolean).join('  ·  ');
+      const ico = f.thumb? `<img src="${f.thumb}" alt="">` : ICON.film;
+      return `<div class="frow">
+        <span class="fico">${ico}</span>
+        <span class="fn"><div class="nm" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div><div class="sz">${meta}</div></span>
+        <button class="rm" data-rm="${f.id}" title="${escapeHtml(t.remove)}">${ICON.trash}</button>
+      </div>`;
+    }).join('');
+    el('totalVal').textContent = fmtBytes(totalBytes());
+    el('convBtn').disabled = files.length===0;
+  }
+
+  // ---- decode the audio track via Web Audio ----
+  let sharedCtx=null;
+  function getCtx(){
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC) return null;
+    if(!sharedCtx) sharedCtx=new AC();
+    return sharedCtx;
+  }
+  async function decodeAudio(file){
+    const ctx=getCtx(); if(!ctx) throw new Error('noaudio');
+    const ab=await file.arrayBuffer();
+    return await new Promise((res,rej)=>{
+      // promise form + legacy callback form (older Safari)
+      try{ const p=ctx.decodeAudioData(ab, res, rej); if(p && p.then) p.then(res,rej); }
+      catch(e){ rej(e); }
+    });
+  }
+
+  // pick / downmix a channel to the requested output layout
+  function getChannel(buf, ch, outCh){
+    if(outCh===1 && buf.numberOfChannels>1){
+      const L=buf.getChannelData(0), R=buf.getChannelData(1), out=new Float32Array(L.length);
+      for(let i=0;i<L.length;i++) out[i]=(L[i]+R[i])*0.5;
+      return out;
+    }
+    return buf.getChannelData(Math.min(ch, buf.numberOfChannels-1));
+  }
+  function floatToInt16(f32){
+    const out=new Int16Array(f32.length);
+    for(let i=0;i<f32.length;i++){ let s=f32[i]; s=s<-1?-1:s>1?1:s; out[i]=s<0?s*0x8000:s*0x7FFF; }
+    return out;
+  }
+
+  // ---- MP3 encode (lamejs) ----
+  async function encodeMp3(buf, kbps, outCh, onProg){
+    if(typeof lamejs==='undefined' || !lamejs.Mp3Encoder) throw new Error('lib');
+    const enc=new lamejs.Mp3Encoder(outCh, buf.sampleRate, kbps);
+    const left=floatToInt16(getChannel(buf,0,outCh));
+    const right=outCh>1 ? floatToInt16(getChannel(buf,1,outCh)) : null;
+    const block=1152, total=left.length, data=[];
+    for(let i=0;i<total;i+=block){
+      const l=left.subarray(i,i+block);
+      const chunk = outCh>1 ? enc.encodeBuffer(l, right.subarray(i,i+block)) : enc.encodeBuffer(l);
+      if(chunk.length) data.push(new Int8Array(chunk));
+      if((i/block)%48===0){ if(onProg) onProg(i/total); await sleep(0); }
+    }
+    const end=enc.flush(); if(end.length) data.push(new Int8Array(end));
+    if(onProg) onProg(1);
+    return new Blob(data,{type:'audio/mpeg'});
+  }
+
+  // ---- WAV encode (16-bit PCM, native) ----
+  function encodeWav(buf, outCh){
+    const rate=buf.sampleRate, frames=buf.length;
+    const c0=getChannel(buf,0,outCh), c1=outCh>1?getChannel(buf,1,outCh):null;
+    const blockAlign=outCh*2, dataSize=frames*blockAlign;
+    const ab=new ArrayBuffer(44+dataSize), view=new DataView(ab);
+    const wr=(off,s)=>{ for(let i=0;i<s.length;i++) view.setUint8(off+i,s.charCodeAt(i)); };
+    const clamp=v=>{ v=v<-1?-1:v>1?1:v; return v<0?v*0x8000:v*0x7FFF; };
+    wr(0,'RIFF'); view.setUint32(4,36+dataSize,true); wr(8,'WAVE');
+    wr(12,'fmt '); view.setUint32(16,16,true); view.setUint16(20,1,true);
+    view.setUint16(22,outCh,true); view.setUint32(24,rate,true);
+    view.setUint32(28,rate*blockAlign,true); view.setUint16(32,blockAlign,true);
+    view.setUint16(34,16,true); wr(36,'data'); view.setUint32(40,dataSize,true);
+    let off=44;
+    for(let i=0;i<frames;i++){
+      view.setInt16(off,clamp(c0[i]),true); off+=2;
+      if(outCh>1){ view.setInt16(off,clamp(c1[i]),true); off+=2; }
+    }
+    return new Blob([ab],{type:'audio/wav'});
+  }
+
+  // ---- convert one file ----
+  async function convertOne(item, opts, onProg){
+    const buf=await decodeAudio(item.file);
+    if(!buf || !buf.length) throw new Error('noaudio');
+    const outCh = opts.channels ? Math.min(opts.channels,2) : Math.min(2, buf.numberOfChannels);
+    let blob;
+    if(opts.fmt==='wav'){ blob=encodeWav(buf, outCh); if(onProg) onProg(1); }
+    else { blob=await encodeMp3(buf, opts.kbps, outCh, onProg); }
+    if(!blob || !blob.size) throw new Error('empty');
+    return { blob, seconds:buf.duration, channels:outCh };
+  }
+
+  // ---- run ----
+  async function runConvert(){
+    if(running) return;
+    el('optErr').textContent='';
+    if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
+    const spec = FORMATS.find(f=>f.id===fmt);
+    if(fmt==='mp3' && (typeof lamejs==='undefined' || !lamejs.Mp3Encoder)){ el('optErr').textContent=t.errLib; return; }
+
+    const opts = { fmt, kbps:+el('bitrate').value||192, channels:+el('channels').value||0 };
+
+    running=true;
+    el('composer').style.display='none';
+    el('resultsCard').classList.remove('show');
+    clearResults();
+    const prog=el('progCard'); prog.classList.add('show');
+
+    results=[];
+    for(let i=0;i<files.length;i++){
+      const it=files[i];
+      el('progName').textContent = `${it.name}  ·  ${i+1}/${files.length}`;
+      setProg(Math.round(i/files.length*100));
+      await sleep(30);
+      try{
+        const r = await convertOne(it, opts, p=>setProg(Math.round((i+p)/files.length*100)));
+        results.push({ name: baseName(it.name)+'.'+spec.ext, blob:r.blob, url:URL.createObjectURL(r.blob),
+                       size:r.blob.size, srcSize:it.size, seconds:r.seconds, kbps:opts.kbps, channels:r.channels,
+                       fmtId:fmt, thumb:it.thumb, ok:true });
+      }catch(err){
+        console.error(err);
+        results.push({ name: baseName(it.name)+'.'+spec.ext, blob:null, url:null, size:0, srcSize:it.size, thumb:it.thumb, ok:false });
+      }
+      setProg(Math.round((i+1)/files.length*100));
+    }
+    await sleep(180);
+    prog.classList.remove('show');
+    running=false;
+
+    if(!results.some(r=>r.ok)){ el('optErr').textContent=t.errDecode; el('composer').style.display=''; return; }
+    showResults();
+  }
+  function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+
+  function showResults(){
+    const okCount=results.filter(r=>r.ok).length;
+    el('readySub').textContent = t.readySub(okCount);
+    el('rlist').innerHTML = results.map((r,i)=>{
+      if(!r.ok){
+        return `<div class="rrow err"><span class="rico">${ICON.warn}</span>
+          <span class="rn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta">${escapeHtml(t.failed)}</div></span></div>`;
+      }
+      const bits = [
+        `${t.origLbl} ${fmtBytes(r.srcSize)} → <em>${fmtBytes(r.size)}</em>`,
+        mmss(r.seconds),
+        r.fmtId==='mp3' ? r.kbps+' kbps' : 'WAV',
+        r.channels===1 ? 'mono' : 'stereo',
+      ].join(' · ');
+      return `<div class="rrow"><span class="rico">${ICON.music}</span>
+        <span class="rn">
+          <div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
+          <div class="meta">${bits}</div>
+          <audio class="rplay" controls preload="none" src="${r.url}"></audio>
+        </span>
+        <button class="dlbtn" data-dl="${i}">${ICON.dl}<span>${escapeHtml(t.download)}</span></button></div>`;
+    }).join('');
+    el('resultsCard').classList.add('show');
+    el('resultsCard').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  function download(r){
+    if(!r||!r.url) return;
+    const a=document.createElement('a'); a.href=r.url; a.download=r.name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  async function downloadAll(){
+    for(const r of results){ if(r.ok){ download(r); await sleep(280); } }
+  }
+
+  function clearResults(){ results.forEach(r=>{ if(r.url) URL.revokeObjectURL(r.url); }); results=[]; }
+  function reset(){
+    clearResults();
+    files.forEach(f=>{ if(f.url) URL.revokeObjectURL(f.url); });
+    files=[];
+    el('resultsCard').classList.remove('show');
+    el('optErr').textContent='';
+    el('composer').style.display=''; renderFiles();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- i18n + theme (mirrors the other pages; header stays in sync via its observer) ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderFmts(); renderFiles();
+    if(el('resultsCard').classList.contains('show')) showResults();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('flist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeFile(b.getAttribute('data-rm')); });
+  el('fmts').addEventListener('click',e=>{ const b=e.target.closest('[data-fmt]'); if(b && !b.disabled){ fmt=b.getAttribute('data-fmt'); renderFmts(); } });
+  el('rlist').addEventListener('click',e=>{ const b=e.target.closest('[data-dl]'); if(b) download(results[+b.getAttribute('data-dl')]); });
+
+  el('convBtn').addEventListener('click',runConvert);
+  el('dlAllBtn').addEventListener('click',downloadAll);
+  el('againBtn').addEventListener('click',reset);
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  renderFmts(); renderFiles();
+})();
+</script>
+</body>
+</html>

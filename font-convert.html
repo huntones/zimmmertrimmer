@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — ממיר גופנים</title>
+<meta name="description" content="Convert fonts between TTF, OTF, WOFF and WOFF2 right in your browser. Drop a font, pick a target format, preview it live, and download. Private and fast — nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:30px 20px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:26px;height:26px;}
+  .drop .big{font-size:15.5px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:12px;color:var(--faint);margin:6px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13.5px;padding:10px 22px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .fmts-in{margin-top:12px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+  .drop .chip{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 8px;}
+  input[type=file]{display:none;}
+
+  /* file list */
+  .files{display:flex;flex-direction:column;}
+  .flist{display:flex;flex-direction:column;gap:8px;padding:14px;}
+  .frow{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line-2);border-radius:11px;background:var(--panel);}
+  .frow.bad{border-color:var(--warm-line);background:var(--warm-soft);}
+  .frow .fico{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--info-soft);color:var(--info-dim);}
+  .frow.bad .fico{background:transparent;color:var(--warn);}
+  .frow .fico svg{width:17px;height:17px;}
+  .frow .fn{flex:1;min-width:0;}
+  .frow .fn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .frow .fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .frow .fn .warnt{font-size:11px;color:var(--warn);font-weight:600;}
+  .frow .rm{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .frow .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .frow .rm svg{width:15px;height:15px;}
+  .ftot{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--line-2);
+    font-size:13px;color:var(--muted);}
+  .ftot b{color:var(--ink);font-family:var(--mono);}
+
+  /* options side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+
+  /* format picker */
+  .fmts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+  .fmt{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:11px 4px 9px;border-radius:11px;
+    border:1px solid var(--line);background:var(--panel-2);cursor:pointer;transition:border-color .12s,background .12s,transform .08s;}
+  .fmt:hover{border-color:var(--accent);}
+  .fmt:active{transform:scale(.97);}
+  .fmt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
+  .fmt b{font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--ink);}
+  .fmt small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;}
+  .fmt.on b{color:var(--accent-dim);}
+  .fmt.soon{cursor:not-allowed;opacity:.62;}
+  .fmt.soon:hover{border-color:var(--line);}
+  .fmt .tag{position:absolute;top:-7px;inset-inline-end:-5px;font-family:var(--mono);font-size:8.5px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.04em;color:var(--warn);background:var(--warm-soft);border:1px solid var(--warm-line);
+    border-radius:6px;padding:1px 5px;}
+
+  /* page-setup (PDF only) group */
+  .pdfgroup{transition:opacity .18s;}
+  .pdfgroup.dim{opacity:.45;pointer-events:none;}
+  .seg{display:flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:4px;}
+  .segbtn{flex:1;height:36px;border:none;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;
+    font-size:13px;font-weight:600;transition:color .14s,background .14s,box-shadow .14s;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
+  .segbtn.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  .segbtn svg{width:14px;height:14px;}
+
+  select.inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;cursor:pointer;transition:border-color .12s,box-shadow .12s;}
+  select.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .chkline{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);cursor:pointer;}
+  .chkline input{accent-color:var(--accent);width:15px;height:15px;}
+
+  .convbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .convbtn:hover{filter:brightness(1.05);} .convbtn:active{transform:translateY(1px);}
+  .convbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .convbtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+
+  /* progress */
+  .prog{padding:16px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;}
+  .prog .lbl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+
+  /* results */
+  .results{padding:22px;display:none;margin-top:18px;}
+  .results.show{display:block;}
+  .results .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .results .ok svg{width:28px;height:28px;}
+  .results h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .results .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+  .rlist{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+  .rrow{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel-2);}
+  .rrow .rico{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .rrow.err .rico{background:var(--danger-soft);color:var(--danger);}
+  .rrow .rico svg{width:18px;height:18px;}
+  .rrow .rn{flex:1;min-width:0;}
+  .rrow .rn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rrow .rn .meta{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .rrow .meta em{font-style:normal;color:var(--success-dim);}
+  .rrow.err .rn .meta{color:var(--danger);}
+  .dlbtn{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:12.5px;padding:0 15px;height:36px;border-radius:10px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
+  .dlbtn:hover{filter:brightness(1.05);} .dlbtn svg{width:15px;height:15px;}
+  .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .row2 a,.row2 button{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 a:hover,.row2 button:hover{border-color:var(--accent);} .row2 *:active{transform:translateY(1px);}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .row2 svg{width:15px;height:15px;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ---- offscreen render host + the document look that becomes the PDF ---- */
+  #renderHost{position:fixed;left:-99999px;top:0;z-index:-1;pointer-events:none;}
+  .pdf-page{background:#ffffff;color:#111111;}
+  .pdf-break{page-break-before:always;break-before:page;height:0;}
+  .doc-body{font-family:'Segoe UI',Arial,'Heebo',sans-serif;font-size:15px;line-height:1.65;color:#111111;
+    padding:2px;word-wrap:break-word;overflow-wrap:break-word;}
+  .doc-body .pre{white-space:pre-wrap;font-family:'Segoe UI',Arial,'Heebo',sans-serif;margin:0;}
+  .doc-body h1{font-size:26px;margin:.4em 0 .5em;} .doc-body h2{font-size:21px;margin:.4em 0 .45em;}
+  .doc-body h3{font-size:18px;margin:.4em 0 .4em;} .doc-body h4{font-size:16px;margin:.4em 0 .4em;}
+  .doc-body p{margin:0 0 .75em;} .doc-body ul,.doc-body ol{margin:0 0 .75em;padding-inline-start:1.6em;}
+  .doc-body li{margin:.15em 0;}
+  .doc-body img{max-width:100%;height:auto;}
+  .doc-body a{color:#2952d6;text-decoration:underline;}
+  .doc-body table{border-collapse:collapse;width:100%;margin:0 0 .75em;font-size:13.5px;}
+  .doc-body td,.doc-body th{border:1px solid #cfd4de;padding:5px 8px;vertical-align:top;}
+  .doc-body th{background:#f2f4f8;text-align:start;}
+  .doc-body blockquote{margin:0 0 .75em;padding:.2em 0 .2em 1em;border-inline-start:3px solid #cfd4de;color:#444;}
+  .doc-body hr{border:none;border-top:1px solid #d7dbe4;margin:1em 0;}
+
+  /* ---- live font preview card ---- */
+  .fontpreview{margin-top:16px;padding:18px 20px;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius,16px);box-shadow:var(--shadow);display:none;}
+  .fontpreview.show{display:block;}
+  .fontpreview .pvhead{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;font-weight:700;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+  .fontpreview .pvhead svg{width:15px;height:15px;}
+  .fontpreview .pvitem{padding:12px 0;border-top:1px solid var(--line-2);}
+  .fontpreview .pvitem:first-of-type{border-top:none;padding-top:0;}
+  .fontpreview .pvname{font-family:var(--mono);font-size:11px;color:var(--faint);margin-bottom:6px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fontpreview .pvline{color:var(--ink);line-height:1.35;word-break:break-word;margin:4px 0;}
+  .fontpreview .pv-lg{font-size:34px;}
+  .fontpreview .pv-md{font-size:22px;}
+  .fontpreview .pv-sm{font-size:15px;}
+</style>
+<link rel="stylesheet" href="./header.css">
+<script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid" id="composer">
+    <!-- main: upload + files -->
+    <div class="col">
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="fmts-in"><span class="chip">TTF</span><span class="chip">OTF</span><span class="chip">WOFF</span><span class="chip">WOFF2</span></div>
+      </div>
+      <input type="file" id="fileInput" accept=".ttf,.otf,.woff" multiple>
+
+      <div class="card files" id="filesCard" style="display:none">
+        <div class="flist" id="flist"></div>
+        <div class="ftot"><span data-i18n="totalLbl"></span> <b id="totalVal">0</b></div>
+      </div>
+
+      <!-- live font preview -->
+      <div class="fontpreview" id="fontPreview">
+        <div class="pvhead">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+          <span data-i18n="previewTitle"></span>
+        </div>
+        <div id="pvlist"></div>
+      </div>
+    </div>
+
+    <!-- side: options -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="optTitle"></h3>
+
+        <div class="opt">
+          <label data-i18n="fmtLbl"></label>
+          <div class="fmts" id="fmts"></div>
+        </div>
+
+        <button class="convbtn" id="convBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          <span data-i18n="convBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="nm" id="progName" data-i18n="working"></span><span id="progPct">0%</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <!-- results -->
+  <div class="card results" id="resultsCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" id="readySub"></p>
+    <div class="rlist" id="rlist"></div>
+    <div class="row2">
+      <button id="dlAllBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="dlAll"></span>
+      </button>
+      <button id="againBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="againBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+
+<div id="renderHost"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'ממירים · ממיר גופנים',
+      pageTitle:'המירו גופנים בין פורמטים',
+      pageSub:'גררו קובצי גופן TTF, OTF או WOFF, בחרו פורמט יעד, צפו בתצוגה חיה של הגופן — וקבלו קובץ מוכן להורדה. הכול מתבצע בדפדפן שלכם, שום קובץ לא עוזב את המחשב.',
+      dropBig:'גררו גופנים לכאן', or2:'או', choose:'בחרו קבצים',
+      remove:'הסרה', totalLbl:'סה״כ', optTitle:'הגדרות המרה',
+      fmtLbl:'פורמט יעד',
+      previewTitle:'תצוגה מקדימה חיה',
+      convBtn:'המירו עכשיו', working:'ממיר…',
+      readingFile:n=>`קורא: ${n}`, convertingFile:n=>`ממיר: ${n}`,
+      readyTitle:'ההמרה הושלמה!', readySub:n=>`${n} ${n===1?'קובץ מוכן':'קבצים מוכנים'} להורדה.`,
+      download:'הורדה', dlAll:'הורדת הכול', againBtn:'המרה נוספת',
+      unsupported:'פורמט לא נתמך', unsupHint:'נתמכים: TTF · OTF · WOFF',
+      failed:'ההמרה נכשלה עבור קובץ זה',
+      seam:'ייצוא ל־TTF מתבצע במלואו כאן בדפדפן, כעת. ייצוא ל־OTF‏, WOFF‏, WOFF2 ו־EOT מתחבר עם מנוע השרת — הקבצים תמיד נשארים אצלכם.',
+      foot:'KOLKLI · ממיר גופנים · פרטי ומהיר, ישירות בדפדפן',
+      errNone:'הוסיפו לפחות קובץ גופן נתמך אחד (TTF / OTF / WOFF)',
+      errLibs:'ספריות ההמרה לא נטענו. בדקו את החיבור לאינטרנט ורעננו את העמוד.',
+      errFail:'ההמרה נכשלה. נסו קובץ אחר.',
+      copied:'הועתק ✓',
+      pangram:'דג סקרן שט בים מאוכזב ולפתע מצא חברה',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'Converters · Font Converter',
+      pageTitle:'Convert fonts between formats',
+      pageSub:'Drop TTF, OTF or WOFF font files, pick a target format, preview the font live — and get a ready-to-download file. Everything runs in your browser; nothing leaves your machine.',
+      dropBig:'Drag fonts here', or2:'or', choose:'Choose files',
+      remove:'Remove', totalLbl:'Total', optTitle:'Convert options',
+      fmtLbl:'Target format',
+      previewTitle:'Live preview',
+      convBtn:'Convert now', working:'Converting…',
+      readingFile:n=>`Reading: ${n}`, convertingFile:n=>`Converting: ${n}`,
+      readyTitle:'Conversion done!', readySub:n=>`${n} ${n===1?'file':'files'} ready to download.`,
+      download:'Download', dlAll:'Download all', againBtn:'Convert more',
+      unsupported:'Format not supported', unsupHint:'Supported: TTF · OTF · WOFF',
+      failed:'Conversion failed for this file',
+      seam:'TTF export runs entirely here in your browser, right now. OTF, WOFF, WOFF2 and EOT export connect with the server engine — your files always stay with you.',
+      foot:'KOLKLI · Font converter · Private and fast, right in your browser',
+      errNone:'Add at least one supported font (TTF / OTF / WOFF)',
+      errLibs:'Conversion libraries failed to load. Check your connection and refresh.',
+      errFail:'Conversion failed. Try a different file.',
+      copied:'Copied ✓',
+      pangram:'The quick brown fox jumps over the lazy dog',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Конвертеры · Конвертер шрифтов',
+      pageTitle:'Конвертируйте шрифты между форматами',
+      pageSub:'Перетащите файлы шрифтов TTF, OTF или WOFF, выберите целевой формат, посмотрите живой предпросмотр шрифта — и получите готовый к скачиванию файл. Всё работает в вашем браузере; ничего не покидает устройство.',
+      dropBig:'Перетащите шрифты сюда', or2:'или', choose:'Выбрать файлы',
+      remove:'Удалить', totalLbl:'Всего', optTitle:'Параметры конвертации',
+      fmtLbl:'Целевой формат',
+      previewTitle:'Живой предпросмотр',
+      convBtn:'Конвертировать', working:'Конвертация…',
+      readingFile:n=>`Чтение: ${n}`, convertingFile:n=>`Конвертация: ${n}`,
+      readyTitle:'Конвертация завершена!', readySub:n=>`Готово к скачиванию: ${n}.`,
+      download:'Скачать', dlAll:'Скачать всё', againBtn:'Ещё конвертация',
+      unsupported:'Формат не поддерживается', unsupHint:'Поддерживаются: TTF · OTF · WOFF',
+      failed:'Не удалось конвертировать этот файл',
+      seam:'Экспорт в TTF выполняется полностью здесь, в вашем браузере, прямо сейчас. Экспорт в OTF, WOFF, WOFF2 и EOT подключается к серверному движку — ваши файлы всегда остаются у вас.',
+      foot:'KOLKLI · Конвертер шрифтов · Приватно и быстро, прямо в браузере',
+      errNone:'Добавьте хотя бы один поддерживаемый шрифт (TTF / OTF / WOFF)',
+      errLibs:'Не удалось загрузить библиотеки конвертации. Проверьте соединение и обновите страницу.',
+      errFail:'Конвертация не удалась. Попробуйте другой файл.',
+      copied:'Скопировано ✓',
+      pangram:'Съешь же ещё этих мягких французских булок',
+    },
+  };
+
+  // target formats — TTF is produced fully client-side via opentype.js; the rest
+  // (OTF/WOFF/WOFF2/EOT) arrive with the server engine.
+  const FORMATS = [
+    { id:'ttf',   label:'TTF',   ext:'ttf',   sub:'truetype', ready:true  },
+    { id:'otf',   label:'OTF',   ext:'otf',   sub:'opentype', ready:false },
+    { id:'woff',  label:'WOFF',  ext:'woff',  sub:'web',      ready:false },
+    { id:'woff2', label:'WOFF2', ext:'woff2', sub:'web',      ready:false },
+    { id:'eot',   label:'EOT',   ext:'eot',   sub:'legacy',   ready:false },
+  ];
+
+  const SUPPORTED = ['ttf','otf','woff'];
+
+  const ICON = {
+    doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>',
+    warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+    check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+    trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  };
+
+  let lang='he', t=I18N.he;
+  let files=[];        // {id,file,name,ext,size,supported,previewFam,previewUrl}
+  let results=[];      // {name, blob, url, size, ok}
+  let uid=1, running=false;
+  let target='ttf';
+
+  function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
+  function baseName(name){ return (name||'file').replace(/\.[^.\/\\]+$/, '') || 'font'; }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function totalBytes(){ return files.reduce((a,f)=>a+f.size,0); }
+  function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1600); }
+
+  // ---- format picker ----
+  function renderFmts(){
+    el('fmts').innerHTML = FORMATS.map(f=>`
+      <button type="button" class="fmt ${f.id===target?'on':''} ${f.ready?'':'soon'}" data-fmt="${f.id}" ${f.ready?'':'disabled'}>
+        ${f.ready?'':`<span class="tag">${lang==='he'?'בקרוב':'soon'}</span>`}
+        <b>${f.label}</b><small>${f.sub}</small>
+      </button>`).join('');
+  }
+
+  // ---- intake ----
+  function addFiles(list){
+    Array.from(list||[]).forEach(file=>{
+      const ext=extOf(file.name);
+      const item = { id:'f'+(uid++), file, name:file.name, ext, size:file.size, supported:SUPPORTED.includes(ext), previewFam:null, previewUrl:null };
+      files.push(item);
+      if(item.supported) loadPreview(item);   // fire-and-forget live preview
+    });
+    renderFiles();
+  }
+  function removeFile(id){
+    const f=files.find(x=>x.id===id);
+    if(f && f.previewUrl){ try{ URL.revokeObjectURL(f.previewUrl); }catch(_){} }
+    files=files.filter(f=>f.id!==id);
+    renderFiles(); renderPreview();
+  }
+
+  // ---- live font preview (robust: any failure just skips silently) ----
+  async function loadPreview(item){
+    try{
+      if(!('fonts' in document) || typeof FontFace==='undefined') return;
+      const url = URL.createObjectURL(item.file);
+      item.previewUrl = url;
+      const fam = 'previewFont_'+item.id;
+      const ff = new FontFace(fam, `url(${url})`);
+      await ff.load();
+      document.fonts.add(ff);
+      item.previewFam = fam;
+      renderPreview();
+    }catch(_){ /* preview is a nice-to-have — never surface an error */ }
+  }
+
+  function renderPreview(){
+    const card=el('fontPreview'), list=el('pvlist');
+    const ready = files.filter(f=>f.supported && f.previewFam);
+    if(!ready.length){ card.classList.remove('show'); list.innerHTML=''; return; }
+    const pangram = t.pangram;
+    list.innerHTML = ready.map(f=>`
+      <div class="pvitem">
+        <div class="pvname" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
+        <div class="pvline pv-lg" style="font-family:'${f.previewFam}',var(--sans)">${escapeHtml(pangram)}</div>
+        <div class="pvline pv-md" style="font-family:'${f.previewFam}',var(--sans)">${escapeHtml(pangram)}</div>
+        <div class="pvline pv-sm" style="font-family:'${f.previewFam}',var(--sans)">${escapeHtml(pangram)}</div>
+      </div>`).join('');
+    card.classList.add('show');
+  }
+
+  function renderFiles(){
+    const card=el('filesCard'), listEl=el('flist');
+    card.style.display = files.length? '' : 'none';
+    listEl.innerHTML = files.map(f=>`
+      <div class="frow ${f.supported?'':'bad'}">
+        <span class="fico">${f.supported?ICON.doc:ICON.warn}</span>
+        <span class="fn">
+          <div class="nm" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
+          <div class="${f.supported?'sz':'warnt'}">${f.supported?fmtBytes(f.size):(t.unsupported+' · '+t.unsupHint)}</div>
+        </span>
+        <button class="rm" data-rm="${f.id}" title="${escapeHtml(t.remove)}">${ICON.trash}</button>
+      </div>`).join('');
+    el('totalVal').textContent = fmtBytes(totalBytes());
+    el('convBtn').disabled = !files.some(f=>f.supported);
+  }
+
+  // ---- convert one font to TTF via opentype.js ----
+  async function convertOne(f){
+    const ab = await f.file.arrayBuffer();
+    const font = opentype.parse(ab);
+    const out = font.toArrayBuffer();
+    const blob = new Blob([out], {type:'font/ttf'});
+    return blob;
+  }
+
+  // ---- run conversion ----
+  async function convert(){
+    if(running) return;
+    clearErr();
+    const list = files.filter(f=>f.supported);
+    if(!list.length){ showErr(t.errNone); return; }
+    const spec = FORMATS.find(f=>f.id===target);
+    if(!spec || !spec.ready){ showErr(t.errNone); return; }
+    if(typeof opentype==='undefined'){ showErr(t.errLibs); return; }
+
+    running=true;
+    el('convBtn').disabled=true;
+    el('composer').style.display='none';
+    el('resultsCard').classList.remove('show');
+    clearResults();
+    showProg();
+
+    try{
+      for(let i=0;i<list.length;i++){
+        setProg(Math.round((i+0.5)/list.length*100), t.convertingFile(list[i].name));
+        const base = baseName(list[i].name);
+        try{
+          const blob = await convertOne(list[i]);
+          results.push({ name:base+'.'+spec.ext, blob, url:URL.createObjectURL(blob), size:blob.size, ok:true });
+        }catch(err){
+          console.error(err);
+          results.push({ name:base+'.'+spec.ext, blob:null, url:null, size:0, ok:false });
+        }
+        setProg(Math.round((i+1)/list.length*100), t.convertingFile(list[i].name));
+        await wait(10);
+      }
+
+      setProg(100, t.working);
+      await wait(150);
+      hideProg();
+
+      if(!results.some(r=>r.ok)){ el('composer').style.display=''; showErr(t.errFail); }
+      else showResults();
+    }catch(err){
+      console.error(err);
+      hideProg();
+      el('composer').style.display='';
+      showErr(t.errFail);
+    }
+    running=false;
+    el('convBtn').disabled = !files.some(f=>f.supported);
+  }
+
+  // ---- progress ----
+  function showProg(){ el('progCard').classList.add('show'); setProg(0, t.working); el('progCard').scrollIntoView({behavior:'smooth',block:'center'}); }
+  function hideProg(){ el('progCard').classList.remove('show'); }
+  function setProg(p, label){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; if(label!=null) el('progName').textContent=label; }
+
+  // ---- results ----
+  function showResults(){
+    const okCount = results.filter(r=>r.ok).length;
+    el('readySub').textContent = t.readySub(okCount);
+    el('rlist').innerHTML = results.map((r,i)=>{
+      if(!r.ok){
+        return `<div class="rrow err"><span class="rico">${ICON.warn}</span>
+          <span class="rn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta">${escapeHtml(t.failed)}</div></span></div>`;
+      }
+      return `<div class="rrow"><span class="rico">${ICON.check}</span>
+        <span class="rn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta"><em>${fmtBytes(r.size)}</em></div></span>
+        <button class="dlbtn" data-dl="${i}">${ICON.dl}<span>${escapeHtml(t.download)}</span></button></div>`;
+    }).join('');
+    const card=el('resultsCard'); card.classList.add('show');
+    card.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function downloadOne(i){
+    const r=results[i]; if(!r||!r.url) return;
+    const a=document.createElement('a'); a.href=r.url; a.download=r.name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  async function downloadAll(){ for(let i=0;i<results.length;i++){ if(results[i].ok){ downloadOne(i); await wait(280); } } }
+
+  function clearResults(){ results.forEach(r=>{ if(r.url) URL.revokeObjectURL(r.url); }); results=[]; }
+  function reset(){
+    clearResults();
+    files.forEach(f=>{ if(f.previewUrl){ try{ URL.revokeObjectURL(f.previewUrl); }catch(_){} } });
+    files=[];
+    el('resultsCard').classList.remove('show');
+    clearErr();
+    el('composer').style.display=''; renderFiles(); renderPreview();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function showErr(m){ el('optErr').textContent=m; }
+  function clearErr(){ el('optErr').textContent=''; }
+
+  // ---- i18n + theme (mirrors the other pages; header stays in sync via its observer) ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderFmts(); renderFiles(); renderPreview();
+    if(el('resultsCard').classList.contains('show')) showResults();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('flist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeFile(b.getAttribute('data-rm')); });
+  el('fmts').addEventListener('click',e=>{ const b=e.target.closest('[data-fmt]'); if(b && !b.disabled){ target=b.getAttribute('data-fmt'); renderFmts(); } });
+  el('rlist').addEventListener('click',e=>{ const b=e.target.closest('[data-dl]'); if(b) downloadOne(+b.getAttribute('data-dl')); });
+
+  el('convBtn').addEventListener('click',convert);
+  el('dlAllBtn').addEventListener('click',downloadAll);
+  el('againBtn').addEventListener('click',reset);
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  renderFmts(); renderFiles();
+})();
+</script>
+</body>
+</html>

@@ -15,12 +15,12 @@
     --warm-soft:#fff5da; --warm-line:#f2d98a;
     --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
     /* one unified brand gradient (matches the CTA button): purple -> blue -> green */
-    --grad:linear-gradient(105deg,#8b2fe0 0%,#3b6ff6 52%,#22d3a0 100%);
-    --grad-h:linear-gradient(105deg,#7d22d6 0%,#2f63ec 52%,#16c493 100%);
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
     --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
     --grad-shadow:rgba(93,79,240,0.30);
     /* glossy CTA button gradient (same ramp, with sheen) */
-    --grad-btn:linear-gradient(105deg,#8b2fe0 0%,#3b6ff6 52%,#22d3a0 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
     --grad-btn-glow:rgba(59,111,246,0.38);
     --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
@@ -36,25 +36,30 @@
     --danger:#ff6b6b; --danger-soft:#2a1719;
     --warm-soft:#2c2718; --warm-line:#5a4d24;
     --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
-    --grad:linear-gradient(105deg,#9a45f0 0%,#4d7bff 52%,#2fe0ad 100%);
-    --grad-h:linear-gradient(105deg,#a659ff 0%,#5d89ff 52%,#48e9bd 100%);
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
     --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
     --grad-shadow:rgba(77,123,255,0.42);
-    --grad-btn:linear-gradient(105deg,#9a45f0 0%,#4d7bff 52%,#2fe0ad 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
     --grad-btn-glow:rgba(77,123,255,0.45);
     --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
     --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;height:100%;}
+  html,body{margin:0;min-height:100%;}
   body{zoom:1.25;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
     -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
-  .wrap{max-width:900px;margin:0 auto;padding:26px 20px 60px;}
+  .wrap{max-width:75%;margin:0 auto;padding:26px 20px 60px;}
   button{font-family:var(--sans);}
 
   /* ---------- header ---------- */
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;}
+  .topbar{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-bottom:22px;}
+  .cover{width:100%;height:clamp(140px,22vw,250px);border-radius:16px;
+    background:url('./assets/audiocut-cover.jpg') center/cover no-repeat;
+    box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:20px;}
+  @media (max-width:640px){ .cover{height:clamp(120px,38vw,190px);border-radius:12px;} }
+  .brand-h{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
   .brand{display:flex;align-items:center;gap:12px;}
   .brand .logo{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;
     background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);flex-shrink:0;}
@@ -97,6 +102,7 @@
     transition:filter .14s,transform .08s,box-shadow .14s;}
   .choose:hover{filter:brightness(1.05);} .choose:active{transform:translateY(1px);}
   .drop .fmts{margin-top:16px;font-size:12px;color:var(--faint);font-family:var(--mono);direction:ltr;}
+  .drop .sizenote{margin-top:6px;font-size:12px;color:var(--faint);font-family:var(--mono);}
   input[type=file]{display:none;}
 
   /* ---------- file table ---------- */
@@ -126,6 +132,40 @@
   .listfoot{margin-top:12px;padding:11px 14px;background:var(--panel-2);border-radius:10px;font-family:var(--mono);
     font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px;}
   .listfoot svg{width:14px;height:14px;color:var(--faint);}
+  /* ---------- view toggle ---------- */
+  .listactions{display:flex;align-items:center;gap:12px;}
+  .viewtoggle{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px;}
+  .viewtoggle .vbtn{background:none;border:none;cursor:pointer;color:var(--faint);padding:5px 8px;border-radius:7px;line-height:0;
+    display:inline-flex;align-items:center;justify-content:center;transition:color .12s,background .12s;}
+  .viewtoggle .vbtn svg{width:16px;height:16px;}
+  .viewtoggle .vbtn:hover{color:var(--muted);}
+  .viewtoggle .vbtn.on{background:var(--panel);color:var(--accent);box-shadow:var(--shadow-sm);}
+
+  /* ---------- file grid (Dropbox-style) ---------- */
+  .filegrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-top:4px;}
+  @media (max-width:760px){ .filegrid{grid-template-columns:repeat(3,minmax(0,1fr));} }
+  @media (max-width:440px){ .filegrid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  .fcard{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;
+    display:flex;flex-direction:column;transition:border-color .12s,box-shadow .12s;}
+  .fcard:hover{border-color:var(--accent);box-shadow:var(--shadow);}
+  .fcard-thumb{position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
+    background:var(--grad-soft);color:var(--accent);}
+  .fcard-thumb svg{width:38%;height:38%;max-width:46px;max-height:46px;opacity:.9;}
+  .fcard-ext{position:absolute;top:6px;inset-inline-start:6px;font-family:var(--mono);font-size:9.5px;font-weight:700;
+    padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.82);color:var(--muted);border:1px solid var(--line);}
+  html[data-theme="dark"] .fcard-ext{background:rgba(0,0,0,.5);}
+  .fcard-rm{position:absolute;top:6px;inset-inline-end:6px;width:24px;height:24px;border:none;border-radius:50%;
+    background:rgba(10,12,20,.55);color:#fff;cursor:pointer;line-height:0;display:flex;align-items:center;justify-content:center;
+    opacity:0;transition:opacity .12s,background .12s;}
+  .fcard:hover .fcard-rm{opacity:1;}
+  .fcard-rm:hover{background:var(--danger);}
+  .fcard-rm svg{width:13px;height:13px;}
+  .fcard-body{padding:9px 10px 11px;display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .fcard-name{font-size:12px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fcard-meta{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap;}
+  .fcard-tags{display:flex;flex-wrap:wrap;gap:5px;align-items:center;min-height:20px;}
+  .fcard-tags .aprog{width:100%;}
+  .fcard-tags .minibar{width:100%;max-width:none;}
   .hidden{display:none !important;}
   /* analysis (BPM + key) cells */
   .aprog{display:flex;align-items:center;gap:8px;}
@@ -159,7 +199,7 @@
   .sel:focus{outline:none;border-color:var(--accent);}
   .lbl{display:block;font-size:11.5px;color:var(--muted);margin:12px 0 7px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;}
   .wave{margin-top:13px;height:46px;display:flex;align-items:center;gap:2px;padding:0 2px;overflow:hidden;}
-  .wave i{flex:1;border-radius:2px;background:linear-gradient(180deg,#8b2fe0,#22d3a0);opacity:.5;min-width:2px;}
+  .wave i{flex:1;border-radius:2px;background:linear-gradient(180deg,#7b34ff,#3f85ff);opacity:.5;min-width:2px;}
   .wave i.hot{opacity:1;background:linear-gradient(180deg,var(--success),#5fd486);}
   /* loudness good/ok classes reuse chip.on but green for -14 recommendation */
   .chip.rec.on{background:var(--success);border-color:var(--success);}
@@ -195,8 +235,17 @@
   .abtoggle{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex-shrink:0;background:var(--panel);}
   .abtoggle button{background:none;border:none;cursor:pointer;font-family:var(--mono);font-size:12.5px;padding:8px 15px;color:var(--muted);transition:all .12s;}
   .abtoggle button.on{background:var(--accent);color:#fff;font-weight:600;}
-  .pvbar{height:5px;background:var(--line);border-radius:999px;overflow:hidden;margin-top:12px;}
-  .pvbar>i{display:block;height:100%;width:0%;background:var(--accent);border-radius:999px;transition:width .1s linear;}
+  .pvbar{position:relative;height:6px;background:var(--line);border-radius:999px;margin-top:14px;
+    direction:ltr;cursor:pointer;touch-action:none;}
+  .pvbar:focus-visible{outline:2px solid var(--accent);outline-offset:4px;}
+  .pvbar>i{display:block;height:100%;width:0%;background:var(--accent);border-radius:999px;pointer-events:none;transition:width .08s linear;}
+  .pvthumb{position:absolute;top:50%;left:0%;width:15px;height:15px;border-radius:50%;background:#fff;
+    border:3px solid var(--accent);box-shadow:0 1px 5px rgba(0,0,0,.3);transform:translate(-50%,-50%);
+    pointer-events:none;transition:left .08s linear,transform .1s;}
+  .pvbar:hover .pvthumb,.pvbar.seeking .pvthumb{transform:translate(-50%,-50%) scale(1.18);}
+  .pvbar.seeking>i{transition:none;} .pvbar.seeking .pvthumb{transition:transform .1s;}
+  .pvtime{direction:ltr;display:flex;justify-content:space-between;margin-top:7px;
+    font-family:var(--mono);font-size:11px;color:var(--faint);}
   .pvfoot{margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
   .pvnote{font-size:11px;color:var(--faint);font-family:var(--mono);display:flex;align-items:center;gap:6px;line-height:1.4;}
   .pvnote svg{width:12px;height:12px;flex-shrink:0;}
@@ -219,6 +268,8 @@
   .txt{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:9px;
     font-family:var(--mono);font-size:13px;padding:9px 11px;}
   .txt:focus{outline:none;border-color:var(--accent);}
+  .txt:disabled,.sel:disabled{opacity:.5;cursor:not-allowed;background:var(--panel-2);color:var(--muted);}
+  .field.locked{opacity:.7;} .field.locked .gh svg{color:var(--muted);}
 
   .go{width:100%;margin-top:20px;color:#fff;border:none;font-weight:700;font-size:16px;
     background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
@@ -311,35 +362,32 @@
     .cardhead{margin-bottom:14px;}
   }
   @media (min-width:1500px){
-    .wrap{max-width:1000px;}
+    .wrap{max-width:75%;}
   }
+  #site-header{zoom:0.8;}
 </style>
+<link rel="stylesheet" href="./header.css">
 </head>
 <body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
 <div class="wrap">
+
+  <!-- ============ cover ============ -->
+  <div class="cover" role="img" aria-label="AudioCut — Cut. Normalize. Perfect."></div>
 
   <!-- ============ header ============ -->
   <div class="topbar">
-    <div class="brand">
-      <div class="logo" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <line x1="4" y1="10" x2="4" y2="14"/><line x1="8" y1="6" x2="8" y2="18"/>
-          <line x1="12" y1="3" x2="12" y2="21"/><line x1="16" y1="7" x2="16" y2="17"/>
-          <line x1="20" y1="10" x2="20" y2="14"/>
-        </svg>
-      </div>
-      <div>
-        <h1>AudioCut</h1>
-        <div class="tag">Cut. Normalize. Perfect.</div>
-      </div>
-    </div>
+    <h1 class="brand-h">AudioCut — Cut. Normalize. Perfect.</h1>
     <div class="toolbtns">
+      <a class="pillbtn" href="./files.html" title="סידור קבצים">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+        <span data-i18n="organize"></span>
+      </a>
       <button class="pillbtn" id="helpBtn" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         <span data-i18n="help"></span>
       </button>
-      <button class="pillbtn iconbtn" id="langBtn" type="button" title="עברית / English"><span id="langIco">EN</span></button>
-      <button class="pillbtn iconbtn" id="themeToggle" type="button" aria-label="Toggle theme"><span id="themeIco">🌙</span></button>
     </div>
   </div>
 
@@ -355,23 +403,31 @@
       <div class="or" data-i18n="or"></div>
       <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
       <div class="fmts" data-i18n="fmts"></div>
+      <div class="sizenote" data-i18n="sizeNote"></div>
     </div>
     <input type="file" id="fileInput" accept="audio/*,.mp3,.wav,.flac,.aac,.m4a" multiple>
 
     <div id="listSection" class="hidden">
       <div class="listhead">
         <h3 id="listTitle"></h3>
-        <button class="linkbtn" id="clearBtn" type="button">
+        <div class="listactions">
+          <div class="viewtoggle" id="viewToggle" role="group" aria-label="View">
+            <button type="button" class="vbtn" data-view="list" data-i18n-title="viewList" aria-label="List view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+            <button type="button" class="vbtn" data-view="grid" data-i18n-title="viewGrid" aria-label="Grid view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></button>
+          </div>
+          <button class="linkbtn" id="clearBtn" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           <span data-i18n="clearAll"></span>
         </button>
+        </div>
       </div>
-      <div class="tblwrap"><table class="tbl">
+      <div class="tblwrap" id="listWrap"><table class="tbl">
         <thead><tr>
           <th data-i18n="colName"></th><th data-i18n="colDur"></th><th data-i18n="colSize"></th><th data-i18n="colFmt"></th><th data-i18n="colBpm"></th><th data-i18n="colKey"></th><th></th>
         </tr></thead>
         <tbody id="fileRows"></tbody>
       </table></div>
+      <div class="filegrid hidden" id="fileGrid"></div>
       <div class="listfoot" id="listFoot"></div>
     </div>
   </section>
@@ -390,9 +446,9 @@
         <div class="clipgrid" id="clipSeg">
           <button class="chip" data-len="15">15</button>
           <button class="chip" data-len="20">20</button>
-          <button class="chip on" data-len="30">30</button>
+          <button class="chip" data-len="30">30</button>
           <button class="chip" data-len="45">45</button>
-          <button class="chip" data-len="60">60</button>
+          <button class="chip on" data-len="60">60</button>
           <button class="chip" data-len="90">90</button>
         </div>
         <label class="lbl" data-i18n="startLabel"></label>
@@ -450,13 +506,16 @@
           <button data-ab="master" class="on" type="button" data-i18n="prevMaster"></button>
         </div>
       </div>
-      <div class="pvbar"><i id="pvFill"></i></div>
+      <div class="pvbar" id="pvBar" role="slider" tabindex="0" aria-label="seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <i id="pvFill"></i><span class="pvthumb" id="pvThumb"></span>
+      </div>
+      <div class="pvtime"><span id="pvCur">0:00</span><span id="pvDur">0:00</span></div>
       <div class="pvfoot">
         <div class="pvnote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span data-i18n="prevNote"></span></div>
         <button class="pvmatch on" id="pvNormBtn" type="button" role="switch" aria-checked="true"><span class="sw"></span><span data-i18n="prevMatch"></span></button>
       </div>
     </div>
-    <audio id="pvAudio" loop crossorigin="anonymous" style="display:none"></audio>
+    <audio id="pvAudio" crossorigin="anonymous" style="display:none"></audio>
 
     <div class="setrow">
       <div class="field">
@@ -477,14 +536,14 @@
           </select>
         </div>
       </div>
-      <div class="field">
+      <div class="field" id="nameField">
         <div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span data-i18n="nameTitle"></span></div>
         <div class="suffixrow">
           <select class="sel" id="nameMode" style="width:auto;">
             <option value="suffix" data-i18n-opt="nameSuffix"></option>
             <option value="keep" data-i18n-opt="nameKeep"></option>
           </select>
-          <input class="txt" id="suffixInput" type="text" value="_30s_normal" spellcheck="false">
+          <input class="txt" id="suffixInput" type="text" value="_60s_normal" spellcheck="false">
         </div>
       </div>
     </div>
@@ -572,12 +631,14 @@
 
   const I18N = {
     he: {
-      dir:'rtl', langIco:'EN', help:'עזרה',
+      dir:'rtl', langIco:'EN', help:'עזרה', organize:'סידור קבצים',
       step1:'העלאת קבצים', step1sub:'העלה את קבצי האודיו שברצונך לעבד',
       dropBig:'גרור קבצים לכאן', or:'או', choose:'בחר קבצים',
       fmts:'פורמטים נתמכים: MP3, WAV, FLAC, AAC, M4A',
+      sizeNote:'ניתן להעלות עד 2GB בכל פעם',
       listTitle:n=>`קבצים שהועלו (${n})`, clearAll:'נקה הכל',
       colName:'שם הקובץ', colDur:'משך', colSize:'גודל', colFmt:'פורמט', colBpm:'BPM', colKey:'סולם',
+      viewList:'תצוגת רשימה', viewGrid:'תצוגת רשת',
       listFoot:(sz,n)=>`סה״כ ${sz} · ${n} קבצים`,
       step2:'הגדרות עיבוד', step2sub:'בחר את ההגדרות שיוחלו על כל הקבצים',
       clipTitle:'אורך הקטע (שניות)', startLabel:'נקודת התחלה',
@@ -608,12 +669,14 @@
       helpBody2:'הכול רץ מקומית בדפדפן דרך ffmpeg. שום קובץ לא עולה לאינטרנט. בסוף אפשר להוריד כל קובץ בנפרד או את כולם כ‑ZIP אחד.',
     },
     en: {
-      dir:'ltr', langIco:'עב', help:'Help',
+      dir:'ltr', langIco:'עב', help:'Help', organize:'Organize',
       step1:'Upload files', step1sub:'Add the audio files you want to process',
       dropBig:'Drag files here', or:'or', choose:'Choose files',
       fmts:'Supported: MP3, WAV, FLAC, AAC, M4A',
+      sizeNote:'Up to 2GB per upload',
       listTitle:n=>`Uploaded files (${n})`, clearAll:'Clear all',
       colName:'File name', colDur:'Duration', colSize:'Size', colFmt:'Format', colBpm:'BPM', colKey:'Key',
+      viewList:'List view', viewGrid:'Grid view',
       listFoot:(sz,n)=>`Total ${sz} · ${n} files`,
       step2:'Processing settings', step2sub:'These settings are applied to every file',
       clipTitle:'Clip length (seconds)', startLabel:'Start point',
@@ -643,6 +706,45 @@
       helpBody1:'Drop audio files, pick a clip length and loudness (LUFS), then click "Start processing". It cuts a clip from each song and balances them all to the same loudness — just like MP3Gain.',
       helpBody2:'Everything runs locally in your browser via ffmpeg. No file is ever uploaded. When done, download each file or all of them as one ZIP.',
     },
+    ru:{
+      dir:'ltr',
+      help:'Помощь', organize:'Упорядочить',
+      step1:'Загрузите файлы', step1sub:'Добавьте аудиофайлы для обработки',
+      dropBig:'Перетащите файлы сюда', or:'или', choose:'Выбрать файлы',
+      fmts:'Поддерживаются: MP3, WAV, FLAC, AAC, M4A',
+      sizeNote:'До 2 ГБ за загрузку',
+      listTitle:n=>`Загруженные файлы (${n})`, clearAll:'Очистить всё',
+      colName:'Имя файла', colDur:'Длительность', colSize:'Размер', colFmt:'Формат', colBpm:'BPM', colKey:'Тональность',
+      viewList:'Список', viewGrid:'Сетка',
+      listFoot:(sz,n)=>`Всего ${sz} · файлов: ${n}`,
+      step2:'Настройки обработки', step2sub:'Эти настройки применяются к каждому файлу',
+      clipTitle:'Длина фрагмента (секунды)', startLabel:'Точка начала',
+      startRandom:'Случайно', startBegin:'С начала', startMiddle:'С середины',
+      loudTitle:'Громкость (единый уровень)', loudHint:'Целевой уровень LUFS',
+      recStreaming:'Рекомендуется для стриминга',
+      masterTitle:'Мастеринг звука',
+      mWarm:'Тёплый', mPunch:'Панч', mBright:'Яркий', mNatural:'Естественный', mRadio:'Радио', mStream:'Стриминг', mNone:'Оригинал (без)',
+      prevTitle:'Предпрослушивание', prevOrig:'Оригинал', prevMaster:'После мастеринга',
+      prevHint:'Загрузите файл для прослушивания', prevOn:name=>`Прослушивание: ${name}`,
+      prevNote:'A/B в реальном времени · громкость авто-подгоняется к целевому LUFS (как в финале)', prevMatch:'Выровнять уровень',
+      qualTitle:'Качество экспорта', nameTitle:'Имя файла', nameSuffix:'Добавить суффикс', nameKeep:'Сохранить имя',
+      start:'Начать обработку', processing:'Обработка…', analyzing:'Анализ файлов… (тональность/BPM)',
+      step3:'Обработка и скачивание', step3sub:'Следите за прогрессом и скачивайте готовые файлы',
+      overall:'Общий прогресс', colStatus:'Статус', colProg:'Прогресс', colOut:'Размер вывода',
+      doneLabel:(d,n)=>`${d} из ${n} готово`, noRun:'Ещё не запускалось',
+      restart:'Очистить и начать заново', dlAll:'Скачать всё (ZIP)',
+      stQueued:'В очереди', stProcessing:'Обработка', stDone:'Готово', stSkip:'Пропущено', stError:'Ошибка',
+      footer:'Вся обработка идёт на вашем устройстве · ничего не загружается',
+      engineLoading:'Загрузка движка…', engineReady:'Движок готов', engineWorking:'Работа…', engineFailed:'Не удалось загрузить движок',
+      errNoEngine:'ОШИБКА: не удалось загрузить аудиодвижок. Убедитесь, что папка vendor/ существует.',
+      errFileProto:'Открыто как локальный файл — браузер блокирует движок. Запустите через start.bat или локальный сервер.',
+      helpTitle:'Как это работает', helpClose:'Понятно',
+      confirmClearTitle:'Удалить всё?',
+      confirmClearBody:'Все загруженные файлы будут удалены из списка. Это нельзя отменить.',
+      confirmYes:'Да, удалить', confirmNo:'Нет',
+      helpBody1:'Перетащите аудиофайлы, выберите длину фрагмента и громкость (LUFS), затем нажмите «Начать обработку». Он вырезает фрагмент из каждой песни и выравнивает их все к одной громкости — как MP3Gain.',
+      helpBody2:'Всё работает локально в вашем браузере через ffmpeg. Ни один файл не загружается. По завершении скачайте каждый файл или все сразу в одном ZIP.',
+    },
   };
 
   // mastering preset -> ffmpeg audio filter chain (applied before loudnorm)
@@ -671,12 +773,12 @@
   let ffmpeg=null, ready=false, busy=false, encoding=false, currentItem=null;
   let lang='he', t=I18N.he;
   let items=[]; // {file,name,ext,size,dur,status,prog,out}
-  let settings={ clip:30, start:'random', lufs:'-14', preset:'none', fmt:'mp3', br:'320', nameMode:'suffix', suffix:'_30s_normal' };
+  let settings={ clip:60, start:'random', lufs:'-14', preset:'none', fmt:'mp3', br:'320', nameMode:'suffix', suffix:'_60s_normal' };
   let runStart=0, elapsedTimer=null;
 
   // ---- helpers ----
   function fmtBytes(n){ if(n==null) return '—'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
-  function fmtDur(s){ if(s==null||isNaN(s)) return '—'; const m=Math.floor(s/60), sec=Math.round(s%60); return m+':'+String(sec).padStart(2,'0'); }
+  function fmtDur(s){ if(s==null||!isFinite(s)) return '—'; const m=Math.floor(s/60), sec=Math.round(s%60); return m+':'+String(sec).padStart(2,'0'); }
   function fmtClock(ms){ const s=Math.floor(ms/1000); const m=Math.floor(s/60), sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
   function extOf(name){ const m=name.match(/\.([^.]+)$/); return m?m[1].toUpperCase():'—'; }
 
@@ -686,7 +788,7 @@
     document.documentElement.lang=l; document.documentElement.dir=t.dir;
     document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
     document.querySelectorAll('[data-i18n-opt]').forEach(n=>{ const k=n.getAttribute('data-i18n-opt'); if(typeof t[k]==='string') n.textContent=t[k]; });
-    el('langIco').textContent=t.langIco;
+    document.querySelectorAll('[data-i18n-title]').forEach(n=>{ const k=n.getAttribute('data-i18n-title'); if(typeof t[k]==='string') n.title=t[k]; });
     if(ready) el('engineText').textContent = busy? t.engineWorking : t.engineReady;
     else el('engineText').textContent = t.engineLoading;
     startBtn_updateLabel();
@@ -694,28 +796,63 @@
   }
 
   // ---- file list ----
+  let viewMode='list'; // 'list' | 'grid'
+  const MUSIC_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+  const X_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
   function renderList(){
-    const sec=el('listSection'), rows=el('fileRows');
+    const sec=el('listSection');
     if(!items.length){ sec.classList.add('hidden'); return; }
     sec.classList.remove('hidden');
     el('listTitle').textContent = t.listTitle(items.length);
-    rows.innerHTML='';
-    items.forEach((it,idx)=>{
-      const tr=document.createElement('tr'); it._lrow=tr;
+    const grid = viewMode==='grid';
+    el('listWrap').classList.toggle('hidden', grid);
+    el('fileGrid').classList.toggle('hidden', !grid);
+    grid ? renderGrid() : renderRows();
+  }
+  function renderRows(){
+    const rows=el('fileRows'); rows.innerHTML='';
+    items.forEach((it)=>{
+      const tr=document.createElement('tr'); it._el=tr;
       tr.innerHTML =
-        `<td><div class="fname"><span class="fico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><span title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</span></div></td>`+
+        `<td><div class="fname"><span class="fico">${MUSIC_SVG}</span><span title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</span></div></td>`+
         `<td class="num" data-dur>${fmtDur(it.dur)}</td>`+
         `<td class="num">${fmtBytes(it.size)}</td>`+
         `<td><span class="badge">${it.ext}</span></td>`+
-        `<td class="bpmcell">${bpmCellHtml(it)}</td>`+
-        `<td class="keycell">${keyCellHtml(it)}</td>`+
+        `<td class="bpmcell" data-slot="bpm">${bpmCellHtml(it)}</td>`+
+        `<td class="keycell" data-slot="key">${keyCellHtml(it)}</td>`+
         `<td style="text-align:end;"></td>`;
       const rm=document.createElement('button'); rm.className='rmbtn'; rm.type='button';
-      rm.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-      rm.addEventListener('click',()=>{ items.splice(idx,1); renderList(); updateTotals(); maybeEnable(); refreshPreviewSource(); });
+      rm.innerHTML=X_SVG;
+      rm.addEventListener('click',()=>removeItem(it));
       tr.lastElementChild.appendChild(rm);
       rows.appendChild(tr);
     });
+  }
+  function renderGrid(){
+    const grid=el('fileGrid'); grid.innerHTML='';
+    items.forEach((it)=>{
+      const card=document.createElement('div'); card.className='fcard'; it._el=card;
+      card.innerHTML =
+        `<div class="fcard-thumb">${MUSIC_SVG}<span class="fcard-ext">${it.ext}</span>`+
+          `<button class="fcard-rm" type="button" aria-label="remove">${X_SVG}</button></div>`+
+        `<div class="fcard-body">`+
+          `<div class="fcard-name" title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</div>`+
+          `<div class="fcard-meta"><span data-dur>${fmtDur(it.dur)}</span><span>&middot;</span><span>${fmtBytes(it.size)}</span></div>`+
+          `<div class="fcard-tags"><span data-slot="bpm">${bpmCellHtml(it)}</span><span data-slot="key">${keyCellHtml(it)}</span></div>`+
+        `</div>`;
+      card.querySelector('.fcard-rm').addEventListener('click',()=>removeItem(it));
+      grid.appendChild(card);
+    });
+  }
+  function removeItem(it){
+    const i=items.indexOf(it); if(i<0) return;
+    items.splice(i,1); renderList(); updateTotals(); maybeEnable(); refreshPreviewSource();
+  }
+  function setView(mode){
+    if(mode!=='grid' && mode!=='list') mode='list';
+    if(mode!==viewMode){ viewMode=mode; try{ localStorage.setItem('ac_view',mode); }catch(_){} }
+    document.querySelectorAll('#viewToggle .vbtn').forEach(b=>b.classList.toggle('on', b.dataset.view===mode));
+    renderList();
   }
   function updateTotals(){
     const total=items.reduce((a,it)=>a+it.size,0);
@@ -762,9 +899,9 @@
     return `<span class="afaint">…</span>`;
   }
   function updateAnalysisCell(it){
-    const tr=it._lrow; if(!tr||!tr.children[4]) return;
-    tr.children[4].innerHTML=bpmCellHtml(it);
-    tr.children[5].innerHTML=keyCellHtml(it);
+    const root=it._el; if(!root) return;
+    const b=root.querySelector('[data-slot="bpm"]'); if(b) b.innerHTML=bpmCellHtml(it);
+    const k=root.querySelector('[data-slot="key"]'); if(k) k.innerHTML=keyCellHtml(it);
   }
 
   // decode any supported file to a mono Float32Array resampled to 44.1kHz
@@ -867,18 +1004,31 @@
   }
 
   // ---- engine ----
-  async function loadEngine(){
-    if(!FFmpeg||!fetchFile){ engineFail(t.errNoEngine); return; }
-    ffmpeg=new FFmpeg();
-    ffmpeg.on('progress',({progress})=>{
+  // Build a fresh FFmpeg instance with the progress handler wired up. The single-
+  // thread wasm core never hands heap back between runs, so for long batches we
+  // recreate the instance instead of reusing one for everything.
+  async function createEngine(){
+    const f=new FFmpeg();
+    f.on('progress',({progress})=>{
       if(currentItem&&encoding){ currentItem.prog=Math.max(currentItem.prog,Math.min(99,Math.round(progress*100))); updateRow(currentItem); updateOverallLive(); }
     });
+    const dir=location.href.replace(/[^/]*$/,'')+'vendor/';
+    await f.load({ coreURL:dir+'ffmpeg-core.js', wasmURL:dir+'ffmpeg-core.wasm' });
+    return f;
+  }
+  async function loadEngine(){
+    if(!FFmpeg||!fetchFile){ engineFail(t.errNoEngine); return; }
     try{
-      const dir=location.href.replace(/[^/]*$/,'')+'vendor/';
-      await ffmpeg.load({ coreURL:dir+'ffmpeg-core.js', wasmURL:dir+'ffmpeg-core.wasm' });
+      ffmpeg=await createEngine();
       ready=true; el('dot').className='dot ready'; el('engineText').textContent=t.engineReady;
       el('engineChip').classList.add('hidden'); maybeEnable();
     }catch(err){ console.error(err); engineFail(location.protocol==='file:'?t.errFileProto:t.errNoEngine); }
+  }
+  // Tear the current instance down and spin up a new one — recovers from a heap-
+  // exhaustion abort mid-batch and is also called proactively every N files.
+  async function reloadEngine(){
+    try{ ffmpeg&&ffmpeg.terminate&&ffmpeg.terminate(); }catch(_){}
+    ffmpeg=await createEngine();
   }
   function engineFail(msg){ el('dot').className='dot err'; el('engineText').textContent=msg; el('engineChip').classList.remove('hidden'); }
 
@@ -951,15 +1101,20 @@
     it.status='processing'; it.prog=0; currentItem=it; updateRow(it);
 
     await ffmpeg.writeFile(safeIn, await fetchFile(it.file));
-    const dur = it.dur!=null ? it.dur : await getDuration(safeIn);
+    // <audio>.duration is unreliable for some MP3s (VBR / no Xing header) and can
+    // come back Infinity or NaN — that would poison startAt below and hand ffmpeg
+    // an "-ss Infinity"/"NaN" that aborts. Trust the cached value only when it's a
+    // finite positive number, otherwise fall back to ffmpeg's own probe.
+    const dur = (it.dur!=null && isFinite(it.dur) && it.dur>0) ? it.dur : await getDuration(safeIn);
     const clip = settings.clip;
-    if(dur==null){ it.status='error'; updateRow(it); await ffmpeg.deleteFile(safeIn).catch(()=>{}); return; }
-    if(dur < clip){ it.status='skip'; it.prog=100; updateRow(it); await ffmpeg.deleteFile(safeIn).catch(()=>{}); return; }
+    if(dur==null || !isFinite(dur) || dur<=0){ it.status='error'; updateRow(it); await ffmpeg.deleteFile(safeIn).catch(()=>{}); return false; }
+    if(dur < clip){ it.status='skip'; it.prog=100; updateRow(it); await ffmpeg.deleteFile(safeIn).catch(()=>{}); return true; }
 
     let startAt;
     if(settings.start==='start') startAt=0;
     else if(settings.start==='middle') startAt=(dur-clip)/2;
     else startAt=Math.random()*(dur-clip);
+    if(!isFinite(startAt) || startAt<0) startAt=0;   // never feed ffmpeg a bad -ss
 
     const preChain = PRESETS[settings.preset] || '';
     // Two-pass loudnorm: measure the exact clip (preset already applied), then
@@ -981,31 +1136,49 @@
 
     try{
       encoding=true;
-      await ffmpeg.exec(['-ss',startAt.toFixed(3),'-t',clip.toFixed(3),'-i',safeIn,'-af',af,...f.args(settings.br),...meta,outFile]);
+      // Force an exact clip-length output. `-ss`/`-t` as *input* options seek
+      // imprecisely on VBR/MP3 sources (clips drifted to 61/63/65s), so we
+      // enforce the length inside the filtergraph: reset the timeline to a clean
+      // 0-based one, apad so we never fall short, then atrim to exactly `clip`
+      // seconds. The output-side `-t` is a final muxer-level safety cap.
+      const cutAf = `${af},asetpts=N/SR/TB,apad,atrim=0:${clip}`;
+      await ffmpeg.exec(['-ss',startAt.toFixed(3),'-i',safeIn,'-af',cutAf,'-t',clip.toFixed(3),...f.args(settings.br),...meta,outFile]);
       encoding=false;
       const data=await ffmpeg.readFile(outFile);
       const blob=new Blob([data.buffer],{type:f.mime});
       it.out={ name:outName, url:URL.createObjectURL(blob), blob, size:blob.size };
       it.status='done'; it.prog=100; updateRow(it);
       await ffmpeg.deleteFile(safeIn).catch(()=>{}); await ffmpeg.deleteFile(outFile).catch(()=>{});
-    }catch(err){ encoding=false; console.error(err); it.status='error'; updateRow(it); await ffmpeg.deleteFile(safeIn).catch(()=>{}); }
+      return true;
+    }catch(err){ encoding=false; console.error(err); it.status='error'; updateRow(it); await ffmpeg.deleteFile(safeIn).catch(()=>{}); return false; }
   }
 
   async function run(){
     if(busy||!ready||!items.length||analysisPending()) return;
-    busy=true; maybeEnable(); startBtn_updateLabel();
+    busy=true; maybeEnable(); startBtn_updateLabel(); syncNameFields();
     el('dot').className='dot busy'; el('engineText').textContent=t.engineWorking;
     el('dlAll').disabled=true;
     items.forEach(it=>{ if(it.out){URL.revokeObjectURL(it.out.url);} it.out=null; it.status='queued'; it.prog=0; });
     renderProgress();
     runStart=Date.now(); startElapsed();
 
+    // The wasm core's heap only grows, so refresh the engine every REFRESH_EVERY
+    // files to stay ahead of an out-of-memory abort. If a file still errors the
+    // instance has likely died — rebuild it and give that one file a second try.
+    const REFRESH_EVERY=15; let sinceReload=0;
     for(let i=0;i<items.length;i++){
-      try{ await processOne(items[i],i); }catch(e){ items[i].status='error'; updateRow(items[i]); }
+      if(sinceReload>=REFRESH_EVERY){ try{ await reloadEngine(); }catch(e){ console.error(e); } sinceReload=0; }
+      let ok=false;
+      try{ ok=await processOne(items[i],i); }catch(e){ console.error(e); items[i].status='error'; ok=false; }
+      if(!ok && items[i].status==='error'){
+        try{ await reloadEngine(); sinceReload=0; ok=await processOne(items[i],i); }
+        catch(e){ console.error(e); items[i].status='error'; updateRow(items[i]); }
+      }
+      sinceReload++;
       updateOverall();
     }
     currentItem=null; stopElapsed();
-    busy=false; maybeEnable(); startBtn_updateLabel();
+    busy=false; maybeEnable(); startBtn_updateLabel(); syncNameFields();
     el('dot').className='dot ready'; el('engineText').textContent=t.engineReady;
     const anyOut=items.some(it=>it.out); el('dlAll').disabled=!anyOut;
     updateTotalsOut();
@@ -1113,8 +1286,9 @@
     stream: { nodes:[ {t:'comp',th:-20,ratio:2.5,atk:0.02,rel:0.25}, {t:'lowshelf',f:90,g:2.5}, {t:'highshelf',f:8500,g:2} ] },
   };
   const pvAudio = el('pvAudio');
+  const pvBar = el('pvBar');
   let pvCtx=null, pvSrc=null, pvGain=null, pvNormGain=null, pvChain=[], pvMode='master',
-      pvItem=null, pvUrl=null, pvRAF=null, pvMeasureTok=0, pvNorm=true;
+      pvItem=null, pvUrl=null, pvRAF=null, pvMeasureTok=0, pvNorm=true, pvSeeking=false;
 
   function pvMakeNode(ctx, spec){
     if(spec.t==='comp'){
@@ -1200,7 +1374,8 @@
     const wasPlaying = keepPlaying && pvItem && !pvAudio.paused;
     pvItem=item||null;
     if(pvUrl){ URL.revokeObjectURL(pvUrl); pvUrl=null; }
-    el('pvFill').style.width='0%';
+    el('pvFill').style.width='0%'; el('pvThumb').style.left='0%';
+    el('pvCur').textContent='0:00'; el('pvDur').textContent='0:00'; pvBar.setAttribute('aria-valuenow','0');
     if(pvItem){
       pvUrl=URL.createObjectURL(pvItem.file); pvAudio.src=pvUrl; el('pvPlay').disabled=false;
       if(wasPlaying){ pvAudio.play().then(()=>{pvIcon(true);pvTrack();}).catch(()=>{}); }
@@ -1216,9 +1391,24 @@
     else pvSetFile(null);
     renderPreviewFiles();
   }
+  // format seconds as m:ss for the seek-bar time labels
+  function pvFmtT(s){ if(!isFinite(s)||s<0) s=0; const m=Math.floor(s/60), sec=Math.floor(s%60); return m+':'+String(sec).padStart(2,'0'); }
+  // paint fill width, thumb position and current/total time from the audio's live
+  // state (bar is forced LTR so 0:00 is always on the left, end on the right)
+  function pvRender(){
+    const d=pvAudio.duration, ct=pvAudio.currentTime||0;
+    const pct=(d&&isFinite(d)&&d>0)?Math.max(0,Math.min(100,ct/d*100)):0;
+    el('pvFill').style.width=pct.toFixed(2)+'%';
+    el('pvThumb').style.left=pct.toFixed(2)+'%';
+    el('pvCur').textContent=pvFmtT(ct);
+    el('pvDur').textContent=(d&&isFinite(d))?pvFmtT(d):'0:00';
+    pvBar.setAttribute('aria-valuenow',String(Math.round(pct)));
+  }
   function pvTrack(){ if(pvRAF) cancelAnimationFrame(pvRAF);
-    const step=()=>{ if(pvAudio.duration) el('pvFill').style.width=(pvAudio.currentTime/pvAudio.duration*100).toFixed(1)+'%';
-      if(!pvAudio.paused) pvRAF=requestAnimationFrame(step); }; step(); }
+    const step=()=>{ if(!pvSeeking) pvRender(); if(!pvAudio.paused) pvRAF=requestAnimationFrame(step); }; step(); }
+  // ---- scrubbing: click / drag the bar (or arrow keys) to seek ----
+  function pvPct(e){ const r=pvBar.getBoundingClientRect(); return r.width? Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)) : 0; }
+  function pvSeekTo(frac){ const d=pvAudio.duration; if(!d||!isFinite(d)) return; pvAudio.currentTime=frac*d; pvRender(); }
   async function pvToggle(){
     if(!pvItem) return; pvEnsure();
     if(pvCtx && pvCtx.state==='suspended'){ try{ await pvCtx.resume(); }catch(_){} }
@@ -1234,6 +1424,7 @@
   ['dragleave','drop'].forEach(ev=>el('drop').addEventListener(ev,e=>{ e.preventDefault(); el('drop').classList.remove('over'); }));
   el('drop').addEventListener('drop',e=>acceptFiles(e.dataTransfer.files));
   el('clearBtn').addEventListener('click',showConfirmClear);
+  el('viewToggle').addEventListener('click',e=>{ const b=e.target.closest('.vbtn'); if(b) setView(b.dataset.view); });
 
   el('clipSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
     [...el('clipSeg').children].forEach(x=>x.classList.remove('on')); b.classList.add('on'); settings.clip=+b.dataset.len; });
@@ -1262,9 +1453,35 @@
   });
   pvAudio.addEventListener('pause',()=>pvIcon(false));
   pvAudio.addEventListener('play',()=>pvIcon(true));
+  // song finished: stop (don't loop back to the start) and freeze the bar at the end
+  pvAudio.addEventListener('ended',()=>{ pvIcon(false); if(pvRAF) cancelAnimationFrame(pvRAF); pvRender(); });
+  pvAudio.addEventListener('loadedmetadata',()=>{ if(!pvSeeking) pvRender(); });
+  pvAudio.addEventListener('seeked',()=>{ if(!pvSeeking) pvRender(); });
+  // seek bar: click / drag the circle handle to scrub, arrow keys to nudge
+  pvBar.addEventListener('pointerdown',e=>{ if(!pvItem||!isFinite(pvAudio.duration)) return;
+    pvSeeking=true; pvBar.classList.add('seeking'); try{ pvBar.setPointerCapture(e.pointerId); }catch(_){}
+    pvSeekTo(pvPct(e)); e.preventDefault(); });
+  pvBar.addEventListener('pointermove',e=>{ if(pvSeeking) pvSeekTo(pvPct(e)); });
+  const pvEndDrag=e=>{ if(!pvSeeking) return; pvSeeking=false; pvBar.classList.remove('seeking');
+    try{ pvBar.releasePointerCapture(e.pointerId); }catch(_){} };
+  pvBar.addEventListener('pointerup',pvEndDrag);
+  pvBar.addEventListener('pointercancel',pvEndDrag);
+  pvBar.addEventListener('keydown',e=>{ if(!pvItem||!isFinite(pvAudio.duration)) return;
+    let ct=pvAudio.currentTime;
+    if(e.key==='ArrowRight') ct+=5; else if(e.key==='ArrowLeft') ct-=5;
+    else if(e.key==='Home') ct=0; else if(e.key==='End') ct=pvAudio.duration; else return;
+    pvAudio.currentTime=Math.max(0,Math.min(pvAudio.duration,ct)); pvRender(); e.preventDefault(); });
   el('fmtSel').addEventListener('change',e=>{ settings.fmt=e.target.value; el('brSel').disabled=((FMT[e.target.value]||FMT.mp3).args.length===0); });
   el('brSel').addEventListener('change',e=>settings.br=e.target.value);
-  el('nameMode').addEventListener('change',e=>{ settings.nameMode=e.target.value; el('suffixInput').disabled=(e.target.value==='keep'); });
+  // Lock the file-name controls while processing runs; also disable the text
+  // field up-front when "keep original name" is selected.
+  function syncNameFields(){
+    const keep = settings.nameMode==='keep';
+    el('nameMode').disabled = busy;
+    el('suffixInput').disabled = busy || keep;
+    el('nameField').classList.toggle('locked', busy);
+  }
+  el('nameMode').addEventListener('change',e=>{ settings.nameMode=e.target.value; syncNameFields(); });
   el('suffixInput').addEventListener('input',e=>settings.suffix=e.target.value);
 
   el('startBtn').addEventListener('click',run);
@@ -1283,13 +1500,15 @@
   el('confirmOverlay').addEventListener('click',e=>{ if(e.target===el('confirmOverlay')) hideConfirmClear(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape' && el('confirmOverlay').classList.contains('show')) hideConfirmClear(); });
 
-  el('langBtn').addEventListener('click',()=>applyLang(lang==='he'?'en':'he'));
+  window.__setLang=applyLang;
   el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
 
   // init
   let savedTheme='light'; try{ savedTheme=localStorage.getItem('theme')||'light'; }catch(_){}
   applyTheme(savedTheme);
   buildWave();
+  let savedView='list'; try{ savedView=localStorage.getItem('ac_view')||'list'; }catch(_){}
+  setView(savedView);
   applyLang('he');
   loadEngine();
 })();

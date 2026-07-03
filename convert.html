@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — המרת אודיו</title>
+<meta name="description" content="Convert audio files right in your browser — pick a format, sample rate, channels and bit depth, and download. Fast, private, nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.25;}
+
+  /* cover banner */
+  .cover{width:100%;height:clamp(140px,22vw,250px);border-radius:16px;
+    background:url('./assets/converter-cover.jpg') center/cover no-repeat;
+    box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:20px;}
+  @media (max-width:640px){ .cover{height:clamp(120px,38vw,190px);border-radius:12px;} }
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:30px 20px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:26px;height:26px;}
+  .drop .big{font-size:15.5px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:12px;color:var(--faint);margin:6px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13.5px;padding:10px 22px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .sizenote{margin-top:12px;font-size:11.5px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  /* file list */
+  .files{display:flex;flex-direction:column;}
+  .flist{display:flex;flex-direction:column;gap:8px;padding:14px;}
+  .frow{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line-2);border-radius:11px;background:var(--panel);}
+  .frow .fico{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
+  .frow .fico svg{width:17px;height:17px;}
+  .frow .fn{flex:1;min-width:0;}
+  .frow .fn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .frow .fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .frow .rm{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .frow .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .frow .rm svg{width:15px;height:15px;}
+  .ftot{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--line-2);
+    font-size:13px;color:var(--muted);}
+  .ftot b{color:var(--ink);font-family:var(--mono);}
+
+  /* options side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+
+  /* format picker */
+  .fmts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+  .fmt{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:11px 4px 9px;border-radius:11px;
+    border:1px solid var(--line);background:var(--panel-2);cursor:pointer;transition:border-color .12s,background .12s,transform .08s;}
+  .fmt:hover{border-color:var(--accent);}
+  .fmt:active{transform:scale(.97);}
+  .fmt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
+  .fmt b{font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--ink);}
+  .fmt small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;}
+  .fmt.on b{color:var(--accent-dim);}
+  .fmt.soon{cursor:not-allowed;opacity:.62;}
+  .fmt.soon:hover{border-color:var(--line);}
+  .fmt .tag{position:absolute;top:-7px;inset-inline-end:-5px;font-family:var(--mono);font-size:8.5px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.04em;color:var(--warn);background:var(--warm-soft);border:1px solid var(--warm-line);
+    border-radius:6px;padding:1px 5px;}
+
+  select.inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;cursor:pointer;transition:border-color .12s,box-shadow .12s;}
+  select.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .opt.dim{opacity:.5;pointer-events:none;}
+
+  .convbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .convbtn:hover{filter:brightness(1.05);} .convbtn:active{transform:translateY(1px);}
+  .convbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .convbtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+
+  /* progress */
+  .prog{padding:16px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;}
+  .prog .lbl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+
+  /* results */
+  .results{padding:22px;display:none;margin-top:18px;}
+  .results.show{display:block;}
+  .results .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .results .ok svg{width:28px;height:28px;}
+  .results h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .results .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+  .rlist{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+  .rrow{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel-2);}
+  .rrow .rico{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .rrow.err .rico{background:var(--danger-soft);color:var(--danger);}
+  .rrow .rico svg{width:18px;height:18px;}
+  .rrow .rn{flex:1;min-width:0;}
+  .rrow .rn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rrow .rn .meta{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .rrow .meta em{font-style:normal;color:var(--success-dim);}
+  .rrow.err .rn .meta{color:var(--danger);}
+  .dlbtn{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:12.5px;padding:0 15px;height:36px;border-radius:10px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
+  .dlbtn:hover{filter:brightness(1.05);} .dlbtn svg{width:15px;height:15px;}
+  .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .row2 a,.row2 button{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 a:hover,.row2 button:hover{border-color:var(--accent);} .row2 *:active{transform:translateY(1px);}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .row2 svg{width:15px;height:15px;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <!-- ============ cover ============ -->
+  <div class="cover" role="img" aria-label="Audio Converter"></div>
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid" id="composer">
+    <!-- main: upload + files -->
+    <div class="col">
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="sizenote" data-i18n="sizeNote"></div>
+      </div>
+      <input type="file" id="fileInput" accept="audio/*" multiple>
+
+      <div class="card files" id="filesCard" style="display:none">
+        <div class="flist" id="flist"></div>
+        <div class="ftot"><span data-i18n="totalLbl"></span> <b id="totalVal">0</b></div>
+      </div>
+    </div>
+
+    <!-- side: options -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="optTitle"></h3>
+
+        <div class="opt">
+          <label data-i18n="fmtLbl"></label>
+          <div class="fmts" id="fmts"></div>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="rateLbl"></label>
+          <select class="inp" id="rate">
+            <option value="0" data-i18n="keepOrig"></option>
+            <option value="48000">48 000 Hz</option>
+            <option value="44100">44 100 Hz</option>
+            <option value="32000">32 000 Hz</option>
+            <option value="22050">22 050 Hz</option>
+            <option value="16000">16 000 Hz</option>
+            <option value="8000">8 000 Hz</option>
+          </select>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="chLbl"></label>
+          <select class="inp" id="channels">
+            <option value="0" data-i18n="keepOrig"></option>
+            <option value="2" data-i18n="stereo"></option>
+            <option value="1" data-i18n="mono"></option>
+          </select>
+        </div>
+
+        <div class="opt" id="depthOpt">
+          <label data-i18n="depthLbl"></label>
+          <select class="inp" id="depth">
+            <option value="16">16-bit PCM</option>
+            <option value="24">24-bit PCM</option>
+            <option value="32" data-i18n="float32"></option>
+          </select>
+        </div>
+
+        <button class="convbtn" id="convBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          <span data-i18n="convBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="nm" id="progName" data-i18n="working"></span><span id="progPct">0%</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <!-- results -->
+  <div class="card results" id="resultsCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" id="readySub"></p>
+    <div class="rlist" id="rlist"></div>
+    <div class="row2">
+      <button id="dlAllBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="dlAll"></span>
+      </button>
+      <button id="againBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="againBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'המרת אודיו',
+      pageTitle:'המירו קבצי אודיו — בלי להעלות לשרת',
+      pageSub:'גררו קבצי אודיו, בחרו פורמט, קצב דגימה, ערוצים ועומק סיביות, וקבלו קובץ מוכן להורדה. הכול מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      dropBig:'גררו קבצי אודיו לכאן', or2:'או', choose:'בחרו קבצים',
+      sizeNote:'MP3 · WAV · M4A · AAC · FLAC · OGG · OPUS', remove:'הסרה',
+      totalLbl:'סה״כ', optTitle:'הגדרות המרה',
+      fmtLbl:'פורמט יעד',
+      rateLbl:'קצב דגימה', chLbl:'ערוצים', depthLbl:'עומק סיביות (WAV)',
+      keepOrig:'כמו המקור', stereo:'סטריאו', mono:'מונו', float32:'32-bit Float',
+      convBtn:'המירו עכשיו', working:'ממיר…',
+      readyTitle:'ההמרה הושלמה!', readySub:n=>`${n} ${n===1?'קובץ מוכן':'קבצים מוכנים'} להורדה.`,
+      dlAll:'הורדת הכול', againBtn:'המרה נוספת',
+      convGo:s=>`ל־${s}`, converted:'הומר', origLbl:'מקור',
+      failed:'ההמרה נכשלה — פורמט לא נתמך בדפדפן',
+      seam:'הדגמה מקומית: המרה מלאה ל־WAV עובדת כאן וכעת, ישירות בדפדפן. מנועי הקידוד ל־MP3/AAC/FLAC/OGG מתחברים עם השרת — הקבצים תמיד נשארים אצלכם.',
+      foot:'KOLKLI · המרת אודיו · פרטי ומהיר, ישירות בדפדפן',
+      errNoFiles:'צריך לצרף לפחות קובץ אודיו אחד', errDecode:'לא הצלחנו לפענח אף קובץ',
+      copied:'הקישור הועתק ✓',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'Convert audio',
+      pageTitle:'Convert audio files — without uploading',
+      pageSub:'Drop audio files, pick a format, sample rate, channels and bit depth, and get a ready-to-download file. Everything runs in your browser — nothing leaves your machine.',
+      dropBig:'Drag audio files here', or2:'or', choose:'Choose files',
+      sizeNote:'MP3 · WAV · M4A · AAC · FLAC · OGG · OPUS', remove:'Remove',
+      totalLbl:'Total', optTitle:'Convert options',
+      fmtLbl:'Target format',
+      rateLbl:'Sample rate', chLbl:'Channels', depthLbl:'Bit depth (WAV)',
+      keepOrig:'Keep original', stereo:'Stereo', mono:'Mono', float32:'32-bit Float',
+      convBtn:'Convert now', working:'Converting…',
+      readyTitle:'Conversion done!', readySub:n=>`${n} ${n===1?'file':'files'} ready to download.`,
+      dlAll:'Download all', againBtn:'Convert more',
+      convGo:s=>`to ${s}`, converted:'Converted', origLbl:'source',
+      failed:'Conversion failed — format not supported by this browser',
+      seam:'Local demo: full conversion to WAV works right here, right now, in your browser. The MP3/AAC/FLAC/OGG encoders connect with the server — your files always stay with you.',
+      foot:'KOLKLI · Audio conversion · Private and fast, right in your browser',
+      errNoFiles:'Add at least one audio file', errDecode:'We could not decode any file',
+      copied:'Link copied ✓',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Конвертация аудио',
+      pageTitle:'Конвертируйте аудиофайлы — без загрузки на сервер',
+      pageSub:'Перетащите аудиофайлы, выберите формат, частоту дискретизации, каналы и разрядность — и получите готовый к скачиванию файл. Всё работает в вашем браузере — ничего не покидает устройство.',
+      dropBig:'Перетащите аудиофайлы сюда', or2:'или', choose:'Выбрать файлы',
+      sizeNote:'MP3 · WAV · M4A · AAC · FLAC · OGG · OPUS', remove:'Удалить',
+      totalLbl:'Всего', optTitle:'Параметры конвертации',
+      fmtLbl:'Целевой формат',
+      rateLbl:'Частота дискретизации', chLbl:'Каналы', depthLbl:'Разрядность (WAV)',
+      keepOrig:'Как в оригинале', stereo:'Стерео', mono:'Моно', float32:'32-бит Float',
+      convBtn:'Конвертировать', working:'Конвертация…',
+      readyTitle:'Конвертация завершена!', readySub:n=>`Готово к скачиванию: ${n}.`,
+      dlAll:'Скачать всё', againBtn:'Ещё конвертация',
+      convGo:s=>`в ${s}`, converted:'Сконвертировано', origLbl:'оригинал',
+      failed:'Конвертация не удалась — формат не поддерживается этим браузером',
+      seam:'Локальная демонстрация: полная конвертация в WAV работает прямо здесь и сейчас, в вашем браузере. Кодировщики MP3/AAC/FLAC/OGG подключаются к серверу — ваши файлы всегда остаются у вас.',
+      foot:'KOLKLI · Конвертация аудио · Приватно и быстро, прямо в браузере',
+      errNoFiles:'Добавьте хотя бы один аудиофайл', errDecode:'Не удалось декодировать ни один файл',
+      copied:'Ссылка скопирована ✓',
+    },
+  };
+
+  // target formats — WAV is fully implemented client-side; the rest arrive with the server engine.
+  const FORMATS = [
+    { id:'wav',  label:'WAV',  ext:'wav',  sub:'lossless', ready:true  },
+    { id:'mp3',  label:'MP3',  ext:'mp3',  sub:'320 kbps', ready:false },
+    { id:'m4a',  label:'M4A',  ext:'m4a',  sub:'AAC',      ready:false },
+    { id:'flac', label:'FLAC', ext:'flac', sub:'lossless', ready:false },
+    { id:'ogg',  label:'OGG',  ext:'ogg',  sub:'vorbis',   ready:false },
+    { id:'aac',  label:'AAC',  ext:'aac',  sub:'256 kbps', ready:false },
+  ];
+
+  const ICON = {
+    audio:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+    check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>',
+    dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  };
+
+  let lang='he', t=I18N.he;
+  let files=[];        // {id,file,name,size}
+  let fmt='wav';
+  let uid=1;
+  let results=[];      // {name, blob, url, size, srcSize, ok}
+  let audioCtx=null;
+
+  function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
+  function baseName(name){ return String(name||'audio').replace(/\.[^.\/\\]+$/,''); }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function totalBytes(){ return files.reduce((a,f)=>a+f.size,0); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+  // ---- format picker ----
+  function renderFmts(){
+    el('fmts').innerHTML = FORMATS.map(f=>`
+      <button type="button" class="fmt ${f.id===fmt?'on':''} ${f.ready?'':'soon'}" data-fmt="${f.id}" ${f.ready?'':'disabled'}>
+        ${f.ready?'':`<span class="tag">${lang==='he'?'בקרוב':'soon'}</span>`}
+        <b>${f.label}</b><small>${f.sub}</small>
+      </button>`).join('');
+    // bit-depth only matters for WAV
+    el('depthOpt').classList.toggle('dim', fmt!=='wav');
+  }
+
+  // ---- intake ----
+  function addFiles(list){
+    Array.from(list||[]).forEach(file=>{
+      files.push({ id:'f'+(uid++), file, name:file.name, size:file.size });
+    });
+    renderFiles();
+  }
+  function removeFile(id){ files=files.filter(f=>f.id!==id); renderFiles(); }
+
+  function renderFiles(){
+    const card=el('filesCard'), list=el('flist');
+    card.style.display = files.length? '' : 'none';
+    list.innerHTML = files.map(f=>`
+      <div class="frow">
+        <span class="fico">${ICON.audio}</span>
+        <span class="fn"><div class="nm" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div><div class="sz">${fmtBytes(f.size)}</div></span>
+        <button class="rm" data-rm="${f.id}" title="${escapeHtml(t.remove)}">${ICON.trash}</button>
+      </div>`).join('');
+    el('totalVal').textContent = fmtBytes(totalBytes());
+    el('convBtn').disabled = files.length===0;
+  }
+
+  // ---- WAV encoding (real, offline) ----
+  function encodeWav(buffer, bitDepth){
+    const numCh=buffer.numberOfChannels, rate=buffer.sampleRate, frames=buffer.length;
+    const isFloat=(bitDepth===32);
+    const bytesPer = isFloat?4:(bitDepth/8);
+    const blockAlign=numCh*bytesPer, dataSize=frames*blockAlign;
+    const ab=new ArrayBuffer(44+dataSize), view=new DataView(ab);
+    const w=(o,s)=>{ for(let i=0;i<s.length;i++) view.setUint8(o+i, s.charCodeAt(i)); };
+    w(0,'RIFF'); view.setUint32(4,36+dataSize,true); w(8,'WAVE');
+    w(12,'fmt '); view.setUint32(16,16,true); view.setUint16(20,isFloat?3:1,true);
+    view.setUint16(22,numCh,true); view.setUint32(24,rate,true);
+    view.setUint32(28,rate*blockAlign,true); view.setUint16(32,blockAlign,true); view.setUint16(34,bitDepth,true);
+    w(36,'data'); view.setUint32(40,dataSize,true);
+    const chans=[]; for(let c=0;c<numCh;c++) chans.push(buffer.getChannelData(c));
+    let off=44;
+    for(let i=0;i<frames;i++){
+      for(let c=0;c<numCh;c++){
+        let s=Math.max(-1,Math.min(1,chans[c][i]));
+        if(isFloat){ view.setFloat32(off,s,true); off+=4; }
+        else if(bitDepth===16){ view.setInt16(off, s<0?s*0x8000:s*0x7FFF, true); off+=2; }
+        else { // 24-bit
+          let v=Math.max(-8388608,Math.min(8388607,Math.round(s*8388607)))&0xFFFFFF;
+          view.setUint8(off,v&0xFF); view.setUint8(off+1,(v>>8)&0xFF); view.setUint8(off+2,(v>>16)&0xFF); off+=3;
+        }
+      }
+    }
+    return new Blob([view],{type:'audio/wav'});
+  }
+
+  // optionally resample / remix channels via an offline render
+  async function reshape(decoded, targetRate, targetCh){
+    const rate = targetRate || decoded.sampleRate;
+    const ch = targetCh || decoded.numberOfChannels;
+    if(rate===decoded.sampleRate && ch===decoded.numberOfChannels) return decoded;
+    const frames = Math.max(1, Math.ceil(decoded.duration*rate));
+    const oc = new (window.OfflineAudioContext||window.webkitOfflineAudioContext)(ch, frames, rate);
+    const src = oc.createBufferSource(); src.buffer=decoded; src.connect(oc.destination); src.start();
+    return await oc.startRendering();
+  }
+
+  async function convertOne(item, opts){
+    const arr = await item.file.arrayBuffer();
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const decoded = await audioCtx.decodeAudioData(arr.slice(0));
+    const shaped = await reshape(decoded, opts.rate, opts.channels);
+    const blob = encodeWav(shaped, opts.depth);          // WAV path (the only live encoder)
+    return { blob, seconds: shaped.duration };
+  }
+
+  // ---- run ----
+  async function runConvert(){
+    el('optErr').textContent='';
+    if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
+    const spec = FORMATS.find(f=>f.id===fmt);
+    const opts = {
+      rate:+el('rate').value || 0,
+      channels:+el('channels').value || 0,
+      depth:+el('depth').value || 16,
+    };
+
+    el('composer').style.display='none';
+    el('resultsCard').classList.remove('show');
+    clearResults();
+    const prog=el('progCard'); prog.classList.add('show');
+
+    results=[];
+    for(let i=0;i<files.length;i++){
+      const it=files[i];
+      el('progName').textContent = `${it.name}  ·  ${i+1}/${files.length}`;
+      setProg(Math.round(i/files.length*100));
+      await sleep(30);
+      try{
+        const { blob } = await convertOne(it, opts);
+        results.push({ name: baseName(it.name)+'.'+spec.ext, blob, url:URL.createObjectURL(blob), size:blob.size, srcSize:it.size, ok:true });
+      }catch(err){
+        results.push({ name: baseName(it.name)+'.'+spec.ext, blob:null, url:null, size:0, srcSize:it.size, ok:false });
+      }
+      setProg(Math.round((i+1)/files.length*100));
+    }
+    await sleep(180);
+    prog.classList.remove('show');
+
+    if(!results.some(r=>r.ok)){ el('optErr').textContent=t.errDecode; el('composer').style.display=''; return; }
+    showResults();
+  }
+  function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+
+  function showResults(){
+    const okCount=results.filter(r=>r.ok).length;
+    el('readySub').textContent = t.readySub(okCount);
+    el('rlist').innerHTML = results.map((r,i)=>{
+      if(!r.ok){
+        return `<div class="rrow err"><span class="rico">${ICON.warn}</span>
+          <span class="rn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta">${escapeHtml(t.failed)}</div></span></div>`;
+      }
+      const meta = `${t.origLbl} ${fmtBytes(r.srcSize)} → <em>${fmtBytes(r.size)}</em>`;
+      return `<div class="rrow"><span class="rico">${ICON.check}</span>
+        <span class="rn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta">${meta}</div></span>
+        <button class="dlbtn" data-dl="${i}">${ICON.dl}<span>${lang==='he'?'הורדה':'Download'}</span></button></div>`;
+    }).join('');
+    el('resultsCard').classList.add('show');
+    el('resultsCard').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  function download(r){
+    if(!r||!r.url) return;
+    const a=document.createElement('a'); a.href=r.url; a.download=r.name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  async function downloadAll(){
+    for(const r of results){ if(r.ok){ download(r); await sleep(280); } }
+  }
+
+  function clearResults(){ results.forEach(r=>{ if(r.url) URL.revokeObjectURL(r.url); }); results=[]; }
+  function reset(){
+    clearResults();
+    files=[];
+    el('resultsCard').classList.remove('show');
+    el('optErr').textContent='';
+    el('composer').style.display=''; renderFiles();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- i18n + theme (mirrors the other pages; header stays in sync via its observer) ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderFmts(); renderFiles();
+    if(el('resultsCard').classList.contains('show')) showResults();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('flist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeFile(b.getAttribute('data-rm')); });
+  el('fmts').addEventListener('click',e=>{ const b=e.target.closest('[data-fmt]'); if(b && !b.disabled){ fmt=b.getAttribute('data-fmt'); renderFmts(); } });
+  el('rlist').addEventListener('click',e=>{ const b=e.target.closest('[data-dl]'); if(b) download(results[+b.getAttribute('data-dl')]); });
+
+  el('convBtn').addEventListener('click',runConvert);
+  el('dlAllBtn').addEventListener('click',downloadAll);
+  el('againBtn').addEventListener('click',reset);
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  renderFmts(); renderFiles();
+})();
+</script>
+</body>
+</html>

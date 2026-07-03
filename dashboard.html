@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — דשבורד</title>
+<meta name="description" content="Your KOLKLI dashboard — manage your profile, audio, video, files and transfers. See your plan, limits and current usage.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;overflow-x:clip;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(56% 38% at 12% 2%,rgba(124,58,237,0.09),transparent 60%),
+      radial-gradient(52% 40% at 90% 0%,rgba(59,111,246,0.08),transparent 60%);}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+
+  /* ---------- layout ---------- */
+  /* content box matches the header's 75% bar (+44px for our 22px side padding)
+     so the sidebar's right edge lines up with the header logo instead of falling short */
+  .dash-wrap{max-width:calc(75% + 44px);width:100%;margin:0 auto;padding:22px 22px 60px;}
+  .dash{display:grid;grid-template-columns:266px 1fr;gap:22px;align-items:start;}
+
+  /* ---------- mobile bar ---------- */
+  .dash-mbar{display:none;align-items:center;gap:12px;margin-bottom:14px;}
+  .dash-mbar button{display:inline-flex;align-items:center;gap:9px;height:42px;padding:0 16px;border-radius:12px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;font-size:14px;font-weight:600;box-shadow:var(--shadow-sm);}
+  .dash-mbar button svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .dash-mbar .mbar-title{font-weight:700;font-size:15px;}
+
+  /* ---------- sidebar ---------- */
+  .side{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:var(--shadow);
+    position:sticky;top:88px;display:flex;flex-direction:column;gap:4px;}
+  .side-scrim{display:none;}
+
+  .cat{border-radius:12px;}
+  .cat-head{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border:none;background:none;cursor:pointer;
+    color:var(--ink-2);font-family:var(--sans);font-size:14.5px;font-weight:700;border-radius:11px;text-align:start;transition:background .12s,color .12s;}
+  .cat-head:hover{background:var(--panel-2);}
+  .cat-head .cat-ic{width:34px;height:34px;flex-shrink:0;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad-soft);color:var(--accent);}
+  .cat-head .cat-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .cat-head .cat-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cat-head .cat-chev{width:16px;height:16px;flex-shrink:0;color:var(--faint);transition:transform .2s ease;}
+  .cat-head .cat-chev svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  .cat.open .cat-head .cat-chev{transform:rotate(180deg);}
+  .cat.on > .cat-head{color:var(--accent-dim);}
+  .cat.on > .cat-head .cat-ic{background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);}
+
+  .subs{display:none;flex-direction:column;gap:2px;padding:2px 4px 8px;}
+  .cat.open .subs{display:flex;}
+  .subitem{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:var(--muted);
+    font-size:13.5px;font-weight:600;transition:background .12s,color .12s;border:1px solid transparent;}
+  .subitem .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5;flex-shrink:0;margin-inline-start:12px;}
+  .subitem:hover{background:var(--panel-2);color:var(--ink-2);}
+  .subitem.active{background:var(--accent-soft);color:var(--accent-dim);border-color:var(--accent);}
+  .subitem.active .dot{opacity:1;}
+  .client-subbar{display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:6px;align-items:center;}
+  .client-subbar .subitem{min-width:0;}
+  .side-add-project{width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:var(--panel);
+    color:var(--accent-dim);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);
+    transition:background .12s,border-color .12s,transform .08s;}
+  .side-add-project:hover{background:var(--accent-soft);border-color:var(--accent);}
+  .side-add-project:active{transform:translateY(1px);}
+  .side-add-project svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  .side-projects{display:flex;flex-direction:column;gap:3px;padding:4px 2px 2px;}
+  .project-nav{display:flex;align-items:center;gap:8px;width:100%;min-height:34px;padding:7px 12px;border:none;border-radius:10px;
+    background:none;color:var(--muted);font-family:var(--sans);font-size:12.8px;font-weight:600;text-align:start;cursor:pointer;
+    transition:background .12s,color .12s;}
+  .project-nav:hover{background:var(--panel-2);color:var(--ink-2);}
+  .project-nav.active{background:var(--accent-soft);color:var(--accent-dim);}
+  .project-nav .pn-dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.65;flex-shrink:0;}
+  .project-nav .pn-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* plan chip pinned at the bottom of the sidebar */
+  .side-plan{margin-top:8px;border-top:1px solid var(--line);padding-top:12px;}
+  .planchip{display:flex;align-items:center;gap:11px;padding:12px;border-radius:14px;background:var(--grad-soft);border:1px solid var(--line);}
+  .planchip .pc-ic{width:36px;height:36px;flex-shrink:0;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);}
+  .planchip .pc-ic svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .planchip .pc-tx{min-width:0;flex:1;display:flex;flex-direction:column;}
+  .planchip .pc-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+  .planchip .pc-name{font-size:15px;font-weight:800;line-height:1.2;}
+  .side-plan .upg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:700;font-size:13.5px;padding:11px 14px;border-radius:11px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .side-plan .upg:hover{filter:brightness(1.05);} .side-plan .upg:active{transform:translateY(1px);}
+  .side-plan .upg svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* admin-only shortcut, pinned above the nav */
+  .side-admin{display:flex;align-items:center;gap:11px;padding:9px 12px;margin-bottom:6px;border-radius:12px;
+    background:var(--grad-soft);border:1px solid var(--accent-soft);color:var(--accent-dim);font-weight:700;font-size:14.5px;
+    transition:border-color .12s;}
+  .side-admin:hover{border-color:var(--accent);}
+  .side-admin .sa-ic{width:34px;height:34px;flex-shrink:0;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);}
+  .side-admin .sa-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ---------- main ---------- */
+  .main{min-width:0;}
+  .guestnote{display:flex;align-items:center;gap:10px;background:var(--info-soft);border:1px solid var(--info);color:var(--info-dim);
+    border-radius:14px;padding:12px 16px;font-size:13.5px;margin-bottom:16px;}
+  .guestnote svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .guestnote a{font-weight:700;color:var(--accent-dim);cursor:pointer;text-decoration:underline;}
+
+  .phead{display:flex;align-items:center;gap:16px;margin:2px 0 22px;}
+  .phead .avatar{width:56px;height:56px;flex-shrink:0;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);color:#fff;font-size:24px;font-weight:800;box-shadow:0 6px 18px var(--grad-shadow);}
+  .phead h1{font-size:clamp(22px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin:0 0 3px;}
+  .phead p{font-size:14px;color:var(--muted);margin:0;}
+  /* ---------- editable profile picture ---------- */
+  .avatar-wrap{position:relative;flex-shrink:0;}
+  .phead .avatar{overflow:hidden;position:relative;}
+  button.avatar{padding:0;border:0;cursor:pointer;font:inherit;}
+  .avatar-img{width:100%;height:100%;object-fit:cover;display:block;}
+  .avatar-edit .avatar-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.42);opacity:0;transition:opacity .15s;}
+  .avatar-edit:hover .avatar-ov,.avatar-edit:focus-visible .avatar-ov{opacity:1;}
+  .avatar-ov svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .avatar-cam{position:absolute;bottom:-4px;inset-inline-end:-4px;width:24px;height:24px;border-radius:50%;
+    background:var(--grad);border:2px solid var(--panel);display:flex;align-items:center;justify-content:center;pointer-events:none;}
+  .avatar-cam svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .avatar-remove{position:absolute;top:100%;inset-inline-start:0;margin-top:7px;background:none;border:0;
+    color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;white-space:nowrap;padding:0;}
+  .avatar-remove:hover{color:#e5484d;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow);margin-bottom:18px;}
+  .card > h2{font-size:17px;font-weight:700;margin:0 0 4px;letter-spacing:-0.01em;}
+  .card > .csub{font-size:13px;color:var(--muted);margin:0 0 16px;}
+  .card > h2 + .csub{margin-top:2px;}
+
+  /* ---------- subscription card ---------- */
+  .subcard{position:relative;overflow:hidden;background:var(--grad-soft);}
+  .subcard .sc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+  .sc-info{min-width:0;}
+  .sc-kick{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  .sc-planline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .sc-planname{font-size:30px;font-weight:800;letter-spacing:-0.02em;line-height:1;}
+  .plan-badge{font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    padding:4px 11px;border-radius:999px;}
+  .plan-badge.free{color:var(--muted);background:var(--panel);border:1px solid var(--line);}
+  .plan-badge.lite{color:var(--info-dim);background:var(--info-soft);border:1px solid var(--info);}
+  .plan-badge.pro{color:#fff;background:var(--grad);border:1px solid transparent;box-shadow:0 4px 12px var(--grad-shadow);}
+  .sc-price{font-size:14px;color:var(--muted);margin-top:10px;}
+  .sc-price b{font-size:22px;color:var(--ink);font-weight:800;}
+  .sc-actions{display:flex;flex-direction:column;gap:10px;align-items:stretch;}
+  .btn-up{display:inline-flex;align-items:center;justify-content:center;gap:8px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:700;font-size:14px;padding:12px 22px;border-radius:12px;text-shadow:0 1px 2px rgba(0,0,0,.18);white-space:nowrap;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 20px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .btn-up:hover{filter:brightness(1.05);} .btn-up:active{transform:translateY(1px);}
+  .btn-up svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .sc-top-plan{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--success-dim);
+    background:var(--success-soft);border:1px solid var(--success);padding:11px 18px;border-radius:12px;white-space:nowrap;}
+  .sc-top-plan svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* demo plan switcher */
+  .demoswitch{margin-top:18px;padding-top:16px;border-top:1px dashed var(--line);}
+  .demoswitch .ds-lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);margin-bottom:8px;}
+  .seg{display:inline-flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;box-shadow:var(--shadow-sm);}
+  .seg-btn{border:none;background:none;color:var(--muted);cursor:pointer;font-family:var(--sans);font-size:13.5px;font-weight:700;
+    padding:8px 18px;border-radius:9px;transition:color .14s,background .14s,box-shadow .14s;}
+  .seg-btn.on{background:var(--accent-soft);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+
+  /* ---------- usage metrics ---------- */
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .metric{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:15px;}
+  .metric-top{display:flex;align-items:center;gap:9px;margin-bottom:11px;}
+  .metric-ic{width:32px;height:32px;flex-shrink:0;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .metric-ic svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .metric-label{font-size:12.5px;font-weight:600;color:var(--muted);line-height:1.2;}
+  .metric-val{font-size:18px;font-weight:800;letter-spacing:-0.01em;margin-bottom:10px;}
+  .metric-lim{font-size:12.5px;font-weight:600;color:var(--faint);}
+  .bar{height:7px;border-radius:999px;background:var(--line);overflow:hidden;}
+  .bar-fill{display:block;height:100%;border-radius:999px;background:var(--grad);transition:width .4s ease;}
+  .bar-fill.warn{background:linear-gradient(90deg,#e5a904,#e5484d);}
+
+  /* ---------- plan features list ---------- */
+  .feats{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,1fr);gap:11px;}
+  .feats li{display:flex;align-items:flex-start;gap:10px;font-size:13.7px;color:var(--ink-2);}
+  .feats li svg{width:17px;height:17px;color:var(--success);flex-shrink:0;margin-top:2px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  .compare{display:inline-flex;align-items:center;gap:7px;margin-top:18px;font-size:13.5px;font-weight:700;color:var(--accent-dim);}
+  .compare svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ---------- quick actions ---------- */
+  .quick{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .qcard{display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:16px;box-shadow:var(--shadow-sm);transition:transform .14s,border-color .14s,box-shadow .14s;}
+  .qcard:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:var(--shadow-lg);}
+  .qcard .q-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--grad-soft);color:var(--accent);}
+  .qcard .q-ic svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .qcard .q-t{font-size:14.5px;font-weight:700;}
+  .qcard .q-d{font-size:12.5px;color:var(--muted);line-height:1.4;}
+
+  /* ---------- generic form rows ---------- */
+  .frow{display:flex;flex-direction:column;gap:6px;margin-bottom:15px;}
+  .frow label{font-size:12.5px;font-weight:600;color:var(--ink-2);}
+  .frow input{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:14px;padding:11px 13px;transition:border-color .12s,box-shadow .12s;}
+  .frow input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .frow input:disabled{color:var(--muted);cursor:not-allowed;}
+  .frow .hint{font-size:11.5px;color:var(--faint);}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:0 16px;}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-family:var(--sans);
+    font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:11px;transition:filter .14s,transform .08s,border-color .12s,background .12s;}
+  .btn:active{transform:translateY(1px);}
+  .btn.primary{color:#fff;border:none;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);}
+  .btn.primary:hover{filter:brightness(1.05);}
+  .btn.ghost{background:var(--panel);border:1px solid var(--line);color:var(--ink-2);box-shadow:var(--shadow-sm);}
+  .btn.ghost:hover{border-color:var(--accent);}
+  .btn.danger{background:var(--panel);border:1px solid var(--danger);color:var(--danger);}
+  .btn.danger:hover{background:var(--danger-soft);}
+  .btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .saved-msg{font-size:12.5px;color:var(--success-dim);font-weight:600;opacity:0;transition:opacity .2s;}
+  .saved-msg.show{opacity:1;}
+
+  /* settings option rows */
+  .optrow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line-2);}
+  .optrow:last-child{border-bottom:none;}
+  .optrow .opt-tx{min-width:0;}
+  .optrow .opt-t{font-size:14px;font-weight:600;}
+  .optrow .opt-d{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .segsm{display:inline-flex;gap:3px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:3px;flex-shrink:0;}
+  .segsm button{border:none;background:none;color:var(--muted);cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:700;padding:7px 14px;border-radius:8px;}
+  .segsm button.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  /* toggle */
+  .toggle{position:relative;width:46px;height:26px;flex-shrink:0;border-radius:999px;background:var(--line);border:none;cursor:pointer;transition:background .16s;}
+  .toggle::after{content:'';position:absolute;top:3px;inset-inline-start:3px;width:20px;height:20px;border-radius:50%;background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .16s;}
+  .toggle.on{background:var(--accent);}
+  html[dir="ltr"] .toggle.on::after{transform:translateX(20px);}
+  html[dir="rtl"] .toggle.on::after{transform:translateX(-20px);}
+
+  .danger-zone{border-color:var(--danger);}
+  .danger-zone > h2{color:var(--danger);}
+
+  /* ---------- payments ---------- */
+  .payrow{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .pm-empty{display:flex;align-items:center;gap:12px;background:var(--panel-2);border:1px dashed var(--line);border-radius:12px;padding:16px;}
+  .pm-empty .pm-ic{width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .pm-empty .pm-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .pm-empty .pm-tx{flex:1;min-width:0;}
+  .pm-empty .pm-t{font-size:14px;font-weight:600;}
+  .pm-empty .pm-d{font-size:12.5px;color:var(--muted);}
+  table.inv{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.inv th{text-align:start;font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);}
+  table.inv td{padding:12px 10px;border-bottom:1px solid var(--line-2);color:var(--ink-2);}
+  table.inv tr:last-child td{border-bottom:none;}
+  .inv-status{font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--success-dim);background:var(--success-soft);border:1px solid var(--success);border-radius:6px;padding:2px 8px;}
+  .inv-dl{color:var(--accent-dim);font-weight:700;cursor:pointer;}
+
+  /* ---------- empty state (my audio/video/files/transfers) ---------- */
+  .empty{text-align:center;padding:44px 20px;}
+  .empty .ei{width:66px;height:66px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad-soft);color:var(--accent);}
+  .empty .ei svg{width:32px;height:32px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .empty h3{margin:0 0 6px;font-size:17px;}
+  .empty p{margin:0 auto 20px;font-size:13.5px;color:var(--muted);max-width:44ch;}
+  .toolrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .toolrow a{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--ink-2);
+    background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:9px 16px;box-shadow:var(--shadow-sm);transition:border-color .12s;}
+  .toolrow a:hover{border-color:var(--accent);}
+  .toolrow a svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ---------- clients / projects ---------- */
+  .projects-card{overflow:hidden;padding:0;}
+  .project-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:22px;border-bottom:1px solid var(--line);}
+  .project-head h2{font-size:18px;font-weight:800;margin:0 0 4px;letter-spacing:-0.01em;}
+  .project-head .csub{font-size:13px;color:var(--muted);margin:0;}
+  .project-list{display:flex;flex-direction:column;}
+  .project-row{display:grid;grid-template-columns:minmax(220px,1.5fr) minmax(92px,.45fr) minmax(92px,.45fr) minmax(104px,.5fr) auto;
+    gap:16px;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line-2);background:var(--panel);
+    transition:background .12s;}
+  .project-row:last-child{border-bottom:none;}
+  .project-row.on{background:var(--accent-soft);}
+  .project-main{display:flex;align-items:center;gap:12px;min-width:0;}
+  .project-mark{width:42px;height:42px;border-radius:12px;background:var(--grad-soft);color:var(--accent);display:flex;
+    align-items:center;justify-content:center;flex-shrink:0;}
+  .project-mark svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .project-title{display:block;font-size:15px;font-weight:800;color:var(--ink);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .project-client{display:block;font-size:12.5px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .project-stat{min-width:0;}
+  .project-stat .ps-l{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);margin-bottom:2px;}
+  .project-stat .ps-v{font-size:13.5px;font-weight:700;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .project-status{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:5px 10px;border-radius:999px;
+    font-size:12px;font-weight:800;color:var(--accent-dim);background:var(--accent-soft);border:1px solid rgba(124,58,237,.24);white-space:nowrap;}
+  .project-status.sent{color:var(--info-dim);background:var(--info-soft);border-color:var(--info);}
+  .project-status.approved{color:var(--success-dim);background:var(--success-soft);border-color:var(--success);}
+  .project-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;}
+  .project-actions .btn{padding:9px 12px;font-size:12.8px;border-radius:10px;white-space:nowrap;}
+  .project-empty{padding:44px 22px;text-align:center;}
+
+  footer.dfoot{text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);margin-top:30px;}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:900px){
+    .dash{grid-template-columns:1fr;}
+    .dash-mbar{display:flex;}
+    .side{position:fixed;top:0;inset-inline-start:0;height:100%;width:300px;max-width:86vw;border-radius:0;z-index:120;
+      transform:translateX(-110%);transition:transform .22s ease;overflow-y:auto;border-inline-start:none;}
+    html[dir="rtl"] .side{transform:translateX(110%);}
+    .side.open{transform:translateX(0)!important;box-shadow:var(--shadow-lg);}
+    .side-scrim{display:block;position:fixed;inset:0;background:rgba(10,12,20,.5);z-index:110;opacity:0;visibility:hidden;transition:opacity .2s;}
+    .side-scrim.open{opacity:1;visibility:visible;}
+    .metrics{grid-template-columns:repeat(2,1fr);}
+    .quick{grid-template-columns:repeat(2,1fr);}
+    .project-row{grid-template-columns:1fr 1fr;gap:12px;}
+    .project-main,.project-actions{grid-column:1/-1;}
+    .project-actions{justify-content:flex-start;}
+  }
+  @media (max-width:560px){
+    .metrics,.quick,.feats,.grid2{grid-template-columns:1fr;}
+    .sc-actions{width:100%;}
+    .phead .avatar{width:48px;height:48px;font-size:20px;}
+    .project-head{flex-direction:column;align-items:stretch;}
+    .project-head .btn{width:100%;}
+    .project-row{grid-template-columns:1fr;padding:15px;}
+    .project-stat,.project-actions{grid-column:auto;}
+    .project-actions{align-items:stretch;justify-content:stretch;}
+    .project-actions .btn,.project-status{width:100%;}
+  }
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+
+<div class="dash-wrap">
+  <div class="dash-mbar">
+    <button id="mMenuBtn" type="button">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <span id="mMenuTx"></span>
+    </button>
+    <span class="mbar-title" id="mBarTitle"></span>
+  </div>
+
+  <div class="dash">
+    <aside class="side" id="side"></aside>
+    <main class="main" id="main"></main>
+  </div>
+
+  <footer class="dfoot" id="dfoot"></footer>
+</div>
+<div class="side-scrim" id="sideScrim"></div>
+
+<script>
+(function(){
+  var el = function(id){ return document.getElementById(id); };
+
+  /* =====================================================
+     i18n (he / en / ru)
+     ===================================================== */
+  var I18N = {
+    he:{
+      dir:'rtl',
+      menu:'תפריט',
+      adminPanel:'ניהול (אדמין)',
+      hi:function(n){ return 'שלום, '+n+' 👋'; },
+      welcomeSub:'ברוכים הבאים לדשבורד של KOLKLI — כאן מנהלים את החשבון, הקבצים והמנוי שלכם.',
+      guestNote:'אתם צופים במצב אורח. ', guestSignin:'התחברו כדי לשמור ולסנכרן את הנתונים שלכם.',
+      /* my account */
+      yourPlan:'המנוי הפעיל שלך',
+      perMonth:'לחודש',
+      free:'חינם',
+      upgrade:'שדרגו מנוי', changePlan:'שינוי חבילה',
+      topPlan:'אתם בחבילה הגבוהה ביותר',
+      demoLabel:'תצוגת דמו — החליפו חבילה כדי לראות את המגבלות',
+      usageTitle:'השימוש הנוכחי שלך',
+      usageSub:'עדכון בזמן אמת מול מגבלות החבילה שלכם.',
+      mStorage:'אחסון בענן', mTransfers:'שליחות החודש', mFiles:'קבצים שמורים', mLinks:'לינקים פעילים',
+      limitsTitle:'מה כלול בחבילה שלך',
+      comparePlans:'השוו בין כל החבילות',
+      quickTitle:'קיצורי דרך',
+      qAudioT:'עריכת אודיו', qAudioD:'חיתוך, נרמול והמרה',
+      qVideoT:'עריכת וידאו', qVideoD:'חיתוך, המרה ודחיסה',
+      qOrgT:'סידור קבצים', qOrgD:'מיון, תיוק וארגון',
+      qSendT:'שליחת קבצים', qSendD:'לינק לשיתוף מהיר',
+      /* account details */
+      detailsTitle:'פרטי חשבון', detailsSub:'המידע האישי המשויך לחשבון שלכם.',
+      fName:'שם מלא', fEmail:'כתובת אימייל', fMember:'חבר/ה מאז', fPlanCur:'חבילה נוכחית',
+      save:'שמירת שינויים', saved:'נשמר בהצלחה ✓',
+      photoChange:'החלפת תמונת פרופיל', photoRemove:'הסרת התמונה', photoErr:'קובץ תמונה לא תקין (עד 5MB).',
+      /* settings */
+      settingsTitle:'הגדרות חשבון', settingsSub:'התאימו את KOLKLI בדיוק לטעמכם.',
+      setLang:'שפת ממשק', setLangD:'בחרו את שפת התצוגה של האתר.',
+      setTheme:'ערכת נושא', setThemeD:'מצב בהיר או כהה.', light:'בהיר', dark:'כהה',
+      notifTitle:'התראות', notifDownloadT:'התראת הורדה', notifDownloadD:'קבלו מייל כשמישהו מוריד קובץ ששלחתם.',
+      notifUpdT:'עדכוני מוצר', notifUpdD:'חדשות, טיפים וכלים חדשים ב-KOLKLI.',
+      dangerTitle:'אזור סכנה', dangerSub:'פעולות בלתי הפיכות. היזהרו.',
+      logout:'התנתקות', logoutD:'יציאה מהחשבון במכשיר הזה.',
+      del:'מחיקת חשבון', delD:'מחיקה לצמיתות של החשבון וכל הנתונים.',
+      delConfirm:'למחוק את החשבון לצמיתות? לא ניתן לבטל פעולה זו.',
+      logoutConfirm:'להתנתק מהחשבון?',
+      /* payments */
+      payTitle:'תשלומים וחיוב', paySub:'ניהול החבילה, אמצעי התשלום וההיסטוריה.',
+      curPlanTitle:'החבילה הנוכחית', nextBill:'החיוב הבא', freeNoBill:'החבילה החינמית — אין חיוב.',
+      pmTitle:'אמצעי תשלום', pmNoneT:'לא הוגדר אמצעי תשלום', pmNoneD:'הוסיפו כרטיס כדי לשדרג לחבילה בתשלום.',
+      addCard:'הוספת כרטיס', manage:'ניהול חבילה',
+      histTitle:'היסטוריית חיובים', histNone:'אין עדיין חיובים להצגה.',
+      thDate:'תאריך', thDesc:'תיאור', thAmount:'סכום', thStatus:'סטטוס', thInvoice:'חשבונית',
+      invPaid:'שולם', invDownload:'הורדה',
+      /* my audio */
+      audioTitle:'האודיו שלי', audioSub:'הקבצים והפרויקטים שערכתם ב-KOLKLI Audio.',
+      audioEmptyT:'אין עדיין קבצי אודיו', audioEmptyP:'פתחו את עורך האודיו כדי לחתוך, לנרמל ולהמיר — הכול ישירות בדפדפן.',
+      openAudio:'פתחו את עורך האודיו',
+      /* my video */
+      videoTitle:'הווידאו שלי', videoSub:'הקליפים והפרויקטים שערכתם ב-KOLKLI Video.',
+      videoEmptyT:'אין עדיין קבצי וידאו', videoEmptyP:'פתחו את חותך הווידאו כדי לחתוך, להמיר ולדחוס קליפים.',
+      openVideo:'פתחו את חותך הווידאו',
+      /* organize */
+      orgTitle:'הלקוחות שלי', orgSub:'נהלו את כל הפרויקטים והגלריות של הלקוחות במקום אחד.',
+      orgEmptyT:'אין עדיין פרויקטים', orgEmptyP:'צרו פרויקט חדש כדי להתחיל לארגן קבצים לפי לקוח.',
+      openOrg:'פתחו פרויקט',
+      clientsTitle:'הלקוחות שלי', clientsSub:'כל שמות הפרויקטים מסודרים לפי לקוח, סטטוס ועדכון אחרון.',
+      newProject:'פרויקט חדש', projectPrompt:'שם הפרויקט החדש',
+      projectClient:'לקוח', projectFiles:'קבצים', projectSelected:'נבחרו', projectUpdated:'עודכן',
+      projectOpen:'פתיחה', projectShare:'שליחת קישור',
+      projectStatusDraft:'טיוטה', projectStatusEditing:'בעריכה', projectStatusSent:'נשלח ללקוח', projectStatusApproved:'מאושר',
+      /* send */
+      sendTitle:'השליחות שלי', sendSub:'הקבצים ששלחתם והלינקים הפעילים שלכם.',
+      sendEmptyT:'אין שליחות פעילות', sendEmptyP:'העלו קבצים וקבלו לינק לשיתוף מהיר, עם הגנה בסיסמה ותאריך תפוגה.',
+      openSend:'שליחת קבצים חדשה',
+      openAudio:'עריכת אודיו חדשה', openVideo:'עריכת וידאו חדשה',
+      reqTitle:'הבקשות שלי', reqSub:'קישורי העלאה שיצרתם והקבצים שהתקבלו מהלקוחות.',
+      reqEmptyT:'עדיין אין בקשות', reqEmptyP:'צרו קישור העלאה, שלחו ללקוח, וקבלו את הקבצים ישירות לתיקייה מסודרת.',
+      openReq:'בקשה חדשה', reqNew:'בקשה חדשה', reqManage:'ניהול הבקשות',
+      footer:'KOLKLI · העריכה רצה בדפדפן שלכם · הקבצים נשארים אצלכם.'
+    },
+    en:{
+      dir:'ltr',
+      menu:'Menu',
+      adminPanel:'Admin panel',
+      hi:function(n){ return 'Hi, '+n+' 👋'; },
+      welcomeSub:'Welcome to your KOLKLI dashboard — manage your account, files and subscription here.',
+      guestNote:'You are viewing as a guest. ', guestSignin:'Sign in to save and sync your data.',
+      yourPlan:'Your active plan',
+      perMonth:'per month',
+      free:'Free',
+      upgrade:'Upgrade plan', changePlan:'Change plan',
+      topPlan:'You’re on the top plan',
+      demoLabel:'Demo — switch plan to preview its limits',
+      usageTitle:'Your current usage',
+      usageSub:'Live against your plan limits.',
+      mStorage:'Cloud storage', mTransfers:'Transfers this month', mFiles:'Stored files', mLinks:'Active links',
+      limitsTitle:'What your plan includes',
+      comparePlans:'Compare all plans',
+      quickTitle:'Quick actions',
+      qAudioT:'Edit audio', qAudioD:'Cut, normalize & convert',
+      qVideoT:'Edit video', qVideoD:'Trim, convert & compress',
+      qOrgT:'Organize files', qOrgD:'Sort, tag & arrange',
+      qSendT:'Send files', qSendD:'Get a share link fast',
+      detailsTitle:'Account details', detailsSub:'The personal info tied to your account.',
+      fName:'Full name', fEmail:'Email address', fMember:'Member since', fPlanCur:'Current plan',
+      save:'Save changes', saved:'Saved ✓',
+      photoChange:'Change profile picture', photoRemove:'Remove photo', photoErr:'Invalid image file (max 5MB).',
+      settingsTitle:'Account settings', settingsSub:'Tune KOLKLI exactly how you like it.',
+      setLang:'Interface language', setLangD:'Choose the display language of the site.',
+      setTheme:'Theme', setThemeD:'Light or dark mode.', light:'Light', dark:'Dark',
+      notifTitle:'Notifications', notifDownloadT:'Download alerts', notifDownloadD:'Get an email when someone downloads a file you sent.',
+      notifUpdT:'Product updates', notifUpdD:'News, tips and new KOLKLI tools.',
+      dangerTitle:'Danger zone', dangerSub:'Irreversible actions. Be careful.',
+      logout:'Log out', logoutD:'Sign out of your account on this device.',
+      del:'Delete account', delD:'Permanently delete your account and all data.',
+      delConfirm:'Permanently delete your account? This cannot be undone.',
+      logoutConfirm:'Log out of your account?',
+      payTitle:'Payments & billing', paySub:'Manage your plan, payment method and history.',
+      curPlanTitle:'Current plan', nextBill:'Next billing', freeNoBill:'Free plan — no billing.',
+      pmTitle:'Payment method', pmNoneT:'No payment method', pmNoneD:'Add a card to upgrade to a paid plan.',
+      addCard:'Add card', manage:'Manage plan',
+      histTitle:'Billing history', histNone:'No charges to show yet.',
+      thDate:'Date', thDesc:'Description', thAmount:'Amount', thStatus:'Status', thInvoice:'Invoice',
+      invPaid:'Paid', invDownload:'Download',
+      audioTitle:'My audio', audioSub:'Files and projects you edited in KOLKLI Audio.',
+      audioEmptyT:'No audio files yet', audioEmptyP:'Open the audio editor to cut, normalize and convert — right in your browser.',
+      openAudio:'Open the audio editor',
+      videoTitle:'My video', videoSub:'Clips and projects you edited in KOLKLI Video.',
+      videoEmptyT:'No video files yet', videoEmptyP:'Open the video cutter to trim, convert and compress clips.',
+      openVideo:'Open the video cutter',
+      orgTitle:'My clients', orgSub:'Manage every client project and gallery in one place.',
+      orgEmptyT:'No projects yet', orgEmptyP:'Create a new project to start organizing files by client.',
+      openOrg:'Open project',
+      clientsTitle:'My clients', clientsSub:'Project names arranged by client, status and recent activity.',
+      newProject:'New project', projectPrompt:'New project name',
+      projectClient:'Client', projectFiles:'Files', projectSelected:'Selected', projectUpdated:'Updated',
+      projectOpen:'Open', projectShare:'Send link',
+      projectStatusDraft:'Draft', projectStatusEditing:'Editing', projectStatusSent:'Sent to client', projectStatusApproved:'Approved',
+      sendTitle:'My transfers', sendSub:'Files you sent and your active links.',
+      sendEmptyT:'No active transfers', sendEmptyP:'Upload files and get a share link fast, with password protection and an expiry date.',
+      openSend:'New file transfer',
+      openAudio:'New audio edit', openVideo:'New video edit',
+      reqTitle:'My requests', reqSub:'Upload links you created and the files clients sent back.',
+      reqEmptyT:'No requests yet', reqEmptyP:'Create an upload link, send it to a client, and receive files straight into an organized folder.',
+      openReq:'New request', reqNew:'New request', reqManage:'Manage requests',
+      footer:'KOLKLI · Editing runs in your browser · Your files stay with you.'
+    },
+    ru:{
+      dir:'ltr',
+      menu:'Меню',
+      adminPanel:'Админ-панель',
+      hi:function(n){ return 'Привет, '+n+' 👋'; },
+      welcomeSub:'Добро пожаловать в панель KOLKLI — управляйте аккаунтом, файлами и подпиской здесь.',
+      guestNote:'Вы просматриваете как гость. ', guestSignin:'Войдите, чтобы сохранять и синхронизировать данные.',
+      yourPlan:'Ваш активный план',
+      perMonth:'в месяц',
+      free:'Бесплатно',
+      upgrade:'Улучшить план', changePlan:'Сменить план',
+      topPlan:'У вас максимальный план',
+      demoLabel:'Демо — переключите план, чтобы увидеть лимиты',
+      usageTitle:'Ваше текущее использование',
+      usageSub:'В реальном времени относительно лимитов плана.',
+      mStorage:'Облачное хранилище', mTransfers:'Передачи за месяц', mFiles:'Сохранённые файлы', mLinks:'Активные ссылки',
+      limitsTitle:'Что входит в ваш план',
+      comparePlans:'Сравнить все планы',
+      quickTitle:'Быстрые действия',
+      qAudioT:'Аудио', qAudioD:'Обрезка, нормализация, конвертация',
+      qVideoT:'Видео', qVideoD:'Обрезка, конвертация, сжатие',
+      qOrgT:'Упорядочить', qOrgD:'Сортировка, теги, порядок',
+      qSendT:'Отправить', qSendD:'Быстрая ссылка для обмена',
+      detailsTitle:'Данные аккаунта', detailsSub:'Личные данные, привязанные к аккаунту.',
+      fName:'Полное имя', fEmail:'Эл. почта', fMember:'Участник с', fPlanCur:'Текущий план',
+      save:'Сохранить', saved:'Сохранено ✓',
+      photoChange:'Сменить фото профиля', photoRemove:'Удалить фото', photoErr:'Некорректный файл изображения (до 5 МБ).',
+      settingsTitle:'Настройки аккаунта', settingsSub:'Настройте KOLKLI под себя.',
+      setLang:'Язык интерфейса', setLangD:'Выберите язык отображения сайта.',
+      setTheme:'Тема', setThemeD:'Светлый или тёмный режим.', light:'Светлая', dark:'Тёмная',
+      notifTitle:'Уведомления', notifDownloadT:'Уведомления о скачивании', notifDownloadD:'Письмо, когда кто-то скачивает отправленный вами файл.',
+      notifUpdT:'Обновления продукта', notifUpdD:'Новости, советы и новые инструменты KOLKLI.',
+      dangerTitle:'Опасная зона', dangerSub:'Необратимые действия. Будьте осторожны.',
+      logout:'Выйти', logoutD:'Выйти из аккаунта на этом устройстве.',
+      del:'Удалить аккаунт', delD:'Навсегда удалить аккаунт и все данные.',
+      delConfirm:'Навсегда удалить аккаунт? Это нельзя отменить.',
+      logoutConfirm:'Выйти из аккаунта?',
+      payTitle:'Платежи и счета', paySub:'Управление планом, способом оплаты и историей.',
+      curPlanTitle:'Текущий план', nextBill:'Следующее списание', freeNoBill:'Бесплатный план — без оплаты.',
+      pmTitle:'Способ оплаты', pmNoneT:'Способ оплаты не добавлен', pmNoneD:'Добавьте карту, чтобы перейти на платный план.',
+      addCard:'Добавить карту', manage:'Управлять планом',
+      histTitle:'История платежей', histNone:'Пока нет списаний.',
+      thDate:'Дата', thDesc:'Описание', thAmount:'Сумма', thStatus:'Статус', thInvoice:'Счёт',
+      invPaid:'Оплачено', invDownload:'Скачать',
+      audioTitle:'Моё аудио', audioSub:'Файлы и проекты, отредактированные в KOLKLI Audio.',
+      audioEmptyT:'Пока нет аудиофайлов', audioEmptyP:'Откройте аудиоредактор, чтобы обрезать, нормализовать и конвертировать — прямо в браузере.',
+      openAudio:'Открыть аудиоредактор',
+      videoTitle:'Моё видео', videoSub:'Клипы и проекты, отредактированные в KOLKLI Video.',
+      videoEmptyT:'Пока нет видеофайлов', videoEmptyP:'Откройте видеорезак, чтобы обрезать, конвертировать и сжимать клипы.',
+      openVideo:'Открыть видеорезак',
+      orgTitle:'Мои клиенты', orgSub:'Управляйте проектами и галереями клиентов в одном месте.',
+      orgEmptyT:'Пока нет проектов', orgEmptyP:'Создайте новый проект, чтобы организовать файлы по клиентам.',
+      openOrg:'Открыть проект',
+      clientsTitle:'Мои клиенты', clientsSub:'Проекты упорядочены по клиенту, статусу и последнему обновлению.',
+      newProject:'Новый проект', projectPrompt:'Название нового проекта',
+      projectClient:'Клиент', projectFiles:'Файлы', projectSelected:'Выбрано', projectUpdated:'Обновлено',
+      projectOpen:'Открыть', projectShare:'Отправить ссылку',
+      projectStatusDraft:'Черновик', projectStatusEditing:'В работе', projectStatusSent:'Отправлено клиенту', projectStatusApproved:'Одобрено',
+      sendTitle:'Мои передачи', sendSub:'Отправленные файлы и активные ссылки.',
+      sendEmptyT:'Нет активных передач', sendEmptyP:'Загрузите файлы и быстро получите ссылку с защитой паролем и сроком действия.',
+      openSend:'Новая передача файлов',
+      openAudio:'Новый аудиопроект', openVideo:'Новый видеопроект',
+      reqTitle:'Мои запросы', reqSub:'Созданные ссылки для загрузки и файлы, присланные клиентами.',
+      reqEmptyT:'Запросов пока нет', reqEmptyP:'Создайте ссылку для загрузки, отправьте клиенту и получайте файлы прямо в упорядоченную папку.',
+      openReq:'Новый запрос', reqNew:'Новый запрос', reqManage:'Управление запросами',
+      footer:'KOLKLI · Редактирование в вашем браузере · Ваши файлы остаются у вас.'
+    }
+  };
+
+  /* =====================================================
+     Plans (Free / Lite / Pro) + demo usage
+     ===================================================== */
+  var INF = Infinity;
+  var PLANS = {
+    free:{ key:'free', name:'Free', price:0,
+      limits:{ storageGB:2, transferGB:2, transfersMo:10, files:50, links:5, keepDays:3 },
+      feats:{
+        he:['שליחה עד 2GB בכל פעם','2GB אחסון בענן','קבצים נשמרים 3 ימים','כלי עריכה בסיסיים','עריכה מקומית בדפדפן'],
+        en:['Up to 2GB per transfer','2GB cloud storage','Files kept for 3 days','Basic editing tools','Local in-browser editing'],
+        ru:['До 2 ГБ за передачу','2 ГБ в облаке','Файлы хранятся 3 дня','Базовые инструменты','Локальное редактирование']
+      }},
+    lite:{ key:'lite', name:'Lite', price:6.99,
+      limits:{ storageGB:100, transferGB:20, transfersMo:100, files:1000, links:50, keepDays:14 },
+      feats:{
+        he:['שליחה עד 20GB בכל פעם','100GB אחסון בענן','קבצים נשמרים 14 יום','כל כלי העריכה','הגנה בסיסמה','בלי פרסומות'],
+        en:['Up to 20GB per transfer','100GB cloud storage','Files kept for 14 days','All editing tools','Password protection','No ads'],
+        ru:['До 20 ГБ за передачу','100 ГБ в облаке','Файлы хранятся 14 дней','Все инструменты','Защита паролем','Без рекламы']
+      }},
+    pro:{ key:'pro', name:'Pro', price:14.99,
+      limits:{ storageGB:1024, transferGB:100, transfersMo:INF, files:INF, links:INF, keepDays:30 },
+      feats:{
+        he:['שליחה עד 100GB בכל פעם','1TB אחסון בענן','קבצים נשמרים 30 יום','כל הכלים + כלי AI','התראות הורדה','תמיכה מהירה בעדיפות','בלי פרסומות'],
+        en:['Up to 100GB per transfer','1TB cloud storage','Files kept for 30 days','All tools + AI tools','Download notifications','Priority support','No ads'],
+        ru:['До 100 ГБ за передачу','1 ТБ в облаке','Файлы хранятся 30 дней','Все инструменты + AI','Уведомления о скачивании','Приоритетная поддержка','Без рекламы']
+      }}
+  };
+  var PLAN_ORDER = ['free','lite','pro'];
+  // demo usage in absolute terms; bars shrink as the plan grows (motivates upgrade)
+  var USAGE = { storageGB:1.62, transfersMo:8, files:34, links:3 };
+
+  /* =====================================================
+     Navigation model (labels live here; arrow = collapsible)
+     ===================================================== */
+  var NAV = [
+    { id:'profile', icon:'user', he:'פרופיל', en:'Profile', ru:'Профиль', open:true, items:[
+      { id:'account',  he:'החשבון שלי',   en:'My Account',       ru:'Мой аккаунт' },
+      { id:'details',  he:'פרטי חשבון',    en:'Account Details',  ru:'Данные аккаунта' },
+      { id:'settings', he:'הגדרות חשבון',  en:'Account Settings', ru:'Настройки аккаунта' },
+      { id:'payments', he:'תשלומים',       en:'Payments',         ru:'Платежи' }
+    ]},
+    { id:'audio', icon:'music', he:'KOLKLI Audio', en:'KOLKLI Audio', ru:'KOLKLI Audio', add:{ href:'audio/', label:'openAudio' }, items:[
+      { id:'my-audio', he:'האודיו שלי', en:'My Audio', ru:'Моё аудио' }
+    ]},
+    { id:'video', icon:'film', he:'KOLKLI Video', en:'KOLKLI Video', ru:'KOLKLI Video', add:{ href:'video/', label:'openVideo' }, items:[
+      { id:'my-video', he:'הווידאו שלי', en:'My Video', ru:'Моё видео' }
+    ]},
+    { id:'organize', icon:'folder', he:'KOLKLI Organize', en:'KOLKLI Organize', ru:'KOLKLI Organize', items:[
+      { id:'my-files', he:'הלקוחות שלי', en:'My Clients', ru:'Мои клиенты' }
+    ]},
+    { id:'send', icon:'send', he:'KOLKLI Send Files', en:'KOLKLI Send Files', ru:'KOLKLI Send Files', add:{ href:'send.html', label:'openSend' }, items:[
+      { id:'my-transfers', he:'השליחות שלי', en:'My Transfers', ru:'Мои передачи' }
+    ]},
+    { id:'request', icon:'inbox', he:'KOLKLI Request', en:'KOLKLI Request', ru:'KOLKLI Request', add:{ href:'request.html', label:'reqNew' }, items:[
+      { id:'my-requests', he:'הבקשות שלי', en:'My Requests', ru:'Мои запросы' }
+    ]}
+  ];
+
+  /* =====================================================
+     Icons
+     ===================================================== */
+  function s(inner){ return '<svg viewBox="0 0 24 24">'+inner+'</svg>'; }
+  var ICON = {
+    user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/>',
+    music:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+    film:'<rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/>',
+    folder:'<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+    send:'<path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9z"/>',
+    inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+    chev:'<polyline points="6 9 12 15 18 9"/>',
+    check:'<polyline points="20 6 9 17 4 12"/>',
+    zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    crown:'<path d="M2 7l4.5 4L12 4l5.5 7L22 7l-2 12H4L2 7z"/>',
+    drive:'<line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/>',
+    swap:'<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
+    files:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    arrow:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+    scissors:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/>',
+    refresh:'<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+    merge:'<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>',
+    card:'<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>',
+    bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+    logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+    trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+    plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+    minimize:'<polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/>',
+    info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
+    camera:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>'
+  };
+  var PLAN_ICON = { free:'zap', lite:'zap', pro:'crown' };
+
+  /* =====================================================
+     State
+     ===================================================== */
+  var USERS_KEY='ac_users', SESSION_KEY='ac_session', PLAN_KEY='ac_plan', NOTIF_KEY='ac_notif', PROJECTS_KEY='ac_projects';
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+  function loadUsers(){ try{ return JSON.parse(lsGet(USERS_KEY))||[]; }catch(e){ return []; } }
+  function saveUsers(u){ lsSet(USERS_KEY, JSON.stringify(u)); }
+
+  // Bootstrap owner(s) are always admin; anyone else can be granted role:'admin'
+  // from admin.html. The link below only appears for admins.
+  var ADMIN_EMAILS=['digitalzimmer@gmail.com'];
+  function isAdmin(){
+    var email=(lsGet(SESSION_KEY)||'').toLowerCase();
+    if(!email) return false;
+    if(ADMIN_EMAILS.indexOf(email)>-1) return true;
+    var u=loadUsers().find(function(x){ return (x.email||'').toLowerCase()===email; });
+    return !!(u && u.role==='admin');
+  }
+
+  var lang='he', t=I18N.he;
+  var view='account';
+  var user=null, isGuest=false, plan='free';
+  var activeProjectId=null;
+  var notif = (function(){ try{ return JSON.parse(lsGet(NOTIF_KEY))||{download:true,updates:false}; }catch(e){ return {download:true,updates:false}; } })();
+
+  function loadUser(){
+    var email = lsGet(SESSION_KEY);
+    var u = email ? loadUsers().find(function(x){ return x.email===email; }) : null;
+    if(u){ isGuest=false; user=u; plan = u.plan || lsGet(PLAN_KEY) || 'free'; }
+    else { isGuest=true; user={ name:'Guest', email:'', created:Date.now() }; plan = lsGet(PLAN_KEY) || 'free'; }
+    if(!PLANS[plan]) plan='free';
+  }
+  function setPlan(p){
+    if(!PLANS[p]) return;
+    plan=p; lsSet(PLAN_KEY, p);
+    if(!isGuest){
+      var users=loadUsers(), i=users.findIndex(function(x){ return x.email===user.email; });
+      if(i>-1){ users[i].plan=p; saveUsers(users); user=users[i]; }
+    }
+    render();
+  }
+  function defaultProjects(){
+    return [
+      { id:'pr-37734', name:'אלבום יום הולדת 60', client:'משפחת דוזדו', status:'editing', files:489, selected:0, sizeMB:465, updated:'2026-07-03' },
+      { id:'pr-45572', name:'יום הולדת 40 - לאוהד', client:'מיכל ואביב', status:'sent', files:589, selected:1, sizeMB:870, updated:'2026-06-21' },
+      { id:'pr-46211', name:'בחירת תמונות בקליק', client:'ספיר אברהם', status:'sent', files:130, selected:1, sizeMB:56, updated:'2026-06-09' },
+      { id:'pr-46806', name:'גלריית לקוח - מאיר', client:'אגמון סטודיו', status:'approved', files:214, selected:38, sizeMB:312, updated:'2026-05-29' }
+    ];
+  }
+  function loadProjects(){
+    try{
+      var list=JSON.parse(lsGet(PROJECTS_KEY));
+      if(Array.isArray(list)) return list;
+    }catch(e){}
+    return defaultProjects();
+  }
+  function saveProjects(list){ lsSet(PROJECTS_KEY, JSON.stringify(list)); }
+  function projectStatusText(st){
+    return ({
+      draft:t.projectStatusDraft,
+      editing:t.projectStatusEditing,
+      sent:t.projectStatusSent,
+      approved:t.projectStatusApproved
+    })[st] || st || t.projectStatusDraft;
+  }
+  function fmtProjectDate(iso){
+    var d=new Date(iso||Date.now());
+    if(isNaN(d.getTime())) return iso||'';
+    try{ return d.toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{year:'numeric',month:'short',day:'numeric'}); }
+    catch(e){ return String(iso||'').slice(0,10); }
+  }
+  function fmtProjectSize(mb){
+    mb=Number(mb)||0;
+    return mb>=1024 ? (Math.round(mb/1024*10)/10)+' GB' : Math.round(mb)+' MB';
+  }
+  function createProject(){
+    var name=prompt(t.projectPrompt || 'Project name');
+    if(name==null) return;
+    name=name.trim();
+    if(!name) return;
+    var list=loadProjects();
+    var p={ id:'pr-'+Date.now(), name:name, client:name, status:'draft', files:0, selected:0, sizeMB:0, updated:new Date().toISOString().slice(0,10) };
+    list.unshift(p);
+    saveProjects(list);
+    activeProjectId=p.id;
+    view='my-files';
+    var org=NAV.find(function(c){ return c.id==='organize'; });
+    if(org) org.open=true;
+    closeDrawer();
+    render();
+  }
+
+  /* =====================================================
+     Helpers
+     ===================================================== */
+  function esc(x){ return String(x).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function fmtGB(n){ if(n===INF) return '∞'; if(n>=1024) return (n/1024)+' TB'; return (Math.round(n*100)/100)+' GB'; }
+  function fmtNum(n){ return n===INF ? '∞' : String(n); }
+  function nameFor(o){ return o[lang]||o.en; }
+  function pct(used,limit){ if(limit===INF||limit===0) return 6; return Math.max(3, Math.min(100, Math.round(used/limit*100))); }
+  function displayName(){ return (user.name && user.name.trim()) ? user.name.trim() : (user.email ? user.email.split('@')[0] : 'Guest'); }
+  function initial(){ return displayName().charAt(0).toUpperCase(); }
+  function avatarInner(){
+    if(user.avatar) return '<img class="avatar-img" src="'+esc(user.avatar)+'" alt="">';
+    return esc(initial());
+  }
+  // Big avatar in the account header. Guests can't save, so theirs is static.
+  function avatarBlock(){
+    if(isGuest) return '<div class="avatar">'+avatarInner()+'</div>';
+    return '<div class="avatar-wrap">'+
+      '<button type="button" class="avatar avatar-edit" id="avatarBtn" title="'+esc(t.photoChange)+'" aria-label="'+esc(t.photoChange)+'">'+
+        avatarInner()+
+        '<span class="avatar-ov">'+s(ICON.camera)+'</span>'+
+      '</button>'+
+      '<span class="avatar-cam">'+s(ICON.camera)+'</span>'+
+      '<input type="file" id="avatarFile" accept="image/*" hidden>'+
+      (user.avatar ? '<button type="button" class="avatar-remove" id="avatarRemove">'+esc(t.photoRemove)+'</button>' : '')+
+    '</div>';
+  }
+  // Persist the (mutated) user record back to the shared store and nudge the
+  // header (same tab) so its avatar refreshes immediately.
+  function persistUser(){
+    if(isGuest) return;
+    var users=loadUsers(), i=users.findIndex(function(x){ return x.email===user.email; });
+    if(i>-1){ users[i]=user; saveUsers(users); }
+    try{ window.dispatchEvent(new CustomEvent('kolkli:auth')); }catch(e){}
+  }
+  // Read an image file, downscale it to <=256px on a canvas (keeps localStorage
+  // small) and store the result as the avatar.
+  function readAvatarFile(file){
+    if(!file) return;
+    if(!/^image\//.test(file.type) || file.size>5*1024*1024){ alert(t.photoErr); return; }
+    var reader=new FileReader();
+    reader.onload=function(){
+      var img=new Image();
+      img.onload=function(){
+        var max=256, scale=Math.min(1, max/Math.max(img.width, img.height));
+        var cw=Math.max(1,Math.round(img.width*scale)), ch=Math.max(1,Math.round(img.height*scale));
+        var cv=document.createElement('canvas'); cv.width=cw; cv.height=ch;
+        var ctx=cv.getContext('2d');
+        ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,cw,ch);
+        ctx.drawImage(img,0,0,cw,ch);
+        var data; try{ data=cv.toDataURL('image/jpeg',0.85); }catch(e){ data=reader.result; }
+        user.avatar=data; persistUser(); render();
+      };
+      img.onerror=function(){ alert(t.photoErr); };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  function memberYear(){ var d=new Date(user.created||Date.now()); return d.getFullYear(); }
+  function currentTitle(){
+    for(var i=0;i<NAV.length;i++){ for(var j=0;j<NAV[i].items.length;j++){ if(NAV[i].items[j].id===view) return nameFor(NAV[i].items[j]); } }
+    return 'KOLKLI';
+  }
+  function nextBillDate(){
+    var d=new Date(); d.setMonth(d.getMonth()+1);
+    try{ return d.toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{year:'numeric',month:'long',day:'numeric'}); }
+    catch(e){ return d.toISOString().slice(0,10); }
+  }
+  function money(p){ return p===0 ? t.free : '$'+p.toFixed(2); }
+
+  /* =====================================================
+     Sidebar render
+     ===================================================== */
+  function renderSide(){
+    var html='';
+    if(isAdmin()){
+      html += '<a class="side-admin" href="admin.html"><span class="sa-ic">'+s(ICON.shield)+'</span><span>'+esc(t.adminPanel)+'</span></a>';
+    }
+    NAV.forEach(function(cat){
+      var isOn = cat.items.some(function(it){ return it.id===view; });
+      var open = cat.open || isOn;
+      var subs;
+      if(cat.id==='organize'){
+        var projects=loadProjects();
+        var projectRows=projects.map(function(p){
+          return '<button class="project-nav '+(activeProjectId===p.id?'active':'')+'" type="button" data-project="'+esc(p.id)+'">'+
+            '<span class="pn-dot"></span><span class="pn-name">'+esc(p.name)+'</span></button>';
+        }).join('');
+        subs = '<div class="client-subbar">'+
+          '<div class="subitem '+(view==='my-files' && !activeProjectId?'active':'')+'" data-view="my-files">'+
+            '<span class="dot"></span><span>'+esc(t.clientsTitle)+'</span></div>'+
+          '<button class="side-add-project" type="button" id="sideNewProject" title="'+esc(t.newProject)+'" aria-label="'+esc(t.newProject)+'">'+s(ICON.plus)+'</button>'+
+        '</div>'+
+        '<div class="side-projects">'+projectRows+'</div>';
+      } else if(cat.add){
+        var first=cat.items[0], rest=cat.items.slice(1);
+        var addLbl=t[cat.add.label]||'';
+        subs = '<div class="client-subbar">'+
+          '<div class="subitem '+(first.id===view?'active':'')+'" data-view="'+first.id+'">'+
+            '<span class="dot"></span><span>'+esc(nameFor(first))+'</span></div>'+
+          '<button class="side-add-project" type="button" data-add-href="'+esc(cat.add.href)+'" title="'+esc(addLbl)+'" aria-label="'+esc(addLbl)+'">'+s(ICON.plus)+'</button>'+
+        '</div>'+
+        rest.map(function(it){
+          return '<div class="subitem '+(it.id===view?'active':'')+'" data-view="'+it.id+'">'+
+            '<span class="dot"></span><span>'+esc(nameFor(it))+'</span></div>';
+        }).join('');
+      } else {
+        subs = cat.items.map(function(it){
+          return '<div class="subitem '+(it.id===view?'active':'')+'" data-view="'+it.id+'">'+
+            '<span class="dot"></span><span>'+esc(nameFor(it))+'</span></div>';
+        }).join('');
+      }
+      html += '<div class="cat '+(open?'open':'')+' '+(isOn?'on':'')+'" data-cat="'+cat.id+'">'+
+        '<button class="cat-head" type="button" data-cattoggle="'+cat.id+'">'+
+          '<span class="cat-ic">'+s(ICON[cat.icon])+'</span>'+
+          '<span class="cat-name">'+esc(nameFor(cat))+'</span>'+
+          '<span class="cat-chev">'+s(ICON.chev)+'</span>'+
+        '</button>'+
+        '<div class="subs">'+subs+'</div>'+
+      '</div>';
+    });
+
+    // plan chip + upgrade at the bottom
+    var P=PLANS[plan];
+    html += '<div class="side-plan">'+
+      '<div class="planchip">'+
+        '<span class="pc-ic">'+s(ICON[PLAN_ICON[plan]])+'</span>'+
+        '<span class="pc-tx"><span class="pc-lbl">'+esc(t.yourPlan)+'</span><span class="pc-name">'+esc(P.name)+'</span></span>'+
+      '</div>'+
+      (plan==='pro' ? '' :
+        '<button class="upg" type="button" id="sideUpg">'+s(ICON.zap)+'<span>'+esc(t.upgrade)+'</span></button>')+
+    '</div>';
+
+    el('side').innerHTML = html;
+  }
+
+  /* =====================================================
+     View builders
+     ===================================================== */
+  function metricCard(icon,label,valTxt,limitTxt,p,warn){
+    return '<div class="metric">'+
+      '<div class="metric-top"><span class="metric-ic">'+s(ICON[icon])+'</span><span class="metric-label">'+esc(label)+'</span></div>'+
+      '<div class="metric-val">'+esc(valTxt)+'<span class="metric-lim"> / '+esc(limitTxt)+'</span></div>'+
+      '<div class="bar"><span class="bar-fill '+(warn?'warn':'')+'" style="width:'+p+'%"></span></div>'+
+    '</div>';
+  }
+
+  function viewAccount(){
+    var P=PLANS[plan], L=P.limits;
+    // subscription card
+    var actions = plan==='pro'
+      ? '<div class="sc-top-plan">'+s(ICON.check)+esc(t.topPlan)+' 🎉</div>'
+      : '<a class="btn-up" href="pricing/">'+s(ICON.zap)+esc(t.upgrade)+'</a>';
+    var seg = PLAN_ORDER.map(function(k){
+      return '<button class="seg-btn '+(k===plan?'on':'')+'" type="button" data-setplan="'+k+'">'+esc(PLANS[k].name)+'</button>';
+    }).join('');
+    var sub = '<div class="card subcard">'+
+      '<div class="sc-top">'+
+        '<div class="sc-info">'+
+          '<div class="sc-kick">'+esc(t.yourPlan)+'</div>'+
+          '<div class="sc-planline"><span class="sc-planname">'+esc(P.name)+'</span>'+
+            '<span class="plan-badge '+plan+'">'+esc(P.name)+'</span></div>'+
+          '<div class="sc-price"><b>'+esc(money(P.price))+'</b>'+(P.price?(' '+esc(t.perMonth)):'')+'</div>'+
+        '</div>'+
+        '<div class="sc-actions">'+actions+'</div>'+
+      '</div>'+
+      '<div class="demoswitch"><div class="ds-lbl">'+esc(t.demoLabel)+'</div><div class="seg">'+seg+'</div></div>'+
+    '</div>';
+
+    // usage
+    var sWarn=pct(USAGE.storageGB,L.storageGB)>=80, tWarn=pct(USAGE.transfersMo,L.transfersMo)>=80,
+        fWarn=pct(USAGE.files,L.files)>=80, lWarn=pct(USAGE.links,L.links)>=80;
+    var usage = '<div class="card">'+
+      '<h2>'+esc(t.usageTitle)+'</h2><p class="csub">'+esc(t.usageSub)+'</p>'+
+      '<div class="metrics">'+
+        metricCard('drive', t.mStorage,   fmtGB(USAGE.storageGB), fmtGB(L.storageGB), pct(USAGE.storageGB,L.storageGB), sWarn)+
+        metricCard('swap',  t.mTransfers, fmtNum(USAGE.transfersMo), fmtNum(L.transfersMo), pct(USAGE.transfersMo,L.transfersMo), tWarn)+
+        metricCard('files', t.mFiles,     fmtNum(USAGE.files), fmtNum(L.files), pct(USAGE.files,L.files), fWarn)+
+        metricCard('link',  t.mLinks,     fmtNum(USAGE.links), fmtNum(L.links), pct(USAGE.links,L.links), lWarn)+
+      '</div>'+
+    '</div>';
+
+    // plan features / limits
+    var feats = P.feats[lang].map(function(f){ return '<li>'+s(ICON.check)+esc(f)+'</li>'; }).join('');
+    var limits = '<div class="card">'+
+      '<h2>'+esc(t.limitsTitle)+' — '+esc(P.name)+'</h2>'+
+      '<ul class="feats">'+feats+'</ul>'+
+      '<a class="compare" href="pricing/">'+esc(t.comparePlans)+s(ICON.arrow)+'</a>'+
+    '</div>';
+
+    // quick actions
+    var q = [
+      {ic:'music', href:'app.html',      t:t.qAudioT, d:t.qAudioD},
+      {ic:'film',  href:'video-cut.html',t:t.qVideoT, d:t.qVideoD},
+      {ic:'folder',href:'files.html',    t:t.qOrgT,   d:t.qOrgD},
+      {ic:'send',  href:'send.html',     t:t.qSendT,  d:t.qSendD}
+    ].map(function(c){
+      return '<a class="qcard" href="'+c.href+'"><span class="q-ic">'+s(ICON[c.ic])+'</span>'+
+        '<span class="q-t">'+esc(c.t)+'</span><span class="q-d">'+esc(c.d)+'</span></a>';
+    }).join('');
+    var quick = '<div class="card"><h2>'+esc(t.quickTitle)+'</h2><p class="csub"></p><div class="quick">'+q+'</div></div>';
+
+    return sub + usage + limits + quick;
+  }
+
+  function viewDetails(){
+    var P=PLANS[plan];
+    return '<div class="card">'+
+      '<h2>'+esc(t.detailsTitle)+'</h2><p class="csub">'+esc(t.detailsSub)+'</p>'+
+      '<div class="grid2">'+
+        '<div class="frow"><label for="dName">'+esc(t.fName)+'</label>'+
+          '<input id="dName" type="text" value="'+esc(user.name||'')+'" '+(isGuest?'disabled':'')+'></div>'+
+        '<div class="frow"><label for="dEmail">'+esc(t.fEmail)+'</label>'+
+          '<input id="dEmail" type="email" dir="ltr" value="'+esc(user.email||'')+'" disabled></div>'+
+        '<div class="frow"><label>'+esc(t.fMember)+'</label>'+
+          '<input type="text" value="'+esc(String(memberYear()))+'" disabled></div>'+
+        '<div class="frow"><label>'+esc(t.fPlanCur)+'</label>'+
+          '<input type="text" value="'+esc(P.name)+'" disabled></div>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:14px;margin-top:4px">'+
+        '<button class="btn primary" id="saveDetails" type="button" '+(isGuest?'disabled':'')+'>'+s(ICON.check)+esc(t.save)+'</button>'+
+        '<span class="saved-msg" id="savedMsg">'+esc(t.saved)+'</span>'+
+      '</div>'+
+    '</div>';
+  }
+
+  function viewSettings(){
+    var dark = document.documentElement.getAttribute('data-theme')==='dark';
+    var langSeg = ['he','en','ru'].map(function(l){
+      var nm={he:'עברית',en:'English',ru:'Русский'}[l];
+      return '<button class="'+(l===lang?'on':'')+'" type="button" data-setlang="'+l+'">'+nm+'</button>';
+    }).join('');
+    return '<div class="card">'+
+      '<h2>'+esc(t.settingsTitle)+'</h2><p class="csub">'+esc(t.settingsSub)+'</p>'+
+      '<div class="optrow"><div class="opt-tx"><div class="opt-t">'+esc(t.setLang)+'</div><div class="opt-d">'+esc(t.setLangD)+'</div></div>'+
+        '<div class="segsm">'+langSeg+'</div></div>'+
+      '<div class="optrow"><div class="opt-tx"><div class="opt-t">'+esc(t.setTheme)+'</div><div class="opt-d">'+esc(t.setThemeD)+'</div></div>'+
+        '<div class="segsm"><button class="'+(!dark?'on':'')+'" type="button" data-settheme="light">'+esc(t.light)+'</button>'+
+          '<button class="'+(dark?'on':'')+'" type="button" data-settheme="dark">'+esc(t.dark)+'</button></div></div>'+
+    '</div>'+
+    '<div class="card">'+
+      '<h2>'+esc(t.notifTitle)+'</h2><p class="csub"></p>'+
+      '<div class="optrow"><div class="opt-tx"><div class="opt-t">'+esc(t.notifDownloadT)+'</div><div class="opt-d">'+esc(t.notifDownloadD)+'</div></div>'+
+        '<button class="toggle '+(notif.download?'on':'')+'" type="button" data-toggle="download" aria-label="'+esc(t.notifDownloadT)+'"></button></div>'+
+      '<div class="optrow"><div class="opt-tx"><div class="opt-t">'+esc(t.notifUpdT)+'</div><div class="opt-d">'+esc(t.notifUpdD)+'</div></div>'+
+        '<button class="toggle '+(notif.updates?'on':'')+'" type="button" data-toggle="updates" aria-label="'+esc(t.notifUpdT)+'"></button></div>'+
+    '</div>'+
+    '<div class="card danger-zone">'+
+      '<h2>'+esc(t.dangerTitle)+'</h2><p class="csub">'+esc(t.dangerSub)+'</p>'+
+      '<div class="optrow"><div class="opt-tx"><div class="opt-t">'+esc(t.logout)+'</div><div class="opt-d">'+esc(t.logoutD)+'</div></div>'+
+        '<button class="btn ghost" id="doLogout" type="button">'+s(ICON.logout)+esc(t.logout)+'</button></div>'+
+      '<div class="optrow"><div class="opt-tx"><div class="opt-t">'+esc(t.del)+'</div><div class="opt-d">'+esc(t.delD)+'</div></div>'+
+        '<button class="btn danger" id="doDelete" type="button" '+(isGuest?'disabled':'')+'>'+s(ICON.trash)+esc(t.del)+'</button></div>'+
+    '</div>';
+  }
+
+  function viewPayments(){
+    var P=PLANS[plan];
+    var billLine = P.price===0
+      ? '<div class="opt-d">'+esc(t.freeNoBill)+'</div>'
+      : '<div class="opt-d">'+esc(t.nextBill)+': '+esc(nextBillDate())+'</div>';
+    var manageBtn = plan==='pro'
+      ? '<a class="btn ghost" href="pricing/">'+esc(t.manage)+'</a>'
+      : '<a class="btn primary" href="pricing/">'+s(ICON.zap)+esc(t.upgrade)+'</a>';
+
+    // demo billing history: paid rows only for paid plans
+    var hist;
+    if(P.price===0){
+      hist = '<p class="csub" style="margin:0">'+esc(t.histNone)+'</p>';
+    } else {
+      var rows='';
+      var now=new Date();
+      for(var i=0;i<3;i++){
+        var d=new Date(now.getFullYear(), now.getMonth()-i, 1);
+        var ds;
+        try{ ds=d.toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{year:'numeric',month:'short',day:'numeric'}); }
+        catch(e){ ds=d.toISOString().slice(0,10); }
+        rows += '<tr><td>'+esc(ds)+'</td><td>KOLKLI '+esc(P.name)+'</td><td>$'+P.price.toFixed(2)+'</td>'+
+          '<td><span class="inv-status">'+esc(t.invPaid)+'</span></td>'+
+          '<td><span class="inv-dl">'+esc(t.invDownload)+'</span></td></tr>';
+      }
+      hist = '<table class="inv"><thead><tr><th>'+esc(t.thDate)+'</th><th>'+esc(t.thDesc)+'</th><th>'+esc(t.thAmount)+
+        '</th><th>'+esc(t.thStatus)+'</th><th>'+esc(t.thInvoice)+'</th></tr></thead><tbody>'+rows+'</tbody></table>';
+    }
+
+    return '<div class="card">'+
+      '<h2>'+esc(t.payTitle)+'</h2><p class="csub">'+esc(t.paySub)+'</p>'+
+      '<div class="payrow" style="padding:14px 0;border-bottom:1px solid var(--line-2)">'+
+        '<div class="opt-tx"><div class="opt-t">'+esc(t.curPlanTitle)+': '+esc(P.name)+' · '+esc(money(P.price))+(P.price?(' '+esc(t.perMonth)):'')+'</div>'+billLine+'</div>'+
+        manageBtn+
+      '</div>'+
+      '<div style="padding-top:16px">'+
+        '<div class="opt-t" style="margin-bottom:10px">'+esc(t.pmTitle)+'</div>'+
+        '<div class="pm-empty"><span class="pm-ic">'+s(ICON.card)+'</span>'+
+          '<span class="pm-tx"><span class="pm-t">'+esc(t.pmNoneT)+'</span><br><span class="pm-d">'+esc(t.pmNoneD)+'</span></span>'+
+          '<button class="btn ghost" id="addCard" type="button">'+s(ICON.plus)+esc(t.addCard)+'</button></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card"><h2>'+esc(t.histTitle)+'</h2><p class="csub"></p>'+hist+'</div>';
+  }
+
+  function emptyPanel(cfg){
+    var tools = (cfg.tools||[]).map(function(x){
+      return '<a href="'+x.href+'">'+s(ICON[x.ic])+esc(x.label)+'</a>';
+    }).join('');
+    return '<div class="card">'+
+      '<h2>'+esc(cfg.title)+'</h2><p class="csub">'+esc(cfg.sub)+'</p>'+
+      '<div class="empty">'+
+        '<div class="ei">'+s(ICON[cfg.icon])+'</div>'+
+        '<h3>'+esc(cfg.emptyT)+'</h3><p>'+esc(cfg.emptyP)+'</p>'+
+        '<a class="btn primary" href="'+cfg.cta.href+'" style="text-decoration:none">'+s(ICON.arrow)+esc(cfg.cta.label)+'</a>'+
+      '</div>'+
+      (tools?('<div class="toolrow">'+tools+'</div>'):'')+
+    '</div>';
+  }
+
+  function viewProjects(){
+    var projects=loadProjects();
+    if(activeProjectId && !projects.some(function(p){ return p.id===activeProjectId; })) activeProjectId=null;
+    var rows=projects.map(function(p){
+      var st=p.status||'draft';
+      var stClass=(st==='sent'||st==='approved') ? ' '+st : '';
+      return '<article class="project-row '+(activeProjectId===p.id?'on':'')+'">'+
+        '<div class="project-main">'+
+          '<span class="project-mark">'+s(ICON.folder)+'</span>'+
+          '<span style="min-width:0"><span class="project-title">'+esc(p.name)+'</span>'+
+            '<span class="project-client">'+esc(t.projectClient)+': '+esc(p.client||p.name)+'</span></span>'+
+        '</div>'+
+        '<div class="project-stat"><div class="ps-l">'+esc(t.projectFiles)+'</div><div class="ps-v"><span dir="ltr">'+esc(p.files||0)+' · '+esc(fmtProjectSize(p.sizeMB))+'</span></div></div>'+
+        '<div class="project-stat"><div class="ps-l">'+esc(t.projectSelected)+'</div><div class="ps-v">'+esc(p.selected||0)+'</div></div>'+
+        '<div class="project-stat"><div class="ps-l">'+esc(t.projectUpdated)+'</div><div class="ps-v">'+esc(fmtProjectDate(p.updated))+'</div></div>'+
+        '<div class="project-actions">'+
+          '<span class="project-status'+stClass+'">'+esc(projectStatusText(st))+'</span>'+
+          '<a class="btn ghost" href="files.html">'+s(ICON.folder)+esc(t.projectOpen)+'</a>'+
+          '<a class="btn primary" href="send.html">'+s(ICON.send)+esc(t.projectShare)+'</a>'+
+        '</div>'+
+      '</article>';
+    }).join('');
+    if(!rows){
+      rows = '<div class="project-empty empty"><div class="ei">'+s(ICON.folder)+'</div>'+
+        '<h3>'+esc(t.orgEmptyT)+'</h3><p>'+esc(t.orgEmptyP)+'</p>'+
+        '<button class="btn primary" type="button" data-new-project>'+s(ICON.plus)+esc(t.newProject)+'</button></div>';
+    }
+    return '<div class="card projects-card">'+
+      '<div class="project-head">'+
+        '<div><h2>'+esc(t.clientsTitle)+'</h2><p class="csub">'+esc(t.clientsSub)+'</p></div>'+
+        '<button class="btn primary" type="button" data-new-project>'+s(ICON.plus)+esc(t.newProject)+'</button>'+
+      '</div>'+
+      '<div class="project-list">'+rows+'</div>'+
+    '</div>';
+  }
+
+  var VIEWS = {
+    account: viewAccount,
+    details: viewDetails,
+    settings: viewSettings,
+    payments: viewPayments,
+    'my-audio': function(){ return emptyPanel({ icon:'music', title:t.audioTitle, sub:t.audioSub,
+      emptyT:t.audioEmptyT, emptyP:t.audioEmptyP, cta:{href:'app.html',label:t.openAudio},
+      tools:[{ic:'scissors',href:'app.html',label:t.qAudioT},{ic:'merge',href:'merge-audio.html',label:({he:'מיזוג אודיו',en:'Merge Audio',ru:'Объединение'})[lang]},{ic:'refresh',href:'convert.html',label:({he:'המרת אודיו',en:'Convert Audio',ru:'Конвертация'})[lang]}] }); },
+    'my-video': function(){ return emptyPanel({ icon:'film', title:t.videoTitle, sub:t.videoSub,
+      emptyT:t.videoEmptyT, emptyP:t.videoEmptyP, cta:{href:'video-cut.html',label:t.openVideo},
+      tools:[{ic:'scissors',href:'video-cut.html',label:({he:'חותך וידאו',en:'Video Cutter',ru:'Обрезка видео'})[lang]},{ic:'refresh',href:'video-convert.html',label:({he:'המרת וידאו',en:'Convert Video',ru:'Конвертация'})[lang]},{ic:'minimize',href:'compress-video.html',label:({he:'דחיסת וידאו',en:'Compress',ru:'Сжатие'})[lang]}] }); },
+    'my-files': viewProjects,
+    'my-transfers': function(){ return emptyPanel({ icon:'send', title:t.sendTitle, sub:t.sendSub,
+      emptyT:t.sendEmptyT, emptyP:t.sendEmptyP, cta:{href:'send.html',label:t.openSend} }); },
+    'my-requests': function(){ return emptyPanel({ icon:'inbox', title:t.reqTitle, sub:t.reqSub,
+      emptyT:t.reqEmptyT, emptyP:t.reqEmptyP, cta:{href:'request.html',label:t.openReq},
+      tools:[{ic:'link',href:'request.html',label:t.reqNew},{ic:'drive',href:'request.html?tab=manage',label:t.reqManage}] }); }
+  };
+
+  /* =====================================================
+     Render + wiring
+     ===================================================== */
+  function guestBanner(){
+    if(!isGuest) return '';
+    return '<div class="guestnote">'+s(ICON.info)+'<span>'+esc(t.guestNote)+
+      '<a data-auth-open="login">'+esc(t.guestSignin)+'</a></span></div>';
+  }
+
+  function renderMain(){
+    var fn=VIEWS[view]||VIEWS.account;
+    var head='';
+    if(view==='account'){
+      head = '<div class="phead">'+avatarBlock()+
+        '<div><h1>'+esc(t.hi(displayName()))+'</h1><p>'+esc(t.welcomeSub)+'</p></div></div>';
+    }
+    el('main').innerHTML = guestBanner() + head + fn();
+    el('mBarTitle').textContent = currentTitle();
+    document.title = 'KOLKLI — '+currentTitle();
+    wireMain();
+  }
+
+  function render(){ renderSide(); renderMain(); }
+
+  function selectView(id){
+    view=id;
+    if(id!=='my-files') activeProjectId=null;
+    // keep the owning category open
+    NAV.forEach(function(c){ if(c.items.some(function(it){return it.id===id;})) c.open=true; });
+    closeDrawer();
+    render();
+    try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+  }
+
+  function openDrawer(){ el('side').classList.add('open'); el('sideScrim').classList.add('open'); }
+  function closeDrawer(){ el('side').classList.remove('open'); el('sideScrim').classList.remove('open'); }
+
+  function wireSide(){
+    el('side').addEventListener('click', function(e){
+      var tog=e.target.closest('[data-cattoggle]');
+      if(tog){
+        var id=tog.getAttribute('data-cattoggle');
+        var cat=NAV.find(function(c){ return c.id===id; });
+        cat.open=!cat.open;
+        renderSide();
+        return;
+      }
+      var addProject=e.target.closest('#sideNewProject');
+      if(addProject){ createProject(); return; }
+      var addNav=e.target.closest('[data-add-href]');
+      if(addNav){ location.href=addNav.getAttribute('data-add-href'); return; }
+      var project=e.target.closest('[data-project]');
+      if(project){ activeProjectId=project.getAttribute('data-project'); selectView('my-files'); return; }
+      var item=e.target.closest('[data-view]');
+      if(item){
+        if(item.getAttribute('data-view')==='my-files') activeProjectId=null;
+        selectView(item.getAttribute('data-view'));
+        return;
+      }
+      var upg=e.target.closest('#sideUpg');
+      if(upg){ location.href='pricing/'; }
+    });
+  }
+
+  function wireMain(){
+    var host=el('main');
+    host.querySelectorAll('[data-new-project]').forEach(function(b){
+      b.addEventListener('click', createProject);
+    });
+    // account header: change / remove profile picture
+    var avBtn=el('avatarBtn'), avFile=el('avatarFile'), avRem=el('avatarRemove');
+    if(avBtn && avFile){
+      avBtn.addEventListener('click', function(){ avFile.click(); });
+      avFile.addEventListener('change', function(){ readAvatarFile(avFile.files && avFile.files[0]); });
+    }
+    if(avRem) avRem.addEventListener('click', function(){
+      delete user.avatar; persistUser(); render();
+    });
+    // plan demo switch
+    host.querySelectorAll('[data-setplan]').forEach(function(b){
+      b.addEventListener('click', function(){ setPlan(b.getAttribute('data-setplan')); });
+    });
+    // settings: language
+    host.querySelectorAll('[data-setlang]').forEach(function(b){
+      b.addEventListener('click', function(){ applyLang(b.getAttribute('data-setlang')); lsSet('ac_lang', b.getAttribute('data-setlang')); });
+    });
+    // settings: theme
+    host.querySelectorAll('[data-settheme]').forEach(function(b){
+      b.addEventListener('click', function(){ applyTheme(b.getAttribute('data-settheme')); render(); });
+    });
+    // settings: toggles
+    host.querySelectorAll('[data-toggle]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var k=b.getAttribute('data-toggle'); notif[k]=!notif[k]; lsSet(NOTIF_KEY, JSON.stringify(notif));
+        b.classList.toggle('on', notif[k]);
+      });
+    });
+    // details: save
+    var save=el('saveDetails');
+    if(save) save.addEventListener('click', function(){
+      var nm=el('dName').value.trim();
+      if(!isGuest){
+        var users=loadUsers(), i=users.findIndex(function(x){ return x.email===user.email; });
+        if(i>-1){ users[i].name=nm; saveUsers(users); user=users[i]; }
+      }
+      var m=el('savedMsg'); if(m){ m.classList.add('show'); setTimeout(function(){ m.classList.remove('show'); }, 1800); }
+      renderSide();
+    });
+    // settings: logout / delete
+    var lo=el('doLogout');
+    if(lo) lo.addEventListener('click', function(){
+      if(confirm(t.logoutConfirm)){ lsDel(SESSION_KEY); location.href='index.html'; }
+    });
+    var del=el('doDelete');
+    if(del) del.addEventListener('click', function(){
+      if(confirm(t.delConfirm)){
+        var users=loadUsers().filter(function(x){ return x.email!==user.email; });
+        saveUsers(users); lsDel(SESSION_KEY); location.href='index.html';
+      }
+    });
+    var addc=el('addCard');
+    if(addc) addc.addEventListener('click', function(){ location.href='pricing/'; });
+  }
+
+  /* =====================================================
+     Language + theme (header owns the picker → __setLang)
+     ===================================================== */
+  function applyLang(l){
+    if(!I18N[l]) l='he';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l;
+    document.documentElement.dir=(l==='he')?'rtl':'ltr';
+    try{ localStorage.setItem('ac_lang', l); }catch(e){}
+    el('mMenuTx').textContent=t.menu;
+    el('dfoot').textContent=t.footer;
+    render();
+  }
+  window.__setLang=applyLang;
+
+  function detectLang(){
+    var c=lsGet('ac_lang'); if(c) return c;
+    var cc=lsGet('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    var tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(e){}
+    var navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    var dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    var ti=el('themeIco'); if(ti) ti.textContent=dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(e){}
+  }
+
+  /* =====================================================
+     Init
+     ===================================================== */
+  // Deep-link: dashboard.html#settings (etc.) opens that view directly — used by
+  // the header account menu. Only accepts ids that exist in NAV.
+  function viewFromHash(){
+    var h=(location.hash||'').replace(/^#/,'');
+    if(!h) return null;
+    return NAV.some(function(c){ return c.items.some(function(it){ return it.id===h; }); }) ? h : null;
+  }
+
+  applyTheme(lsGet('theme')||'light');
+  loadUser();
+  var hv=viewFromHash(); if(hv) view=hv;
+  window.addEventListener('hashchange', function(){ var v=viewFromHash(); if(v) selectView(v); });
+  wireSide();
+  el('mMenuBtn').addEventListener('click', openDrawer);
+  el('sideScrim').addEventListener('click', closeDrawer);
+  var tb=el('themeToggle'); if(tb) tb.addEventListener('click', function(){
+    applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'); render();
+  });
+  applyLang(detectLang());
+})();
+</script>
+</body>
+</html>

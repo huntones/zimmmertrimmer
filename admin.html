@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>KOLKLI — Admin</title>
+<meta name="description" content="KOLKLI admin panel — manage users, plans and permissions.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(56% 38% at 12% 2%,rgba(124,58,237,0.09),transparent 60%),
+      radial-gradient(52% 40% at 90% 0%,rgba(59,111,246,0.08),transparent 60%);}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+
+  .admin-wrap{max-width:1100px;margin:0 auto;padding:22px 22px 60px;}
+
+  /* ---------- header row ---------- */
+  .ahead{display:flex;align-items:center;gap:16px;margin:2px 0 22px;flex-wrap:wrap;}
+  .ahead .avatar{width:56px;height:56px;flex-shrink:0;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);color:#fff;font-size:24px;font-weight:800;box-shadow:0 6px 18px var(--grad-shadow);}
+  .ahead .ah-tx{min-width:0;flex:1;}
+  .ahead h1{font-size:clamp(22px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin:0 0 3px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .ahead h1 .adm-tag{font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    color:#fff;background:var(--grad);padding:4px 10px;border-radius:999px;box-shadow:0 4px 12px var(--grad-shadow);}
+  .ahead p{font-size:14px;color:var(--muted);margin:0;}
+  .ah-back{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--ink-2);
+    background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:10px 16px;box-shadow:var(--shadow-sm);
+    transition:border-color .12s;white-space:nowrap;}
+  .ah-back:hover{border-color:var(--accent);}
+  .ah-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow);margin-bottom:18px;}
+  .card > h2{font-size:17px;font-weight:700;margin:0 0 4px;letter-spacing:-0.01em;}
+  .card > .csub{font-size:13px;color:var(--muted);margin:0 0 16px;}
+
+  /* ---------- stats ---------- */
+  .astats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px;}
+  .astat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow-sm);}
+  .astat-top{display:flex;align-items:center;gap:9px;margin-bottom:12px;}
+  .astat-ic{width:34px;height:34px;flex-shrink:0;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .astat-ic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .astat.hl .astat-ic{background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);}
+  .astat-label{font-size:12.5px;font-weight:600;color:var(--muted);line-height:1.2;}
+  .astat-val{font-size:28px;font-weight:800;letter-spacing:-0.02em;}
+
+  /* ---------- users card head ---------- */
+  .uhead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
+  .uhead h2{margin:0 0 4px;}
+  .uhead .csub{margin:0;}
+  .search{position:relative;display:flex;align-items:center;min-width:230px;}
+  .search svg{position:absolute;inset-inline-start:12px;width:16px;height:16px;color:var(--faint);
+    stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;}
+  .search input{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:11px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 14px 10px 38px;transition:border-color .12s,box-shadow .12s;}
+  html[dir="rtl"] .search input{padding:10px 38px 10px 14px;}
+  .search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+
+  /* ---------- users table ---------- */
+  .utable-wrap{overflow-x:auto;margin:0 -4px;}
+  table.utable{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px;}
+  table.utable th{text-align:start;font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--faint);font-weight:600;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  table.utable td{padding:14px 12px;border-bottom:1px solid var(--line-2);color:var(--ink-2);vertical-align:middle;}
+  table.utable tr:last-child td{border-bottom:none;}
+  .u-cell{display:flex;align-items:center;gap:11px;min-width:0;}
+  .u-av{width:38px;height:38px;flex-shrink:0;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad-soft);color:var(--accent-dim);font-size:16px;font-weight:800;}
+  .u-meta{min-width:0;}
+  .u-name{font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+  .u-email{font-family:var(--mono);font-size:11.5px;color:var(--muted);direction:ltr;text-align:start;
+    overflow:hidden;text-overflow:ellipsis;max-width:230px;white-space:nowrap;}
+  .youtag{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--info-dim);background:var(--info-soft);border:1px solid var(--info);border-radius:5px;padding:1px 6px;}
+
+  /* small segmented plan control */
+  .segsm{display:inline-flex;gap:3px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:3px;}
+  .segsm button{border:none;background:none;color:var(--muted);cursor:pointer;font-family:var(--sans);font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:8px;transition:color .12s,background .12s,box-shadow .12s;}
+  .segsm button.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+
+  /* role cell */
+  .rolecell{display:inline-flex;align-items:center;gap:9px;}
+  .toggle{position:relative;width:44px;height:25px;flex-shrink:0;border-radius:999px;background:var(--line);border:none;cursor:pointer;transition:background .16s;}
+  .toggle::after{content:'';position:absolute;top:3px;inset-inline-start:3px;width:19px;height:19px;border-radius:50%;background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .16s;}
+  .toggle.on{background:var(--accent);}
+  html[dir="ltr"] .toggle.on::after{transform:translateX(19px);}
+  html[dir="rtl"] .toggle.on::after{transform:translateX(-19px);}
+  .role-tx{font-size:13px;font-weight:600;color:var(--ink-2);}
+  .rbadge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;font-weight:800;
+    letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--grad);padding:5px 11px;border-radius:999px;
+    box-shadow:0 4px 12px var(--grad-shadow);}
+  .rbadge svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;font-family:var(--sans);
+    font-weight:700;font-size:13px;padding:9px 14px;border-radius:10px;transition:filter .14s,transform .08s,border-color .12s,background .12s;}
+  .btn:active{transform:translateY(1px);}
+  .btn.danger{background:var(--panel);border:1px solid var(--danger);color:var(--danger);}
+  .btn.danger:hover{background:var(--danger-soft);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* empty + deny states */
+  .empty{text-align:center;padding:44px 20px;}
+  .empty .ei{width:66px;height:66px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad-soft);color:var(--accent);}
+  .empty .ei svg{width:32px;height:32px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .empty h3{margin:0 0 6px;font-size:17px;}
+  .empty p{margin:0 auto;font-size:13.5px;color:var(--muted);max-width:44ch;}
+
+  .deny{max-width:520px;margin:60px auto;text-align:center;}
+  .deny .di{width:78px;height:78px;margin:0 auto 20px;border-radius:22px;display:flex;align-items:center;justify-content:center;
+    background:var(--danger-soft);color:var(--danger);}
+  .deny .di svg{width:38px;height:38px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .deny h2{margin:0 0 8px;font-size:22px;font-weight:800;}
+  .deny p{margin:0 auto 24px;font-size:14px;color:var(--muted);max-width:40ch;}
+  .deny .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .btn.primary{color:#fff;border:none;text-shadow:0 1px 2px rgba(0,0,0,.18);padding:11px 20px;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);}
+  .btn.primary:hover{filter:brightness(1.05);}
+  .btn.ghost{background:var(--panel);border:1px solid var(--line);color:var(--ink-2);box-shadow:var(--shadow-sm);padding:11px 20px;}
+  .btn.ghost:hover{border-color:var(--accent);}
+
+  footer.afoot{text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);margin-top:30px;}
+
+  @media (max-width:900px){ .astats{grid-template-columns:repeat(3,1fr);} }
+  @media (max-width:560px){ .astats{grid-template-columns:repeat(2,1fr);} .search{width:100%;} }
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+
+<div class="admin-wrap" id="adminWrap"></div>
+<footer class="afoot" id="afoot"></footer>
+
+<script>
+(function(){
+  var el = function(id){ return document.getElementById(id); };
+
+  /* =====================================================
+     Who is an admin?
+     - Bootstrap owners (below) are ALWAYS admin — this is how
+       "make me admin" persists in a demo with no server: even
+       after clearing localStorage or re-registering, this email
+       is recognised as admin the moment it signs in.
+     - Any other user can be granted admin here (role:'admin'),
+       stored on their record in ac_users.
+     ===================================================== */
+  var ADMIN_EMAILS = ['digitalzimmer@gmail.com'];
+
+  /* =====================================================
+     i18n (he / en / ru)
+     ===================================================== */
+  var I18N = {
+    he:{ dir:'rtl',
+      title:'ניהול מערכת', tag:'אדמין',
+      sub:'ניהול משתמשים, חבילות והרשאות — פאנל האדמין של KOLKLI.',
+      back:'חזרה לדשבורד',
+      statTotal:'סה״כ משתמשים', statFree:'חינם (Free)', statLite:'Lite', statPro:'Pro', statAdmins:'אדמינים',
+      usersTitle:'משתמשים', usersSub:'כל המשתמשים הרשומים. אפשר לשנות חבילה, להעניק/לשלול הרשאת אדמין או למחוק.',
+      searchPh:'חיפוש לפי שם או אימייל…',
+      thUser:'משתמש', thJoined:'הצטרפ/ה', thPlan:'חבילה', thRole:'הרשאה', thActions:'פעולות',
+      you:'זה אתם', owner:'בעלים', roleAdmin:'אדמין', roleUser:'משתמש',
+      del:'מחיקה',
+      delConfirm:function(n){ return 'למחוק את המשתמש '+n+'? לא ניתן לבטל את הפעולה.'; },
+      selfDelConfirm:'זה החשבון שאיתו אתם מחוברים כרגע. מחיקה תנתק אתכם. להמשיך?',
+      emptyT:'אין עדיין משתמשים', emptyP:'משתמשים שנרשמים לאתר יופיעו כאן אוטומטית.',
+      noMatchT:'אין תוצאות', noMatchP:'לא נמצאו משתמשים שתואמים לחיפוש.',
+      denyTitle:'אין לך הרשאת גישה', denyMsg:'האזור הזה מיועד למנהלי המערכת בלבד. התחברו עם חשבון אדמין כדי להיכנס.',
+      denyDash:'חזרה לדשבורד', denyLogin:'התחברות',
+      footer:'KOLKLI · פאנל ניהול · גישה למנהלים בלבד' },
+    en:{ dir:'ltr',
+      title:'Admin panel', tag:'Admin',
+      sub:'Manage users, plans and permissions — the KOLKLI admin panel.',
+      back:'Back to dashboard',
+      statTotal:'Total users', statFree:'Free', statLite:'Lite', statPro:'Pro', statAdmins:'Admins',
+      usersTitle:'Users', usersSub:'Everyone registered. Change a plan, grant or revoke admin, or remove a user.',
+      searchPh:'Search by name or email…',
+      thUser:'User', thJoined:'Joined', thPlan:'Plan', thRole:'Role', thActions:'Actions',
+      you:'You', owner:'Owner', roleAdmin:'Admin', roleUser:'User',
+      del:'Delete',
+      delConfirm:function(n){ return 'Delete user '+n+'? This cannot be undone.'; },
+      selfDelConfirm:'This is the account you are signed in with. Deleting it will log you out. Continue?',
+      emptyT:'No users yet', emptyP:'People who register on the site will show up here automatically.',
+      noMatchT:'No matches', noMatchP:'No users matched your search.',
+      denyTitle:'Access denied', denyMsg:'This area is for administrators only. Sign in with an admin account to continue.',
+      denyDash:'Back to dashboard', denyLogin:'Sign in',
+      footer:'KOLKLI · Admin panel · Administrators only' },
+    ru:{ dir:'ltr',
+      title:'Админ-панель', tag:'Админ',
+      sub:'Управление пользователями, планами и правами — админ-панель KOLKLI.',
+      back:'Назад в кабинет',
+      statTotal:'Всего пользователей', statFree:'Free', statLite:'Lite', statPro:'Pro', statAdmins:'Админы',
+      usersTitle:'Пользователи', usersSub:'Все зарегистрированные. Меняйте план, выдавайте или отзывайте админ-права, удаляйте.',
+      searchPh:'Поиск по имени или почте…',
+      thUser:'Пользователь', thJoined:'Регистрация', thPlan:'План', thRole:'Роль', thActions:'Действия',
+      you:'Вы', owner:'Владелец', roleAdmin:'Админ', roleUser:'Пользователь',
+      del:'Удалить',
+      delConfirm:function(n){ return 'Удалить пользователя '+n+'? Это нельзя отменить.'; },
+      selfDelConfirm:'Это аккаунт, под которым вы вошли. Удаление приведёт к выходу. Продолжить?',
+      emptyT:'Пока нет пользователей', emptyP:'Зарегистрированные пользователи появятся здесь автоматически.',
+      noMatchT:'Ничего не найдено', noMatchP:'Пользователи по запросу не найдены.',
+      denyTitle:'Доступ запрещён', denyMsg:'Этот раздел только для администраторов. Войдите под учётной записью администратора.',
+      denyDash:'Назад в кабинет', denyLogin:'Войти',
+      footer:'KOLKLI · Админ-панель · Только для администраторов' }
+  };
+
+  /* =====================================================
+     Icons
+     ===================================================== */
+  function s(inner){ return '<svg viewBox="0 0 24 24">'+inner+'</svg>'; }
+  var ICON = {
+    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
+    users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/>',
+    zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    crown:'<path d="M2 7l4.5 4L12 4l5.5 7L22 7l-2 12H4L2 7z"/>',
+    star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    check:'<polyline points="20 6 9 17 4 12"/>',
+    trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+    arrow:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+    arrowBack:'<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>',
+    search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+    lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
+  };
+
+  /* =====================================================
+     Store (shared with the demo auth in auth-modal.js / dashboard)
+     ===================================================== */
+  var USERS_KEY='ac_users', SESSION_KEY='ac_session', PLAN_KEY='ac_plan';
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+  function loadUsers(){ try{ return JSON.parse(lsGet(USERS_KEY))||[]; }catch(e){ return []; } }
+  function saveUsers(u){ lsSet(USERS_KEY, JSON.stringify(u)); }
+
+  var PLAN_ORDER=['free','lite','pro'];
+  var PLAN_NAME={ free:'Free', lite:'Lite', pro:'Pro' };
+
+  function sessionEmail(){ return (lsGet(SESSION_KEY)||'').toLowerCase(); }
+  function isBootstrap(email){ return ADMIN_EMAILS.indexOf((email||'').toLowerCase())>-1; }
+  function isAdminUser(u){ return !!u && (isBootstrap(u.email) || u.role==='admin'); }
+  function userPlan(u){ var p=u&&u.plan; return (p==='lite'||p==='pro')?p:'free'; }
+  function currentIsAdmin(){
+    var e=sessionEmail();
+    if(!e) return false;
+    if(isBootstrap(e)) return true;
+    var u=loadUsers().find(function(x){ return (x.email||'').toLowerCase()===e; });
+    return !!(u && u.role==='admin');
+  }
+
+  /* =====================================================
+     Helpers
+     ===================================================== */
+  var lang='he', t=I18N.he, searchTerm='';
+  function esc(x){ return String(x).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function displayName(u){ return (u.name && u.name.trim()) ? u.name.trim() : (u.email ? u.email.split('@')[0] : '?'); }
+  function initial(u){ return displayName(u).charAt(0).toUpperCase(); }
+  function fmtDate(ts){
+    var d=new Date(ts||Date.now());
+    try{ return d.toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{year:'numeric',month:'short',day:'numeric'}); }
+    catch(e){ return d.toISOString().slice(0,10); }
+  }
+
+  /* =====================================================
+     Access-denied view
+     ===================================================== */
+  function renderDeny(){
+    el('adminWrap').innerHTML =
+      '<div class="deny">'+
+        '<div class="di">'+s(ICON.lock)+'</div>'+
+        '<h2>'+esc(t.denyTitle)+'</h2>'+
+        '<p>'+esc(t.denyMsg)+'</p>'+
+        '<div class="row">'+
+          '<a class="btn primary" href="./dashboard.html">'+esc(t.denyDash)+'</a>'+
+          '<a class="btn ghost" href="./auth.html">'+esc(t.denyLogin)+'</a>'+
+        '</div>'+
+      '</div>';
+  }
+
+  /* =====================================================
+     Admin view
+     ===================================================== */
+  function renderAll(){
+    if(!currentIsAdmin()){ renderDeny(); return; }
+    var me=loadUsers().find(function(x){ return (x.email||'').toLowerCase()===sessionEmail(); })
+         || { name:sessionEmail().split('@')[0], email:sessionEmail() };
+
+    el('adminWrap').innerHTML =
+      '<div class="ahead">'+
+        '<div class="avatar">'+esc(initial(me))+'</div>'+
+        '<div class="ah-tx">'+
+          '<h1>'+esc(t.title)+'<span class="adm-tag">'+esc(t.tag)+'</span></h1>'+
+          '<p>'+esc(t.sub)+'</p>'+
+        '</div>'+
+        '<a class="ah-back" href="./dashboard.html">'+s(t.dir==='rtl'?ICON.arrow:ICON.arrowBack)+esc(t.back)+'</a>'+
+      '</div>'+
+      '<div class="astats" id="astats"></div>'+
+      '<div class="card">'+
+        '<div class="uhead">'+
+          '<div><h2>'+esc(t.usersTitle)+'</h2><p class="csub">'+esc(t.usersSub)+'</p></div>'+
+          '<label class="search">'+s(ICON.search)+
+            '<input id="userSearch" type="text" placeholder="'+esc(t.searchPh)+'" value="'+esc(searchTerm)+'" autocomplete="off">'+
+          '</label>'+
+        '</div>'+
+        '<div id="usersBody"></div>'+
+      '</div>';
+
+    renderStats();
+    renderUsers();
+    wire();
+  }
+
+  function statCard(icon,label,val,hl){
+    return '<div class="astat'+(hl?' hl':'')+'">'+
+      '<div class="astat-top"><span class="astat-ic">'+s(ICON[icon])+'</span><span class="astat-label">'+esc(label)+'</span></div>'+
+      '<div class="astat-val">'+esc(String(val))+'</div>'+
+    '</div>';
+  }
+  function renderStats(){
+    var users=loadUsers();
+    var c={ free:0, lite:0, pro:0, admins:0 };
+    users.forEach(function(u){ c[userPlan(u)]++; if(isAdminUser(u)) c.admins++; });
+    el('astats').innerHTML =
+      statCard('users', t.statTotal, users.length, true)+
+      statCard('zap',   t.statFree,  c.free)+
+      statCard('star',  t.statLite,  c.lite)+
+      statCard('crown', t.statPro,   c.pro)+
+      statCard('shield',t.statAdmins,c.admins);
+  }
+
+  function renderUsers(){
+    var users=loadUsers();
+    var term=searchTerm.trim().toLowerCase();
+    var list = term ? users.filter(function(u){
+      return (displayName(u).toLowerCase().indexOf(term)>-1) || ((u.email||'').toLowerCase().indexOf(term)>-1);
+    }) : users;
+
+    if(!users.length){
+      el('usersBody').innerHTML = '<div class="empty"><div class="ei">'+s(ICON.users)+'</div>'+
+        '<h3>'+esc(t.emptyT)+'</h3><p>'+esc(t.emptyP)+'</p></div>';
+      return;
+    }
+    if(!list.length){
+      el('usersBody').innerHTML = '<div class="empty"><div class="ei">'+s(ICON.search)+'</div>'+
+        '<h3>'+esc(t.noMatchT)+'</h3><p>'+esc(t.noMatchP)+'</p></div>';
+      return;
+    }
+
+    var me=sessionEmail();
+    var rows = list.map(function(u){
+      var email=(u.email||''), enc=encodeURIComponent(email), boot=isBootstrap(email), plan=userPlan(u);
+      var isMe = email.toLowerCase()===me;
+
+      var planSeg = '<div class="segsm">'+PLAN_ORDER.map(function(k){
+        return '<button type="button" class="'+(k===plan?'on':'')+'" data-act="plan" data-plan="'+k+'" data-email="'+enc+'">'+esc(PLAN_NAME[k])+'</button>';
+      }).join('')+'</div>';
+
+      var roleCell = boot
+        ? '<span class="rbadge">'+s(ICON.crown)+esc(t.roleAdmin+' · '+t.owner)+'</span>'
+        : '<span class="rolecell">'+
+            '<button type="button" class="toggle '+(u.role==='admin'?'on':'')+'" data-act="role" data-email="'+enc+'" aria-label="'+esc(t.roleAdmin)+'"></button>'+
+            '<span class="role-tx">'+esc(u.role==='admin'?t.roleAdmin:t.roleUser)+'</span>'+
+          '</span>';
+
+      var delBtn = boot
+        ? '<button class="btn danger" type="button" disabled>'+s(ICON.trash)+esc(t.del)+'</button>'
+        : '<button class="btn danger" type="button" data-act="del" data-email="'+enc+'">'+s(ICON.trash)+esc(t.del)+'</button>';
+
+      return '<tr>'+
+        '<td><div class="u-cell"><span class="u-av">'+esc(initial(u))+'</span>'+
+          '<span class="u-meta"><span class="u-name">'+esc(displayName(u))+
+            (isMe?'<span class="youtag">'+esc(t.you)+'</span>':'')+'</span>'+
+            '<span class="u-email">'+esc(email)+'</span></span></div></td>'+
+        '<td>'+esc(fmtDate(u.created))+'</td>'+
+        '<td>'+planSeg+'</td>'+
+        '<td>'+roleCell+'</td>'+
+        '<td>'+delBtn+'</td>'+
+      '</tr>';
+    }).join('');
+
+    el('usersBody').innerHTML =
+      '<div class="utable-wrap"><table class="utable"><thead><tr>'+
+        '<th>'+esc(t.thUser)+'</th><th>'+esc(t.thJoined)+'</th><th>'+esc(t.thPlan)+'</th>'+
+        '<th>'+esc(t.thRole)+'</th><th>'+esc(t.thActions)+'</th>'+
+      '</tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }
+
+  /* =====================================================
+     Actions
+     ===================================================== */
+  function withUser(email, fn){
+    var users=loadUsers(), i=users.findIndex(function(x){ return (x.email||'')===email; });
+    if(i<0) return;
+    fn(users, i);
+    saveUsers(users);
+  }
+  function setPlan(email, plan){
+    withUser(email, function(users,i){ users[i].plan=plan; });
+    // keep the active-plan mirror in sync if the admin edited their own plan
+    if(email.toLowerCase()===sessionEmail()) lsSet(PLAN_KEY, plan);
+    renderStats(); renderUsers();
+  }
+  function toggleRole(email){
+    withUser(email, function(users,i){
+      if(users[i].role==='admin') delete users[i].role; else users[i].role='admin';
+    });
+    renderStats(); renderUsers();
+  }
+  function delUser(email){
+    var u=loadUsers().find(function(x){ return (x.email||'')===email; });
+    var nm=u?displayName(u):email;
+    if(!confirm(t.delConfirm(nm))) return;
+    var isMe = email.toLowerCase()===sessionEmail();
+    if(isMe && !confirm(t.selfDelConfirm)) return;
+    saveUsers(loadUsers().filter(function(x){ return (x.email||'')!==email; }));
+    if(isMe){ lsDel(SESSION_KEY); location.href='./index.html'; return; }
+    renderStats(); renderUsers();
+  }
+
+  function wire(){
+    var srch=el('userSearch');
+    if(srch) srch.addEventListener('input', function(){ searchTerm=srch.value; renderUsers(); });
+
+    var body=el('usersBody');
+    if(body) body.addEventListener('click', function(e){
+      var b=e.target.closest('[data-act]'); if(!b) return;
+      var email=decodeURIComponent(b.getAttribute('data-email')||'');
+      var act=b.getAttribute('data-act');
+      if(act==='plan') setPlan(email, b.getAttribute('data-plan'));
+      else if(act==='role') toggleRole(email);
+      else if(act==='del') delUser(email);
+    });
+  }
+
+  /* =====================================================
+     Language + theme (header owns the pickers)
+     ===================================================== */
+  function applyLang(l){
+    if(!I18N[l]) l='he';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l;
+    document.documentElement.dir=t.dir;
+    try{ localStorage.setItem('ac_lang', l); }catch(e){}
+    el('afoot').textContent=t.footer;
+    document.title='KOLKLI — '+t.title;
+    renderAll();
+  }
+  window.__setLang=applyLang;
+
+  function detectLang(){
+    var c=lsGet('ac_lang'); if(c) return c;
+    var cc=lsGet('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    var tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(e){}
+    var navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    var dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    var ti=el('themeIco'); if(ti) ti.textContent=dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(e){}
+  }
+
+  /* =====================================================
+     Init
+     ===================================================== */
+  applyTheme(lsGet('theme')||'light');
+  var tb=el('themeToggle'); if(tb) tb.addEventListener('click', function(){
+    applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+  });
+  applyLang(detectLang());
+})();
+</script>
+</body>
+</html>

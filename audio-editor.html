@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — עורך אודיו</title>
+<meta name="description" content="Visual audio editor in your browser — see the waveform, select a segment, then trim or delete it and download. Fast, private, nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --wave-1:#7b34ff; --wave-2:#3f85ff;
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --wave-1:#8f52ff; --wave-2:#5a97ff;
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:960px;margin:0 auto;padding:22px 20px 60px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:64px 28px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:76px;height:76px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:38px;height:38px;}
+  .drop .big{font-size:21px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:14px;color:var(--faint);margin:8px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:16px;padding:13px 30px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .sizenote{margin-top:16px;font-size:13px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  /* editor */
+  .editor{display:none;}
+  .editor.show{display:block;}
+
+  /* now-playing strip */
+  .nowbar{display:flex;align-items:center;gap:13px;padding:14px 16px;border-radius:14px;
+    background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-sm);}
+  .nowbar .nico{width:44px;height:44px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--grad-soft);color:var(--accent);}
+  .nowbar .nico svg{width:22px;height:22px;}
+  .nowbar .nmeta{flex:1;min-width:0;}
+  .nowbar .nname{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .nowbar .nsub{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:2px;}
+
+  .edcard{padding:18px;margin-top:16px;}
+  .edcard h3{font-size:15px;margin:0 0 4px;font-weight:700;}
+  .edcard .hint{font-size:12.5px;color:var(--muted);margin:0 0 14px;}
+
+  /* waveform timeline */
+  .tl{position:relative;height:132px;border-radius:12px;overflow:hidden;border:1px solid var(--line);
+    background:var(--panel-2);user-select:none;touch-action:none;direction:ltr;cursor:pointer;}
+  .tl canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;}
+  .tl-mid{position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line);pointer-events:none;}
+  .tl-shade{position:absolute;top:0;bottom:0;background:rgba(12,14,22,.44);pointer-events:none;backdrop-filter:grayscale(.4);}
+  html[data-theme="dark"] .tl-shade{background:rgba(0,0,0,.55);}
+  .tl-sel{position:absolute;top:0;bottom:0;box-sizing:border-box;pointer-events:none;
+    border-left:2px solid var(--accent);border-right:2px solid var(--accent);background:rgba(124,58,237,.06);}
+  .tl-handle{position:absolute;top:0;bottom:0;width:16px;margin-left:-8px;background:var(--accent);
+    cursor:ew-resize;display:flex;align-items:center;justify-content:center;z-index:3;
+    box-shadow:0 0 0 1px rgba(0,0,0,.2);}
+  .tl-handle.start{border-radius:6px 0 0 6px;}
+  .tl-handle.end{border-radius:0 6px 6px 0;}
+  .tl-handle::before{content:'';width:2px;height:38%;background:rgba(255,255,255,.92);border-radius:2px;box-shadow:3px 0 0 rgba(255,255,255,.92),-3px 0 0 rgba(255,255,255,.92);}
+  .tl-play{position:absolute;top:0;bottom:0;width:2px;background:#fff;margin-left:-1px;z-index:2;
+    pointer-events:none;box-shadow:0 0 0 1px rgba(0,0,0,.55);}
+  /* delete-mode: highlight the doomed region in red, keep the rest bright */
+  .tl.mode-remove .tl-shade{display:none;}
+  .tl.mode-remove .tl-sel{border-color:var(--danger);background:rgba(229,72,77,.20);}
+  .tl.mode-remove .tl-handle{background:var(--danger);}
+
+  .tl-read{display:flex;gap:22px;flex-wrap:wrap;margin-top:14px;}
+  .tl-read .rd{display:flex;flex-direction:column;gap:2px;font-family:var(--mono);}
+  .tl-read .rd span{font-size:9.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;}
+  .tl-read .rd b{font-size:17px;color:var(--ink);font-weight:700;}
+  .tl-read .rd.clip b{color:var(--accent-dim);}
+
+  .trim-ctrls{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+  .tbtn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--sans);
+    box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s;}
+  .tbtn:hover{border-color:var(--accent);} .tbtn:active{transform:translateY(1px);}
+  .tbtn svg{width:15px;height:15px;}
+  .tbtn.play{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px var(--grad-btn-glow);}
+  .tbtn.play:hover{filter:brightness(1.05);}
+
+  /* options */
+  .opt{margin-top:18px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:8px;}
+  .seg{display:flex;gap:9px;}
+  @media (max-width:560px){ .seg{flex-direction:column;} }
+  .seg button{flex:1;text-align:start;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+    background:var(--panel-2);cursor:pointer;transition:border-color .12s,background .12s,transform .08s;}
+  .seg button:hover{border-color:var(--accent);} .seg button:active{transform:scale(.99);}
+  .seg button.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
+  .seg button b{display:block;font-size:13.5px;color:var(--ink);}
+  .seg button small{font-size:10.5px;color:var(--faint);font-family:var(--mono);}
+  .seg button.on b{color:var(--accent-dim);}
+
+  .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;
+    padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);}
+  .toggle .tg-txt b{font-size:13px;display:block;} .toggle .tg-txt small{font-size:10.5px;color:var(--faint);font-family:var(--mono);}
+  .sw{position:relative;width:42px;height:24px;flex-shrink:0;direction:ltr;}
+  .sw input{opacity:0;width:0;height:0;position:absolute;}
+  .sw .track{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:background .15s;cursor:pointer;}
+  .sw .track::before{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;
+    transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+  .sw input:checked + .track{background:var(--accent);}
+  .sw input:checked + .track::before{transform:translateX(18px);}
+
+  .qual{margin-top:16px;}
+  .qual > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:8px;}
+  .qrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  .sel{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--mono);font-size:13px;padding:10px 11px;cursor:pointer;}
+  .sel:focus{outline:none;border-color:var(--accent);}
+  .sel:disabled{opacity:.5;cursor:not-allowed;}
+
+  .cutbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:14px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:18px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .cutbtn:hover{filter:brightness(1.05);} .cutbtn:active{transform:translateY(1px);}
+  .cutbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .cutbtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+  .rtnote{font-size:10.5px;color:var(--faint);font-family:var(--mono);text-align:center;margin-top:6px;line-height:1.45;}
+
+  /* progress */
+  .prog{padding:16px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;}
+  .prog .lbl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+  .bar.indet i{width:35%;animation:slide 1.1s ease-in-out infinite;}
+  @keyframes slide{0%{margin-left:-35%}100%{margin-left:100%}}
+
+  /* results */
+  .results{padding:22px;display:none;margin-top:18px;}
+  .results.show{display:block;}
+  .results .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .results .ok svg{width:28px;height:28px;}
+  .results h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .results .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+  .rrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line-2);border-radius:12px;
+    background:var(--panel-2);margin-bottom:14px;}
+  .rrow .rico{width:48px;height:48px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .rrow .rico svg{width:20px;height:20px;}
+  .rrow .rn{flex:1;min-width:0;}
+  .rrow .rn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rrow .rn .meta{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .rrow .meta em{font-style:normal;color:var(--success-dim);}
+  .rplayer{width:100%;margin-bottom:16px;}
+  .rplayer audio{width:100%;display:block;}
+  .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .row2 a,.row2 button{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 a:hover,.row2 button:hover{border-color:var(--accent);} .row2 *:active{transform:translateY(1px);}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .row2 svg{width:15px;height:15px;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <!-- upload -->
+  <div id="composer">
+    <div class="drop" id="drop">
+      <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+      <div class="big" data-i18n="dropBig"></div>
+      <div class="or" data-i18n="or2"></div>
+      <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+      <div class="sizenote" data-i18n="sizeNote"></div>
+    </div>
+    <input type="file" id="fileInput" accept="audio/*,.mp3,.wav,.flac,.aac,.m4a,.ogg,.opus">
+
+    <!-- editor -->
+    <div class="editor" id="editor">
+      <div class="nowbar">
+        <div class="nico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+        <div class="nmeta">
+          <div class="nname" id="nowName">—</div>
+          <div class="nsub" id="nowSub">—</div>
+        </div>
+      </div>
+
+      <div class="card edcard">
+        <h3 data-i18n="trimTitle"></h3>
+        <p class="hint" data-i18n="trimHint"></p>
+
+        <div class="tl" id="tl">
+          <canvas id="wave"></canvas>
+          <div class="tl-mid"></div>
+          <div class="tl-shade" id="shadeL"></div>
+          <div class="tl-shade" id="shadeR"></div>
+          <div class="tl-sel" id="tlSel"></div>
+          <div class="tl-play" id="tlPlay"></div>
+          <div class="tl-handle start" id="hStart" data-h="start"></div>
+          <div class="tl-handle end" id="hEnd" data-h="end"></div>
+        </div>
+
+        <div class="tl-read">
+          <div class="rd"><span data-i18n="lblStart"></span><b id="rdStart">0:00.0</b></div>
+          <div class="rd"><span data-i18n="lblEnd"></span><b id="rdEnd">0:00.0</b></div>
+          <div class="rd clip"><span id="rdClipLbl" data-i18n="lblClip"></span><b id="rdClip">0:00.0</b></div>
+        </div>
+
+        <div class="trim-ctrls">
+          <button class="tbtn play" id="btnPlay" type="button">
+            <svg id="playIco" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+            <span id="playTxt" data-i18n="btnPlay"></span>
+          </button>
+          <button class="tbtn" id="btnPlaySel" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/><line x1="21.5" y1="4" x2="21.5" y2="20"/><line x1="2.5" y1="4" x2="2.5" y2="20"/></svg>
+            <span data-i18n="btnPlaySel"></span>
+          </button>
+          <button class="tbtn" id="btnSetStart" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h2"/><path d="M18 12H10"/><path d="m13 8-3 4 3 4"/></svg>
+            <span data-i18n="btnSetStart"></span>
+          </button>
+          <button class="tbtn" id="btnSetEnd" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-2"/><path d="M6 12h8"/><path d="m11 8 3 4-3 4"/></svg>
+            <span data-i18n="btnSetEnd"></span>
+          </button>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="modeLbl"></label>
+          <div class="seg" id="seg">
+            <button type="button" class="on" data-mode="keep"><b data-i18n="modeKeep"></b><small data-i18n="modeKeepSub"></small></button>
+            <button type="button" data-mode="remove"><b data-i18n="modeRemove"></b><small data-i18n="modeRemoveSub"></small></button>
+          </div>
+        </div>
+
+        <div class="toggle">
+          <div class="tg-txt"><b data-i18n="fadeLbl"></b><small data-i18n="fadeSub"></small></div>
+          <label class="sw"><input type="checkbox" id="fade"><span class="track"></span></label>
+        </div>
+
+        <div class="qual">
+          <label data-i18n="qualLbl"></label>
+          <div class="qrow">
+            <select class="sel" id="fmtSel">
+              <option value="mp3">MP3</option>
+              <option value="m4a">M4A (AAC)</option>
+              <option value="wav">WAV</option>
+              <option value="flac">FLAC</option>
+            </select>
+            <select class="sel" id="brSel">
+              <option value="320">320 kbps</option>
+              <option value="256">256 kbps</option>
+              <option value="192">192 kbps</option>
+              <option value="128">128 kbps</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="cutbtn" id="cutBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+          <span id="cutTxt" data-i18n="cutBtnKeep"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+        <div class="rtnote" data-i18n="rtNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="nm" id="progName" data-i18n="working"></span><span id="progPct"></span></div>
+    <div class="bar" id="progWrap"><i id="progBar"></i></div>
+  </div>
+
+  <!-- results -->
+  <div class="card results" id="resultsCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" id="readySub"></p>
+    <div class="rrow" id="rrow"></div>
+    <div class="rplayer"><audio id="resAudio" controls preload="metadata"></audio></div>
+    <div class="row2">
+      <button id="dlBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="dlBtn"></span>
+      </button>
+      <button id="againBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        <span data-i18n="againBtn"></span>
+      </button>
+      <button id="newBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="newBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<audio id="audio" preload="metadata"></audio>
+<div class="toast" id="toast"></div>
+
+<!-- Local engine (in ./vendor). No external network needed at runtime. -->
+<script src="./vendor/ffmpeg.js"></script>
+<script src="./vendor/util.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const FFmpeg = (window.FFmpegWASM && window.FFmpegWASM.FFmpeg);
+  const fetchFile = (window.FFmpegUtil && window.FFmpegUtil.fetchFile);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'עורך אודיו',
+      pageTitle:'ערכו אודיו חזותית — בלי להעלות לשרת',
+      pageSub:'העלו שיר, ראו את גלי הקול, סמנו קטע בגרירה — ואז חתכו אותו (השאירו רק את הקטע) או מחקו אותו מהשיר. הכול רץ בדפדפן שלכם, שום קובץ לא עוזב את המחשב.',
+      dropBig:'גררו קובץ אודיו לכאן', or2:'או', choose:'בחרו קובץ',
+      sizeNote:'MP3 · WAV · FLAC · AAC · M4A · OGG',
+      trimTitle:'סמנו את הקטע', trimHint:'גררו את הידיות הסגולות לאורך גלי הקול כדי לסמן איפה הקטע מתחיל ואיפה נגמר. אפשר גם ללחוץ על התצוגה כדי לדלג, ולסמן לפי מיקום הנגן.',
+      lblStart:'התחלה', lblEnd:'סיום', lblClip:'אורך הקטע', lblClipRemove:'אורך הפלט',
+      btnPlay:'נגן', btnPause:'עצור', btnPlaySel:'נגן קטע', btnSetStart:'התחלה כאן', btnSetEnd:'סיום כאן',
+      modeLbl:'מה לעשות עם הקטע המסומן',
+      modeKeep:'השאר רק את הקטע', modeKeepSub:'חיתוך — כל השאר יימחק',
+      modeRemove:'מחק את הקטע', modeRemoveSub:'הסרה — שאר השיר יתחבר',
+      fadeLbl:'עמעום כניסה ויציאה', fadeSub:'Fade רך של חצי שנייה בקצוות',
+      qualLbl:'פורמט ואיכות ייצוא',
+      cutBtnKeep:'חתכו את הקטע', cutBtnRemove:'מחקו את הקטע',
+      working:'מעבד…', engineLoading:'טוען מנוע…',
+      rtNote:'העריכה רצה מקומית בדפדפן דרך מנוע ffmpeg. הפלט מקודד מחדש בפורמט שבחרתם.',
+      readyTitle:'האודיו מוכן!', readySub:'הקובץ הערוך מוכן להאזנה ולהורדה.',
+      dlBtn:'הורדה', againBtn:'עריכה נוספת', newBtn:'קובץ חדש',
+      origLbl:'מקור', outLbl:'פלט',
+      failed:'העיבוד נכשל — נסו פורמט אחר או קובץ אחר',
+      seam:'עריכה מקומית: השיר נחתך כאן ועכשיו, ישירות בדפדפן דרך מנוע ffmpeg מקומי. שום קובץ לא עולה לאינטרנט — הוא תמיד נשאר אצלכם.',
+      foot:'KOLKLI · עורך אודיו · פרטי ומהיר, ישירות בדפדפן',
+      errNoFile:'צריך להעלות קובץ אודיו', errRange:'סמנו קטע באורך של לפחות רבע שנייה',
+      errRemoveAll:'לא ניתן למחוק את כל השיר — השאירו לפחות חלק ממנו',
+      errEngine:'שגיאה: לא ניתן לטעון את מנוע האודיו. ודאו שתיקיית vendor/ קיימת.',
+      errFileProto:'נפתח כקובץ מקומי — הדפדפן חוסם את המנוע. הריצו דרך start.bat או שרת מקומי.',
+      decodeWarn:'לא הצלחנו לצייר את גלי הקול לקובץ הזה, אבל עדיין אפשר לחתוך אותו לפי הזמן.',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'Audio editor',
+      pageTitle:'Edit audio visually — without uploading',
+      pageSub:'Load a song, see the waveform, drag to select a segment — then trim it (keep only the segment) or delete it from the track. Everything runs in your browser; nothing leaves your machine.',
+      dropBig:'Drop an audio file here', or2:'or', choose:'Choose file',
+      sizeNote:'MP3 · WAV · FLAC · AAC · M4A · OGG',
+      trimTitle:'Select the segment', trimHint:'Drag the purple handles across the waveform to mark where the segment starts and ends. You can also click the view to seek and mark from the playhead position.',
+      lblStart:'Start', lblEnd:'End', lblClip:'Segment length', lblClipRemove:'Output length',
+      btnPlay:'Play', btnPause:'Pause', btnPlaySel:'Play segment', btnSetStart:'Start here', btnSetEnd:'End here',
+      modeLbl:'What to do with the selected segment',
+      modeKeep:'Keep only the segment', modeKeepSub:'Trim — everything else is dropped',
+      modeRemove:'Delete the segment', modeRemoveSub:'Remove — the rest is joined',
+      fadeLbl:'Fade in & out', fadeSub:'Gentle half-second fade at the edges',
+      qualLbl:'Export format & quality',
+      cutBtnKeep:'Trim to segment', cutBtnRemove:'Delete segment',
+      working:'Processing…', engineLoading:'Loading engine…',
+      rtNote:'Editing runs locally in your browser via the ffmpeg engine. The output is re-encoded in the format you pick.',
+      readyTitle:'Audio ready!', readySub:'Your edited file is ready to play and download.',
+      dlBtn:'Download', againBtn:'Edit again', newBtn:'New file',
+      origLbl:'source', outLbl:'output',
+      failed:'Processing failed — try another format or a different file',
+      seam:'Local editing: your song is cut right here, right now, in your browser via a local ffmpeg engine. Nothing is uploaded — it always stays with you.',
+      foot:'KOLKLI · Audio editor · Private and fast, right in your browser',
+      errNoFile:'Add an audio file', errRange:'Select a segment at least a quarter second long',
+      errRemoveAll:'Can’t delete the entire track — keep at least part of it',
+      errEngine:'ERROR: could not load the audio engine. Make sure the vendor/ folder exists.',
+      errFileProto:'Opened as a local file — the browser blocks the engine. Run via start.bat or a local server.',
+      decodeWarn:'Couldn’t draw the waveform for this file, but you can still cut it by time.',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Аудиоредактор',
+      pageTitle:'Редактируйте аудио визуально — без загрузки на сервер',
+      pageSub:'Загрузите песню, посмотрите на волновую форму, выделите фрагмент — затем обрежьте его (оставить только фрагмент) или удалите из трека. Всё работает в вашем браузере; ничего не покидает устройство.',
+      dropBig:'Перетащите аудиофайл сюда', or2:'или', choose:'Выбрать файл',
+      sizeNote:'MP3 · WAV · FLAC · AAC · M4A · OGG',
+      trimTitle:'Выделите фрагмент', trimHint:'Перетаскивайте фиолетовые маркеры по волновой форме, чтобы отметить начало и конец фрагмента. Также можно кликнуть по области, чтобы перейти и отметить от позиции воспроизведения.',
+      lblStart:'Начало', lblEnd:'Конец', lblClip:'Длина фрагмента', lblClipRemove:'Длина результата',
+      btnPlay:'Играть', btnPause:'Пауза', btnPlaySel:'Играть фрагмент', btnSetStart:'Начало здесь', btnSetEnd:'Конец здесь',
+      modeLbl:'Что сделать с выделенным фрагментом',
+      modeKeep:'Оставить только фрагмент', modeKeepSub:'Обрезка — остальное удаляется',
+      modeRemove:'Удалить фрагмент', modeRemoveSub:'Удаление — остальное соединяется',
+      fadeLbl:'Плавное появление и затухание', fadeSub:'Мягкое затухание на полсекунды по краям',
+      qualLbl:'Формат и качество экспорта',
+      cutBtnKeep:'Обрезать до фрагмента', cutBtnRemove:'Удалить фрагмент',
+      working:'Обработка…', engineLoading:'Загрузка движка…',
+      rtNote:'Редактирование идёт локально в вашем браузере через движок ffmpeg. Результат перекодируется в выбранный формат.',
+      readyTitle:'Аудио готово!', readySub:'Ваш отредактированный файл готов к прослушиванию и скачиванию.',
+      dlBtn:'Скачать', againBtn:'Редактировать снова', newBtn:'Новый файл',
+      origLbl:'оригинал', outLbl:'результат',
+      failed:'Обработка не удалась — попробуйте другой формат или файл',
+      seam:'Локальное редактирование: ваша песня режется прямо здесь и сейчас, в вашем браузере через локальный движок ffmpeg. Ничего не загружается — файл всегда остаётся у вас.',
+      foot:'KOLKLI · Аудиоредактор · Приватно и быстро, прямо в браузере',
+      errNoFile:'Добавьте аудиофайл', errRange:'Выделите фрагмент не короче четверти секунды',
+      errRemoveAll:'Нельзя удалить весь трек — оставьте хотя бы часть',
+      errEngine:'ОШИБКА: не удалось загрузить аудиодвижок. Убедитесь, что папка vendor/ существует.',
+      errFileProto:'Открыто как локальный файл — браузер блокирует движок. Запустите через start.bat или локальный сервер.',
+      decodeWarn:'Не удалось нарисовать волновую форму для этого файла, но вы всё равно можете резать его по времени.',
+    },
+  };
+
+  const MINGAP = 0.1;      // smallest selectable segment (seconds)
+  const FADE = 0.5;        // fade length (seconds) when enabled
+  const AUDIO_EXTS = ['mp3','wav','flac','aac','m4a','ogg','oga','opus','wma','aiff','aif'];
+  const MIME = { mp3:'audio/mpeg', m4a:'audio/mp4', wav:'audio/wav', flac:'audio/flac' };
+
+  let lang='he', t=I18N.he;
+  let file=null, url=null, dur=0, srcExt='mp3';
+  let audioBuffer=null, peaks=null;
+  let start=0, end=0;
+  let mode='keep', dragging=null, playingSel=false;
+  let ffmpeg=null, engineReady=false, busy=false;
+  let result=null; // {name, blob, url, size, ...}
+
+  function baseName(name){ return String(name||'audio').replace(/\.[^.\/\\]+$/,''); }
+  function extOf(name){ const m=/\.([^.\/\\]+)$/.exec(name||''); const e=m?m[1].toLowerCase():''; return AUDIO_EXTS.includes(e)?e:'mp3'; }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function tc(s){ if(s==null||!isFinite(s)) return '0:00.0'; s=Math.max(0,s); const m=Math.floor(s/60); const sec=Math.floor(s%60); const d=Math.floor((s-Math.floor(s))*10); return m+':'+String(sec).padStart(2,'0')+'.'+d; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function clamp(v,lo,hi){ return Math.min(hi,Math.max(lo,v)); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1900); }
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+  // ---- intake ----
+  function loadFile(f){
+    if(!f) return;
+    if(f.type && f.type.indexOf('audio')!==0 && !new RegExp('\\.('+AUDIO_EXTS.join('|')+')$','i').test(f.name)) return;
+    if(url) URL.revokeObjectURL(url);
+    file=f; srcExt=extOf(f.name); url=URL.createObjectURL(f);
+    audioBuffer=null; peaks=null; result=null; playingSel=false;
+    el('resultsCard').classList.remove('show');
+    el('optErr').textContent='';
+    // suggest matching output format for common lossless/lossy inputs
+    if(['wav','flac','m4a','mp3'].includes(srcExt)){ el('fmtSel').value = srcExt==='aac'?'m4a':srcExt; syncQual(); }
+
+    const a=el('audio');
+    a.src=url;
+    a.onloadedmetadata=()=>{
+      dur=isFinite(a.duration)&&a.duration>0?a.duration:0;
+      start=0; end=dur;
+      el('nowName').textContent=f.name;
+      el('nowSub').textContent=`${srcExt.toUpperCase()} · ${tc(dur)} · ${fmtBytes(f.size)}`;
+      el('drop').style.display='none';
+      el('editor').classList.add('show');
+      setPlayIcon(false);
+      renderTL(); renderPlay();
+      el('editor').scrollIntoView({behavior:'smooth',block:'start'});
+      decodeWave(f);
+    };
+    a.onerror=()=>{ /* metadata may still work through ffmpeg later; ignore */ };
+  }
+
+  // ---- waveform: decode + peaks ----
+  async function decodeWave(f){
+    try{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if(!AC) throw new Error('no AudioContext');
+      const buf = await f.arrayBuffer();
+      const ac = new AC();
+      const decoded = await ac.decodeAudioData(buf.slice(0));
+      ac.close && ac.close();
+      audioBuffer = decoded;
+      if(!dur || !isFinite(dur)){ dur = decoded.duration; end = dur; }
+      peaks = computePeaks(decoded, 900);
+      drawWave();
+    }catch(err){
+      // Some containers (certain m4a/ogg) won't decode for drawing in every
+      // browser — that's fine, the file can still be cut by time via ffmpeg.
+      audioBuffer=null; peaks=null; drawWave();
+      toast(t.decodeWarn);
+    }
+  }
+  function computePeaks(buffer, buckets){
+    const ch = buffer.numberOfChannels;
+    const len = buffer.length;
+    const data = [];
+    for(let c=0;c<ch;c++) data.push(buffer.getChannelData(c));
+    const step = Math.max(1, Math.floor(len/buckets));
+    const out = new Float32Array(buckets);
+    for(let i=0;i<buckets;i++){
+      const s=i*step, e=Math.min(len, s+step);
+      let max=0;
+      for(let j=s;j<e;j++){
+        let v=0; for(let c=0;c<ch;c++) v+=data[c][j];
+        v/=ch; const a=v<0?-v:v; if(a>max) max=a;
+      }
+      out[i]=max;
+    }
+    // gentle normalisation so quiet tracks still fill the view
+    let peak=0; for(let i=0;i<out.length;i++) if(out[i]>peak) peak=out[i];
+    if(peak>0){ const g=Math.min(1/peak, 4); for(let i=0;i<out.length;i++) out[i]*=g; }
+    return out;
+  }
+  function drawWave(){
+    const cv=el('wave'); if(!cv) return;
+    const box=el('tl'); const w=box.clientWidth||800, h=box.clientHeight||132;
+    const dpr=window.devicePixelRatio||1;
+    cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+    const ctx=cv.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    const mid=h/2;
+    if(!peaks || !peaks.length){
+      ctx.strokeStyle=cssVar('--wave-1'); ctx.globalAlpha=.35; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(0,mid); ctx.lineTo(w,mid); ctx.stroke(); ctx.globalAlpha=1;
+      return;
+    }
+    const bars=peaks.length, bw=w/bars, gap=bw>2.4?1:0;
+    const grad=ctx.createLinearGradient(0,6,0,h-6);
+    grad.addColorStop(0,cssVar('--wave-1')); grad.addColorStop(1,cssVar('--wave-2'));
+    ctx.fillStyle=grad;
+    for(let i=0;i<bars;i++){
+      const bh=Math.max(1.5, peaks[i]*(h*0.9));
+      ctx.fillRect(i*bw, mid-bh/2, Math.max(1, bw-gap), bh);
+    }
+  }
+  function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#7b34ff'; }
+
+  // ---- timeline render ----
+  function renderTL(){
+    const sp = dur>0 ? start/dur*100 : 0;
+    const ep = dur>0 ? end/dur*100 : 100;
+    el('shadeL').style.left='0'; el('shadeL').style.width=sp+'%';
+    el('shadeR').style.left=ep+'%'; el('shadeR').style.width=(100-ep)+'%';
+    el('tlSel').style.left=sp+'%'; el('tlSel').style.width=(ep-sp)+'%';
+    el('hStart').style.left=sp+'%';
+    el('hEnd').style.left=ep+'%';
+    el('rdStart').textContent=tc(start);
+    el('rdEnd').textContent=tc(end);
+    const outLen = mode==='remove' ? Math.max(0, dur-(end-start)) : (end-start);
+    el('rdClip').textContent=tc(outLen);
+  }
+  function renderPlay(){
+    const a=el('audio');
+    const p = dur>0 ? clamp(a.currentTime,0,dur)/dur*100 : 0;
+    el('tlPlay').style.left=p+'%';
+  }
+
+  // ---- timeline interaction ----
+  function timeAt(clientX){
+    const r=el('tl').getBoundingClientRect();
+    return clamp((clientX-r.left)/r.width,0,1)*dur;
+  }
+  function applyDrag(time){
+    const a=el('audio');
+    if(dragging==='start'){ start=clamp(time,0,end-MINGAP); a.currentTime=start; }
+    else if(dragging==='end'){ end=clamp(time,start+MINGAP,dur); a.currentTime=Math.min(end, dur-0.001); }
+    else { a.currentTime=clamp(time,0,dur); }
+    renderTL(); renderPlay();
+  }
+  function initTL(){
+    const tl=el('tl');
+    tl.addEventListener('pointerdown',e=>{
+      if(!dur) return;
+      e.preventDefault();
+      playingSel=false;
+      const h=e.target.getAttribute && e.target.getAttribute('data-h');
+      dragging = h || 'seek';
+      try{ tl.setPointerCapture(e.pointerId); }catch(_){}
+      applyDrag(timeAt(e.clientX));
+    });
+    tl.addEventListener('pointermove',e=>{ if(dragging) applyDrag(timeAt(e.clientX)); });
+    const doneP=e=>{ dragging=null; try{ tl.releasePointerCapture(e.pointerId); }catch(_){} };
+    tl.addEventListener('pointerup',doneP);
+    tl.addEventListener('pointercancel',doneP);
+    // keep the waveform crisp on resize / rotation
+    if(window.ResizeObserver){ new ResizeObserver(()=>drawWave()).observe(tl); }
+    else window.addEventListener('resize',drawWave);
+  }
+
+  // ---- playback ----
+  function setPlayIcon(playing){
+    el('playIco').innerHTML = playing
+      ? '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>'
+      : '<polygon points="6 4 20 12 6 20 6 4"/>';
+    el('playTxt').textContent = playing ? t.btnPause : t.btnPlay;
+  }
+
+  // ---- engine ----
+  async function ensureEngine(){
+    if(engineReady) return true;
+    if(!FFmpeg||!fetchFile){ el('optErr').textContent = location.protocol==='file:'?t.errFileProto:t.errEngine; return false; }
+    try{
+      const f=new FFmpeg();
+      f.on('progress',({progress})=>{
+        if(!busy) return;
+        el('progWrap').classList.remove('indet');
+        setProg(Math.min(99,Math.round((progress||0)*100)));
+      });
+      const dir=location.href.replace(/[^/]*$/,'')+'vendor/';
+      await f.load({ coreURL:dir+'ffmpeg-core.js', wasmURL:dir+'ffmpeg-core.wasm' });
+      ffmpeg=f; engineReady=true; return true;
+    }catch(err){
+      console.error(err);
+      el('optErr').textContent = location.protocol==='file:'?t.errFileProto:t.errEngine;
+      return false;
+    }
+  }
+  function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+
+  function encodeArgs(){
+    const fmt=el('fmtSel').value, br=el('brSel').value;
+    switch(fmt){
+      case 'wav':  return ['-c:a','pcm_s16le'];
+      case 'flac': return ['-c:a','flac'];
+      case 'm4a':  return ['-c:a','aac','-b:a',br+'k'];
+      case 'mp3':
+      default:     return ['-c:a','libmp3lame','-b:a',br+'k'];
+    }
+  }
+
+  // ---- process ----
+  async function run(){
+    if(busy) return;
+    el('optErr').textContent='';
+    if(!file){ el('optErr').textContent=t.errNoFile; return; }
+    const s=Math.max(0,start), e=Math.min(dur,end), d=Math.max(0, e-s);
+    if(d < 0.25){ el('optErr').textContent=t.errRange; return; }
+    if(mode==='remove' && (dur-d) < 0.25){ el('optErr').textContent=t.errRemoveAll; return; }
+
+    pausePlayback();
+    busy=true;
+    el('cutBtn').disabled=true;
+    el('resultsCard').classList.remove('show');
+    const prog=el('progCard'); prog.classList.add('show');
+    el('progName').textContent=t.engineLoading; el('progPct').textContent='';
+    el('progWrap').classList.add('indet');
+    el('editor').scrollIntoView({behavior:'smooth',block:'end'});
+
+    const ok=await ensureEngine();
+    if(!ok){ busy=false; el('cutBtn').disabled=false; prog.classList.remove('show'); el('progWrap').classList.remove('indet'); return; }
+
+    el('progName').textContent=t.working; setProg(0);
+    const fmt=el('fmtSel').value;
+    const outExt = fmt;
+    const inName = 'in.'+srcExt;
+    const outName = 'out.'+outExt;
+    const tagHe = mode==='remove' ? '_edit' : '_trim';
+    const dlName = baseName(file.name)+tagHe+'.'+outExt;
+    const fade = el('fade').checked;
+    const outSeconds = mode==='remove' ? (dur-d) : d;
+
+    try{
+      await ffmpeg.writeFile(inName, await fetchFile(file));
+      let args;
+
+      if(mode==='keep'){
+        args = ['-ss', s.toFixed(3), '-i', inName, '-t', d.toFixed(3)];
+        if(fade){
+          const af = `afade=t=in:st=0:d=${FADE},afade=t=out:st=${Math.max(0,(d-FADE)).toFixed(3)}:d=${FADE}`;
+          args.push('-af', af);
+        }
+        args = args.concat(encodeArgs(), [outName]);
+      } else {
+        // delete the [s,e] region, join what's left
+        const headEmpty = s <= 0.01;
+        const tailEmpty = e >= dur-0.01;
+        if(headEmpty){
+          args = ['-ss', e.toFixed(3), '-i', inName].concat(encodeArgs(), [outName]);
+        } else if(tailEmpty){
+          args = ['-i', inName, '-t', s.toFixed(3)].concat(encodeArgs(), [outName]);
+        } else {
+          const fc = `[0:a]atrim=end=${s.toFixed(3)},asetpts=PTS-STARTPTS[a0];` +
+                     `[0:a]atrim=start=${e.toFixed(3)},asetpts=PTS-STARTPTS[a1];` +
+                     `[a0][a1]concat=n=2:v=0:a=1[out]`;
+          args = ['-i', inName, '-filter_complex', fc, '-map', '[out]'].concat(encodeArgs(), [outName]);
+        }
+      }
+
+      await ffmpeg.exec(args);
+      const data = await ffmpeg.readFile(outName);
+      await ffmpeg.deleteFile(inName).catch(()=>{});
+      await ffmpeg.deleteFile(outName).catch(()=>{});
+      const blob = new Blob([data.buffer], { type: MIME[outExt] || 'audio/mpeg' });
+      if(!blob.size) throw new Error('empty output');
+      setProg(100);
+      if(result && result.url) URL.revokeObjectURL(result.url);
+      result = { name:dlName, blob, url:URL.createObjectURL(blob), size:blob.size, srcSize:file.size, seconds:outSeconds, fmt:outExt };
+      await sleep(160);
+      prog.classList.remove('show'); el('progWrap').classList.remove('indet');
+      showResult();
+    }catch(err){
+      console.error(err);
+      try{ await ffmpeg.deleteFile(inName); }catch(_){}
+      try{ await ffmpeg.deleteFile(outName); }catch(_){}
+      prog.classList.remove('show'); el('progWrap').classList.remove('indet');
+      el('optErr').textContent=t.failed;
+    }
+    busy=false; el('cutBtn').disabled=false;
+  }
+
+  function showResult(){
+    if(!result) return;
+    el('readySub').textContent=t.readySub;
+    const meta = `${result.fmt.toUpperCase()} · ${tc(result.seconds)} · ${t.origLbl} ${fmtBytes(result.srcSize)} → <em>${fmtBytes(result.size)}</em>`;
+    el('rrow').innerHTML =
+      `<span class="rico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+       <span class="rn"><div class="nm" title="${escapeHtml(result.name)}">${escapeHtml(result.name)}</div><div class="meta">${meta}</div></span>`;
+    const ra=el('resAudio'); ra.src=result.url;
+    el('resultsCard').classList.add('show');
+    el('resultsCard').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  function download(){
+    if(!result||!result.url) return;
+    const a=document.createElement('a'); a.href=result.url; a.download=result.name; document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  function pausePlayback(){ const a=el('audio'); if(!a.paused){ a.pause(); } playingSel=false; setPlayIcon(false); }
+
+  // back to the editor with the same audio loaded
+  function editAgain(){
+    el('resultsCard').classList.remove('show');
+    el('resAudio').pause(); el('resAudio').removeAttribute('src');
+    el('optErr').textContent='';
+    if(el('editor').classList.contains('show')) el('editor').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  // full reset — drop the current audio and go back to upload
+  function reset(){
+    pausePlayback();
+    if(url) URL.revokeObjectURL(url);
+    if(result&&result.url) URL.revokeObjectURL(result.url);
+    file=null; url=null; dur=0; start=0; end=0; audioBuffer=null; peaks=null; result=null;
+    const a=el('audio'); a.removeAttribute('src'); a.load();
+    el('resAudio').removeAttribute('src');
+    el('editor').classList.remove('show');
+    el('drop').style.display='';
+    el('resultsCard').classList.remove('show');
+    el('optErr').textContent='';
+    drawWave();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- mode ----
+  function setMode(m){
+    mode=m;
+    el('seg').querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.getAttribute('data-mode')===m));
+    el('tl').classList.toggle('mode-remove', m==='remove');
+    el('cutTxt').textContent = m==='remove' ? t.cutBtnRemove : t.cutBtnKeep;
+    el('rdClipLbl').textContent = m==='remove' ? t.lblClipRemove : t.lblClip;
+    renderTL();
+  }
+
+  // ---- export format enable/disable bitrate ----
+  function syncQual(){
+    const fmt=el('fmtSel').value;
+    el('brSel').disabled = (fmt==='wav' || fmt==='flac');
+  }
+
+  // ---- i18n + theme (mirrors the other pages; header stays in sync via its observer) ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    setPlayIcon(!el('audio').paused && !el('audio').ended);
+    setMode(mode);
+    if(result && el('resultsCard').classList.contains('show')) showResult();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+    drawWave(); // wave colours are theme-aware
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ loadFile(input.files&&input.files[0]); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) loadFile(e.dataTransfer.files&&e.dataTransfer.files[0]); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  const a=el('audio');
+  a.addEventListener('timeupdate',()=>{
+    renderPlay();
+    if(playingSel && a.currentTime>=end-0.02){ a.pause(); try{ a.currentTime=end; }catch(_){} playingSel=false; setPlayIcon(false); }
+  });
+  a.addEventListener('seeked',renderPlay);
+  a.addEventListener('play',()=>setPlayIcon(true));
+  a.addEventListener('pause',()=>{ playingSel=false; setPlayIcon(false); });
+  a.addEventListener('ended',()=>{ playingSel=false; setPlayIcon(false); });
+
+  el('btnPlay').addEventListener('click',()=>{
+    if(!dur) return;
+    if(a.paused){ playingSel=false; a.play().catch(()=>{}); } else { a.pause(); }
+  });
+  el('btnPlaySel').addEventListener('click',()=>{
+    if(!dur) return;
+    if(a.currentTime<start || a.currentTime>=end-0.02){ try{ a.currentTime=start; }catch(_){} }
+    playingSel=true; a.play().catch(()=>{});
+  });
+  el('btnSetStart').addEventListener('click',()=>{ if(!dur) return; start=clamp(a.currentTime,0,end-MINGAP); renderTL(); });
+  el('btnSetEnd').addEventListener('click',()=>{ if(!dur) return; end=clamp(a.currentTime,start+MINGAP,dur); renderTL(); });
+
+  el('seg').addEventListener('click',e=>{ const b=e.target.closest('[data-mode]'); if(b) setMode(b.getAttribute('data-mode')); });
+  el('fmtSel').addEventListener('change',syncQual);
+
+  el('cutBtn').addEventListener('click',run);
+  el('dlBtn').addEventListener('click',download);
+  el('againBtn').addEventListener('click',editAgain);
+  el('newBtn').addEventListener('click',reset);
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  initTL();
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  syncQual();
+  setMode('keep');
+  // warm up the engine in the background so the first export feels instant
+  setTimeout(()=>{ ensureEngine().catch(()=>{}); }, 500);
+})();
+</script>
+</body>
+</html>

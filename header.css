@@ -1,0 +1,276 @@
+/* ============================================================
+   Shared site header (KOLKLI) — used on every page.
+   Injected into <div id="site-header"></div> by header.js.
+   All rules are scoped under #site-header so they never collide
+   with a page's own .nav / .topbar / .pillbtn styles.
+   Relies on the CSS variables (--grad, --panel, --line, …) that
+   every page already defines in :root, so it themes automatically.
+   ============================================================ */
+/* The wrapper div — not .sh-nav — carries the sticky, because it is a direct
+   child of <body> (the tall scroll box). A sticky element can never escape its
+   own parent's box, so keeping sticky on the short .sh-nav wrapper made it
+   unstick immediately. Requires that no ancestor of #site-header creates a
+   scroll container (pages use overflow-x:clip, not hidden, for that reason). */
+#site-header{display:block;position:sticky;top:0;z-index:60;}
+
+#site-header .sh-nav{position:relative;font-family:var(--sans);direction:inherit;
+  backdrop-filter:saturate(1.4) blur(10px);
+  background:rgba(247,248,255,.74);
+  border-bottom:1px solid transparent;transition:border-color .2s,background .2s;}
+#site-header .sh-nav.scrolled{border-bottom-color:#e7eafd;background:rgba(247,248,255,.9);}
+
+#site-header .sh-bar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  height:72px;max-width:75%;margin:0 auto;padding:0;}
+
+#site-header .sh-brand{display:flex;align-items:center;color:var(--ink);text-decoration:none;}
+#site-header .sh-logo-img{height:34px;width:auto;display:block;flex-shrink:0;}
+
+#site-header .sh-tools{display:flex;align-items:center;gap:8px;}
+/* dead-center the nav in the bar regardless of logo / button widths */
+#site-header .sh-links{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  display:flex;align-items:center;gap:27px;}
+#site-header .sh-links a{display:inline-flex;align-items:center;gap:5px;padding:8px 0;border-radius:9px;
+  font-size:16px;font-weight:700;color:#121834;white-space:nowrap;text-decoration:none;transition:color .12s,background .12s;}
+#site-header .sh-links a:hover{color:#5d43f5;background:transparent;}
+#site-header .sh-new{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 8px;
+  border-radius:9px;background:linear-gradient(135deg,#7b3cff,#4e72ff);color:#fff;font-size:11px;font-weight:800;
+  box-shadow:0 8px 18px rgba(100,72,255,.24);}
+#site-header .sh-chev{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+
+/* Tools mega-menu — click "Tools" to drop a panel with every tool below the bar */
+#site-header .sh-drop{position:relative;display:inline-flex;align-items:center;}
+#site-header .sh-tlink{display:inline-flex;align-items:center;gap:5px;padding:8px 0;
+  background:none;border:0;cursor:pointer;font-family:var(--sans);font-size:16px;font-weight:700;
+  color:#121834;white-space:nowrap;transition:color .12s;}
+#site-header .sh-tlink:hover,#site-header .sh-drop.open .sh-tlink{color:#5d43f5;}
+#site-header .sh-tlink .sh-chev{transition:transform .18s;}
+#site-header .sh-drop.open .sh-tlink .sh-chev{transform:rotate(180deg);}
+
+/* Mega-menu is centered over the page: it lives directly inside .sh-bar (the
+   max-width content box, itself centered via margin:auto), and we pin it to the
+   bar's horizontal center with left:50% + translateX(-50%). Centering is
+   symmetric, so it needs no RTL flip. */
+#site-header .sh-mega{position:absolute;top:calc(100% + 16px);left:50%;z-index:70;
+  width:min(880px,100%);overflow:hidden;
+  border-radius:20px;background:#fff;border:1px solid #e8ebfb;box-shadow:0 30px 72px rgba(30,37,80,.20);
+  opacity:0;visibility:hidden;transform:translate(-50%,-8px);pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease,visibility .18s;}
+#site-header .sh-mega.open{opacity:1;visibility:visible;transform:translate(-50%,0);pointer-events:auto;}
+#site-header .sh-mega-in{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 14px;padding:18px;}
+
+#site-header .sh-col{display:flex;flex-direction:column;}
+#site-header .sh-col.c-audio{--ic:#7c3aed;--ic-bg:#efe9fe;}
+#site-header .sh-col.c-image{--ic:#12a077;--ic-bg:#e3f6ef;}
+#site-header .sh-col.c-video{--ic:#3b6ff6;--ic-bg:#e8f0fe;}
+#site-header .sh-col.c-docs {--ic:#ef7a3a;--ic-bg:#fdeee2;}
+#site-header .sh-col.c-conv {--ic:#d6489a;--ic-bg:#fce7f3;}
+#site-header .sh-col.c-comp {--ic:#0fa6ab;--ic-bg:#def5f5;}
+
+/* small uppercase category label with a tinted emoji chip */
+#site-header .sh-col-h{display:flex;align-items:center;gap:9px;padding:6px 8px;margin-bottom:2px;
+  font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#98a1b8;text-decoration:none;}
+#site-header .sh-col-i{width:26px;height:26px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;background:var(--ic-bg);font-size:14px;line-height:1;}
+#site-header .sh-col-h:hover{color:var(--ic);}
+
+/* each tool is a row: colored icon tile + name + one-line description */
+#site-header .sh-item{display:flex;align-items:center;gap:11px;padding:8px;border-radius:12px;
+  text-decoration:none;transition:background .12s;}
+#site-header .sh-item:hover{background:#f5f6ff;}
+#site-header .sh-item .it-ic{width:36px;height:36px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;background:var(--ic-bg);color:var(--ic);transition:transform .12s;}
+#site-header .sh-item:hover .it-ic{transform:scale(1.07);}
+#site-header .sh-item .it-ic svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;}
+#site-header .sh-item .it-tx{display:flex;flex-direction:column;min-width:0;}
+#site-header .sh-item .it-t{font-size:13px;font-weight:700;color:#1b2138;line-height:1.25;}
+#site-header .sh-item .it-d{font-size:11px;color:#8a92aa;line-height:1.25;margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#site-header .sh-item:hover .it-t{color:#5d43f5;}
+
+/* gradient promo bar pinned to the bottom of the menu */
+#site-header .sh-mega-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:13px 20px;background:linear-gradient(100deg,#f4f1ff,#eaf1ff);border-top:1px solid #eceefb;}
+#site-header .sh-foot-t{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600;color:#4a5170;}
+#site-header .sh-foot-badge{display:inline-flex;align-items:center;height:19px;padding:0 8px;border-radius:7px;
+  background:linear-gradient(135deg,#7b3cff,#4e72ff);color:#fff;font-size:10px;font-weight:800;letter-spacing:.03em;}
+#site-header .sh-foot-cta{font-size:12.5px;font-weight:800;color:#5d43f5;text-decoration:none;white-space:nowrap;}
+#site-header .sh-foot-cta:hover{text-decoration:underline;}
+
+/* ============================================================
+   Products dropdown — a compact menu of the file-transfer
+   product pages, anchored under its nav button. Shares the
+   .sh-drop open/chevron mechanics with the Tools dropdown.
+   ============================================================ */
+/* Anchored to the button's inline-start edge (translateY only for the reveal),
+   so it drops straight under "קבצים" and mirrors correctly in RTL. Using a
+   translateX centering hack here breaks in RTL because CSS translate() is not
+   direction-aware — it shoved the menu far to the left of the button. */
+#site-header .sh-prodmenu{position:absolute;top:calc(100% + 14px);inset-inline-start:0;z-index:75;
+  width:308px;padding:8px;border-radius:16px;background:#fff;border:1px solid #e8ebfb;
+  box-shadow:0 24px 56px rgba(30,37,80,.20);
+  opacity:0;visibility:hidden;transform:translateY(-8px);pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease,visibility .18s;}
+#site-header .sh-proddrop.open .sh-prodmenu{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
+#site-header .sh-prod-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;
+  text-decoration:none;transition:background .12s;}
+#site-header .sh-prod-item:hover{background:#f5f6ff;}
+#site-header .sh-prod-ic{width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;background:#efe9fe;color:#7c3aed;transition:transform .12s;}
+#site-header .sh-prod-item:hover .sh-prod-ic{transform:scale(1.07);}
+#site-header .sh-prod-ic svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;}
+#site-header .sh-prod-tx{display:flex;flex-direction:column;min-width:0;}
+#site-header .sh-prod-t{font-size:14px;font-weight:700;color:#1b2138;line-height:1.25;}
+#site-header .sh-prod-d{font-size:11.5px;color:#8a92aa;line-height:1.25;margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#site-header .sh-prod-item:hover .sh-prod-t{color:#5d43f5;}
+
+#site-header .sh-pill{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;
+  border-radius:15px;background:rgba(255,255,255,.58);border:1px solid #e8ebfb;color:#111735;
+  cursor:pointer;font-size:13.5px;font-weight:700;font-family:var(--sans);text-decoration:none;
+  box-shadow:0 8px 24px rgba(30,37,80,.04);transition:border-color .12s,transform .08s,background .12s;}
+#site-header .sh-pill:hover{border-color:#cdd4f8;background:#fff;}
+#site-header .sh-pill:active{transform:scale(.97);}
+#site-header .sh-icon{width:38px;height:38px;padding:0;justify-content:center;font-size:15px;line-height:1;}
+#site-header .sh-lang{width:auto;gap:8px;padding:0 13px;border-radius:18px;}
+#site-header .sh-lang svg:first-child{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+#site-header .sh-theme{display:none!important;}
+
+/* ============================================================
+   Language picker dropdown (owned by header.js). The globe pill
+   shows the active language's own name; clicking it drops a small
+   menu listing every interface language by its endonym.
+   ============================================================ */
+#site-header .sh-langwrap{position:relative;display:inline-flex;}
+#site-header .sh-lang .sh-chev{transition:transform .18s;}
+#site-header .sh-langwrap.open .sh-lang .sh-chev{transform:rotate(180deg);}
+/* Anchored to the button's inline-end edge, so it mirrors correctly in RTL. */
+#site-header .sh-langmenu{position:absolute;top:calc(100% + 8px);inset-inline-end:0;z-index:80;
+  min-width:184px;padding:6px;border-radius:14px;background:#fff;border:1px solid #e8ebfb;
+  box-shadow:0 20px 48px rgba(30,37,80,.18);
+  opacity:0;visibility:hidden;transform:translateY(-6px);pointer-events:none;
+  transition:opacity .16s ease,transform .16s ease,visibility .16s;}
+#site-header .sh-langwrap.open .sh-langmenu{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
+#site-header .sh-langopt{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+  padding:9px 12px;border:0;border-radius:10px;background:none;cursor:pointer;
+  font-family:var(--sans);font-size:14px;font-weight:700;color:#1b2138;text-align:start;
+  transition:background .12s,color .12s;}
+#site-header .sh-langopt:hover{background:#f5f6ff;color:#5d43f5;}
+#site-header .sh-langopt.active{color:#5d43f5;}
+#site-header .sh-langopt-c{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;
+  stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;opacity:0;}
+#site-header .sh-langopt.active .sh-langopt-c{opacity:1;}
+
+#site-header .sh-cta{display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;
+  border:none;cursor:pointer;font-weight:800;font-size:14px;padding:0 22px;height:42px;border-radius:15px;
+  font-family:var(--sans);text-decoration:none;text-shadow:0 1px 2px rgba(0,0,0,.18);
+  background:linear-gradient(135deg,#7b34ff 0%,#3f85ff 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.38),0 16px 30px rgba(82,94,244,.22);
+  transition:filter .14s,transform .08s;}
+#site-header .sh-cta:hover{filter:brightness(1.06);}
+#site-header .sh-cta:active{transform:translateY(1px);}
+
+/* ============================================================
+   Signed-in account area (owned by header.js). Replaces the
+   Login / Sign Up buttons with an avatar + name button that
+   drops a menu of quick account actions. Mirrors the language
+   picker's dropdown mechanics, so it's RTL-safe out of the box.
+   ============================================================ */
+#site-header .sh-autharea{display:inline-flex;align-items:center;gap:8px;}
+#site-header .sh-acctwrap{position:relative;display:inline-flex;}
+#site-header .sh-acctbtn{gap:8px;padding-inline:6px 12px;height:40px;border-radius:20px;}
+#site-header .sh-acctbtn .sh-chev{transition:transform .18s;}
+#site-header .sh-acctwrap.open .sh-acctbtn .sh-chev{transform:rotate(180deg);}
+#site-header .sh-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#7b34ff,#3f85ff);color:#fff;font-size:12.5px;font-weight:800;line-height:1;}
+#site-header .sh-avatar-img,#site-header .sh-acct-av img{width:100%;height:100%;object-fit:cover;}
+#site-header .sh-acctbtn-name{font-size:14px;font-weight:700;color:#111735;max-width:130px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* Anchored to the button's inline-end edge → mirrors correctly in RTL. */
+#site-header .sh-acctmenu{position:absolute;top:calc(100% + 8px);inset-inline-end:0;z-index:80;
+  min-width:250px;padding:6px;border-radius:16px;background:#fff;border:1px solid #e8ebfb;
+  box-shadow:0 20px 48px rgba(30,37,80,.18);
+  opacity:0;visibility:hidden;transform:translateY(-6px);pointer-events:none;
+  transition:opacity .16s ease,transform .16s ease,visibility .16s;}
+#site-header .sh-acctwrap.open .sh-acctmenu{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
+
+#site-header .sh-acct-head{display:flex;align-items:center;gap:11px;padding:10px 12px 12px;}
+#site-header .sh-acct-av{width:40px;height:40px;border-radius:50%;flex-shrink:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#7b34ff,#3f85ff);color:#fff;font-size:16px;font-weight:800;line-height:1;}
+#site-header .sh-acct-id{display:flex;flex-direction:column;min-width:0;}
+#site-header .sh-acct-name{font-size:14px;font-weight:800;color:#1b2138;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#site-header .sh-acct-mail{font-size:12px;color:#8a92aa;line-height:1.3;direction:ltr;text-align:start;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#site-header .sh-acct-sep{height:1px;margin:6px 8px;background:#eceefb;}
+
+#site-header .sh-acct-item{display:flex;align-items:center;gap:11px;width:100%;
+  padding:10px 12px;border:0;border-radius:10px;background:none;cursor:pointer;
+  font-family:var(--sans);font-size:14px;font-weight:700;color:#1b2138;text-align:start;text-decoration:none;
+  transition:background .12s,color .12s;}
+#site-header .sh-acct-item:hover{background:#f5f6ff;color:#5d43f5;}
+#site-header .sh-acct-item svg{width:18px;height:18px;flex-shrink:0;color:#8a92aa;
+  stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+#site-header .sh-acct-item:hover svg{color:#5d43f5;}
+#site-header .sh-acct-admin,#site-header .sh-acct-admin svg{color:#5d43f5;}
+#site-header .sh-acct-out,#site-header .sh-acct-out svg{color:#e5484d;}
+#site-header .sh-acct-out:hover{background:#fdecec;color:#e5484d;}
+
+/* Compact avatar-only button on phones. */
+@media (max-width:640px){
+  #site-header .sh-acctbtn-name{display:none;}
+  #site-header .sh-acctbtn .sh-chev{display:none;}
+  #site-header .sh-acctbtn{padding-inline:5px;width:40px;justify-content:center;}
+}
+
+#site-header .sh-menu{display:none;}
+#site-header .sh-panel{display:none;border-top:1px solid var(--line);background:var(--panel);}
+#site-header .sh-panel.open{display:block;}
+#site-header .sh-panel .sh-inner{display:flex;flex-direction:column;max-width:75%;margin:0 auto;padding:6px 22px 14px;}
+#site-header .sh-panel a{padding:12px 8px;font-size:15px;color:var(--ink-2);text-decoration:none;
+  border-bottom:1px solid var(--line-2);}
+#site-header .sh-panel a:last-child{border-bottom:none;}
+/* "Products" group label + indented sub-links inside the mobile panel */
+#site-header .sh-panel-h{padding:14px 8px 4px;font-size:11px;font-weight:800;letter-spacing:.05em;
+  text-transform:uppercase;color:#98a1b8;}
+#site-header .sh-panel .sh-panel-sub{padding-inline-start:20px;}
+
+/* collapse the inline links into the ☰ menu once the centered nav would
+   crowd the right-side buttons (nav is absolutely centered in the bar) */
+@media (max-width:1360px){
+  #site-header .sh-links{display:none;}
+  #site-header .sh-menu{display:inline-flex;}
+}
+/* Russian labels are noticeably wider than he/en, so the centered nav crowds
+   the action buttons until the viewport is very wide. Collapse it into the ☰
+   menu earlier for Russian only — he/en keep the 1360 threshold above. */
+@media (max-width:1900px){
+  html[lang="ru"] #site-header .sh-links{display:none;}
+  html[lang="ru"] #site-header .sh-menu{display:inline-flex;}
+}
+
+@media (max-width:1180px){
+  #site-header .sh-bar{padding:0 22px;}
+}
+
+@media (max-width:640px){
+  #site-header .sh-bar{height:64px;padding:0 14px;}
+  #site-header .sh-logo-img{height:28px;}
+  #site-header .sh-pill[href="./auth.html"]{display:none;}
+  #site-header .sh-cta{height:38px;padding:0 15px;}
+}
+
+/* ============================================================
+   RTL (Hebrew): the header follows the page direction via
+   direction:inherit on .sh-nav. The flex bar auto-mirrors
+   (brand → right, action buttons → left; centered links stay
+   centered). Only the few explicitly LTR-positioned pieces
+   below need flipping. English (dir=ltr) is unaffected.
+   ============================================================ */
+/* Tools mega-menu is horizontally centered in the bar, so it needs no explicit
+   RTL flip — centering is symmetric, and the flex rows inside auto-mirror via
+   direction:inherit (icon → right). */

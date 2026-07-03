@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — דחיסת ZIP</title>
+<meta name="description" content="Bundle any files or folders into a single compressed ZIP archive right in your browser. Nothing is uploaded — everything is zipped locally. Fast, private and free.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:40px 20px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:26px;height:26px;}
+  .drop .big{font-size:15.5px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:12px;color:var(--faint);margin:6px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13.5px;padding:10px 22px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .altline{margin-top:11px;font-size:12px;color:var(--faint);font-family:var(--mono);}
+  .drop .altbtn{background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;font-family:var(--sans);
+    font-size:12.5px;text-decoration:underline;text-underline-offset:2px;padding:0;}
+  .drop .altbtn:hover{color:var(--accent-dim);}
+  .drop .fmts{margin-top:12px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+  .drop .fmt{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 8px;}
+  input[type=file]{display:none;}
+
+  /* selected file list */
+  .flist{padding:12px;}
+  .flist .fhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 6px 11px;
+    border-bottom:1px solid var(--line-2);margin-bottom:6px;}
+  .flist .fhead .ft{font-size:13.5px;font-weight:700;}
+  .flist .fhead .fc{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-inline-start:8px;font-weight:500;}
+  .flist .fhead .clr{font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:var(--sans);
+    padding:5px 8px;border-radius:8px;transition:color .12s,background .12s;}
+  .flist .fhead .clr:hover{color:var(--danger);background:var(--danger-soft);}
+  .fscroll{max-height:360px;overflow:auto;}
+  .frow{display:flex;align-items:center;gap:12px;padding:9px 6px;border-radius:10px;}
+  .frow:hover{background:var(--panel-2);}
+  .frow .fico{width:38px;height:38px;flex-shrink:0;border-radius:10px;background:var(--accent-soft);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;}
+  .frow .fico svg{width:19px;height:19px;}
+  .frow .fmeta{flex:1;min-width:0;}
+  .frow .fmeta .fn{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;text-align:start;}
+  .frow .fmeta .fs{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .frow .frm{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .frow .frm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .frow .frm svg{width:15px;height:15px;}
+
+  /* options side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+
+  /* mode levels */
+  .levels{display:flex;flex-direction:column;gap:8px;}
+  .lvl{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1.4px solid var(--line);border-radius:12px;
+    background:var(--panel-2);cursor:pointer;transition:border-color .12s,background .12s;}
+  .lvl:hover{border-color:var(--accent);}
+  .lvl.sel{border-color:var(--accent);background:var(--accent-soft);}
+  .lvl .dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;position:relative;transition:border-color .12s;}
+  .lvl.sel .dot{border-color:var(--accent);}
+  .lvl.sel .dot::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--accent);}
+  .lvl .lv-t{flex:1;min-width:0;}
+  .lvl .lv-t .lt{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .lvl .lv-t .ld{font-size:11.5px;color:var(--muted);margin-top:1px;}
+
+  .inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .nameField{display:flex;align-items:stretch;}
+  .nameField .inp{border-start-end-radius:0;border-end-end-radius:0;border-inline-end:none;}
+  .nameField .ext{display:flex;align-items:center;padding:0 12px;font-family:var(--mono);font-size:12.5px;color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);border-start-start-radius:0;border-end-start-radius:0;border-radius:0 10px 10px 0;}
+  html[dir=rtl] .nameField .ext{border-radius:10px 0 0 10px;}
+  .hint{font-size:11px;color:var(--faint);font-family:var(--mono);margin-top:6px;line-height:1.5;}
+
+  .gobtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .gobtn:hover{filter:brightness(1.05);} .gobtn:active{transform:translateY(1px);}
+  .gobtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .gobtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+
+  /* progress */
+  .prog{padding:16px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;}
+  .prog .lbl .fn2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+
+  /* result */
+  .result{padding:22px;display:none;margin-top:18px;}
+  .result.show{display:block;}
+  .result .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .result .ok svg{width:28px;height:28px;}
+  .result h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .result .subt{text-align:center;font-size:13.5px;color:var(--muted);margin:0 0 20px;}
+
+  /* result zip preview */
+  .zbox{display:flex;align-items:center;gap:14px;max-width:560px;margin:0 auto 18px;padding:15px 16px;border-radius:14px;
+    background:var(--panel-2);border:1px solid var(--line-2);}
+  .zbox .zico{width:46px;height:46px;flex-shrink:0;border-radius:12px;background:var(--accent-soft);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;}
+  .zbox .zico svg{width:23px;height:23px;}
+  .zbox .zt{flex:1;min-width:0;}
+  .zbox .zt .zn{font-size:14.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;text-align:start;}
+  .zbox .zt .zm{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:3px;}
+
+  .rstats{display:flex;gap:10px;max-width:560px;margin:0 auto 12px;}
+  .rstats .box{flex:1;text-align:center;background:var(--panel-2);border:1px solid var(--line-2);border-radius:12px;padding:12px 6px;}
+  .rstats .box .v{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--ink);line-height:1.1;}
+  .rstats .box.new .v{color:var(--success-dim);}
+  .rstats .box.save .v{color:var(--accent-dim);}
+  .rstats .box .k{font-size:11px;color:var(--muted);margin-top:4px;}
+
+  .row2{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:560px;margin:0 auto;}
+  .row2 button{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 22px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 button:hover{border-color:var(--accent);} .row2 button:active{transform:translateY(1px);}
+  .row2 svg{width:15px;height:15px;}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin:18px auto 0;max-width:560px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid" id="composer">
+    <!-- main: upload + file list -->
+    <div class="col">
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="altline"><span data-i18n="orFolder"></span> <button class="altbtn" type="button" id="folderBtn" data-i18n="addFolder"></button></div>
+        <div class="fmts"><span class="fmt" data-i18n="fmtAny"></span><span class="fmt" data-i18n="fmtFolders"></span><span class="fmt" data-i18n="fmtMany"></span></div>
+      </div>
+      <input type="file" id="fileInput" multiple>
+      <input type="file" id="folderInput" webkitdirectory directory multiple>
+
+      <div class="card flist" id="listCard" style="display:none">
+        <div class="fhead">
+          <span><span class="ft" data-i18n="listTitle"></span><span class="fc" id="listCount"></span></span>
+          <button class="clr" id="clearBtn" type="button" data-i18n="clearAll"></button>
+        </div>
+        <div class="fscroll" id="fscroll"></div>
+      </div>
+    </div>
+
+    <!-- side: options -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="optTitle"></h3>
+
+        <div class="opt">
+          <label data-i18n="nameLbl"></label>
+          <div class="nameField">
+            <input class="inp" id="nameInp" type="text" spellcheck="false" autocomplete="off" placeholder="archive">
+            <span class="ext">.zip</span>
+          </div>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="modeLbl"></label>
+          <div class="levels" id="modes"></div>
+        </div>
+
+        <button class="gobtn" id="goBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+          <span data-i18n="goBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="fn2" id="progName" data-i18n="working"></span><span id="progPct">0%</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <!-- result -->
+  <div class="card result" id="resultCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" id="readySub"></p>
+
+    <div class="zbox">
+      <div class="zico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg></div>
+      <div class="zt">
+        <div class="zn" id="zName"></div>
+        <div class="zm" id="zMeta"></div>
+      </div>
+    </div>
+
+    <div class="rstats">
+      <div class="box"><div class="v" id="stOrig">—</div><div class="k" data-i18n="stOrigK"></div></div>
+      <div class="box new"><div class="v" id="stNew">—</div><div class="k" data-i18n="stNewK"></div></div>
+      <div class="box save"><div class="v" id="stSave">—</div><div class="k" data-i18n="stSaveK"></div></div>
+    </div>
+
+    <div class="row2">
+      <button id="dlBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        <span data-i18n="dl"></span>
+      </button>
+      <button id="againBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="againBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl',
+      kick:'דחיסה · דחיסת ZIP',
+      pageTitle:'דחסו קבצים לארכיון ZIP אחד',
+      pageSub:'גררו כמה קבצים או תיקיות שלמות, ואנחנו נארוז ונדחוס אותם לקובץ ZIP יחיד — נוח לשליחה ולשמירה. הכול קורה בדפדפן שלכם, ושום קובץ לא עולה לשרת.',
+      dropBig:'גררו קבצים או תיקיות לכאן', or2:'או', choose:'בחרו קבצים',
+      orFolder:'או', addFolder:'הוסיפו תיקייה שלמה',
+      fmtAny:'כל סוג קובץ', fmtFolders:'תיקיות', fmtMany:'כמה קבצים',
+      remove:'הסרה',
+      listTitle:'קבצים לארכיון', clearAll:'ניקוי הכול',
+      optTitle:'הגדרות הארכיון',
+      nameLbl:'שם הקובץ',
+      modeLbl:'שיטת אריזה',
+      mSmallerT:'דחיסה מקסימלית', mSmallerD:'הקובץ הכי קטן שאפשר (Deflate)',
+      mFasterT:'מהיר', mFasterD:'אריזה בלבד, בלי דחיסה (Store)',
+      goBtn:'צרו ZIP', working:'אורז…', workingN:(d,n)=>`אורז ${d} מתוך ${n}…`,
+      readyTitle:'הארכיון מוכן!',
+      readySub:(c,p)=>`${c} נארזו ל-ZIP אחד — חסכתם ${p} מהמשקל.`,
+      readyFlat:(c)=>`${c} נארזו ל-ZIP אחד.`,
+      filesN:(n)=>`${n} קבצים`, fileOne:'קובץ אחד',
+      zMeta:(c,s)=>`${c} · ${s}`,
+      stOrigK:'לפני', stNewK:'ZIP', stSaveK:'חיסכון',
+      dl:'הורדת ה-ZIP', againBtn:'ארכיון נוסף',
+      seam:'הכול קורה מקומית: הקבצים נדחסים ונארזים ל-ZIP ישירות בדפדפן שלכם — שום קובץ לא נשלח לשרת, וכלום לא עוזב את המחשב.',
+      foot:'KOLKLI · דחיסת ZIP · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הועתק ✓',
+      errNoFile:'קודם הוסיפו קבצים לארכיון',
+      errFail:'יצירת ה-ZIP נכשלה — נסו שוב',
+    },
+    en:{
+      dir:'ltr',
+      kick:'Compress · Compress ZIP',
+      pageTitle:'Bundle files into one ZIP archive',
+      pageSub:'Drop in any files or whole folders and we’ll pack and compress them into a single ZIP — easy to send and to store. It all runs in your browser, and no file ever leaves your machine.',
+      dropBig:'Drag files or folders here', or2:'or', choose:'Choose files',
+      orFolder:'or', addFolder:'add a whole folder',
+      fmtAny:'Any file', fmtFolders:'Folders', fmtMany:'Multiple files',
+      remove:'Remove',
+      listTitle:'Files to archive', clearAll:'Clear all',
+      optTitle:'Archive options',
+      nameLbl:'File name',
+      modeLbl:'Packing method',
+      mSmallerT:'Maximum compression', mSmallerD:'Smallest possible file (Deflate)',
+      mFasterT:'Fastest', mFasterD:'Bundle only, no compression (Store)',
+      goBtn:'Create ZIP', working:'Packing…', workingN:(d,n)=>`Packing ${d} of ${n}…`,
+      readyTitle:'Your archive is ready!',
+      readySub:(c,p)=>`${c} packed into one ZIP — you saved ${p}.`,
+      readyFlat:(c)=>`${c} packed into one ZIP.`,
+      filesN:(n)=>`${n} files`, fileOne:'1 file',
+      zMeta:(c,s)=>`${c} · ${s}`,
+      stOrigK:'Before', stNewK:'ZIP', stSaveK:'Saved',
+      dl:'Download ZIP', againBtn:'New archive',
+      seam:'Everything is local: files are compressed and packed into a ZIP right in your browser — no file is sent to a server, and nothing leaves your machine.',
+      foot:'KOLKLI · Compress ZIP · Private and fast, right in your browser',
+      copied:'Copied ✓',
+      errNoFile:'Add some files to the archive first',
+      errFail:'Creating the ZIP failed — please try again',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Сжатие · Сжать ZIP',
+      pageTitle:'Соберите файлы в один ZIP-архив',
+      pageSub:'Перетащите любые файлы или целые папки — мы упакуем и сожмём их в единый ZIP, удобный для отправки и хранения. Всё работает в вашем браузере, и ни один файл не покидает устройство.',
+      dropBig:'Перетащите файлы или папки сюда', or2:'или', choose:'Выбрать файлы',
+      orFolder:'или', addFolder:'добавить целую папку',
+      fmtAny:'Любой файл', fmtFolders:'Папки', fmtMany:'Несколько файлов',
+      remove:'Удалить',
+      listTitle:'Файлы для архива', clearAll:'Очистить всё',
+      optTitle:'Параметры архива',
+      nameLbl:'Имя файла',
+      modeLbl:'Способ упаковки',
+      mSmallerT:'Максимальное сжатие', mSmallerD:'Наименьший файл (Deflate)',
+      mFasterT:'Быстрее всего', mFasterD:'Только упаковка, без сжатия (Store)',
+      goBtn:'Создать ZIP', working:'Упаковка…', workingN:(d,n)=>`Упаковка ${d} из ${n}…`,
+      readyTitle:'Ваш архив готов!',
+      readySub:(c,p)=>`${c} упаковано в один ZIP — вы сэкономили ${p}.`,
+      readyFlat:(c)=>`${c} упаковано в один ZIP.`,
+      filesN:(n)=>`${n} файлов`, fileOne:'1 файл',
+      zMeta:(c,s)=>`${c} · ${s}`,
+      stOrigK:'До', stNewK:'ZIP', stSaveK:'Экономия',
+      dl:'Скачать ZIP', againBtn:'Новый архив',
+      seam:'Всё локально: файлы сжимаются и упаковываются в ZIP прямо в вашем браузере — ни один файл не отправляется на сервер, ничего не покидает устройство.',
+      foot:'KOLKLI · Сжать ZIP · Приватно и быстро, прямо в браузере',
+      copied:'Скопировано ✓',
+      errNoFile:'Сначала добавьте файлы в архив',
+      errFail:'Не удалось создать ZIP — попробуйте ещё раз',
+    },
+  };
+
+  let lang='he', t=I18N.he;
+  let files=[];        // [{id,file,name,path,size}]
+  let result=null;     // {blob,url,size,name,count,origTotal}
+  let mode='smaller';  // 'smaller' | 'faster'
+  let running=false;
+  let uid=0;
+
+  function safeName(s){ return String(s||'').replace(/[\\/:*?"<>|]+/g,'').trim(); }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function pct(o,n){ if(!o) return '0%'; return Math.max(0,Math.round((1-n/o)*100))+'%'; }
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1600); }
+  function countLbl(n){ return n===1 ? t.fileOne : t.filesN(n); }
+
+  // ---- intake ----
+  // Add an array of {file, path}. Paths use forward slashes; duplicates are skipped.
+  function addFiles(list){
+    let added=0;
+    for(const it of list){
+      if(!it || !it.file) continue;
+      // browsers report empty dir markers as 0-length with trailing slash; skip those
+      if(!it.path || it.path.endsWith('/')) continue;
+      const path = it.path.replace(/\\/g,'/').replace(/^\/+/,'');
+      if(files.some(f=>f.path===path)) continue;
+      files.push({ id:'f'+(uid++), file:it.file, name:it.file.name, path, size:it.file.size });
+      added++;
+    }
+    if(added) renderList();
+  }
+  function removeFile(id){ files=files.filter(f=>f.id!==id); renderList(); }
+  function clearFiles(){ files=[]; renderList(); }
+
+  function renderList(){
+    const card=el('listCard');
+    if(!files.length){ card.style.display='none'; el('fscroll').innerHTML=''; el('goBtn').disabled=true; return; }
+    card.style.display='';
+    const total=files.reduce((a,f)=>a+f.size,0);
+    el('listCount').textContent = '· ' + countLbl(files.length) + ' · ' + fmtBytes(total);
+    el('fscroll').innerHTML = files.map(f=>`
+      <div class="frow" data-id="${f.id}">
+        <span class="fico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+        <span class="fmeta"><div class="fn" title="${escapeHtml(f.path)}">${escapeHtml(f.path)}</div><div class="fs">${fmtBytes(f.size)}</div></span>
+        <button class="frm" type="button" data-rm="${f.id}" title="${escapeHtml(t.remove)}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`).join('');
+    el('goBtn').disabled = running || !files.length;
+  }
+
+  // ---- drag & drop (supports nested folders via entries) ----
+  async function filesFromDataTransfer(dt){
+    const items = dt.items;
+    if(items && items.length && items[0].webkitGetAsEntry){
+      const entries=[];
+      for(let i=0;i<items.length;i++){ const en = items[i].webkitGetAsEntry && items[i].webkitGetAsEntry(); if(en) entries.push(en); }
+      if(entries.length){
+        const out=[];
+        for(const en of entries) await walkEntry(en, '', out);
+        if(out.length) return out;
+      }
+    }
+    return Array.from(dt.files||[]).map(f=>({ file:f, path:f.name }));
+  }
+  function walkEntry(entry, prefix, out){
+    return new Promise(resolve=>{
+      if(entry.isFile){
+        entry.file(f=>{ out.push({ file:f, path:prefix+entry.name }); resolve(); }, ()=>resolve());
+      } else if(entry.isDirectory){
+        const reader=entry.createReader();
+        const all=[];
+        const readBatch=()=>reader.readEntries(async ents=>{
+          if(!ents.length){
+            for(const c of all) await walkEntry(c, prefix+entry.name+'/', out);
+            resolve();
+          } else { for(let i=0;i<ents.length;i++) all.push(ents[i]); readBatch(); }
+        }, ()=>resolve());
+        readBatch();
+      } else resolve();
+    });
+  }
+
+  // ---- ZIP writer (CRC32 + DEFLATE via CompressionStream, built by hand) ----
+  const CRC = (()=>{ const tb=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); tb[n]=c>>>0; } return tb; })();
+  function crc32(u8){ let c=0xFFFFFFFF; for(let i=0;i<u8.length;i++) c=CRC[(c^u8[i])&0xFF]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+
+  async function deflateRaw(u8){
+    if(!('CompressionStream' in window)) return null;
+    try{
+      const cs=new CompressionStream('deflate-raw');
+      const ab=await new Response(new Blob([u8]).stream().pipeThrough(cs)).arrayBuffer();
+      return new Uint8Array(ab);
+    }catch(_){ return null; }
+  }
+
+  // DOS date/time from a JS timestamp (ms). Values before 1980 clamp to 1980-01-01.
+  function dosDateTime(ms){
+    const d=new Date(ms||Date.now());
+    const y=d.getFullYear();
+    if(y<1980) return { time:0, date:0x21 };
+    const time=((d.getHours()&31)<<11)|((d.getMinutes()&63)<<5)|((d.getSeconds()>>1)&31);
+    const date=(((y-1980)&127)<<9)|(((d.getMonth()+1)&15)<<5)|(d.getDate()&31);
+    return { time:time&0xFFFF, date:date&0xFFFF };
+  }
+
+  async function buildZip(onProgress){
+    const enc=new TextEncoder();
+    const local=[];      // local headers + file data
+    const central=[];    // central directory records
+    let offset=0;
+    const useDeflate = (mode!=='faster');
+
+    for(let i=0;i<files.length;i++){
+      const f=files[i];
+      const data=new Uint8Array(await f.file.arrayBuffer());
+      const crc=crc32(data);
+      let method=0, out=data;
+      if(useDeflate && data.length>0){
+        const def=await deflateRaw(data);
+        if(def && def.length < data.length){ method=8; out=def; }
+      }
+      const nameBytes=enc.encode(f.path);
+      const dt=dosDateTime(f.file.lastModified);
+
+      const lh=new Uint8Array(30+nameBytes.length);
+      const lv=new DataView(lh.buffer);
+      lv.setUint32(0,0x04034b50,true);      // local file header signature
+      lv.setUint16(4,20,true);              // version needed
+      lv.setUint16(6,0x0800,true);          // flags: UTF-8 filename
+      lv.setUint16(8,method,true);          // compression method
+      lv.setUint16(10,dt.time,true);
+      lv.setUint16(12,dt.date,true);
+      lv.setUint32(14,crc,true);
+      lv.setUint32(18,out.length,true);     // compressed size
+      lv.setUint32(22,data.length,true);    // uncompressed size
+      lv.setUint16(26,nameBytes.length,true);
+      lv.setUint16(28,0,true);              // extra length
+      lh.set(nameBytes,30);
+      local.push(lh,out);
+
+      const ch=new Uint8Array(46+nameBytes.length);
+      const cv=new DataView(ch.buffer);
+      cv.setUint32(0,0x02014b50,true);      // central dir header signature
+      cv.setUint16(4,20,true);              // version made by
+      cv.setUint16(6,20,true);              // version needed
+      cv.setUint16(8,0x0800,true);          // flags
+      cv.setUint16(10,method,true);
+      cv.setUint16(12,dt.time,true);
+      cv.setUint16(14,dt.date,true);
+      cv.setUint32(16,crc,true);
+      cv.setUint32(20,out.length,true);
+      cv.setUint32(24,data.length,true);
+      cv.setUint16(28,nameBytes.length,true);
+      cv.setUint16(30,0,true);              // extra length
+      cv.setUint16(32,0,true);              // comment length
+      cv.setUint16(34,0,true);              // disk number start
+      cv.setUint16(36,0,true);              // internal attrs
+      cv.setUint32(38,0,true);              // external attrs
+      cv.setUint32(42,offset,true);         // local header offset
+      ch.set(nameBytes,46);
+      central.push(ch);
+
+      offset += lh.length + out.length;
+      if(onProgress) onProgress(i+1, files.length);
+      await sleep(0); // keep the UI responsive between files
+    }
+
+    const cdSize=central.reduce((a,c)=>a+c.length,0);
+    const cdOffset=offset;
+    const eocd=new Uint8Array(22);
+    const ev=new DataView(eocd.buffer);
+    ev.setUint32(0,0x06054b50,true);        // end of central dir signature
+    ev.setUint16(4,0,true);
+    ev.setUint16(6,0,true);
+    ev.setUint16(8,files.length&0xFFFF,true);
+    ev.setUint16(10,files.length&0xFFFF,true);
+    ev.setUint32(12,cdSize,true);
+    ev.setUint32(16,cdOffset,true);
+    ev.setUint16(20,0,true);
+
+    return new Blob([...local, ...central, eocd], { type:'application/zip' });
+  }
+
+  // ---- run ----
+  async function run(){
+    if(running) return;
+    el('optErr').textContent='';
+    if(!files.length){ el('optErr').textContent=t.errNoFile; return; }
+
+    running=true; el('goBtn').disabled=true;
+    el('composer').style.display='none';
+    el('resultCard').classList.remove('show');
+    clearResult();
+    showProg();
+
+    try{
+      const origTotal=files.reduce((a,f)=>a+f.size,0);
+      const count=files.length;
+      const blob=await buildZip((done,total)=>{
+        setProg(4+Math.round(done/total*90));
+        el('progName').textContent=t.workingN(done,total);
+      });
+      setProg(98); await sleep(60);
+      const name=(safeName(el('nameInp').value)||'archive')+'.zip';
+      result={ blob, url:URL.createObjectURL(blob), size:blob.size, name, count, origTotal };
+      setProg(100); await sleep(130);
+      hideProg();
+      showResult();
+    }catch(err){
+      console.error(err);
+      hideProg();
+      el('composer').style.display='';
+      el('optErr').textContent=t.errFail;
+    }
+    running=false;
+    renderList();
+  }
+
+  function clearResult(){ if(result && result.url) URL.revokeObjectURL(result.url); result=null; }
+
+  // ---- progress ----
+  function showProg(){ el('progCard').classList.add('show'); setProg(0); el('progName').textContent=t.working; el('progCard').scrollIntoView({behavior:'smooth',block:'center'}); }
+  function hideProg(){ el('progCard').classList.remove('show'); }
+  function setProg(p){ p=Math.max(0,Math.min(100,Math.round(p))); el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+
+  // ---- result ----
+  function showResult(){
+    if(!result) return;
+    const saved = pct(result.origTotal, result.size);
+    if(result.size < result.origTotal){
+      el('readySub').textContent = t.readySub(countLbl(result.count), saved);
+    }else{
+      el('readySub').textContent = t.readyFlat(countLbl(result.count));
+    }
+    el('zName').textContent = result.name;
+    el('zMeta').textContent = t.zMeta(countLbl(result.count), fmtBytes(result.size));
+    el('stOrig').textContent = fmtBytes(result.origTotal);
+    el('stNew').textContent  = fmtBytes(result.size);
+    el('stSave').textContent = result.size < result.origTotal ? saved : '0%';
+
+    const card=el('resultCard'); card.classList.add('show');
+    card.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  function downloadResult(){
+    if(!result||!result.url) return;
+    const a=document.createElement('a'); a.href=result.url; a.download=result.name; document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  function reset(){
+    clearResult(); clearFiles();
+    el('resultCard').classList.remove('show');
+    el('optErr').textContent='';
+    el('composer').style.display='';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- mode UI ----
+  function renderModes(){
+    const rows=[
+      ['smaller', t.mSmallerT, t.mSmallerD],
+      ['faster',  t.mFasterT,  t.mFasterD],
+    ];
+    el('modes').innerHTML = rows.map(([k,ttl,desc])=>`
+      <div class="lvl ${mode===k?'sel':''}" data-mode="${k}">
+        <span class="dot"></span>
+        <span class="lv-t"><div class="lt">${escapeHtml(ttl)}</div><div class="ld">${escapeHtml(desc)}</div></span>
+      </div>`).join('');
+  }
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderModes(); renderList();
+    if(result && el('resultCard').classList.contains('show')) showResult();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput'), folderInput=el('folderInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  el('folderBtn').addEventListener('click',e=>{ e.stopPropagation(); folderInput.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ addFiles(Array.from(input.files||[]).map(f=>({file:f,path:f.name}))); input.value=''; });
+  folderInput.addEventListener('change',()=>{ addFiles(Array.from(folderInput.files||[]).map(f=>({file:f,path:f.webkitRelativePath||f.name}))); folderInput.value=''; });
+
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',async e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(await filesFromDataTransfer(e.dataTransfer)); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('fscroll').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeFile(b.getAttribute('data-rm')); });
+  el('clearBtn').addEventListener('click',clearFiles);
+  el('modes').addEventListener('click',e=>{ const row=e.target.closest('[data-mode]'); if(!row) return; mode=row.getAttribute('data-mode'); renderModes(); });
+
+  el('goBtn').addEventListener('click',run);
+  el('dlBtn').addEventListener('click',downloadResult);
+  el('againBtn').addEventListener('click',reset);
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  renderModes(); renderList();
+})();
+</script>
+</body>
+</html>

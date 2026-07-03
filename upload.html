@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — Upload files</title>
+<meta name="description" content="Upload your files securely — no account needed.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 60px;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:26px;}
+  .dhead{text-align:center;border-bottom:1px solid var(--line-2);padding-bottom:20px;margin-bottom:20px;}
+  .dhead .ava{width:58px;height:58px;margin:0 auto 12px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad-soft);color:var(--accent);}
+  .dhead .ava svg{width:29px;height:29px;}
+  .dhead h1{font-size:21px;margin:0 0 6px;font-weight:700;word-break:break-word;}
+  .dhead .desc{font-size:14px;color:var(--muted);white-space:pre-wrap;word-break:break-word;max-width:52ch;margin:0 auto;}
+  .metarow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;}
+  .chip svg{width:13px;height:13px;color:var(--accent);}
+
+  /* client fields */
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+  @media (max-width:520px){ .fields{grid-template-columns:1fr;} }
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{font-size:12px;font-weight:600;color:var(--ink-2);}
+  .inp,.ta{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .inp:focus,.ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .ta{resize:vertical;min-height:56px;}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:34px 24px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:64px;height:64px;margin:0 auto 14px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:32px;height:32px;}
+  .drop .big{font-size:19px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:15px;color:var(--faint);margin:7px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:16px;padding:12px 26px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .sizenote{margin-top:13px;font-size:12.5px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  /* file list */
+  .flist{display:flex;flex-direction:column;gap:9px;margin-bottom:16px;}
+  .frow{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel);}
+  .frow .fico{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .frow .fico.image{color:var(--info);background:var(--info-soft);} .frow .fico.video{color:#e5484d;background:var(--danger-soft);}
+  .frow .fico.doc{color:var(--info-dim);background:var(--info-soft);}
+  .frow .fico svg{width:17px;height:17px;}
+  .frow .fn{flex:1;min-width:0;}
+  .frow .fn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .frow .fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .frow .fbar{height:5px;border-radius:999px;background:var(--panel-2);overflow:hidden;margin-top:5px;display:none;}
+  .frow.up .fbar{display:block;}
+  .frow .fbar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+  .frow.done .fn .sz{color:var(--success-dim);}
+  .frow .rm{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .frow .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .frow .rm svg{width:15px;height:15px;}
+  .frow .tick{width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--success-dim);}
+  .frow .tick svg{width:18px;height:18px;}
+
+  .sendbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:14px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .sendbtn:hover{filter:brightness(1.05);} .sendbtn:active{transform:translateY(1px);}
+  .sendbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .sendbtn svg{width:17px;height:17px;}
+  .uperr{font-size:12px;color:var(--danger);margin-top:10px;min-height:15px;text-align:center;}
+
+  /* states */
+  .state{text-align:center;padding:20px 10px;}
+  .state .si{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;}
+  .state .si.warn{background:var(--warm-soft);color:var(--warn);} .state .si.lock{background:var(--accent-soft);color:var(--accent);}
+  .state .si.ok{background:var(--success-soft);color:var(--success-dim);}
+  .state .si svg{width:32px;height:32px;}
+  .state h2{font-size:20px;margin:0 0 8px;}
+  .state p{font-size:14px;color:var(--muted);margin:0 auto 18px;max-width:46ch;line-height:1.6;white-space:pre-wrap;}
+  .pwform{display:flex;gap:8px;max-width:340px;margin:0 auto;}
+  .pwform input{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:14px;padding:11px 13px;}
+  .pwform input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .pwform.bad input{border-color:var(--danger);}
+  .pwform button{border:none;color:#fff;cursor:pointer;border-radius:10px;padding:0 18px;font-weight:600;font-size:14px;
+    background:var(--grad-btn);box-shadow:0 4px 12px var(--grad-btn-glow);}
+  .pwerr{font-size:12px;color:var(--danger);margin-top:10px;min-height:14px;}
+  .again{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink-2);box-shadow:var(--shadow-sm);}
+  .again:hover{border-color:var(--accent);} .again svg{width:15px;height:15px;}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:18px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+  .hidden{display:none !important;}
+
+  footer{margin-top:30px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+  <div class="card">
+    <!-- loading -->
+    <div class="state" id="loadingState">
+      <div class="si lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg></div>
+      <p data-i18n="loading"></p>
+    </div>
+
+    <!-- notice: expired / closed / not found -->
+    <div class="state hidden" id="noticeState">
+      <div class="si warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
+      <h2 id="noticeTitle"></h2>
+      <p id="noticeBody"></p>
+    </div>
+
+    <!-- password gate -->
+    <div class="state hidden" id="pwState">
+      <div class="si lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <h2 data-i18n="pwTitle"></h2>
+      <p data-i18n="pwSub"></p>
+      <form class="pwform" id="pwForm">
+        <input id="pwInput" type="password" dir="ltr" data-i18n-ph="pwPh" autocomplete="off">
+        <button type="submit" data-i18n="unlock"></button>
+      </form>
+      <div class="pwerr" id="pwErr"></div>
+    </div>
+
+    <!-- upload -->
+    <div class="hidden" id="uploadView">
+      <div class="dhead">
+        <div class="ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+        <h1 id="reqName"></h1>
+        <div class="desc" id="reqDesc"></div>
+      </div>
+      <div class="metarow" id="metaRow"></div>
+
+      <div class="fields">
+        <div class="field"><label data-i18n="cName"></label><input class="inp" id="cName" type="text" data-i18n-ph="cNamePh"></div>
+        <div class="field"><label data-i18n="cPhone"></label><input class="inp" id="cPhone" type="tel" dir="ltr" data-i18n-ph="cPhonePh"></div>
+        <div class="field full"><label data-i18n="cEmail"></label><input class="inp" id="cEmail" type="email" dir="ltr" data-i18n-ph="cEmailPh"></div>
+        <div class="field full"><label data-i18n="cNote"></label><textarea class="ta" id="cNote" data-i18n-ph="cNotePh"></textarea></div>
+      </div>
+
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="sizenote" id="sizeNote"></div>
+      </div>
+      <input type="file" id="fileInput" multiple>
+
+      <div class="flist" id="flist"></div>
+
+      <button class="sendbtn" id="uploadBtn" type="button" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+        <span id="uploadBtnLbl"></span>
+      </button>
+      <div class="uperr" id="upErr"></div>
+
+      <div class="seam">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span data-i18n="privacy"></span>
+      </div>
+    </div>
+
+    <!-- success -->
+    <div class="state hidden" id="successState">
+      <div class="si ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <h2 data-i18n="successTitle"></h2>
+      <p id="successBody"></p>
+      <button class="again" id="moreBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="uploadMore"></span>
+      </button>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./request-store.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const KR = window.KR;
+
+  const I18N = {
+    he:{ dir:'rtl',
+      loading:'טוען את הבקשה…',
+      ntExpiredT:'הקישור פג תוקף', ntExpiredB:'הקישור להעלאת הקבצים כבר לא פעיל. בקשו מבעל הבקשה קישור חדש.',
+      ntClosedT:'הבקשה נסגרה', ntClosedB:'בעל הבקשה סגר את קבלת הקבצים. בקשו קישור חדש אם צריך.',
+      ntMissingT:'הקישור לא נמצא', ntMissingB:'הקישור שגוי או שאינו קיים במכשיר הזה. ודאו שהעתקתם את הקישור המלא.',
+      pwTitle:'הבקשה מוגנת בסיסמה', pwSub:'הזינו את הסיסמה שקיבלתם כדי להעלות קבצים.',
+      pwPh:'סיסמה', unlock:'כניסה', pwWrong:'סיסמה שגויה',
+      cName:'שם', cNamePh:'השם שלכם', cPhone:'טלפון', cPhonePh:'מספר טלפון',
+      cEmail:'אימייל', cEmailPh:'you@mail.com', cNote:'הערה', cNotePh:'משהו שנרצה שנדע…',
+      dropBig:'גררו קבצים לכאן', or2:'או', choose:'בחרו קבצים',
+      uploadBtn:n=> n?`העלאת ${n} קבצים`:'העלאה', uploadBtnOne:'העלאת קובץ',
+      uploading:'מעלה…',
+      chipTypes:s=>`מותר: ${s}`, chipMaxFile:s=>`עד ${s} לקובץ`, chipMaxCount:n=>`עד ${n} קבצים`,
+      chipMaxTotal:s=>`עד ${s} סה״כ`, chipExpiry:d=>`פג תוקף בעוד ${d}`, chipAllTypes:'כל סוגי הקבצים',
+      tImage:'תמונות', tVideo:'וידאו', tAudio:'אודיו', tDoc:'מסמכים',
+      sizeNoteAll:'כל סוגי הקבצים', sizeNoteTypes:s=>`סוגים מותרים: ${s}`,
+      privacy:'הקבצים נשלחים ישירות לבעל הבקשה. לקוחות אחרים לא רואים את מה שהעליתם.',
+      foot:'KOLKLI · Kolkli Request · העלאה מאובטחת ללא צורך בחשבון',
+      successTitle:'הקבצים הועלו!', successDefault:'תודה! הקבצים התקבלו אצל בעל הבקשה.', uploadMore:'העלאת קבצים נוספים',
+      day:'יום', days:d=>`${d} ימים`, today:'היום',
+      errType:n=>`"${n}" — סוג קובץ לא מותר בבקשה זו`, errSize:(n,s)=>`"${n}" גדול מדי (מקסימום ${s})`,
+      errCount:n=>`אפשר להעלות עד ${n} קבצים`, errTotal:s=>`חריגה מהגודל הכולל המותר (${s})`,
+      errNone:'צריך לבחור לפחות קובץ אחד', remove:'הסרה',
+      uploadFail:'ההעלאה נכשלה, נסו שוב', added:n=>`נוספו ${n} קבצים`,
+    },
+    en:{ dir:'ltr',
+      loading:'Loading request…',
+      ntExpiredT:'This link has expired', ntExpiredB:'The upload link is no longer active. Ask the request owner for a new link.',
+      ntClosedT:'This request is closed', ntClosedB:'The owner has stopped accepting files. Ask for a new link if you still need to upload.',
+      ntMissingT:'Link not found', ntMissingB:'The link is invalid or doesn’t exist on this device. Make sure you copied the full link.',
+      pwTitle:'This request is password protected', pwSub:'Enter the password you received to upload files.',
+      pwPh:'Password', unlock:'Enter', pwWrong:'Wrong password',
+      cName:'Name', cNamePh:'Your name', cPhone:'Phone', cPhonePh:'Phone number',
+      cEmail:'Email', cEmailPh:'you@mail.com', cNote:'Note', cNotePh:'Anything we should know…',
+      dropBig:'Drag files here', or2:'or', choose:'Choose files',
+      uploadBtn:n=> n?`Upload ${n} files`:'Upload', uploadBtnOne:'Upload file',
+      uploading:'Uploading…',
+      chipTypes:s=>`Allowed: ${s}`, chipMaxFile:s=>`Up to ${s}/file`, chipMaxCount:n=>`Up to ${n} files`,
+      chipMaxTotal:s=>`Up to ${s} total`, chipExpiry:d=>`Expires in ${d}`, chipAllTypes:'All file types',
+      tImage:'Images', tVideo:'Video', tAudio:'Audio', tDoc:'Documents',
+      sizeNoteAll:'All file types', sizeNoteTypes:s=>`Allowed types: ${s}`,
+      privacy:'Your files go straight to the request owner. Other clients can’t see what you upload.',
+      foot:'KOLKLI · Kolkli Request · Secure upload, no account needed',
+      successTitle:'Files uploaded!', successDefault:'Thank you! Your files reached the request owner.', uploadMore:'Upload more files',
+      day:'1 day', days:d=>`${d} days`, today:'today',
+      errType:n=>`"${n}" — file type not allowed for this request`, errSize:(n,s)=>`"${n}" is too large (max ${s})`,
+      errCount:n=>`You can upload up to ${n} files`, errTotal:s=>`Over the allowed total size (${s})`,
+      errNone:'Choose at least one file', remove:'Remove',
+      uploadFail:'Upload failed, please try again', added:n=>`${n} files added`,
+    },
+    ru:{ dir:'ltr',
+      loading:'Загрузка запроса…',
+      ntExpiredT:'Срок ссылки истёк', ntExpiredB:'Ссылка для загрузки больше не активна. Попросите у владельца запроса новую ссылку.',
+      ntClosedT:'Запрос закрыт', ntClosedB:'Владелец прекратил приём файлов. Попросите новую ссылку, если нужно загрузить файлы.',
+      ntMissingT:'Ссылка не найдена', ntMissingB:'Ссылка неверна или не существует на этом устройстве. Убедитесь, что скопировали ссылку полностью.',
+      pwTitle:'Запрос защищён паролем', pwSub:'Введите полученный пароль, чтобы загрузить файлы.',
+      pwPh:'Пароль', unlock:'Войти', pwWrong:'Неверный пароль',
+      cName:'Имя', cNamePh:'Ваше имя', cPhone:'Телефон', cPhonePh:'Номер телефона',
+      cEmail:'Эл. почта', cEmailPh:'you@mail.com', cNote:'Комментарий', cNotePh:'Что нам стоит знать…',
+      dropBig:'Перетащите файлы сюда', or2:'или', choose:'Выбрать файлы',
+      uploadBtn:n=> n?`Загрузить ${n} файлов`:'Загрузить', uploadBtnOne:'Загрузить файл',
+      uploading:'Загрузка…',
+      chipTypes:s=>`Разрешено: ${s}`, chipMaxFile:s=>`До ${s}/файл`, chipMaxCount:n=>`До ${n} файлов`,
+      chipMaxTotal:s=>`До ${s} всего`, chipExpiry:d=>`Истекает через ${d}`, chipAllTypes:'Любые файлы',
+      tImage:'Изображения', tVideo:'Видео', tAudio:'Аудио', tDoc:'Документы',
+      sizeNoteAll:'Любые типы файлов', sizeNoteTypes:s=>`Разрешённые типы: ${s}`,
+      privacy:'Ваши файлы попадают напрямую владельцу запроса. Другие клиенты не видят, что вы загрузили.',
+      foot:'KOLKLI · Kolkli Request · Безопасная загрузка без аккаунта',
+      successTitle:'Файлы загружены!', successDefault:'Спасибо! Ваши файлы получены владельцем запроса.', uploadMore:'Загрузить ещё файлы',
+      day:'1 день', days:d=>`${d} дн.`, today:'сегодня',
+      errType:n=>`«${n}» — тип файла не разрешён для этого запроса`, errSize:(n,s)=>`«${n}» слишком большой (макс. ${s})`,
+      errCount:n=>`Можно загрузить до ${n} файлов`, errTotal:s=>`Превышен допустимый общий размер (${s})`,
+      errNone:'Выберите хотя бы один файл', remove:'Удалить',
+      uploadFail:'Ошибка загрузки, попробуйте снова', added:n=>`Добавлено файлов: ${n}`,
+    },
+  };
+
+  let lang='he', t=I18N.he;
+  let req=null, token=null, unlocked=false;
+  let files=[];            // {id,file,name,ext,kind,size,done}
+  let uid=1, uploading=false;
+
+  function toast(msg){ const b=el('toast'); b.textContent=msg; b.classList.add('show'); clearTimeout(b._t); b._t=setTimeout(()=>b.classList.remove('show'),1900); }
+  function ls(k){ return KR.ls(k); }
+  function daysWord(n){ n=+n; return n===1? t.day : t.days(n); }
+
+  function show(id){ ['loadingState','noticeState','pwState','uploadView','successState'].forEach(s=>el(s).classList.toggle('hidden', s!==id)); }
+  function notice(tk,bk){ el('noticeTitle').textContent=t[tk]; el('noticeBody').textContent=t[bk]; show('noticeState'); }
+
+  function allowedTypes(){ return (req && req.types && req.types.length)? req.types : null; }
+  function typeLbl(k){ return t['t'+k.charAt(0).toUpperCase()+k.slice(1)]; }
+  function acceptAttr(){
+    const at=allowedTypes(); if(!at) return '';
+    let exts=[]; at.forEach(k=>{ exts=exts.concat((KR.TYPES[k]||[]).map(e=>'.'+e)); }); return exts.join(',');
+  }
+
+  // ---------- meta / notes ----------
+  function renderMeta(){
+    const chips=[];
+    const at=allowedTypes();
+    chips.push(`<span class="chip">${tagSvg()} ${at? at.map(typeLbl).join(' · ') : t.chipAllTypes}</span>`);
+    if(req.maxFileMB) chips.push(`<span class="chip">${fileSvg()} ${t.chipMaxFile(mb(req.maxFileMB))}</span>`);
+    if(req.maxCount) chips.push(`<span class="chip">${hashSvg()} ${t.chipMaxCount(req.maxCount)}</span>`);
+    if(req.maxTotalMB) chips.push(`<span class="chip">${stackSvg()} ${t.chipMaxTotal(mb(req.maxTotalMB))}</span>`);
+    if(req.expiresAt){ const d=Math.ceil((req.expiresAt-Date.now())/86400000); if(d>0) chips.push(`<span class="chip">${clockSvg()} ${t.chipExpiry(daysWord(d))}</span>`); }
+    el('metaRow').innerHTML=chips.join('');
+    const at2=allowedTypes();
+    el('sizeNote').textContent = at2? t.sizeNoteTypes(at2.map(typeLbl).join(' · ')) : t.sizeNoteAll;
+  }
+  function mb(n){ return n>=1000? (n/1000)+' GB' : n+' MB'; }
+
+  // ---------- file intake with validation ----------
+  function addFiles(list){
+    const at=allowedTypes();
+    let msg='';
+    Array.from(list||[]).forEach(file=>{
+      const ext=KR.extOf(file.name), kind=KR.kindOf(ext);
+      if(at && at.indexOf(kind)<0){ msg=t.errType(file.name); return; }
+      if(req.maxFileMB && file.size> req.maxFileMB*1048576){ msg=t.errSize(file.name, mb(req.maxFileMB)); return; }
+      if(req.maxCount && files.length>=req.maxCount){ msg=t.errCount(req.maxCount); return; }
+      const projected=files.reduce((a,f)=>a+f.size,0)+file.size;
+      if(req.maxTotalMB && projected> req.maxTotalMB*1048576){ msg=t.errTotal(mb(req.maxTotalMB)); return; }
+      files.push({ id:'kf'+KR.randToken()+(uid++), file, name:file.name, ext, kind, size:file.size, done:false });
+    });
+    el('upErr').textContent=msg;
+    renderFiles();
+  }
+  function removeFile(id){ files=files.filter(f=>f.id!==id); renderFiles(); }
+  function renderFiles(){
+    el('flist').innerHTML = files.map(f=>`
+      <div class="frow${f.done?' done':''}" data-id="${f.id}">
+        <span class="fico ${f.kind}">${KR.FICON[f.kind]}</span>
+        <span class="fn"><div class="nm" title="${KR.escapeHtml(f.name)}">${KR.escapeHtml(f.name)}</div><div class="sz">${KR.fmtBytes(f.size)}</div>
+          <div class="fbar"><i style="width:${f.done?100:0}%"></i></div></span>
+        ${f.done? `<span class="tick">${checkSvg()}</span>` : `<button class="rm" data-rm="${f.id}" title="${KR.escapeHtml(t.remove)}">${xSvg()}</button>`}
+      </div>`).join('');
+    updateBtn();
+  }
+  function updateBtn(){
+    el('uploadBtn').disabled = uploading || files.length===0;
+    el('uploadBtnLbl').textContent = uploading? t.uploading : (files.length===1? t.uploadBtnOne : t.uploadBtn(files.length));
+  }
+
+  // ---------- submit ----------
+  async function submit(){
+    if(uploading) return;
+    if(!files.length){ el('upErr').textContent=t.errNone; return; }
+    // re-fetch to respect any owner changes; re-check gate
+    const fresh=KR.getRequest(token);
+    if(!fresh){ notice('ntMissingT','ntMissingB'); return; }
+    if(KR.statusOf(fresh)==='closed'){ notice('ntClosedT','ntClosedB'); return; }
+    if(KR.statusOf(fresh)==='expired'){ notice('ntExpiredT','ntExpiredB'); return; }
+    req=fresh;
+
+    uploading=true; el('upErr').textContent=''; updateBtn();
+    document.querySelectorAll('#flist .rm').forEach(b=>b.style.display='none');
+    document.querySelectorAll('#flist .frow').forEach(r=>r.classList.add('up'));
+
+    const subId='s'+KR.randToken();
+    const metas=[];
+    try{
+      for(let i=0;i<files.length;i++){
+        const f=files[i];
+        const row=document.querySelector('.frow[data-id="'+f.id+'"]');
+        const bar=row? row.querySelector('.fbar i') : null;
+        if(bar){ bar.style.width='35%'; }
+        await KR.putBlob(f.id, f.file);
+        if(bar){ bar.style.width='100%'; }
+        f.done=true; if(row){ row.classList.add('done'); }
+        metas.push({ id:f.id, subId, name:f.name, ext:f.ext, kind:f.kind, size:f.size, at:Date.now(), seen:false });
+        await new Promise(r=>setTimeout(r,120));
+      }
+    }catch(_){
+      uploading=false; el('upErr').textContent=t.uploadFail; updateBtn(); return;
+    }
+
+    const sub={ id:subId, name:el('cName').value.trim(), phone:el('cPhone').value.trim(),
+      email:el('cEmail').value.trim(), note:el('cNote').value.trim(), at:Date.now(), fileIds:metas.map(m=>m.id) };
+    req.submissions = (req.submissions||[]).concat([sub]);
+    req.files = (req.files||[]).concat(metas);
+    KR.upsertRequest(req);
+    KR.post({ type:'upload', token, count:metas.length, who:sub.name });
+
+    uploading=false;
+    el('successBody').textContent = req.thankYou || t.successDefault;
+    show('successState');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function resetForm(){
+    files=[]; uploading=false;
+    el('cName').value=''; el('cPhone').value=''; el('cEmail').value=''; el('cNote').value='';
+    renderFiles(); el('upErr').textContent=''; show('uploadView');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---------- password ----------
+  async function tryUnlock(e){
+    e.preventDefault();
+    const val=el('pwInput').value;
+    if(await KR.hashPass(val)===req.password){ unlocked=true; el('pwForm').classList.remove('bad'); el('pwErr').textContent=''; enterUpload(); }
+    else { el('pwForm').classList.add('bad'); el('pwErr').textContent=t.pwWrong; }
+  }
+
+  function enterUpload(){
+    el('reqName').textContent=req.name;
+    el('reqDesc').textContent=req.desc||''; el('reqDesc').style.display=req.desc? '' : 'none';
+    el('fileInput').setAttribute('accept', acceptAttr());
+    renderMeta(); renderFiles(); show('uploadView');
+  }
+
+  // ---------- i18n + theme ----------
+  function applyStatic(){
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
+  }
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    applyStatic(); KR.lsSet('ac_lang', l);
+    if(req){
+      if(!el('uploadView').classList.contains('hidden')){ renderMeta(); renderFiles(); }
+      if(!el('noticeState').classList.contains('hidden')){ /* keep as-is; texts re-derived on next route */ }
+      if(!el('successState').classList.contains('hidden')) el('successBody').textContent = req.thankYou || t.successDefault;
+    }
+  }
+  function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); const ic=el('themeIco'); if(ic) ic.textContent=dark?'☀️':'🌙'; KR.lsSet('theme',dark?'dark':'light'); }
+
+  // ---------- svg atoms ----------
+  function tagSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12 22l-8-8V4h10z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>'; }
+  function fileSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>'; }
+  function hashSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>'; }
+  function stackSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>'; }
+  function clockSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'; }
+  function xSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>'; }
+  function checkSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'; }
+
+  // ---------- events ----------
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  el('flist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeFile(b.getAttribute('data-rm')); });
+  el('uploadBtn').addEventListener('click',submit);
+  el('moreBtn').addEventListener('click',resetForm);
+  el('pwForm').addEventListener('submit',tryUnlock);
+  window.__setLang=applyLang;
+  const themeBtn=el('themeToggle'); if(themeBtn) themeBtn.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---------- init ----------
+  applyTheme(ls('theme')||'light');
+  applyLang(KR.detectLang());
+  token=(location.search.match(/[?&]req=([^&]+)/)||[])[1];
+  token = token? decodeURIComponent(token) : null;
+  if(!token){ notice('ntMissingT','ntMissingB'); return; }
+  req=KR.getRequest(token);
+  if(!req){ notice('ntMissingT','ntMissingB'); return; }
+  const st=KR.statusOf(req);
+  if(st==='expired'){ notice('ntExpiredT','ntExpiredB'); return; }
+  if(st==='closed'){ notice('ntClosedT','ntClosedB'); return; }
+  if(req.password){ show('pwState'); setTimeout(()=>el('pwInput').focus(),40); return; }
+  enterUpload();
+})();
+</script>
+</body>
+</html>

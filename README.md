@@ -1,13 +1,20 @@
-# Random 60s MP3 Cutter & Volume Normalizer — Web App
+# KOLKLI — Everything you need to work with files
 
-Cuts a random 60-second clip from each MP3 and balances loudness to 89/90/91 dB
-(like MP3Gain), exporting 320 kbps MP3. Bilingual (Hebrew/English). Runs fully
-in your browser — no file is uploaded, no internet needed at runtime.
+KOLKLI is a browser-first file platform: upload once, then edit, convert,
+compress, organize and send. Editing runs locally in your browser — files only
+leave your device when you choose to send or store them. Bilingual
+(Hebrew/English) with light/dark themes.
+
+Today the two live modules are the **audio editor** (`app.html`, formerly
+"AudioCut": cut a clip / normalize loudness to 89/90/91 dB like MP3Gain /
+convert / batch, exporting 320 kbps MP3) and the **local file organizer**
+(`files.html`). Everything else on the homepage (image/video tools, converters,
+AI Studio, send-large-files, accounts) is on the roadmap — see `SPEC.md`.
 
 ## Files
-- `index.html` — the landing page (marketing homepage). Every "Open the
-  Editor" / upload button links to `app.html`.
-- `app.html` — the actual editor (cut / normalize / convert / batch). This is
+- `index.html` — the KOLKLI landing page (marketing homepage). Live tool cards
+  link to `app.html` / `files.html`; roadmap tools are marked "Soon".
+- `app.html` — the audio editor (cut / normalize / convert / batch). This is
   the working tool.
 - `vendor/` — the local FFmpeg + Essentia engines (ffmpeg.js, util.js,
   jszip.min.js, essentia-wasm/essentia.js). Everything runs from here; no CDN.

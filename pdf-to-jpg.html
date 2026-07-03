@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — PDF ל-JPG</title>
+<meta name="description" content="Convert PDF pages to JPG, PNG or WEBP images right in your browser. Pick resolution and quality, and download every page as an image or a ZIP. Fast, private, nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:30px 20px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:26px;height:26px;}
+  .drop .big{font-size:15.5px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:12px;color:var(--faint);margin:6px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13.5px;padding:10px 22px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .chips{margin-top:12px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+  .drop .chip{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 8px;}
+  input[type=file]{display:none;}
+
+  /* file list */
+  .files{display:flex;flex-direction:column;}
+  .flisthead{display:flex;align-items:center;justify-content:space-between;padding:13px 16px 3px;}
+  .flisthead .ttl{font-size:13px;font-weight:700;color:var(--ink-2);}
+  .flisthead .clear{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer;transition:all .12s;}
+  .flisthead .clear:hover{border-color:var(--danger);color:var(--danger);}
+  .flisthead .clear svg{width:13px;height:13px;}
+  .flist{display:flex;flex-direction:column;gap:8px;padding:10px 14px 4px;}
+  .frow{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line-2);border-radius:11px;background:var(--panel);
+    transition:box-shadow .12s,border-color .12s,opacity .12s;}
+  .frow.bad{border-color:var(--warm-line);background:var(--warm-soft);}
+  .frow .fico{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--danger-soft);color:var(--danger);}
+  .frow.bad .fico{background:transparent;color:var(--warn);}
+  .frow .fico svg{width:16px;height:16px;}
+  .frow .fn{flex:1;min-width:0;}
+  .frow .fn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .frow .fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .frow .fn .warnt{font-size:11px;color:var(--warn);font-weight:600;}
+  .frow .rm{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0;}
+  .frow .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .frow .rm svg{width:14px;height:14px;}
+  .ftot{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--line-2);
+    font-size:13px;color:var(--muted);margin-top:6px;}
+  .ftot b{color:var(--ink);font-family:var(--mono);}
+  .ftot .pg{color:var(--accent-dim);}
+
+  /* options side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+  .opt.dim{opacity:.5;pointer-events:none;}
+
+  .stat{display:flex;gap:10px;margin-bottom:16px;}
+  .stat .box{flex:1;text-align:center;background:var(--panel-2);border:1px solid var(--line-2);border-radius:11px;padding:11px 6px;}
+  .stat .box .v{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--accent-dim);line-height:1.1;}
+  .stat .box .k{font-size:11px;color:var(--muted);margin-top:3px;}
+
+  /* format picker */
+  .fmts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+  .fmt{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:11px 4px 9px;border-radius:11px;
+    border:1px solid var(--line);background:var(--panel-2);cursor:pointer;transition:border-color .12s,background .12s,transform .08s;}
+  .fmt:hover{border-color:var(--accent);}
+  .fmt:active{transform:scale(.97);}
+  .fmt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
+  .fmt b{font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--ink);}
+  .fmt small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;}
+  .fmt.on b{color:var(--accent-dim);}
+
+  /* quality slider */
+  .qhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+  .qhead label{font-size:12.5px;font-weight:600;color:var(--ink-2);margin:0;}
+  .qval{font-family:var(--mono);font-size:12px;color:var(--accent-dim);font-weight:700;
+    background:var(--accent-soft);padding:2px 9px;border-radius:999px;}
+  .range{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;margin:0;
+    background:var(--panel-2);border:1px solid var(--line);outline:none;cursor:pointer;}
+  .range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:19px;height:19px;border-radius:50%;
+    background:var(--accent);cursor:pointer;border:3px solid var(--panel);box-shadow:var(--shadow-sm),0 0 0 1px var(--line);transition:transform .08s;}
+  .range::-webkit-slider-thumb:active{transform:scale(1.12);}
+  .range::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;
+    border:3px solid var(--panel);box-shadow:var(--shadow-sm);}
+  .qhint{font-size:11px;color:var(--faint);margin-top:7px;font-family:var(--mono);}
+
+  select.inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;cursor:pointer;transition:border-color .12s,box-shadow .12s;}
+  select.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+
+  .gobtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .gobtn:hover{filter:brightness(1.05);} .gobtn:active{transform:translateY(1px);}
+  .gobtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .gobtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+
+  /* progress */
+  .prog{padding:16px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;}
+  .prog .lbl .fn2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+
+  /* result */
+  .result{padding:22px;display:none;margin-top:18px;}
+  .result.show{display:block;}
+  .result .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .result .ok svg{width:28px;height:28px;}
+  .result h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .result .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+
+  /* result thumbnails grid */
+  .rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;margin-bottom:18px;}
+  .rcell{border:1px solid var(--line-2);border-radius:12px;overflow:hidden;background:var(--panel-2);display:flex;flex-direction:column;
+    transition:border-color .12s,box-shadow .12s;}
+  .rcell:hover{border-color:var(--accent);box-shadow:var(--shadow-sm);}
+  .rcell .th{width:100%;aspect-ratio:1/1.3;object-fit:contain;background:#fff;border-bottom:1px solid var(--line-2);}
+  .rcell .cap{padding:9px 10px;display:flex;align-items:center;gap:8px;}
+  .rcell .cap .cn{flex:1;min-width:0;}
+  .rcell .cap .cn .nm{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rcell .cap .cn .meta{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:1px;}
+  .rcell .cap .cdl{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0;}
+  .rcell .cap .cdl:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .rcell .cap .cdl svg{width:15px;height:15px;}
+
+  .result .row2{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:600px;margin:0 auto;}
+  .result .row2 button{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 22px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .result .row2 button:hover{border-color:var(--accent);} .result .row2 button:active{transform:translateY(1px);}
+  .result .row2 svg{width:15px;height:15px;}
+  .result .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script src="./vendor/jszip.min.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid" id="composer">
+    <!-- main: upload + files -->
+    <div class="col">
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M9 15h6"/><path d="M9 18h4"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="chips"><span class="chip">PDF</span><span class="chip" data-i18n="fmtOnlyPdf"></span></div>
+      </div>
+      <input type="file" id="fileInput" accept="application/pdf,.pdf" multiple>
+
+      <div class="card files" id="filesCard" style="display:none">
+        <div class="flisthead">
+          <span class="ttl" data-i18n="listTtl"></span>
+          <button class="clear" id="clearBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span data-i18n="clearAll"></span>
+          </button>
+        </div>
+        <div class="flist" id="flist"></div>
+        <div class="ftot">
+          <span data-i18n="totalLbl"></span>
+          <span><b id="totalVal">0</b> · <span class="pg" id="pagesVal"></span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- side: options -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="optTitle"></h3>
+
+        <div class="stat">
+          <div class="box"><div class="v" id="stFiles">0</div><div class="k" data-i18n="stFiles"></div></div>
+          <div class="box"><div class="v" id="stPages">0</div><div class="k" data-i18n="stPages"></div></div>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="fmtLbl"></label>
+          <div class="fmts" id="fmts"></div>
+        </div>
+
+        <div class="opt" id="qualityOpt">
+          <div class="qhead">
+            <label data-i18n="qualityLbl"></label>
+            <span class="qval" id="qVal">85%</span>
+          </div>
+          <input type="range" class="range" id="quality" min="40" max="100" step="1" value="85">
+          <div class="qhint" data-i18n="qualityHint"></div>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="resLbl"></label>
+          <select class="inp" id="res">
+            <option value="1" data-i18n="resLow"></option>
+            <option value="2.0833" data-i18n="resMed" selected></option>
+            <option value="4.1667" data-i18n="resHigh"></option>
+          </select>
+        </div>
+
+        <button class="gobtn" id="goBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span data-i18n="goBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="fn2" id="progName" data-i18n="working"></span><span id="progPct">0%</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <!-- result -->
+  <div class="card result" id="resultCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" id="readySub"></p>
+    <div class="rgrid" id="rlist"></div>
+    <div class="row2">
+      <button id="dlAllBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        <span id="dlAllLbl"></span>
+      </button>
+      <button id="againBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="againBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'מסמכים · PDF ל-JPG',
+      pageTitle:'המירו עמודי PDF לתמונות',
+      pageSub:'גררו קובצי PDF, בחרו פורמט, איכות ורזולוציה, וקבלו כל עמוד כתמונה מוכנה להורדה. הכול מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      dropBig:'גררו קובצי PDF לכאן', or2:'או', choose:'בחרו קבצים', fmtOnlyPdf:'קובצי PDF בלבד',
+      remove:'הסרה', totalLbl:'סה״כ', listTtl:'קבצים להמרה', clearAll:'נקה הכול',
+      optTitle:'הגדרות המרה', stFiles:'קבצים', stPages:'עמודים',
+      fmtLbl:'פורמט יעד', qualityLbl:'איכות', qualityHint:'איכות גבוהה יותר = קובץ גדול יותר',
+      resLbl:'רזולוציה', resLow:'רגיל (72 DPI)', resMed:'גבוה (150 DPI)', resHigh:'הדפסה (300 DPI)',
+      goBtn:'המירו לתמונות', working:'ממיר…',
+      readyTitle:'ההמרה הושלמה!',
+      readySub:n=>`${n} ${n===1?'תמונה מוכנה':'תמונות מוכנות'} להורדה.`,
+      download:'הורדה', downloadAll:'הורדת הכול (ZIP)',
+      againBtn:'המרה נוספת',
+      pageCount:n=>`${n} ${n===1?'עמוד':'עמודים'}`, loadingPages:'טוען…',
+      seam:'ההמרה רצה מקומית בדפדפן: כל עמוד עובר רינדור לתמונה בעזרת pdf.js. הקבצים לא נשלחים לשום שרת.',
+      foot:'KOLKLI · PDF ל-JPG · רץ בדפדפן שלכם',
+      copied:'הועתק ✓',
+      errNone:'הוסיפו לפחות קובץ PDF תקין אחד כדי להמיר',
+      errLibs:'ספריית ההמרה לא נטענה. בדקו את החיבור לאינטרנט ורעננו את העמוד.',
+      errFail:'ההמרה נכשלה. בדקו שהקבצים תקינים ואינם מוגני סיסמה.',
+      badEnc:'מוגן בסיסמה — לא נתמך', badCorrupt:'קובץ פגום או לא PDF תקין',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'Documents · PDF to JPG',
+      pageTitle:'Convert PDF pages to images',
+      pageSub:'Drop your PDF files, pick a format, quality and resolution, and get every page as a ready-to-download image. It all runs in your browser — no file ever leaves your machine.',
+      dropBig:'Drag PDF files here', or2:'or', choose:'Choose files', fmtOnlyPdf:'PDF files only',
+      remove:'Remove', totalLbl:'Total', listTtl:'Files to convert', clearAll:'Clear all',
+      optTitle:'Convert options', stFiles:'Files', stPages:'Pages',
+      fmtLbl:'Target format', qualityLbl:'Quality', qualityHint:'Higher quality = larger file',
+      resLbl:'Resolution', resLow:'Screen (72 DPI)', resMed:'High (150 DPI)', resHigh:'Print (300 DPI)',
+      goBtn:'Convert to images', working:'Converting…',
+      readyTitle:'Conversion done!',
+      readySub:n=>`${n} ${n===1?'image':'images'} ready to download.`,
+      download:'Download', downloadAll:'Download all (ZIP)',
+      againBtn:'Convert more',
+      pageCount:n=>`${n} ${n===1?'page':'pages'}`, loadingPages:'reading…',
+      seam:'Conversion runs locally in your browser: every page is rendered to an image with pdf.js. Files are never uploaded.',
+      foot:'KOLKLI · PDF to JPG · runs in your browser',
+      copied:'Copied ✓',
+      errNone:'Add at least one valid PDF file to convert',
+      errLibs:'The conversion library failed to load. Check your connection and refresh.',
+      errFail:'Conversion failed. Make sure the files are valid and not password-protected.',
+      badEnc:'Password-protected — not supported', badCorrupt:'Corrupt or not a valid PDF',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Документы · PDF в JPG',
+      pageTitle:'Конвертируйте страницы PDF в изображения',
+      pageSub:'Перетащите PDF-файлы, выберите формат, качество и разрешение — и получите каждую страницу как готовое к скачиванию изображение. Всё работает в вашем браузере — ни один файл не покидает устройство.',
+      dropBig:'Перетащите PDF-файлы сюда', or2:'или', choose:'Выбрать файлы', fmtOnlyPdf:'Только PDF-файлы',
+      remove:'Удалить', totalLbl:'Всего', listTtl:'Файлы для конвертации', clearAll:'Очистить всё',
+      optTitle:'Параметры конвертации', stFiles:'Файлы', stPages:'Страницы',
+      fmtLbl:'Целевой формат', qualityLbl:'Качество', qualityHint:'Выше качество = больше файл',
+      resLbl:'Разрешение', resLow:'Экран (72 DPI)', resMed:'Высокое (150 DPI)', resHigh:'Печать (300 DPI)',
+      goBtn:'Конвертировать в изображения', working:'Конвертация…',
+      readyTitle:'Конвертация завершена!',
+      readySub:n=>`Готово к скачиванию: ${n}.`,
+      download:'Скачать', downloadAll:'Скачать всё (ZIP)',
+      againBtn:'Ещё конвертация',
+      pageCount:n=>`Страниц: ${n}`, loadingPages:'чтение…',
+      seam:'Конвертация идёт локально в вашем браузере: каждая страница отрисовывается в изображение через pdf.js. Файлы никогда не загружаются.',
+      foot:'KOLKLI · PDF в JPG · работает в вашем браузере',
+      copied:'Скопировано ✓',
+      errNone:'Добавьте хотя бы один корректный PDF-файл для конвертации',
+      errLibs:'Не удалось загрузить библиотеку конвертации. Проверьте соединение и обновите страницу.',
+      errFail:'Конвертация не удалась. Убедитесь, что файлы корректны и не защищены паролем.',
+      badEnc:'Защищён паролем — не поддерживается', badCorrupt:'Повреждён или не является корректным PDF',
+    },
+  };
+
+  // target image formats — all encoded client-side via canvas.toBlob
+  const FORMATS = [
+    { id:'jpg',  label:'JPG',  type:'image/jpeg', ext:'jpg',  sub:'small',    quality:true  },
+    { id:'png',  label:'PNG',  type:'image/png',  ext:'png',  sub:'lossless', quality:false },
+    { id:'webp', label:'WEBP', type:'image/webp', ext:'webp', sub:'modern',   quality:true  },
+  ];
+
+  const ICON = {
+    pdf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M8.5 13h1a1.5 1.5 0 0 1 0 3h-1zM8.5 13v5"/></svg>',
+    warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+    trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+    dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>',
+  };
+
+  // point pdf.js at its worker (matches the CDN build above)
+  if(window.pdfjsLib){ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'; }
+
+  let lang='he', t=I18N.he;
+  let files=[];          // {id,file,name,size,status:'loading'|'ready'|'bad',reason,pages}
+  let results=[];        // {name,url,blob,size,w,h,src}
+  let fmt='jpg';
+  let uid=1, running=false;
+
+  function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
+  function baseName(name){ return String(name||'').replace(/\.[^.\/\\]+$/,''); }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function safeName(s){ return String(s||'').replace(/[\\/:*?"<>|]+/g,'').trim(); }
+  function totalBytes(){ return files.reduce((a,f)=>a+f.size,0); }
+  function readyFiles(){ return files.filter(f=>f.status==='ready'); }
+  function totalPages(){ return files.reduce((a,f)=>a+(f.status==='ready'?(f.pages||0):0),0); }
+  function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1600); }
+
+  // ---- intake ----
+  function addFiles(list){
+    Array.from(list||[]).forEach(file=>{
+      const isPdf = extOf(file.name)==='pdf' || file.type==='application/pdf';
+      const f = { id:'f'+(uid++), file, name:file.name, size:file.size,
+                  status: isPdf?'loading':'bad', reason: isPdf?'':'badCorrupt', pages:null };
+      files.push(f);
+      if(isPdf) probe(f);
+    });
+    renderFiles();
+  }
+
+  // read the page count (and validate) with pdf.js, without blocking the UI
+  async function probe(f){
+    try{
+      const buf = await f.file.arrayBuffer();
+      const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+      f.pages = doc.numPages; f.status='ready';
+      try{ doc.destroy(); }catch(_){}
+    }catch(err){
+      f.status='bad';
+      f.reason = (err && err.name==='PasswordException') ? 'badEnc' : 'badCorrupt';
+    }
+    renderFiles();
+  }
+
+  function removeFile(id){ files=files.filter(f=>f.id!==id); renderFiles(); }
+  function clearFiles(){ files=[]; renderFiles(); }
+
+  function renderFiles(){
+    const card=el('filesCard'), listEl=el('flist');
+    card.style.display = files.length? '' : 'none';
+    listEl.innerHTML = files.map(f=>{
+      const bad = f.status==='bad';
+      let meta;
+      if(bad) meta = `<div class="warnt">${escapeHtml(t[f.reason]||t.badCorrupt)}</div>`;
+      else if(f.status==='loading') meta = `<div class="sz">${fmtBytes(f.size)} · ${escapeHtml(t.loadingPages)}</div>`;
+      else meta = `<div class="sz">${fmtBytes(f.size)} · ${escapeHtml(t.pageCount(f.pages||0))}</div>`;
+      return `
+      <div class="frow ${bad?'bad':''}" data-id="${f.id}">
+        <span class="fico">${bad?ICON.warn:ICON.pdf}</span>
+        <span class="fn"><div class="nm" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>${meta}</span>
+        <button class="rm" data-rm="${f.id}" title="${escapeHtml(t.remove)}">${ICON.trash}</button>
+      </div>`;
+    }).join('');
+    const pages=totalPages();
+    el('totalVal').textContent = fmtBytes(totalBytes());
+    el('pagesVal').textContent = t.pageCount(pages);
+    el('stFiles').textContent = readyFiles().length;
+    el('stPages').textContent = pages;
+    el('goBtn').disabled = running || readyFiles().length < 1;
+  }
+
+  // ---- format picker ----
+  function renderFmts(){
+    el('fmts').innerHTML = FORMATS.map(f=>`
+      <button type="button" class="fmt ${f.id===fmt?'on':''}" data-fmt="${f.id}">
+        <b>${f.label}</b><small>${f.sub}</small>
+      </button>`).join('');
+    const spec = FORMATS.find(f=>f.id===fmt);
+    el('qualityOpt').classList.toggle('dim', !spec.quality);
+  }
+
+  // ---- convert one file: rasterize every page -> image blob ----
+  async function convertFile(f, spec, opts, onPage){
+    const buf = await f.file.arrayBuffer();
+    const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+    const n = doc.numPages;
+    const pad = String(n).length;
+    const base = safeName(baseName(f.name)) || 'page';
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const out = [];
+
+    for(let i=1;i<=n;i++){
+      const page = await doc.getPage(i);
+      const vp = page.getViewport({ scale: opts.scale });
+      canvas.width = Math.max(1, Math.round(vp.width));
+      canvas.height = Math.max(1, Math.round(vp.height));
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+
+      const blob = await new Promise(res=>canvas.toBlob(res, spec.type, spec.quality?opts.quality:undefined));
+      out.push({
+        name: `${base}-${String(i).padStart(pad,'0')}.${spec.ext}`,
+        blob, url:URL.createObjectURL(blob), size:blob.size,
+        w:canvas.width, h:canvas.height, src:f.name,
+      });
+      page.cleanup();
+      if(onPage) onPage();
+    }
+    canvas.width = canvas.height = 0;
+    try{ doc.destroy(); }catch(_){}
+    return out;
+  }
+
+  async function convertAll(){
+    if(running) return;
+    clearErr();
+    const list = readyFiles();
+    if(list.length<1){ showErr(t.errNone); return; }
+    if(!window.pdfjsLib){ showErr(t.errLibs); return; }
+
+    const spec = FORMATS.find(f=>f.id===fmt);
+    const opts = { scale: parseFloat(el('res').value)||2, quality: (+el('quality').value)/100 };
+
+    running=true; el('goBtn').disabled=true;
+    el('composer').style.display='none';
+    el('resultCard').classList.remove('show');
+    results.forEach(r=>URL.revokeObjectURL(r.url)); results=[];
+    showProg();
+
+    const grand = list.reduce((a,f)=>a+(f.pages||0),0) || 1;
+    let done=0;
+    try{
+      for(const f of list){
+        const out = await convertFile(f, spec, opts, ()=>{
+          done++; setProg(Math.round(done/grand*100), f.name);
+        });
+        results = results.concat(out);
+        await wait(15);
+      }
+      setProg(100, t.working);
+      await wait(150);
+      hideProg();
+      showResult();
+    }catch(err){
+      console.error(err);
+      results.forEach(r=>URL.revokeObjectURL(r.url)); results=[];
+      hideProg();
+      el('composer').style.display='';
+      showErr(t.errFail);
+    }
+    running=false;
+    renderFiles();
+  }
+
+  // ---- progress ----
+  function showProg(){ el('progCard').classList.add('show'); setProg(0, t.working); el('progCard').scrollIntoView({behavior:'smooth',block:'center'}); }
+  function hideProg(){ el('progCard').classList.remove('show'); }
+  function setProg(p, label){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; if(label!=null) el('progName').textContent=label; }
+
+  // ---- result ----
+  function showResult(){
+    if(!results.length) return;
+    el('readySub').textContent = t.readySub(results.length);
+    el('rlist').innerHTML = results.map((r,i)=>`
+      <div class="rcell">
+        <img class="th" src="${r.url}" alt="" loading="lazy">
+        <div class="cap">
+          <span class="cn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta">${r.w}×${r.h} · ${fmtBytes(r.size)}</div></span>
+          <button class="cdl" data-dl="${i}" title="${escapeHtml(t.download)}">${ICON.dl}</button>
+        </div>
+      </div>`).join('');
+    el('dlAllLbl').textContent = results.length>1 ? t.downloadAll : t.download;
+    const card=el('resultCard'); card.classList.add('show');
+    card.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function downloadOne(i){
+    const r=results[i]; if(!r) return;
+    const a=document.createElement('a'); a.href=r.url; a.download=r.name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  async function downloadAll(){
+    if(!results.length) return;
+    if(results.length===1){ downloadOne(0); return; }
+    if(!window.JSZip){ results.forEach((_,i)=>downloadOne(i)); return; }
+    const zip=new JSZip();
+    const multi = new Set(results.map(r=>r.src)).size>1;
+    results.forEach(r=>{
+      if(multi){ zip.folder(safeName(baseName(r.src))||'pdf').file(r.name, r.blob); }
+      else { zip.file(r.name, r.blob); }
+    });
+    const blob=await zip.generateAsync({type:'blob'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='pdf-images.zip'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  }
+
+  function reset(){
+    results.forEach(r=>URL.revokeObjectURL(r.url)); results=[];
+    files=[];
+    el('resultCard').classList.remove('show');
+    el('composer').style.display=''; renderFiles();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function showErr(m){ el('optErr').textContent=m; }
+  function clearErr(){ el('optErr').textContent=''; }
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderFmts();
+    renderFiles();
+    if(results.length) showResult();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && !el('flist').contains(e.target) && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('flist').addEventListener('click',e=>{
+    const rm=e.target.closest('[data-rm]'); if(rm){ removeFile(rm.getAttribute('data-rm')); }
+  });
+  el('clearBtn').addEventListener('click',clearFiles);
+  el('fmts').addEventListener('click',e=>{ const b=e.target.closest('[data-fmt]'); if(b){ fmt=b.getAttribute('data-fmt'); renderFmts(); } });
+  el('quality').addEventListener('input',()=>{ el('qVal').textContent=el('quality').value+'%'; });
+  el('goBtn').addEventListener('click',convertAll);
+  el('rlist').addEventListener('click',e=>{
+    const dl=e.target.closest('[data-dl]'); if(dl){ downloadOne(+dl.getAttribute('data-dl')); }
+  });
+  el('dlAllBtn').addEventListener('click',downloadAll);
+  el('againBtn').addEventListener('click',reset);
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  renderFmts();
+  renderFiles();
+})();
+</script>
+</body>
+</html>

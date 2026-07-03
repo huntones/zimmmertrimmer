@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — שינוי גודל תמונה</title>
+<meta name="description" content="Resize images right in your browser — set exact dimensions or scale by percent, keep the aspect ratio, pick a format and download. Fast, private, nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:30px 20px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:26px;height:26px;}
+  .drop .big{font-size:15.5px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:12px;color:var(--faint);margin:6px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13.5px;padding:10px 22px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .sizenote{margin-top:12px;font-size:11.5px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  /* file list */
+  .files{display:flex;flex-direction:column;}
+  .flist{display:flex;flex-direction:column;gap:8px;padding:14px;}
+  .frow{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line-2);border-radius:11px;background:var(--panel);}
+  .frow .thumb{width:44px;height:44px;border-radius:9px;flex-shrink:0;object-fit:cover;background:var(--panel-2);
+    border:1px solid var(--line-2);display:block;}
+  .frow .fn{flex:1;min-width:0;}
+  .frow .fn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .frow .fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .frow .rm{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .frow .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .frow .rm svg{width:15px;height:15px;}
+  .ftot{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--line-2);
+    font-size:13px;color:var(--muted);}
+  .ftot b{color:var(--ink);font-family:var(--mono);}
+
+  /* options side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+
+  /* segmented mode toggle */
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:12px;padding:4px;}
+  .seg button{border:none;background:transparent;color:var(--muted);font-family:var(--sans);font-size:13px;font-weight:600;
+    padding:8px 6px;border-radius:9px;cursor:pointer;transition:background .12s,color .12s;}
+  .seg button.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+
+  /* dimension inputs with a lock between them */
+  .dims{display:flex;align-items:flex-end;gap:8px;}
+  .dims .field{flex:1;min-width:0;}
+  .dims .field span{display:block;font-size:10.5px;font-family:var(--mono);color:var(--faint);text-transform:uppercase;
+    letter-spacing:.05em;margin-bottom:4px;}
+  .lock{width:34px;height:42px;flex-shrink:0;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;margin-bottom:0;}
+  .lock:hover{border-color:var(--accent);}
+  .lock.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim);}
+  .lock svg{width:16px;height:16px;}
+
+  .inp,select.inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  select.inp{cursor:pointer;}
+  .inp:focus,select.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  input.inp[type=number]{-moz-appearance:textfield;}
+  input.inp::-webkit-outer-spin-button,input.inp::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .opt.dim{opacity:.5;pointer-events:none;}
+  .hint{font-size:11px;color:var(--faint);font-family:var(--mono);margin-top:6px;}
+
+  /* range slider */
+  .rangewrap{display:flex;align-items:center;gap:11px;}
+  input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;
+    background:var(--panel-2);border:1px solid var(--line-2);cursor:pointer;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:var(--grad-btn);border:2px solid var(--panel);box-shadow:var(--shadow-sm);cursor:pointer;}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#5d43f5;border:2px solid var(--panel);cursor:pointer;}
+  .rangeval{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--accent-dim);min-width:44px;text-align:center;}
+
+  .convbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .convbtn:hover{filter:brightness(1.05);} .convbtn:active{transform:translateY(1px);}
+  .convbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .convbtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+
+  /* progress */
+  .prog{padding:16px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;}
+  .prog .lbl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+
+  /* results */
+  .results{padding:22px;display:none;margin-top:18px;}
+  .results.show{display:block;}
+  .results .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .results .ok svg{width:28px;height:28px;}
+  .results h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .results .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+  .rlist{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+  .rrow{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel-2);}
+  .rrow .thumb{width:46px;height:46px;border-radius:10px;flex-shrink:0;object-fit:cover;background:var(--panel);
+    border:1px solid var(--line-2);display:block;}
+  .rrow.err .rico{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--danger-soft);color:var(--danger);}
+  .rrow.err .rico svg{width:18px;height:18px;}
+  .rrow .rn{flex:1;min-width:0;}
+  .rrow .rn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rrow .rn .meta{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .rrow .meta em{font-style:normal;color:var(--success-dim);}
+  .rrow.err .rn .meta{color:var(--danger);}
+  .dlbtn{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:12.5px;padding:0 15px;height:36px;border-radius:10px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
+  .dlbtn:hover{filter:brightness(1.05);} .dlbtn svg{width:15px;height:15px;}
+  .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .row2 a,.row2 button{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 a:hover,.row2 button:hover{border-color:var(--accent);} .row2 *:active{transform:translateY(1px);}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .row2 svg{width:15px;height:15px;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid" id="composer">
+    <!-- main: upload + files -->
+    <div class="col">
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="sizenote" data-i18n="sizeNote"></div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" multiple>
+
+      <div class="card files" id="filesCard" style="display:none">
+        <div class="flist" id="flist"></div>
+        <div class="ftot"><span data-i18n="totalLbl"></span> <b id="totalVal">0</b></div>
+      </div>
+    </div>
+
+    <!-- side: options -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="optTitle"></h3>
+
+        <div class="opt">
+          <label data-i18n="modeLbl"></label>
+          <div class="seg" id="modeSeg">
+            <button type="button" data-mode="size" class="on" data-i18n="modeSize"></button>
+            <button type="button" data-mode="percent" data-i18n="modePercent"></button>
+          </div>
+        </div>
+
+        <!-- by dimensions -->
+        <div class="opt" id="sizeOpt">
+          <label data-i18n="dimLbl"></label>
+          <div class="dims">
+            <div class="field">
+              <span data-i18n="wLbl"></span>
+              <input class="inp" id="wInp" type="number" min="1" max="20000" inputmode="numeric" placeholder="1920">
+            </div>
+            <button class="lock on" id="lockBtn" type="button" title="">
+              <svg id="lockIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </button>
+            <div class="field">
+              <span data-i18n="hLbl"></span>
+              <input class="inp" id="hInp" type="number" min="1" max="20000" inputmode="numeric" placeholder="1080">
+            </div>
+          </div>
+          <div class="hint" id="sizeHint"></div>
+        </div>
+
+        <!-- by percent -->
+        <div class="opt" id="percentOpt" style="display:none">
+          <label data-i18n="scaleLbl"></label>
+          <div class="rangewrap">
+            <input type="range" id="pct" min="5" max="200" step="5" value="50">
+            <span class="rangeval" id="pctVal">50%</span>
+          </div>
+          <div class="hint" data-i18n="scaleHint"></div>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="fmtLbl"></label>
+          <select class="inp" id="fmt">
+            <option value="keep" data-i18n="keepOrig"></option>
+            <option value="image/jpeg">JPG</option>
+            <option value="image/png">PNG</option>
+            <option value="image/webp">WEBP</option>
+          </select>
+        </div>
+
+        <div class="opt" id="qualityOpt">
+          <label data-i18n="qLbl"></label>
+          <div class="rangewrap">
+            <input type="range" id="quality" min="30" max="100" step="1" value="90">
+            <span class="rangeval" id="qVal">90%</span>
+          </div>
+        </div>
+
+        <button class="convbtn" id="convBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+          <span data-i18n="convBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="nm" id="progName" data-i18n="working"></span><span id="progPct">0%</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <!-- results -->
+  <div class="card results" id="resultsCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" id="readySub"></p>
+    <div class="rlist" id="rlist"></div>
+    <div class="row2">
+      <button id="dlAllBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="dlAll"></span>
+      </button>
+      <button id="againBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="againBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'שינוי גודל תמונה',
+      pageTitle:'שנו גודל של תמונות — בלי להעלות לשרת',
+      pageSub:'גררו תמונות, קבעו מידות מדויקות או הקטינו באחוזים, שמרו על יחס הממדים, בחרו פורמט וקבלו קובץ מוכן להורדה. הכול מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      dropBig:'גררו תמונות לכאן', or2:'או', choose:'בחרו תמונות',
+      sizeNote:'JPG · PNG · WEBP · GIF · BMP', remove:'הסרה',
+      totalLbl:'סה״כ', optTitle:'הגדרות שינוי גודל',
+      modeLbl:'שיטה', modeSize:'לפי מידות', modePercent:'לפי אחוז',
+      dimLbl:'מידות (פיקסלים)', wLbl:'רוחב', hLbl:'גובה',
+      lockOn:'יחס ממדים נעול', lockOff:'יחס ממדים חופשי',
+      sizeHintFit:'מתאים בתוך התיבה תוך שמירה על יחס הממדים. השאירו שדה ריק כדי לחשב אותו אוטומטית.',
+      sizeHintStretch:'התמונה תימתח למידות המדויקות — יחס הממדים לא יישמר.',
+      scaleLbl:'שינוי קנה מידה', scaleHint:'ביחס לגודל המקורי של כל תמונה.',
+      fmtLbl:'פורמט יעד', keepOrig:'כמו המקור',
+      qLbl:'איכות (JPG / WEBP)',
+      convBtn:'שנו גודל עכשיו', working:'מעבד…',
+      readyTitle:'הכול מוכן!', readySub:n=>`${n} ${n===1?'תמונה מוכנה':'תמונות מוכנות'} להורדה.`,
+      dlAll:'הורדת הכול', againBtn:'תמונה נוספת',
+      converted:'שונה', origLbl:'מקור',
+      failed:'העיבוד נכשל — פורמט לא נתמך בדפדפן',
+      seam:'הכול קורה מקומית: התמונות מעובדות ישירות בדפדפן שלכם דרך canvas — שום קובץ לא נשלח לשרת, וכלום לא עוזב את המחשב.',
+      foot:'KOLKLI · שינוי גודל תמונה · פרטי ומהיר, ישירות בדפדפן',
+      errNoFiles:'צריך לצרף לפחות תמונה אחת', errDims:'הזינו רוחב או גובה', errDecode:'לא הצלחנו לפענח אף תמונה',
+      copied:'הקישור הועתק ✓',
+      dl:'הורדה',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'Resize image',
+      pageTitle:'Resize images — without uploading',
+      pageSub:'Drop images, set exact dimensions or scale by percent, keep the aspect ratio, pick a format and get a ready-to-download file. Everything runs in your browser — nothing leaves your machine.',
+      dropBig:'Drag images here', or2:'or', choose:'Choose images',
+      sizeNote:'JPG · PNG · WEBP · GIF · BMP', remove:'Remove',
+      totalLbl:'Total', optTitle:'Resize options',
+      modeLbl:'Method', modeSize:'By size', modePercent:'By percent',
+      dimLbl:'Dimensions (pixels)', wLbl:'Width', hLbl:'Height',
+      lockOn:'Aspect ratio locked', lockOff:'Aspect ratio free',
+      sizeHintFit:'Fits inside the box while keeping the aspect ratio. Leave a field empty to compute it automatically.',
+      sizeHintStretch:'The image is stretched to the exact size — the aspect ratio is not kept.',
+      scaleLbl:'Scale', scaleHint:'Relative to each image’s original size.',
+      fmtLbl:'Target format', keepOrig:'Keep original',
+      qLbl:'Quality (JPG / WEBP)',
+      convBtn:'Resize now', working:'Processing…',
+      readyTitle:'All done!', readySub:n=>`${n} ${n===1?'image':'images'} ready to download.`,
+      dlAll:'Download all', againBtn:'Resize more',
+      converted:'resized', origLbl:'source',
+      failed:'Processing failed — format not supported by this browser',
+      seam:'Everything is local: images are processed right in your browser via canvas — no file is sent to a server, and nothing leaves your machine.',
+      foot:'KOLKLI · Image resize · Private and fast, right in your browser',
+      errNoFiles:'Add at least one image', errDims:'Enter a width or a height', errDecode:'We could not decode any image',
+      copied:'Link copied ✓',
+      dl:'Download',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Изменение размера изображения',
+      pageTitle:'Изменяйте размер изображений — без загрузки на сервер',
+      pageSub:'Перетащите изображения, задайте точные размеры или масштаб в процентах, сохраните соотношение сторон, выберите формат и получите готовый к скачиванию файл. Всё работает в вашем браузере — ничего не покидает устройство.',
+      dropBig:'Перетащите изображения сюда', or2:'или', choose:'Выбрать изображения',
+      sizeNote:'JPG · PNG · WEBP · GIF · BMP', remove:'Удалить',
+      totalLbl:'Всего', optTitle:'Параметры изменения размера',
+      modeLbl:'Метод', modeSize:'По размеру', modePercent:'В процентах',
+      dimLbl:'Размеры (пиксели)', wLbl:'Ширина', hLbl:'Высота',
+      lockOn:'Соотношение сторон закреплено', lockOff:'Соотношение сторон свободно',
+      sizeHintFit:'Вписывается в рамку с сохранением соотношения сторон. Оставьте поле пустым, чтобы вычислить его автоматически.',
+      sizeHintStretch:'Изображение растягивается точно до заданного размера — соотношение сторон не сохраняется.',
+      scaleLbl:'Масштаб', scaleHint:'Относительно исходного размера каждого изображения.',
+      fmtLbl:'Целевой формат', keepOrig:'Как в оригинале',
+      qLbl:'Качество (JPG / WEBP)',
+      convBtn:'Изменить размер', working:'Обработка…',
+      readyTitle:'Готово!', readySub:n=>`Готово к скачиванию: ${n}.`,
+      dlAll:'Скачать всё', againBtn:'Ещё',
+      converted:'изменено', origLbl:'оригинал',
+      failed:'Обработка не удалась — формат не поддерживается этим браузером',
+      seam:'Всё локально: изображения обрабатываются прямо в вашем браузере через canvas — ни один файл не отправляется на сервер, ничего не покидает устройство.',
+      foot:'KOLKLI · Изменение размера · Приватно и быстро, прямо в браузере',
+      errNoFiles:'Добавьте хотя бы одно изображение', errDims:'Введите ширину или высоту', errDecode:'Не удалось декодировать ни одно изображение',
+      copied:'Ссылка скопирована ✓',
+      dl:'Скачать',
+    },
+  };
+
+  const ICON = {
+    trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+    check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>',
+    dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  };
+
+  // Formats a canvas can reliably export to. Anything else falls back to PNG.
+  const EXPORTABLE = { 'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp' };
+
+  let lang='he', t=I18N.he;
+  let files=[];        // {id,file,name,size,url,w,h}
+  let uid=1;
+  let results=[];      // {name, blob, url, size, srcSize, w, h, ok}
+  let mode='size';     // 'size' | 'percent'
+  let lockAspect=true;
+
+  function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
+  function baseName(name){ return String(name||'image').replace(/\.[^.\/\\]+$/,''); }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function totalBytes(){ return files.reduce((a,f)=>a+f.size,0); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+  // ---- intake ----
+  function addFiles(list){
+    Array.from(list||[]).forEach(file=>{
+      if(!/^image\//i.test(file.type) && !/\.(jpe?g|png|webp|gif|bmp|avif)$/i.test(file.name)) return;
+      const item={ id:'f'+(uid++), file, name:file.name, size:file.size, url:URL.createObjectURL(file), w:0, h:0 };
+      files.push(item);
+      // read natural dimensions for display
+      const img=new Image();
+      img.onload=()=>{ item.w=img.naturalWidth; item.h=img.naturalHeight; renderFiles(); };
+      img.src=item.url;
+    });
+    renderFiles();
+  }
+  function removeFile(id){
+    const f=files.find(x=>x.id===id);
+    if(f && f.url) URL.revokeObjectURL(f.url);
+    files=files.filter(x=>x.id!==id); renderFiles();
+  }
+
+  function renderFiles(){
+    const card=el('filesCard'), list=el('flist');
+    card.style.display = files.length? '' : 'none';
+    list.innerHTML = files.map(f=>{
+      const dim = f.w? `${f.w}×${f.h}px · ` : '';
+      return `<div class="frow">
+        <img class="thumb" src="${f.url}" alt="">
+        <span class="fn"><div class="nm" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div><div class="sz">${dim}${fmtBytes(f.size)}</div></span>
+        <button class="rm" data-rm="${f.id}" title="${escapeHtml(t.remove)}">${ICON.trash}</button>
+      </div>`;
+    }).join('');
+    el('totalVal').textContent = fmtBytes(totalBytes());
+    el('convBtn').disabled = files.length===0;
+  }
+
+  // ---- compute target size for one image ----
+  function targetSize(natW, natH, opts){
+    if(opts.mode==='percent'){
+      const s=opts.pct/100;
+      return { w:Math.max(1,Math.round(natW*s)), h:Math.max(1,Math.round(natH*s)) };
+    }
+    // by dimensions
+    let W=opts.w||0, H=opts.h||0;
+    if(opts.lock){
+      // fit within the given box, preserving aspect; a blank field is unconstrained
+      const ratio=natW/natH;
+      if(W && H){
+        const scale=Math.min(W/natW, H/natH);
+        return { w:Math.max(1,Math.round(natW*scale)), h:Math.max(1,Math.round(natH*scale)) };
+      }
+      if(W) return { w:W, h:Math.max(1,Math.round(W/ratio)) };
+      if(H) return { w:Math.max(1,Math.round(H*ratio)), h:H };
+      return { w:natW, h:natH };
+    }
+    // stretch to exact (fall back to natural for a missing dimension)
+    return { w:Math.max(1,W||natW), h:Math.max(1,H||natH) };
+  }
+
+  async function loadBitmap(file, url){
+    if(window.createImageBitmap){
+      try{ return await createImageBitmap(file); }catch(_){ /* fall through */ }
+    }
+    return await new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=url; });
+  }
+
+  async function resizeOne(item, opts){
+    const src = await loadBitmap(item.file, item.url);
+    const natW = src.width||src.naturalWidth, natH = src.height||src.naturalHeight;
+    const { w, h } = targetSize(natW, natH, opts);
+
+    const canvas=document.createElement('canvas');
+    canvas.width=w; canvas.height=h;
+    const ctx=canvas.getContext('2d');
+    ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+
+    // pick output type: keep original when we can export it, else PNG
+    let type=opts.fmt;
+    if(type==='keep'){ type = EXPORTABLE[item.file.type] ? item.file.type : 'image/png'; }
+    if(!EXPORTABLE[type]) type='image/png';
+
+    // JPG has no alpha — paint a white backdrop so transparency doesn't turn black
+    if(type==='image/jpeg'){ ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,w,h); }
+    ctx.drawImage(src, 0, 0, w, h);
+    if(src.close) src.close();
+
+    const q = (type==='image/png') ? undefined : opts.quality/100;
+    const blob = await new Promise(res=>canvas.toBlob(res, type, q));
+    if(!blob) throw new Error('toBlob failed');
+    return { blob, w, h, ext: EXPORTABLE[type]||'png' };
+  }
+
+  // ---- run ----
+  async function runResize(){
+    el('optErr').textContent='';
+    if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
+    const opts = {
+      mode,
+      lock:lockAspect,
+      w:Math.round(+el('wInp').value)||0,
+      h:Math.round(+el('hInp').value)||0,
+      pct:+el('pct').value||100,
+      fmt:el('fmt').value,
+      quality:+el('quality').value||90,
+    };
+    if(opts.mode==='size' && !opts.w && !opts.h){ el('optErr').textContent=t.errDims; return; }
+
+    el('composer').style.display='none';
+    el('resultsCard').classList.remove('show');
+    clearResults();
+    const prog=el('progCard'); prog.classList.add('show');
+
+    results=[];
+    for(let i=0;i<files.length;i++){
+      const it=files[i];
+      el('progName').textContent = `${it.name}  ·  ${i+1}/${files.length}`;
+      setProg(Math.round(i/files.length*100));
+      await sleep(20);
+      try{
+        const { blob, w, h, ext } = await resizeOne(it, opts);
+        results.push({ name: baseName(it.name)+'.'+ext, blob, url:URL.createObjectURL(blob), size:blob.size, srcSize:it.size, w, h, ok:true });
+      }catch(err){
+        results.push({ name: baseName(it.name), blob:null, url:null, size:0, srcSize:it.size, w:0, h:0, ok:false });
+      }
+      setProg(Math.round((i+1)/files.length*100));
+    }
+    await sleep(160);
+    prog.classList.remove('show');
+
+    if(!results.some(r=>r.ok)){ el('optErr').textContent=t.errDecode; el('composer').style.display=''; return; }
+    showResults();
+  }
+  function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+
+  function showResults(){
+    const okCount=results.filter(r=>r.ok).length;
+    el('readySub').textContent = t.readySub(okCount);
+    el('rlist').innerHTML = results.map((r,i)=>{
+      if(!r.ok){
+        return `<div class="rrow err"><span class="rico">${ICON.warn}</span>
+          <span class="rn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta">${escapeHtml(t.failed)}</div></span></div>`;
+      }
+      const meta = `${r.w}×${r.h}px · ${t.origLbl} ${fmtBytes(r.srcSize)} → <em>${fmtBytes(r.size)}</em>`;
+      return `<div class="rrow"><img class="thumb" src="${r.url}" alt="">
+        <span class="rn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta">${meta}</div></span>
+        <button class="dlbtn" data-dl="${i}">${ICON.dl}<span>${escapeHtml(t.dl)}</span></button></div>`;
+    }).join('');
+    el('resultsCard').classList.add('show');
+    el('resultsCard').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  function download(r){
+    if(!r||!r.url) return;
+    const a=document.createElement('a'); a.href=r.url; a.download=r.name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  async function downloadAll(){
+    for(const r of results){ if(r.ok){ download(r); await sleep(280); } }
+  }
+
+  function clearResults(){ results.forEach(r=>{ if(r.url) URL.revokeObjectURL(r.url); }); results=[]; }
+  function reset(){
+    clearResults();
+    files.forEach(f=>{ if(f.url) URL.revokeObjectURL(f.url); });
+    files=[];
+    el('resultsCard').classList.remove('show');
+    el('optErr').textContent='';
+    el('composer').style.display=''; renderFiles();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- options UI ----
+  function applyMode(){
+    el('sizeOpt').style.display = mode==='size' ? '' : 'none';
+    el('percentOpt').style.display = mode==='percent' ? '' : 'none';
+    el('modeSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.getAttribute('data-mode')===mode));
+  }
+  function applyLock(){
+    const b=el('lockBtn');
+    b.classList.toggle('on', lockAspect);
+    b.title = lockAspect ? t.lockOn : t.lockOff;
+    // open padlock when unlocked
+    el('lockIco').innerHTML = lockAspect
+      ? '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
+      : '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>';
+    el('sizeHint').textContent = lockAspect ? t.sizeHintFit : t.sizeHintStretch;
+  }
+  function applyQualityVis(){
+    // PNG is lossless — the quality slider does nothing for it
+    const f=el('fmt').value;
+    const usesQ = (f==='keep') || f==='image/jpeg' || f==='image/webp';
+    el('qualityOpt').classList.toggle('dim', !usesQ);
+  }
+
+  // ---- i18n + theme (mirrors the other pages; header stays in sync via its observer) ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    applyLock(); renderFiles();
+    if(el('resultsCard').classList.contains('show')) showResults();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('flist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeFile(b.getAttribute('data-rm')); });
+  el('rlist').addEventListener('click',e=>{ const b=e.target.closest('[data-dl]'); if(b) download(results[+b.getAttribute('data-dl')]); });
+
+  el('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-mode]'); if(b){ mode=b.getAttribute('data-mode'); applyMode(); } });
+  el('lockBtn').addEventListener('click',()=>{ lockAspect=!lockAspect; applyLock(); });
+  el('fmt').addEventListener('change',applyQualityVis);
+  el('pct').addEventListener('input',()=>{ el('pctVal').textContent=el('pct').value+'%'; });
+  el('quality').addEventListener('input',()=>{ el('qVal').textContent=el('quality').value+'%'; });
+
+  el('convBtn').addEventListener('click',runResize);
+  el('dlAllBtn').addEventListener('click',downloadAll);
+  el('againBtn').addEventListener('click',reset);
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  applyMode(); applyLock(); applyQualityVis(); renderFiles();
+})();
+</script>
+</body>
+</html>
