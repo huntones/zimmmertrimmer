@@ -26,13 +26,13 @@
   if (!mount) return;
 
   var T = {
-    he: { navTools:'כלים', navDev:'כלי עיצוב ופיתוח', navAI:'כלי AI', navConvert:'המרה', navCompress:'דחיסה', navMarketing:'כלי שיווק וקישורים',
+    he: { navTools:'כלים', navDev:'כלי עיצוב ופיתוח', navAI:'כלי AI', navText:'כלי טקסט', navConvert:'המרה', navCompress:'דחיסה', navMarketing:'כלי שיווק וקישורים', navCalc:'מחשבונים',
           navSend:'שליחת קבצים', navRequest:'בקשת קבצים', navProducts:'מוצרים', navPricing:'מסלולים ומחירים', navSignin:'התחברות', navStart:'הרשמה', navNew:'חדש',
-          acctDash:'החשבון שלי', acctFiles:'הקבצים שלי', acctRequest:'בקשות קבצים', acctReview:'אישורי לקוח', acctSettings:'הגדרות', acctLanguage:'שפה', acctAdmin:'ניהול', acctLogout:'התנתקות' },
-    en: { navTools:'Tools', navDev:'Design & Dev', navAI:'AI Tools', navConvert:'Convert', navCompress:'Compress', navMarketing:'Marketing & Links',
+          acctDash:'החשבון שלי', acctFiles:'הקבצים שלי', acctRequest:'בקשות קבצים', acctReview:'אישורי לקוח', acctSettings:'הגדרות', acctLanguage:'שפות', acctAdmin:'ניהול', acctLogout:'התנתקות' },
+    en: { navTools:'Tools', navDev:'Design & Dev', navAI:'AI Tools', navText:'Text Tools', navConvert:'Convert', navCompress:'Compress', navMarketing:'Marketing & Links', navCalc:'Calculators',
           navSend:'Send Files', navRequest:'Request Files', navProducts:'Files', navPricing:'Pricing', navSignin:'Login', navStart:'Sign Up', navNew:'New',
           acctDash:'My Account', acctFiles:'My Files', acctRequest:'File Requests', acctReview:'Client Review', acctSettings:'Settings', acctLanguage:'Language', acctAdmin:'Admin', acctLogout:'Log out' },
-    ru: { navTools:'Инструменты', navDev:'Дизайн и код', navAI:'AI-инструменты', navConvert:'Конвертация', navCompress:'Сжатие', navMarketing:'Маркетинг и ссылки',
+    ru: { navTools:'Инструменты', navDev:'Дизайн и код', navAI:'AI-инструменты', navText:'Текстовые инструменты', navConvert:'Конвертация', navCompress:'Сжатие', navMarketing:'Маркетинг и ссылки', navCalc:'Калькуляторы',
           navSend:'Отправка файлов', navRequest:'Запрос файлов', navProducts:'Файлы', navPricing:'Цены', navSignin:'Вход', navStart:'Регистрация', navNew:'Новое',
           acctDash:'Мой аккаунт', acctFiles:'Мои файлы', acctRequest:'Запросы файлов', acctReview:'Одобрения', acctSettings:'Настройки', acctLanguage:'Язык', acctAdmin:'Админ', acctLogout:'Выйти' }
   };
@@ -49,7 +49,7 @@
 
   // [ i18n key, page path from the site root ]  (navTools + navProducts are dropdowns → null path)
   var LINKS = [
-    ['navTools', null], ['navDev', null], ['navAI', 'ai/'], ['navMarketing', 'marketing/'],
+    ['navTools', null], ['navDev', null], ['navAI', 'ai/'], ['navText', null], ['navMarketing', 'marketing/'], ['navCalc', 'calc/'],
     ['navProducts', null], ['navPricing', 'pricing/']
   ];
 
@@ -148,7 +148,15 @@
     code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
     ruler:'<path d="M21.3 8.7 8.7 21.3a1 1 0 0 1-1.4 0l-4.6-4.6a1 1 0 0 1 0-1.4L15.3 2.7a1 1 0 0 1 1.4 0l4.6 4.6a1 1 0 0 1 0 1.4z"/><path d="m9 11 1.5 1.5"/><path d="m12 8 1.5 1.5"/><path d="m6 14 1.5 1.5"/><path d="m15 5 1.5 1.5"/>',
     ratio:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 4 20 16"/>',
-    eraser:'<path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4L14 4a2 2 0 0 1 2.8 0l4.2 4.2a2 2 0 0 1 0 2.8L12 20"/><path d="M22 21H7"/><path d="m5 13 6 6"/>'
+    eraser:'<path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4L14 4a2 2 0 0 1 2.8 0l4.2 4.2a2 2 0 0 1 0 2.8L12 20"/><path d="M22 21H7"/><path d="m5 13 6 6"/>',
+    wind:'<path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>',
+    sort:'<path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="m3 17 3 3 3-3"/><path d="M6 18V4"/>',
+    copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+    plus:'<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>',
+    listnum:'<line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-1.5 2-2.5S5 14 4 14.5"/>',
+    at:'<circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/>',
+    hash:'<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
+    table:'<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="9" x2="12" y2="21"/>'
   };
   function svg(name) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (IC[name] || '') + '</svg>'; }
 
@@ -290,6 +298,62 @@
     return '<div class="sh-mega-in sh-mega-in-dev">' + cols + '</div><div class="sh-mega-foot">' + foot + '</div>';
   }
 
+  // ============================================================
+  //  "Text Tools" mega-menu. A third #shTextMega element reuses
+  //  the .sh-mega styling; three grouped columns hold the 17 text
+  //  utilities, each deep-linking into text-tools.html#<slug>.
+  // ============================================================
+  var TEXT_GROUPS = [
+    { c:'tedit', i:'✍️', he:'עיבוד טקסט', en:'Edit Text', ru:'Обработка', items:[
+      { slug:'reverse', ic:'flip', he:'היפוך טקסט', en:'Reverse Text', ru:'Обратить текст', dhe:'תווים, מילים או שורות', den:'Characters, words or lines', dru:'Символы, слова, строки' },
+      { slug:'case', ic:'text', he:'שינוי אותיות', en:'Change Case', ru:'Регистр', dhe:'גדולות, קטנות, Title', den:'UPPER, lower, Title', dru:'ПРОПИСНЫЕ, строчные' },
+      { slug:'slug', ic:'link', he:'המרה ל־Slug', en:'Slugify', ru:'Slug', dhe:'כתובת URL נקייה', den:'A clean URL slug', dru:'Чистый URL-slug' },
+      { slug:'whitespace', ic:'wind', he:'ניקוי רווחים', en:'Clean Whitespace', ru:'Очистка пробелов', dhe:'רווחים, טאבים, שורות ריקות', den:'Spaces, tabs, blank lines', dru:'Пробелы, табы, пустые' },
+      { slug:'strip', ic:'eraser', he:'הסרת אימוג׳ים', en:'Strip Emoji', ru:'Убрать эмодзи', dhe:'אימוג׳ים ותווים מיוחדים', den:'Emojis & special chars', dru:'Эмодзи и символы' }
+    ]},
+    { c:'tlist', i:'📋', he:'רשימות', en:'Lists', ru:'Списки', items:[
+      { slug:'sort', ic:'sort', he:'מיון רשימה', en:'Sort List', ru:'Сортировка', dhe:'A–Z, מספרי, אורך, אקראי', den:'A–Z, numeric, length', dru:'A–Z, числа, длина' },
+      { slug:'dedupe', ic:'copy', he:'הסרת כפילויות', en:'Remove Duplicates', ru:'Убрать дубли', dhe:'שורות, מילים, אימיילים', den:'Lines, words, emails', dru:'Строки, слова, email' },
+      { slug:'split', ic:'scissors', he:'פיצול טקסט', en:'Split Text', ru:'Разбить текст', dhe:'לפי פסיק, שורה או מקף', den:'By comma, line or dash', dru:'По запятой, строке' },
+      { slug:'join', ic:'merge', he:'איחוד שורות', en:'Join Lines', ru:'Объединить', dhe:'לרשימה מופרדת בפסיקים', den:'Into a comma list', dru:'В список через запятые' },
+      { slug:'affix', ic:'plus', he:'הוספת טקסט לשורה', en:'Add to Each Line', ru:'Добавить к строкам', dhe:'קידומת, סיומת או מספר', den:'Prefix, suffix or number', dru:'Префикс, суффикс, номер' },
+      { slug:'number', ic:'listnum', he:'מספור אוטומטי', en:'Auto Numbering', ru:'Нумерация', dhe:'1,2,3 או A,B,C', den:'1,2,3 or A,B,C', dru:'1,2,3 или A,B,C' }
+    ]},
+    { c:'tdev', i:'🔎', he:'חילוץ וקוד', en:'Extract & Code', ru:'Извлечение и код', items:[
+      { slug:'extract', ic:'at', he:'חילוץ מטקסט', en:'Extract Data', ru:'Извлечь данные', dhe:'אימייל, טלפון או קישור', den:'Emails, phones, links', dru:'Email, телефоны, ссылки' },
+      { slug:'count', ic:'hash', he:'מונה תווים ומילים', en:'Word Counter', ru:'Счётчик слов', dhe:'תווים, מילים, שורות', den:'Chars, words, lines', dru:'Символы, слова, строки' },
+      { slug:'hashtags', ic:'tags', he:'יצירת האשטגים', en:'Hashtag Maker', ru:'Хэштеги', dhe:'ניקוי והוספת #', den:'Clean & add #', dru:'Очистка и #' },
+      { slug:'csv', ic:'table', he:'ניקוי CSV', en:'CSV Cleaner', ru:'Очистка CSV', dhe:'רשימות מאקסל או CRM', den:'Lists from Excel/CRM', dru:'Списки из Excel/CRM' },
+      { slug:'url', ic:'link', he:'קידוד URL', en:'URL Encode', ru:'URL-кодирование', dhe:'קידוד ופענוח כתובות', den:'Encode & decode URLs', dru:'Кодировать URL' },
+      { slug:'json', ic:'braces', he:'JSON Formatter', en:'JSON Formatter', ru:'JSON Formatter', dhe:'סידור ובדיקת תקינות', den:'Format & validate', dru:'Формат и проверка' }
+    ]}
+  ];
+
+  var TEXT_FOOT = {
+    he: ['חדש', '17 כלי טקסט מהירים — הכול רץ בדפדפן שלכם', 'פתחו את כלי הטקסט ←'],
+    en: ['NEW', '17 fast text tools — all run in your browser', 'Open Text Tools →'],
+    ru: ['НОВОЕ', '17 быстрых текстовых инструментов — всё в браузере', 'Открыть →']
+  };
+
+  function textMegaHtml(lang) {
+    var hub = link('text-tools.html');
+    var cols = TEXT_GROUPS.map(function (c) {
+      var items = c.items.map(function (t) {
+        return '<a class="sh-item" href="' + link('text-tools.html#' + t.slug) + '" role="menuitem">' +
+          '<span class="it-ic">' + svg(t.ic) + '</span>' +
+          '<span class="it-tx"><span class="it-t">' + t[lang] + '</span>' +
+          '<span class="it-d">' + t['d' + lang] + '</span></span></a>';
+      }).join('');
+      return '<div class="sh-col c-' + c.c + '">' +
+        '<a class="sh-col-h" href="' + hub + '"><span class="sh-col-i">' + c.i + '</span>' + c[lang] + '</a>' +
+        items + '</div>';
+    }).join('');
+    var f = TEXT_FOOT[lang] || TEXT_FOOT.en;
+    var foot = '<span class="sh-foot-t"><span class="sh-foot-badge">' + f[0] + '</span> ' + f[1] + '</span>' +
+      '<a class="sh-foot-cta" href="' + hub + '">' + f[2] + '</a>';
+    return '<div class="sh-mega-in">' + cols + '</div><div class="sh-mega-foot">' + foot + '</div>';
+  }
+
   // Rows of the Products dropdown: colored icon tile + name + one-line description,
   // each linking to its dedicated product page.
   function productsHtml(lang) {
@@ -299,6 +363,19 @@
         '<span class="sh-prod-tx"><span class="sh-prod-t">' + p[lang] + '</span>' +
         '<span class="sh-prod-d">' + p['d' + lang] + '</span></span></a>';
     }).join('');
+  }
+
+  // Rows of the AI Tools dropdown (reuses the .sh-prod-* row styling), plus a
+  // full-width footer link to the AI hub so the menu still reaches /ai/.
+  function aiToolsHtml(lang) {
+    var items = AITOOLS.map(function (t) {
+      return '<a class="sh-prod-item sh-ai-item" href="' + link(t.page) + '" role="menuitem">' +
+        '<span class="sh-prod-ic">' + svg(t.ic) + '</span>' +
+        '<span class="sh-prod-tx"><span class="sh-prod-t">' + t[lang] + '</span>' +
+        '<span class="sh-prod-d">' + t['d' + lang] + '</span></span></a>';
+    }).join('');
+    return items + '<a class="sh-aimenu-all" href="' + link('ai/') + '" role="menuitem">' +
+      (AI_FOOT[lang] || AI_FOOT.en) + '</a>';
   }
 
   var linksHtml = LINKS.map(function (l) {
@@ -327,8 +404,26 @@
         '<div class="sh-prodmenu" id="shProdMenu" role="menu">' + productsHtml(curLang()) + '</div>' +
       '</div>';
     }
-    var extra = l[0] === 'navAI' ? '<span class="sh-new" data-k="navNew"></span>' : '';
-    return '<a href="' + link(l[1]) + '"><span data-k="' + l[0] + '"></span>' + extra + '</a>';
+    if (l[0] === 'navAI') {
+      // "AI Tools" is a click-to-open dropdown (with a NEW badge on the button),
+      // anchored under its button like Products.
+      return '<div class="sh-drop sh-aidrop" id="shAiDrop">' +
+        '<button class="sh-tlink" id="shAiBtn" type="button" aria-haspopup="true" aria-controls="shAiMenu" aria-expanded="false">' +
+          '<span data-k="navAI"></span>' +
+          '<span class="sh-new" data-k="navNew"></span>' + CHEV +
+        '</button>' +
+        '<div class="sh-aimenu" id="shAiMenu" role="menu">' + aiToolsHtml(curLang()) + '</div>' +
+      '</div>';
+    }
+    if (l[0] === 'navText') {
+      // "Text Tools" is a click-to-open mega-menu, like "Tools" / "Design & Dev".
+      return '<div class="sh-drop sh-textdrop" id="shTextDrop">' +
+        '<button class="sh-tlink" id="shTextBtn" type="button" aria-haspopup="true" aria-controls="shTextMega" aria-expanded="false">' +
+          '<span data-k="navText"></span>' + CHEV +
+        '</button>' +
+      '</div>';
+    }
+    return '<a href="' + link(l[1]) + '"><span data-k="' + l[0] + '"></span></a>';
   }).join('');
 
   // Language picker: globe + active language name + chevron open a small menu
@@ -362,6 +457,7 @@
         '</nav>' +
         '<div class="sh-mega" id="shMega" role="menu"></div>' +
         '<div class="sh-mega" id="shDevMega" role="menu"></div>' +
+        '<div class="sh-mega" id="shTextMega" role="menu"></div>' +
       '</div>' +
       '<div class="sh-panel" id="shPanel"></div>' +
     '</header>';
@@ -401,7 +497,7 @@
               return '<a class="sh-panel-sub" href="' + link(p.page) + '">' + p[curLang()] + '</a>';
             }).join('');
         }
-        var h = (l[0] === 'navTools') ? homeHash('#popular') : (l[0] === 'navDev') ? link('dev-tools/') : link(l[1]);
+        var h = (l[0] === 'navTools') ? homeHash('#popular') : (l[0] === 'navDev') ? link('dev-tools/') : (l[0] === 'navText') ? link('text-tools.html') : link(l[1]);
         return '<a href="' + h + '">' + d[l[0]] + '</a>';
       }).join('') +
       panelAuthHtml(d) + '</div>';
@@ -411,9 +507,15 @@
     // (re)build the Design & Dev mega-menu in the current language
     var devmega = mount.querySelector('#shDevMega');
     if (devmega) devmega.innerHTML = devMegaHtml(curLang());
+    // (re)build the Text Tools mega-menu in the current language
+    var tmega = mount.querySelector('#shTextMega');
+    if (tmega) tmega.innerHTML = textMegaHtml(curLang());
     // (re)build the Products dropdown in the current language
     var prod = mount.querySelector('#shProdMenu');
     if (prod) prod.innerHTML = productsHtml(curLang());
+    // (re)build the AI Tools dropdown in the current language
+    var ai = mount.querySelector('#shAiMenu');
+    if (ai) ai.innerHTML = aiToolsHtml(curLang());
   }
 
   // =====================================================
@@ -464,27 +566,29 @@
     if (u.avatar) return '<img class="sh-avatar-img" src="' + esc(u.avatar) + '" alt="">';
     return esc((acctName(u) || '?').charAt(0).toUpperCase());
   }
+  var PLAN_NAMES = { free:'Free', lite:'Lite', pro:'Pro', business:'Business' };
+  function acctPlan(u) {
+    var plan = String((u && u.plan) || '').toLowerCase();
+    return PLAN_NAMES[plan] || PLAN_NAMES.free;
+  }
 
   function acctLangHtml(d) {
     var cur = curLang();
     var opts = LANGS.map(function (L) {
-      return '<button class="sh-acct-langopt' + (L.code === cur ? ' active' : '') + '" type="button" data-acct-lang="' + L.code + '" lang="' + L.code + '" dir="' + L.dir + '">' +
+      return '<button class="sh-acct-langopt' + (L.code === cur ? ' active' : '') + '" type="button" role="option" data-acct-lang="' + L.code + '" aria-selected="' + (L.code === cur ? 'true' : 'false') + '" lang="' + L.code + '" dir="' + L.dir + '">' +
         '<span>' + L.name + '</span>' +
         '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>' +
       '</button>';
     }).join('');
-    return '<div class="sh-acct-langbox" role="group" aria-label="' + esc(d.acctLanguage) + '">' +
-      '<div class="sh-acct-langhead">' + asvg('globe') +
-        '<span>' + esc(d.acctLanguage) + '</span><b>' + esc(LNAME[cur]) + '</b></div>' +
-      '<div class="sh-acct-langopts">' + opts + '</div>' +
+    return '<div class="sh-acct-langbox" id="shAcctLang" role="group" aria-label="' + esc(d.acctLanguage) + '">' +
+      '<button class="sh-acct-langhead" id="shAcctLangBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="shAcctLangMenu">' + asvg('globe') +
+        '<span>' + esc(d.acctLanguage) + '</span><b>' + esc(LNAME[cur]) + '</b>' + CHEV + '</button>' +
+      '<div class="sh-acct-langopts" id="shAcctLangMenu" role="listbox">' + opts + '</div>' +
     '</div>';
   }
 
   // Desktop account button + dropdown menu markup for a signed-in user.
   function acctMenuHtml(u, d) {
-    var admin = isAdmin(u)
-      ? '<a class="sh-acct-item sh-acct-admin" role="menuitem" href="' + link('admin.html') + '">' + asvg('shield') + '<span>' + esc(d.acctAdmin) + '</span></a>'
-      : '';
     return '<div class="sh-acctwrap" id="shAcct">' +
       '<button class="sh-pill sh-acctbtn" id="shAcctBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="' + esc(acctName(u)) + '">' +
         '<span class="sh-avatar">' + avatarInner(u) + '</span>' +
@@ -495,15 +599,11 @@
         '<div class="sh-acct-head">' +
           '<span class="sh-acct-av">' + avatarInner(u) + '</span>' +
           '<span class="sh-acct-id">' +
-            '<span class="sh-acct-name">' + esc(acctName(u)) + '</span>' +
+            '<span class="sh-acct-name-row"><span class="sh-acct-name">' + esc(acctName(u)) + '</span><span class="sh-acct-plan">' + esc(acctPlan(u)) + '</span></span>' +
             (u.email ? '<span class="sh-acct-mail">' + esc(u.email) + '</span>' : '') +
           '</span>' +
         '</div>' +
-        admin +
         '<a class="sh-acct-item" role="menuitem" href="' + link('dashboard.html') + '">' + asvg('grid') + '<span>' + esc(d.acctDash) + '</span></a>' +
-        '<a class="sh-acct-item" role="menuitem" href="' + link('files.html') + '">' + asvg('folder') + '<span>' + esc(d.acctFiles) + '</span></a>' +
-        '<a class="sh-acct-item" role="menuitem" href="' + link('request.html') + '">' + asvg('inbox') + '<span>' + esc(d.acctRequest) + '</span></a>' +
-        '<a class="sh-acct-item" role="menuitem" href="' + link('review.html') + '">' + asvg('check') + '<span>' + esc(d.acctReview) + '</span></a>' +
         '<a class="sh-acct-item" role="menuitem" href="' + link('dashboard.html') + '#settings">' + asvg('gear') + '<span>' + esc(d.acctSettings) + '</span></a>' +
         acctLangHtml(d) +
         '<div class="sh-acct-sep"></div>' +
@@ -516,11 +616,7 @@
   function panelAuthHtml(d) {
     var u = currentUser();
     if (!u) return '<a href="' + link('auth.html') + '">' + d.navSignin + '</a>';
-    return (isAdmin(u) ? '<a href="' + link('admin.html') + '">' + esc(d.acctAdmin) + '</a>' : '') +
-      '<a href="' + link('dashboard.html') + '">' + esc(d.acctDash) + '</a>' +
-      '<a href="' + link('files.html') + '">' + esc(d.acctFiles) + '</a>' +
-      '<a href="' + link('request.html') + '">' + esc(d.acctRequest) + '</a>' +
-      '<a href="' + link('review.html') + '">' + esc(d.acctReview) + '</a>' +
+    return '<a href="' + link('dashboard.html') + '">' + esc(d.acctDash) + '</a>' +
       '<a href="' + link('dashboard.html') + '#settings">' + esc(d.acctSettings) + '</a>' +
       '<a href="#" data-sh-logout>' + esc(d.acctLogout) + '</a>';
   }
@@ -555,6 +651,14 @@
     });
     var out = mount.querySelector('#shLogout');
     if (out) out.addEventListener('click', function (e) { e.preventDefault(); doLogout(); });
+    var langBox = mount.querySelector('#shAcctLang');
+    var langBtn = mount.querySelector('#shAcctLangBtn');
+    if (langBox && langBtn) langBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var open = langBox.classList.toggle('open');
+      langBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
     var menu = mount.querySelector('#shAcctMenu');
     if (menu) menu.addEventListener('click', function (e) {
       var lang = e.target.closest('[data-acct-lang]');
@@ -571,6 +675,10 @@
     if (!wrap) return;
     wrap.classList.remove('open');
     var b = wrap.querySelector('#shAcctBtn'); if (b) b.setAttribute('aria-expanded', 'false');
+    var lb = wrap.querySelector('#shAcctLang');
+    var lbb = wrap.querySelector('#shAcctLangBtn');
+    if (lb) lb.classList.remove('open');
+    if (lbb) lbb.setAttribute('aria-expanded', 'false');
   }
 
   function doLogout() {
@@ -675,6 +783,12 @@
       if (dmg) dmg.classList.remove('open');
       if (db) db.setAttribute('aria-expanded', 'false');
     }
+    if (except !== 'text') {
+      var xd = mount.querySelector('#shTextDrop'), xmg = mount.querySelector('#shTextMega'), xb = mount.querySelector('#shTextBtn');
+      if (xd) xd.classList.remove('open');
+      if (xmg) xmg.classList.remove('open');
+      if (xb) xb.setAttribute('aria-expanded', 'false');
+    }
     if (except !== 'tools') {
       var d = mount.querySelector('#shDrop'), mg = mount.querySelector('#shMega'), tb = mount.querySelector('#shToolsBtn');
       if (d) d.classList.remove('open');
@@ -685,6 +799,11 @@
       var pd = mount.querySelector('#shProdDrop'), pb = mount.querySelector('#shProdBtn');
       if (pd) pd.classList.remove('open');
       if (pb) pb.setAttribute('aria-expanded', 'false');
+    }
+    if (except !== 'ai') {
+      var ad = mount.querySelector('#shAiDrop'), ab = mount.querySelector('#shAiBtn');
+      if (ad) ad.classList.remove('open');
+      if (ab) ab.setAttribute('aria-expanded', 'false');
     }
     if (except !== 'lang') closeLang();
     if (except !== 'acct') closeAcct();
@@ -738,6 +857,30 @@
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDev(); });
   }
 
+  // Text Tools mega-menu (desktop): click to open, click-away / Esc to close.
+  var textDrop = mount.querySelector('#shTextDrop');
+  var textBtn = mount.querySelector('#shTextBtn');
+  var textMegaEl = mount.querySelector('#shTextMega');
+  if (textDrop && textBtn) {
+    var closeText = function () {
+      textDrop.classList.remove('open');
+      if (textMegaEl) textMegaEl.classList.remove('open');
+      textBtn.setAttribute('aria-expanded', 'false');
+    };
+    textBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var open = textDrop.classList.toggle('open');
+      if (textMegaEl) textMegaEl.classList.toggle('open', open);
+      textBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) closeAllMenus('text');
+    });
+    if (textMegaEl) textMegaEl.addEventListener('click', function (e) { if (e.target.closest('a')) closeText(); });
+    document.addEventListener('click', function (e) {
+      if (!textDrop.contains(e.target) && (!textMegaEl || !textMegaEl.contains(e.target))) closeText();
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeText(); });
+  }
+
   // Products dropdown (desktop): click to open, click-away / Esc to close.
   var prodDrop = mount.querySelector('#shProdDrop');
   var prodBtn = mount.querySelector('#shProdBtn');
@@ -756,6 +899,26 @@
     prodDrop.addEventListener('click', function (e) { if (e.target.closest('a')) closeProd(); });
     document.addEventListener('click', function (e) { if (!prodDrop.contains(e.target)) closeProd(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeProd(); });
+  }
+
+  // AI Tools dropdown (desktop): click to open, click-away / Esc to close.
+  var aiDrop = mount.querySelector('#shAiDrop');
+  var aiBtn = mount.querySelector('#shAiBtn');
+  if (aiDrop && aiBtn) {
+    var closeAi = function () {
+      aiDrop.classList.remove('open');
+      aiBtn.setAttribute('aria-expanded', 'false');
+    };
+    aiBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var open = aiDrop.classList.toggle('open');
+      aiBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) closeAllMenus('ai');
+    });
+    aiDrop.addEventListener('click', function (e) { if (e.target.closest('a')) closeAi(); });
+    document.addEventListener('click', function (e) { if (!aiDrop.contains(e.target)) closeAi(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAi(); });
   }
 
   // subtle bottom border once the page is scrolled
