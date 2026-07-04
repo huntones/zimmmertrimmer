@@ -69,23 +69,29 @@
   .col{min-width:0;}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
 
-  /* dropzone */
-  .drop{border:2.5px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:16px;padding:44px 28px;text-align:center;cursor:pointer;
-    background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  /* dropzone (compact horizontal bar) */
+  .drop{display:flex;align-items:center;gap:14px;border:2px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:14px;
+    padding:11px 15px;cursor:pointer;background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
   .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
-  .drop .cloud{width:72px;height:72px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+  .drop .cloud{width:40px;height:40px;flex:0 0 auto;border-radius:12px;display:flex;align-items:center;justify-content:center;
     background:var(--accent-soft);color:var(--accent);}
-  .drop .cloud svg{width:36px;height:36px;}
-  .drop .big{font-size:21px;font-weight:600;color:var(--ink);}
-  .drop .or{font-size:15px;color:var(--faint);margin:8px 0;font-family:var(--mono);}
-  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+  .drop .cloud svg{width:22px;height:22px;}
+  .drop .dinfo{flex:1;min-width:0;text-align:start;}
+  .drop .big{font-size:14.5px;font-weight:600;color:var(--ink);}
+  .drop .dbtns{display:flex;align-items:center;gap:8px;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;}
+  .drop .choose{display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;white-space:nowrap;
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
-    font-weight:600;font-size:18px;padding:14px 30px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    font-weight:600;font-size:13px;padding:9px 16px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
   .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
-  .drop .fmts-in{margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
-  .drop .chip{font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.04em;color:var(--muted);
-    background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:4px 11px;}
+  .drop .choose svg{width:15px;height:15px;}
+  .drop .choose.ghost{color:var(--accent-dim,var(--accent));background:var(--panel);border:1px solid var(--accent);text-shadow:none;box-shadow:none;}
+  html[data-theme="dark"] .drop .choose.ghost{color:var(--accent);}
+  .drop .choose.ghost:hover{background:var(--accent-soft);filter:none;}
+  .drop .fmts-in{margin-top:4px;display:flex;gap:6px;justify-content:flex-start;flex-wrap:wrap;}
+  .drop .chip{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:2px 7px;}
+  @media (max-width:560px){ .drop{flex-wrap:wrap;} .drop .dinfo{flex:1 1 auto;} .drop .dbtns{flex:1 1 100%;} .drop .choose{flex:1;justify-content:center;} .drop .fmts-in{display:none;} }
   input[type=file]{display:none;}
 
   /* file list */
@@ -243,12 +249,23 @@
     <div class="col">
       <div class="drop" id="drop">
         <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
-        <div class="big" data-i18n="dropBig"></div>
-        <div class="or" data-i18n="or2"></div>
-        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
-        <div class="fmts-in"><span class="chip">ZIP</span><span class="chip">GZIP</span><span class="chip">TAR</span><span class="chip">7Z</span><span class="chip">RAR</span></div>
+        <div class="dinfo">
+          <div class="big" data-i18n="dropBig"></div>
+          <div class="fmts-in"><span class="chip">ZIP</span><span class="chip">GZIP</span><span class="chip">TAR</span><span class="chip">7Z</span><span class="chip">RAR</span></div>
+        </div>
+        <div class="dbtns">
+          <button class="choose" type="button" id="chooseBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span data-i18n="choose"></span>
+          </button>
+          <button class="choose ghost" type="button" id="chooseFolderBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+            <span data-i18n="chooseFolder"></span>
+          </button>
+        </div>
       </div>
       <input type="file" id="fileInput" accept="*/*" multiple>
+      <input type="file" id="folderInput" webkitdirectory directory multiple>
 
       <div class="card files" id="filesCard" style="display:none">
         <div class="flist" id="flist"></div>
@@ -323,7 +340,7 @@
       kick:'ממירים · ממיר ארכיונים',
       pageTitle:'ארזו והמירו קבצים לארכיון',
       pageSub:'גררו כל קובץ שתרצו, בחרו פורמט יעד — ZIP או GZIP — וקבלו ארכיון מוכן להורדה. ZIP מאגד את כל הקבצים לקובץ אחד, GZIP דוחס כל קובץ בנפרד. הכול מתבצע בדפדפן שלכם, שום קובץ לא עוזב את המחשב.',
-      dropBig:'גררו קבצים לכאן', or2:'או', choose:'בחרו קבצים',
+      dropBig:'גררו קבצים או תיקיות לכאן', or2:'או', choose:'בחירת קבצים', chooseFolder:'בחירת תיקייה',
       remove:'הסרה', totalLbl:'סה״כ', optTitle:'הגדרות ארכיון',
       fmtLbl:'פורמט יעד',
       combineChk:'ליצור ארכיון אחד מכל הקבצים',
@@ -345,7 +362,7 @@
       kick:'Converters · Archive Converter',
       pageTitle:'Bundle and convert files into archives',
       pageSub:'Drop any files, pick a target format — ZIP or GZIP — and get a ready-to-download archive. ZIP bundles everything into one file; GZIP compresses each file separately. Everything runs in your browser; nothing leaves your machine.',
-      dropBig:'Drag files here', or2:'or', choose:'Choose files',
+      dropBig:'Drag files or folders here', or2:'or', choose:'Choose files', chooseFolder:'Choose folder',
       remove:'Remove', totalLbl:'Total', optTitle:'Archive options',
       fmtLbl:'Target format',
       combineChk:'Bundle all files into one archive',
@@ -367,7 +384,7 @@
       kick:'Конвертеры · Конвертер архивов',
       pageTitle:'Упакуйте и конвертируйте файлы в архивы',
       pageSub:'Перетащите любые файлы, выберите целевой формат — ZIP или GZIP — и получите готовый к скачиванию архив. ZIP объединяет всё в один файл; GZIP сжимает каждый файл отдельно. Всё работает в вашем браузере; ничего не покидает устройство.',
-      dropBig:'Перетащите файлы сюда', or2:'или', choose:'Выбрать файлы',
+      dropBig:'Перетащите файлы или папки сюда', or2:'или', choose:'Выбрать файлы', chooseFolder:'Выбрать папку',
       remove:'Удалить', totalLbl:'Всего', optTitle:'Параметры архива',
       fmtLbl:'Целевой формат',
       combineChk:'Объединить все файлы в один архив',
@@ -428,12 +445,46 @@
   }
 
   // ---- intake ---- (every file is supported — an archiver bundles anything)
-  function addFiles(list){
-    Array.from(list||[]).forEach(file=>{
+  // accepts a FileList/File[] or an array of {file,path}; keeps each file's relative path so a
+  // dropped folder is repacked into the archive with its original subfolder structure intact
+  function pathItems(list){ return Array.from(list||[]).map(f=>({file:f, path:f.webkitRelativePath||f.name})); }
+  function addFiles(items){
+    (items||[]).forEach(it=>{
+      const file = it.file || it;
+      const path = (it.path || file.webkitRelativePath || file.name);
       const ext=extOf(file.name);
-      files.push({ id:'f'+(uid++), file, name:file.name, ext, size:file.size });
+      files.push({ id:'f'+(uid++), file, name:file.name, path, ext, size:file.size });
     });
     renderFiles();
+  }
+
+  // walk dropped directories via the entries API so whole folders keep their tree
+  async function addFromDataTransfer(dt){
+    let items;
+    try{ items = await filesFromDataTransfer(dt); }
+    catch(_){ items = pathItems(dt.files); }
+    addFiles(items);
+  }
+  function filesFromDataTransfer(dt){
+    const list = dt.items ? Array.from(dt.items) : [];
+    const entries = list.map(it=> it.webkitGetAsEntry ? it.webkitGetAsEntry() : null).filter(Boolean);
+    if(!entries.length){ return Promise.resolve(pathItems(dt.files)); }
+    const out=[];
+    return Promise.all(entries.map(en=>walkEntry(en,'',out))).then(()=>out);
+  }
+  function walkEntry(entry, prefix, out){
+    return new Promise(resolve=>{
+      if(!entry){ resolve(); return; }
+      if(entry.isFile){ entry.file(f=>{ out.push({file:f, path:prefix+entry.name}); resolve(); }, ()=>resolve()); }
+      else if(entry.isDirectory){
+        const reader=entry.createReader(), kids=[];
+        const readBatch=()=>reader.readEntries(batch=>{
+          if(!batch.length){ Promise.all(kids.map(k=>walkEntry(k, prefix+entry.name+'/', out))).then(resolve); }
+          else { kids.push(...batch); readBatch(); }
+        }, ()=>resolve());
+        readBatch();
+      } else resolve();
+    });
   }
   function removeFile(id){ files=files.filter(f=>f.id!==id); renderFiles(); }
 
@@ -444,7 +495,7 @@
       <div class="frow">
         <span class="fico">${ICON.doc}</span>
         <span class="fn">
-          <div class="nm" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
+          <div class="nm" title="${escapeHtml(f.path||f.name)}">${escapeHtml(f.path||f.name)}</div>
           <div class="sz">${fmtBytes(f.size)}</div>
         </span>
         <button class="rm" data-rm="${f.id}" title="${escapeHtml(t.remove)}">${ICON.trash}</button>
@@ -494,7 +545,7 @@
         for(let i=0;i<files.length;i++){
           setProg(Math.round(i/files.length*80), t.readingFile(files[i].name));
           const u8 = await readU8(files[i]);
-          obj[uniqueName(files[i].name, used)] = u8;
+          obj[uniqueName(files[i].path||files[i].name, used)] = u8;   // keep folder tree in the archive
           await wait(10);
         }
         setProg(90, t.packing);
@@ -608,13 +659,15 @@
   }
 
   // ---- events ----
-  const drop=el('drop'), input=el('fileInput');
+  const drop=el('drop'), input=el('fileInput'), folderInput=el('folderInput');
   el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  el('chooseFolderBtn').addEventListener('click',e=>{ e.stopPropagation(); folderInput.click(); });
   drop.addEventListener('click',()=>input.click());
-  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  input.addEventListener('change',()=>{ addFiles(pathItems(input.files)); input.value=''; });
+  folderInput.addEventListener('change',()=>{ addFiles(pathItems(folderInput.files)); folderInput.value=''; });
   ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
   ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
-  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFromDataTransfer(e.dataTransfer); });
   document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
   document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
 

@@ -547,10 +547,10 @@
         <div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span data-i18n="nameTitle"></span></div>
         <div class="suffixrow">
           <select class="sel" id="nameMode" style="width:auto;">
-            <option value="suffix" data-i18n-opt="nameSuffix"></option>
+            <option value="prefix" data-i18n-opt="nameSuffix"></option>
             <option value="keep" data-i18n-opt="nameKeep"></option>
           </select>
-          <input class="txt" id="suffixInput" type="text" value="_60s_normal" spellcheck="false">
+          <input class="txt" id="suffixInput" type="text" value="60s_normal_" spellcheck="false">
         </div>
       </div>
     </div>
@@ -661,7 +661,7 @@
       prevTitle:'האזנה מקדימה', prevOrig:'מקורי', prevMaster:'מאסטרינג',
       prevHint:'העלה קובץ כדי להאזין', prevOn:name=>`מאזין ל: ${name}`,
       prevNote:'השוואת גוון בזמן אמת · העוצמה מיושרת אוטומטית ליעד ה‑LUFS (כמו בפלט)', prevMatch:'יישור עוצמה',
-      qualTitle:'איכות ייצוא', nameTitle:'שם הקובץ', nameSuffix:'הוסף סיומת', nameKeep:'שם מקורי',
+      qualTitle:'איכות ייצוא', nameTitle:'שם הקובץ', nameSuffix:'הוסף קידומת', nameKeep:'שם מקורי',
       start:'התחל לעבד', processing:'מעבד…', analyzing:'מנתח קבצים… (סולם/BPM)',
       step3:'עיבוד והורדה', step3sub:'מעקב אחר ההתקדמות והורדת הקבצים המעובדים',
       overall:'סה״כ התקדמות', colStatus:'סטטוס', colProg:'התקדמות', colOut:'גודל פלט',
@@ -703,7 +703,7 @@
       prevTitle:'Preview', prevOrig:'Original', prevMaster:'Mastered',
       prevHint:'Upload a file to preview', prevOn:name=>`Previewing: ${name}`,
       prevNote:'Real-time A/B · loudness auto-matched to the target LUFS (like the final output)', prevMatch:'Level-match',
-      qualTitle:'Export quality', nameTitle:'File name', nameSuffix:'Add suffix', nameKeep:'Keep name',
+      qualTitle:'Export quality', nameTitle:'File name', nameSuffix:'Add prefix', nameKeep:'Keep name',
       start:'Start processing', processing:'Processing…', analyzing:'Analyzing files… (key/BPM)',
       step3:'Process & download', step3sub:'Track progress and download the processed files',
       overall:'Overall progress', colStatus:'Status', colProg:'Progress', colOut:'Output size',
@@ -746,7 +746,7 @@
       prevTitle:'Предпрослушивание', prevOrig:'Оригинал', prevMaster:'После мастеринга',
       prevHint:'Загрузите файл для прослушивания', prevOn:name=>`Прослушивание: ${name}`,
       prevNote:'A/B в реальном времени · громкость авто-подгоняется к целевому LUFS (как в финале)', prevMatch:'Выровнять уровень',
-      qualTitle:'Качество экспорта', nameTitle:'Имя файла', nameSuffix:'Добавить суффикс', nameKeep:'Сохранить имя',
+      qualTitle:'Качество экспорта', nameTitle:'Имя файла', nameSuffix:'Добавить префикс', nameKeep:'Сохранить имя',
       start:'Начать обработку', processing:'Обработка…', analyzing:'Анализ файлов… (тональность/BPM)',
       step3:'Обработка и скачивание', step3sub:'Следите за прогрессом и скачивайте готовые файлы',
       overall:'Общий прогресс', colStatus:'Статус', colProg:'Прогресс', colOut:'Размер вывода',
@@ -792,7 +792,7 @@
   let ffmpeg=null, ready=false, busy=false, encoding=false, currentItem=null;
   let lang='he', t=I18N.he;
   let items=[]; // {file,name,ext,size,dur,status,prog,out}
-  let settings={ clip:60, start:'random', lufs:'-14', preset:'none', fmt:'mp3', br:'320', nameMode:'suffix', suffix:'_60s_normal' };
+  let settings={ clip:60, start:'random', lufs:'-14', preset:'none', fmt:'mp3', br:'320', nameMode:'prefix', suffix:'60s_normal_' };
   let runStart=0, elapsedTimer=null;
 
   // ---- helpers ----
@@ -1116,7 +1116,7 @@
     const stem=it.name.replace(/\.[^.]+$/,'');
     const f=FMT[settings.fmt]||FMT.mp3;
     const safeIn=`in_${idx}.${it.ext.toLowerCase()||'dat'}`;
-    const outName = (settings.nameMode==='keep'? stem : stem+settings.suffix) + '.' + f.ext;
+    const outName = (settings.nameMode==='keep'? stem : settings.suffix+stem) + '.' + f.ext;
     it.status='processing'; it.prog=0; currentItem=it; updateRow(it);
 
     await ffmpeg.writeFile(safeIn, await fetchFile(it.file));
@@ -1445,8 +1445,16 @@
   el('clearBtn').addEventListener('click',showConfirmClear);
   el('viewToggle').addEventListener('click',e=>{ const b=e.target.closest('.vbtn'); if(b) setView(b.dataset.view); });
 
+  // Auto name-tag: reflect step-2 settings (clip length + mastering preset) in the
+  // file-name prefix, e.g. "30s_warm_". Regenerated whenever the length or preset
+  // changes; a manual edit persists until the next step-2 change overwrites it.
+  const PRESET_TAG = { none:'normal', warm:'warm', punch:'punch', bright:'bright', natural:'natural', radio:'radio', stream:'stream' };
+  const buildNameTag = () => `${settings.clip}s_${PRESET_TAG[settings.preset]||'normal'}_`;
+  function syncNameTag(){ settings.suffix = buildNameTag(); el('suffixInput').value = settings.suffix; }
+  syncNameTag();
+
   el('clipSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
-    [...el('clipSeg').children].forEach(x=>x.classList.remove('on')); b.classList.add('on'); settings.clip=+b.dataset.len; });
+    [...el('clipSeg').children].forEach(x=>x.classList.remove('on')); b.classList.add('on'); settings.clip=+b.dataset.len; syncNameTag(); });
   el('startSel').addEventListener('change',e=>{ settings.start=e.target.value; highlightWave(); });
   el('lufsSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
     [...el('lufsSeg').children].forEach(x=>x.classList.remove('on')); b.classList.add('on'); settings.lufs=b.dataset.lufs;
@@ -1456,6 +1464,7 @@
     settings.preset=name;
     [...el('masterSeg').children].forEach(x=>x.classList.toggle('on',x.dataset.preset===name));
     el('origToggle').classList.toggle('on',name==='none');
+    syncNameTag();    // reflect the new preset in the auto file-name prefix
     pvBuildGraph();   // live-update the running preview to the new preset
   }
   el('masterSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) selectPreset(b.dataset.preset); });

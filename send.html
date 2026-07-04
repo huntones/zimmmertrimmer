@@ -85,25 +85,35 @@
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
 
   /* dropzone */
-  .drop{border:2.5px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:16px;padding:42px 28px;text-align:center;cursor:pointer;
-    background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  .drop{display:flex;align-items:center;gap:14px;border:2px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:14px;
+    padding:11px 15px;cursor:pointer;background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
   .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
-  .drop .cloud{width:73px;height:73px;margin:0 auto 17px;border-radius:20px;display:flex;align-items:center;justify-content:center;
+  .drop .cloud{width:40px;height:40px;flex:0 0 auto;border-radius:12px;display:flex;align-items:center;justify-content:center;
     background:var(--accent-soft);color:var(--accent);}
-  .drop .cloud svg{width:36px;height:36px;}
-  .drop .big{font-size:22px;font-weight:600;color:var(--ink);}
-  .drop .or{font-size:17px;color:var(--faint);margin:8px 0;font-family:var(--mono);}
-  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+  .drop .cloud svg{width:22px;height:22px;}
+  .drop .dinfo{flex:1;min-width:0;text-align:start;}
+  .drop .big{font-size:14.5px;font-weight:600;color:var(--ink);}
+  .drop .dhint{margin-top:2px;font-size:11.5px;color:var(--faint);font-family:var(--mono);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .drop .dbtns{display:flex;align-items:center;gap:8px;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;}
+  .drop .choose{display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;white-space:nowrap;
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
-    font-weight:600;font-size:19px;padding:14px 31px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    font-weight:600;font-size:13px;padding:9px 16px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
   .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
-  .drop .sizenote{margin-top:17px;font-size:16px;color:var(--faint);font-family:var(--mono);}
+  .drop .choose svg{width:15px;height:15px;}
+  .drop .choose.ghost{color:var(--accent-dim,var(--accent));background:var(--panel);border:1px solid var(--accent);text-shadow:none;box-shadow:none;}
+  html[data-theme="dark"] .drop .choose.ghost{color:var(--accent);}
+  .drop .choose.ghost:hover{background:var(--accent-soft);filter:none;}
+  @media (max-width:560px){ .drop{flex-wrap:wrap;} .drop .dinfo{flex:1 1 auto;} .drop .dbtns{flex:1 1 100%;} .drop .choose{flex:1;justify-content:center;} }
   input[type=file]{display:none;}
 
   /* file list */
   .files{display:flex;flex-direction:column;}
-  .flist{display:flex;flex-direction:column;gap:8px;padding:14px;}
+  .flist{display:flex;flex-direction:column;gap:8px;padding:14px;max-height:calc(100vh - 220px);overflow-y:auto;overscroll-behavior:contain;}
+  .flist::-webkit-scrollbar{width:10px;}
+  .flist::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:999px;border:3px solid var(--panel);}
+  .flist::-webkit-scrollbar-thumb:hover{background:var(--muted);}
   .frow{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line-2);border-radius:11px;background:var(--panel);}
   .frow .fico{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
   .frow .fico.image{color:var(--info);background:var(--info-soft);} .frow .fico.video{color:#e5484d;background:var(--danger-soft);}
@@ -120,6 +130,41 @@
     font-size:13px;color:var(--muted);}
   .ftot b{color:var(--ink);font-family:var(--mono);}
   .flist.empty-hint{color:var(--faint);font-size:13px;text-align:center;padding:22px;}
+
+  /* thumbnail inside a list row (images) */
+  .frow .fico.img{background:none;overflow:hidden;}
+  .frow .fico.img img{width:100%;height:100%;object-fit:cover;display:block;}
+
+  /* files card header + view toggle */
+  .fhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px 0;}
+  .fhead .fcount{font-size:12.5px;color:var(--muted);font-weight:600;}
+  .fhead .fcount b{color:var(--ink);}
+  .vtoggle{display:flex;gap:3px;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:3px;flex:0 0 auto;}
+  .vbtn{width:32px;height:28px;border:none;border-radius:6px;background:transparent;color:var(--muted);cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;transition:color .14s,background .14s,box-shadow .14s;}
+  .vbtn svg{width:16px;height:16px;}
+  .vbtn.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  .vbtn:hover:not(.on){color:var(--ink-2);}
+
+  /* gallery view */
+  .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;padding:14px;}
+  .fcard{position:relative;border:1px solid var(--line-2);border-radius:12px;background:var(--panel);overflow:hidden;}
+  .fcard .fthumb{position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:var(--panel-2);overflow:hidden;}
+  .fcard .fthumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .fcard .fthumb .fico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
+  .fcard .fthumb .fico.image{color:var(--info);background:var(--info-soft);} .fcard .fthumb .fico.video{color:#e5484d;background:var(--danger-soft);}
+  .fcard .fthumb .fico.audio{color:var(--accent);} .fcard .fthumb .fico.doc{color:var(--info-dim);background:var(--info-soft);}
+  .fcard .fthumb .fico svg{width:23px;height:23px;}
+  .fcard .ext-badge{position:absolute;bottom:7px;inset-inline-start:7px;font-family:var(--mono);font-size:9.5px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.03em;padding:2px 6px;border-radius:6px;background:color-mix(in srgb,var(--ink) 70%,transparent);color:#fff;}
+  .fcard .fmeta{padding:8px 10px 10px;}
+  .fcard .fmeta .nm{font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fcard .fmeta .sz{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:2px;}
+  .fcard .rm{position:absolute;top:7px;inset-inline-end:7px;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);
+    background:color-mix(in srgb,var(--panel) 80%,transparent);color:var(--muted);cursor:pointer;z-index:1;
+    display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .fcard .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .fcard .rm svg{width:14px;height:14px;}
 
   /* options side */
   .side{padding:18px;position:sticky;top:16px;}
@@ -235,6 +280,15 @@
   .bprev-logo img{display:block;max-height:26px;max-width:120px;object-fit:contain;}
   .bprev-name{font-size:15px;font-weight:800;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.35);text-align:center;padding:0 8px;}
   .bprev-hint{font-size:11px;color:var(--faint);text-align:center;margin-top:7px;}
+  .brandlock{border:1.4px solid var(--line);border-radius:13px;background:var(--panel-2);padding:16px 15px;margin-top:4px;
+    display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;}
+  .brandlock[hidden]{display:none;}
+  .brandlock-badge{font-size:10px;font-weight:800;letter-spacing:.06em;color:#fff;background:var(--grad);padding:3px 10px;border-radius:999px;}
+  .brandlock-ic{width:26px;height:26px;color:var(--accent);}
+  .brandlock-txt{font-size:12px;color:var(--muted);line-height:1.55;max-width:250px;}
+  .brandlock-cta{display:inline-block;text-decoration:none;font-size:12.5px;font-weight:700;color:#fff;
+    background:var(--grad-btn);padding:9px 18px;border-radius:10px;box-shadow:0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
+  .brandlock-cta:hover{filter:brightness(1.06);}
 
   footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
@@ -260,14 +314,32 @@
     <div class="col">
       <div class="drop" id="drop">
         <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
-        <div class="big" data-i18n="dropBig"></div>
-        <div class="or" data-i18n="or2"></div>
-        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
-        <div class="sizenote" data-i18n="sizeNote"></div>
+        <div class="dinfo">
+          <div class="big" data-i18n="dropBig"></div>
+          <div class="dhint" data-i18n="sizeNote"></div>
+        </div>
+        <div class="dbtns">
+          <button class="choose" type="button" id="chooseBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span data-i18n="choose"></span>
+          </button>
+          <button class="choose ghost" type="button" id="chooseFolderBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+            <span data-i18n="chooseFolder"></span>
+          </button>
+        </div>
       </div>
       <input type="file" id="fileInput" multiple>
+      <input type="file" id="folderInput" webkitdirectory directory multiple>
 
       <div class="card files" id="filesCard" style="display:none">
+        <div class="fhead">
+          <div class="fcount"><b id="fcountVal">0</b> <span id="fcountWord"></span></div>
+          <div class="vtoggle" id="vtoggle">
+            <button class="vbtn" type="button" data-view="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+            <button class="vbtn" type="button" data-view="gallery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></button>
+          </div>
+        </div>
         <div class="flist" id="flist"></div>
         <div class="ftot"><span data-i18n="totalLbl"></span> <b id="totalVal">0</b></div>
       </div>
@@ -323,6 +395,13 @@
 
         <div class="opt brandsec" id="brandSec">
           <label class="brandhead" data-i18n="brandLbl"></label>
+          <div class="brandlock" id="brandLock" hidden>
+            <span class="brandlock-badge">PRO</span>
+            <svg class="brandlock-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <div class="brandlock-txt" data-i18n="brandLockTxt"></div>
+            <a class="brandlock-cta" id="brandUpgrade" href="pricing/" data-i18n="brandLockCta"></a>
+          </div>
+          <div id="brandBody">
           <div class="brandsub" data-i18n="brandSub"></div>
           <input class="inp" id="brandName" type="text" data-i18n-ph="brandNamePh" style="margin-bottom:9px">
           <input class="inp" id="brandTagline" type="text" data-i18n-ph="brandTagPh" style="margin-bottom:11px">
@@ -350,6 +429,7 @@
             </div>
           </div>
           <div class="bprev-hint" data-i18n="brandPreviewHint"></div>
+          </div>
         </div>
 
         <button class="sendbtn" id="sendBtn" type="button" disabled>
@@ -428,8 +508,9 @@
       kick:'שליחת קבצים גדולים',
       pageTitle:'שלחו קבצים גדולים בקישור אחד',
       pageSub:'גררו קבצים, הגדירו תוקף וסיסמה, וקבלו קישור הורדה מסודר לנמען. הכול נשאר במחשב שלכם עד שתחליטו לשלוח.',
-      dropBig:'גררו קבצים לכאן', or2:'או', choose:'בחרו קבצים',
+      dropBig:'גררו קבצים או תיקיות לכאן', or2:'או', choose:'בחירת קבצים', chooseFolder:'בחירת תיקייה',
       sizeNote:'עד 2GB בשליחה (חבילת Free)', remove:'הסרה',
+      viewList:'תצוגת רשימה', viewGallery:'תצוגת גלרייה', filesWord:n=>n===1?'קובץ':'קבצים',
       totalLbl:'סה״כ', optTitle:'הגדרות שליחה',
       methodLbl:'איך לשלוח', mLink:'קישור', mEmail:'אימייל',
       toLbl:'נמענים (מופרדים בפסיק)', toPh:'a@mail.com, b@mail.com',
@@ -457,6 +538,7 @@
       brandNamePh:'שם העסק שלכם', brandTagPh:'שורת תיאור קצרה (לא חובה)',
       brandLogo:'לוגו', brandBg:'רקע', brandColor:'צבע המותג',
       brandPreviewHint:'כך ייראה עמוד ההורדה של הנמען', brandYou:'העסק שלכם', brandImgErr:'לא הצלחנו לטעון את התמונה',
+      brandLockTxt:'מיתוג אישי — לוגו, רקע וצבע — זמין בתוכניות Pro ו‑Business. בתוכניות Free ו‑Lite אין אפשרות למיתוג.', brandLockCta:'שדרגו לתוכנית Pro',
     },
     en:{
       dir:'ltr', langIco:'עב',
@@ -464,8 +546,9 @@
       kick:'Send large files',
       pageTitle:'Send large files with one link',
       pageSub:'Drop files, set an expiry and a password, and get a clean download link for your recipient. Nothing leaves your machine until you send.',
-      dropBig:'Drag files here', or2:'or', choose:'Choose files',
+      dropBig:'Drag files or folders here', or2:'or', choose:'Choose files', chooseFolder:'Choose folder',
       sizeNote:'Up to 2GB per send (Free plan)', remove:'Remove',
+      viewList:'List view', viewGallery:'Gallery view', filesWord:n=>n===1?'file':'files',
       totalLbl:'Total', optTitle:'Send options',
       methodLbl:'How to send', mLink:'Link', mEmail:'Email',
       toLbl:'Recipients (comma separated)', toPh:'a@mail.com, b@mail.com',
@@ -493,6 +576,7 @@
       brandNamePh:'Your business name', brandTagPh:'Short tagline (optional)',
       brandLogo:'Logo', brandBg:'Background', brandColor:'Brand color',
       brandPreviewHint:'This is how your recipient’s download page will look', brandYou:'Your business', brandImgErr:'We couldn’t load that image',
+      brandLockTxt:'Personal branding — logo, background & color — is available on the Pro and Business plans. Free and Lite plans don’t include branding.', brandLockCta:'Upgrade to Pro',
     },
     ru:{
       dir:'ltr',
@@ -500,8 +584,9 @@
       kick:'Отправка больших файлов',
       pageTitle:'Отправляйте большие файлы одной ссылкой',
       pageSub:'Перетащите файлы, задайте срок действия и пароль — и получите чистую ссылку для скачивания для получателя. Ничего не покидает ваше устройство, пока вы не отправите.',
-      dropBig:'Перетащите файлы сюда', or2:'или', choose:'Выбрать файлы',
+      dropBig:'Перетащите файлы или папки сюда', or2:'или', choose:'Выбрать файлы', chooseFolder:'Выбрать папку',
       sizeNote:'До 2 ГБ за отправку (бесплатный план)', remove:'Удалить',
+      viewList:'Список', viewGallery:'Галерея', filesWord:n=>{var m=n%10,d=n%100;return (m===1&&d!==11)?'файл':((m>=2&&m<=4)&&!(d>=12&&d<=14))?'файла':'файлов';},
       totalLbl:'Всего', optTitle:'Параметры отправки',
       methodLbl:'Как отправить', mLink:'Ссылка', mEmail:'Эл. почта',
       toLbl:'Получатели (через запятую)', toPh:'a@mail.com, b@mail.com',
@@ -529,6 +614,7 @@
       brandNamePh:'Название вашей компании', brandTagPh:'Короткий слоган (необязательно)',
       brandLogo:'Логотип', brandBg:'Фон', brandColor:'Цвет бренда',
       brandPreviewHint:'Так будет выглядеть страница скачивания получателя', brandYou:'Ваш бренд', brandImgErr:'Не удалось загрузить изображение',
+      brandLockTxt:'Персональный брендинг — логотип, фон и цвет — доступен в тарифах Pro и Business. В тарифах Free и Lite брендинг недоступен.', brandLockCta:'Перейти на Pro',
     },
   };
 
@@ -548,9 +634,10 @@
   };
 
   let lang='he', t=I18N.he;
-  let files=[];   // {id,file,name,ext,kind,size}
+  let files=[];   // {id,file,name,ext,kind,size,thumb}
   let method='link';
   let uid=1;
+  let view=(function(){ try{ var v=localStorage.getItem('kolkli_send_view'); return (v==='gallery'||v==='list')?v:'list'; }catch(_){ return 'list'; } })();
 
   function safeOwnerId(v){ return String(v||'guest').toLowerCase().replace(/[^a-z0-9_.@-]+/g,'_') || 'guest'; }
   function currentOwnerId(){
@@ -586,7 +673,28 @@
     try{ return Object.assign(d, JSON.parse(localStorage.getItem(scopedKey('kolkli_brand'))||'{}')); }catch(_){ return d; }
   }
   function saveBrand(){ try{ localStorage.setItem(scopedKey('kolkli_brand'), JSON.stringify(brand)); }catch(_){} }
+  // branding is a paid feature: Pro + Business only (Free/Lite are locked out)
+  function currentPlan(){
+    let plan='';
+    try{
+      const email=(localStorage.getItem('ac_session')||'').toLowerCase();
+      if(email){
+        const users=JSON.parse(localStorage.getItem('ac_users')||'[]')||[];
+        const u=users.find(x=>(x.email||'').toLowerCase()===email);
+        if(u&&u.plan) plan=u.plan;
+      }
+    }catch(_){}
+    if(!plan){ try{ plan=localStorage.getItem('ac_plan')||''; }catch(_){} }
+    return (plan||'free').toLowerCase();
+  }
+  function canBrand(){ const p=currentPlan(); return p==='pro'||p==='business'; }
+  function applyBrandGate(){
+    const ok=canBrand(), body=el('brandBody'), lock=el('brandLock');
+    if(body) body.hidden=!ok;
+    if(lock) lock.hidden=ok;
+  }
   function brandForRecord(){
+    if(!canBrand()) return null;
     const b=brand||{};
     const any=(b.name&&b.name.trim())||b.logo||b.bg||((b.color||DEFCLR).toLowerCase()!==DEFCLR);
     if(!any) return null;
@@ -670,24 +778,90 @@
   async function idbDel(key){ const db=await idb(); return new Promise((res,rej)=>{ const tx=db.transaction('transfers','readwrite'); tx.objectStore('transfers').delete(key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
 
   // ---- intake ----
-  function addFiles(list){
-    Array.from(list||[]).forEach(file=>{
+  // accepts either a FileList/File[] or an array of {file,path}; keeps each file's relative
+  // path so dropped folders keep their structure (used as the zip entry path on the recipient side)
+  function pathItems(list){ return Array.from(list||[]).map(f=>({file:f, path:f.webkitRelativePath||f.name})); }
+  function addFiles(items){
+    (items||[]).forEach(it=>{
+      const file = it.file || it;                       // tolerate a raw File too
+      const path = (it.path || file.webkitRelativePath || file.name);
       const ext=extOf(file.name);
-      files.push({ id:'f'+(uid++), file, name:file.name, ext, kind:kindOf(ext), size:file.size });
+      const kind=kindOf(ext);
+      const rec={ id:'f'+(uid++), file, name:file.name, path, ext, kind, size:file.size, thumb:'' };
+      if(kind==='image'){ try{ rec.thumb=URL.createObjectURL(file); }catch(_){} }   // preview for gallery/list
+      files.push(rec);
     });
     renderFiles();
   }
-  function removeFile(id){ files=files.filter(f=>f.id!==id); renderFiles(); }
+
+  // walk dropped directories via the entries API so whole folders keep their tree
+  async function addFromDataTransfer(dt){
+    let items;
+    try{ items = await filesFromDataTransfer(dt); }
+    catch(_){ items = pathItems(dt.files); }
+    addFiles(items);
+  }
+  function filesFromDataTransfer(dt){
+    const list = dt.items ? Array.from(dt.items) : [];
+    const entries = list.map(it=> it.webkitGetAsEntry ? it.webkitGetAsEntry() : null).filter(Boolean);
+    if(!entries.length){ return Promise.resolve(pathItems(dt.files)); }
+    const out=[];
+    return Promise.all(entries.map(en=>walkEntry(en,'',out))).then(()=>out);
+  }
+  function walkEntry(entry, prefix, out){
+    return new Promise(resolve=>{
+      if(!entry){ resolve(); return; }
+      if(entry.isFile){ entry.file(f=>{ out.push({file:f, path:prefix+entry.name}); resolve(); }, ()=>resolve()); }
+      else if(entry.isDirectory){
+        const reader=entry.createReader(), kids=[];
+        const readBatch=()=>reader.readEntries(batch=>{
+          if(!batch.length){ Promise.all(kids.map(k=>walkEntry(k, prefix+entry.name+'/', out))).then(resolve); }
+          else { kids.push(...batch); readBatch(); }
+        }, ()=>resolve());
+        readBatch();
+      } else resolve();
+    });
+  }
+  function removeFile(id){
+    const f=files.find(x=>x.id===id);
+    if(f&&f.thumb){ try{ URL.revokeObjectURL(f.thumb); }catch(_){} }
+    files=files.filter(x=>x.id!==id); renderFiles();
+  }
 
   function renderFiles(){
     const card=el('filesCard'), list=el('flist');
     card.style.display = files.length? '' : 'none';
-    list.innerHTML = files.map(f=>`
-      <div class="frow">
-        <span class="fico ${f.kind}">${ICON[f.kind]}</span>
-        <span class="fn"><div class="nm" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div><div class="sz">${fmtBytes(f.size)}</div></span>
-        <button class="rm" data-rm="${f.id}" title="${escapeHtml(t.remove)}">${ICON.trash}</button>
-      </div>`).join('');
+    // header: file count + active view button
+    if(el('fcountVal')) el('fcountVal').textContent = files.length;
+    if(el('fcountWord')) el('fcountWord').textContent = t.filesWord(files.length);
+    document.querySelectorAll('#vtoggle .vbtn').forEach(b=>{
+      const v=b.getAttribute('data-view');
+      b.classList.toggle('on', v===view);
+      b.title = v==='gallery' ? t.viewGallery : t.viewList;
+    });
+    if(view==='gallery'){
+      list.className='fgrid';
+      list.innerHTML = files.map(f=>`
+        <div class="fcard">
+          <button class="rm" data-rm="${f.id}" title="${escapeHtml(t.remove)}">${ICON.trash}</button>
+          <div class="fthumb">
+            ${f.thumb ? `<img src="${f.thumb}" alt="" loading="lazy">` : `<span class="fico ${f.kind}">${ICON[f.kind]}</span>`}
+            ${f.ext ? `<span class="ext-badge">${escapeHtml(f.ext)}</span>` : ''}
+          </div>
+          <div class="fmeta">
+            <div class="nm" title="${escapeHtml(f.path||f.name)}">${escapeHtml(f.name)}</div>
+            <div class="sz">${fmtBytes(f.size)}</div>
+          </div>
+        </div>`).join('');
+    } else {
+      list.className='flist';
+      list.innerHTML = files.map(f=>`
+        <div class="frow">
+          <span class="fico ${f.kind}${f.thumb?' img':''}">${f.thumb ? `<img src="${f.thumb}" alt="" loading="lazy">` : ICON[f.kind]}</span>
+          <span class="fn"><div class="nm" title="${escapeHtml(f.path||f.name)}">${escapeHtml(f.path||f.name)}</div><div class="sz">${fmtBytes(f.size)}</div></span>
+          <button class="rm" data-rm="${f.id}" title="${escapeHtml(t.remove)}">${ICON.trash}</button>
+        </div>`).join('');
+    }
     el('totalVal').textContent = fmtBytes(totalBytes());
     el('sendBtn').disabled = files.length===0;
   }
@@ -717,7 +891,7 @@
       password: pwOn? await hashPass(pwVal) : null,
       notify: notifyOn,
       downloads:0,
-      files: files.map(f=>({ name:f.name, size:f.size, type:f.file.type||'', blob:f.file })),
+      files: files.map(f=>({ name:(f.path||f.name), size:f.size, type:f.file.type||'', blob:f.file })),
     };
     record.brand = brandForRecord();
 
@@ -857,17 +1031,20 @@
   }
 
   // ---- events ----
-  const drop=el('drop'), input=el('fileInput');
+  const drop=el('drop'), input=el('fileInput'), folderInput=el('folderInput');
   el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  el('chooseFolderBtn').addEventListener('click',e=>{ e.stopPropagation(); folderInput.click(); });
   drop.addEventListener('click',()=>input.click());
-  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  input.addEventListener('change',()=>{ addFiles(pathItems(input.files)); input.value=''; });
+  folderInput.addEventListener('change',()=>{ addFiles(pathItems(folderInput.files)); folderInput.value=''; });
   ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
   ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
-  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFromDataTransfer(e.dataTransfer); });
   document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
   document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
 
   el('flist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeFile(b.getAttribute('data-rm')); });
+  el('vtoggle').addEventListener('click',e=>{ const b=e.target.closest('[data-view]'); if(!b) return; view=b.getAttribute('data-view'); try{ localStorage.setItem('kolkli_send_view',view); }catch(_){} renderFiles(); });
 
   el('mLink').addEventListener('click',()=>{ method='link'; el('mLink').classList.add('on'); el('mEmail').classList.remove('on'); el('emailOpt').classList.add('hidden'); });
   el('mEmail').addEventListener('click',()=>{ method='email'; el('mEmail').classList.add('on'); el('mLink').classList.remove('on'); el('emailOpt').classList.remove('hidden'); });
@@ -906,11 +1083,15 @@
 
   window.__setLang=applyLang;
   el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+  // keep the branding gate in sync when the user logs in/out or switches plan
+  window.addEventListener('kolkli:auth',applyBrandGate);
+  window.addEventListener('storage',e=>{ if(!e.key||e.key==='ac_session'||e.key==='ac_plan'||e.key==='ac_users') applyBrandGate(); });
 
   // ---- init ----
   applyTheme(ls('theme')||'light');
   applyLang(detectLang());
   renderFiles();
+  applyBrandGate();
 })();
 </script>
 </body>

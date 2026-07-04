@@ -62,7 +62,7 @@
   /* content box matches the header's 75% bar (+44px for our 22px side padding)
      so the sidebar's right edge lines up with the header logo instead of falling short */
   .dash-wrap{max-width:calc(75% + 44px);width:100%;margin:0 auto;padding:22px 22px 60px;}
-  .dash{display:grid;grid-template-columns:266px 1fr;gap:22px;align-items:start;}
+  .dash{display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start;}
 
   /* ---------- mobile bar ---------- */
   .dash-mbar{display:none;align-items:center;gap:12px;margin-bottom:14px;}
@@ -614,22 +614,22 @@
       docEmptyT:'אין עדיין מסמכים', docEmptyP:'המירו מסמכים, צרו PDF, מזגו ודחסו — או סכמו מסמך ב-AI, הכול בדפדפן.',
       openDoc:'פתחו את כלי המסמכים',
       /* organize */
-      orgTitle:'הלקוחות שלי', orgSub:'נהלו את כל הפרויקטים והגלריות של הלקוחות במקום אחד.',
+      orgTitle:'הפרויקטים שלי', orgSub:'נהלו את כל הפרויקטים והגלריות של הלקוחות במקום אחד.',
       orgEmptyT:'אין עדיין פרויקטים', orgEmptyP:'צרו פרויקט חדש כדי להתחיל לארגן קבצים לפי לקוח.',
       openOrg:'פתחו פרויקט',
-      clientsTitle:'הלקוחות שלי', clientsSub:'כל שמות הפרויקטים מסודרים לפי לקוח, סטטוס ועדכון אחרון.',
+      clientsTitle:'הפרויקטים שלי', clientsSub:'כל שמות הפרויקטים מסודרים לפי לקוח, סטטוס ועדכון אחרון.',
       newProject:'פרויקט חדש', projectPrompt:'שם הפרויקט החדש',
       editLabel:'עריכת שם', saveLabel:'שמירה',
       projectClient:'לקוח', projectFiles:'קבצים', projectSelected:'נבחרו', projectUpdated:'עודכן',
       projectOpen:'פתיחה', projectShare:'שליחת קישור',
       projectStatusDraft:'טיוטה', projectStatusEditing:'בעריכה', projectStatusSent:'נשלח ללקוח', projectStatusApproved:'מאושר',
       /* send */
-      sendTitle:'השליחות שלי', sendSub:'הקבצים ששלחתם והלינקים הפעילים שלכם.',
+      sendTitle:'קבצים שנשלחו', sendSub:'הקבצים ששלחתם והלינקים הפעילים שלכם.',
       sendEmptyT:'אין שליחות פעילות', sendEmptyP:'העלו קבצים וקבלו לינק לשיתוף מהיר, עם הגנה בסיסמה ותאריך תפוגה.',
       openSend:'שליחת קבצים חדשה',
       inviteMember:'הזמנת חבר צוות',
       openAudio:'עריכת אודיו חדשה', openVideo:'עריכת וידאו חדשה',
-      reqTitle:'הבקשות שלי', reqSub:'קישורי העלאה שיצרתם והקבצים שהתקבלו מהלקוחות.',
+      reqTitle:'הזמנות שהתקבלו', reqSub:'קישורי העלאה שיצרתם והקבצים שהתקבלו מהלקוחות.',
       reqEmptyT:'עדיין אין בקשות', reqEmptyP:'צרו קישור העלאה, שלחו ללקוח, וקבלו את הקבצים ישירות לתיקייה מסודרת.',
       openReq:'בקשה חדשה', reqNew:'בקשה חדשה', reqManage:'ניהול הבקשות',
       ri:{
@@ -649,7 +649,7 @@
         kSubs:'לקוחות', kFiles:'קבצים', kSize:'נפח',
         openFull:'עמוד מלא', detNoFiles:'עדיין לא התקבלו קבצים', dl:'הורדה', noResults:'לא נמצאו בקשות'
       },
-      reviewTitle:'האישורים שלי', reviewSub:'פרויקטים ששלחתם ללקוח לצפייה, הערות ואישור.', reviewEmptyT:'עדיין אין פרויקטים', reviewEmptyP:'צרו פרויקט, העלו חומרים, ושתפו קישור ממותג לצפייה ואישור.', openReview:'פרויקט חדש', reviewNew:'פרויקט חדש', reviewManage:'ניהול הפרויקטים',
+      reviewTitle:'הערות מלקוחות', reviewSub:'פרויקטים ששלחתם ללקוח לצפייה, הערות ואישור.', reviewEmptyT:'עדיין אין פרויקטים', reviewEmptyP:'צרו פרויקט, העלו חומרים, ושתפו קישור ממותג לצפייה ואישור.', openReview:'פרויקט חדש', reviewNew:'פרויקט חדש', reviewManage:'ניהול הפרויקטים',
       footer:'KOLKLI · העריכה רצה בדפדפן שלכם · הקבצים נשארים אצלכם.'
     },
     en:{
@@ -708,21 +708,21 @@
       docTitle:'My documents', docSub:'Files you converted, merged and compressed with KOLKLI document tools.',
       docEmptyT:'No documents yet', docEmptyP:'Convert documents, make a PDF, merge and compress — or summarize with AI, right in your browser.',
       openDoc:'Open the document tools',
-      orgTitle:'My clients', orgSub:'Manage every client project and gallery in one place.',
+      orgTitle:'My projects', orgSub:'Manage every client project and gallery in one place.',
       orgEmptyT:'No projects yet', orgEmptyP:'Create a new project to start organizing files by client.',
       openOrg:'Open project',
-      clientsTitle:'My clients', clientsSub:'Project names arranged by client, status and recent activity.',
+      clientsTitle:'My projects', clientsSub:'Project names arranged by client, status and recent activity.',
       newProject:'New project', projectPrompt:'New project name',
       editLabel:'Edit name', saveLabel:'Save',
       projectClient:'Client', projectFiles:'Files', projectSelected:'Selected', projectUpdated:'Updated',
       projectOpen:'Open', projectShare:'Send link',
       projectStatusDraft:'Draft', projectStatusEditing:'Editing', projectStatusSent:'Sent to client', projectStatusApproved:'Approved',
-      sendTitle:'My transfers', sendSub:'Files you sent and your active links.',
+      sendTitle:'Sent files', sendSub:'Files you sent and your active links.',
       sendEmptyT:'No active transfers', sendEmptyP:'Upload files and get a share link fast, with password protection and an expiry date.',
       openSend:'New file transfer',
       inviteMember:'Invite a teammate',
       openAudio:'New audio edit', openVideo:'New video edit',
-      reqTitle:'My requests', reqSub:'Upload links you created and the files clients sent back.',
+      reqTitle:'Orders received', reqSub:'Upload links you created and the files clients sent back.',
       reqEmptyT:'No requests yet', reqEmptyP:'Create an upload link, send it to a client, and receive files straight into an organized folder.',
       openReq:'New request', reqNew:'New request', reqManage:'Manage requests',
       ri:{
@@ -742,7 +742,7 @@
         kSubs:'Clients', kFiles:'Files', kSize:'Size',
         openFull:'Full page', detNoFiles:'No files received yet', dl:'Download', noResults:'No requests found'
       },
-      reviewTitle:'My reviews', reviewSub:'Projects you sent to a client to view, comment on and approve.', reviewEmptyT:'No projects yet', reviewEmptyP:'Create a project, upload materials, and share a branded link to view and approve.', openReview:'New project', reviewNew:'New project', reviewManage:'Manage projects',
+      reviewTitle:'Client comments', reviewSub:'Projects you sent to a client to view, comment on and approve.', reviewEmptyT:'No projects yet', reviewEmptyP:'Create a project, upload materials, and share a branded link to view and approve.', openReview:'New project', reviewNew:'New project', reviewManage:'Manage projects',
       footer:'KOLKLI · Editing runs in your browser · Your files stay with you.'
     },
     ru:{
@@ -801,21 +801,21 @@
       docTitle:'Мои документы', docSub:'Файлы, конвертированные, объединённые и сжатые в инструментах KOLKLI.',
       docEmptyT:'Пока нет документов', docEmptyP:'Конвертируйте документы, создавайте PDF, объединяйте и сжимайте — или делайте AI-резюме, прямо в браузере.',
       openDoc:'Открыть инструменты документов',
-      orgTitle:'Мои клиенты', orgSub:'Управляйте проектами и галереями клиентов в одном месте.',
+      orgTitle:'Мои проекты', orgSub:'Управляйте проектами и галереями клиентов в одном месте.',
       orgEmptyT:'Пока нет проектов', orgEmptyP:'Создайте новый проект, чтобы организовать файлы по клиентам.',
       openOrg:'Открыть проект',
-      clientsTitle:'Мои клиенты', clientsSub:'Проекты упорядочены по клиенту, статусу и последнему обновлению.',
+      clientsTitle:'Мои проекты', clientsSub:'Проекты упорядочены по клиенту, статусу и последнему обновлению.',
       newProject:'Новый проект', projectPrompt:'Название нового проекта',
       editLabel:'Изменить название', saveLabel:'Сохранить',
       projectClient:'Клиент', projectFiles:'Файлы', projectSelected:'Выбрано', projectUpdated:'Обновлено',
       projectOpen:'Открыть', projectShare:'Отправить ссылку',
       projectStatusDraft:'Черновик', projectStatusEditing:'В работе', projectStatusSent:'Отправлено клиенту', projectStatusApproved:'Одобрено',
-      sendTitle:'Мои передачи', sendSub:'Отправленные файлы и активные ссылки.',
+      sendTitle:'Отправленные файлы', sendSub:'Отправленные файлы и активные ссылки.',
       sendEmptyT:'Нет активных передач', sendEmptyP:'Загрузите файлы и быстро получите ссылку с защитой паролем и сроком действия.',
       openSend:'Новая передача файлов',
       inviteMember:'Пригласить участника',
       openAudio:'Новый аудиопроект', openVideo:'Новый видеопроект',
-      reqTitle:'Мои запросы', reqSub:'Созданные ссылки для загрузки и файлы, присланные клиентами.',
+      reqTitle:'Полученные заказы', reqSub:'Созданные ссылки для загрузки и файлы, присланные клиентами.',
       reqEmptyT:'Запросов пока нет', reqEmptyP:'Создайте ссылку для загрузки, отправьте клиенту и получайте файлы прямо в упорядоченную папку.',
       openReq:'Новый запрос', reqNew:'Новый запрос', reqManage:'Управление запросами',
       ri:{
@@ -835,7 +835,7 @@
         kSubs:'Клиенты', kFiles:'Файлы', kSize:'Объём',
         openFull:'Вся страница', detNoFiles:'Файлы ещё не получены', dl:'Скачать', noResults:'Запросы не найдены'
       },
-      reviewTitle:'Мои одобрения', reviewSub:'Проекты, отправленные клиенту для просмотра, комментариев и одобрения.', reviewEmptyT:'Проектов пока нет', reviewEmptyP:'Создайте проект, загрузите материалы и поделитесь брендированной ссылкой для просмотра и одобрения.', openReview:'Новый проект', reviewNew:'Новый проект', reviewManage:'Управление проектами',
+      reviewTitle:'Комментарии клиентов', reviewSub:'Проекты, отправленные клиенту для просмотра, комментариев и одобрения.', reviewEmptyT:'Проектов пока нет', reviewEmptyP:'Создайте проект, загрузите материалы и поделитесь брендированной ссылкой для просмотра и одобрения.', openReview:'Новый проект', reviewNew:'Новый проект', reviewManage:'Управление проектами',
       footer:'KOLKLI · Редактирование в вашем браузере · Ваши файлы остаются у вас.'
     }
   };
@@ -899,16 +899,16 @@
       { id:'my-docs',   he:'מסמכים',  en:'Documents', ru:'Документы' }
     ]},
     { id:'organize', icon:'folder', he:'KOLKLI Organize', en:'KOLKLI Organize', ru:'KOLKLI Organize', items:[
-      { id:'my-files', he:'הלקוחות שלי', en:'My Clients', ru:'Мои клиенты' }
+      { id:'my-files', he:'הפרויקטים שלי', en:'My projects', ru:'Мои проекты' }
     ]},
     { id:'send', icon:'send', he:'KOLKLI Send Files', en:'KOLKLI Send Files', ru:'KOLKLI Send Files', add:{ href:'send.html', label:'openSend' }, items:[
-      { id:'my-transfers', he:'השליחות שלי', en:'My Transfers', ru:'Мои передачи' }
+      { id:'my-transfers', he:'קבצים שנשלחו', en:'Sent files', ru:'Отправленные файлы' }
     ]},
     { id:'request', icon:'inbox', he:'KOLKLI Request', en:'KOLKLI Request', ru:'KOLKLI Request', add:{ href:'request.html', label:'reqNew' }, items:[
-      { id:'my-requests', he:'הבקשות שלי', en:'My Requests', ru:'Мои запросы' }
+      { id:'my-requests', he:'הזמנות שהתקבלו', en:'Requests Received', ru:'Полученные запросы' }
     ]},
     { id:'review', icon:'check', he:'KOLKLI Review', en:'KOLKLI Review', ru:'KOLKLI Review', add:{ href:'review.html', label:'reviewNew' }, items:[
-      { id:'my-reviews', he:'האישורים שלי', en:'My Reviews', ru:'Мои одобрения' }
+      { id:'my-reviews', he:'הערות מלקוחות', en:'Client comments', ru:'Комментарии клиентов' }
     ]}
   ];
 
@@ -1188,7 +1188,7 @@
       var subs;
       if(cat.id==='organize'){
         subs = '<div class="client-subbar">'+
-          editableItem('my-files', labelFor('my-files', t.clientsTitle), view==='my-files' && !activeProjectId)+
+          editableItem('my-files', labelFor('my-files', nameFor(cat.items[0])), view==='my-files' && !activeProjectId)+
           '<button class="side-add-project" type="button" id="sideNewProject" title="'+esc(t.newProject)+'" aria-label="'+esc(t.newProject)+'">'+s(ICON.plus)+'</button>'+
         '</div>';
       } else if(cat.add){

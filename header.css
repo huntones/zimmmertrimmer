@@ -20,7 +20,7 @@
 #site-header .sh-nav.scrolled{border-bottom-color:#e7eafd;background:rgba(247,248,255,.9);}
 
 #site-header .sh-bar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;
-  height:72px;max-width:85%;margin:0 auto;padding:0;}
+  height:72px;max-width:90%;margin:0 auto;padding:0;}
 
 #site-header .sh-brand{display:flex;align-items:center;color:var(--ink);text-decoration:none;}
 #site-header .sh-logo-img{height:34px;width:auto;display:block;flex-shrink:0;}
@@ -28,9 +28,9 @@
 #site-header .sh-tools{display:flex;align-items:center;gap:8px;}
 /* dead-center the nav in the bar regardless of logo / button widths */
 #site-header .sh-links{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  display:flex;align-items:center;gap:27px;}
+  display:flex;align-items:center;gap:18px;}
 #site-header .sh-links a{display:inline-flex;align-items:center;gap:5px;padding:8px 0;border-radius:9px;
-  font-size:16px;font-weight:700;color:#121834;white-space:nowrap;text-decoration:none;transition:color .12s,background .12s;}
+  font-size:15px;font-weight:700;color:#121834;white-space:nowrap;text-decoration:none;transition:color .12s,background .12s;}
 #site-header .sh-links a:hover{color:#5d43f5;background:transparent;}
 #site-header .sh-new{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 8px;
   border-radius:9px;background:linear-gradient(135deg,#7b3cff,#4e72ff);color:#fff;font-size:11px;font-weight:800;
@@ -40,7 +40,7 @@
 /* Tools mega-menu — click "Tools" to drop a panel with every tool below the bar */
 #site-header .sh-drop{position:relative;display:inline-flex;align-items:center;}
 #site-header .sh-tlink{display:inline-flex;align-items:center;gap:5px;padding:8px 0;
-  background:none;border:0;cursor:pointer;font-family:var(--sans);font-size:16px;font-weight:700;
+  background:none;border:0;cursor:pointer;font-family:var(--sans);font-size:15px;font-weight:700;
   color:#121834;white-space:nowrap;transition:color .12s;}
 #site-header .sh-tlink:hover,#site-header .sh-drop.open .sh-tlink{color:#5d43f5;}
 #site-header .sh-tlink .sh-chev{transition:transform .18s;}
@@ -71,6 +71,10 @@
 #site-header .sh-col.c-code  {--ic:#2f7d63;--ic-bg:#e3f6ef;}
 #site-header .sh-col.c-seo   {--ic:#c27803;--ic-bg:#fdf0d5;}
 #site-header .sh-col.c-layout{--ic:#3b6ff6;--ic-bg:#e8f0fe;}
+/* "Text Tools" mega-menu column tints */
+#site-header .sh-col.c-tedit{--ic:#7c3aed;--ic-bg:#efe9fe;}
+#site-header .sh-col.c-tlist{--ic:#3b6ff6;--ic-bg:#e8f0fe;}
+#site-header .sh-col.c-tdev {--ic:#0fa6ab;--ic-bg:#def5f5;}
 
 /* small uppercase category label with a tinted emoji chip */
 #site-header .sh-col-h{display:flex;align-items:center;gap:9px;padding:6px 8px;margin-bottom:2px;
@@ -131,6 +135,25 @@
 #site-header .sh-prod-d{font-size:11.5px;color:#8a92aa;line-height:1.25;margin-top:1px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #site-header .sh-prod-item:hover .sh-prod-t{color:#5d43f5;}
+
+/* ============================================================
+   AI Tools dropdown — a compact 2-column menu of the AI tools,
+   anchored under its nav button. Reuses the .sh-prod-* row
+   styling and the .sh-drop open/chevron mechanics; a full-width
+   footer link drops to the /ai/ hub.
+   ============================================================ */
+#site-header .sh-aimenu{position:absolute;top:calc(100% + 14px);inset-inline-start:0;z-index:75;
+  width:min(486px,92vw);padding:8px;border-radius:16px;background:#fff;border:1px solid #e8ebfb;
+  box-shadow:0 24px 56px rgba(30,37,80,.20);
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 4px;
+  opacity:0;visibility:hidden;transform:translateY(-8px);pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease,visibility .18s;}
+#site-header .sh-aidrop.open .sh-aimenu{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
+#site-header .sh-ai-item{padding:9px;}
+#site-header .sh-aimenu-all{grid-column:1/-1;display:flex;align-items:center;justify-content:center;
+  margin-top:4px;padding:11px;border-radius:12px;background:linear-gradient(100deg,#f4f1ff,#eaf1ff);
+  font-size:12.5px;font-weight:800;color:#5d43f5;text-decoration:none;transition:filter .12s;}
+#site-header .sh-aimenu-all:hover{filter:brightness(.97);}
 
 #site-header .sh-pill{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;
   border-radius:15px;background:rgba(255,255,255,.58);border:1px solid #e8ebfb;color:#111735;
@@ -208,9 +231,12 @@
 #site-header .sh-acct-av{width:40px;height:40px;border-radius:50%;flex-shrink:0;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(135deg,#7b34ff,#3f85ff);color:#fff;font-size:16px;font-weight:800;line-height:1;}
-#site-header .sh-acct-id{display:flex;flex-direction:column;min-width:0;}
+#site-header .sh-acct-id{display:flex;flex-direction:column;min-width:0;flex:1;}
+#site-header .sh-acct-name-row{display:flex;align-items:center;gap:8px;min-width:0;}
 #site-header .sh-acct-name{font-size:14px;font-weight:800;color:#1b2138;line-height:1.3;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#site-header .sh-acct-plan{flex-shrink:0;padding:3px 7px;border-radius:999px;background:#f1edff;
+  color:#5d43f5;font-size:11px;font-weight:800;line-height:1;}
 #site-header .sh-acct-mail{font-size:12px;color:#8a92aa;line-height:1.3;direction:ltr;text-align:start;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #site-header .sh-acct-sep{height:1px;margin:6px 8px;background:#eceefb;}
@@ -228,12 +254,16 @@
 #site-header .sh-acct-out:hover{background:#fdecec;color:#e5484d;}
 #site-header .sh-acct-langbox{margin:2px 6px 6px;padding:8px 6px 6px;border:1px solid #edf0fb;
   border-radius:12px;background:#f7f8ff;}
-#site-header .sh-acct-langhead{display:flex;align-items:center;gap:10px;padding:2px 6px 8px;
+#site-header .sh-acct-langhead{width:100%;display:flex;align-items:center;gap:10px;padding:2px 6px 8px;
+  border:0;background:none;cursor:pointer;font-family:var(--sans);text-align:start;
   color:#1b2138;font-size:13px;font-weight:800;}
 #site-header .sh-acct-langhead svg{width:18px;height:18px;flex-shrink:0;color:#8a92aa;
   stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 #site-header .sh-acct-langhead b{margin-inline-start:auto;color:#5d43f5;font-size:12.5px;}
-#site-header .sh-acct-langopts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;}
+#site-header .sh-acct-langhead .sh-chev{width:13px;height:13px;color:#8a92aa;transition:transform .18s;}
+#site-header .sh-acct-langbox.open .sh-acct-langhead .sh-chev{transform:rotate(180deg);}
+#site-header .sh-acct-langopts{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;}
+#site-header .sh-acct-langbox.open .sh-acct-langopts{display:grid;}
 #site-header .sh-acct-langopt{min-width:0;height:32px;border:0;border-radius:9px;background:transparent;
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;
   font-family:var(--sans);font-size:12px;font-weight:800;color:#59627a;
@@ -263,16 +293,41 @@
   text-transform:uppercase;color:#98a1b8;}
 #site-header .sh-panel .sh-panel-sub{padding-inline-start:20px;}
 
-/* collapse the inline links into the ☰ menu once the centered nav would
-   crowd the right-side buttons (nav is absolutely centered in the bar) */
-@media (max-width:1360px){
+/* Progressive nav compaction: keep all 6 items INLINE on laptops/tablets.
+   The nav is absolutely centered, so it OVERLAPS (not wraps) the logo + side
+   buttons once it's wider than the leftover room. Wide desktops (styles above)
+   stay roomy; from here down we shrink the nav spacing/font + the side pills so
+   the 6-item nav still clears the buttons without folding to the ☰. One tier
+   (not two) so the compaction is continuous — a gap that re-opened just above a
+   second breakpoint would let the nav re-expand and overlap. Values tuned via
+   Playwright overlap measurements; the ☰ only appears on phones / small tablets
+   (collapse query below). */
+@media (max-width:1560px){
+  #site-header .sh-bar{max-width:96%;}
+  #site-header .sh-links{gap:7px;}
+  #site-header .sh-links a,
+  #site-header .sh-tlink{font-size:12.5px;gap:4px;}
+  #site-header .sh-links a{padding:6px 0;}
+  #site-header .sh-tools{gap:5px;}
+  #site-header .sh-pill{height:36px;padding:0 10px;font-size:12.5px;gap:6px;}
+  #site-header .sh-lang{padding:0 9px;gap:6px;}
+  #site-header .sh-cta{height:38px;padding:0 14px;font-size:12.5px;}
+  #site-header .sh-icon{width:36px;height:36px;}
+  #site-header .sh-new{height:19px;padding:0 6px;font-size:10px;}
+  #site-header .sh-logo-img{height:30px;}
+}
+
+/* Collapse the inline links into the ☰ menu only on phones / small tablets.
+   The compaction above keeps all 6 items inline down to laptop widths; below
+   this the centered nav can no longer clear the buttons, so fold it into the ☰
+   (which lists every item). Thresholds from Playwright overlap measurements of
+   the compacted nav — he/en share one (~1200px min); ru (wider labels) folds
+   earlier (~1440px min). If you add/remove nav items, re-measure and adjust. */
+@media (max-width:1240px){
   #site-header .sh-links{display:none;}
   #site-header .sh-menu{display:inline-flex;}
 }
-/* Russian labels are noticeably wider than he/en, so the centered nav crowds
-   the action buttons until the viewport is very wide. Collapse it into the ☰
-   menu earlier for Russian only — he/en keep the 1360 threshold above. */
-@media (max-width:1900px){
+@media (max-width:1470px){
   html[lang="ru"] #site-header .sh-links{display:none;}
   html[lang="ru"] #site-header .sh-menu{display:inline-flex;}
 }

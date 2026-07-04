@@ -290,10 +290,10 @@
 
   /* ---------- AI / pricing / faq data (from index.html DATA) ---------- */
   var AI = [
-    {i:'🪄',he:'הסרת רקע AI',en:'AI Remove Background',ru:'AI-удаление фона',href:'../remove-bg.html'},{i:'🎧',he:'ניקוי אודיו AI',en:'AI Audio Cleaner',ru:'AI-очистка звука',href:'../ai-audio-cleanup.html'},
-    {i:'💬',he:'יצירת כתוביות AI',en:'AI Subtitle Generator',ru:'AI-генератор субтитров',href:'../subtitle-generator.html'},{i:'🖼️',he:'חיתוך חכם AI',en:'AI Smart Crop',ru:'AI-умная обрезка',href:'../ai-smart-crop.html'},
-    {i:'🩹',he:'שחזור תמונה AI',en:'AI Restore Photo',ru:'AI-восстановление фото',href:'../restore-image.html'},{i:'🎚️',he:'מאסטרינג AI',en:'AI Master Audio',ru:'AI-мастеринг аудио',href:'../ai-master.html'},
-    {i:'🧽',he:'הסרת אובייקטים AI',en:'AI Remove Objects',ru:'AI-удаление объектов',href:'../ai-object-remover.html'},{i:'📝',he:'סיכום PDF AI',en:'AI Summarize PDF',ru:'AI-конспект PDF',href:'../ai-summarize-pdf.html'}
+    {i:'🪄',he:'הסרת רקע AI',en:'AI Remove Background',ru:'AI-удаление фона',dhe:'מסיר רקע מתמונות בלחיצה, עם קצוות נקיים.',den:'Removes image backgrounds in one click with clean edges.',dru:'Удаляет фон с изображений в один клик с чистыми краями.',href:'../remove-bg.html'},{i:'🎧',he:'ניקוי אודיו AI',en:'AI Audio Cleaner',ru:'AI-очистка звука',dhe:'מסיר רעשי רקע והדים מכל הקלטה.',den:'Strips background noise and echo from any recording.',dru:'Убирает фоновый шум и эхо из любой записи.',href:'../ai-audio-cleanup.html'},
+    {i:'💬',he:'יצירת כתוביות AI',en:'AI Subtitle Generator',ru:'AI-генератор субтитров',dhe:'מתמלל וידאו ואודיו לכתוביות מסונכרנות.',den:'Transcribes video and audio into synced subtitles.',dru:'Транскрибирует видео и аудио в синхронные субтитры.',href:'../subtitle-generator.html'},{i:'🖼️',he:'חיתוך חכם AI',en:'AI Smart Crop',ru:'AI-умная обрезка',dhe:'ממקד את הנושא וחותך אוטומטית לכל יחס.',den:'Finds the subject and auto-crops to any ratio.',dru:'Находит объект и автоматически кадрирует под любое соотношение.',href:'../ai-smart-crop.html'},
+    {i:'🩹',he:'שחזור תמונה AI',en:'AI Restore Photo',ru:'AI-восстановление фото',dhe:'משפר תמונות ישנות ומטושטשות לרזולוציה גבוהה.',den:'Restores old, blurry photos to crisp high-res.',dru:'Восстанавливает старые размытые фото до высокого разрешения.',href:'../restore-image.html'},{i:'🎚️',he:'מאסטרינג AI',en:'AI Master Audio',ru:'AI-мастеринг аудио',dhe:'מאזן ומחזק את המיקס לסאונד מקצועי.',den:'Balances and boosts your mix to a pro sound.',dru:'Балансирует и усиливает микс до профессионального звучания.',href:'../ai-master.html'},
+    {i:'🧽',he:'הסרת אובייקטים AI',en:'AI Remove Objects',ru:'AI-удаление объектов',dhe:'מוחק עצמים לא רצויים מהתמונה בלי עקבות.',den:'Erases unwanted objects from photos seamlessly.',dru:'Удаляет ненужные объекты с фото без следов.',href:'../ai-object-remover.html'},{i:'📝',he:'סיכום PDF AI',en:'AI Summarize PDF',ru:'AI-конспект PDF',dhe:'מפיק תקציר ונקודות מפתח מכל מסמך.',den:'Extracts a summary and key points from any document.',dru:'Извлекает краткое содержание и ключевые пункты из документа.',href:'../ai-summarize-pdf.html'}
   ];
   var PLANS = [
     {price:'$0', he:['חינם','להתחלה מהירה'], en:['Free','To get started'], ru:['Бесплатно','Для быстрого старта'], cta:{he:'התחילו',en:'Get Started',ru:'Начать'}, feats:[
@@ -404,7 +404,8 @@
   }
   function renderAI(L, S) {
     var grid = AI.map(function (a) {
-      var inner = '<span class="aico">' + a.i + '</span><span class="an">' + a[L] + '</span>' + badge(a.href ? 'live' : 'soon', S);
+      var inner = '<span class="aico">' + a.i + '</span>' + badge(a.href ? 'live' : 'soon', S) +
+        '<span class="an">' + a[L] + '</span><p class="ad">' + a['d' + L] + '</p>';
       return a.href ? '<a class="aicard hov" href="' + a.href + '">' + inner + '</a>'
                     : '<div class="aicard">' + inner + '</div>';
     }).join('');

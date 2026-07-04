@@ -80,7 +80,10 @@
     background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;}
   .chip svg{width:13px;height:13px;color:var(--accent);}
 
-  .flist{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+  .flist{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;max-height:calc(100vh - 300px);overflow-y:auto;overscroll-behavior:contain;}
+  .flist::-webkit-scrollbar{width:10px;}
+  .flist::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:999px;border:3px solid var(--panel);}
+  .flist::-webkit-scrollbar-thumb:hover{background:var(--muted);}
   .frow{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel);
     transition:border-color .12s;}
   .frow:hover{border-color:var(--accent);}

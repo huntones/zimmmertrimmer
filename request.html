@@ -53,18 +53,19 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:min(80vw,1380px);max-width:80vw;margin:0 auto;padding:16px 0 18px;}
+  @media (max-width:840px){ .wrap{width:100%;max-width:none;padding:18px 14px 48px;} }
 
   /* page intro */
-  .pagehead{margin:4px 0 18px;}
+  .pagehead{text-align:center;margin:0 auto 12px;}
   .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
   .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
     letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
     padding:4px 11px;border-radius:999px;margin-bottom:11px;}
-  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0 auto;max-width:70ch;}
 
   /* tabs */
-  .tabs{display:inline-flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:18px;box-shadow:var(--shadow-sm);}
+  .tabs{display:flex;width:max-content;max-width:100%;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;margin:0 auto 14px;box-shadow:var(--shadow-sm);}
   .tab{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border:none;border-radius:9px;background:transparent;
     color:var(--muted);cursor:pointer;font-size:13.5px;font-weight:600;transition:color .14s,background .14s,box-shadow .14s;}
   .tab.on{background:var(--accent-soft);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
@@ -73,7 +74,7 @@
   .tab.on .count{background:var(--panel);color:var(--accent-dim);}
 
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
-  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,340px);gap:16px;align-items:start;}
   @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
   .col{min-width:0;}
   .hidden{display:none !important;}
@@ -132,6 +133,80 @@
   .chip svg{width:13px;height:13px;color:var(--accent);}
   .chip.warn{background:var(--warm-soft);border-color:var(--warm-line);color:var(--warn);}
   .chip.warn svg{color:var(--warn);}
+
+  @media (min-width:841px){
+    .wrap{padding-top:8px;padding-bottom:8px;}
+    .pagehead{margin-bottom:10px;}
+    .pagehead .kick{font-size:10.5px;padding:3px 9px;margin-bottom:7px;}
+    .pagehead h2{font-size:clamp(21px,2.3vw,27px);margin-bottom:3px;}
+    .pagehead p{font-size:13px;line-height:1.36;max-width:58ch;}
+    .tabs{margin-bottom:12px;}
+    .tab{height:34px;padding:0 13px;font-size:12.5px;}
+    .grid{grid-template-columns:minmax(0,1fr) minmax(260px,320px);gap:14px;}
+    .form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 12px;padding:14px;}
+    .form h3{grid-column:1/-1;margin:0;font-size:14px;}
+    .form > .opt{margin-bottom:0;}
+    .form > .opt:nth-child(2),
+    .form > .opt:nth-child(3),
+    .form > .opt:nth-child(4),
+    .form > .opt:nth-child(5),
+    .form > .opt:nth-child(9){grid-column:span 2;}
+    .form > .opt:nth-child(10){align-self:end;}
+    .form > .two{grid-column:span 2;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px;}
+    .form > .two .opt{margin-bottom:0;}
+    .opt > label,.optlbl{font-size:12px;margin-bottom:4px;}
+    .inp,.ta{padding:7px 10px;font-size:12.5px;}
+    .ta{min-height:44px;}
+    .hint{margin-top:3px;line-height:1.25;}
+    .typechips{gap:6px;}
+    .tchip{padding:5px 9px;font-size:11.5px;}
+    .chkline{margin-bottom:0;}
+    .primary{grid-column:span 2;align-self:end;min-height:38px;padding:9px 16px;margin-top:0;font-size:14px;}
+    .opterr{grid-column:span 2;margin-top:0;align-self:center;}
+    .side{position:static;padding:14px;}
+    .side .plabel{margin-bottom:7px;}
+    .pvcard .pv-top{padding:12px;}
+    .pvcard .pv-ava{width:38px;height:38px;margin-bottom:7px;}
+    .pvcard .pv-body{padding:11px;}
+    .pvcard .pv-drop{padding:12px;}
+    .pvcard .pv-chips{margin-top:9px;}
+    #createView:not(.hidden) ~ footer{display:none;}
+  }
+
+  @media (min-width:841px) and (max-width:1099px){
+    .form{grid-template-columns:repeat(3,minmax(0,1fr));}
+    .form > .opt:nth-child(2),
+    .form > .opt:nth-child(4),
+    .form > .opt:nth-child(8),
+    .form > .opt:nth-child(10){grid-column:span 1;}
+    .form > .two{grid-column:1/-1;}
+    .opterr{grid-column:1/-1;}
+  }
+
+  @media (min-width:1100px) and (min-height:760px){
+    .wrap{padding-top:12px;padding-bottom:12px;}
+    .pagehead{margin-bottom:12px;}
+    .pagehead .kick{font-size:11px;padding:4px 10px;margin-bottom:8px;}
+    .pagehead h2{font-size:clamp(24px,2.35vw,31px);margin-bottom:4px;}
+    .pagehead p{font-size:14px;line-height:1.42;max-width:62ch;}
+    .tabs{margin-bottom:14px;}
+    .tab{height:36px;padding:0 15px;font-size:13px;}
+    .grid{grid-template-columns:minmax(0,1fr) minmax(310px,380px);gap:16px;}
+    .form{gap:10px 14px;padding:18px;}
+    .form h3{font-size:15px;}
+    .opt > label,.optlbl{font-size:12.5px;margin-bottom:5px;}
+    .inp,.ta{font-size:13px;padding:8px 11px;}
+    .ta{min-height:52px;}
+    .typechips{gap:7px;}
+    .tchip{padding:6px 11px;font-size:12px;}
+    .primary{min-height:42px;padding:10px 18px;font-size:14.5px;}
+    .side{padding:16px;}
+    .pvcard .pv-top{padding:15px;}
+    .pvcard .pv-ava{width:44px;height:44px;margin-bottom:8px;}
+    .pvcard .pv-body{padding:13px;}
+    .pvcard .pv-drop{padding:16px;}
+    .pvcard .pv-chips{margin-top:11px;}
+  }
 
   /* share panel */
   .share{padding:22px;display:none;}
@@ -221,7 +296,10 @@
   .sg-when{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
   .sg-contact{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
   .sg-note{font-size:12.5px;color:var(--ink-2);background:var(--panel);border:1px solid var(--line-2);border-radius:9px;padding:8px 11px;margin-top:9px;width:100%;white-space:pre-wrap;word-break:break-word;}
-  .sg-files{display:flex;flex-direction:column;}
+  .sg-files{display:flex;flex-direction:column;max-height:340px;overflow-y:auto;overscroll-behavior:contain;}
+  .sg-files::-webkit-scrollbar{width:10px;}
+  .sg-files::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:999px;border:3px solid var(--panel);}
+  .sg-files::-webkit-scrollbar-thumb:hover{background:var(--muted);}
   .frow{display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--line-2);}
   .frow:first-child{border-top:none;}
   .frow .newdot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;box-shadow:0 0 0 3px var(--accent-soft);}
@@ -282,6 +360,9 @@
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 <link rel="stylesheet" href="./header.css">
+<style>
+  #site-header .sh-mega:not(.open){display:none;}
+</style>
 </head>
 <body>
 <div id="site-header"></div>
@@ -540,7 +621,7 @@
       kick:'Kolkli Request',
       pageTitle:'קבלו קבצים ישירות מהלקוחות שלכם',
       pageSub:'צרו קישור העלאה, שלחו ללקוח, וכל הקבצים נכנסים אוטומטית לתיקייה מסודרת אצלכם. הלקוח לא צריך חשבון או התחברות.',
-      tabCreate:'בקשה חדשה', tabManage:'הבקשות שלי',
+      tabCreate:'בקשה חדשה', tabManage:'הזמנות שהתקבלו',
       formTitle:'יצירת בקשת קבצים',
       fName:'שם הבקשה', fNamePh:'לדוגמה: תמונות לאירוע',
       fDesc:'הנחיות ללקוח', fDescPh:'מה בדיוק להעלות? כמה מילים שיראה הלקוח…',
@@ -561,7 +642,7 @@
       qrDl:'הורדת קוד QR',
       seam:'הדגמה מקומית: הבקשות והקבצים נשמרים בדפדפן הזה. עם חיבור השרת הקישור יעבוד לכל לקוח מכל מכשיר.',
       foot:'KOLKLI · Kolkli Request · הדגמה מקומית עד לחיבור השרת',
-      mgTitle:'הבקשות שלי', newReq:'בקשה חדשה',
+      mgTitle:'הזמנות שהתקבלו', newReq:'בקשה חדשה',
       mgEmptyTitle:'עדיין אין בקשות', mgEmptyBody:'צרו בקשת קבצים ראשונה כדי לקבל קבצים מלקוחות בקישור אחד.',
       stActive:'פעיל', stExpired:'פג תוקף', stClosed:'נסגר',
       chipFolder:f=>`תיקייה: ${f}`, chipFiles:n=>`${n} קבצים`, chipSize:s=>s,
@@ -589,7 +670,7 @@
       kick:'Kolkli Request',
       pageTitle:'Receive files directly from your clients',
       pageSub:'Create an upload link, send it to your client, and every file lands automatically in an organized folder on your side. Your client needs no account and no login.',
-      tabCreate:'New request', tabManage:'My requests',
+      tabCreate:'New request', tabManage:'Orders received',
       formTitle:'Create a file request',
       fName:'Request name', fNamePh:'e.g. Event photos',
       fDesc:'Instructions for the client', fDescPh:'What exactly should they upload? A few words shown to the client…',
@@ -610,7 +691,7 @@
       qrDl:'Download QR code',
       seam:'This is a local demo: requests and files are stored in this browser. Once the server is connected, the link works for any client on any device.',
       foot:'KOLKLI · Kolkli Request · Local demo until the server is connected',
-      mgTitle:'My requests', newReq:'New request',
+      mgTitle:'Orders received', newReq:'New request',
       mgEmptyTitle:'No requests yet', mgEmptyBody:'Create your first file request to receive files from clients with a single link.',
       stActive:'Active', stExpired:'Expired', stClosed:'Closed',
       chipFolder:f=>`Folder: ${f}`, chipFiles:n=>`${n} files`, chipSize:s=>s,
@@ -638,7 +719,7 @@
       kick:'Kolkli Request',
       pageTitle:'Получайте файлы напрямую от клиентов',
       pageSub:'Создайте ссылку для загрузки, отправьте её клиенту — и каждый файл автоматически попадает в упорядоченную папку у вас. Клиенту не нужен аккаунт и вход.',
-      tabCreate:'Новый запрос', tabManage:'Мои запросы',
+      tabCreate:'Новый запрос', tabManage:'Полученные заказы',
       formTitle:'Создать запрос файлов',
       fName:'Название запроса', fNamePh:'напр. Фото с мероприятия',
       fDesc:'Инструкции для клиента', fDescPh:'Что именно загрузить? Пара слов, которые увидит клиент…',
@@ -659,7 +740,7 @@
       qrDl:'Скачать QR-код',
       seam:'Это локальная демонстрация: запросы и файлы хранятся в этом браузере. После подключения сервера ссылка работает для любого клиента на любом устройстве.',
       foot:'KOLKLI · Kolkli Request · Локальная демонстрация до подключения сервера',
-      mgTitle:'Мои запросы', newReq:'Новый запрос',
+      mgTitle:'Полученные заказы', newReq:'Новый запрос',
       mgEmptyTitle:'Запросов пока нет', mgEmptyBody:'Создайте первый запрос файлов, чтобы получать файлы от клиентов по одной ссылке.',
       stActive:'Активен', stExpired:'Истёк', stClosed:'Закрыт',
       chipFolder:f=>`Папка: ${f}`, chipFiles:n=>`${n} файлов`, chipSize:s=>s,

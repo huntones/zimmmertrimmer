@@ -56,7 +56,9 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:26px 20px 60px;}
+  .wrap{width:90%;max-width:none;margin:0 auto;padding:26px 0 60px;}
+  @media (max-width:1560px){ .wrap{width:96%;} }
+  @media (max-width:640px){ .wrap{width:100%;padding:18px 14px 52px;} }
 
   /* ---------- header ---------- */
   .topbar{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
@@ -97,7 +99,7 @@
     padding:0 12px;height:40px;flex:1 1 240px;min-width:180px;}
   .search svg{width:16px;height:16px;color:var(--faint);flex-shrink:0;}
   .search input{border:none;background:none;outline:none;color:var(--ink);font-family:var(--sans);font-size:14px;width:100%;}
-  .zoom{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);font-family:var(--mono);white-space:nowrap;}
+  .zoom{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);font-family:var(--mono);white-space:nowrap;}
   .zoom input[type=range]{accent-color:var(--accent);width:118px;cursor:pointer;}
   .zbtn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 auto;
     border-radius:7px;cursor:pointer;font-size:16px;font-weight:700;line-height:1;
@@ -105,9 +107,9 @@
   .zbtn:hover{border-color:var(--accent);color:var(--accent);}
   .zbtn:active{background:var(--accent-soft);}
   .zbtn:disabled{opacity:.4;cursor:default;border-color:var(--line);color:var(--ink-2);}
-  .toolchk{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);font-family:var(--mono);white-space:nowrap;cursor:pointer;user-select:none;}
+  .toolchk{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);font-family:var(--mono);white-space:nowrap;cursor:pointer;user-select:none;}
   .toolchk input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;flex-shrink:0;}
-  .selbar{display:flex;align-items:center;gap:9px;margin-inline-start:auto;flex-wrap:wrap;}
+  .selbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
   .selcount{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap;}
   .selcount b{color:var(--accent-dim);font-size:15px;font-weight:700;}
   html[data-theme="dark"] .selcount b{color:var(--accent);}
@@ -140,7 +142,8 @@
   .btnline.dlbtn-lg svg{width:17px;height:17px;}
 
   /* ---------- layout ---------- */
-  .organizer{display:grid;grid-template-columns:236px 1fr;gap:18px;align-items:start;}
+  .organizer{display:grid;grid-template-columns:236px minmax(0,1fr);gap:18px;align-items:start;}
+  @media (max-width:980px){ .organizer{grid-template-columns:218px minmax(0,1fr);gap:14px;} }
   @media (max-width:820px){ .organizer{grid-template-columns:1fr;} }
 
   /* ---------- sidebar / folders ---------- */
@@ -151,6 +154,10 @@
     cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
   .side .addf:hover{border-color:var(--accent);background:var(--accent-soft);}
   .side .addf svg{width:16px;height:16px;}
+  .side .side-search{display:flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+    padding:0 11px;height:38px;margin-bottom:10px;}
+  .side .side-search svg{width:15px;height:15px;color:var(--faint);flex-shrink:0;}
+  .side .side-search input{border:none;background:none;outline:none;color:var(--ink);font-family:var(--sans);font-size:13px;width:100%;}
   .folders{display:flex;flex-direction:column;gap:3px;}
   .fitem{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;cursor:pointer;font-size:13.5px;color:var(--ink-2);
     transition:background .12s;border:1px solid transparent;}
@@ -161,6 +168,9 @@
   .fitem.on .fi-ic{color:var(--accent);}
   .fitem .fi-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .fitem .fi-count{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .fitem .fi-count b{font-weight:700;}
+  .fitem .fi-count.on{color:var(--accent);}
+  .fitem.on .fi-count.on{color:var(--accent-dim);}
   .fitem .fi-act{display:none;gap:2px;}
   .fitem:hover .fi-act{display:flex;}
   .fitem .fi-act button{background:none;border:none;color:var(--faint);cursor:pointer;padding:2px;border-radius:5px;line-height:0;}
@@ -177,33 +187,140 @@
   .fitem .fi-tw .tw:hover{color:var(--accent);}
   .fitem.dragging{opacity:.45;}
 
-  /* ---------- main / dropzone ---------- */
+  /* ---------- main / dropzone (compact horizontal bar) ---------- */
   .main{min-width:0;}
-  .drop{border:2.5px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:16px;padding:26px 20px;text-align:center;cursor:pointer;
-    background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  .drop{display:flex;align-items:center;gap:14px;border:2px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:14px;
+    padding:11px 15px;cursor:pointer;background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
   .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
-  .drop .cloud{width:48px;height:48px;margin:0 auto 10px;border-radius:14px;display:flex;align-items:center;
+  .drop .cloud{width:40px;height:40px;flex:0 0 auto;border-radius:12px;display:flex;align-items:center;
     justify-content:center;background:var(--accent-soft);color:var(--accent);}
-  .drop .cloud svg{width:24px;height:24px;}
-  .drop .big{font-size:15px;font-weight:600;color:var(--ink);}
-  .drop .or{font-size:12px;color:var(--faint);margin:6px 0;font-family:var(--mono);}
-  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+  .drop .cloud svg{width:22px;height:22px;}
+  .drop .dinfo{flex:1;min-width:0;text-align:start;}
+  .drop .big{font-size:14.5px;font-weight:600;color:var(--ink);}
+  .drop .dhint{margin-top:2px;font-size:11.5px;color:var(--faint);font-family:var(--mono);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .drop .dbtns{display:flex;align-items:center;gap:8px;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;}
+  .drop .choose{display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;white-space:nowrap;
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
-    font-weight:600;font-size:13.5px;padding:10px 22px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    font-weight:600;font-size:13px;padding:9px 16px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
   .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
-  .drop .dfmts{margin-top:12px;font-size:11.5px;color:var(--faint);font-family:var(--mono);}
-  .drop .sizenote{margin-top:6px;font-size:11.5px;color:var(--faint);font-family:var(--mono);}
+  .drop .choose svg{width:15px;height:15px;}
+  .drop .choose.ghost{color:var(--accent-dim);background:var(--panel);border:1px solid var(--accent);text-shadow:none;box-shadow:none;}
+  html[data-theme="dark"] .drop .choose.ghost{color:var(--accent);}
+  .drop .choose.ghost:hover{background:var(--accent-soft);filter:none;}
+  @media (max-width:560px){
+    .drop{flex-wrap:wrap;}
+    .drop .dinfo{flex:1 1 auto;}
+    .drop .dhint{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.55;}
+    .drop .dbtns{flex:1 1 100%;}
+    .drop .choose{flex:1;justify-content:center;}
+  }
+  @media (max-width:700px){
+    .toolbar{gap:10px;padding:12px;}
+    .toolbar .ambtn,.toolbar .selbar,.toolbar .gearbtn{flex:1 1 auto;}
+    .toolbar .selbar{min-width:0;}
+    .zoom{order:3;width:100%;justify-content:space-between;}
+    .zoom input[type=range]{flex:1;min-width:0;}
+    .toolchk{order:4;width:100%;justify-content:flex-start;}
+  }
   input[type=file]{display:none;}
 
+  /* ---------- stats strip ---------- */
+  .statrow{display:grid;grid-template-columns:1.15fr 1fr 1fr 1fr 1.1fr;gap:13px;margin-bottom:18px;}
+  .statcard{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:15px 16px;
+    box-shadow:var(--shadow-sm);transition:box-shadow .15s;}
+  .statcard:hover{box-shadow:var(--shadow);}
+  .st-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+  .st-tx{min-width:0;}
+  .st-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .st-val{font-size:22px;font-weight:800;letter-spacing:-0.01em;line-height:1;color:var(--ink);direction:ltr;display:inline-block;}
+  .st-ic{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--panel-2);color:var(--muted);}
+  .st-ic svg{width:19px;height:19px;}
+  .st-ic.i{background:var(--info-soft);color:var(--info);}
+  .st-ic.v{background:var(--danger-soft);color:var(--danger);}
+  .st-ic.d{background:var(--success-soft);color:var(--success);}
+  .st-ic.s{background:var(--warm-soft);color:var(--warn);}
+  .statcard.total{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 32%,transparent);}
+  .statcard.total .st-label{color:var(--accent-dim);}
+  .statcard.total .st-val{color:var(--accent-dim);}
+  .statcard.total .st-ic{background:var(--panel);color:var(--accent);box-shadow:var(--shadow-sm);}
+  /* selection-status card (replaces the storage stat) */
+  .statcard.status{position:relative;cursor:pointer;--st-c:var(--muted);z-index:1;}
+  .statcard.status.open{z-index:30;}
+  .statcard.status:hover{border-color:color-mix(in srgb,var(--st-c) 45%,var(--line));box-shadow:var(--shadow);}
+  .statcard.status:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .statcard.status .st-val{direction:unset;line-height:1;}
+  .statcard.status .st-ic.st{background:color-mix(in srgb,var(--st-c) 15%,transparent);color:var(--st-c);}
+  .statusbadge{display:inline-flex;align-items:center;gap:7px;max-width:100%;padding:4px 10px;border-radius:999px;
+    font-size:13px;font-weight:700;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    color:var(--st-c);background:color-mix(in srgb,var(--st-c) 14%,transparent);
+    border:1px solid color-mix(in srgb,var(--st-c) 30%,transparent);}
+  .statusbadge .dot{width:8px;height:8px;border-radius:50%;background:var(--st-c);flex-shrink:0;}
+  .st-sub{margin-top:11px;font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .st-sub b{color:var(--ink);font-weight:800;}
+  .statusmenu{position:absolute;inset-inline:12px;top:calc(100% + 8px);display:none;gap:4px;padding:6px;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);cursor:default;}
+  .statcard.status.open .statusmenu{display:grid;}
+  .statusmenu button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;color:var(--ink);
+    padding:9px 10px;border-radius:8px;font-size:13px;font-weight:700;text-align:start;cursor:pointer;}
+  .statusmenu button:hover,.statusmenu button:focus-visible{background:var(--panel-2);outline:none;}
+  .statusmenu button.on{color:var(--item-c);background:color-mix(in srgb,var(--item-c) 12%,transparent);}
+  .statusmenu .dot{width:8px;height:8px;border-radius:50%;background:var(--item-c);flex-shrink:0;}
+  /* compact quota strip */
+  .statrow{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;background:transparent;border:0;
+    border-radius:0;box-shadow:none;overflow:visible;}
+  html[data-theme="dark"] .statrow{box-shadow:none;}
+  .statrow .statcard,.statrow .statcard.total{position:relative;min-width:0;min-height:78px;padding:17px 24px 15px;
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;
+    justify-content:center;gap:8px;transition:background .14s;}
+  .statrow .statcard + .statcard{border-inline-start:1px solid var(--line);}
+  .statrow .statcard:hover{background:var(--panel);box-shadow:var(--shadow);}
+  .statrow .st-top{flex-direction:row-reverse;align-items:flex-start;justify-content:center;gap:12px;min-width:0;}
+  .statrow .st-tx{min-width:0;text-align:center;}
+  .statrow .st-label{font-size:12px;font-weight:700;margin-bottom:5px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.2;}
+  .statrow .st-val{font-size:22px;letter-spacing:0;line-height:1;color:var(--ink);direction:ltr;
+    display:inline-flex;align-items:baseline;justify-content:center;gap:8px;}
+  .statrow .st-val .cur{font-weight:800;}
+  .statrow .statcard.total .st-label{color:var(--muted);}
+  .statrow .statcard.total .st-val{color:var(--ink);}
+  .statrow .statcard.total .cur,
+  .statrow .statcard.videos .cur,
+  .statrow .statcard.images .cur{color:var(--ink);}
+  .statrow .st-val .sep{color:var(--faint);font-size:22px;font-weight:700;}
+  .statrow .st-val .max{color:var(--ink-2);font-size:22px;font-weight:800;}
+  .statrow .st-ic{width:40px;height:40px;border-radius:12px;flex:0 0 auto;border:1px solid var(--line);}
+  .statrow .st-ic svg{width:20px;height:20px;}
+  .statrow .st-ic.g,.statrow .st-ic.v{background:var(--accent-soft);color:var(--accent);}
+  .statrow .st-ic.i{background:var(--success-soft);color:var(--success);}
+  .statrow .st-bar{width:min(230px,82%);height:4px;margin:2px auto 0;direction:ltr;}
+  .statrow .st-bar.v span{background:var(--grad);}
+  .statrow .st-bar.i span{background:linear-gradient(90deg,var(--success),var(--success-dim));}
+  .statrow .st-bar.near span{background:linear-gradient(90deg,var(--warn),#f0b429);}
+  .statrow .st-bar.full span{background:linear-gradient(90deg,var(--danger),#ff8a8a);}
+  .statrow .statcard.status{display:none;}
+  @media (max-width:760px){
+    .statrow{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .statrow .statcard{min-height:86px;padding:16px 18px;}
+    .statrow .statcard + .statcard{border-inline-start:1px solid var(--line);}
+    .statrow .statcard:nth-child(even){border-inline-start:1px solid var(--line);}
+    .statrow .statcard:nth-child(n+3){border-top:1px solid var(--line);}
+  }
+  @media (max-width:460px){
+    .statrow{grid-template-columns:1fr;}
+    .statrow .statcard:nth-child(even){border-inline-start:1px solid var(--line);}
+    .statrow .statcard + .statcard{border-top:1px solid var(--line);}
+  }
+
   /* ---------- file grid ---------- */
-  .filegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-size),1fr));gap:14px;}
-  .fcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);
+  .filegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,var(--card-size)),var(--card-size)));gap:14px;justify-content:center;}
+  .fcard{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);
     transition:transform .14s,border-color .14s,box-shadow .14s;display:flex;flex-direction:column;}
   .fcard:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:var(--shadow-lg);}
   .fcard.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent),var(--shadow);}
   /* purple check alone (management multi-select, not the green album pick): slight darkening */
-  .fcard.picked:not(.sel) .fthumb::after,.fcard.picked:not(.sel) .frow-thumb::after{content:'';position:absolute;inset:0;background:rgba(6,8,16,.30);z-index:1;pointer-events:none;}
+  .fcard.picked:not(.sel) .fthumb::after{content:'';position:absolute;inset:0;background:rgba(6,8,16,.30);z-index:1;pointer-events:none;}
   .fthumb{position:relative;aspect-ratio:1/1;background:var(--panel-2);display:flex;align-items:center;justify-content:center;
     overflow:hidden;cursor:pointer;}
   .fthumb img,.fthumb video{width:100%;height:100%;object-fit:cover;display:block;}
@@ -220,16 +337,16 @@
   .fthumb .filmstrip::before{left:0;box-shadow:1px 0 0 rgba(0,0,0,.25);}
   .fthumb .filmstrip::after{right:0;box-shadow:-1px 0 0 rgba(0,0,0,.25);}
   /* ---------- centered selection circle: empty when unselected, green + check when selected ---------- */
-  .fcheck{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;
-    border:2.5px solid rgba(255,255,255,.9);background:rgba(10,12,20,.22);cursor:pointer;
-    display:flex;align-items:center;justify-content:center;z-index:5;box-shadow:0 2px 9px rgba(0,0,0,.35);opacity:.6;
+  .fcheck{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.96);background:transparent;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;z-index:5;box-shadow:none;opacity:1;
     transition:opacity .14s,background .14s,border-color .14s,transform .12s;}
   .fcheck svg{width:26px;height:26px;color:#fff;opacity:0;transition:opacity .12s;}
   .fthumb:hover .fcheck{opacity:1;}
-  .fcheck:hover{background:rgba(10,12,20,.5);transform:translate(-50%,-50%) scale(1.07);}
-  .fcard.sel .fcheck{opacity:1;background:var(--success);border-color:#fff;box-shadow:0 3px 14px rgba(34,176,75,.55);}
+  .fcheck:hover{background:transparent;border-color:#fff;transform:translate(-50%,-50%) scale(1.06);}
+  .fcard.sel .fcheck{opacity:1;background:var(--success);border-color:rgba(255,255,255,.96);box-shadow:0 3px 14px rgba(34,176,75,.55);}
   .fcard.sel .fcheck svg{opacity:1;}
-  .fcard.sel .fcheck:hover{background:var(--success-dim);transform:translate(-50%,-50%) scale(1.07);}
+  .fcard.sel .fcheck:hover{background:var(--success-dim);border-color:#fff;transform:translate(-50%,-50%) scale(1.06);}
   /* ---------- hover: darken the thumb and reveal the file name along the bottom ---------- */
   .fthumb::before{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .16s;
     background:linear-gradient(to top,rgba(6,8,16,.82) 0%,rgba(6,8,16,.32) 34%,rgba(6,8,16,.10) 60%,rgba(6,8,16,.16) 100%);}
@@ -239,12 +356,20 @@
     text-shadow:0 1px 3px rgba(0,0,0,.7);opacity:0;transform:translateY(5px);transition:opacity .16s,transform .16s;}
   .fthumb:hover .fname-ov{opacity:1;transform:none;}
   /* ---------- order number + drag-to-reorder ---------- */
-  .fnum{position:absolute;top:8px;inset-inline-start:8px;z-index:4;height:24px;min-width:32px;padding:0 8px;
-    display:flex;align-items:center;justify-content:center;border-radius:7px;font-family:var(--mono);
-    font-size:11.5px;font-weight:700;letter-spacing:.04em;color:#fff;cursor:grab;
-    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 60%),var(--grad-btn);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 2px 7px rgba(0,0,0,.3);}
-  .fcard.locked .fnum{inset-inline-start:8px;cursor:default;filter:saturate(.55) brightness(.9);}
+  .fnum{position:absolute;top:9px;right:9px;z-index:4;height:28px;min-width:42px;padding:0 10px;
+    display:flex;align-items:center;justify-content:center;border-radius:8px;font-family:var(--mono);
+    font-size:12px;font-weight:800;letter-spacing:.04em;color:#fff;cursor:grab;
+    background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,0) 62%),var(--grad-btn);
+    box-shadow:0 4px 12px rgba(80,54,210,.28),inset 0 1px 0 rgba(255,255,255,.45);}
+  .fcard.locked .fnum{right:9px;cursor:default;filter:saturate(.55) brightness(.9);}
+  /* small black × delete affordance, top-left corner of the thumbnail (opposite the order badge) */
+  .fdel-x{position:absolute;top:8px;inset-inline-end:8px;z-index:5;width:22px;height:22px;padding:0;border:none;
+    border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.85);color:#11141c;box-shadow:0 1px 5px rgba(0,0,0,.35);
+    opacity:.9;transition:background .12s,color .12s,transform .12s,opacity .12s;}
+  .fdel-x svg{width:13px;height:13px;}
+  .fthumb:hover .fdel-x{opacity:1;}
+  .fdel-x:hover{background:var(--danger);color:#fff;transform:scale(1.12);opacity:1;}
   .fcard.dragging{opacity:.4;}
   .fcard.rz::after{content:'';position:absolute;top:6%;bottom:6%;width:3px;border-radius:3px;background:var(--accent);
     z-index:6;box-shadow:0 0 9px 1px var(--accent);}
@@ -265,12 +390,12 @@
   .facts .ab.del:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
   .facts .ab svg{width:15px;height:15px;}
   /* purple Multi-Select checkbox in card actions - independent of the green favorite circle */
-  .facts .ab.pick svg,.frow-acts .ab.pick svg{opacity:0;transition:opacity .1s;color:var(--accent);}
-  .facts .ab.pick:hover,.frow-acts .ab.pick:hover{border-color:var(--accent);background:var(--accent-soft);}
-  .facts .ab.pick:hover svg,.frow-acts .ab.pick:hover svg{opacity:.5;}
-  .facts .ab.pick.on,.frow-acts .ab.pick.on{background:var(--accent);border-color:var(--accent);box-shadow:0 2px 8px var(--grad-shadow);}
-  .facts .ab.pick.on svg,.frow-acts .ab.pick.on svg{opacity:1;color:#fff;}
-  .facts .ab.pick.on:hover,.frow-acts .ab.pick.on:hover{background:var(--accent-dim);border-color:var(--accent-dim);}
+  .facts .ab.pick svg{opacity:0;transition:opacity .1s;color:var(--accent);}
+  .facts .ab.pick:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .facts .ab.pick:hover svg{opacity:.5;}
+  .facts .ab.pick.on{background:var(--accent);border-color:var(--accent);box-shadow:0 2px 8px var(--grad-shadow);}
+  .facts .ab.pick.on svg{opacity:1;color:#fff;}
+  .facts .ab.pick.on:hover{background:var(--accent-dim);border-color:var(--accent-dim);}
   .facts .movesel{flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:8px;
     font-family:var(--mono);font-size:11px;padding:6px 6px;cursor:pointer;height:30px;}
   .facts .movesel:focus{outline:none;border-color:var(--accent);}
@@ -280,86 +405,16 @@
   .fcard.locked:hover{transform:none;border-color:var(--line);box-shadow:var(--shadow);}
   .fcard.locked .fthumb{cursor:default;}
   .fcard.locked .fthumb img,.fcard.locked .fthumb video,.fcard.locked .fthumb .ph{filter:grayscale(.45) brightness(.5);}
-  .fcard.locked .fthumb::after{content:'';position:absolute;inset:0;background:rgba(6,8,16,.42);z-index:1;pointer-events:none;}
-  .lockbadge{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:9px;color:#fff;pointer-events:none;}
-  .lockbadge .noentry{width:46px;height:46px;border-radius:50%;border:2.5px solid #fff;background:rgba(229,72,77,.32);
-    display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.45);}
-  .lockbadge .noentry svg{width:26px;height:26px;color:#fff;}
+  .fcard.locked .fthumb::after{content:'';position:absolute;inset:0;background:transparent;z-index:1;pointer-events:none;}
+  .fcard.locked .fcheck{cursor:pointer;}
+  .lockbadge{position:absolute;left:0;right:0;top:50%;z-index:4;display:flex;align-items:center;justify-content:center;
+    color:#fff;pointer-events:none;transform:translateY(38px);padding:0 10px;}
   .lockbadge .lockfolder{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
     background:rgba(10,12,20,.72);padding:3px 10px;border-radius:999px;}
   .fassigned{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent-dim);
     background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:7px 9px;overflow:hidden;}
   .fassigned svg{width:14px;height:14px;flex-shrink:0;color:var(--accent);}
   .fassigned span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-  /* ---------- view toggle (grid / list) ---------- */
-  .viewtoggle{display:inline-flex;align-items:center;gap:2px;background:var(--panel-2);border:1px solid var(--line);
-    border-radius:10px;padding:3px;}
-  .viewtoggle .vbtn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:30px;border-radius:8px;
-    border:none;background:none;color:var(--muted);cursor:pointer;transition:background .12s,color .12s;}
-  .viewtoggle .vbtn svg{width:17px;height:17px;}
-  .viewtoggle .vbtn:hover{color:var(--accent);}
-  .viewtoggle .vbtn.on{background:var(--panel);color:var(--accent);box-shadow:var(--shadow-sm);}
-
-  /* ---------- list view (rows) ---------- */
-  .filelist{display:flex;flex-direction:column;gap:8px;}
-  .filelist .fcard{position:relative;flex-direction:row;align-items:center;gap:12px;border-radius:12px;
-    padding:8px 12px;overflow:visible;}
-  .filelist .fcard:hover{transform:none;border-color:var(--accent);box-shadow:var(--shadow);}
-  .filelist .fcard.locked:hover{border-color:var(--line);box-shadow:var(--shadow);}
-  .frow-num{flex:0 0 auto;height:24px;min-width:34px;padding:0 8px;display:flex;align-items:center;justify-content:center;
-    border-radius:7px;font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.04em;color:#fff;cursor:grab;
-    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 60%),var(--grad-btn);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 2px 7px rgba(0,0,0,.25);}
-  .fcard.locked .frow-num{cursor:default;filter:saturate(.55) brightness(.9);}
-  .frow-check{flex:0 0 auto;width:22px;height:22px;border-radius:6px;border:2px solid var(--line);background:var(--panel-2);
-    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .12s,background .12s;}
-  .frow-check svg{width:14px;height:14px;color:#fff;opacity:0;transition:opacity .12s;}
-  .frow-check:hover{border-color:var(--accent);}
-  .fcard.sel .frow-check{background:var(--success);border-color:var(--success);}
-  .fcard.sel .frow-check svg{opacity:1;}
-  .frow-check.locked-ic{border:none;background:none;cursor:default;}
-  .frow-check.locked-ic svg{width:19px;height:19px;color:var(--danger);opacity:1;}
-  .frow-thumb{flex:0 0 auto;width:46px;height:46px;border-radius:9px;overflow:hidden;background:var(--panel-2);
-    display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;}
-  .frow-thumb img,.frow-thumb video{width:100%;height:100%;object-fit:cover;display:block;}
-  .frow-thumb .ph{display:flex;align-items:center;justify-content:center;}
-  .frow-thumb .ph svg{width:22px;height:22px;opacity:.9;}
-  .frow-thumb .ph .pext{display:none;}
-  .frow-thumb .filmstrip{display:none;}
-  .frow-thumb .ph.img{color:var(--info);} .frow-thumb .ph.video{color:#e5484d;}
-  .frow-thumb .ph.audio{color:var(--accent);} .frow-thumb .ph.pdf{color:#e5484d;} .frow-thumb .ph.doc{color:var(--info-dim);}
-  .fcard.locked .frow-thumb{cursor:default;}
-  .fcard.locked .frow-thumb img,.fcard.locked .frow-thumb video,.fcard.locked .frow-thumb .ph{filter:grayscale(.5) brightness(.7);}
-  .frow-main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:5px;}
-  .frow-name{font-size:13px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}
-  .frow-name:hover{color:var(--accent);}
-  .fcard.locked .frow-name{cursor:default;}
-  .fcard.locked .frow-name:hover{color:var(--ink);}
-  .filelist .fcap{max-width:340px;}
-  .filelist .fcapview{margin:0;}
-  .frow-meta{flex:0 0 auto;min-width:104px;text-align:end;font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap;}
-  .frow-acts{flex:0 0 auto;display:flex;align-items:center;gap:6px;}
-  .frow-acts .ab{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
-    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
-  .frow-acts .ab:hover{border-color:var(--accent);color:var(--accent);}
-  .frow-acts .ab.del:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
-  .frow-acts .ab svg{width:15px;height:15px;}
-  .frow-acts .movesel{width:124px;height:30px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);
-    border-radius:8px;font-family:var(--mono);font-size:11px;padding:0 6px;cursor:pointer;}
-  .frow-acts .movesel:focus{outline:none;border-color:var(--accent);}
-  .frow-acts .fassigned{margin:0;}
-  /* list reorder insertion bar (horizontal) */
-  .filelist .fcard.rz::after{content:'';position:absolute;top:auto;bottom:auto;left:2%;right:2%;width:auto;height:3px;
-    border-radius:3px;background:var(--accent);z-index:6;box-shadow:0 0 9px 1px var(--accent);}
-  .filelist .fcard.rz[data-rz-side="t"]::after{top:-6px;}
-  .filelist .fcard.rz[data-rz-side="b"]::after{bottom:-6px;}
-  @media (max-width:640px){
-    .filelist .fcap{display:none;}
-    .frow-meta{display:none;}
-    .frow-acts .movesel{width:96px;}
-  }
 
   /* ---------- empty state ---------- */
   .empty{text-align:center;padding:60px 20px;color:var(--muted);}
@@ -377,6 +432,7 @@
     padding:24px;box-shadow:var(--shadow-lg);}
   .modal h3{margin:0 0 12px;font-size:17px;}
   .modal p{font-size:13.5px;color:var(--muted);margin:0 0 10px;line-height:1.6;}
+  #confirmBody{white-space:pre-line;}
   .modal .minput{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
     font-family:var(--sans);font-size:14px;padding:11px 13px;margin-top:6px;}
   .modal .minput:focus{outline:none;border-color:var(--accent);}
@@ -611,18 +667,12 @@
 
   footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
   /* ---------- album-selection quota: dim the GREEN check on cards that already hit the client's limit ---------- */
-  .fcard.atcap .fcheck{opacity:.3;cursor:not-allowed;background:rgba(10,12,20,.22);}
+  .fcard.atcap .fcheck{opacity:.3;cursor:not-allowed;background:transparent;}
   .fcard.atcap .fthumb:hover .fcheck{opacity:.42;}
-  .fcard.atcap .fcheck:hover{transform:translate(-50%,-50%);background:rgba(10,12,20,.22);}
-  .fcard.atcap .frow-check{opacity:.4;cursor:not-allowed;}
-  .fcard.atcap .frow-check:hover{border-color:var(--line);}
+  .fcard.atcap .fcheck:hover{transform:translate(-50%,-50%);background:transparent;}
   /* frozen album pick after the client confirms "I'm done selecting" */
-  .sellock{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:12px;font-weight:700;
-    color:var(--success);background:rgba(34,176,75,.13);border:1px solid rgba(34,176,75,.4);
-    border-radius:999px;padding:3px 9px;white-space:nowrap;}
-  .sellock svg{width:13px;height:13px;}
   .seldone-count{color:var(--ink);font-weight:600;}
-  body.sel-locked .fcheck,body.sel-locked .frow-check{cursor:not-allowed;}
+  body.sel-locked .fcheck{cursor:not-allowed;}
   body.sel-locked .fcard:not(.sel) .fcheck{opacity:.15;}
   body.sel-locked .fcard:not(.sel) .fthumb:hover .fcheck{opacity:.2;transform:translate(-50%,-50%);}
   /* ---------- selection-limit toast (brief notice when the client tries to exceed the quota) ---------- */
@@ -660,20 +710,64 @@
     <p data-i18n="pageSub"></p>
   </div>
 
+  <!-- ============ stats strip ============ -->
+  <div class="statrow" id="statRow">
+    <div class="statcard gallery">
+      <div class="st-top">
+        <div class="st-tx">
+          <div class="st-label" data-i18n="statGalleryTotal"></div>
+          <div class="st-val"><span id="stGalleryTotal">0</span></div>
+        </div>
+        <div class="st-ic g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg></div>
+      </div>
+    </div>
+    <div class="statcard images">
+      <div class="st-top">
+        <div class="st-tx">
+          <div class="st-label" data-i18n="statImagesSelected"></div>
+          <div class="st-val"><span class="cur" id="stImagesCur">0</span><span class="sep">/</span><span class="max" id="stImagesMax">50</span></div>
+        </div>
+        <div class="st-ic i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      </div>
+      <div class="st-bar i"><span id="stImagesBar" style="width:0%"></span></div>
+    </div>
+    <div class="statcard videos">
+      <div class="st-top">
+        <div class="st-tx">
+          <div class="st-label" data-i18n="statVideosSelected"></div>
+          <div class="st-val"><span class="cur" id="stVideosCur">0</span><span class="sep">/</span><span class="max" id="stVideosMax">5</span></div>
+        </div>
+        <div class="st-ic v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></div>
+      </div>
+      <div class="st-bar v"><span id="stVideosBar" style="width:0%"></span></div>
+    </div>
+    <div class="statcard total">
+      <div class="st-top">
+        <div class="st-tx">
+          <div class="st-label" data-i18n="statSelectedTotal"></div>
+          <div class="st-val"><span class="cur" id="stSelectedCur">0</span><span class="sep">/</span><span class="max" id="stSelectedMax">55</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="statcard status" id="statStatusCard" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" data-i18n-title="statStatusHint">
+      <div class="st-top">
+        <div class="st-tx">
+          <div class="st-label" data-i18n="statStatus"></div>
+          <div class="st-val"><span class="statusbadge" id="stStatusBadge"><span class="dot"></span><span id="stStatusText">—</span></span></div>
+        </div>
+        <div class="st-ic st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L20 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+      </div>
+      <div class="st-sub" id="stStatusCounter"></div>
+      <div class="statusmenu" id="statusMenu" role="listbox"></div>
+    </div>
+  </div>
+
   <!-- ============ toolbar ============ -->
   <div class="toolbar">
-    <label class="search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input type="text" id="searchInput" data-i18n-ph="searchPh">
-    </label>
-    <div class="viewtoggle" id="viewToggle" role="group" aria-label="view mode">
-      <button class="vbtn on" type="button" data-view="grid" data-i18n-title="viewGrid" aria-label="grid view">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
-      </button>
-      <button class="vbtn" type="button" data-view="list" data-i18n-title="viewList" aria-label="list view">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3.5" y1="6" x2="3.51" y2="6"/><line x1="3.5" y1="12" x2="3.51" y2="12"/><line x1="3.5" y1="18" x2="3.51" y2="18"/></svg>
-      </button>
-    </div>
+    <button class="btnline ambtn" id="albumMgrBtn" type="button" data-i18n-title="amTitle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      <span data-i18n="amBtn"></span>
+    </button>
     <div class="zoom" id="zoomWrap">
       <span data-i18n="gridSize"></span>
       <button class="zbtn" id="zoomMinus" type="button" aria-label="−">−</button>
@@ -685,16 +779,10 @@
       <span data-i18n="showMovedInMain"></span>
     </label>
     <div class="selbar">
-      <button class="btnline ambtn" id="albumMgrBtn" type="button" data-i18n-title="amTitle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-        <span data-i18n="amBtn"></span>
-      </button>
       <button class="btnline gearbtn" id="clientBtn" type="button" data-i18n-title="setTitle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         <span data-i18n="setBtn"></span>
       </button>
-      <span class="selcount" id="selCount"></span>
-      <span class="sellock" id="selLock" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span id="selLockTxt"></span></span>
       <span class="msgroup" id="msGroup" hidden>
         <span class="selcount mscount" id="msCount"></span>
         <button class="btnline" id="msPickAllBtn" type="button"><span data-i18n="selectAll"></span></button>
@@ -717,6 +805,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 10v6"/><path d="M9 13h6"/></svg>
         </button>
       </div>
+      <label class="side-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="folderSearch" data-i18n-ph="folderSearchPh">
+      </label>
       <div class="folders" id="folderList"></div>
     </aside>
 
@@ -724,13 +816,23 @@
     <div class="main">
       <div class="drop" id="drop">
         <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
-        <div class="big" data-i18n="dropBig"></div>
-        <div class="or" data-i18n="or"></div>
-        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
-        <div class="dfmts" data-i18n="fmts"></div>
-        <div class="sizenote" data-i18n="sizeNote"></div>
+        <div class="dinfo">
+          <div class="big" data-i18n="dropBig"></div>
+          <div class="dhint"><span data-i18n="fmts"></span> · <span data-i18n="sizeNote"></span></div>
+        </div>
+        <div class="dbtns">
+          <button class="choose" type="button" id="chooseBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span data-i18n="choose"></span>
+          </button>
+          <button class="choose ghost" type="button" id="chooseFolderBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+            <span data-i18n="chooseFolder"></span>
+          </button>
+        </div>
       </div>
       <input type="file" id="fileInput" multiple>
+      <input type="file" id="folderInput" webkitdirectory directory multiple>
 
       <div class="filegrid" id="fileGrid"></div>
       <div class="empty hidden" id="emptyState">
@@ -954,8 +1056,8 @@
               <label data-i18n="cStatus"></label>
               <select id="cStatus">
                 <option value="draft" data-i18n="statusDraft"></option>
-                <option value="active" data-i18n="statusActive"></option>
                 <option value="awaiting" data-i18n="statusAwaiting"></option>
+                <option value="selecting" data-i18n="statusSelecting"></option>
                 <option value="completed" data-i18n="statusCompleted"></option>
               </select>
             </div>
@@ -1529,7 +1631,7 @@
       kick:'מסך העבודה המרכזי',
       pageTitle:'ארגון קבצים',
       pageSub:'ארגנו, מיינו ותייגו את קבצי המדיה שלכם — תמונות, וידאו, אודיו ומסמכים. הכול רץ בדפדפן, שום קובץ לא עולה לשרת.',
-      searchPh:'חיפוש קבצים…', gridSize:'גודל תצוגה', viewGrid:'תצוגת רשת', viewList:'תצוגת רשימה',
+      searchPh:'חיפוש קבצים…', gridSize:'גודל תצוגה',
       showMovedInMain:'הצג קבצים שהועברו בתיקייה הראשית',
       selCount:(n,tot)=>`<b>${n}</b>/${tot} נבחרו`, selectHint:'סמן / בטל בחירה', selectAll:'בחר הכל', deselectAll:'נקה בחירה',
       selCountFree:(n)=>`<b>${n}</b> נבחרו`, selCountLimit:(n,max)=>`נבחרו <b>${n}</b> מתוך ${max}`,
@@ -1547,8 +1649,11 @@
       pickHint:'סמן / בטל סימון', msCount:n=>`<b>${n}</b> סומנו`, msPh:'העבר לתיקייה…', msMoveTitle:'העבר את המסומנים לתיקייה',
       delSelected:'מחק נבחרים',
       downloadZip:'הורדת הכל (ZIP)', preparingZip:'מכין…', zipName:'גלריה', zipError:'לא ניתן ליצור את קובץ ה־ZIP',
-      foldersTitle:'תיקיות', allFiles:'כל הקבצים', unsorted:'ללא תיקייה',
-      dropBig:'גררו קבצים לכאן', or:'או', choose:'בחרו קבצים',
+      foldersTitle:'תיקיות', allFiles:'תיקייה ראשית', unsorted:'ללא תיקייה', folderSearchPh:'חיפוש קבצים…', noFolders:'אין תוצאות תואמות',
+      statTotal:'סה״כ קבצים', statImages:'תמונות', statVideos:'וידאו', statDocs:'מסמכים', statSize:'נפח כולל',
+      statGalleryTotal:'\u05e1\u05d4\u05f4\u05db \u05e7\u05d1\u05e6\u05d9\u05dd \u05d1\u05d2\u05dc\u05e8\u05d9\u05d4', statImagesSelected:'\u05ea\u05de\u05d5\u05e0\u05d5\u05ea \u05e0\u05d1\u05d7\u05e8\u05d5', statVideosSelected:'\u05e1\u05e8\u05d8\u05d5\u05e0\u05d9\u05dd \u05e0\u05d1\u05d7\u05e8\u05d5', statSelectedTotal:'\u05e0\u05d1\u05d7\u05e8\u05d5 \u05e1\u05d4\u05f4\u05db',
+      moreActions:'עוד פעולות', capLabel:'כיתוב לקובץ',
+      dropBig:'גררו קבצים או תיקיות לכאן', or:'או', choose:'בחירת קבצים', chooseFolder:'בחירת תיקייה',
       fmts:'תמונות · וידאו · אודיו · מסמכים',
       sizeNote:'ניתן להעלות עד 2GB בכל פעם',
       emptyTitle:'אין כאן קבצים עדיין', emptySub:'גררו קבצים לכאן כדי להתחיל לארגן',
@@ -1565,6 +1670,9 @@
       confirmDelTitle:'למחוק קבצים?', confirmDelBody:n=>`${n} קבצים יוסרו מהרשימה. לא ניתן לבטל.`,
       confirmDelFolderTitle:'למחוק תיקייה?', confirmDelFolderBody:name=>`התיקייה "${name}" תימחק. הקבצים ותתי־התיקיות שבתוכה יועברו רמה אחת מעלה.`,
       confirmYes:'כן, מחק',
+      unassign:'בטל שיוך לתיקייה', unassignTitle:'להחזיר לתיקייה הראשית?',
+      unassignBody:'פעולה זו תחזיר את הקובץ לתיקייה הראשית.\nהאם ברצונך להמשיך?',
+      unassignConfirm:'כן, המשך', unassignDone:'הקובץ הוחזר לתיקייה הראשית',
       moveChoiceTitle:n=>`נבחרו ${n} קבצים להעברה`,
       moveChoicePrompt:'לאיזו פעולה תרצה להמשיך?',
       moveAllSelected:name=>`העבר את כל הקבצים המסומנים לתיקייה „${name}“`,
@@ -1580,7 +1688,9 @@
       clientDetails:'פרטי הלקוח', clientPerms:'הרשאות לקוח',
       cName:'שם הלקוח', cNamePh:'שם מלא', cEmail:'אימייל', cPhone:'טלפון',
       cEvent:'תאריך האירוע', cDeadline:'מועד אחרון לבחירת קבצים', cStatus:'סטטוס הפרויקט',
-      statusDraft:'טיוטה', statusActive:'פעיל', statusAwaiting:'ממתין לבחירה', statusCompleted:'הושלם',
+      statusDraft:'טיוטה', statusReady:'ממתין לשליחה', statusSent:'נשלח ללקוח', statusAwaiting:'ממתין לבחירה',
+      statusSelecting:'בחירה בתהליך', statusCompleted:'הושלם', statusRevision:'נדרש תיקון', statusExpired:'פג תוקף', statusClosed:'נסגר / הושלם',
+      statStatus:'סטטוס בחירה', statStatusHint:'לחצו לעדכון סטטוס הבחירה', statSelLine:(n,tot)=>`<b>${n}</b> מתוך <b>${tot}</b> קבצים נבחרו`,
       permDownload:'הורדת תמונות וקבצים', permDownloadD:'הלקוח יכול להוריד קבצים בודדים',
       permZip:'הורדת כל הגלריה (ZIP)', permZipD:'הורדת כל הקבצים כארכיון אחד',
       permEditText:'עריכת טקסטים וכיתובים', permEditTextD:'שינוי כיתובים ופתקים לתמונות',
@@ -1589,31 +1699,31 @@
       permUpload:'העלאת קבצים נוספים', permUploadD:'הוספת תמונות או קבצים לגלריה',
       permSelection:'שינוי בחירת התמונות', permSelectionD:'סימון וביטול בחירה של קבצים',
       permViewOnly:'צפייה בלבד', permViewOnlyD:'ללא אפשרות לבצע שינויים — מבטל את כל שאר ההרשאות',
-      setBtn:'הגדרות', setTitle:'הגדרות אלבום',
-      setSub:'נהלו את פרטי האלבום, השיתוף, ההרשאות והעיצוב. ההגדרות נשמרות במכשיר זה בלבד.',
+      setBtn:'הגדרות', setTitle:'הגדרות הפרויקט',
+      setSub:'נהלו את פרטי הפרויקט, השיתוף, ההרשאות והעיצוב. ההגדרות נשמרות במכשיר זה בלבד.',
       selModeTitle:'מצב פרויקט בחירה', selModeDesc:'הלקוח רק צופה, מסמן מועדפים ומוסיף הערות — בלי למחוק או לשנות סדר.',
       tabGeneral:'כללי', tabAccess:'שיתוף וגישה', tabContent:'תוכן וסידור', tabBrand:'עיצוב ומיתוג', tabAdvanced:'מתקדם',
-      secAlbum:'פרטי האלבום',
-      alTitleL:'שם האלבום', alTitlePh:'למשל: החתונה של דנה ויוסי',
+      secAlbum:'פרטי הפרויקט',
+      alTitleL:'שם הפרויקט', alTitlePh:'למשל: החתונה של דנה ויוסי',
       alDescL:'תיאור קצר', alDescPh:'כמה מילים על האירוע…',
       alEventTypeL:'סוג האירוע', etWedding:'חתונה', etParty:'מסיבה', etCorporate:'אירוע עסקי', etPortrait:'צילומי פורטרט', etOther:'אחר',
       alLocationL:'מיקום', alLocationPh:'עיר / אולם',
       alCoverL:'תמונת קאבר', alCoverBtn:'העלה תמונה',
       secVisibility:'נראות הפרויקט', alVisibilityL:'מי יכול לראות',
       visPrivate:'פרטי — רק אני', visLink:'כל מי שיש לו קישור', visPassword:'מוגן בסיסמה',
-      alShareLinkL:'קישור לשיתוף', alPrivateNote:'האלבום פרטי — רק אתם רואים אותו. בחרו ב"כל מי שיש לו קישור" כדי לקבל קישור לשיתוף ולהגדיר הגנות.',
+      alShareLinkL:'קישור לשיתוף', alPrivateNote:'הפרויקט פרטי — רק אתם רואים אותו. בחרו ב"כל מי שיש לו קישור" כדי לקבל קישור לשיתוף ולהגדיר הגנות.',
       secPassword:'סיסמת גישה', alPwOnL:'הפעל סיסמה', alPwOnD:'האורחים יתבקשו להזין סיסמה כדי לצפות', alPwPh:'בחר סיסמה',
       secDownloads:'הרשאות אורחים',
       alDlPhotosL:'הורדת תמונות', alDlPhotosD:'אורחים יכולים להוריד תמונות בודדות',
       alDlVideosL:'הורדת וידאו', alDlVideosD:'אורחים יכולים להוריד סרטונים',
-      alDlZipL:'הורדת כל האלבום (ZIP)', alDlZipD:'הורדת כל הקבצים כארכיון אחד',
+      alDlZipL:'הורדת כל הפרויקט (ZIP)', alDlZipD:'הורדת כל הקבצים כארכיון אחד',
       alDlOriginalL:'הורדה באיכות מקור', alDlOriginalD:'לאפשר הורדת הקובץ המקורי באיכות מלאה',
       secQuality:'איכות קבצים', alQualityL:'איכות התצוגה לאורחים',
       qFull:'איכות מלאה', qPreview:'תצוגה מוקטנת בלבד', qRequest:'מוקטנת + אפשרות לבקש מקור',
       secGuest:'העלאות מצד אורחים',
-      alGuestUploadL:'אפשר לאורחים להעלות', alGuestUploadD:'אורחים יכולים להוסיף תמונות וסרטונים לאלבום',
+      alGuestUploadL:'אפשר לאורחים להעלות', alGuestUploadD:'אורחים יכולים להוסיף תמונות וסרטונים לפרויקט',
       alGuestApprovalL:'דרוש אישור לפני פרסום', alGuestApprovalD:'קבצים מאורחים ימתינו לאישור שלך',
-      secApproval:'אישור קבצים', alApprovalL:'כל קובץ חדש ממתין לאישור', alApprovalD:'קבצים מופיעים באלבום רק לאחר אישור',
+      secApproval:'אישור קבצים', alApprovalL:'כל קובץ חדש ממתין לאישור', alApprovalD:'קבצים מופיעים בפרויקט רק לאחר אישור',
       secComments:'תגובות ולייקים',
       alCommentsL:'אפשר תגובות', alCommentsD:'אורחים יכולים להגיב על תמונות',
       alCommentsGuestsL:'רק למוזמנים', alCommentsGuestsD:'רק אנשים עם קישור יכולים להגיב',
@@ -1626,21 +1736,21 @@
       alEditRequestsL:'אפשר בקשות עריכה', alEditRequestsD:'הלקוח משאיר הערה על תמונה (להחליף / למחוק / לערוך)',
       secBrand:'מיתוג אישי',
       alBrandNameL:'שם העסק', alBrandNamePh:'שם הסטודיו / העסק', alBrandColorL:'צבע מותג',
-      alWelcomeL:'הודעת פתיחה', alWelcomePh:'ברוכים הבאים לאלבום…', alFooterL:'טקסט תחתון', alFooterPh:'נוצר באהבה על ידי…',
+      alWelcomeL:'הודעת פתיחה', alWelcomePh:'ברוכים הבאים לפרויקט…', alFooterL:'טקסט תחתון', alFooterPh:'נוצר באהבה על ידי…',
       secWm:'סימן מים', alWmOnL:'הפעל סימן מים', alWmOnD:'סימן מים יוצג על תמונות התצוגה',
       alWmTypeL:'סוג', wmLogo:'לוגו', wmText:'טקסט', alWmTextL:'טקסט הסימן', alWmTextPh:'© הסטודיו שלי',
       alWmPosL:'מיקום', posTl:'למעלה משמאל', posTr:'למעלה מימין', posC:'מרכז', posBl:'למטה משמאל', posBr:'למטה מימין',
       alWmOpacityL:'שקיפות',
       secNotif:'התראות',
-      alNotifNewFilesL:'קבצים נוספו לאלבום', alNotifGuestUploadL:'אורח העלה קובץ', alNotifFavoritesL:'נבחרו מועדפים',
-      alNotifCommentsL:'התקבלה תגובה', alNotifExpiryL:'האלבום עומד לפוג',
-      secExpiry:'תאריך תפוגה', alExpiryOnL:'הפעל תפוגה', alExpiryOnD:'האלבום ייסגר אוטומטית בתאריך שנקבע',
-      alExpiryDateL:'תאריך', alExpiryActionL:'בתפוגה', expReadonly:'הפוך לצפייה בלבד', expDelete:'מחק את האלבום',
+      alNotifNewFilesL:'קבצים נוספו לפרויקט', alNotifGuestUploadL:'אורח העלה קובץ', alNotifFavoritesL:'נבחרו מועדפים',
+      alNotifCommentsL:'התקבלה תגובה', alNotifExpiryL:'הפרויקט עומד לפוג',
+      secExpiry:'תאריך תפוגה', alExpiryOnL:'הפעל תפוגה', alExpiryOnD:'הפרויקט ייסגר אוטומטית בתאריך שנקבע',
+      alExpiryDateL:'תאריך', alExpiryActionL:'בתפוגה', expReadonly:'הפוך לצפייה בלבד', expDelete:'מחק את הפרויקט',
       secStorage:'ניהול אחסון', storOf:'מתוך 15GB', storUsed:n=>`${n} בשימוש`, storUpgrade:'שדרג אחסון',
       secBackup:'גיבוי וארכיון', backupBtn:'הורד גיבוי מלא', archiveBtn:'העבר לארכיון', archivedMsg:'הועבר לארכיון',
-      secDelete:'מחיקת אלבום', delZoneTitle:'מחיקת האלבום',
-      delZoneDesc:'הפעולה תסיר את כל הקבצים והתיקיות מהאלבום. ניתן לשחזר לזמן מוגבל.', delAlbumBtn:'מחק אלבום',
-      confirmDelAlbumTitle:'למחוק את האלבום?', confirmDelAlbumBody:'כל הקבצים והתיקיות יוסרו מהאלבום. ניתן לשחזר לזמן מוגבל.',
+      secDelete:'מחיקת פרויקט', delZoneTitle:'מחיקת הפרויקט',
+      delZoneDesc:'הפעולה תסיר את כל הקבצים והתיקיות מהפרויקט. ניתן לשחזר לזמן מוגבל.', delAlbumBtn:'מחק פרויקט',
+      confirmDelAlbumTitle:'למחוק את הפרויקט?', confirmDelAlbumBody:'כל הקבצים והתיקיות יוסרו מהפרויקט. ניתן לשחזר לזמן מוגבל.',
       shareBtn:'שיתוף', shareTitle:'שיתוף קישור לגלריה',
       shareLinkLabel:'קישור לגלריה', shareLinkInfo:'קישור ייחודי לצפייה בגלריה — כל מי שמקבל אותו יכול לפתוח את הפרויקט',
       shareOpen:'פתח', shareCopy:'העתק', shareCopied:'הועתק',
@@ -1648,7 +1758,7 @@
       sharePwLabel:'הגדר סיסמא', sharePwDesc:'הגן על הגלריה בסיסמא — הלקוח יתבקש להזין אותה כדי לצפות', sharePwPh:'בחר סיסמא',
       shareBlockLabel:'חסום גלריה', shareBlockDesc:'במקום למחוק את הגלריה ניתן לחסום זמנית את הגישה אליה. חסימת הגלריה חוסמת גם את כל השיתופים שבוצעו.',
       shareBlockedNote:'הגלריה חסומה — הקישורים ששותפו אינם פעילים כרגע',
-      amBtn:'ניהול אלבומים', amTitle:'ניהול אלבומים',
+      amBtn:'ניהול גלריות', amTitle:'ניהול גלריות',
       amSub:'קבעו כמה קבצים הלקוח רשאי לבחור, הפרידו בין מכסת תמונות למכסת סרטונים והוסיפו הודעה שתוצג לפני תחילת הבחירה. ההגדרות נשמרות במכשיר זה בלבד.',
       amPresetsTitle:'בחירות מובנות', amPresetsHint:'בחרו נקודת פתיחה מהירה לאלבום או לאוסף — ואז התאימו את המספרים לפי הצורך.',
       amPresetAlbumL:'אלבום דיגיטלי', amPresetAlbumD:'עד 40 תמונות',
@@ -1680,7 +1790,7 @@
       kick:'The main workspace',
       pageTitle:'Organize files',
       pageSub:'Organize, sort and tag your media — images, video, audio and documents. Everything runs in your browser, nothing is uploaded.',
-      searchPh:'Search files…', gridSize:'Grid size', viewGrid:'Grid view', viewList:'List view',
+      searchPh:'Search files…', gridSize:'Grid size',
       showMovedInMain:'Show moved files in main folder',
       selCount:(n,tot)=>`<b>${n}</b>/${tot} selected`, selectHint:'Select / deselect', selectAll:'Select all', deselectAll:'Clear selection',
       selCountFree:(n)=>`<b>${n}</b> selected`, selCountLimit:(n,max)=>`<b>${n}</b> of ${max} selected`,
@@ -1698,8 +1808,11 @@
       pickHint:'Mark / unmark', msCount:n=>`<b>${n}</b> marked`, msPh:'Move to folder…', msMoveTitle:'Move marked to folder',
       delSelected:'Delete',
       downloadZip:'Download all (ZIP)', preparingZip:'Preparing…', zipName:'gallery', zipError:'Could not create the ZIP',
-      foldersTitle:'Folders', allFiles:'All files', unsorted:'Unsorted',
-      dropBig:'Drag files here', or:'or', choose:'Choose files',
+      foldersTitle:'Folders', allFiles:'All files', unsorted:'Unsorted', folderSearchPh:'Search files…', noFolders:'No matching results',
+      statTotal:'Total files', statImages:'Images', statVideos:'Video', statDocs:'Documents', statSize:'Total size',
+      statGalleryTotal:'Files in gallery', statImagesSelected:'Photos selected', statVideosSelected:'Videos selected', statSelectedTotal:'Selected total',
+      moreActions:'More actions', capLabel:'File caption',
+      dropBig:'Drag files or folders here', or:'or', choose:'Choose files', chooseFolder:'Choose folder',
       fmts:'Images · Video · Audio · Documents',
       sizeNote:'Up to 2GB per upload',
       emptyTitle:'No files here yet', emptySub:'Drag files here to start organizing',
@@ -1716,6 +1829,9 @@
       confirmDelTitle:'Delete files?', confirmDelBody:n=>`${n} files will be removed from the list. This can’t be undone.`,
       confirmDelFolderTitle:'Delete folder?', confirmDelFolderBody:name=>`The folder "${name}" will be deleted. Its files and subfolders move up one level.`,
       confirmYes:'Yes, delete',
+      unassign:'Remove from folder', unassignTitle:'Return to the main folder?',
+      unassignBody:'This action will return the file to the main folder.\nWould you like to continue?',
+      unassignConfirm:'Yes, continue', unassignDone:'The file was returned to the main folder',
       moveChoiceTitle:n=>`${n} files selected to move`,
       moveChoicePrompt:'Which action would you like?',
       moveAllSelected:name=>`Move all selected files to “${name}”`,
@@ -1731,7 +1847,9 @@
       clientDetails:'Client details', clientPerms:'Client permissions',
       cName:'Client name', cNamePh:'Full name', cEmail:'Email', cPhone:'Phone',
       cEvent:'Event date', cDeadline:'Selection deadline', cStatus:'Project status',
-      statusDraft:'Draft', statusActive:'Active', statusAwaiting:'Awaiting selection', statusCompleted:'Completed',
+      statusDraft:'Draft', statusReady:'Ready to send', statusSent:'Sent to client', statusAwaiting:'Awaiting selection',
+      statusSelecting:'Selection in progress', statusCompleted:'Completed', statusRevision:'Needs revision', statusExpired:'Expired', statusClosed:'Closed',
+      statStatus:'Selection status', statStatusHint:'Click to update the selection status', statSelLine:(n,tot)=>`<b>${n}</b> of <b>${tot}</b> files selected`,
       permDownload:'Download images & files', permDownloadD:'Client can download individual files',
       permZip:'Download whole gallery (ZIP)', permZipD:'Download all files as one archive',
       permEditText:'Edit texts & captions', permEditTextD:'Change captions and notes on images',
@@ -1740,31 +1858,31 @@
       permUpload:'Upload more files', permUploadD:'Add extra images or files',
       permSelection:'Change image selection', permSelectionD:'Select and deselect files',
       permViewOnly:'View only', permViewOnlyD:'No changes allowed — overrides all other permissions',
-      setBtn:'Settings', setTitle:'Album settings',
-      setSub:'Manage album details, sharing, permissions and design. Settings are stored on this device only.',
-      selModeTitle:'Selection album mode', selModeDesc:'The client can only view, mark favorites and add notes — no deleting or reordering.',
+      setBtn:'Settings', setTitle:'Project settings',
+      setSub:'Manage project details, sharing, permissions and design. Settings are stored on this device only.',
+      selModeTitle:'Selection project mode', selModeDesc:'The client can only view, mark favorites and add notes — no deleting or reordering.',
       tabGeneral:'General', tabAccess:'Sharing & access', tabContent:'Content & order', tabBrand:'Design & branding', tabAdvanced:'Advanced',
-      secAlbum:'Album details',
-      alTitleL:'Album name', alTitlePh:'e.g. Dana & Joe’s wedding',
+      secAlbum:'Project details',
+      alTitleL:'Project name', alTitlePh:'e.g. Dana & Joe’s wedding',
       alDescL:'Short description', alDescPh:'A few words about the event…',
       alEventTypeL:'Event type', etWedding:'Wedding', etParty:'Party', etCorporate:'Corporate', etPortrait:'Portrait session', etOther:'Other',
       alLocationL:'Location', alLocationPh:'City / venue',
       alCoverL:'Cover image', alCoverBtn:'Upload image',
-      secVisibility:'Album visibility', alVisibilityL:'Who can view',
+      secVisibility:'Project visibility', alVisibilityL:'Who can view',
       visPrivate:'Private — only me', visLink:'Anyone with the link', visPassword:'Password protected',
-      alShareLinkL:'Share link', alPrivateNote:'This album is private — only you can see it. Choose "Anyone with the link" to get a shareable link and set protections.',
+      alShareLinkL:'Share link', alPrivateNote:'This project is private — only you can see it. Choose "Anyone with the link" to get a shareable link and set protections.',
       secPassword:'Access password', alPwOnL:'Enable password', alPwOnD:'Guests must enter a password to view', alPwPh:'Choose a password',
       secDownloads:'Guest permissions',
       alDlPhotosL:'Download photos', alDlPhotosD:'Guests can download individual photos',
       alDlVideosL:'Download video', alDlVideosD:'Guests can download videos',
-      alDlZipL:'Download whole album (ZIP)', alDlZipD:'Download every file as one archive',
+      alDlZipL:'Download whole project (ZIP)', alDlZipD:'Download every file as one archive',
       alDlOriginalL:'Original-quality download', alDlOriginalD:'Allow downloading the full-resolution original',
       secQuality:'File quality', alQualityL:'Quality shown to guests',
       qFull:'Full quality', qPreview:'Preview only', qRequest:'Preview + request original',
       secGuest:'Guest uploads',
-      alGuestUploadL:'Allow guest uploads', alGuestUploadD:'Guests can add photos and videos to the album',
+      alGuestUploadL:'Allow guest uploads', alGuestUploadD:'Guests can add photos and videos to the project',
       alGuestApprovalL:'Require approval before publishing', alGuestApprovalD:'Guest files wait for your approval',
-      secApproval:'File approval', alApprovalL:'Every new file awaits approval', alApprovalD:'Files appear in the album only after approval',
+      secApproval:'File approval', alApprovalL:'Every new file awaits approval', alApprovalD:'Files appear in the project only after approval',
       secComments:'Comments & likes',
       alCommentsL:'Allow comments', alCommentsD:'Guests can comment on photos',
       alCommentsGuestsL:'Invited only', alCommentsGuestsD:'Only people with the link can comment',
@@ -1777,21 +1895,21 @@
       alEditRequestsL:'Allow edit requests', alEditRequestsD:'The client leaves a note on a photo (replace / delete / edit)',
       secBrand:'Personal branding',
       alBrandNameL:'Business name', alBrandNamePh:'Studio / business name', alBrandColorL:'Brand color',
-      alWelcomeL:'Welcome message', alWelcomePh:'Welcome to the album…', alFooterL:'Footer text', alFooterPh:'Made with love by…',
+      alWelcomeL:'Welcome message', alWelcomePh:'Welcome to the project…', alFooterL:'Footer text', alFooterPh:'Made with love by…',
       secWm:'Watermark', alWmOnL:'Enable watermark', alWmOnD:'A watermark is shown on preview images',
       alWmTypeL:'Type', wmLogo:'Logo', wmText:'Text', alWmTextL:'Watermark text', alWmTextPh:'© My Studio',
       alWmPosL:'Position', posTl:'Top left', posTr:'Top right', posC:'Center', posBl:'Bottom left', posBr:'Bottom right',
       alWmOpacityL:'Opacity',
       secNotif:'Notifications',
-      alNotifNewFilesL:'Files added to the album', alNotifGuestUploadL:'A guest uploaded a file', alNotifFavoritesL:'Favorites were picked',
-      alNotifCommentsL:'A comment was received', alNotifExpiryL:'The album is about to expire',
-      secExpiry:'Expiration date', alExpiryOnL:'Enable expiration', alExpiryOnD:'The album closes automatically on the set date',
-      alExpiryDateL:'Date', alExpiryActionL:'On expiry', expReadonly:'Make view-only', expDelete:'Delete the album',
+      alNotifNewFilesL:'Files added to the project', alNotifGuestUploadL:'A guest uploaded a file', alNotifFavoritesL:'Favorites were picked',
+      alNotifCommentsL:'A comment was received', alNotifExpiryL:'The project is about to expire',
+      secExpiry:'Expiration date', alExpiryOnL:'Enable expiration', alExpiryOnD:'The project closes automatically on the set date',
+      alExpiryDateL:'Date', alExpiryActionL:'On expiry', expReadonly:'Make view-only', expDelete:'Delete the project',
       secStorage:'Storage', storOf:'of 15GB', storUsed:n=>`${n} used`, storUpgrade:'Upgrade storage',
       secBackup:'Backup & archive', backupBtn:'Download full backup', archiveBtn:'Move to archive', archivedMsg:'Archived',
-      secDelete:'Delete album', delZoneTitle:'Delete the album',
-      delZoneDesc:'This removes every file and folder from the album. Recoverable for a limited time.', delAlbumBtn:'Delete album',
-      confirmDelAlbumTitle:'Delete the album?', confirmDelAlbumBody:'Every file and folder will be removed from the album. Recoverable for a limited time.',
+      secDelete:'Delete project', delZoneTitle:'Delete the project',
+      delZoneDesc:'This removes every file and folder from the project. Recoverable for a limited time.', delAlbumBtn:'Delete project',
+      confirmDelAlbumTitle:'Delete the project?', confirmDelAlbumBody:'Every file and folder will be removed from the project. Recoverable for a limited time.',
       shareBtn:'Share', shareTitle:'Share gallery link',
       shareLinkLabel:'Gallery link', shareLinkInfo:'A unique link to view the gallery — anyone with it can open the project',
       shareOpen:'Open', shareCopy:'Copy', shareCopied:'Copied',
@@ -1831,7 +1949,7 @@
       kick:'Основное рабочее пространство',
       pageTitle:'Упорядочить файлы',
       pageSub:'Упорядочивайте, сортируйте и помечайте медиа — изображения, видео, аудио и документы. Всё работает в вашем браузере, ничего не загружается.',
-      searchPh:'Поиск файлов…', gridSize:'Размер сетки', viewGrid:'Сетка', viewList:'Список',
+      searchPh:'Поиск файлов…', gridSize:'Размер сетки',
       showMovedInMain:'Показывать перемещённые файлы в основной папке',
       selCount:(n,tot)=>`Выбрано: <b>${n}</b>/${tot}`, selectHint:'Выбрать / снять', selectAll:'Выбрать всё', deselectAll:'Снять выделение',
       selCountFree:(n)=>`Выбрано: <b>${n}</b>`, selCountLimit:(n,max)=>`Выбрано <b>${n}</b> из ${max}`,
@@ -1849,8 +1967,11 @@
       pickHint:'Отметить / снять', msCount:n=>`Отмечено: <b>${n}</b>`, msPh:'В папку…', msMoveTitle:'Переместить отмеченные в папку',
       delSelected:'Удалить',
       downloadZip:'Скачать всё (ZIP)', preparingZip:'Готовим…', zipName:'галерея', zipError:'Не удалось создать ZIP',
-      foldersTitle:'Папки', allFiles:'Все файлы', unsorted:'Без сортировки',
-      dropBig:'Перетащите файлы сюда', or:'или', choose:'Выбрать файлы',
+      foldersTitle:'Папки', allFiles:'Все файлы', unsorted:'Без сортировки', folderSearchPh:'Поиск файлов…', noFolders:'Нет совпадений',
+      statTotal:'Всего файлов', statImages:'Фото', statVideos:'Видео', statDocs:'Документы', statSize:'Общий размер',
+      statGalleryTotal:'\u0424\u0430\u0439\u043b\u043e\u0432 \u0432 \u0433\u0430\u043b\u0435\u0440\u0435\u0435', statImagesSelected:'\u0424\u043e\u0442\u043e \u0432\u044b\u0431\u0440\u0430\u043d\u043e', statVideosSelected:'\u0412\u0438\u0434\u0435\u043e \u0432\u044b\u0431\u0440\u0430\u043d\u043e', statSelectedTotal:'\u0412\u044b\u0431\u0440\u0430\u043d\u043e \u0432\u0441\u0435\u0433\u043e',
+      moreActions:'Ещё действия', capLabel:'Подпись файла',
+      dropBig:'Перетащите файлы или папки сюда', or:'или', choose:'Выбрать файлы', chooseFolder:'Выбрать папку',
       fmts:'Изображения · Видео · Аудио · Документы',
       sizeNote:'До 2 ГБ за загрузку',
       emptyTitle:'Здесь пока нет файлов', emptySub:'Перетащите файлы сюда, чтобы начать',
@@ -1867,6 +1988,9 @@
       confirmDelTitle:'Удалить файлы?', confirmDelBody:n=>`${n} файлов будет удалено из списка. Это нельзя отменить.`,
       confirmDelFolderTitle:'Удалить папку?', confirmDelFolderBody:name=>`Папка «${name}» будет удалена. Её файлы и подпапки поднимутся на уровень выше.`,
       confirmYes:'Да, удалить',
+      unassign:'Убрать из папки', unassignTitle:'Вернуть в основную папку?',
+      unassignBody:'Это действие вернёт файл в основную папку.\nПродолжить?',
+      unassignConfirm:'Да, продолжить', unassignDone:'Файл возвращён в основную папку',
       moveChoiceTitle:n=>`Выбрано файлов для перемещения: ${n}`,
       moveChoicePrompt:'Какое действие выполнить?',
       moveAllSelected:name=>`Переместить все выбранные файлы в «${name}»`,
@@ -1882,7 +2006,9 @@
       clientDetails:'Данные клиента', clientPerms:'Права клиента',
       cName:'Имя клиента', cNamePh:'Полное имя', cEmail:'Эл. почта', cPhone:'Телефон',
       cEvent:'Дата события', cDeadline:'Крайний срок выбора', cStatus:'Статус проекта',
-      statusDraft:'Черновик', statusActive:'Активный', statusAwaiting:'Ожидает выбора', statusCompleted:'Завершён',
+      statusDraft:'Черновик', statusReady:'Готов к отправке', statusSent:'Отправлено клиенту', statusAwaiting:'Ожидает выбора',
+      statusSelecting:'Выбор в процессе', statusCompleted:'Завершено', statusRevision:'Нужна правка', statusExpired:'Истёк срок', statusClosed:'Закрыт',
+      statStatus:'Статус выбора', statStatusHint:'Нажмите, чтобы изменить статус', statSelLine:(n,tot)=>`Выбрано <b>${n}</b> из <b>${tot}</b>`,
       permDownload:'Скачивание изображений и файлов', permDownloadD:'Клиент может скачивать отдельные файлы',
       permZip:'Скачать всю галерею (ZIP)', permZipD:'Скачать все файлы одним архивом',
       permEditText:'Редактирование текстов и подписей', permEditTextD:'Изменение подписей и заметок',
@@ -1891,31 +2017,31 @@
       permUpload:'Загрузка дополнительных файлов', permUploadD:'Добавление изображений или файлов',
       permSelection:'Изменение выбора изображений', permSelectionD:'Выбор и отмена выбора файлов',
       permViewOnly:'Только просмотр', permViewOnlyD:'Изменения запрещены — отменяет все остальные права',
-      setBtn:'Настройки', setTitle:'Настройки альбома',
-      setSub:'Управляйте данными альбома, доступом, правами и оформлением. Настройки хранятся только на этом устройстве.',
+      setBtn:'Настройки', setTitle:'Настройки проекта',
+      setSub:'Управляйте данными проекта, доступом, правами и оформлением. Настройки хранятся только на этом устройстве.',
       selModeTitle:'Режим выбора', selModeDesc:'Клиент может только просматривать, отмечать избранное и оставлять заметки — без удаления и изменения порядка.',
       tabGeneral:'Общее', tabAccess:'Доступ', tabContent:'Контент и порядок', tabBrand:'Оформление', tabAdvanced:'Дополнительно',
-      secAlbum:'Данные альбома',
-      alTitleL:'Название альбома', alTitlePh:'напр.: Свадьба Даны и Йоси',
+      secAlbum:'Данные проекта',
+      alTitleL:'Название проекта', alTitlePh:'напр.: Свадьба Даны и Йоси',
       alDescL:'Краткое описание', alDescPh:'Несколько слов о событии…',
       alEventTypeL:'Тип события', etWedding:'Свадьба', etParty:'Вечеринка', etCorporate:'Корпоратив', etPortrait:'Портретная съёмка', etOther:'Другое',
       alLocationL:'Место', alLocationPh:'Город / площадка',
       alCoverL:'Обложка', alCoverBtn:'Загрузить изображение',
-      secVisibility:'Видимость альбома', alVisibilityL:'Кто может смотреть',
+      secVisibility:'Видимость проекта', alVisibilityL:'Кто может смотреть',
       visPrivate:'Приватный — только я', visLink:'Любой, у кого есть ссылка', visPassword:'Защищён паролем',
-      alShareLinkL:'Ссылка для доступа', alPrivateNote:'Альбом приватный — виден только вам. Выберите «Любой, у кого есть ссылка», чтобы получить ссылку и настроить защиту.',
+      alShareLinkL:'Ссылка для доступа', alPrivateNote:'Проект приватный — виден только вам. Выберите «Любой, у кого есть ссылка», чтобы получить ссылку и настроить защиту.',
       secPassword:'Пароль доступа', alPwOnL:'Включить пароль', alPwOnD:'Гости должны ввести пароль для просмотра', alPwPh:'Придумайте пароль',
       secDownloads:'Разрешения для гостей',
       alDlPhotosL:'Скачивание фото', alDlPhotosD:'Гости могут скачивать отдельные фото',
       alDlVideosL:'Скачивание видео', alDlVideosD:'Гости могут скачивать видео',
-      alDlZipL:'Скачать весь альбом (ZIP)', alDlZipD:'Скачать все файлы одним архивом',
+      alDlZipL:'Скачать весь проект (ZIP)', alDlZipD:'Скачать все файлы одним архивом',
       alDlOriginalL:'Скачивание в оригинале', alDlOriginalD:'Разрешить скачивание оригинала в полном качестве',
       secQuality:'Качество файлов', alQualityL:'Качество для гостей',
       qFull:'Полное качество', qPreview:'Только превью', qRequest:'Превью + запрос оригинала',
       secGuest:'Загрузки гостей',
-      alGuestUploadL:'Разрешить загрузку гостям', alGuestUploadD:'Гости могут добавлять фото и видео в альбом',
+      alGuestUploadL:'Разрешить загрузку гостям', alGuestUploadD:'Гости могут добавлять фото и видео в проект',
       alGuestApprovalL:'Требовать одобрения', alGuestApprovalD:'Файлы гостей ждут вашего одобрения',
-      secApproval:'Одобрение файлов', alApprovalL:'Каждый новый файл ждёт одобрения', alApprovalD:'Файлы появляются в альбоме только после одобрения',
+      secApproval:'Одобрение файлов', alApprovalL:'Каждый новый файл ждёт одобрения', alApprovalD:'Файлы появляются в проекте только после одобрения',
       secComments:'Комментарии и лайки',
       alCommentsL:'Разрешить комментарии', alCommentsD:'Гости могут комментировать фото',
       alCommentsGuestsL:'Только приглашённым', alCommentsGuestsD:'Комментировать могут только люди со ссылкой',
@@ -1928,21 +2054,21 @@
       alEditRequestsL:'Разрешить запросы правок', alEditRequestsD:'Клиент оставляет заметку к фото (заменить / удалить / отредактировать)',
       secBrand:'Личный бренд',
       alBrandNameL:'Название бизнеса', alBrandNamePh:'Название студии / бизнеса', alBrandColorL:'Цвет бренда',
-      alWelcomeL:'Приветствие', alWelcomePh:'Добро пожаловать в альбом…', alFooterL:'Нижний текст', alFooterPh:'Сделано с любовью…',
+      alWelcomeL:'Приветствие', alWelcomePh:'Добро пожаловать в проект…', alFooterL:'Нижний текст', alFooterPh:'Сделано с любовью…',
       secWm:'Водяной знак', alWmOnL:'Включить водяной знак', alWmOnD:'Водяной знак показывается на превью',
       alWmTypeL:'Тип', wmLogo:'Логотип', wmText:'Текст', alWmTextL:'Текст знака', alWmTextPh:'© Моя студия',
       alWmPosL:'Положение', posTl:'Сверху слева', posTr:'Сверху справа', posC:'По центру', posBl:'Снизу слева', posBr:'Снизу справа',
       alWmOpacityL:'Прозрачность',
       secNotif:'Уведомления',
-      alNotifNewFilesL:'Файлы добавлены в альбом', alNotifGuestUploadL:'Гость загрузил файл', alNotifFavoritesL:'Выбрано избранное',
-      alNotifCommentsL:'Получен комментарий', alNotifExpiryL:'Альбом скоро истекает',
-      secExpiry:'Срок действия', alExpiryOnL:'Включить срок', alExpiryOnD:'Альбом закроется автоматически в заданную дату',
-      alExpiryDateL:'Дата', alExpiryActionL:'По истечении', expReadonly:'Только просмотр', expDelete:'Удалить альбом',
+      alNotifNewFilesL:'Файлы добавлены в проект', alNotifGuestUploadL:'Гость загрузил файл', alNotifFavoritesL:'Выбрано избранное',
+      alNotifCommentsL:'Получен комментарий', alNotifExpiryL:'Проект скоро истекает',
+      secExpiry:'Срок действия', alExpiryOnL:'Включить срок', alExpiryOnD:'Проект закроется автоматически в заданную дату',
+      alExpiryDateL:'Дата', alExpiryActionL:'По истечении', expReadonly:'Только просмотр', expDelete:'Удалить проект',
       secStorage:'Хранилище', storOf:'из 15 ГБ', storUsed:n=>`${n} занято`, storUpgrade:'Расширить хранилище',
       secBackup:'Резервная копия и архив', backupBtn:'Скачать полную копию', archiveBtn:'В архив', archivedMsg:'В архиве',
-      secDelete:'Удаление альбома', delZoneTitle:'Удалить альбом',
-      delZoneDesc:'Действие удалит все файлы и папки из альбома. Восстановление доступно ограниченное время.', delAlbumBtn:'Удалить альбом',
-      confirmDelAlbumTitle:'Удалить альбом?', confirmDelAlbumBody:'Все файлы и папки будут удалены из альбома. Восстановление доступно ограниченное время.',
+      secDelete:'Удаление проекта', delZoneTitle:'Удалить проект',
+      delZoneDesc:'Действие удалит все файлы и папки из проекта. Восстановление доступно ограниченное время.', delAlbumBtn:'Удалить проект',
+      confirmDelAlbumTitle:'Удалить проект?', confirmDelAlbumBody:'Все файлы и папки будут удалены из проекта. Восстановление доступно ограниченное время.',
       shareBtn:'Поделиться', shareTitle:'Поделиться ссылкой на галерею',
       shareLinkLabel:'Ссылка на галерею', shareLinkInfo:'Уникальная ссылка для просмотра галереи — любой, у кого она есть, может открыть проект',
       shareOpen:'Открыть', shareCopy:'Копировать', shareCopied:'Скопировано',
@@ -1998,6 +2124,7 @@
   let currentFolder='all';        // 'all' | folderId  (also the upload target)
   let showMovedInMain=true;       // show folder-assigned (locked) files in the "all files" view
   let query='';
+  let folderQuery='';             // sidebar folder-name filter (independent of the grid search)
   let uid=1; const nid = () => 'x'+(uid++)+'_'+Date.now().toString(36);
   let albumMgr = null;            // cached client selection-limit config (drives the GREEN check quota); set in init()
   let quotaState = null;          // per-render snapshot of the active limit + live selected counts
@@ -2020,17 +2147,30 @@
   function stripExt(name){ return name.replace(/\.[^.\/\\]+$/,''); }
   function fmtBytes(n){ if(n==null) return '—'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
   function pad3(n){ return String(n).padStart(3,'0'); }
+  function mmss(s){ s=Math.max(0,Math.round(s||0)); const m=Math.floor(s/60), ss=s%60; return m+':'+String(ss).padStart(2,'0'); }
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function urlFor(f){ if(!f.url) f.url=URL.createObjectURL(f.file); return f.url; }
   function revoke(f){ if(f.url){ URL.revokeObjectURL(f.url); f.url=null; } }
   function folderName(id){ if(id==null) return t.unsorted; const f=folders.find(x=>x.id===id); return f?f.name:t.unsorted; }
 
+  function folderDescendantSearchSet(q){
+    const ids=new Set();
+    const addWithKids=id=>{
+      if(ids.has(id)) return;
+      ids.add(id);
+      folders.filter(f=>(f.parentId||null)===id).forEach(child=>addWithKids(child.id));
+    };
+    folders.forEach(fo=>{ if(fo.name.toLowerCase().includes(q)) addWithKids(fo.id); });
+    return ids;
+  }
+
   // files visible in the current folder + search
   function visibleFiles(){
+    const matchingFolders = query ? folderDescendantSearchSet(query) : null;
     return files.filter(f=>{
+      if(query) return f.name.toLowerCase().includes(query) || (f.folderId!=null && matchingFolders.has(f.folderId));
       if(currentFolder!=='all' && f.folderId!==currentFolder) return false;
       if(currentFolder==='all' && !showMovedInMain && f.folderId!=null) return false;
-      if(query && !f.name.toLowerCase().includes(query)) return false;
       return true;
     });
   }
@@ -2052,28 +2192,77 @@
     folder:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>',
     layers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>',
     pencil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+    dots:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>',
     noentry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/></svg>',
     chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
     folderplus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 10v6"/><path d="M9 13h6"/></svg>',
+    xmark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
   };
 
   // =====================================================
   //  RENDER
   // =====================================================
+  // live "picked / total" counter shown next to a folder (or "all") in the rail
+  function folderSelCount(fid){
+    if(fid==='all') return { sel:files.filter(f=>f.selected).length, total:files.length };
+    return { sel:files.filter(f=>f.folderId===fid && f.selected).length,
+             total:files.filter(f=>f.folderId===fid).length };
+  }
+  function folderCountHtml(fid){
+    const {sel,total}=folderSelCount(fid);
+    return `<span class="fi-count${sel>0?' on':''}" dir="ltr" data-fcount="${fid}"><b>${sel}</b>/${total}</span>`;
+  }
+  // refresh just the numbers in the folder rail without rebuilding the whole tree
+  function updateFolderCounts(){
+    document.querySelectorAll('#folderList [data-fcount]').forEach(sp=>{
+      const {sel,total}=folderSelCount(sp.getAttribute('data-fcount'));
+      sp.innerHTML=`<b>${sel}</b>/${total}`;
+      sp.classList.toggle('on', sel>0);
+    });
+  }
+
+  function addFolderAncestors(show,id){
+    let cur=folders.find(x=>x.id===id);
+    while(cur){
+      show.add(cur.id);
+      cur = cur.parentId!=null ? folders.find(x=>x.id===cur.parentId) : null;
+    }
+  }
+
+  function fileSearchMatches(q){
+    const matchingFolders = folderDescendantSearchSet(q);
+    return files.some(f=>f.name.toLowerCase().includes(q) || (f.folderId!=null && matchingFolders.has(f.folderId)));
+  }
+
+  // Folders (and parents of matching files) to keep visible for a sidebar search query.
+  function folderSearchSet(q){
+    const show=new Set();
+    folders.forEach(fo=>{
+      if(fo.name.toLowerCase().includes(q)) addFolderAncestors(show, fo.id);
+    });
+    files.forEach(f=>{
+      if(f.folderId==null || !f.name.toLowerCase().includes(q)) return;
+      addFolderAncestors(show, f.folderId);
+    });
+    return show;
+  }
+
   function renderFolders(){
     const list=el('folderList');
-    const allCount=files.length;
-    let html=`<div class="fitem ${currentFolder==='all'?'on':''}" data-folder="all" data-drop="all">
+    const q=folderQuery.trim().toLowerCase();
+    const show = q ? folderSearchSet(q) : null;
+    let renderedFolders = 0;
+    let html = `<div class="fitem ${currentFolder==='all'?'on':''}" data-folder="all" data-drop="all">
         <span class="fi-tw"></span>
         <span class="fi-ic">${ICON.layers}</span>
         <span class="fi-name">${escapeHtml(t.allFiles)}</span>
-        <span class="fi-count">${allCount}</span>
+        ${folderCountHtml('all')}
       </div>`;
     const renderLevel=(parentId,depth)=>{
       folders.filter(f=>(f.parentId||null)===parentId).forEach(fo=>{
-        const c=files.filter(f=>f.folderId===fo.id).length;
+        if(show && !show.has(fo.id)) return;
         const hasKids=folders.some(f=>(f.parentId||null)===fo.id);
-        const open=fo.open!==false;
+        const open = q ? true : (fo.open!==false);   // force-open the tree while searching
         const tw=hasKids
           ? `<button class="tw ${open?'open':''}" data-ftoggle="${fo.id}" aria-label="toggle">${ICON.chev}</button>`
           : '';
@@ -2085,12 +2274,14 @@
             <button data-fedit="${fo.id}" title="${escapeHtml(t.save)}">${ICON.pencil}</button>
             <button class="del" data-fdel="${fo.id}" title="${escapeHtml(t.del)}">${ICON.trash}</button>
           </span>
-          <span class="fi-count">${c}</span>
+          ${folderCountHtml(fo.id)}
         </div>`;
+        renderedFolders++;
         if(hasKids && open) renderLevel(fo.id, depth+1);
       });
     };
     renderLevel(null,0);
+    if(q && !renderedFolders && !fileSearchMatches(q)) html+=`<div class="fitem" style="cursor:default;color:var(--faint);font-size:13px">${escapeHtml(t.noFolders)}</div>`;
     list.innerHTML=html;
   }
 
@@ -2125,6 +2316,13 @@
     return `<span class="ph ${cls}">${ic}<span class="pext">${escapeHtml(f.ext.toUpperCase())}</span></span>`;
   }
 
+  function fileXButtonHtml(f){
+    const assigned=f.folderId!=null;
+    const label=assigned ? t.unassign : t.del;
+    const action=assigned ? 'data-unassign' : 'data-del';
+    return `<button class="fdel-x" ${action}="${f.id}" title="${escapeHtml(label)}" aria-label="${escapeHtml(label)}">${ICON.xmark}</button>`;
+  }
+
   // Grab a still frame from a video clip to use as its thumbnail. Runs once per file,
   // decodes off-screen, and patches any already-rendered placeholders when the frame is ready.
   function makeVideoPoster(f){
@@ -2155,6 +2353,7 @@
     v.addEventListener('loadeddata', ()=>{
       // seek a touch into the clip so we don't capture a black lead-in frame
       const d=(isFinite(v.duration) && v.duration>0) ? v.duration : 0;
+      if(d && !f.dur){ f.dur=d; applyDurToDom(f); }
       const target = d ? Math.min(d*0.1, 1) : 0.1;
       v.addEventListener('seeked', ()=>finish(true), {once:true});
       try{ v.currentTime=target; }
@@ -2165,6 +2364,16 @@
     v.src=urlFor(f);
   }
 
+  // stamp the captured clip length onto any grid card already on screen
+  function applyDurToDom(f){
+    if(!f.dur) return;
+    document.querySelectorAll('.fcard[data-id="'+f.id+'"] .fthumb').forEach(th=>{
+      if(th.querySelector('.dur')) return;
+      const sp=document.createElement('span'); sp.className='dur';
+      sp.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'+mmss(f.dur);
+      th.appendChild(sp);
+    });
+  }
   // swap the film-icon placeholder for the captured frame wherever this file is on screen
   function applyPosterToDom(f){
     document.querySelectorAll('[data-vthumbph="'+f.id+'"]').forEach(ph=>{
@@ -2181,12 +2390,13 @@
   function lockedCardHtml(f,ord){
     const fn=folderName(f.folderId);
     return `
-      <div class="fcard locked" data-id="${f.id}" title="${escapeHtml(t.lockedHint(fn))}">
+      <div class="fcard locked ${f.selected?'sel':''} ${selAtCap(f)?'atcap':''}" data-id="${f.id}" title="${escapeHtml(t.lockedHint(fn))}">
         <div class="fthumb">
           <span class="fnum" title="${escapeHtml(t.orderTitle)}">${pad3(ord)}</span>
           ${thumbHtml(f)}
+          ${fileXButtonHtml(f)}
+          <div class="fcheck" data-check="${f.id}" title="${escapeHtml(t.selectHint)}">${ICON.check}</div>
           <div class="lockbadge">
-            <span class="noentry">${ICON.noentry}</span>
             <span class="lockfolder">${escapeHtml(t.lockedTag)}</span>
           </div>
           <div class="fname-ov">${escapeHtml(f.name)}</div>
@@ -2204,6 +2414,7 @@
         <div class="fthumb" data-preview="${f.id}">
           <span class="fnum" title="${escapeHtml(t.orderTitle)}">${pad3(ord)}</span>
           ${thumbHtml(f)}
+          ${fileXButtonHtml(f)}
           <div class="fcheck" data-check="${f.id}" title="${escapeHtml(t.selectHint)}">${ICON.check}</div>
           <div class="fname-ov">${escapeHtml(f.name)}</div>
         </div>
@@ -2212,78 +2423,27 @@
           <div class="facts">
             <button class="ab pick ${f.picked?'on':''}" data-pick="${f.id}" title="${escapeHtml(t.pickHint)}" aria-pressed="${f.picked?'true':'false'}">${ICON.check}</button>
             <select class="movesel" data-move="${f.id}" title="${escapeHtml(t.moveTo)}">${moveOptions(f.folderId)}</select>
-            <button class="ab del" data-del="${f.id}" title="${escapeHtml(t.del)}">${ICON.trash}</button>
           </div>
-        </div>
-      </div>`;
-  }
-
-  // ---- list-view rows (share every data-* hook the grid cards use) ----
-  function activeRowHtml(f,ord){
-    return `
-      <div class="fcard frow ${f.selected?'sel':''} ${f.picked?'picked':''} ${selAtCap(f)?'atcap':''}" data-id="${f.id}" draggable="true">
-        <span class="frow-num" title="${escapeHtml(t.orderTitle)}">${pad3(ord)}</span>
-        <div class="frow-check" data-check="${f.id}" title="${escapeHtml(t.selectHint)}">${ICON.check}</div>
-        <div class="frow-thumb" data-preview="${f.id}">${thumbHtml(f)}</div>
-        <div class="frow-main">
-          <div class="frow-name" data-preview="${f.id}" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
-          <input class="fcap" type="text" data-note="${f.id}" value="${escapeHtml(f.note||'')}" placeholder="${escapeHtml(t.addNote)}" spellcheck="false">
-        </div>
-        <div class="frow-meta">${escapeHtml(f.ext.toUpperCase())} · ${fmtBytes(f.size)}</div>
-        <div class="frow-acts">
-          <button class="ab pick ${f.picked?'on':''}" data-pick="${f.id}" title="${escapeHtml(t.pickHint)}" aria-pressed="${f.picked?'true':'false'}">${ICON.check}</button>
-          <select class="movesel" data-move="${f.id}" title="${escapeHtml(t.moveTo)}">${moveOptions(f.folderId)}</select>
-          <button class="ab del" data-del="${f.id}" title="${escapeHtml(t.del)}">${ICON.trash}</button>
-        </div>
-      </div>`;
-  }
-
-  function lockedRowHtml(f,ord){
-    const fn=folderName(f.folderId);
-    return `
-      <div class="fcard frow locked" data-id="${f.id}" title="${escapeHtml(t.lockedHint(fn))}">
-        <span class="frow-num" title="${escapeHtml(t.orderTitle)}">${pad3(ord)}</span>
-        <div class="frow-check locked-ic">${ICON.noentry}</div>
-        <div class="frow-thumb">${thumbHtml(f)}</div>
-        <div class="frow-main">
-          <div class="frow-name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</div>
-          ${f.note?`<div class="fcapview" title="${escapeHtml(f.note)}">${escapeHtml(f.note)}</div>`:''}
-        </div>
-        <div class="frow-meta">${escapeHtml(f.ext.toUpperCase())} · ${fmtBytes(f.size)}</div>
-        <div class="frow-acts">
-          <div class="fassigned">${ICON.folder}<span>${escapeHtml(fn)}</span></div>
         </div>
       </div>`;
   }
 
   function renderGrid(){
     const grid=el('fileGrid'), empty=el('emptyState');
-    grid.className = viewMode==='list' ? 'filelist' : 'filegrid';
+    grid.className = 'filegrid';
     const vis=visibleFiles();
-    vis.forEach(f=>{ if(isLocked(f)) f.selected=false; }); // locked files can't stay selected
     quotaState=computeQuota(); // snapshot the limit + live counts once for this render pass
     if(!vis.length){ grid.innerHTML=''; empty.classList.remove('hidden'); updateSelBar(); return; }
     empty.classList.add('hidden');
-    const cardHtml = viewMode==='list'
-      ? (f,i)=> isLocked(f) ? lockedRowHtml(f,i+1) : activeRowHtml(f,i+1)
-      : (f,i)=> isLocked(f) ? lockedCardHtml(f,i+1) : activeCardHtml(f,i+1);
+    const cardHtml = (f,i)=> isLocked(f) ? lockedCardHtml(f,i+1) : activeCardHtml(f,i+1);
     grid.innerHTML=vis.map(cardHtml).join('');
     updateSelBar();
   }
 
   function updateSelBar(){
-    const vis=visibleFiles().filter(f=>!isLocked(f));
+    updateFolderCounts(); // keep the per-folder picked/total tallies in the rail live
+    const vis=visibleFiles();
     const total=vis.length;
-    const nVis=vis.filter(f=>f.selected).length;
-    const nAll=files.filter(f=>f.selected).length;
-    const q=quotaState||computeQuota();
-    if(q.m){
-      el('selCount').innerHTML = q.m.separate
-        ? t.selCountPhotos(q.c.photos,q.m.maxPhotos)+' <span style="opacity:.45">·</span> '+t.selCountVideos(q.c.videos,q.m.maxVideos)
-        : t.selCountLimit(q.c.total,q.m.maxTotal);
-    } else { el('selCount').innerHTML = q.c.total ? t.selCountFree(q.c.total) : ''; }
-    el('selLock').hidden = !selConfirmed;
-    if(selConfirmed) el('selLockTxt').textContent = t.selLockedBadge;
     document.body.classList.toggle('sel-locked', selConfirmed);
     el('downloadZipBtn').disabled = files.length===0 || zipBusy;
     // purple multi-select group - shown only when at least one file is picked
@@ -2299,54 +2459,202 @@
     }
   }
 
-  function renderAll(){ renderFolders(); renderGrid(); }
+  function renderAll(){ renderFolders(); renderGrid(); renderStats(); }
 
-  // grid <-> list view switch (persisted)
-  function applyView(mode){
-    viewMode = (mode==='list') ? 'list' : 'grid';
-    try{ localStorage.setItem('ac_view', viewMode); }catch(_){}
-    document.querySelectorAll('#viewToggle .vbtn').forEach(b=>b.classList.toggle('on', b.getAttribute('data-view')===viewMode));
-    el('zoomWrap').classList.toggle('hidden', viewMode==='list'); // grid-size slider is meaningless in list view
-    renderGrid();
+  // ---- stats strip: gallery total + live client-pick quotas ----
+  function statQuota(){
+    const m = albumMgr && albumMgr.limitOn ? albumMgr : null;
+    if(!m) return { photos:50, videos:5, total:55 };
+    if(m.separate) return { photos:m.maxPhotos, videos:m.maxVideos, total:m.maxPhotos + m.maxVideos };
+    return { photos:m.maxTotal, videos:m.maxTotal, total:m.maxTotal };
   }
+  function setStatBar(id, cur, max){
+    const span=el(id); if(!span) return;
+    const ratio=max>0 ? Math.max(0,Math.min(1,cur/max)) : 0;
+    span.style.width=(ratio*100)+'%';
+    const bar=span.parentElement;
+    bar.classList.toggle('near', ratio>=0.8 && ratio<1);
+    bar.classList.toggle('full', ratio>=1);
+  }
+  function renderStats(){
+    if(!el('statRow')) return;
+    const nf=n=>{ try{ return Number(n).toLocaleString('en-US'); }catch(_){ return ''+n; } };
+    const c=selCounts();
+    const q=statQuota();
+    el('stGalleryTotal').textContent = nf(files.length);
+    el('stImagesCur').textContent = nf(c.photos);
+    el('stImagesMax').textContent = nf(q.photos);
+    el('stVideosCur').textContent = nf(c.videos);
+    el('stVideosMax').textContent = nf(q.videos);
+    el('stSelectedCur').textContent = nf(c.total);
+    el('stSelectedMax').textContent = nf(q.total);
+    setStatBar('stImagesBar', c.photos, q.photos);
+    setStatBar('stVideosBar', c.videos, q.videos);
+    renderStatusCard();
+  }
+
+  // ---- selection-status card: direct four-state selector ----
+  const STATUS_ORDER=['draft','awaiting','selecting','completed'];
+  const STATUS_META={
+    draft:    {c:'#9aa1b1'},
+    awaiting: {c:'#0ea5b7'},
+    selecting:{c:'#7c3aed'},
+    completed:{c:'#22b04b'},
+  };
+  const STATUS_LEGACY={
+    active:'selecting',
+    ready:'awaiting',
+    sent:'awaiting',
+    revision:'selecting',
+    expired:'completed',
+    closed:'completed',
+  };
+  function normStatus(s){ s=STATUS_LEGACY[s]||s; return STATUS_META[s]?s:'draft'; }
+  function statusText(s){
+    s=normStatus(s);
+    const key='status'+s.charAt(0).toUpperCase()+s.slice(1);
+    return t[key]||s;
+  }
+  function renderStatusCard(){
+    const card=el('statStatusCard'); if(!card) return;
+    const s=normStatus(loadClient().status);
+    card.style.setProperty('--st-c', STATUS_META[s].c);
+    el('stStatusText').textContent = statusText(s);
+    el('stStatusCounter').innerHTML = t.statSelLine(selCounts().total, files.length);
+    renderStatusMenu(s);
+  }
+  function renderStatusMenu(current){
+    const menu=el('statusMenu'); if(!menu) return;
+    const active=normStatus(current);
+    menu.innerHTML=STATUS_ORDER.map(s=>{
+      const on=s===active;
+      return `<button type="button" role="option" data-status="${s}" aria-selected="${on?'true':'false'}" class="${on?'on':''}" style="--item-c:${STATUS_META[s].c}">
+        <span class="dot"></span><span>${escapeHtml(statusText(s))}</span>
+      </button>`;
+    }).join('');
+  }
+  function setStatusCardOpen(open){
+    const card=el('statStatusCard'); if(!card) return;
+    card.classList.toggle('open', !!open);
+    card.setAttribute('aria-expanded', open?'true':'false');
+    if(open) renderStatusMenu(loadClient().status);
+  }
+  function toggleStatusMenu(){
+    const card=el('statStatusCard'); if(card) setStatusCardOpen(!card.classList.contains('open'));
+  }
+  function saveSelectionStatus(status){
+    const c=loadClient();
+    c.status=normStatus(status);
+    try{ localStorage.setItem(scopedKey('ac_client'), JSON.stringify(c)); }catch(_){}
+    const sel=el('cStatus'); if(sel) sel.value=c.status;
+    renderStatusCard();
+    setStatusCardOpen(false);
+  }
+
+  function closeAllCardMenus(){ document.querySelectorAll('.fcard.menuopen').forEach(c=>c.classList.remove('menuopen')); }
 
   // =====================================================
   //  FILE INTAKE  (+ duplicate handling)
   // =====================================================
-  let dupQueue=null;
+  // Build (or reuse) a nested folder chain from path segments; returns the deepest folder id.
+  // Matches existing folders by (parent, name) so repeated uploads and multiple files from the
+  // same directory land in one folder instead of creating duplicates.
+  function ensureFolderPath(segs, baseParentId){
+    let parent = baseParentId || null;
+    for(const raw of segs){
+      const name = String(raw).trim() || String(raw);
+      if(!name) continue;
+      let f = folders.find(x=>(x.parentId||null)===(parent||null) && x.name===name);
+      if(!f){ f={id:nid(), name, parentId:parent||null, open:true}; folders.push(f); }
+      else { f.open=true; }
+      if(parent){ const p=folders.find(x=>x.id===parent); if(p) p.open=true; }
+      parent = f.id;
+    }
+    return parent;
+  }
+
+  // entry point for a plain FileList (file <input>; the folder <input webkitdirectory> also
+  // lands here — its files carry a webkitRelativePath that rebuilds the tree).
   function addFiles(fileList){
-    const incoming=Array.from(fileList||[]);
+    intake(Array.from(fileList||[]).map(f=>({file:f, path:f.webkitRelativePath || f.name})));
+  }
+
+  // entry point for a drag-drop — walks any dropped directories via the entries API so folders
+  // keep their full structure (subfolders + names). Falls back to a flat file list if unsupported.
+  async function addFromDataTransfer(dt){
+    let items;
+    try{ items = await filesFromDataTransfer(dt); }
+    catch(_){ items = Array.from(dt.files||[]).map(f=>({file:f, path:f.webkitRelativePath||f.name})); }
+    intake(items);
+  }
+  function filesFromDataTransfer(dt){
+    const list = dt.items ? Array.from(dt.items) : [];
+    // webkitGetAsEntry() must be read synchronously while the drop event is live
+    const entries = list.map(it=> it.webkitGetAsEntry ? it.webkitGetAsEntry() : null).filter(Boolean);
+    if(!entries.length){
+      return Promise.resolve(Array.from(dt.files||[]).map(f=>({file:f, path:f.webkitRelativePath||f.name})));
+    }
+    const out=[];
+    return Promise.all(entries.map(en=>walkEntry(en,'',out))).then(()=>out);
+  }
+  function walkEntry(entry, prefix, out){
+    return new Promise(resolve=>{
+      if(!entry){ resolve(); return; }
+      if(entry.isFile){
+        entry.file(f=>{ out.push({file:f, path:prefix+entry.name}); resolve(); }, ()=>resolve());
+      } else if(entry.isDirectory){
+        const reader=entry.createReader(), kids=[];
+        const readBatch=()=>reader.readEntries(batch=>{
+          if(!batch.length){ Promise.all(kids.map(k=>walkEntry(k, prefix+entry.name+'/', out))).then(resolve); }
+          else { kids.push(...batch); readBatch(); }   // readEntries returns in chunks — keep going until empty
+        }, ()=>resolve());
+        readBatch();
+      } else resolve();
+    });
+  }
+
+  let dupQueue=null;
+  // Normalize a batch of {file,path} into accepted items, filtering unsupported types and
+  // resolving each file's target folder from its path (nested under the current folder).
+  function intake(rawItems){
+    const incoming=(rawItems||[]).filter(r=>r && r.file);
     if(!incoming.length) return;
-    const blocked=[];
-    const accepted=[];
-    incoming.forEach(file=>{
-      const ext=extOf(file.name);
-      const kind=kindOf(ext);
+    const blocked=[], accepted=[];
+    const base=targetFolderId();
+    incoming.forEach(({file,path})=>{
+      const ext=extOf(file.name), kind=kindOf(ext);
       if(!kind){ blocked.push(file.name); return; }
-      accepted.push({file,ext,kind});
+      const segs=String(path||file.name).split('/').filter(Boolean);
+      segs.pop();                                        // drop the filename → directory chain
+      accepted.push({file,ext,kind,segs});
     });
     if(blocked.length) showBlocked(blocked);
     if(!accepted.length){ return; }
-    processQueue(accepted, targetFolderId());
+    accepted.forEach(it=>{ it.folderId = it.segs.length ? ensureFolderPath(it.segs, base) : base; });
+    processQueue(accepted);
   }
 
-  function processQueue(queue, folderId){
+  function processQueue(queue){
     let applyAll=null; // 'keep'|'replace'|'skip'
-    const step=(i)=>{
-      if(i>=queue.length){ renderAll(); return; }
-      const item=queue[i];
-      const dupIdx=files.findIndex(f=>f.folderId===folderId && f.name.toLowerCase()===item.file.name.toLowerCase());
-      if(dupIdx<0){ insertFile(item,folderId,null); return step(i+1); }
-      const act=(choice)=>{
-        if(choice==='replace'){ const old=files[dupIdx]; revoke(old); files.splice(dupIdx,1); insertFile(item,folderId,null); }
-        else if(choice==='keep'){ insertFile(item,folderId,uniqueName(item.file.name,folderId)); }
-        // skip -> nothing
-        step(i+1);
-      };
-      if(applyAll){ return act(applyAll); }
-      askDuplicate(item.file.name, (choice, all)=>{ if(all) applyAll=choice; act(choice); });
+    // Loop iteratively (folder uploads can be huge — avoid per-file recursion), and only pause
+    // when a duplicate needs the user's decision; the dialog callback resumes the loop.
+    const run=(start)=>{
+      for(let i=start;i<queue.length;i++){
+        const item=queue[i], folderId=item.folderId;
+        const dupIdx=files.findIndex(f=>f.folderId===folderId && f.name.toLowerCase()===item.file.name.toLowerCase());
+        if(dupIdx<0){ insertFile(item,folderId,null); continue; }
+        const apply=(choice)=>{
+          if(choice==='replace'){ const old=files[dupIdx]; revoke(old); files.splice(dupIdx,1); insertFile(item,folderId,null); }
+          else if(choice==='keep'){ insertFile(item,folderId,uniqueName(item.file.name,folderId)); }
+          // skip -> nothing
+        };
+        if(applyAll){ apply(applyAll); continue; }
+        askDuplicate(item.file.name, (choice, all)=>{ if(all) applyAll=choice; apply(choice); run(i+1); });
+        return; // wait for the dialog before continuing
+      }
+      renderAll();
     };
-    step(0);
+    run(0);
   }
 
   function uniqueName(name,folderId){
@@ -2465,13 +2773,27 @@
   //  CONFIRM (generic)
   // =====================================================
   let confirmCb=null;
-  function confirmAsk(title, body, cb){
+  function confirmAsk(title, body, cb, opts){
+    opts=opts||{};
     el('confirmTitle').textContent=title; el('confirmBody').textContent=body;
-    el('confirmYes').textContent=t.confirmYes;
+    const yes=el('confirmYes'), no=el('confirmNo');
+    yes.textContent=opts.yesText||t.confirmYes;
+    no.textContent=opts.cancelText||t.cancel;
+    yes.classList.remove('danger','primary');
+    yes.classList.add(opts.variant||'danger');
     confirmCb=cb; el('confirmOverlay').classList.add('show');
   }
 
-  // move-to-folder disambiguation when a multi-selection is active
+  function unassignFile(f){
+    if(!f || f.folderId==null) return;
+    confirmAsk(t.unassignTitle, t.unassignBody, ()=>{
+      f.folderId=null;
+      renderAll();
+      showToast(t.unassignDone);
+    }, { yesText:t.unassignConfirm, variant:'primary' });
+  }
+
+  // move-to-folder disambiguation when a management multi-selection is active
   let moveCtx=null;
   function askMoveChoice(target, curFile, selCount){
     moveCtx={target, curFile};
@@ -2500,7 +2822,9 @@
     try{
       const raw=localStorage.getItem(scopedKey('ac_client'));
       if(raw){ const o=JSON.parse(raw);
-        return Object.assign({}, CLIENT_DEFAULT, o, { perms:Object.assign({}, CLIENT_DEFAULT.perms, o.perms||{}) }); }
+        const c=Object.assign({}, CLIENT_DEFAULT, o, { perms:Object.assign({}, CLIENT_DEFAULT.perms, o.perms||{}) });
+        c.status=normStatus(c.status);
+        return c; }
     }catch(_){}
     return JSON.parse(JSON.stringify(CLIENT_DEFAULT));
   }
@@ -2538,7 +2862,7 @@
     const c = isNew ? JSON.parse(JSON.stringify(CLIENT_DEFAULT)) : loadClient();
     const a = isNew ? (function(){ const d={}; ALBUM_FIELDS.forEach(([id,,def])=>d[id]=def); return d; })() : loadAlbum();
     el('cName').value=c.name||''; el('cEmail').value=c.email||''; el('cPhone').value=c.phone||'';
-    el('cEvent').value=c.event||''; el('cDeadline').value=c.deadline||''; el('cStatus').value=c.status||'draft';
+    el('cEvent').value=c.event||''; el('cDeadline').value=c.deadline||''; el('cStatus').value=normStatus(c.status);
     PERM_KEYS.forEach(k=>{ const box=el('perm_'+k); if(box) box.checked=!!c.perms[k]; });
     ALBUM_FIELDS.forEach(([id,kind])=>setField(id,kind,a[id]));
     applyViewOnlyLock(); applySettingsDeps(); refreshStorage(); setActiveTab('general');
@@ -2608,11 +2932,12 @@
   function saveSettings(){
     const perms={}; PERM_KEYS.forEach(k=>{ const box=el('perm_'+k); perms[k]=!!(box&&box.checked); });
     const c={ name:el('cName').value.trim(), email:el('cEmail').value.trim(), phone:el('cPhone').value.trim(),
-      event:el('cEvent').value, deadline:el('cDeadline').value, status:el('cStatus').value, perms };
+      event:el('cEvent').value, deadline:el('cDeadline').value, status:normStatus(el('cStatus').value), perms };
     try{ localStorage.setItem(scopedKey('ac_client'), JSON.stringify(c)); }catch(_){}
     const a={}; ALBUM_FIELDS.forEach(([id,kind])=>a[id]=getField(id,kind));
     try{ localStorage.setItem(scopedKey('ac_album'), JSON.stringify(a)); }catch(_){}
     el('settingsOverlay').classList.remove('show');
+    renderStatusCard(); // reflect the new status on the strip immediately
   }
 
   // =====================================================
@@ -2793,7 +3118,7 @@
     albumMgr=m; // refresh the cached quota so the green check + counter update immediately
     selConfirmed=false; selPromptShown=false; // owner changed the quota -> release any prior selection lock
     el('albumMgrOverlay').classList.remove('show');
-    renderGrid();
+    renderGrid(); renderStats();
   }
 
   // =====================================================
@@ -2808,19 +3133,33 @@
   }
   function persistShare(s){ try{ localStorage.setItem(scopedKey('ac_share'), JSON.stringify(s)); }catch(_){} }
   function shareLinkFor(id){ return location.href.split(/[?#]/)[0]+'?g='+id; }
+  // write a few fields into the stored album settings without touching the rest —
+  // lets the share modal edit the SAME password/visibility the settings pane owns
+  function patchAlbum(partial){
+    let a={}; try{ a=JSON.parse(localStorage.getItem(scopedKey('ac_album'))||'{}')||{}; }catch(_){}
+    Object.assign(a, partial);
+    try{ localStorage.setItem(scopedKey('ac_album'), JSON.stringify(a)); }catch(_){}
+  }
   function saveShareState(){
     const s=shareState();
     s.email=el('shareEmail').value.trim(); s.phone=el('sharePhone').value.trim();
-    s.pwOn=el('share_pw_on').checked; s.pw=el('sharePw').value; s.blocked=el('share_block').checked;
     persistShare(s);
+    // password + link on/off are owned by the album settings — persist them there, not in ac_share
+    patchAlbum({ alPwOn:el('share_pw_on').checked, alPw:el('sharePw').value,
+                 alVisibility: el('share_block').checked?'private':'link' });
   }
   function openShare(){
     const s=shareState(), client=loadClient();
+    // one-time migration: fold a legacy share-only password into the album, then forget the old keys
+    if(s.pw||s.pwOn){ const a0=loadAlbum(); if(!a0.alPwOn&&!a0.alPw) patchAlbum({ alPwOn:!!s.pwOn, alPw:s.pw||'' }); }
+    if('pwOn' in s||'pw' in s||'blocked' in s){ delete s.pwOn; delete s.pw; delete s.blocked; persistShare(s); }
+    const alb=loadAlbum();
     el('shareLink').value=shareLinkFor(s.id);
     el('shareEmail').value=s.email||client.email||'';
     el('sharePhone').value=s.phone||client.phone||'';
-    el('share_pw_on').checked=!!s.pwOn; el('sharePw').value=s.pw||'';
-    el('share_block').checked=!!s.blocked;
+    // password + link on/off mirror the album settings — single source of truth (ac_album)
+    el('share_pw_on').checked=!!alb.alPwOn; el('sharePw').value=alb.alPw||'';
+    el('share_block').checked=(alb.alVisibility!=='link');
     applySharePw(); applyShareBlock();
     el('shareOverlay').classList.add('show');
   }
@@ -2938,10 +3277,12 @@
   // =====================================================
   function bindStatic(){
     // upload
-    const drop=el('drop'), input=el('fileInput');
+    const drop=el('drop'), input=el('fileInput'), folderInput=el('folderInput');
     el('chooseBtn').addEventListener('click',()=>input.click());
+    el('chooseFolderBtn').addEventListener('click',()=>folderInput.click());
     drop.addEventListener('click',(e)=>{ if(e.target.closest('.choose')) return; input.click(); });
     input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+    folderInput.addEventListener('change',()=>{ addFiles(folderInput.files); folderInput.value=''; });
     ;['dragenter','dragover'].forEach(ev=>document.addEventListener(ev,e=>{
       if(draggingId||draggingFolderId) return; // internal reorder / move between cards — not an external file upload
       if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')){ e.preventDefault(); drop.classList.add('over'); }
@@ -2950,16 +3291,40 @@
       if(ev==='drop'){ e.preventDefault(); }
       if(e.target===document || e.relatedTarget===null) drop.classList.remove('over');
     }));
-    drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(draggingId||draggingFolderId) return; if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+    drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(draggingId||draggingFolderId) return; if(e.dataTransfer) addFromDataTransfer(e.dataTransfer); });
     document.addEventListener('drop',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')){ e.preventDefault(); drop.classList.remove('over'); } });
 
     // search + zoom
-    el('searchInput').addEventListener('input',e=>{ query=e.target.value.trim().toLowerCase(); renderGrid(); });
+    el('folderSearch').addEventListener('input',e=>{
+      folderQuery=e.target.value;
+      query=folderQuery.trim().toLowerCase();
+      if(query) currentFolder='all';
+      renderAll();
+    });
     function applyGrid(v){
       const r=el('zoomRange');
       v=Math.max(+r.min, Math.min(+r.max, v));
+      const changed = v !== +r.value;
+      const before = changed ? new Map([...document.querySelectorAll('.filegrid .fcard')].map(card=>[card.dataset.id, card.getBoundingClientRect()])) : null;
       r.value=v;
       document.documentElement.style.setProperty('--card-size', v+'px');
+      if(before){
+        requestAnimationFrame(()=>{
+          document.querySelectorAll('.filegrid .fcard').forEach(card=>{
+            const first=before.get(card.dataset.id);
+            if(!first) return;
+            const last=card.getBoundingClientRect();
+            if(!last.width || !last.height) return;
+            const dx=first.left-last.left, dy=first.top-last.top;
+            const sx=first.width/last.width, sy=first.height/last.height;
+            if(Math.abs(dx)<.5 && Math.abs(dy)<.5 && Math.abs(sx-1)<.01 && Math.abs(sy-1)<.01) return;
+            card.animate([
+              {transform:`translate(${dx}px,${dy}px) scale(${sx},${sy})`,transformOrigin:'top left'},
+              {transform:'translate(0,0) scale(1,1)',transformOrigin:'top left'}
+            ],{duration:180,easing:'cubic-bezier(.2,.8,.2,1)'});
+          });
+        });
+      }
       try{ localStorage.setItem('ac_grid', String(v)); }catch(_){}
       el('zoomMinus').disabled = v<=+r.min;
       el('zoomPlus').disabled  = v>=+r.max;
@@ -2967,7 +3332,6 @@
     el('zoomRange').addEventListener('input',e=>applyGrid(+e.target.value));
     el('zoomMinus').addEventListener('click',()=>applyGrid(+el('zoomRange').value - (+el('zoomRange').step||10)));
     el('zoomPlus').addEventListener('click',()=>applyGrid(+el('zoomRange').value + (+el('zoomRange').step||10)));
-    el('viewToggle').addEventListener('click',e=>{ const b=e.target.closest('.vbtn'); if(b) applyView(b.getAttribute('data-view')); });
     el('showMovedChk').addEventListener('change',e=>{
       showMovedInMain=e.target.checked;
       try{ localStorage.setItem('ac_showmoved', showMovedInMain?'1':'0'); }catch(_){}
@@ -3028,7 +3392,7 @@
       if(draggingId){
         e.preventDefault(); item.classList.remove('dragover');
         const moving=dragTargets(); if(!moving.length) return;
-        moving.forEach(f=>{ f.folderId = target==='all'?null:target; f.selected=false; f.picked=false; });
+        moving.forEach(f=>{ f.folderId = target==='all'?null:target; f.picked=false; });
         renderAll();
       } else if(draggingFolderId){
         e.preventDefault(); item.classList.remove('dragover');
@@ -3041,11 +3405,16 @@
     // grid (delegated)
     const grid=el('fileGrid');
     grid.addEventListener('click',e=>{
+      const kb=e.target.closest('[data-kebab]');
+      if(kb){ e.stopPropagation(); const card=kb.closest('.fcard'); const open=card.classList.contains('menuopen');
+        closeAllCardMenus(); if(!open) card.classList.add('menuopen'); return; }
+      if(e.target.closest('.cardmenu')){ /* interactions inside the menu bubble to their own data-* handlers below */ }
       if(e.target.closest('.fcap')) return; // let the caption input handle its own clicks
       const chk=e.target.closest('[data-check]'); if(chk){ e.stopPropagation(); toggleSel(chk.getAttribute('data-check')); return; }
       const pk=e.target.closest('[data-pick]'); if(pk){ e.stopPropagation(); togglePick(pk.getAttribute('data-pick')); return; }
+      const unassign=e.target.closest('[data-unassign]'); if(unassign){ e.stopPropagation(); const f=fileById(unassign.getAttribute('data-unassign')); if(f) unassignFile(f); return; }
+      const del=e.target.closest('[data-del]'); if(del){ e.stopPropagation(); const f=fileById(del.getAttribute('data-del')); if(f){ confirmAsk(t.confirmDelTitle,t.confirmDelBody(1),()=>{ revoke(f); files=files.filter(x=>x.id!==f.id); renderAll(); }); } return; }
       const pv=e.target.closest('[data-preview]'); if(pv){ const f=fileById(pv.getAttribute('data-preview')); if(f) openPreview(f); return; }
-      const del=e.target.closest('[data-del]'); if(del){ const f=fileById(del.getAttribute('data-del')); if(f){ confirmAsk(t.confirmDelTitle,t.confirmDelBody(1),()=>{ revoke(f); files=files.filter(x=>x.id!==f.id); renderAll(); }); } return; }
     });
     grid.addEventListener('input',e=>{
       const note=e.target.closest('[data-note]'); if(note){ const f=fileById(note.getAttribute('data-note')); if(f) f.note=note.value; }
@@ -3054,18 +3423,18 @@
       const mv=e.target.closest('[data-move]'); if(!mv) return;
       const f=fileById(mv.getAttribute('data-move')); if(!f) return;
       const target = mv.value===''?null:mv.value;
-      const sel=files.filter(x=>x.selected);
-      // multiple files are selected — ask whether to move all of them or just this one
-      if(sel.length>=2){ askMoveChoice(target,f,sel.length); return; }
+      const picked=files.filter(x=>x.picked);
+      // multiple files are marked in the purple management selection - ask whether to move all of them or just this one
+      if(picked.length>=2){ askMoveChoice(target,f,picked.length); return; }
       f.folderId=target; renderAll();
     });
     // drag files to folders
     grid.addEventListener('dragstart',e=>{
       const card=e.target.closest('.fcard'); if(!card) return;
-      if(e.target.closest('.fcap')||e.target.closest('.movesel')){ e.preventDefault(); return; } // don't drag while editing caption / picking folder
+      if(e.target.closest('.fcap')||e.target.closest('.movesel')||e.target.closest('.fdel-x')||e.target.closest('.cardmenu')||e.target.closest('[data-kebab]')){ e.preventDefault(); return; } // don't drag from controls inside the card
       draggingId=card.getAttribute('data-id');
       const d=fileById(draggingId);
-      if(d && d.selected){ document.querySelectorAll('.fcard.sel').forEach(n=>n.classList.add('dragging')); } // lift the whole checkbox selection
+      if(d && d.picked){ document.querySelectorAll('.fcard.picked').forEach(n=>n.classList.add('dragging')); } // lift the whole management selection
       else{ card.classList.add('dragging'); }
       e.dataTransfer.effectAllowed='move'; try{e.dataTransfer.setData('text/plain',draggingId);}catch(_){}
     });
@@ -3102,7 +3471,7 @@
     el('dupSkip').addEventListener('click',()=>resolveDup('skip'));
     el('confirmYes').addEventListener('click',()=>{ el('confirmOverlay').classList.remove('show'); const cb=confirmCb; confirmCb=null; if(cb) cb(); });
     el('confirmNo').addEventListener('click',()=>{ el('confirmOverlay').classList.remove('show'); confirmCb=null; });
-    el('moveAll').addEventListener('click',()=>{ if(!moveCtx) return; const target=moveCtx.target; files.forEach(f=>{ if(f.selected){ f.folderId=target; f.selected=false; } }); closeMoveChoice(); });
+    el('moveAll').addEventListener('click',()=>{ if(!moveCtx) return; const target=moveCtx.target; files.forEach(f=>{ if(f.picked){ f.folderId=target; f.picked=false; } }); closeMoveChoice(); });
     el('moveOne').addEventListener('click',()=>{ if(!moveCtx) return; moveCtx.curFile.folderId=moveCtx.target; closeMoveChoice(); });
     el('moveClose').addEventListener('click',closeMoveChoice);
     el('moveCancel').addEventListener('click',closeMoveChoice);
@@ -3111,6 +3480,19 @@
     el('downloadZipBtn').addEventListener('click',downloadAllZip);
     // album settings
     el('clientBtn').addEventListener('click',openSettings);
+    // status card -> choose one of the four selection states directly
+    el('statStatusCard').addEventListener('click',e=>{
+      const opt=e.target.closest('[data-status]');
+      if(opt){ saveSelectionStatus(opt.getAttribute('data-status')); return; }
+      toggleStatusMenu();
+    });
+    el('statStatusCard').addEventListener('keydown',e=>{
+      const opt=e.target.closest('[data-status]');
+      if(opt && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); saveSelectionStatus(opt.getAttribute('data-status')); return; }
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleStatusMenu(); }
+      if(e.key==='Escape') setStatusCardOpen(false);
+    });
+    document.addEventListener('click',e=>{ const c=el('statStatusCard'); if(c&&!c.contains(e.target)) setStatusCardOpen(false); });
     el('settingsSave').addEventListener('click',saveSettings);
     el('settingsCancel').addEventListener('click',()=>el('settingsOverlay').classList.remove('show'));
     el('settingsClose').addEventListener('click',()=>el('settingsOverlay').classList.remove('show'));
@@ -3148,7 +3530,9 @@
     el('share_pw_on').addEventListener('change',applySharePw);
     el('share_block').addEventListener('change',applyShareBlock);
     ['shareEmail','sharePhone','sharePw'].forEach(id=>el(id).addEventListener('input',saveShareState));
-    document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePreview(); if(moveCtx) closeMoveChoice(); document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show')); } });
+    // close any open card ⋮ menu when clicking elsewhere (kebab clicks stopPropagation, so they don't reach here)
+    document.addEventListener('click',e=>{ if(!e.target.closest('.cardmenu') && !e.target.closest('[data-kebab]')) closeAllCardMenus(); });
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeAllCardMenus(); closePreview(); if(moveCtx) closeMoveChoice(); document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show')); } });
     // click outside modal to close (non-destructive ones)
     ['helpOverlay','blockedOverlay','limitOverlay','selDoneOverlay','folderOverlay','settingsOverlay','shareOverlay','albumMgrOverlay'].forEach(idn=>{ el(idn).addEventListener('click',e=>{ if(e.target===el(idn)) el(idn).classList.remove('show'); }); });
     el('moveOverlay').addEventListener('click',e=>{ if(e.target===el('moveOverlay')) closeMoveChoice(); });
@@ -3159,7 +3543,7 @@
     el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
   }
 
-  let draggingId=null, draggingFolderId=null, viewMode='grid';
+  let draggingId=null, draggingFolderId=null;
   function fileById(id){ return files.find(f=>f.id===id); }
   // ---- album-selection quota (the GREEN check): count photos / videos across the WHOLE album ----
   function quotaKind(f){ return f.kind==='image'?'photo':(f.kind==='video'?'video':null); }
@@ -3249,16 +3633,16 @@
     if(!f.selected && selBlocked(f)){ openLimitPop(f); return; }    // at the client's quota -> popup, ask to deselect first
     f.selected=!f.selected;
     if(!f.selected) selPromptShown=false;                          // dropped below cap -> allow re-prompting on refill
-    renderGrid();
+    renderGrid(); renderStats();
     maybePromptSelConfirm();
   }
   function togglePick(id){ const f=fileById(id); if(f && !isLocked(f)){ f.picked=!f.picked; renderGrid(); } }
   function refreshMsMove(){ el('msMoveSel').innerHTML = `<option value="__ph" disabled selected hidden>${escapeHtml(t.msPh)}</option>` + moveOptions('__ph'); }
-  // files that move together on a folder drop: the whole checkbox selection when the
+  // files that move together on a folder drop: the whole management selection when the
   // dragged card is part of it, otherwise just the single dragged card.
   function dragTargets(){
     const d=fileById(draggingId); if(!d) return [];
-    return d.selected ? files.filter(f=>f.selected) : [d];
+    return d.picked ? files.filter(f=>f.picked) : [d];
   }
 
   // move a file to a new position in the master order (relative to a target card)
@@ -3270,16 +3654,14 @@
     if(placeAfter) to+=1;
     files.splice(to,0,moved);
   }
-  // insertion point: vertical (above/below) in list view, horizontal (left/right) in grid view
+  // insertion point: horizontal (left/right) in the grid
   function reorderPlaceAfter(card, e){
     const rect=card.getBoundingClientRect();
-    if(viewMode==='list') return e.clientY > rect.top+rect.height/2;
     const rtl=document.documentElement.dir==='rtl';
     return rtl ? (e.clientX < rect.left+rect.width/2) : (e.clientX > rect.left+rect.width/2);
   }
   function markReorder(card, placeAfter){
     clearReorderMarks(); card.classList.add('rz');
-    if(viewMode==='list'){ card.setAttribute('data-rz-side', placeAfter?'b':'t'); return; }
     const rtl=document.documentElement.dir==='rtl';
     const physRight = rtl ? !placeAfter : placeAfter; // insertion bar on physical side
     card.setAttribute('data-rz-side', physRight?'r':'l');
@@ -3317,10 +3699,6 @@
     let gz='170'; try{ gz=localStorage.getItem('ac_grid')||'170'; }catch(_){}
     el('zoomRange').value=gz; document.documentElement.style.setProperty('--card-size', gz+'px');
     el('zoomMinus').disabled=(+gz<=+el('zoomRange').min); el('zoomPlus').disabled=(+gz>=+el('zoomRange').max);
-    let vw='grid'; try{ vw=localStorage.getItem('ac_view')||'grid'; }catch(_){}
-    viewMode = vw==='list' ? 'list' : 'grid';
-    document.querySelectorAll('#viewToggle .vbtn').forEach(b=>b.classList.toggle('on', b.getAttribute('data-view')===viewMode));
-    el('zoomWrap').classList.toggle('hidden', viewMode==='list');
     let sm=null; try{ sm=localStorage.getItem('ac_showmoved'); }catch(_){}
     showMovedInMain=(sm!=='0');
     el('showMovedChk').checked=showMovedInMain;

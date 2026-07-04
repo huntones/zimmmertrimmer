@@ -26,13 +26,13 @@
   if (!mount) return;
 
   var T = {
-    he: { navTools:'כלים', navDev:'כלי עיצוב ופיתוח', navAI:'כלי AI', navText:'כלי טקסט', navConvert:'המרה', navCompress:'דחיסה', navMarketing:'כלי שיווק וקישורים', navCalc:'מחשבונים',
-          navSend:'שליחת קבצים', navRequest:'בקשת קבצים', navProducts:'מוצרים', navPricing:'מסלולים ומחירים', navSignin:'התחברות', navStart:'הרשמה', navNew:'חדש',
+    he: { navTools:'כלי עריכה', navDev:'כלי עיצוב ודיגיטל', navAI:'כלי AI', navText:'כלי טקסט', navConvert:'המרה', navCompress:'דחיסה', navMarketing:'כלי שיווק וקישורים', navCalc:'מחשבונים',
+          navSend:'שליחת קבצים', navRequest:'בקשת קבצים', navProducts:'כלי קבצים', navPricing:'מסלולים ומחירים', navSignin:'התחברות', navStart:'הרשמה', navNew:'חדש',
           acctDash:'החשבון שלי', acctFiles:'הקבצים שלי', acctRequest:'בקשות קבצים', acctReview:'אישורי לקוח', acctSettings:'הגדרות', acctLanguage:'שפות', acctAdmin:'ניהול', acctLogout:'התנתקות' },
-    en: { navTools:'Tools', navDev:'Design & Dev', navAI:'AI Tools', navText:'Text Tools', navConvert:'Convert', navCompress:'Compress', navMarketing:'Marketing & Links', navCalc:'Calculators',
+    en: { navTools:'Editing Tools', navDev:'Design & Digital', navAI:'AI Tools', navText:'Text Tools', navConvert:'Convert', navCompress:'Compress', navMarketing:'Marketing & Links', navCalc:'Calculators',
           navSend:'Send Files', navRequest:'Request Files', navProducts:'Files', navPricing:'Pricing', navSignin:'Login', navStart:'Sign Up', navNew:'New',
           acctDash:'My Account', acctFiles:'My Files', acctRequest:'File Requests', acctReview:'Client Review', acctSettings:'Settings', acctLanguage:'Language', acctAdmin:'Admin', acctLogout:'Log out' },
-    ru: { navTools:'Инструменты', navDev:'Дизайн и код', navAI:'AI-инструменты', navText:'Текстовые инструменты', navConvert:'Конвертация', navCompress:'Сжатие', navMarketing:'Маркетинг и ссылки', navCalc:'Калькуляторы',
+    ru: { navTools:'Редактирование', navDev:'Дизайн и диджитал', navAI:'AI-инструменты', navText:'Текстовые инструменты', navConvert:'Конвертация', navCompress:'Сжатие', navMarketing:'Маркетинг и ссылки', navCalc:'Калькуляторы',
           navSend:'Отправка файлов', navRequest:'Запрос файлов', navProducts:'Файлы', navPricing:'Цены', navSignin:'Вход', navStart:'Регистрация', navNew:'Новое',
           acctDash:'Мой аккаунт', acctFiles:'Мои файлы', acctRequest:'Запросы файлов', acctReview:'Одобрения', acctSettings:'Настройки', acctLanguage:'Язык', acctAdmin:'Админ', acctLogout:'Выйти' }
   };
@@ -49,8 +49,7 @@
 
   // [ i18n key, page path from the site root ]  (navTools + navProducts are dropdowns → null path)
   var LINKS = [
-    ['navTools', null], ['navDev', null], ['navAI', 'ai/'], ['navText', null], ['navMarketing', 'marketing/'], ['navCalc', 'calc/'],
-    ['navProducts', null], ['navPricing', 'pricing/']
+    ['navTools', null], ['navProducts', null], ['navPricing', 'pricing/'], ['navAI', 'ai/'], ['navDev', null], ['navText', null]
   ];
 
   // "Products" dropdown: the three file-transfer product pages. Each links to its

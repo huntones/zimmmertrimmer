@@ -60,6 +60,21 @@
   .pillbtn:hover{border-color:var(--accent);} .pillbtn:active{transform:scale(0.97);}
   .pillbtn.ico{width:36px;padding:0;justify-content:center;font-size:14px;}
   .pillbtn svg{width:15px;height:15px;}
+  .langwrap{position:relative;display:inline-flex;}
+  .langbtn .chev{width:13px;height:13px;transition:transform .18s;}
+  .langwrap.open .langbtn .chev{transform:rotate(180deg);}
+  .langmenu{position:absolute;top:calc(100% + 8px);inset-inline-end:0;z-index:220;min-width:166px;padding:6px;
+    border-radius:13px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-lg);
+    opacity:0;visibility:hidden;transform:translateY(-6px);pointer-events:none;
+    transition:opacity .16s ease,transform .16s ease,visibility .16s;}
+  .langwrap.open .langmenu{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
+  .langopt{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+    padding:9px 11px;border:0;border-radius:10px;background:none;color:var(--ink-2);cursor:pointer;
+    font-size:13px;font-weight:700;text-align:start;transition:background .12s,color .12s;}
+  .langopt:hover{background:var(--panel-2);color:var(--accent-dim);}
+  .langopt.active{color:var(--accent-dim);}
+  .langopt svg{width:15px;height:15px;opacity:0;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
+  .langopt.active svg{opacity:1;}
 
   .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:24px;}
 
@@ -190,10 +205,14 @@
 <body>
 <div class="wrap">
   <div class="topbar">
-    <button class="pillbtn" id="langBtn" type="button" aria-label="Language">
+    <div class="langwrap" id="langWrap">
+      <button class="pillbtn langbtn" id="langBtn" type="button" aria-label="Language" aria-haspopup="listbox" aria-expanded="false" aria-controls="langMenu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/></svg>
-      <span id="langIco">עב</span>
-    </button>
+      <span id="langIco">&#1506;&#1489;&#1512;&#1497;&#1514;</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="langmenu" id="langMenu" role="listbox" aria-label="Language"></div>
+    </div>
     <button class="pillbtn ico" id="themeToggle" type="button" aria-label="Theme"><span id="themeIco">🌙</span></button>
   </div>
 
@@ -280,6 +299,15 @@
 (function(){
   const el = id => document.getElementById(id);
   const RV = window.RV;
+  const LANGS = [
+    { code:'he', name:'\u05e2\u05d1\u05e8\u05d9\u05ea', dir:'rtl' },
+    { code:'en', name:'English', dir:'ltr' },
+    { code:'ru', name:'\u0420\u0443\u0441\u0441\u043a\u0438\u0439', dir:'ltr' }
+  ];
+  function langName(code){
+    const item = LANGS.find(x => x.code === code);
+    return item ? item.name : LANGS[0].name;
+  }
 
   const I18N = {
     he:{ dir:'rtl', langIco:'EN',
@@ -607,14 +635,30 @@
     lang=l; t=I18N[l];
     document.documentElement.lang=l; document.documentElement.dir=t.dir;
     applyStatic(); RV.lsSet('ac_lang', l);
-    const li=el('langIco'); if(li) li.textContent=t.langIco;
+    const li=el('langIco'); if(li) li.textContent=langName(l);
+    renderLangMenu();
     if(proj && !el('reviewView').classList.contains('hidden')){
       renderHead(); renderVersions(); renderStrip(); renderThread(); renderAddFoot(); renderPerms();
       document.querySelectorAll('.sthumb').forEach(s=>s.classList.toggle('on', s.getAttribute('data-item')===activeId));
     }
   }
   function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); const ti=el('themeIco'); if(ti) ti.textContent=dark?'☀️':'🌙'; RV.lsSet('theme',dark?'dark':'light'); }
-  function cycleLang(){ const order=['he','en','ru']; const i=order.indexOf(lang); applyLang(order[(i+1)%order.length]); }
+  function renderLangMenu(){
+    const menu=el('langMenu'); if(!menu) return;
+    menu.innerHTML=LANGS.map(L=>`<button class="langopt${L.code===lang?' active':''}" type="button" role="option" data-lang="${L.code}" lang="${L.code}" dir="${L.dir}" aria-selected="${L.code===lang?'true':'false'}"><span>${L.name}</span><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></button>`).join('');
+  }
+  function closeLangMenu(){
+    const wrap=el('langWrap'), btn=el('langBtn');
+    if(wrap) wrap.classList.remove('open');
+    if(btn) btn.setAttribute('aria-expanded','false');
+  }
+  function toggleLangMenu(e){
+    e.preventDefault(); e.stopPropagation();
+    const wrap=el('langWrap'), btn=el('langBtn');
+    if(!wrap || !btn) return;
+    const open=wrap.classList.toggle('open');
+    btn.setAttribute('aria-expanded',open?'true':'false');
+  }
 
   // ---- events ----
   el('strip').addEventListener('click',e=>{ const s=e.target.closest('[data-item]'); if(s) selectItem(s.getAttribute('data-item')); });
@@ -628,7 +672,15 @@
     else if(e.target.closest('#redoBtn')) redo();
   });
   el('pwForm').addEventListener('submit',unlock);
-  el('langBtn').addEventListener('click',cycleLang);
+  el('langBtn').addEventListener('click',toggleLangMenu);
+  el('langMenu').addEventListener('click',e=>{
+    const b=e.target.closest('[data-lang]');
+    if(!b) return;
+    applyLang(b.getAttribute('data-lang'));
+    closeLangMenu();
+  });
+  document.addEventListener('click',e=>{ const w=el('langWrap'); if(w && !w.contains(e.target)) closeLangMenu(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLangMenu(); });
   el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
   window.__setLang=applyLang;
 

@@ -28,7 +28,7 @@
   function init(I18N, onLang) {
     var lang, t;
 
-    function applyLang(l) {
+    function applyLang(l, skipCb) {
       if (!I18N[l]) l = I18N.en ? 'en' : Object.keys(I18N)[0];
       lang = l; t = I18N[l];
       var html = document.documentElement;
@@ -47,7 +47,7 @@
         var k = n.getAttribute('data-i18n-title');
         if (typeof t[k] === 'string') n.setAttribute('title', t[k]);
       });
-      if (typeof onLang === 'function') { try { onLang(t, lang); } catch (e) { console.error(e); } }
+      if (!skipCb && typeof onLang === 'function') { try { onLang(t, lang); } catch (e) { console.error(e); } }
     }
 
     function applyTheme(th) {
@@ -67,13 +67,22 @@
     });
 
     applyTheme(ls('theme') || 'light');
-    applyLang(detectLang(I18N));
+    // Fill [data-i18n] text now, but skip the page's custom render — pages usually
+    // write `const APP = KolkliTool.init(...)` and their render() closes over that
+    // `APP`, which is still in its temporal dead zone during this synchronous call.
+    applyLang(detectLang(I18N), true);
 
-    return {
+    var api = {
       lang: function () { return lang; },
       t: function () { return t; },
       setLang: applyLang
     };
+    // Run the initial custom render on a microtask, after the page's `const APP = …`
+    // assignment (and any manual post-init render) has completed.
+    if (typeof onLang === 'function') {
+      Promise.resolve().then(function () { try { onLang(t, lang); } catch (e) { console.error(e); } });
+    }
+    return api;
   }
 
   // Small clipboard helper shared by the generator pages: writes text and
