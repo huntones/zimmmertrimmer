@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — ממיר אזורי זמן</title>
+<meta name="description" content="Convert a time across time zones to coordinate calls and meetings with clients abroad. Handles DST automatically. Runs entirely in your browser.">
+<link rel="stylesheet" href="./calc.css">
+<link rel="stylesheet" href="./header.css">
+<style>
+  .tzrow td .zname{font-weight:600;}
+  .tzrow td .zoff{font-size:11px;color:var(--muted);font-family:var(--mono);}
+  .tzrow .tztime{font-family:var(--mono);font-weight:700;font-size:15px;}
+  .tzrow .tzdate{font-size:11px;color:var(--muted);}
+  .tzrm{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .tzrm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .tzrm svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .addzone{display:flex;gap:10px;margin-top:14px;}
+  .addzone select{flex:1;}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="title"></h1>
+    <p data-i18n="sub"></p>
+  </div>
+
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <h2 data-i18n="srcTitle"></h2>
+        <p class="csub" data-i18n="srcSub"></p>
+        <div class="field">
+          <label data-i18n="dtLbl"></label>
+          <input class="inp" id="dt" type="datetime-local">
+        </div>
+        <div class="field">
+          <label data-i18n="zoneLbl"></label>
+          <select class="inp" id="srcZone"></select>
+        </div>
+        <button class="btn ghost sm" id="nowBtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg><span data-i18n="nowBtn"></span></button>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h2 data-i18n="tgtTitle"></h2>
+        <p class="csub" data-i18n="tgtSub"></p>
+        <table class="tz-table"><tbody id="tzBody"></tbody></table>
+        <div class="addzone">
+          <select class="inp" id="addSel"></select>
+          <button class="btn sm" id="addBtn"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span data-i18n="addBtn"></span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="pgfoot" data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./calc.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'חישובים והמרות · אזורי זמן',
+      title:'ממיר אזורי זמן',
+      sub:'תאמו שיחות ופגישות עם לקוחות מחו״ל — בחרו שעה ואזור זמן, וראו מיד את השעה בכל אזור אחר. מעבר שעון קיץ מחושב אוטומטית.',
+      srcTitle:'זמן המקור', srcSub:'בחרו את השעה והאזור להמרה.',
+      dtLbl:'תאריך ושעה', zoneLbl:'אזור זמן', nowBtn:'עכשיו',
+      tgtTitle:'אזורים ליעד', tgtSub:'אותה נקודת זמן בכל אזור.',
+      addBtn:'הוספה',
+      foot:'KOLKLI · ממיר אזורי זמן · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'Calc & Convert · Time zones',
+      title:'Time Zone Converter',
+      sub:'Coordinate calls and meetings with clients abroad — pick a time and zone and instantly see it everywhere else. Daylight saving is handled automatically.',
+      srcTitle:'Source time', srcSub:'Pick the time and zone to convert.',
+      dtLbl:'Date & time', zoneLbl:'Time zone', nowBtn:'Now',
+      tgtTitle:'Target zones', tgtSub:'The same moment in each zone.',
+      addBtn:'Add',
+      foot:'KOLKLI · Time Zone Converter · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'Расчёты · Часовые пояса',
+      title:'Конвертер часовых поясов',
+      sub:'Планируйте звонки и встречи с клиентами за рубежом — выберите время и пояс и сразу увидите его в любом другом. Переход на летнее время учитывается автоматически.',
+      srcTitle:'Исходное время', srcSub:'Выберите время и пояс для пересчёта.',
+      dtLbl:'Дата и время', zoneLbl:'Часовой пояс', nowBtn:'Сейчас',
+      tgtTitle:'Целевые пояса', tgtSub:'Один и тот же момент в каждом поясе.',
+      addBtn:'Добавить',
+      foot:'KOLKLI · Конвертер часовых поясов · Приватно и быстро, прямо в браузере' }
+  };
+
+  const ZONES = [
+    {tz:'Asia/Jerusalem', he:'ירושלים', en:'Jerusalem', ru:'Иерусалим'},
+    {tz:'UTC', he:'UTC', en:'UTC', ru:'UTC'},
+    {tz:'America/New_York', he:'ניו יורק', en:'New York', ru:'Нью-Йорк'},
+    {tz:'America/Chicago', he:'שיקגו', en:'Chicago', ru:'Чикаго'},
+    {tz:'America/Denver', he:'דנוור', en:'Denver', ru:'Денвер'},
+    {tz:'America/Los_Angeles', he:'לוס אנג׳לס', en:'Los Angeles', ru:'Лос-Анджелес'},
+    {tz:'America/Sao_Paulo', he:'סאו פאולו', en:'São Paulo', ru:'Сан-Паулу'},
+    {tz:'Europe/London', he:'לונדון', en:'London', ru:'Лондон'},
+    {tz:'Europe/Berlin', he:'ברלין', en:'Berlin', ru:'Берлин'},
+    {tz:'Europe/Paris', he:'פריז', en:'Paris', ru:'Париж'},
+    {tz:'Europe/Moscow', he:'מוסקבה', en:'Moscow', ru:'Москва'},
+    {tz:'Asia/Dubai', he:'דובאי', en:'Dubai', ru:'Дубай'},
+    {tz:'Asia/Kolkata', he:'הודו', en:'India', ru:'Индия'},
+    {tz:'Asia/Shanghai', he:'סין', en:'China', ru:'Китай'},
+    {tz:'Asia/Tokyo', he:'טוקיו', en:'Tokyo', ru:'Токио'},
+    {tz:'Australia/Sydney', he:'סידני', en:'Sydney', ru:'Сидней'}
+  ];
+  const LOCALE = { he:'he-IL', en:'en-GB', ru:'ru-RU' };
+  let srcZone = 'Asia/Jerusalem';
+  let targets = ['America/New_York','Europe/London','Europe/Berlin','Asia/Kolkata','Asia/Tokyo'];
+
+  function zoneName(tz){ const z = ZONES.find(z=>z.tz===tz); return z ? z[APP.lang()] : tz; }
+
+  // minutes `tz` is ahead of UTC at a given UTC instant
+  function tzOffset(utcMs, tz){
+    const dtf = new Intl.DateTimeFormat('en-US',{timeZone:tz, hourCycle:'h23',
+      year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    const map = {}; dtf.formatToParts(new Date(utcMs)).forEach(p=>map[p.type]=p.value);
+    const asIfUTC = Date.UTC(+map.year, +map.month-1, +map.day, +map.hour, +map.minute, +map.second);
+    return Math.round((asIfUTC - utcMs)/60000);
+  }
+  // convert a naive wall time in `tz` to the true UTC instant (2-pass refine for DST)
+  function wallToUtc(y,mo,d,h,mi, tz){
+    const guess = Date.UTC(y,mo-1,d,h,mi);
+    let utc = guess - tzOffset(guess, tz)*60000;
+    utc = guess - tzOffset(utc, tz)*60000;
+    return utc;
+  }
+  function offLabel(mins){
+    const sign = mins<0?'-':'+';
+    const a = Math.abs(mins);
+    return 'GMT'+sign+String(Math.floor(a/60)).padStart(2,'0')+':'+String(a%60).padStart(2,'0');
+  }
+
+  function currentUtc(){
+    const v = el('dt').value; // "YYYY-MM-DDTHH:MM"
+    if(!v) return null;
+    const [dpart,tpart] = v.split('T');
+    const [y,mo,d] = dpart.split('-').map(Number);
+    const [h,mi] = tpart.split(':').map(Number);
+    return wallToUtc(y,mo,d,h,mi, srcZone);
+  }
+
+  function render(){
+    const utc = currentUtc();
+    const loc = LOCALE[APP.lang()] || 'en-GB';
+    el('tzBody').innerHTML = targets.map(tz=>{
+      let time='—', date='', off='';
+      if(utc!=null){
+        const dObj = new Date(utc);
+        time = new Intl.DateTimeFormat(loc, {timeZone:tz, hour:'2-digit', minute:'2-digit', hourCycle:'h23'}).format(dObj);
+        date = new Intl.DateTimeFormat(loc, {timeZone:tz, weekday:'short', day:'2-digit', month:'short'}).format(dObj);
+        off = offLabel(tzOffset(utc, tz));
+      }
+      return `<tr class="tzrow" data-tz="${tz}">
+        <td><div class="zname">${zoneName(tz)}</div><div class="zoff">${off}</div></td>
+        <td style="text-align:end"><div class="tztime">${time}</div><div class="tzdate">${date}</div></td>
+        <td style="width:34px;text-align:end"><button class="tzrm" data-rm="${tz}"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg></button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function fillZoneSelects(){
+    const opts = ZONES.map(z=>`<option value="${z.tz}">${z[APP.lang()]}</option>`).join('');
+    el('srcZone').innerHTML = opts; el('srcZone').value = srcZone;
+    el('addSel').innerHTML = ZONES.filter(z=>!targets.includes(z.tz)).map(z=>`<option value="${z.tz}">${z[APP.lang()]}</option>`).join('');
+  }
+  function setNow(){
+    const d = new Date();
+    // show wall time of the source zone as the datetime-local value
+    const loc='sv-SE'; // yields ISO-ish "YYYY-MM-DD HH:MM:SS"
+    const map={}; new Intl.DateTimeFormat('en-CA',{timeZone:srcZone, year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'})
+      .formatToParts(d).forEach(p=>map[p.type]=p.value);
+    el('dt').value = `${map.year}-${map.month}-${map.day}T${map.hour}:${map.minute}`;
+  }
+
+  el('dt').addEventListener('input', render);
+  el('srcZone').addEventListener('change', ()=>{ srcZone=el('srcZone').value; render(); });
+  el('nowBtn').addEventListener('click', ()=>{ setNow(); render(); });
+  el('addBtn').addEventListener('click', ()=>{
+    const tz = el('addSel').value;
+    if(tz && !targets.includes(tz)){ targets.push(tz); fillZoneSelects(); render(); }
+  });
+  el('tzBody').addEventListener('click', e=>{
+    const b=e.target.closest('[data-rm]'); if(!b) return;
+    targets = targets.filter(t=>t!==b.getAttribute('data-rm'));
+    fillZoneSelects(); render();
+  });
+
+  const APP = KolkliTool.init(I18N, function(){ fillZoneSelects(); render(); });
+  fillZoneSelects();
+  setNow();
+  render();
+})();
+</script>
+</body>
+</html>

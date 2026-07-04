@@ -49,6 +49,26 @@ stands. A manual EN/עב toggle always wins and is remembered. The editor
 Upload this whole folder to Netlify Drop, Cloudflare Pages, or GitHub Pages and
 you get a shareable link that works with no local server.
 
+## Connecting real accounts (Supabase)
+Out of the box, sign-up / sign-in is a **local demo** (stored in the browser).
+To make accounts real — working across every device and browser, with password
+reset — connect Supabase (no server code to run or host):
+
+1. Create a free project at https://supabase.com. Under **Project Settings →
+   API**, copy the **Project URL** and the **anon / public key**.
+2. Paste both into `supabase-config.js` (replace the two `YOUR_…` placeholders).
+3. Open the Supabase **SQL Editor** and run all of `supabase-schema.sql` once
+   (creates the `profiles` table + security rules).
+4. In **Authentication → Providers → Email**, turn "Confirm email" on or off to
+   taste (off = instant sign-in; on = users click a link first).
+
+That's it. `auth-store.js` (the `KolkliAuth` adapter) then routes every
+sign-up / sign-in / logout / reset through Supabase, while the rest of the site
+keeps working unchanged. The audio/file editing itself still runs 100% in the
+browser — only the account + metadata ever touches the server. Leaving the
+placeholders in `supabase-config.js` keeps the local demo, so nothing breaks
+before you're ready.
+
 
 
 

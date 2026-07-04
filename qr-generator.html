@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל QR Code</title>
+<meta name="description" content="Free QR Code generator that runs entirely in your browser. Make QR codes for links, text, WhatsApp, email, phone or WiFi. Pick size and colors, then download PNG or SVG. Nothing is uploaded.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px;}
+
+  /* type tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
+  .tab{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink-2);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;
+    transition:border-color .12s,background .12s,color .12s,transform .08s;}
+  .tab:hover{border-color:var(--accent);}
+  .tab:active{transform:scale(.97);}
+  .tab.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  .tab svg{width:15px;height:15px;}
+
+  /* fields */
+  .fields{display:none;flex-direction:column;gap:14px;}
+  .fields.on{display:flex;}
+  .field{display:flex;flex-direction:column;gap:7px;}
+  .field.two{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:end;}
+  @media (max-width:520px){ .field.two{grid-template-columns:1fr;} }
+  label{font-size:12.5px;font-weight:600;color:var(--ink-2);}
+  .inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  textarea.inp{resize:vertical;min-height:78px;line-height:1.5;}
+  select.inp{cursor:pointer;}
+  .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .hint{font-size:11px;color:var(--faint);font-family:var(--mono);}
+  .checkrow{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink-2);cursor:pointer;user-select:none;}
+  .checkrow input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;}
+
+  /* options */
+  .optsHead{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label{display:block;margin-bottom:7px;}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;
+    transition:border-color .12s,background .12s,color .12s;}
+  .chip:hover{border-color:var(--accent);}
+  .chip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim);}
+
+  .sizehead{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+  .sizeval{font-family:var(--mono);font-size:12px;color:var(--accent-dim);font-weight:700;
+    background:var(--accent-soft);padding:2px 9px;border-radius:999px;}
+  .range{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;margin:0;
+    background:var(--panel-2);border:1px solid var(--line);outline:none;cursor:pointer;}
+  .range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:19px;height:19px;border-radius:50%;
+    background:var(--accent);cursor:pointer;border:3px solid var(--panel);box-shadow:var(--shadow-sm),0 0 0 1px var(--line);transition:transform .08s;}
+  .range::-webkit-slider-thumb:active{transform:scale(1.12);}
+  .range::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;
+    border:3px solid var(--panel);box-shadow:var(--shadow-sm);}
+
+  .colors{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .colorbox{display:flex;flex-direction:column;gap:7px;}
+  .colorbox .row{display:flex;align-items:center;gap:9px;}
+  input[type=color]{width:42px;height:38px;padding:0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);cursor:pointer;}
+  input[type=color]::-webkit-color-swatch-wrapper{padding:3px;}
+  input[type=color]::-webkit-color-swatch{border:none;border-radius:6px;}
+  .colorhex{flex:1;font-family:var(--mono);font-size:12px;text-transform:uppercase;}
+
+  /* preview side */
+  .side{position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .preview{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .qbox{border:1px solid var(--line-2);border-radius:14px;background:var(--panel-2);padding:16px;
+    display:flex;align-items:center;justify-content:center;width:100%;min-height:220px;}
+  #qcanvas{max-width:100%;height:auto;image-rendering:pixelated;border-radius:6px;box-shadow:var(--shadow-sm);}
+  .qerr{font-size:12.5px;color:var(--danger);text-align:center;line-height:1.55;padding:20px;}
+  .payloadbox{width:100%;}
+  .payloadbox label{display:block;margin-bottom:6px;}
+  .payload{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:10px;
+    font-family:var(--mono);font-size:11.5px;padding:9px 11px;resize:vertical;min-height:52px;line-height:1.5;
+    overflow-wrap:anywhere;}
+
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;width:100%;}
+  .btnrow button{flex:1;min-width:120px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 14px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .btnrow button:hover{border-color:var(--accent);} .btnrow button:active{transform:translateY(1px);}
+  .btnrow button svg{width:15px;height:15px;}
+  .btnrow button.primary{color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .btnrow button.primary:hover{filter:brightness(1.05);border:none;}
+  .btnrow button:disabled{opacity:.45;cursor:not-allowed;filter:none;transform:none;border-color:var(--line);}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+<script src="./vendor/qrcode.min.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid">
+    <!-- left: type tabs + fields + options -->
+    <div class="col">
+      <div class="card">
+        <div class="tabs" id="tabs"></div>
+
+        <!-- URL -->
+        <div class="fields" data-fields="url">
+          <div class="field">
+            <label data-i18n="urlLbl"></label>
+            <input class="inp" id="url_val" type="url" inputmode="url" placeholder="https://kolkli.com">
+          </div>
+        </div>
+
+        <!-- TEXT -->
+        <div class="fields" data-fields="text">
+          <div class="field">
+            <label data-i18n="textLbl"></label>
+            <textarea class="inp" id="text_val" data-ph="textPh"></textarea>
+          </div>
+        </div>
+
+        <!-- WHATSAPP -->
+        <div class="fields" data-fields="wa">
+          <div class="field two">
+            <div class="field">
+              <label data-i18n="waCountryLbl"></label>
+              <input class="inp" id="wa_cc" inputmode="numeric" placeholder="972">
+            </div>
+            <div class="field">
+              <label data-i18n="waPhoneLbl"></label>
+              <input class="inp" id="wa_phone" inputmode="tel" placeholder="50 123 4567">
+            </div>
+          </div>
+          <div class="field">
+            <label data-i18n="waMsgLbl"></label>
+            <textarea class="inp" id="wa_msg" data-ph="waMsgPh"></textarea>
+          </div>
+        </div>
+
+        <!-- EMAIL -->
+        <div class="fields" data-fields="email">
+          <div class="field">
+            <label data-i18n="emailToLbl"></label>
+            <input class="inp" id="em_to" type="email" inputmode="email" placeholder="hello@kolkli.com">
+          </div>
+          <div class="field">
+            <label data-i18n="emailSubLbl"></label>
+            <input class="inp" id="em_sub" data-ph="emailSubPh">
+          </div>
+          <div class="field">
+            <label data-i18n="emailBodyLbl"></label>
+            <textarea class="inp" id="em_body" data-ph="emailBodyPh"></textarea>
+          </div>
+        </div>
+
+        <!-- PHONE -->
+        <div class="fields" data-fields="phone">
+          <div class="field">
+            <label data-i18n="phoneLbl"></label>
+            <input class="inp" id="ph_val" inputmode="tel" placeholder="+972 50 123 4567">
+            <span class="hint" data-i18n="phoneHint"></span>
+          </div>
+        </div>
+
+        <!-- WIFI -->
+        <div class="fields" data-fields="wifi">
+          <div class="field">
+            <label data-i18n="wifiSsidLbl"></label>
+            <input class="inp" id="wf_ssid" data-ph="wifiSsidPh">
+          </div>
+          <div class="field">
+            <label data-i18n="wifiEncLbl"></label>
+            <select class="inp" id="wf_enc">
+              <option value="WPA">WPA / WPA2</option>
+              <option value="WEP">WEP</option>
+              <option value="nopass" data-i18n-opt="wifiNoPass"></option>
+            </select>
+          </div>
+          <div class="field" id="wf_passField">
+            <label data-i18n="wifiPassLbl"></label>
+            <input class="inp" id="wf_pass" data-ph="wifiPassPh">
+          </div>
+          <label class="checkrow"><input type="checkbox" id="wf_hidden"><span data-i18n="wifiHidden"></span></label>
+        </div>
+      </div>
+
+      <!-- options -->
+      <div class="card" style="margin-top:18px">
+        <h3 class="optsHead" data-i18n="optTitle"></h3>
+
+        <div class="opt">
+          <div class="sizehead">
+            <label data-i18n="sizeLbl" style="margin:0"></label>
+            <span class="sizeval" id="sizeVal">320 px</span>
+          </div>
+          <input type="range" class="range" id="size" min="160" max="512" step="16" value="320">
+        </div>
+
+        <div class="opt">
+          <label data-i18n="eccLbl"></label>
+          <div class="chips" id="eccChips"></div>
+          <span class="hint" data-i18n="eccHint" style="display:block;margin-top:7px"></span>
+        </div>
+
+        <div class="opt" style="margin-bottom:0">
+          <label data-i18n="colorLbl"></label>
+          <div class="colors">
+            <div class="colorbox">
+              <span class="hint" data-i18n="fgLbl"></span>
+              <div class="row">
+                <input type="color" id="fg" value="#1c2030">
+                <input class="inp colorhex" id="fgHex" value="#1C2030" maxlength="7" spellcheck="false">
+              </div>
+            </div>
+            <div class="colorbox">
+              <span class="hint" data-i18n="bgLbl"></span>
+              <div class="row">
+                <input type="color" id="bg" value="#ffffff">
+                <input class="inp colorhex" id="bgHex" value="#FFFFFF" maxlength="7" spellcheck="false">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- right: live preview -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="previewTitle"></h3>
+        <div class="preview">
+          <div class="qbox">
+            <canvas id="qcanvas" width="320" height="320"></canvas>
+            <div class="qerr" id="qerr" style="display:none"></div>
+          </div>
+
+          <div class="payloadbox">
+            <label data-i18n="payloadLbl"></label>
+            <textarea class="payload" id="payloadOut" readonly rows="2"></textarea>
+          </div>
+
+          <div class="btnrow">
+            <button class="primary" id="dlPng" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="dlPng"></span>
+            </button>
+            <button id="dlSvg" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><path d="M9 13h6"/><path d="M9 17h4"/></svg>
+              <span data-i18n="dlSvg"></span>
+            </button>
+          </div>
+          <div class="btnrow">
+            <button id="copyBtn" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span data-i18n="copyBtn"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="seam">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-i18n="seam"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl',
+      kick:'שיווק · מחולל QR Code',
+      pageTitle:'מחוללל QR Code — קישור, טקסט, וואטסאפ, וויי-פיי',
+      pageSub:'בנו קוד QR לכל דבר — קישור, טקסט חופשי, צ׳אט וואטסאפ, אימייל, טלפון או רשת וויי-פיי. בחרו גודל וצבעים, וצפו בתצוגה חיה. הכול נוצר בדפדפן שלכם, שום דבר לא נשלח לשרת.',
+      tabUrl:'קישור', tabText:'טקסט', tabWa:'וואטסאפ', tabEmail:'אימייל', tabPhone:'טלפון', tabWifi:'וויי-פיי',
+      urlLbl:'כתובת האתר (URL)',
+      textLbl:'טקסט חופשי', textPh:'כל טקסט שתרצו לקודד…',
+      waCountryLbl:'קידומת מדינה', waPhoneLbl:'מספר טלפון', waMsgLbl:'הודעה מוכנה מראש (רשות)',
+      waMsgPh:'שלום! ראיתי אתכם דרך קוד ה-QR…',
+      emailToLbl:'נמען', emailSubLbl:'נושא (רשות)', emailSubPh:'שאלה קטנה',
+      emailBodyLbl:'תוכן ההודעה (רשות)', emailBodyPh:'שלום…',
+      phoneLbl:'מספר טלפון', phoneHint:'סריקה תפתח חייגן עם המספר',
+      wifiSsidLbl:'שם הרשת (SSID)', wifiSsidPh:'MyWiFi',
+      wifiEncLbl:'סוג הצפנה', wifiNoPass:'ללא סיסמה',
+      wifiPassLbl:'סיסמה', wifiPassPh:'סיסמת הרשת',
+      wifiHidden:'רשת מוסתרת',
+      optTitle:'הגדרות עיצוב',
+      sizeLbl:'גודל (פיקסלים)',
+      eccLbl:'רמת תיקון שגיאות', eccHint:'רמה גבוהה יותר עמידה יותר לפגמים אך צפופה יותר. H מומלץ ללוגו במרכז.',
+      colorLbl:'צבעים', fgLbl:'צבע קוד', bgLbl:'צבע רקע',
+      previewTitle:'תצוגה מקדימה', payloadLbl:'התוכן המקודד',
+      dlPng:'הורדת PNG', dlSvg:'הורדת SVG', copyBtn:'העתקת התוכן',
+      seam:'הכול רץ מקומית בדפדפן — התוכן שלכם אף פעם לא נשלח לשרת. הקוד נוצר על ידי ספריית qrcode-generator ישירות אצלכם.',
+      foot:'KOLKLI · מחולל QR Code · פרטי ומהיר, ישירות בדפדפן',
+      emptyErr:'הזינו תוכן כדי ליצור קוד QR',
+      libErr:'ספריית ה-QR לא נטענה. רעננו את העמוד ונסו שוב.',
+      tooLong:'התוכן ארוך מדי לקוד QR. קצרו אותו.',
+      copied:'הועתק ✓', dlDone:'ההורדה החלה ✓',
+    },
+    en:{
+      dir:'ltr',
+      kick:'Marketing · QR Code Generator',
+      pageTitle:'QR Code Generator — link, text, WhatsApp, WiFi',
+      pageSub:'Make a QR code for anything — a link, free text, a WhatsApp chat, email, phone number or WiFi network. Pick the size and colors and watch the live preview. Everything is built in your browser; nothing is sent to a server.',
+      tabUrl:'URL', tabText:'Text', tabWa:'WhatsApp', tabEmail:'Email', tabPhone:'Phone', tabWifi:'WiFi',
+      urlLbl:'Website address (URL)',
+      textLbl:'Free text', textPh:'Any text you want to encode…',
+      waCountryLbl:'Country code', waPhoneLbl:'Phone number', waMsgLbl:'Prefilled message (optional)',
+      waMsgPh:'Hi! I found you via your QR code…',
+      emailToLbl:'To', emailSubLbl:'Subject (optional)', emailSubPh:'Quick question',
+      emailBodyLbl:'Message (optional)', emailBodyPh:'Hello…',
+      phoneLbl:'Phone number', phoneHint:'Scanning opens the dialer with this number',
+      wifiSsidLbl:'Network name (SSID)', wifiSsidPh:'MyWiFi',
+      wifiEncLbl:'Encryption', wifiNoPass:'No password',
+      wifiPassLbl:'Password', wifiPassPh:'Network password',
+      wifiHidden:'Hidden network',
+      optTitle:'Design options',
+      sizeLbl:'Size (pixels)',
+      eccLbl:'Error correction', eccHint:'Higher levels survive damage but pack tighter. H is best if you add a center logo.',
+      colorLbl:'Colors', fgLbl:'Code color', bgLbl:'Background',
+      previewTitle:'Live preview', payloadLbl:'Encoded content',
+      dlPng:'Download PNG', dlSvg:'Download SVG', copyBtn:'Copy content',
+      seam:'Everything runs locally in your browser — your content is never uploaded. The code is built by the qrcode-generator library right on your machine.',
+      foot:'KOLKLI · QR Code Generator · Private and fast, right in your browser',
+      emptyErr:'Enter some content to build a QR code',
+      libErr:'The QR library failed to load. Refresh the page and try again.',
+      tooLong:'That content is too long for a QR code. Shorten it.',
+      copied:'Copied ✓', dlDone:'Download started ✓',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Маркетинг · Генератор QR-кодов',
+      pageTitle:'Генератор QR-кодов — ссылка, текст, WhatsApp, WiFi',
+      pageSub:'Создайте QR-код для чего угодно — ссылки, произвольного текста, чата WhatsApp, письма, телефона или сети WiFi. Выберите размер и цвета и смотрите живой предпросмотр. Всё создаётся в вашем браузере, ничего не отправляется на сервер.',
+      tabUrl:'Ссылка', tabText:'Текст', tabWa:'WhatsApp', tabEmail:'Email', tabPhone:'Телефон', tabWifi:'WiFi',
+      urlLbl:'Адрес сайта (URL)',
+      textLbl:'Произвольный текст', textPh:'Любой текст для кодирования…',
+      waCountryLbl:'Код страны', waPhoneLbl:'Номер телефона', waMsgLbl:'Готовое сообщение (необязательно)',
+      waMsgPh:'Здравствуйте! Нашёл вас по QR-коду…',
+      emailToLbl:'Кому', emailSubLbl:'Тема (необязательно)', emailSubPh:'Короткий вопрос',
+      emailBodyLbl:'Сообщение (необязательно)', emailBodyPh:'Здравствуйте…',
+      phoneLbl:'Номер телефона', phoneHint:'При сканировании откроется набор номера',
+      wifiSsidLbl:'Имя сети (SSID)', wifiSsidPh:'MyWiFi',
+      wifiEncLbl:'Шифрование', wifiNoPass:'Без пароля',
+      wifiPassLbl:'Пароль', wifiPassPh:'Пароль сети',
+      wifiHidden:'Скрытая сеть',
+      optTitle:'Оформление',
+      sizeLbl:'Размер (пиксели)',
+      eccLbl:'Коррекция ошибок', eccHint:'Выше уровень — устойчивее к повреждениям, но плотнее. H лучше, если добавляете логотип в центр.',
+      colorLbl:'Цвета', fgLbl:'Цвет кода', bgLbl:'Фон',
+      previewTitle:'Живой предпросмотр', payloadLbl:'Закодированное содержимое',
+      dlPng:'Скачать PNG', dlSvg:'Скачать SVG', copyBtn:'Копировать содержимое',
+      seam:'Всё работает локально в вашем браузере — содержимое никогда не загружается. Код строит библиотека qrcode-generator прямо на вашем устройстве.',
+      foot:'KOLKLI · Генератор QR-кодов · Приватно и быстро, прямо в браузере',
+      emptyErr:'Введите содержимое, чтобы построить QR-код',
+      libErr:'Не удалось загрузить библиотеку QR. Обновите страницу и попробуйте снова.',
+      tooLong:'Содержимое слишком длинное для QR-кода. Сократите его.',
+      copied:'Скопировано ✓', dlDone:'Загрузка началась ✓',
+    },
+  };
+
+  const TYPES = [
+    { id:'url',   i18n:'tabUrl',   icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>' },
+    { id:'text',  i18n:'tabText',  icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>' },
+    { id:'wa',    i18n:'tabWa',    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' },
+    { id:'email', i18n:'tabEmail', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>' },
+    { id:'phone', i18n:'tabPhone', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>' },
+    { id:'wifi',  i18n:'tabWifi',  icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>' },
+  ];
+
+  const ECC = ['L','M','Q','H'];
+
+  let lang='he', t=I18N.he;
+  let type='url', ecc='M';
+  let lastModules=null, lastCount=0;   // cache for SVG export
+
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+  const val = id => (el(id).value||'').trim();
+
+  // ---------- payload builders ----------
+  function enc(s){ return encodeURIComponent(s); }
+  function wifiEsc(s){ return String(s).replace(/([\\;,:"])/g,'\\$1'); }
+
+  function buildPayload(){
+    switch(type){
+      case 'url': {
+        let u = val('url_val');
+        if(!u) return '';
+        if(!/^[a-z][a-z0-9+.\-]*:/i.test(u)) u = 'https://'+u;   // default scheme
+        return u;
+      }
+      case 'text':
+        return el('text_val').value;   // keep as typed, incl. newlines
+      case 'wa': {
+        const digits = (val('wa_cc')+val('wa_phone')).replace(/[^\d]/g,'');
+        if(!digits) return '';
+        const msg = el('wa_msg').value;
+        return 'https://wa.me/'+digits + (msg? '?text='+enc(msg) : '');
+      }
+      case 'email': {
+        const to = val('em_to');
+        const sub = el('em_sub').value, body = el('em_body').value;
+        const q=[];
+        if(sub) q.push('subject='+enc(sub));
+        if(body) q.push('body='+enc(body));
+        if(!to && !q.length) return '';
+        return 'mailto:'+enc(to).replace(/%40/g,'@') + (q.length? '?'+q.join('&') : '');
+      }
+      case 'phone': {
+        const num = val('ph_val').replace(/[^\d+]/g,'');
+        return num? 'tel:'+num : '';
+      }
+      case 'wifi': {
+        const ssid = el('wf_ssid').value;
+        if(!ssid) return '';
+        const encType = el('wf_enc').value;   // WPA | WEP | nopass
+        const pass = el('wf_pass').value;
+        const hidden = el('wf_hidden').checked ? 'true' : 'false';
+        let s = 'WIFI:T:'+encType+';S:'+wifiEsc(ssid)+';';
+        if(encType!=='nopass') s += 'P:'+wifiEsc(pass)+';';
+        s += 'H:'+hidden+';;';
+        return s;
+      }
+    }
+    return '';
+  }
+
+  // ---------- render ----------
+  function hex(v){ return /^#[0-9a-fA-F]{6}$/.test(v) ? v : null; }
+
+  function render(){
+    const payload = buildPayload();
+    el('payloadOut').value = payload;
+
+    const canvas=el('qcanvas'), errBox=el('qerr');
+    const setErr = msg => {
+      canvas.style.display='none'; errBox.style.display=''; errBox.textContent=msg;
+      lastModules=null; lastCount=0;
+      el('dlPng').disabled=true; el('dlSvg').disabled=true; el('copyBtn').disabled=!payload;
+    };
+
+    if(typeof qrcode==='undefined'){ setErr(t.libErr); return; }
+    if(!payload){ setErr(t.emptyErr); el('copyBtn').disabled=true; return; }
+
+    let qr;
+    try{
+      qr = qrcode(0, ecc);           // typeNumber 0 = auto-size
+      qr.addData(payload);
+      qr.make();
+    }catch(e){ setErr(t.tooLong); return; }
+
+    const count = qr.getModuleCount();
+    const fg = hex(el('fg').value) || '#1c2030';
+    const bg = hex(el('bg').value) || '#ffffff';
+    const pxSize = +el('size').value || 320;
+    const quiet = 4;                                    // modules of quiet zone
+    const total = count + quiet*2;
+    // integer module scale so modules stay crisp; canvas then holds full pixel size
+    const scale = Math.max(1, Math.floor(pxSize/total));
+    const dim = total*scale;
+
+    canvas.style.display=''; errBox.style.display='none';
+    canvas.width=dim; canvas.height=dim;
+    canvas.style.width=pxSize+'px'; canvas.style.height=pxSize+'px';
+    const ctx=canvas.getContext('2d');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,dim,dim);
+    ctx.fillStyle=fg;
+    // remember modules for SVG/PNG export
+    const mods=[];
+    for(let r=0;r<count;r++){
+      const row=[];
+      for(let c=0;c<count;c++){
+        const dark=qr.isDark(r,c); row.push(dark);
+        if(dark) ctx.fillRect((c+quiet)*scale,(r+quiet)*scale,scale,scale);
+      }
+      mods.push(row);
+    }
+    lastModules=mods; lastCount=count;
+    el('dlPng').disabled=false; el('dlSvg').disabled=false; el('copyBtn').disabled=false;
+  }
+
+  // ---------- exports ----------
+  function fileStub(){
+    const map={url:'url',text:'text',wa:'whatsapp',email:'email',phone:'phone',wifi:'wifi'};
+    return 'qr-'+(map[type]||'code');
+  }
+  function downloadPng(){
+    if(!lastModules) return;
+    // re-render at higher resolution for a clean PNG (independent of on-screen scale)
+    const count=lastCount, quiet=4, total=count+quiet*2;
+    const scale=Math.max(8, Math.ceil((+el('size').value||320)/total));
+    const dim=total*scale;
+    const fg=hex(el('fg').value)||'#1c2030', bg=hex(el('bg').value)||'#ffffff';
+    const cv=document.createElement('canvas'); cv.width=dim; cv.height=dim;
+    const ctx=cv.getContext('2d');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,dim,dim); ctx.fillStyle=fg;
+    for(let r=0;r<count;r++) for(let c=0;c<count;c++) if(lastModules[r][c]) ctx.fillRect((c+quiet)*scale,(r+quiet)*scale,scale,scale);
+    const a=document.createElement('a'); a.href=cv.toDataURL('image/png'); a.download=fileStub()+'.png';
+    document.body.appendChild(a); a.click(); a.remove(); toast(t.dlDone);
+  }
+  function buildSvg(){
+    if(!lastModules) return '';
+    const count=lastCount, quiet=4, total=count+quiet*2;
+    const fg=hex(el('fg').value)||'#1c2030', bg=hex(el('bg').value)||'#ffffff';
+    let path='';
+    for(let r=0;r<count;r++) for(let c=0;c<count;c++) if(lastModules[r][c]) path+='M'+(c+quiet)+' '+(r+quiet)+'h1v1h-1z';
+    return '<?xml version="1.0" encoding="UTF-8"?>\n'
+      + '<svg xmlns="http://www.w3.org/2000/svg" width="'+total+'" height="'+total+'" viewBox="0 0 '+total+' '+total+'" shape-rendering="crispEdges">'
+      + '<rect width="'+total+'" height="'+total+'" fill="'+bg+'"/>'
+      + '<path fill="'+fg+'" d="'+path+'"/></svg>';
+  }
+  function downloadSvg(){
+    const svg=buildSvg(); if(!svg) return;
+    const blob=new Blob([svg],{type:'image/svg+xml'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=fileStub()+'.svg';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),2000); toast(t.dlDone);
+  }
+
+  // ---------- clipboard ----------
+  function copyText(str){
+    const done=()=>toast(t.copied);
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(str).then(done).catch(()=>fallback(str,done)); }
+    else fallback(str,done);
+  }
+  function fallback(str,cb){ const ta=document.createElement('textarea'); ta.value=str; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); cb&&cb(); }
+
+  // ---------- tabs / chips ----------
+  function renderTabs(){
+    el('tabs').innerHTML = TYPES.map(x=>`
+      <button type="button" class="tab ${x.id===type?'on':''}" data-type="${x.id}">${x.icon}<span data-i18n="${x.i18n}">${t[x.i18n]}</span></button>`).join('');
+    document.querySelectorAll('.fields').forEach(f=>f.classList.toggle('on', f.getAttribute('data-fields')===type));
+  }
+  function renderEcc(){
+    el('eccChips').innerHTML = ECC.map(l=>`<button type="button" class="chip ${l===ecc?'on':''}" data-ecc="${l}">${l}</button>`).join('');
+  }
+  function syncWifiPass(){ el('wf_passField').style.display = el('wf_enc').value==='nopass' ? 'none' : ''; }
+
+  // ---------- i18n + theme ----------
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    document.querySelectorAll('[data-ph]').forEach(n=>{ const k=n.getAttribute('data-ph'); if(t[k]) n.setAttribute('placeholder',t[k]); });
+    document.querySelectorAll('[data-i18n-opt]').forEach(n=>{ const k=n.getAttribute('data-i18n-opt'); if(t[k]) n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderTabs(); renderEcc();
+    render();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---------- events ----------
+  el('tabs').addEventListener('click',e=>{ const b=e.target.closest('[data-type]'); if(b){ type=b.getAttribute('data-type'); renderTabs(); render(); } });
+  el('eccChips').addEventListener('click',e=>{ const b=e.target.closest('[data-ecc]'); if(b){ ecc=b.getAttribute('data-ecc'); renderEcc(); render(); } });
+
+  // any input inside the form re-renders live
+  document.querySelectorAll('.fields input, .fields textarea, .fields select').forEach(n=>{
+    n.addEventListener('input',()=>{ if(n.id==='wf_enc') syncWifiPass(); render(); });
+    n.addEventListener('change',render);
+  });
+
+  el('size').addEventListener('input',()=>{ el('sizeVal').textContent=el('size').value+' px'; render(); });
+
+  function bindColor(colorId, hexId){
+    const cIn=el(colorId), hIn=el(hexId);
+    cIn.addEventListener('input',()=>{ hIn.value=cIn.value.toUpperCase(); render(); });
+    hIn.addEventListener('input',()=>{ let v=hIn.value.trim(); if(!/^#/.test(v)) v='#'+v; if(/^#[0-9a-fA-F]{6}$/.test(v)){ cIn.value=v; render(); } });
+  }
+  bindColor('fg','fgHex'); bindColor('bg','bgHex');
+
+  el('dlPng').addEventListener('click',downloadPng);
+  el('dlSvg').addEventListener('click',downloadSvg);
+  el('copyBtn').addEventListener('click',()=>{ const p=el('payloadOut').value; if(p) copyText(p); });
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---------- init ----------
+  applyTheme(ls('theme')||'light');
+  el('url_val').value='https://kolkli.com';   // friendly starter so the preview is non-empty
+  syncWifiPass();
+  applyLang(detectLang());
+})();
+</script>
+</body>
+</html>

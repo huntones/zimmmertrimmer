@@ -128,6 +128,23 @@
   .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
   .hidden{display:none !important;}
 
+  /* client branding */
+  .brandhero{position:relative;border-radius:20px;overflow:hidden;margin-bottom:16px;border:1px solid var(--line);box-shadow:var(--shadow-lg);}
+  .bh-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;}
+  .bh-scrim{position:absolute;inset:0;}
+  .bh-in{position:relative;padding:34px 22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;}
+  .bh-logo{background:#fff;border-radius:15px;padding:11px 17px;box-shadow:0 8px 24px rgba(0,0,0,.20);}
+  .bh-logo img{display:block;max-height:52px;max-width:min(220px,60vw);object-fit:contain;}
+  .bh-name{font-size:clamp(20px,4vw,26px);font-weight:800;letter-spacing:-0.01em;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.30);}
+  .bh-tag{font-size:14px;color:rgba(255,255,255,.92);text-shadow:0 1px 8px rgba(0,0,0,.30);max-width:46ch;}
+  body.branded .dhead .ava{display:none;}
+  .poweredby{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin:22px auto 0;font-size:11.5px;
+    color:var(--faint);font-family:var(--mono);letter-spacing:.02em;transition:opacity .12s;}
+  .poweredby:hover{opacity:.72;}
+  .poweredby img{height:19px;width:auto;display:block;}
+  html[data-theme="dark"] .poweredby img{filter:brightness(1.12);}
+  .pbwrap{text-align:center;}
+
   /* preview modal */
   .pv{position:fixed;inset:0;background:rgba(6,8,16,.86);display:none;flex-direction:column;z-index:80;}
   .pv.show{display:flex;}
@@ -145,12 +162,18 @@
     box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
-<link rel="stylesheet" href="./header.css">
 </head>
 <body>
-<div id="site-header"></div>
-<script src="./header.js"></script>
 <div class="wrap">
+  <div class="brandhero hidden" id="brandHero">
+    <div class="bh-bg" id="bhBg"></div>
+    <div class="bh-scrim" id="bhScrim"></div>
+    <div class="bh-in">
+      <div class="bh-logo hidden" id="bhLogo"><img id="bhLogoImg" alt=""></div>
+      <div class="bh-name hidden" id="bhName"></div>
+      <div class="bh-tag hidden" id="bhTag"></div>
+    </div>
+  </div>
   <div class="card">
     <!-- loading -->
     <div class="state" id="loadingState">
@@ -198,6 +221,13 @@
     </div>
   </div>
 
+  <div class="pbwrap">
+    <a class="poweredby" id="poweredBy" href="./index.html" aria-label="KOLKLI">
+      <span data-i18n="poweredBy"></span>
+      <img src="./assets/logo.png" alt="KOLKLI" width="139" height="34" decoding="async">
+    </a>
+  </div>
+
   <footer data-i18n="foot"></footer>
 </div>
 
@@ -225,7 +255,7 @@
       preview:'תצוגה מקדימה', download:'הורדה', close:'סגור',
       copied:'הועתק ✓',
       seam:'הדגמה מקומית: הקבצים נטענים מהדפדפן הזה (IndexedDB). עם חיבור השרת הקישור יעבוד מכל מכשיר.',
-      foot:'KOLKLI · הורדת קבצים · הדגמה מקומית',
+      foot:'הורדת קבצים · הדגמה מקומית', poweredBy:'מופעל על ידי',
     },
     en:{ dir:'ltr', langIco:'עב',
       loading:'Loading files…',
@@ -239,7 +269,7 @@
       preview:'Preview', download:'Download', close:'Close',
       copied:'Copied ✓',
       seam:'Local demo: files load from this browser (IndexedDB). Once the server is connected, the link will work from any device.',
-      foot:'KOLKLI · File download · Local demo',
+      foot:'File download · Local demo', poweredBy:'Powered by',
     },
     ru:{
       dir:'ltr',
@@ -254,7 +284,7 @@
       preview:'Просмотр', download:'Скачать', close:'Закрыть',
       copied:'Скопировано ✓',
       seam:'Локальная демонстрация: файлы загружаются из этого браузера (IndexedDB). После подключения сервера ссылка будет работать с любого устройства.',
-      foot:'KOLKLI · Скачивание файлов · Локальная демонстрация',
+      foot:'Скачивание файлов · Локальная демонстрация', poweredBy:'Работает на',
     },
   };
 
@@ -275,7 +305,7 @@
   };
 
   let lang='he', t=I18N.he;
-  let record=null, key=null;
+  let record=null, key=null, brand=null;
 
   function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
   function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
@@ -285,6 +315,37 @@
     let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; } return 'x'+(h>>>0).toString(16);
   }
   function toast(msg){ const el2=el('toast'); el2.textContent=msg; el2.classList.add('show'); clearTimeout(el2._t); el2._t=setTimeout(()=>el2.classList.remove('show'),1800); }
+
+  // ---- client branding (per-transfer, set by the sender) ----
+  function hexToRgb(h){ h=String(h||'').trim().replace('#',''); if(h.length===3)h=h.split('').map(c=>c+c).join(''); if(!/^[0-9a-f]{6}$/i.test(h))return null; const n=parseInt(h,16); return {r:(n>>16)&255,g:(n>>8)&255,b:n&255}; }
+  function mixc(a,b,tt){ return {r:Math.round(a.r+(b.r-a.r)*tt),g:Math.round(a.g+(b.g-a.g)*tt),b:Math.round(a.b+(b.b-a.b)*tt)}; }
+  function hexOf(c){ return '#'+[c.r,c.g,c.b].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join(''); }
+  function rgbStr(c){ return c.r+','+c.g+','+c.b; }
+  function applyBrand(b){
+    if(!b || !(b.logo||b.name||b.bg||b.color)) return;
+    brand=b;
+    const base=hexToRgb(b.color)||hexToRgb('#7b34ff');
+    if(base){
+      const light=mixc(base,{r:255,g:255,b:255},0.16), dim=mixc(base,{r:0,g:0,b:0},0.14);
+      const grad='linear-gradient(105deg,'+hexOf(base)+' 0%,'+hexOf(light)+' 100%)';
+      const st=document.documentElement.style;
+      st.setProperty('--accent',hexOf(base));
+      st.setProperty('--accent-dim',hexOf(dim));
+      st.setProperty('--accent-soft','rgba('+rgbStr(base)+',0.14)');
+      st.setProperty('--grad',grad); st.setProperty('--grad-btn',grad);
+      st.setProperty('--grad-soft','linear-gradient(120deg,rgba('+rgbStr(base)+',0.14),rgba('+rgbStr(light)+',0.10))');
+      st.setProperty('--grad-shadow','rgba('+rgbStr(base)+',0.32)');
+      st.setProperty('--grad-btn-glow','rgba('+rgbStr(base)+',0.40)');
+    }
+    const bg=el('bhBg'), scrim=el('bhScrim');
+    if(b.bg){ bg.style.backgroundImage='url("'+b.bg+'")'; scrim.style.background='linear-gradient(160deg,rgba(8,10,20,.30),rgba(8,10,20,.58))'; }
+    else { bg.style.background='var(--grad)'; scrim.style.background='linear-gradient(160deg,rgba(255,255,255,.12),rgba(0,0,0,.16))'; }
+    if(b.logo){ el('bhLogoImg').src=b.logo; el('bhLogo').classList.remove('hidden'); }
+    if(b.name){ el('bhName').textContent=b.name; el('bhName').classList.remove('hidden'); }
+    if(b.tagline){ el('bhTag').textContent=b.tagline; el('bhTag').classList.remove('hidden'); }
+    el('brandHero').classList.remove('hidden');
+    document.body.classList.add('branded');
+  }
 
   // ---- IndexedDB (demo store) ----
   function idb(){ return new Promise((res,rej)=>{ const r=indexedDB.open('audiocut',1); r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains('transfers')) r.result.createObjectStore('transfers'); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
@@ -312,7 +373,8 @@
   }
 
   function renderTransfer(){
-    el('whoLine').textContent = record.sender ? t.fromNamed(record.sender) : t.fromSomeone;
+    if(brand && brand.name){ el('whoLine').style.display='none'; }
+    else { el('whoLine').style.display=''; el('whoLine').textContent = record.sender ? t.fromNamed(record.sender) : t.fromSomeone; }
     if(record.message){ el('msgBox').textContent=record.message; el('msgBox').classList.remove('hidden'); }
     const total=record.files.reduce((a,f)=>a+(f.size||0),0);
     el('metaRow').innerHTML =
@@ -344,7 +406,7 @@
     const zip=new JSZip(); const used=new Set();
     record.files.forEach(f=>{ let n=f.name,i=2; while(used.has(n)){ const dot=f.name.lastIndexOf('.'); n = dot>0? f.name.slice(0,dot)+' ('+i+')'+f.name.slice(dot) : f.name+' ('+i+')'; i++; } used.add(n); zip.file(n, f.blob); });
     const blob=await zip.generateAsync({type:'blob'});
-    triggerDownload(blob, 'appload-files.zip'); bumpDownloads();
+    triggerDownload(blob, 'kolkli-files.zip'); bumpDownloads();
     btn.disabled=false; lbl.textContent=t.dlAll(record.files.length);
   }
 
@@ -389,7 +451,7 @@
     const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
     return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
   }
-  function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); el('themeIco').textContent=dark?'☀️':'🌙'; try{ localStorage.setItem('theme',dark?'dark':'light'); }catch(_){} }
+  function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); const ti=el('themeIco'); if(ti) ti.textContent=dark?'☀️':'🌙'; try{ localStorage.setItem('theme',dark?'dark':'light'); }catch(_){} }
 
   // ---- events ----
   el('flist').addEventListener('click',e=>{
@@ -402,7 +464,6 @@
   el('pv').addEventListener('click',e=>{ if(e.target===el('pv')) closePreview(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePreview(); });
   window.__setLang=applyLang;
-  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
 
   // ---- init ----
   async function init(){
@@ -413,6 +474,7 @@
     key='t_'+decodeURIComponent(token);
     try{ record=await idbGet(key); }catch(_){ record=null; }
     if(!record){ show('expiredState'); return; }
+    applyBrand(record.brand);
     if(Date.now() > record.expiresAt){ try{ await idbDel(key); }catch(_){}; show('expiredState'); return; }
     if(record.password){ show('pwState'); setTimeout(()=>el('pwInput').focus(),40); return; }
     renderTransfer();

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AudioCut — סידור קבצים</title>
+<title>AudioCut — ארגון קבצים</title>
 <meta name="description" content="Organize, sort and tag your media files. Images, video, audio and documents — all in your browser. Nothing gets uploaded.">
 <style>
   :root {
@@ -179,7 +179,7 @@
 
   /* ---------- main / dropzone ---------- */
   .main{min-width:0;}
-  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:26px 20px;text-align:center;cursor:pointer;
+  .drop{border:2.5px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:16px;padding:26px 20px;text-align:center;cursor:pointer;
     background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
   .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
   .drop .cloud{width:48px;height:48px;margin:0 auto 10px;border-radius:14px;display:flex;align-items:center;
@@ -973,13 +973,26 @@
               <select id="alVisibility">
                 <option value="private" data-i18n="visPrivate"></option>
                 <option value="link" data-i18n="visLink"></option>
-                <option value="password" data-i18n="visPassword"></option>
               </select>
             </div>
           </div>
+          <!-- share link — visible only for 'anyone with the link' -->
+          <div class="shbox hidden" id="alShareRow" style="margin-top:12px">
+            <div class="shbox-h">
+              <span class="shlabel"><span data-i18n="alShareLinkL"></span></span>
+              <div class="shbox-acts">
+                <button class="shbtn" id="alShareCopy" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  <span data-i18n="shareCopy"></span>
+                </button>
+              </div>
+            </div>
+            <input class="shlink" id="alShareLink" type="text" dir="ltr" readonly spellcheck="false">
+          </div>
+          <p id="alPrivateNote" class="hidden" data-i18n="alPrivateNote" style="margin:10px 2px 0;font-size:12.5px;line-height:1.55;opacity:.72"></p>
         </div>
 
-        <div class="csec">
+        <div class="csec" id="alProtectSec">
           <div class="csec-h"><span data-i18n="secPassword"></span></div>
           <div class="permlist">
             <label class="permrow">
@@ -1514,7 +1527,7 @@
       dir:'rtl', langIco:'EN',
       toEditor:'לעורך', help:'עזרה', signin:'התחברות', send:'שליחת קבצים',
       kick:'מסך העבודה המרכזי',
-      pageTitle:'סידור קבצים',
+      pageTitle:'ארגון קבצים',
       pageSub:'ארגנו, מיינו ותייגו את קבצי המדיה שלכם — תמונות, וידאו, אודיו ומסמכים. הכול רץ בדפדפן, שום קובץ לא עולה לשרת.',
       searchPh:'חיפוש קבצים…', gridSize:'גודל תצוגה', viewGrid:'תצוגת רשת', viewList:'תצוגת רשימה',
       showMovedInMain:'הצג קבצים שהועברו בתיקייה הראשית',
@@ -1578,7 +1591,7 @@
       permViewOnly:'צפייה בלבד', permViewOnlyD:'ללא אפשרות לבצע שינויים — מבטל את כל שאר ההרשאות',
       setBtn:'הגדרות', setTitle:'הגדרות אלבום',
       setSub:'נהלו את פרטי האלבום, השיתוף, ההרשאות והעיצוב. ההגדרות נשמרות במכשיר זה בלבד.',
-      selModeTitle:'מצב אלבום בחירה', selModeDesc:'הלקוח רק צופה, מסמן מועדפים ומוסיף הערות — בלי למחוק או לשנות סדר.',
+      selModeTitle:'מצב פרויקט בחירה', selModeDesc:'הלקוח רק צופה, מסמן מועדפים ומוסיף הערות — בלי למחוק או לשנות סדר.',
       tabGeneral:'כללי', tabAccess:'שיתוף וגישה', tabContent:'תוכן וסידור', tabBrand:'עיצוב ומיתוג', tabAdvanced:'מתקדם',
       secAlbum:'פרטי האלבום',
       alTitleL:'שם האלבום', alTitlePh:'למשל: החתונה של דנה ויוסי',
@@ -1586,10 +1599,11 @@
       alEventTypeL:'סוג האירוע', etWedding:'חתונה', etParty:'מסיבה', etCorporate:'אירוע עסקי', etPortrait:'צילומי פורטרט', etOther:'אחר',
       alLocationL:'מיקום', alLocationPh:'עיר / אולם',
       alCoverL:'תמונת קאבר', alCoverBtn:'העלה תמונה',
-      secVisibility:'נראות האלבום', alVisibilityL:'מי יכול לראות',
+      secVisibility:'נראות הפרויקט', alVisibilityL:'מי יכול לראות',
       visPrivate:'פרטי — רק אני', visLink:'כל מי שיש לו קישור', visPassword:'מוגן בסיסמה',
+      alShareLinkL:'קישור לשיתוף', alPrivateNote:'האלבום פרטי — רק אתם רואים אותו. בחרו ב"כל מי שיש לו קישור" כדי לקבל קישור לשיתוף ולהגדיר הגנות.',
       secPassword:'סיסמת גישה', alPwOnL:'הפעל סיסמה', alPwOnD:'האורחים יתבקשו להזין סיסמה כדי לצפות', alPwPh:'בחר סיסמה',
-      secDownloads:'הורדות',
+      secDownloads:'הרשאות אורחים',
       alDlPhotosL:'הורדת תמונות', alDlPhotosD:'אורחים יכולים להוריד תמונות בודדות',
       alDlVideosL:'הורדת וידאו', alDlVideosD:'אורחים יכולים להוריד סרטונים',
       alDlZipL:'הורדת כל האלבום (ZIP)', alDlZipD:'הורדת כל הקבצים כארכיון אחד',
@@ -1738,8 +1752,9 @@
       alCoverL:'Cover image', alCoverBtn:'Upload image',
       secVisibility:'Album visibility', alVisibilityL:'Who can view',
       visPrivate:'Private — only me', visLink:'Anyone with the link', visPassword:'Password protected',
+      alShareLinkL:'Share link', alPrivateNote:'This album is private — only you can see it. Choose "Anyone with the link" to get a shareable link and set protections.',
       secPassword:'Access password', alPwOnL:'Enable password', alPwOnD:'Guests must enter a password to view', alPwPh:'Choose a password',
-      secDownloads:'Downloads',
+      secDownloads:'Guest permissions',
       alDlPhotosL:'Download photos', alDlPhotosD:'Guests can download individual photos',
       alDlVideosL:'Download video', alDlVideosD:'Guests can download videos',
       alDlZipL:'Download whole album (ZIP)', alDlZipD:'Download every file as one archive',
@@ -1888,8 +1903,9 @@
       alCoverL:'Обложка', alCoverBtn:'Загрузить изображение',
       secVisibility:'Видимость альбома', alVisibilityL:'Кто может смотреть',
       visPrivate:'Приватный — только я', visLink:'Любой, у кого есть ссылка', visPassword:'Защищён паролем',
+      alShareLinkL:'Ссылка для доступа', alPrivateNote:'Альбом приватный — виден только вам. Выберите «Любой, у кого есть ссылка», чтобы получить ссылку и настроить защиту.',
       secPassword:'Пароль доступа', alPwOnL:'Включить пароль', alPwOnD:'Гости должны ввести пароль для просмотра', alPwPh:'Придумайте пароль',
-      secDownloads:'Загрузки',
+      secDownloads:'Разрешения для гостей',
       alDlPhotosL:'Скачивание фото', alDlPhotosD:'Гости могут скачивать отдельные фото',
       alDlVideosL:'Скачивание видео', alDlVideosD:'Гости могут скачивать видео',
       alDlZipL:'Скачать весь альбом (ZIP)', alDlZipD:'Скачать все файлы одним архивом',
@@ -1989,6 +2005,17 @@
   let selPromptShown=false;       // the "are you finished?" dialog was already offered for the current full-cap state
 
   // ---- helpers ----
+  function safeOwnerId(v){ return String(v||'guest').toLowerCase().replace(/[^a-z0-9_.@-]+/g,'_') || 'guest'; }
+  function currentOwnerId(){
+    let email=''; try{ email=(localStorage.getItem('ac_session')||'').toLowerCase(); }catch(_){}
+    if(!email) return 'guest';
+    try{
+      const users=JSON.parse(localStorage.getItem('ac_users')||'[]')||[];
+      const u=users.find(x=>(x.email||'').toLowerCase()===email);
+      return safeOwnerId((u&&(u.id||u.userId))||email);
+    }catch(_){ return safeOwnerId(email); }
+  }
+  function scopedKey(base){ return base+'::'+currentOwnerId(); }
   function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
   function stripExt(name){ return name.replace(/\.[^.\/\\]+$/,''); }
   function fmtBytes(n){ if(n==null) return '—'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
@@ -2471,7 +2498,7 @@
     perms:{ download:true, zip:true, editText:false, reorder:true, delete:false, upload:false, selection:true, viewOnly:false } };
   function loadClient(){
     try{
-      const raw=localStorage.getItem('ac_client');
+      const raw=localStorage.getItem(scopedKey('ac_client'));
       if(raw){ const o=JSON.parse(raw);
         return Object.assign({}, CLIENT_DEFAULT, o, { perms:Object.assign({}, CLIENT_DEFAULT.perms, o.perms||{}) }); }
     }catch(_){}
@@ -2486,7 +2513,7 @@
     ['alQuality','sel','full'],
     ['alGuestUpload','chk',false],['alGuestApproval','chk',true],['alApproval','chk',false],
     ['alComments','chk',true],['alCommentsGuests','chk',false],['alLikes','chk',true],
-    ['alSort','sel','manual'],['alView','sel','grid'],['alFavorites','chk',true],['alEditRequests','chk',false],
+    ['alSort','sel','name'],['alView','sel','grid'],['alFavorites','chk',true],['alEditRequests','chk',false],
     ['alBrandName','text',''],['alBrandColor','text','#7c3aed'],['alWelcome','text',''],['alFooter','text',''],
     ['alWmOn','chk',false],['alWmType','sel','logo'],['alWmText','text',''],['alWmPos','sel','br'],['alWmOpacity','rng',35],
     ['alNotifNewFiles','chk',true],['alNotifGuestUpload','chk',true],['alNotifFavorites','chk',true],
@@ -2496,14 +2523,20 @@
   ];
   function loadAlbum(){
     const d={}; ALBUM_FIELDS.forEach(([id,,def])=>d[id]=def);
-    try{ const o=JSON.parse(localStorage.getItem('ac_album')||'{}'); if(o&&typeof o==='object') Object.assign(d,o); }catch(_){}
+    try{ const o=JSON.parse(localStorage.getItem(scopedKey('ac_album'))||'{}'); if(o&&typeof o==='object') Object.assign(d,o); }catch(_){}
+    // legacy: 'password' used to be a visibility value; it's now 'link' + the password toggle
+    if(d.alVisibility==='password'){ d.alVisibility='link'; d.alPwOn=true; }
     return d;
   }
   function setField(id,kind,v){ const n=el(id); if(!n) return; if(kind==='chk') n.checked=!!v; else n.value=(v==null?'':v); }
   function getField(id,kind){ const n=el(id); if(!n) return null; if(kind==='chk') return !!n.checked; if(kind==='rng') return +n.value; return n.value; }
 
-  function openSettings(){
-    const c=loadClient(), a=loadAlbum();
+  // isNew (from the dashboard "+ New project") opens a blank form for a fresh
+  // album without touching stored data — nothing persists until Save.
+  function openSettings(isNew){
+    isNew = isNew===true; // guard: clientBtn passes a click Event, not a flag
+    const c = isNew ? JSON.parse(JSON.stringify(CLIENT_DEFAULT)) : loadClient();
+    const a = isNew ? (function(){ const d={}; ALBUM_FIELDS.forEach(([id,,def])=>d[id]=def); return d; })() : loadAlbum();
     el('cName').value=c.name||''; el('cEmail').value=c.email||''; el('cPhone').value=c.phone||'';
     el('cEvent').value=c.event||''; el('cDeadline').value=c.deadline||''; el('cStatus').value=c.status||'draft';
     PERM_KEYS.forEach(k=>{ const box=el('perm_'+k); if(box) box.checked=!!c.perms[k]; });
@@ -2528,6 +2561,12 @@
     el('alWmWrap').classList.toggle('hidden', !el('alWmOn').checked);
     el('alExpiryWrap').classList.toggle('hidden', !el('alExpiryOn').checked);
     el('alWmOpacityVal').textContent=el('alWmOpacity').value+'%';
+    // visibility drives the share link + extra protections: 'link' shows both, 'private' hides both
+    const shared=el('alVisibility').value==='link';
+    el('alShareRow').classList.toggle('hidden', !shared);
+    el('alPrivateNote').classList.toggle('hidden', shared);
+    el('alProtectSec').classList.toggle('hidden', !shared);
+    if(shared) el('alShareLink').value=shareLinkFor(shareState().id);
     const gu=el('alGuestUpload').checked, ga=el('alGuestApproval');
     ga.disabled=!gu; ga.closest('.permrow').classList.toggle('disabled', !gu);
     const cm=el('alComments').checked, cg=el('alCommentsGuests');
@@ -2570,9 +2609,9 @@
     const perms={}; PERM_KEYS.forEach(k=>{ const box=el('perm_'+k); perms[k]=!!(box&&box.checked); });
     const c={ name:el('cName').value.trim(), email:el('cEmail').value.trim(), phone:el('cPhone').value.trim(),
       event:el('cEvent').value, deadline:el('cDeadline').value, status:el('cStatus').value, perms };
-    try{ localStorage.setItem('ac_client', JSON.stringify(c)); }catch(_){}
+    try{ localStorage.setItem(scopedKey('ac_client'), JSON.stringify(c)); }catch(_){}
     const a={}; ALBUM_FIELDS.forEach(([id,kind])=>a[id]=getField(id,kind));
-    try{ localStorage.setItem('ac_album', JSON.stringify(a)); }catch(_){}
+    try{ localStorage.setItem(scopedKey('ac_album'), JSON.stringify(a)); }catch(_){}
     el('settingsOverlay').classList.remove('show');
   }
 
@@ -2593,15 +2632,15 @@
   // user-created presets, persisted separately from the album quota
   let customPresets=loadCustomPresets();
   function loadCustomPresets(){
-    try{ const a=JSON.parse(localStorage.getItem('ac_ampresets')||'[]'); return Array.isArray(a)?a:[]; }catch(_){ return []; }
+    try{ const a=JSON.parse(localStorage.getItem(scopedKey('ac_ampresets'))||'[]'); return Array.isArray(a)?a:[]; }catch(_){ return []; }
   }
-  function saveCustomPresets(){ try{ localStorage.setItem('ac_ampresets', JSON.stringify(customPresets)); }catch(_){} }
+  function saveCustomPresets(){ try{ localStorage.setItem(scopedKey('ac_ampresets'), JSON.stringify(customPresets)); }catch(_){} }
   // built-in preset ids the owner deleted (hidden) — persisted so they stay gone across reloads
   let hiddenBuiltins=loadHiddenBuiltins();
   function loadHiddenBuiltins(){
-    try{ const a=JSON.parse(localStorage.getItem('ac_amhidden')||'[]'); return Array.isArray(a)?a:[]; }catch(_){ return []; }
+    try{ const a=JSON.parse(localStorage.getItem(scopedKey('ac_amhidden'))||'[]'); return Array.isArray(a)?a:[]; }catch(_){ return []; }
   }
-  function saveHiddenBuiltins(){ try{ localStorage.setItem('ac_amhidden', JSON.stringify(hiddenBuiltins)); }catch(_){} }
+  function saveHiddenBuiltins(){ try{ localStorage.setItem(scopedKey('ac_amhidden'), JSON.stringify(hiddenBuiltins)); }catch(_){} }
   // show/hide the built-in cards according to the deleted list
   function applyHiddenBuiltins(){
     document.querySelectorAll('#amPresets .preset[data-preset]').forEach(b=>{
@@ -2624,7 +2663,7 @@
   }
   function loadAlbumMgr(){
     const d=Object.assign({}, AM_DEFAULT);
-    try{ const o=JSON.parse(localStorage.getItem('ac_albummgr')||'{}'); if(o&&typeof o==='object') Object.assign(d,o); }catch(_){}
+    try{ const o=JSON.parse(localStorage.getItem(scopedKey('ac_albummgr'))||'{}'); if(o&&typeof o==='object') Object.assign(d,o); }catch(_){}
     return d;
   }
   function markPreset(id){
@@ -2750,7 +2789,7 @@
       customPresets.push(p); saveCustomPresets();
       m.preset=p.id; // the forked preset becomes the active one
     }
-    try{ localStorage.setItem('ac_albummgr', JSON.stringify(m)); }catch(_){}
+    try{ localStorage.setItem(scopedKey('ac_albummgr'), JSON.stringify(m)); }catch(_){}
     albumMgr=m; // refresh the cached quota so the green check + counter update immediately
     selConfirmed=false; selPromptShown=false; // owner changed the quota -> release any prior selection lock
     el('albumMgrOverlay').classList.remove('show');
@@ -2763,11 +2802,11 @@
   function genId(){ return (Date.now().toString(36)+Math.random().toString(36).slice(2,8)).replace(/[^a-z0-9]/g,''); }
   // load persisted share settings; mint a stable gallery id on first use
   function shareState(){
-    let s={}; try{ s=JSON.parse(localStorage.getItem('ac_share')||'{}')||{}; }catch(_){}
+    let s={}; try{ s=JSON.parse(localStorage.getItem(scopedKey('ac_share'))||'{}')||{}; }catch(_){}
     if(!s.id){ s.id=genId(); persistShare(s); }
     return s;
   }
-  function persistShare(s){ try{ localStorage.setItem('ac_share', JSON.stringify(s)); }catch(_){} }
+  function persistShare(s){ try{ localStorage.setItem(scopedKey('ac_share'), JSON.stringify(s)); }catch(_){} }
   function shareLinkFor(id){ return location.href.split(/[?#]/)[0]+'?g='+id; }
   function saveShareState(){
     const s=shareState();
@@ -2809,6 +2848,14 @@
     else { fallback(); done(); }
   }
   function openShareLink(){ window.open(el('shareLink').value, '_blank', 'noopener'); }
+  // copy the settings-pane share link (separate input from the share modal's)
+  function copyAlbumLink(){
+    const i=el('alShareLink'), link=i.value;
+    const fallback=()=>{ i.removeAttribute('readonly'); i.select(); try{document.execCommand('copy');}catch(_){} i.setAttribute('readonly','readonly'); i.blur(); };
+    const done=()=>flashBtn('alShareCopy', t.shareCopied);
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(link).then(done).catch(()=>{ fallback(); done(); }); }
+    else { fallback(); done(); }
+  }
   function sendShare(){
     saveShareState();
     const link=el('shareLink').value, email=el('shareEmail').value.trim(), phone=el('sharePhone').value.trim();
@@ -3069,7 +3116,8 @@
     el('settingsClose').addEventListener('click',()=>el('settingsOverlay').classList.remove('show'));
     el('perm_viewOnly').addEventListener('change',applyViewOnlyLock);
     el('setTabs').addEventListener('click',e=>{ const b=e.target.closest('.settab'); if(b) setActiveTab(b.getAttribute('data-tab')); });
-    ['alPwOn','alWmOn','alExpiryOn','alGuestUpload','alComments'].forEach(id=>el(id).addEventListener('change',applySettingsDeps));
+    ['alPwOn','alWmOn','alExpiryOn','alGuestUpload','alComments','alVisibility'].forEach(id=>el(id).addEventListener('change',applySettingsDeps));
+    el('alShareCopy').addEventListener('click',copyAlbumLink);
     el('alWmOpacity').addEventListener('input',()=>{ el('alWmOpacityVal').textContent=el('alWmOpacity').value+'%'; });
     el('alSelectionMode').addEventListener('change',applySelectionMode);
     el('alDeleteBtn').addEventListener('click',deleteAlbum);
@@ -3279,6 +3327,12 @@
     bindStatic();
     let sl='he'; try{ sl=localStorage.getItem('ac_lang')||'he'; }catch(_){}
     applyLang(sl);
+    // Arriving from the dashboard "+ New project" — open album settings on a blank
+    // form and strip the flag so a refresh doesn't reopen it.
+    if(/[?&]new=1/.test(location.search)){
+      openSettings(true);
+      try{ history.replaceState(null,'',location.pathname); }catch(_){}
+    }
   })();
 })();
 </script>

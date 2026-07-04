@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל קישור Mailto</title>
+<meta name="description" content="Build a mailto: link with To, Cc, Bcc, subject and a multi-line body — right in your browser. Live preview, one-click copy, an HTML snippet, and a test-open button. Private, nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px;}
+  .card h3{font-size:15px;margin:0 0 4px;font-weight:700;}
+  .card .csub{font-size:12px;color:var(--muted);margin:0 0 15px;}
+
+  /* form */
+  .field{margin-bottom:15px;}
+  .field:last-child{margin-bottom:0;}
+  .field > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:6px;}
+  .field .hint{font-size:11px;color:var(--faint);font-weight:500;margin-inline-start:6px;}
+  .inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  textarea.inp{resize:vertical;min-height:120px;line-height:1.55;}
+  .inp.err{border-color:var(--danger);}
+  .fbelow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;min-height:15px;}
+  .fnote{font-size:11px;color:var(--danger);font-weight:600;}
+  .fnote.ok{color:var(--muted);font-weight:500;}
+  .ccount{font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap;}
+
+  /* toggle extra fields */
+  .toggles{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px;}
+  .tgl{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.03em;color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer;
+    transition:border-color .12s,background .12s,color .12s;display:inline-flex;align-items:center;gap:6px;}
+  .tgl:hover{border-color:var(--accent);}
+  .tgl.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim);}
+  .tgl .dot{width:7px;height:7px;border-radius:50%;background:var(--faint);transition:background .12s;}
+  .tgl.on .dot{background:var(--accent);}
+  .optionalField{display:none;}
+  .optionalField.show{display:block;}
+
+  /* output blocks */
+  .outblock{margin-bottom:18px;}
+  .outblock:last-child{margin-bottom:0;}
+  .outhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px;}
+  .outhead label{font-size:12.5px;font-weight:600;color:var(--ink-2);margin:0;}
+  .outbox{position:relative;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;overflow:hidden;}
+  .outbox textarea{width:100%;display:block;background:transparent;border:none;color:var(--ink);
+    font-family:var(--mono);font-size:12.5px;line-height:1.6;padding:12px 13px;resize:vertical;outline:none;
+    word-break:break-all;overflow-wrap:anywhere;}
+  .outbox textarea.link{min-height:78px;}
+  .outbox textarea.snip{min-height:60px;}
+
+  .copybtn{display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink-2);border-radius:999px;
+    font-size:12px;font-weight:600;padding:6px 13px;transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .copybtn:hover{border-color:var(--accent);} .copybtn:active{transform:translateY(1px);}
+  .copybtn svg{width:14px;height:14px;}
+
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+  .actions > *{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s,filter .14s;box-shadow:var(--shadow-sm);}
+  .actions > *:hover{border-color:var(--accent);} .actions > *:active{transform:translateY(1px);}
+  .actions .primary{color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);}
+  .actions .primary:hover{filter:brightness(1.05);border:none;}
+  .actions svg{width:16px;height:16px;}
+
+  /* live summary chips */
+  .summary{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 16px;}
+  .schip{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:7px;padding:4px 10px;
+    display:inline-flex;align-items:center;gap:6px;max-width:100%;}
+  .schip b{color:var(--ink);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .schip .k{color:var(--accent-dim);text-transform:uppercase;font-size:9.5px;letter-spacing:.05em;}
+  .schip.empty{opacity:.55;}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid">
+    <!-- form -->
+    <div class="col">
+      <div class="card">
+        <h3 data-i18n="formTitle"></h3>
+        <p class="csub" data-i18n="formSub"></p>
+
+        <div class="field">
+          <label for="toIn" data-i18n="toLbl"></label>
+          <input type="text" class="inp" id="toIn" autocomplete="off" spellcheck="false">
+          <div class="fbelow">
+            <span class="fnote ok" id="toNote"></span>
+          </div>
+        </div>
+
+        <div class="toggles">
+          <button type="button" class="tgl" id="tglCc" data-tgl="cc"><span class="dot"></span><span data-i18n="ccChip"></span></button>
+          <button type="button" class="tgl" id="tglBcc" data-tgl="bcc"><span class="dot"></span><span data-i18n="bccChip"></span></button>
+          <button type="button" class="tgl" id="tglLink" data-tgl="link"><span class="dot"></span><span data-i18n="linkChip"></span></button>
+        </div>
+
+        <div class="field optionalField" id="ccField">
+          <label for="ccIn" data-i18n="ccLbl"></label>
+          <input type="text" class="inp" id="ccIn" autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="field optionalField" id="bccField">
+          <label for="bccIn" data-i18n="bccLbl"></label>
+          <input type="text" class="inp" id="bccIn" autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="field">
+          <label for="subjIn" data-i18n="subjLbl"></label>
+          <input type="text" class="inp" id="subjIn" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="bodyIn" data-i18n="bodyLbl"></label>
+          <textarea class="inp" id="bodyIn" spellcheck="true"></textarea>
+          <div class="fbelow">
+            <span class="fnote ok" data-i18n="bodyNote"></span>
+            <span class="ccount" id="bodyCount"></span>
+          </div>
+        </div>
+
+        <div class="field optionalField" id="linkField">
+          <label for="linkTextIn" data-i18n="linkTextLbl"></label>
+          <input type="text" class="inp" id="linkTextIn" autocomplete="off">
+          <div class="fbelow">
+            <span class="fnote ok" data-i18n="linkTextHint"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- output -->
+    <div class="col">
+      <div class="card">
+        <h3 data-i18n="outTitle"></h3>
+        <p class="csub" data-i18n="outSub"></p>
+
+        <div class="summary" id="summary"></div>
+
+        <div class="outblock">
+          <div class="outhead">
+            <label data-i18n="linkOutLbl"></label>
+            <button type="button" class="copybtn" id="copyLink">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span data-i18n="copyBtn"></span>
+            </button>
+          </div>
+          <div class="outbox"><textarea class="link" id="linkOut" readonly spellcheck="false"></textarea></div>
+        </div>
+
+        <div class="actions">
+          <a class="primary" id="openBtn" href="#" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span data-i18n="openBtn"></span>
+          </a>
+          <button type="button" id="copyLink2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span data-i18n="copyBtn"></span>
+          </button>
+        </div>
+
+        <div class="outblock" style="margin-top:18px">
+          <div class="outhead">
+            <label data-i18n="snipOutLbl"></label>
+            <button type="button" class="copybtn" id="copySnip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span data-i18n="copyBtn"></span>
+            </button>
+          </div>
+          <div class="outbox"><textarea class="snip" id="snipOut" readonly spellcheck="false"></textarea></div>
+        </div>
+
+        <div class="seam">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-i18n="seam"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'שיווק · מחולל Mailto',
+      pageTitle:'מחולל קישור Mailto',
+      pageSub:'בנו קישור mailto: עם נמענים, עותק, עותק מוסתר, נושא וגוף רב-שורות — והדביקו אותו בכפתור, בבאנר או בחתימת מייל. הכול נבנה בדפדפן שלכם, שום נתון לא נשלח לשרת.',
+      formTitle:'פרטי ההודעה',
+      formSub:'מלאו את השדות והקישור מתעדכן מיד. אפשר לרשום כמה כתובות מופרדות בפסיק.',
+      toLbl:'אל (To)',
+      toEmpty:'בלי כתובת יווצר קישור mailto ריק שפותח הודעה חדשה ללא נמען.',
+      toValid:n=>`${n===1?'כתובת אחת תקינה':n+' כתובות תקינות'} ✓`,
+      toBad:'שימו לב: יש כתובת שנראית לא תקינה',
+      ccChip:'עותק (Cc)', bccChip:'עותק מוסתר (Bcc)', linkChip:'טקסט לקישור',
+      ccLbl:'עותק (Cc)', bccLbl:'עותק מוסתר (Bcc)',
+      subjLbl:'נושא', bodyLbl:'גוף ההודעה',
+      bodyNote:'שורות חדשות נשמרות בקישור.',
+      linkTextLbl:'טקסט להצגה בקישור',
+      linkTextHint:'ברירת מחדל: הנושא, ואם ריק — הכתובת.',
+      outTitle:'הקישור שנוצר', outSub:'העתיקו את הקישור, פתחו אותו כדי לבדוק, או קחו את קטע ה-HTML לאתר.',
+      linkOutLbl:'קישור mailto', snipOutLbl:'קטע HTML',
+      copyBtn:'העתקה', openBtn:'בדיקה · פתח מייל',
+      chipTo:'אל', chipCc:'עותק', chipBcc:'מוסתר', chipSubj:'נושא', chipBody:'גוף',
+      chipChars:n=>`${n} תווים`,
+      seam:'הכול רץ מקומית בדפדפן — הכתובות והטקסט לא נשלחים לשום מקום. כפתור ״בדיקה״ פשוט מוסר לתוכנת המייל שמותקנת אצלכם לפתוח הודעה חדשה.',
+      foot:'KOLKLI · מחולל קישור Mailto · פרטי ומהיר, ישירות בדפדפן',
+      openedToast:'פותח את תוכנת המייל…', noLink:'אין קישור לפתיחה עדיין',
+      copied:'הקישור הועתק ✓',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'Marketing · Mailto Generator',
+      pageTitle:'Mailto Link Generator',
+      pageSub:'Build a mailto: link with recipients, Cc, Bcc, a subject and a multi-line body — then drop it into a button, a banner or an email signature. It is all built in your browser; no data is sent to a server.',
+      formTitle:'Message details',
+      formSub:'Fill the fields and the link updates instantly. You can list several comma-separated addresses.',
+      toLbl:'To',
+      toEmpty:'With no address you get an empty mailto that opens a new message with no recipient.',
+      toValid:n=>`${n===1?'1 valid address':n+' valid addresses'} ✓`,
+      toBad:'Heads up: one address looks invalid',
+      ccChip:'Cc', bccChip:'Bcc', linkChip:'Link text',
+      ccLbl:'Cc', bccLbl:'Bcc',
+      subjLbl:'Subject', bodyLbl:'Body',
+      bodyNote:'Line breaks are preserved in the link.',
+      linkTextLbl:'Link text to display',
+      linkTextHint:'Defaults to the subject, or the To address if empty.',
+      outTitle:'Generated link', outSub:'Copy the link, open it to test, or grab the HTML snippet for your site.',
+      linkOutLbl:'mailto link', snipOutLbl:'HTML snippet',
+      copyBtn:'Copy', openBtn:'Test · open email',
+      chipTo:'To', chipCc:'Cc', chipBcc:'Bcc', chipSubj:'Subject', chipBody:'Body',
+      chipChars:n=>`${n} chars`,
+      seam:'Everything runs locally in your browser — addresses and text are never sent anywhere. The Test button just hands off to whatever mail app is installed on your machine to open a new message.',
+      foot:'KOLKLI · Mailto Link Generator · Private and fast, right in your browser',
+      openedToast:'Opening your email app…', noLink:'No link to open yet',
+      copied:'Link copied ✓',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Маркетинг · Генератор Mailto',
+      pageTitle:'Генератор Mailto-ссылки',
+      pageSub:'Соберите ссылку mailto: с получателями, копией, скрытой копией, темой и многострочным телом письма — и вставьте её в кнопку, баннер или подпись. Всё создаётся в вашем браузере, ни одни данные не отправляются на сервер.',
+      formTitle:'Данные письма',
+      formSub:'Заполните поля — ссылка обновляется мгновенно. Можно указать несколько адресов через запятую.',
+      toLbl:'Кому (To)',
+      toEmpty:'Без адреса получится пустой mailto, открывающий новое письмо без получателя.',
+      toValid:n=>`${n===1?'1 корректный адрес':n+' корректных адреса(ов)'} ✓`,
+      toBad:'Внимание: один адрес выглядит некорректным',
+      ccChip:'Копия (Cc)', bccChip:'Скрытая (Bcc)', linkChip:'Текст ссылки',
+      ccLbl:'Копия (Cc)', bccLbl:'Скрытая копия (Bcc)',
+      subjLbl:'Тема', bodyLbl:'Текст письма',
+      bodyNote:'Переносы строк сохраняются в ссылке.',
+      linkTextLbl:'Отображаемый текст ссылки',
+      linkTextHint:'По умолчанию — тема, а если пусто — адрес.',
+      outTitle:'Готовая ссылка', outSub:'Скопируйте ссылку, откройте для проверки или возьмите HTML-фрагмент для сайта.',
+      linkOutLbl:'ссылка mailto', snipOutLbl:'HTML-фрагмент',
+      copyBtn:'Копировать', openBtn:'Проверка · открыть почту',
+      chipTo:'Кому', chipCc:'Копия', chipBcc:'Скрытая', chipSubj:'Тема', chipBody:'Тело',
+      chipChars:n=>`${n} симв.`,
+      seam:'Всё работает локально в вашем браузере — адреса и текст никуда не отправляются. Кнопка «Проверка» просто передаёт управление установленному почтовому приложению, чтобы открыть новое письмо.',
+      foot:'KOLKLI · Генератор Mailto-ссылки · Приватно и быстро, прямо в браузере',
+      openedToast:'Открываем почтовое приложение…', noLink:'Пока нет ссылки для открытия',
+      copied:'Ссылка скопирована ✓',
+    },
+  };
+
+  const LS_KEY = 'kolkli_mailto';
+  // reasonable email shape check — deliberately permissive
+  const EMAIL_RE = /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/;
+
+  let lang='he', t=I18N.he;
+  const state = { to:'', cc:'', bcc:'', subject:'', body:'', linkText:'', showCc:false, showBcc:false, showLink:false };
+  let currentLink = '';
+
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+
+  // ---- clipboard ----
+  function copyText(str){
+    const done=()=>toast(t.copied);
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(str).then(done).catch(()=>fallback(str,done)); }
+    else fallback(str,done);
+  }
+  function fallback(str,cb){ const ta=document.createElement('textarea'); ta.value=str; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); cb&&cb(); }
+
+  // ---- address helpers ----
+  function splitAddrs(str){ return String(str||'').split(',').map(s=>s.trim()).filter(Boolean); }
+  // build the part before "?": keep commas, encode each address's spaces/specials but not the comma separators
+  function encodeToPart(str){ return splitAddrs(str).map(a=>encodeURIComponent(a)).join(','); }
+
+  // ---- build the mailto link ----
+  function buildLink(){
+    const toPart = encodeToPart(state.to);
+    const params = [];
+    if(state.showCc && state.cc.trim())   params.push('cc='  + encodeToPart(state.cc));
+    if(state.showBcc && state.bcc.trim()) params.push('bcc=' + encodeToPart(state.bcc));
+    if(state.subject) params.push('subject=' + encodeURIComponent(state.subject));
+    if(state.body)    params.push('body='    + encodeURIComponent(state.body));
+    let url = 'mailto:' + toPart;
+    if(params.length) url += '?' + params.join('&');
+    return url;
+  }
+
+  function defaultLinkText(){
+    if(state.showLink && state.linkText.trim()) return state.linkText.trim();
+    if(state.subject.trim()) return state.subject.trim();
+    const first = splitAddrs(state.to)[0];
+    return first || 'Email';
+  }
+
+  function buildSnippet(url){
+    return '<a href="' + escapeHtml(url) + '">' + escapeHtml(defaultLinkText()) + '</a>';
+  }
+
+  // ---- To validation hint ----
+  function updateToNote(){
+    const note = el('toNote'); const inp = el('toIn');
+    const addrs = splitAddrs(state.to);
+    inp.classList.remove('err');
+    if(!addrs.length){ note.className='fnote ok'; note.textContent = t.toEmpty; return; }
+    const bad = addrs.filter(a=>!EMAIL_RE.test(a));
+    if(bad.length){ note.className='fnote'; note.textContent = t.toBad; inp.classList.add('err'); }
+    else { note.className='fnote ok'; note.textContent = t.toValid(addrs.length); }
+  }
+
+  // ---- live summary chips ----
+  function renderSummary(){
+    const rows = [
+      { k:t.chipTo,   v:splitAddrs(state.to).length ? splitAddrs(state.to).join(', ') : '—', empty:!state.to.trim() },
+      { k:t.chipSubj, v:state.subject.trim() || '—', empty:!state.subject.trim() },
+      { k:t.chipBody, v:state.body ? t.chipChars(state.body.length) : '—', empty:!state.body },
+    ];
+    if(state.showCc)  rows.splice(1,0,{ k:t.chipCc,  v:splitAddrs(state.cc).join(', ')||'—',  empty:!state.cc.trim() });
+    if(state.showBcc) rows.splice(state.showCc?2:1,0,{ k:t.chipBcc, v:splitAddrs(state.bcc).join(', ')||'—', empty:!state.bcc.trim() });
+    el('summary').innerHTML = rows.map(r=>
+      `<span class="schip ${r.empty?'empty':''}"><span class="k">${escapeHtml(r.k)}</span><b title="${escapeHtml(r.v)}">${escapeHtml(r.v)}</b></span>`
+    ).join('');
+  }
+
+  // ---- master render ----
+  function render(){
+    currentLink = buildLink();
+    el('linkOut').value = currentLink;
+    el('snipOut').value = buildSnippet(currentLink);
+    el('openBtn').setAttribute('href', currentLink);
+    el('bodyCount').textContent = t.chipChars(state.body.length);
+    updateToNote();
+    renderSummary();
+  }
+
+  function persist(){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(_){}
+  }
+
+  function readInputs(){
+    state.to       = el('toIn').value;
+    state.cc       = el('ccIn').value;
+    state.bcc      = el('bccIn').value;
+    state.subject  = el('subjIn').value;
+    state.body     = el('bodyIn').value;
+    state.linkText = el('linkTextIn').value;
+  }
+
+  function onInput(){ readInputs(); render(); persist(); }
+
+  // ---- optional-field toggles ----
+  function applyToggles(){
+    el('ccField').classList.toggle('show', state.showCc);
+    el('bccField').classList.toggle('show', state.showBcc);
+    el('linkField').classList.toggle('show', state.showLink);
+    el('tglCc').classList.toggle('on', state.showCc);
+    el('tglBcc').classList.toggle('on', state.showBcc);
+    el('tglLink').classList.toggle('on', state.showLink);
+  }
+  function toggle(which){
+    if(which==='cc')   state.showCc   = !state.showCc;
+    if(which==='bcc')  state.showBcc  = !state.showBcc;
+    if(which==='link') state.showLink = !state.showLink;
+    applyToggles(); render(); persist();
+  }
+
+  // ---- test-open ----
+  function openEmail(){
+    if(!splitAddrs(state.to).length && !state.subject && !state.body){ /* still allow: empty mailto opens compose */ }
+    if(!currentLink){ toast(t.noLink); return; }
+    toast(t.openedToast);
+    try{ window.location.href = currentLink; }
+    catch(_){ const a=document.createElement('a'); a.href=currentLink; document.body.appendChild(a); a.click(); a.remove(); }
+  }
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    render();
+  }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- restore saved state ----
+  function restore(){
+    let saved=null; try{ saved=JSON.parse(ls(LS_KEY)||'null'); }catch(_){}
+    if(saved && typeof saved==='object'){
+      ['to','cc','bcc','subject','body','linkText'].forEach(k=>{ if(typeof saved[k]==='string') state[k]=saved[k]; });
+      ['showCc','showBcc','showLink'].forEach(k=>{ if(typeof saved[k]==='boolean') state[k]=saved[k]; });
+    }
+    el('toIn').value=state.to; el('ccIn').value=state.cc; el('bccIn').value=state.bcc;
+    el('subjIn').value=state.subject; el('bodyIn').value=state.body; el('linkTextIn').value=state.linkText;
+    applyToggles();
+  }
+
+  // ---- events ----
+  ['toIn','ccIn','bccIn','subjIn','bodyIn','linkTextIn'].forEach(id=> el(id).addEventListener('input', onInput));
+  document.querySelectorAll('[data-tgl]').forEach(b=> b.addEventListener('click',()=>toggle(b.getAttribute('data-tgl'))));
+  el('copyLink').addEventListener('click',()=>copyText(currentLink));
+  el('copyLink2').addEventListener('click',()=>copyText(currentLink));
+  el('copySnip').addEventListener('click',()=>copyText(el('snipOut').value));
+  el('openBtn').addEventListener('click',e=>{ e.preventDefault(); openEmail(); });
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  restore();
+  applyLang(detectLang());
+})();
+</script>
+</body>
+</html>

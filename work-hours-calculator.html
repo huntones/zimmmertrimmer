@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחשבון שעות עבודה</title>
+<meta name="description" content="Calculate work hours: duration between start and end times with breaks, total hours across the week, and pay from an hourly rate. Runs in your browser.">
+<link rel="stylesheet" href="./calc.css">
+<link rel="stylesheet" href="./header.css">
+<style>
+  .wrow{display:grid;grid-template-columns:1fr 1fr 96px 92px 40px;gap:10px;align-items:end;margin-bottom:10px;}
+  .wrow .dur{font-family:var(--mono);font-weight:700;color:var(--accent-dim);font-size:15px;text-align:center;padding-bottom:11px;}
+  .wrow .rm{width:40px;height:44px;border-radius:11px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .wrow .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .wrow .rm svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .whead{display:grid;grid-template-columns:1fr 1fr 96px 92px 40px;gap:10px;font-size:11px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:8px;padding:0 2px;}
+  @media (max-width:640px){
+    .whead{display:none;}
+    .wrow{grid-template-columns:1fr 1fr;gap:8px;padding:12px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel-2);position:relative;}
+    .wrow .dur{grid-column:1;text-align:start;padding:0;}
+    .wrow .rm{position:absolute;top:8px;inset-inline-end:8px;width:32px;height:32px;}
+  }
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="title"></h1>
+    <p data-i18n="sub"></p>
+  </div>
+
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <h2 data-i18n="rowsTitle"></h2>
+        <p class="csub" data-i18n="rowsSub"></p>
+        <div class="whead">
+          <span data-i18n="hStart"></span><span data-i18n="hEnd"></span><span data-i18n="hBreak"></span><span data-i18n="hDur"></span><span></span>
+        </div>
+        <div id="rows"></div>
+        <button class="btn ghost sm" id="addBtn" style="margin-top:6px"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span data-i18n="addRow"></span></button>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h2 data-i18n="totalTitle"></h2>
+        <div class="result compact" style="margin-bottom:14px">
+          <div class="rlabel" data-i18n="totalLbl"></div>
+          <div class="rbig" id="totalHM">0:00</div>
+          <div class="rsub" id="totalDec">0.00 h</div>
+        </div>
+        <div class="field">
+          <label data-i18n="rateLbl"></label>
+          <div class="addon"><input class="inp" id="rate" type="number" min="0" placeholder="0"><span class="unit" id="cur">₪</span></div>
+        </div>
+        <div class="stats" id="payStats"></div>
+        <div class="btnrow" style="margin-top:14px">
+          <button class="btn ghost sm" id="copyBtn"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copyBtn"></span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="pgfoot" data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./calc.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'חישובים והמרות · שעות עבודה',
+      title:'מחשבון שעות עבודה',
+      sub:'חשבו את משך העבודה בין שעת התחלה לסיום, נכו הפסקות, וסכמו שעות של יום או שבוע שלם. אפשר להוסיף תעריף שעתי כדי לחשב שכר.',
+      rowsTitle:'רישום שעות', rowsSub:'הזינו שעת כניסה ויציאה לכל משמרת. חוצה חצות? נחשב אוטומטית.',
+      hStart:'כניסה', hEnd:'יציאה', hBreak:'הפסקה (דק׳)', hDur:'משך',
+      addRow:'הוספת שורה',
+      totalTitle:'סיכום', totalLbl:'סה״כ שעות', rateLbl:'תעריף לשעה (רשות)',
+      pHours:'שעות', pPay:'שכר', copyBtn:'העתקת סיכום',
+      foot:'KOLKLI · מחשבון שעות עבודה · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הסיכום הועתק ✓', sumTxt:'סה״כ' },
+    en:{ dir:'ltr',
+      kick:'Calc & Convert · Work hours',
+      title:'Work Hours Calculator',
+      sub:'Work out the duration between start and end times, subtract breaks, and total the hours across a day or a whole week. Add an hourly rate to get pay.',
+      rowsTitle:'Time entries', rowsSub:'Enter a start and end time per shift. Crossing midnight is handled automatically.',
+      hStart:'Start', hEnd:'End', hBreak:'Break (min)', hDur:'Duration',
+      addRow:'Add row',
+      totalTitle:'Summary', totalLbl:'Total hours', rateLbl:'Hourly rate (optional)',
+      pHours:'Hours', pPay:'Pay', copyBtn:'Copy summary',
+      foot:'KOLKLI · Work Hours Calculator · Private and fast, right in your browser',
+      copied:'Summary copied ✓', sumTxt:'Total' },
+    ru:{ dir:'ltr',
+      kick:'Расчёты · Рабочие часы',
+      title:'Калькулятор рабочих часов',
+      sub:'Считайте длительность между началом и концом смены, вычитайте перерывы и суммируйте часы за день или всю неделю. Добавьте ставку, чтобы получить оплату.',
+      rowsTitle:'Записи времени', rowsSub:'Введите начало и конец каждой смены. Переход через полночь учитывается автоматически.',
+      hStart:'Начало', hEnd:'Конец', hBreak:'Перерыв (мин)', hDur:'Длит.',
+      addRow:'Добавить строку',
+      totalTitle:'Итог', totalLbl:'Всего часов', rateLbl:'Ставка в час (необязательно)',
+      pHours:'Часы', pPay:'Оплата', copyBtn:'Копировать итог',
+      foot:'KOLKLI · Калькулятор рабочих часов · Приватно и быстро, прямо в браузере',
+      copied:'Итог скопирован ✓', sumTxt:'Всего' }
+  };
+
+  const rowsEl = el('rows');
+  let uid = 0;
+
+  function rowHtml(start, end){
+    const id = 'r'+(uid++);
+    return `<div class="wrow" data-row="${id}">
+      <div class="field" style="margin:0"><input class="inp" type="time" data-k="start" value="${start||''}"></div>
+      <div class="field" style="margin:0"><input class="inp" type="time" data-k="end" value="${end||''}"></div>
+      <div class="field" style="margin:0"><input class="inp" type="number" data-k="brk" min="0" placeholder="0"></div>
+      <div class="dur" data-k="dur">—</div>
+      <button class="rm" data-rm title="remove"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+    </div>`;
+  }
+  function addRow(start, end){ rowsEl.insertAdjacentHTML('beforeend', rowHtml(start, end)); }
+
+  function toMin(v){ if(!v) return null; const m=v.split(':'); return (+m[0])*60 + (+m[1]); }
+  function rowMinutes(row){
+    const s = toMin(row.querySelector('[data-k=start]').value);
+    const e = toMin(row.querySelector('[data-k=end]').value);
+    let brk = parseInt(row.querySelector('[data-k=brk]').value,10); if(!(brk>=0)) brk=0;
+    if(s==null || e==null) return null;
+    let dur = e - s; if(dur < 0) dur += 1440; // crosses midnight
+    dur -= brk;
+    return Math.max(0, dur);
+  }
+  function hm(mins){ const h=Math.floor(mins/60), m=mins%60; return h+':'+String(m).padStart(2,'0'); }
+
+  function compute(){
+    const t = APP.t();
+    let total = 0;
+    rowsEl.querySelectorAll('.wrow').forEach(row=>{
+      const mins = rowMinutes(row);
+      row.querySelector('[data-k=dur]').textContent = mins==null ? '—' : hm(mins);
+      if(mins!=null) total += mins;
+    });
+    el('totalHM').textContent = hm(total);
+    const dec = total/60;
+    el('totalDec').textContent = dec.toFixed(2) + ' h';
+    const rate = parseFloat(el('rate').value);
+    if(isFinite(rate) && rate>0){
+      const pay = dec*rate;
+      el('payStats').innerHTML =
+        `<div class="stat"><div class="k">${t.pHours}</div><div class="v">${dec.toFixed(2)}</div></div>`+
+        `<div class="stat"><div class="k">${t.pPay}</div><div class="v">${pay.toLocaleString(undefined,{maximumFractionDigits:2})}</div></div>`;
+    } else {
+      el('payStats').innerHTML = '';
+    }
+  }
+
+  function copySummary(){
+    const t = APP.t();
+    let lines = [];
+    rowsEl.querySelectorAll('.wrow').forEach(row=>{
+      const s=row.querySelector('[data-k=start]').value, e=row.querySelector('[data-k=end]').value;
+      const mins=rowMinutes(row);
+      if(mins!=null) lines.push(`${s}–${e}  =  ${hm(mins)}`);
+    });
+    lines.push(`${t.sumTxt}: ${el('totalHM').textContent} (${el('totalDec').textContent})`);
+    KolkliTool.copy(lines.join('\n'), el('copyBtn'));
+    KolkliTool.toast(t.copied);
+  }
+
+  rowsEl.addEventListener('input', compute);
+  rowsEl.addEventListener('click', e=>{
+    const b=e.target.closest('[data-rm]'); if(!b) return;
+    if(rowsEl.querySelectorAll('.wrow').length>1) b.closest('.wrow').remove();
+    else b.closest('.wrow').querySelectorAll('input').forEach(i=>i.value='');
+    compute();
+  });
+  el('addBtn').addEventListener('click', ()=>{ addRow(); compute(); });
+  el('rate').addEventListener('input', compute);
+  el('copyBtn').addEventListener('click', copySummary);
+
+  // seed two example rows
+  addRow('09:00','17:00');
+  addRow('','');
+
+  const APP = KolkliTool.init(I18N, compute);
+  compute();
+})();
+</script>
+</body>
+</html>

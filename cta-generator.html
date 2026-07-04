@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל CTA</title>
+<meta name="description" content="Generate high-converting call-to-action button text for any goal — purchase, leads, downloads, sign-ups and more. Curated phrase banks in Hebrew, English and Russian, with a live button preview and copyable HTML. 100% in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* inputs */
+  .inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  textarea.inp{resize:vertical;min-height:74px;}
+  label.lbl{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+
+  /* config card */
+  .config{padding:18px;}
+  .config h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt:last-child{margin-bottom:0;}
+  .hint{font-size:11px;color:var(--faint);margin-top:7px;font-family:var(--mono);line-height:1.5;}
+
+  /* goal picker */
+  .goals{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+  .goal{position:relative;display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:12px;
+    border:1px solid var(--line);background:var(--panel-2);cursor:pointer;transition:border-color .12s,background .12s,transform .08s;text-align:start;}
+  .goal:hover{border-color:var(--accent);}
+  .goal:active{transform:scale(.98);}
+  .goal.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
+  .goal .gico{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--panel);color:var(--accent);border:1px solid var(--line-2);}
+  .goal.on .gico{background:var(--accent);color:#fff;border-color:transparent;}
+  .goal .gico svg{width:16px;height:16px;}
+  .goal b{font-size:13px;font-weight:600;color:var(--ink);line-height:1.25;}
+  .goal.on b{color:var(--accent-dim);}
+
+  /* phrases grid */
+  .phrasewrap{padding:18px;}
+  .phrasehead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+  .phrasehead h3{font-size:16px;margin:0;font-weight:700;}
+  .phrasehead .cnt{font-family:var(--mono);font-size:11px;color:var(--accent-dim);font-weight:700;
+    background:var(--accent-soft);padding:3px 10px;border-radius:999px;}
+  .phrases{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px;}
+  .phrase{display:flex;flex-direction:column;gap:8px;padding:12px 13px;border:1px solid var(--line);border-radius:13px;
+    background:var(--panel-2);transition:border-color .12s,transform .08s,box-shadow .12s;cursor:pointer;}
+  .phrase:hover{border-color:var(--accent);box-shadow:var(--shadow-sm);}
+  .phrase.tpl{background:var(--grad-soft);border-color:color-mix(in srgb,var(--accent) 30%,var(--line));}
+  .phrase .ptxt{font-size:15px;font-weight:600;color:var(--ink);line-height:1.3;word-break:break-word;}
+  .phrase .prow{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .phrase .plen{font-family:var(--mono);font-size:10.5px;color:var(--faint);white-space:nowrap;}
+  .phrase .pbtns{display:flex;gap:6px;}
+  .pbtn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);
+    font-family:var(--sans);font-size:11px;font-weight:600;padding:5px 9px;border-radius:8px;cursor:pointer;transition:all .12s;}
+  .pbtn:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .pbtn svg{width:12px;height:12px;}
+  .pbtn.use{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);color:#fff;border:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 3px 9px var(--grad-btn-glow);}
+  .pbtn.use:hover{filter:brightness(1.06);color:#fff;}
+  .tplbadge{align-self:flex-start;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--accent-dim);background:var(--panel);border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));
+    padding:2px 7px;border-radius:999px;}
+
+  /* preview side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 4px;font-weight:700;}
+  .side .subh{font-size:11.5px;color:var(--muted);margin:0 0 14px;}
+  .stage{border:1px solid var(--line-2);border-radius:14px;background:
+    radial-gradient(circle at 25% 20%,color-mix(in srgb,var(--accent) 10%,transparent),transparent 60%),var(--panel-2);
+    padding:30px 18px;display:flex;align-items:center;justify-content:center;min-height:118px;margin-bottom:16px;}
+  #previewBtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;border:none;
+    font-family:var(--sans);text-decoration:none;max-width:100%;text-align:center;transition:filter .14s,transform .08s;
+    word-break:break-word;line-height:1.25;}
+  #previewBtn:active{transform:translateY(1px);}
+
+  .ctrl{margin-bottom:14px;}
+  .ctrl > label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:6px;}
+  .seg{display:flex;gap:5px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px;}
+  .seg button{flex:1;border:none;background:transparent;color:var(--muted);font-family:var(--sans);font-size:12px;font-weight:600;
+    padding:7px 4px;border-radius:7px;cursor:pointer;transition:all .12s;}
+  .seg button:hover{color:var(--ink);}
+  .seg button.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+
+  .swatch{display:flex;gap:8px;align-items:center;}
+  .swatch input[type=color]{width:38px;height:34px;padding:0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);cursor:pointer;}
+  .swatch .inp{flex:1;font-family:var(--mono);text-transform:uppercase;}
+
+  .copyhtml{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:14px;padding:12px 18px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .copyhtml:hover{filter:brightness(1.05);} .copyhtml:active{transform:translateY(1px);}
+  .copyhtml svg{width:16px;height:16px;}
+
+  .code{margin-top:14px;}
+  .codebox{position:relative;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);overflow:hidden;}
+  .codebox pre{margin:0;padding:12px 13px;font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--ink-2);
+    white-space:pre-wrap;word-break:break-all;max-height:150px;overflow:auto;}
+  .codecopy{position:absolute;top:8px;inset-inline-end:8px;display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);font-family:var(--sans);font-size:10.5px;font-weight:600;padding:4px 8px;border-radius:7px;cursor:pointer;transition:all .12s;}
+  .codecopy:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .codecopy svg{width:11px;height:11px;}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid">
+    <!-- main: goal + phrases -->
+    <div class="col">
+      <div class="card config">
+        <h3 data-i18n="goalTitle"></h3>
+        <div class="opt">
+          <div class="goals" id="goals"></div>
+        </div>
+        <div class="opt">
+          <label class="lbl" for="offer" data-i18n="offerLbl"></label>
+          <input type="text" class="inp" id="offer" maxlength="40" autocomplete="off" data-i18n-ph="offerPh">
+          <div class="hint" data-i18n="offerHint"></div>
+        </div>
+      </div>
+
+      <div class="card phrasewrap" style="margin-top:18px;">
+        <div class="phrasehead">
+          <h3 id="phrTitle"></h3>
+          <span class="cnt" id="phrCnt"></span>
+        </div>
+        <div class="phrases" id="phrases"></div>
+      </div>
+    </div>
+
+    <!-- side: preview + controls -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="previewTitle"></h3>
+        <p class="subh" data-i18n="previewSub"></p>
+
+        <div class="stage">
+          <a id="previewBtn" href="#" onclick="return false"></a>
+        </div>
+
+        <div class="ctrl">
+          <label data-i18n="styleLbl"></label>
+          <div class="seg" id="styleSeg"></div>
+        </div>
+        <div class="ctrl">
+          <label data-i18n="shapeLbl"></label>
+          <div class="seg" id="shapeSeg"></div>
+        </div>
+        <div class="ctrl">
+          <label data-i18n="sizeLbl"></label>
+          <div class="seg" id="sizeSeg"></div>
+        </div>
+        <div class="ctrl">
+          <label data-i18n="colorLbl"></label>
+          <div class="swatch">
+            <input type="color" id="colorPick" value="#7b34ff">
+            <input type="text" class="inp" id="colorHex" value="#7B34FF" maxlength="7" spellcheck="false">
+          </div>
+        </div>
+
+        <button class="copyhtml" id="copyHtmlBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span data-i18n="copyHtml"></span>
+        </button>
+
+        <div class="code">
+          <label class="lbl" data-i18n="codeLbl"></label>
+          <div class="codebox">
+            <button class="codecopy" id="codeCopyBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copy"></span></button>
+            <pre id="codeOut"></pre>
+          </div>
+        </div>
+
+        <div class="seam">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-i18n="seam"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'שיווק · מחולל CTA',
+      pageTitle:'מחוללו קריאות לפעולה שממירות',
+      pageSub:'בחרו את מטרת הכפתור, קבלו בנק ביטויים מוכנים בשלוש שפות, טענו כל אחד לתצוגה חיה ועצבו כפתור מוכן — עם קוד HTML מוכן להעתקה. הכול רץ אצלכם בדפדפן.',
+      goalTitle:'מה מטרת הכפתור?',
+      offerLbl:'מילת מוצר / הצעה (רשות)',
+      offerPh:'לדוגמה: קורס, מנוי, ספר…',
+      offerHint:'כשתמלאו — נוסיף ביטויים מותאמים אישית עם המילה שלכם.',
+      previewTitle:'תצוגת כפתור חיה',
+      previewSub:'לחצו על ביטוי כדי לטעון אותו, ואז עצבו.',
+      styleLbl:'סגנון', shapeLbl:'צורה', sizeLbl:'גודל', colorLbl:'צבע מותג',
+      copyHtml:'העתקת קוד HTML', codeLbl:'קוד הכפתור',
+      copy:'העתקה', copyPhrase:'העתקה', usePhrase:'לתצוגה',
+      styleFilled:'מלא', styleOutline:'מתאר', styleSolid:'אחיד',
+      shapePill:'גלולה', shapeRounded:'מעוגל', shapeSquare:'ריבועי',
+      sizeS:'S', sizeM:'M', sizeL:'L',
+      goals:{
+        buy:'רכישה / קנייה', lead:'השארת פרטים', download:'הורדה',
+        contact:'יצירת קשר', signup:'הרשמה', book:'קביעת תור',
+      },
+      phrTitle:g=>`ביטויים ל${g}`,
+      cntLbl:n=>`${n} ביטויים`,
+      charsLbl:n=>`${n} תווים`,
+      tplBadge:'מותאם',
+      chosen:'נטען לתצוגה ✓',
+      seam:'כל הביטויים והקוד נוצרים אצלכם בדפדפן — שום דבר לא נשלח לשרת. העתיקו את הביטוי או את קוד ה-HTML והדביקו באתר, בדף הנחיתה או בקמפיין.',
+      foot:'KOLKLI · מחולל CTA · טקסטים שממירים, ישירות בדפדפן',
+      copied:'הועתק ✓',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'Marketing · CTA Generator',
+      pageTitle:'Generate calls to action that convert',
+      pageSub:'Pick your button goal, get a ready-made bank of phrases in three languages, load any one into a live preview and style a button — with copy-ready HTML. Everything runs in your browser.',
+      goalTitle:'What is the button for?',
+      offerLbl:'Product / offer word (optional)',
+      offerPh:'e.g. course, plan, ebook…',
+      offerHint:'Fill this in and we will add personalized phrases with your word.',
+      previewTitle:'Live button preview',
+      previewSub:'Click a phrase to load it, then style away.',
+      styleLbl:'Style', shapeLbl:'Shape', sizeLbl:'Size', colorLbl:'Brand color',
+      copyHtml:'Copy HTML', codeLbl:'Button code',
+      copy:'Copy', copyPhrase:'Copy', usePhrase:'Preview',
+      styleFilled:'Filled', styleOutline:'Outline', styleSolid:'Solid',
+      shapePill:'Pill', shapeRounded:'Rounded', shapeSquare:'Square',
+      sizeS:'S', sizeM:'M', sizeL:'L',
+      goals:{
+        buy:'Purchase / Buy', lead:'Leave details', download:'Download',
+        contact:'Contact', signup:'Sign up', book:'Book / Schedule',
+      },
+      phrTitle:g=>`${g} phrases`,
+      cntLbl:n=>`${n} phrases`,
+      charsLbl:n=>`${n} chars`,
+      tplBadge:'custom',
+      chosen:'Loaded into preview ✓',
+      seam:'Every phrase and code snippet is built in your browser — nothing is sent to a server. Copy the phrase or the HTML and paste it into your site, landing page or campaign.',
+      foot:'KOLKLI · CTA Generator · Copy that converts, right in your browser',
+      copied:'Copied ✓',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Маркетинг · Генератор CTA',
+      pageTitle:'Создавайте призывы к действию, которые конвертируют',
+      pageSub:'Выберите цель кнопки, получите готовый банк фраз на трёх языках, загрузите любую в живой превью и оформите кнопку — с готовым HTML-кодом. Всё работает в вашем браузере.',
+      goalTitle:'Для чего кнопка?',
+      offerLbl:'Слово продукта / предложения (необязательно)',
+      offerPh:'напр.: курс, подписка, книга…',
+      offerHint:'Заполните — и мы добавим персональные фразы с вашим словом.',
+      previewTitle:'Живой превью кнопки',
+      previewSub:'Нажмите фразу, чтобы загрузить её, затем оформите.',
+      styleLbl:'Стиль', shapeLbl:'Форма', sizeLbl:'Размер', colorLbl:'Цвет бренда',
+      copyHtml:'Копировать HTML', codeLbl:'Код кнопки',
+      copy:'Копировать', copyPhrase:'Копировать', usePhrase:'В превью',
+      styleFilled:'Заливка', styleOutline:'Контур', styleSolid:'Сплошной',
+      shapePill:'Пилюля', shapeRounded:'Скруглённый', shapeSquare:'Квадрат',
+      sizeS:'S', sizeM:'M', sizeL:'L',
+      goals:{
+        buy:'Покупка', lead:'Оставить заявку', download:'Скачать',
+        contact:'Контакт', signup:'Регистрация', book:'Запись / Бронь',
+      },
+      phrTitle:g=>`Фразы: ${g}`,
+      cntLbl:n=>`${n} фраз`,
+      charsLbl:n=>`${n} симв.`,
+      tplBadge:'своё',
+      chosen:'Загружено в превью ✓',
+      seam:'Каждая фраза и фрагмент кода создаются в вашем браузере — ничего не отправляется на сервер. Скопируйте фразу или HTML и вставьте на сайт, лендинг или в кампанию.',
+      foot:'KOLKLI · Генератор CTA · Тексты, которые конвертируют, прямо в браузере',
+      copied:'Скопировано ✓',
+    },
+  };
+
+  // ---- goal definitions: icon + curated tri-lingual phrase banks (~12 each) + templates ----
+  const GOALS = [
+    {
+      id:'buy',
+      ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>',
+      phrases:{
+        he:['קנו עכשיו','הזמינו היום','רכשו במבצע','הוסיפו לעגלה','קנו וחסכו','שריינו את שלכם','אני רוצה את זה','לרכישה מאובטחת','קנו לפני שייגמר','הזמנה מהירה','שדרגו עכשיו','קבלו הצעה מיוחדת'],
+        en:['Buy now','Order today','Get yours','Add to cart','Buy & save','Shop the deal','I want it','Checkout securely','Buy before it is gone','Grab it now','Upgrade now','Claim the offer'],
+        ru:['Купить сейчас','Заказать сегодня','Купить со скидкой','В корзину','Купить и сэкономить','Оформить заказ','Хочу это','Безопасная оплата','Успеть купить','Забрать сейчас','Обновить сейчас','Получить предложение'],
+      },
+      tpl:{ he:['קבלו {X} עכשיו','קנו {X} במבצע','הזמינו {X} היום'], en:['Get {X} now','Buy {X} on sale','Order {X} today'], ru:['Получить {X} сейчас','Купить {X} со скидкой','Заказать {X} сегодня'] },
+    },
+    {
+      id:'lead',
+      ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+      phrases:{
+        he:['השאירו פרטים','דברו איתי','אני מעוניין','חזרו אליי','קבלו הצעת מחיר','בקשו שיחת ייעוץ','רוצה לשמוע עוד','קבעו שיחה','מלאו פרטים','נשמח לחזור אליכם','קבלו ייעוץ חינם','השאירו טלפון'],
+        en:['Leave details','Talk to us','I am interested','Call me back','Get a quote','Request a consultation','Tell me more','Book a call','Send my details','We will get back to you','Get free advice','Leave your number'],
+        ru:['Оставить заявку','Связаться с нами','Мне интересно','Перезвоните мне','Получить расчёт','Записаться на консультацию','Узнать больше','Заказать звонок','Отправить данные','Мы перезвоним','Бесплатная консультация','Оставить телефон'],
+      },
+      tpl:{ he:['קבלו הצעה ל{X}','דברו איתנו על {X}','רוצה לשמוע על {X}'], en:['Get a quote for {X}','Ask us about {X}','I want {X} details'], ru:['Заявка на {X}','Спросить про {X}','Узнать о {X}'] },
+    },
+    {
+      id:'download',
+      ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+      phrases:{
+        he:['הורידו עכשיו','הורדה חינם','קבלו את הקובץ','הורידו את האפליקציה','התחילו להוריד','קבלו את המדריך','הורידו PDF','שמרו אצלכם','הורידו למכשיר','קבלו גישה מיידית','הורידו בחינם','קחו את זה איתכם'],
+        en:['Download now','Free download','Get the file','Download the app','Start download','Get the guide','Download PDF','Save it now','Download to device','Get instant access','Grab it free','Take it with you'],
+        ru:['Скачать сейчас','Скачать бесплатно','Получить файл','Скачать приложение','Начать загрузку','Получить гайд','Скачать PDF','Сохранить себе','Скачать на устройство','Мгновенный доступ','Забрать бесплатно','Взять с собой'],
+      },
+      tpl:{ he:['הורידו את {X}','קבלו את {X} חינם','התחילו עם {X}'], en:['Download {X}','Get {X} free','Start with {X}'], ru:['Скачать {X}','Получить {X} бесплатно','Начать с {X}'] },
+    },
+    {
+      id:'contact',
+      ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+      phrases:{
+        he:['צרו קשר','דברו איתנו','שלחו הודעה','התקשרו אלינו','כתבו לנו בוואטסאפ','נשמח לעזור','יש לי שאלה','פנו אלינו','שוחחו איתנו','שלחו מייל','דברו עם נציג','בואו נדבר'],
+        en:['Contact us','Get in touch','Send a message','Call us','Chat on WhatsApp','We are here to help','I have a question','Reach out','Message us','Email us','Talk to an agent','Let us talk'],
+        ru:['Связаться','Написать нам','Отправить сообщение','Позвонить нам','Написать в WhatsApp','Мы поможем','У меня вопрос','Обратиться к нам','Напишите нам','Отправить email','Связаться с менеджером','Давайте поговорим'],
+      },
+      tpl:{ he:['שאלו על {X}','דברו איתנו על {X}','צרו קשר בנושא {X}'], en:['Ask about {X}','Contact us about {X}','Talk {X} with us'], ru:['Спросить о {X}','Связаться по {X}','Обсудить {X}'] },
+    },
+    {
+      id:'signup',
+      ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
+      phrases:{
+        he:['הרשמו עכשיו','הצטרפו אלינו','פתחו חשבון','התחילו בחינם','הירשמו לניוזלטר','צרפו אותי','נסו בחינם','הצטרפו לקהילה','התחילו עכשיו','הרשמה מהירה','קבלו גישה','אני בפנים'],
+        en:['Sign up now','Join us','Create an account','Start for free','Join the newsletter','Count me in','Try it free','Join the community','Get started','Quick sign up','Get access','I am in'],
+        ru:['Зарегистрироваться','Присоединиться','Создать аккаунт','Начать бесплатно','Подписаться на рассылку','Я с вами','Попробовать бесплатно','Вступить в сообщество','Начать сейчас','Быстрая регистрация','Получить доступ','Я в деле'],
+      },
+      tpl:{ he:['הצטרפו ל{X}','הירשמו ל{X}','התחילו עם {X} בחינם'], en:['Join {X}','Sign up for {X}','Start {X} free'], ru:['Вступить в {X}','Записаться на {X}','Начать {X} бесплатно'] },
+    },
+    {
+      id:'book',
+      ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>',
+      phrases:{
+        he:['קבעו תור','הזמינו מקום','שריינו תאריך','קבעו פגישה','בחרו שעה','הזמינו עכשיו','קבעו שיחה','שמרו לי מקום','לתיאום מיידי','הזמינו שולחן','קבעו הדגמה','קבלו זמן פנוי'],
+        en:['Book now','Reserve a spot','Save your date','Schedule a meeting','Pick a time','Book an appointment','Book a call','Save my seat','Book instantly','Reserve a table','Book a demo','See open times'],
+        ru:['Записаться','Забронировать место','Выбрать дату','Назначить встречу','Выбрать время','Записаться на приём','Заказать звонок','Забронировать место','Быстрая запись','Забронировать столик','Записаться на демо','Свободное время'],
+      },
+      tpl:{ he:['קבעו תור ל{X}','הזמינו {X} עכשיו','שריינו {X}'], en:['Book {X} now','Schedule your {X}','Reserve {X}'], ru:['Записаться на {X}','Забронировать {X}','Назначить {X}'] },
+    },
+  ];
+
+  const STYLES = [
+    { id:'filled',  key:'styleFilled' },
+    { id:'outline', key:'styleOutline' },
+    { id:'solid',   key:'styleSolid' },
+  ];
+  const SHAPES = [
+    { id:'pill',    key:'shapePill',    radius:'999px' },
+    { id:'rounded', key:'shapeRounded', radius:'12px' },
+    { id:'square',  key:'shapeSquare',  radius:'0px' },
+  ];
+  const SIZES = [
+    { id:'s', key:'sizeS', pad:'9px 18px',  font:'13px' },
+    { id:'m', key:'sizeM', pad:'13px 26px', font:'15px' },
+    { id:'l', key:'sizeL', pad:'17px 36px', font:'18px' },
+  ];
+
+  let lang='he', t=I18N.he;
+  let goal='buy';
+  let phrase='';        // currently loaded phrase in the preview
+  let style='filled', shape='pill', size='m', color='#7b34ff';
+
+  // ---- helpers ----
+  function toast(m){ const e=el('toast'); e.textContent=m; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function escapeAttr(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function normHex(v){ v=String(v||'').trim(); if(!v.startsWith('#')) v='#'+v; return /^#[0-9a-fA-F]{6}$/.test(v)?v:null; }
+  function lighten(hex,amt){ const h=hex.replace('#',''); const r=Math.min(255,parseInt(h.slice(0,2),16)+amt), g=Math.min(255,parseInt(h.slice(2,4),16)+amt), b=Math.min(255,parseInt(h.slice(4,6),16)+amt); return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+  function darken(hex,amt){ const h=hex.replace('#',''); const r=Math.max(0,parseInt(h.slice(0,2),16)-amt), g=Math.max(0,parseInt(h.slice(2,4),16)-amt), b=Math.max(0,parseInt(h.slice(4,6),16)-amt); return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+  function charLen(s){ return Array.from(String(s||'')).length; }
+
+  function copyText(str){
+    const done=()=>toast(t.copied);
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(str).then(done).catch(()=>fallback(str,done)); }
+    else fallback(str,done);
+  }
+  function fallback(str,cb){ const ta=document.createElement('textarea'); ta.value=str; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); cb&&cb(); }
+
+  function currentGoal(){ return GOALS.find(g=>g.id===goal); }
+
+  // ---- goal picker ----
+  function renderGoals(){
+    el('goals').innerHTML = GOALS.map(g=>`
+      <button type="button" class="goal ${g.id===goal?'on':''}" data-goal="${g.id}">
+        <span class="gico">${g.ico}</span>
+        <b>${escapeHtml(t.goals[g.id])}</b>
+      </button>`).join('');
+  }
+
+  // ---- phrase bank ----
+  function buildPhraseList(){
+    const g=currentGoal();
+    const base=(g.phrases[lang]||[]).map(p=>({text:p,tpl:false}));
+    const offer=el('offer').value.trim();
+    let out=base;
+    if(offer){
+      const tpl=(g.tpl[lang]||[]).map(s=>({text:s.replace('{X}',offer),tpl:true}));
+      out=tpl.concat(base);
+    }
+    return out;
+  }
+
+  function renderPhrases(){
+    const g=currentGoal();
+    el('phrTitle').textContent = t.phrTitle(t.goals[g.id]);
+    const list=buildPhraseList();
+    el('phrCnt').textContent = t.cntLbl(list.length);
+    el('phrases').innerHTML = list.map((p,i)=>{
+      const len=charLen(p.text);
+      return `<div class="phrase ${p.tpl?'tpl':''}" data-i="${i}">
+        ${p.tpl?`<span class="tplbadge">${escapeHtml(t.tplBadge)}</span>`:''}
+        <div class="ptxt">${escapeHtml(p.text)}</div>
+        <div class="prow">
+          <span class="plen">${t.charsLbl(len)}</span>
+          <span class="pbtns">
+            <button type="button" class="pbtn use" data-use="${i}">${escapeHtml(t.usePhrase)}</button>
+            <button type="button" class="pbtn" data-copy="${i}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>${escapeHtml(t.copyPhrase)}</span>
+            </button>
+          </span>
+        </div>
+      </div>`;
+    }).join('');
+    // ensure a phrase is loaded
+    if(!phrase && list.length){ phrase=list[0].text; }
+    renderPreview();
+  }
+
+  // ---- button style computation (shared by preview + code) ----
+  function btnStyle(){
+    const sh=SHAPES.find(s=>s.id===shape), sz=SIZES.find(s=>s.id===size);
+    const c=color, cd=darken(c,26), cl=lighten(c,40);
+    const base={ 'display':'inline-flex','align-items':'center','justify-content':'center',
+      'font-family':"'Space Grotesk',system-ui,'Segoe UI',sans-serif",'font-weight':'600',
+      'font-size':sz.font,'padding':sz.pad,'border-radius':sh.radius,'text-decoration':'none',
+      'cursor':'pointer','line-height':'1.25','letter-spacing':'.005em' };
+    if(style==='filled'){
+      base['background']=`linear-gradient(105deg, ${c} 0%, ${lighten(c,24)} 100%)`;
+      base['color']='#ffffff';
+      base['border']='none';
+      base['box-shadow']=`0 6px 18px ${hexToRgba(c,0.35)}`;
+    } else if(style==='outline'){
+      base['background']='transparent';
+      base['color']=c;
+      base['border']=`2px solid ${c}`;
+    } else { // solid
+      base['background']=c;
+      base['color']='#ffffff';
+      base['border']='none';
+      base['box-shadow']=`0 4px 12px ${hexToRgba(c,0.28)}`;
+    }
+    return base;
+  }
+  function hexToRgba(hex,a){ const h=hex.replace('#',''); const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16); return `rgba(${r},${g},${b},${a})`; }
+  function styleToCss(obj){ return Object.entries(obj).map(([k,v])=>`${k}:${v}`).join(';'); }
+
+  // ---- preview + code ----
+  function renderPreview(){
+    const b=el('previewBtn');
+    const css=btnStyle();
+    b.removeAttribute('style');
+    Object.entries(css).forEach(([k,v])=>b.style.setProperty(k,v));
+    b.textContent = phrase || (currentGoal().phrases[lang][0]||'CTA');
+    renderCode();
+  }
+  function renderCode(){
+    const css=styleToCss(btnStyle());
+    const txt=phrase || (currentGoal().phrases[lang][0]||'CTA');
+    const html=`<a href="#" style="${css}">${escapeHtml(txt)}</a>`;
+    el('codeOut').textContent = html;
+  }
+
+  // ---- segmented controls ----
+  function renderSegs(){
+    el('styleSeg').innerHTML = STYLES.map(s=>`<button type="button" data-style="${s.id}" class="${s.id===style?'on':''}">${escapeHtml(t[s.key])}</button>`).join('');
+    el('shapeSeg').innerHTML = SHAPES.map(s=>`<button type="button" data-shape="${s.id}" class="${s.id===shape?'on':''}">${escapeHtml(t[s.key])}</button>`).join('');
+    el('sizeSeg').innerHTML  = SIZES.map(s=>`<button type="button" data-size="${s.id}" class="${s.id===size?'on':''}">${escapeHtml(t[s.key])}</button>`).join('');
+  }
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    // keep the loaded phrase in sync with the language: map by index if it was from the bank
+    reconcilePhrase();
+    renderGoals(); renderSegs(); renderPhrases();
+  }
+  function reconcilePhrase(){
+    // when switching languages, move the loaded phrase to the same slot in the new language
+    const list=buildPhraseList();
+    if(list.some(p=>p.text===phrase)) return; // still valid
+    if(prevList){
+      const idx=prevList.findIndex(p=>p.text===phrase);
+      if(idx>=0 && list[idx]){ phrase=list[idx].text; return; }
+    }
+    phrase = list.length ? list[0].text : '';
+  }
+  let prevList=null;
+  function snapshotList(){ prevList=buildPhraseList(); }
+
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  el('goals').addEventListener('click',e=>{
+    const b=e.target.closest('[data-goal]'); if(!b) return;
+    snapshotList();
+    goal=b.getAttribute('data-goal');
+    // reset loaded phrase to the new goal's first phrase
+    phrase='';
+    renderGoals(); renderPhrases();
+  });
+
+  el('offer').addEventListener('input',()=>{ renderPhrases(); });
+
+  el('phrases').addEventListener('click',e=>{
+    const list=buildPhraseList();
+    const u=e.target.closest('[data-use]');
+    if(u){ const i=+u.getAttribute('data-use'); if(list[i]){ phrase=list[i].text; renderPreview(); toast(t.chosen); } return; }
+    const c=e.target.closest('[data-copy]');
+    if(c){ const i=+c.getAttribute('data-copy'); if(list[i]) copyText(list[i].text); return; }
+    // clicking the card body (not a button) also loads it
+    const card=e.target.closest('.phrase');
+    if(card){ const i=+card.getAttribute('data-i'); if(list[i]){ phrase=list[i].text; renderPreview(); toast(t.chosen); } }
+  });
+
+  el('styleSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-style]'); if(b){ style=b.getAttribute('data-style'); renderSegs(); renderPreview(); } });
+  el('shapeSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-shape]'); if(b){ shape=b.getAttribute('data-shape'); renderSegs(); renderPreview(); } });
+  el('sizeSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-size]'); if(b){ size=b.getAttribute('data-size'); renderSegs(); renderPreview(); } });
+
+  function setColor(v,syncPick,syncHex){
+    const n=normHex(v); if(!n) return;
+    color=n.toLowerCase();
+    if(syncPick) el('colorPick').value=color;
+    if(syncHex)  el('colorHex').value=color.toUpperCase();
+    renderPreview();
+  }
+  el('colorPick').addEventListener('input',()=>setColor(el('colorPick').value,false,true));
+  el('colorHex').addEventListener('input',()=>{ const n=normHex(el('colorHex').value); if(n) setColor(n,true,false); });
+  el('colorHex').addEventListener('blur',()=>{ el('colorHex').value=color.toUpperCase(); });
+
+  el('copyHtmlBtn').addEventListener('click',()=>copyText(el('codeOut').textContent));
+  el('codeCopyBtn').addEventListener('click',()=>copyText(el('codeOut').textContent));
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל קופי קצר</title>
+<meta name="description" content="Generate short marketing copy — headlines, ads, social posts and landing heroes — in Hebrew, English and Russian. Pick a tone and type, and get ready-to-use variations. 100% in your browser, nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:360px 1fr;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* form side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .side h3 svg{width:17px;height:17px;color:var(--accent);}
+  .opt{margin-bottom:15px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+  .opt > label .req{color:var(--accent);}
+  .opt .hint{font-size:11px;color:var(--faint);margin-top:6px;font-family:var(--mono);}
+
+  .inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  select.inp{cursor:pointer;}
+  textarea.inp{resize:vertical;min-height:58px;line-height:1.5;}
+
+  /* segmented pickers (tone / type) */
+  .seg{display:flex;flex-wrap:wrap;gap:7px;}
+  .seg button{flex:1 1 auto;min-width:calc(50% - 4px);display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);
+    font-size:12.5px;font-weight:600;cursor:pointer;transition:border-color .12s,background .12s,transform .08s;}
+  .seg button:hover{border-color:var(--accent);}
+  .seg button:active{transform:scale(.98);}
+  .seg button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  .seg button .ic{font-size:14px;line-height:1;}
+
+  .genbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .genbtn:hover{filter:brightness(1.05);} .genbtn:active{transform:translateY(1px);}
+  .genbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .genbtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:9px;min-height:14px;text-align:center;}
+
+  /* output side */
+  .outhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+  .outhead .ti{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .outhead .ti b{font-size:15px;font-weight:700;}
+  .outhead .ti span{font-size:11.5px;color:var(--faint);font-family:var(--mono);}
+  .outhead .tools{display:flex;gap:9px;flex-wrap:wrap;}
+  .toolbtn{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:999px;font-size:12.5px;font-weight:600;
+    cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);
+    transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .toolbtn:hover{border-color:var(--accent);} .toolbtn:active{transform:translateY(1px);}
+  .toolbtn svg{width:15px;height:15px;}
+
+  .cards{display:flex;flex-direction:column;gap:11px;}
+  .vcard{border:1px solid var(--line-2);border-radius:13px;background:var(--panel-2);padding:14px 15px;
+    display:flex;flex-direction:column;gap:10px;transition:border-color .12s,box-shadow .12s;}
+  .vcard:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));box-shadow:var(--shadow-sm);}
+  .vcard .txt{font-size:15px;line-height:1.55;color:var(--ink);font-weight:500;white-space:pre-wrap;word-break:break-word;}
+  .vcard.hero .txt{font-size:17px;font-weight:600;}
+  .vcard .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .vcard .badges{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+  .chip{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:3px 9px;}
+  .chip.cc{color:var(--accent-dim);background:var(--accent-soft);border-color:transparent;}
+  .cpbtn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:9px;font-size:12px;font-weight:600;
+    cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);
+    transition:border-color .12s,color .12s,background .12s,transform .08s;}
+  .cpbtn:hover{border-color:var(--accent);color:var(--accent-dim);} .cpbtn:active{transform:translateY(1px);}
+  .cpbtn.done{border-color:var(--success);color:var(--success-dim);background:var(--success-soft);}
+  .cpbtn svg{width:14px;height:14px;}
+
+  /* empty state */
+  .empty{padding:48px 24px;text-align:center;color:var(--muted);}
+  .empty .eic{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .empty .eic svg{width:32px;height:32px;}
+  .empty b{display:block;font-size:16px;color:var(--ink);font-weight:700;margin-bottom:5px;}
+  .empty p{font-size:13px;margin:0;max-width:40ch;margin-inline:auto;line-height:1.55;}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid">
+    <!-- form -->
+    <div class="col">
+      <div class="card side">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M6 16l6-12 6 12"/><path d="M8 12h8"/></svg>
+          <span data-i18n="formTitle"></span>
+        </h3>
+
+        <div class="opt">
+          <label for="product"><span data-i18n="productLbl"></span> <span class="req">*</span></label>
+          <input class="inp" id="product" type="text" data-i18n-ph="productPh" autocomplete="off">
+        </div>
+
+        <div class="opt">
+          <label for="audience" data-i18n="audienceLbl"></label>
+          <input class="inp" id="audience" type="text" data-i18n-ph="audiencePh" autocomplete="off">
+        </div>
+
+        <div class="opt">
+          <label for="benefit" data-i18n="benefitLbl"></label>
+          <textarea class="inp" id="benefit" data-i18n-ph="benefitPh"></textarea>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="toneLbl"></label>
+          <div class="seg" id="toneSeg"></div>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="typeLbl"></label>
+          <div class="seg" id="typeSeg"></div>
+        </div>
+
+        <button class="genbtn" id="genBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/><path d="M12 3l2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4z"/></svg>
+          <span data-i18n="genBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+      </div>
+    </div>
+
+    <!-- output -->
+    <div class="col">
+      <div class="card" style="padding:18px">
+        <div class="outhead">
+          <div class="ti">
+            <b data-i18n="outTitle"></b>
+            <span id="outMeta"></span>
+          </div>
+          <div class="tools">
+            <button class="toolbtn" id="regenBtn" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+              <span data-i18n="regenBtn"></span>
+            </button>
+            <button class="toolbtn" id="copyAllBtn" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span data-i18n="copyAllBtn"></span>
+            </button>
+          </div>
+        </div>
+
+        <div id="cards" class="cards"></div>
+
+        <div class="empty" id="empty">
+          <div class="eic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4z"/></svg></div>
+          <b data-i18n="emptyTitle"></b>
+          <p data-i18n="emptyBody"></p>
+        </div>
+
+        <div class="seam">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-i18n="seam"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'שיווק · מחולל קופי קצר',
+      pageTitle:'מחולל קופי קצר',
+      pageSub:'הזינו שם מוצר, קהל ותועלת — ובחרו טון וסוג. המחולל מרכיב עבורכם כמה גרסאות קופי קצרות ומוכנות לשימוש: כותרות, מודעות, פוסטים ותיאורי דף נחיתה. הכול נבנה מקומית בדפדפן, בלי שום שליחה לשרת.',
+      formTitle:'הגדרות הקופי',
+      productLbl:'שם המוצר או השירות',
+      productPh:'לדוגמה: אפליקציית כושר, בית קפה שכונתי, קורס דיגיטלי',
+      audienceLbl:'קהל היעד (רשות)',
+      audiencePh:'לדוגמה: הורים עסוקים, בעלי עסקים קטנים',
+      benefitLbl:'התועלת או ההצעה המרכזית (רשות)',
+      benefitPh:'לדוגמה: חוסכים שעתיים ביום, משלוח חינם בהזמנה ראשונה',
+      toneLbl:'טון', typeLbl:'סוג הקופי',
+      genBtn:'הפקת קופי', regenBtn:'ערבוב מחדש', copyAllBtn:'העתקת הכול',
+      outTitle:'הגרסאות שלכם',
+      outMeta:(n,type,tone)=>`${n} גרסאות · ${type} · ${tone}`,
+      emptyTitle:'עדיין אין קופי',
+      emptyBody:'מלאו את שם המוצר בצד ולחצו “הפקת קופי” כדי לקבל כמה גרסאות מוכנות.',
+      copyOne:'העתקה', copiedOne:'הועתק', charsLbl:'תווים',
+      errNoProduct:'צריך להזין שם מוצר או שירות כדי להתחיל',
+      seam:'המחולל עובד מהתבניות המובנות בעמוד בלבד — הטקסט מורכב מקומית בדפדפן, שום נתון לא נשלח לשרת ואין כאן שום קריאה לבינה מלאכותית חיצונית.',
+      foot:'KOLKLI · מחולל קופי קצר · טקסטים שיווקיים ישירות בדפדפן',
+      copied:'הועתק ✓', copiedAll:'כל הגרסאות הועתקו ✓',
+      tones:{ professional:'מקצועי', friendly:'ידידותי', bold:'נועז', luxury:'יוקרתי', playful:'שובב' },
+      types:{ headline:'כותרת', ad:'מודעה', social:'פוסט לרשת', hero:'דף נחיתה' },
+      // fallbacks used inside templates when a field is empty
+      fbAudience:'הקהל שלכם', fbBenefit:'תוצאות אמיתיות',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'Marketing · Short Copy Generator',
+      pageTitle:'Short Copy Generator',
+      pageSub:'Enter a product name, an audience and a benefit, then pick a tone and type. The generator assembles several short, ready-to-use copy variations — headlines, ads, social posts and landing heroes. Everything is built locally in your browser, with nothing sent to a server.',
+      formTitle:'Copy settings',
+      productLbl:'Product or service name',
+      productPh:'e.g. a fitness app, a neighborhood café, an online course',
+      audienceLbl:'Target audience (optional)',
+      audiencePh:'e.g. busy parents, small business owners',
+      benefitLbl:'Main benefit or offer (optional)',
+      benefitPh:'e.g. save two hours a day, free shipping on your first order',
+      toneLbl:'Tone', typeLbl:'Copy type',
+      genBtn:'Generate copy', regenBtn:'Shuffle', copyAllBtn:'Copy all',
+      outTitle:'Your variations',
+      outMeta:(n,type,tone)=>`${n} variations · ${type} · ${tone}`,
+      emptyTitle:'No copy yet',
+      emptyBody:'Fill in the product name on the side and press “Generate copy” to get a set of ready-to-use variations.',
+      copyOne:'Copy', copiedOne:'Copied', charsLbl:'chars',
+      errNoProduct:'Enter a product or service name to get started',
+      seam:'The generator works only from the templates built into this page — copy is assembled locally in your browser, no data is sent to a server, and there is no external AI call involved.',
+      foot:'KOLKLI · Short Copy Generator · Marketing copy right in your browser',
+      copied:'Copied ✓', copiedAll:'All variations copied ✓',
+      tones:{ professional:'Professional', friendly:'Friendly', bold:'Bold', luxury:'Luxury', playful:'Playful' },
+      types:{ headline:'Headline', ad:'Ad', social:'Social post', hero:'Landing hero' },
+      fbAudience:'your audience', fbBenefit:'real results',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Маркетинг · Генератор коротких текстов',
+      pageTitle:'Генератор коротких текстов',
+      pageSub:'Введите название продукта, аудиторию и выгоду, затем выберите тон и тип. Генератор соберёт несколько коротких готовых вариантов — заголовки, объявления, посты и тексты для лендинга. Всё создаётся локально в браузере, ничего не отправляется на сервер.',
+      formTitle:'Настройки текста',
+      productLbl:'Название продукта или услуги',
+      productPh:'напр.: фитнес-приложение, районное кафе, онлайн-курс',
+      audienceLbl:'Целевая аудитория (необязательно)',
+      audiencePh:'напр.: занятые родители, владельцы малого бизнеса',
+      benefitLbl:'Главная выгода или предложение (необязательно)',
+      benefitPh:'напр.: экономьте два часа в день, бесплатная доставка первого заказа',
+      toneLbl:'Тон', typeLbl:'Тип текста',
+      genBtn:'Создать текст', regenBtn:'Перемешать', copyAllBtn:'Копировать всё',
+      outTitle:'Ваши варианты',
+      outMeta:(n,type,tone)=>`${n} вариантов · ${type} · ${tone}`,
+      emptyTitle:'Текста пока нет',
+      emptyBody:'Заполните название продукта слева и нажмите «Создать текст», чтобы получить набор готовых вариантов.',
+      copyOne:'Копировать', copiedOne:'Скопировано', charsLbl:'симв.',
+      errNoProduct:'Введите название продукта или услуги, чтобы начать',
+      seam:'Генератор работает только на встроенных в страницу шаблонах — текст собирается локально в браузере, данные не отправляются на сервер и никакой внешний ИИ не вызывается.',
+      foot:'KOLKLI · Генератор коротких текстов · Маркетинговые тексты прямо в браузере',
+      copied:'Скопировано ✓', copiedAll:'Все варианты скопированы ✓',
+      tones:{ professional:'Деловой', friendly:'Дружелюбный', bold:'Смелый', luxury:'Премиум', playful:'Игривый' },
+      types:{ headline:'Заголовок', ad:'Объявление', social:'Пост', hero:'Лендинг' },
+      fbAudience:'вашей аудитории', fbBenefit:'реальные результаты',
+    },
+  };
+
+  const TONE_ICON = { professional:'💼', friendly:'😊', bold:'⚡', luxury:'✨', playful:'🎈' };
+  const TYPE_ICON = { headline:'📰', ad:'📣', social:'💬', hero:'🚀' };
+  const TONES = ['professional','friendly','bold','luxury','playful'];
+  const TYPES = ['headline','ad','social','hero'];
+
+  /* ------------------------------------------------------------------ *
+   *  TEMPLATE BANKS — keyed [lang][type][tone] => array of templates.  *
+   *  Placeholders: {product} {audience} {benefit}.                     *
+   *  Every template is written so it reads naturally; where a field    *
+   *  might be empty we branch to a variant that omits it (see build).  *
+   * ------------------------------------------------------------------ */
+  const T = {
+    he:{
+      headline:{
+        professional:[
+          '{product} — הפתרון המקצועי ש{audience} חיכו לו',
+          'העתיד של {product} מתחיל כאן',
+          '{product}: {benefit}, בלי פשרות',
+          'למה {audience} בוחרים ב{product}',
+          'סטנדרט חדש: {product}',
+          '{product} — {benefit} שאפשר לסמוך עליה',
+          'עושים {product} נכון, מהצעד הראשון',
+        ],
+        friendly:[
+          'הכירו את {product} — נוח, פשוט ובשבילכם',
+          '{product} כאן כדי להקל על {audience}',
+          'שלום {audience}, ל{product} יש משהו בשבילכם',
+          '{benefit}? עם {product} זה קורה',
+          '{product} — הדרך הקלה ל{benefit}',
+          'כל מה שרציתם מ{product}, במקום אחד',
+        ],
+        bold:[
+          '{product}. שום דבר לא יהיה כמו קודם',
+          'תשכחו מהכול — {product} כאן',
+          '{benefit}. עכשיו. עם {product}',
+          '{audience} כבר לא מתפשרים — ולא בכדי',
+          'זה הזמן של {product}',
+          '{product} משנה את המשחק. נקודה',
+        ],
+        luxury:[
+          '{product} — כשמצוינות פוגשת פשטות',
+          'חוויה שאין להשוות: {product}',
+          '{product}. יוקרה שמורגשת בכל פרט',
+          'ל{audience} שיודעים להעריך את הטוב ביותר',
+          '{benefit}, ברמה אחרת לגמרי',
+          '{product} — הבחירה של מי שלא מתפשר',
+        ],
+        playful:[
+          '{product} — קצת קסם ליום שלכם',
+          'פסססט… {audience}, כדאי לכם להכיר את {product}',
+          '{benefit}? קל כמו לחיצת כפתור',
+          '{product}: אוהבים אתכם בחזרה',
+          'החיים קצרים — {product} עושה אותם כיפיים',
+          'עם {product} אפילו {audience} מחייכים',
+        ],
+      },
+      ad:{
+        professional:[
+          '{product} מספק ל{audience} {benefit} — בצורה מדויקת ואמינה. התחילו היום.',
+          'עם {product} תקבלו {benefit} בלי מאמץ מיותר. הצטרפו עכשיו.',
+          '{audience} סומכים על {product} כדי להשיג {benefit}. גם אתם יכולים.',
+          '{product}: כלים מקצועיים שמביאים {benefit}. נסו בחינם.',
+        ],
+        friendly:[
+          'רוצים {benefit}? {product} כאן בשבילכם, בלי כאב ראש. בואו נתחיל.',
+          '{product} הופך את החיים של {audience} לקלים יותר. הצטרפו אלינו!',
+          'עשינו את {product} כדי ש{audience} יקבלו {benefit} — פשוט ונעים.',
+          'נסו את {product} ותראו איך {benefit} קורה מעצמו.',
+        ],
+        bold:[
+          'הפסיקו להתפשר. {product} נותן ל{audience} {benefit} — עכשיו.',
+          '{benefit} מתחיל ברגע שתבחרו ב{product}. אל תחכו.',
+          '{product}: או שאתם בפנים, או שאתם מפספסים. {audience}, זה הרגע.',
+          'המתחרים מדברים. {product} פשוט מביא {benefit}.',
+        ],
+        luxury:[
+          '{product} מעניק ל{audience} {benefit} — בסטנדרט שלא מתפשר. הצטרפו למובחרים.',
+          'חוו את {product}: {benefit} עטוף בשירות ללא רבב.',
+          '{product} נבנה עבור {audience} שדורשים את המושלם. גלו את ההבדל.',
+          'מעבר לרגיל. {product} הופך {benefit} לחוויה יוקרתית.',
+        ],
+        playful:[
+          '{product} כאן, ו{benefit} כבר בדרך אליכם! {audience}, קפצו פנים.',
+          'למה להסתפק בפחות? {product} מביא ל{audience} {benefit} — וגם חיוך.',
+          'טוק טוק, {audience}! זה {product} עם {benefit} בכיס.',
+          'מריחים את זה? זה {benefit} של {product} מתקרב אליכם.',
+        ],
+      },
+      social:{
+        professional:[
+          'שדרגנו את הדרך שבה {audience} משיגים {benefit}. הכירו את {product}. 🔗',
+          '{product} כבר כאן — {benefit} במרחק לחיצה. פרטים בקישור.',
+          'התוצאות מדברות: {product} מביא {benefit} ל{audience}. #מקצועיות',
+        ],
+        friendly:[
+          'יש לנו חדשות טובות ל{audience} 💜 {product} כאן, ואיתו {benefit}!',
+          'סיפרנו לכם על {product}? הוא עושה {benefit} ממש פשוט. תיכנסו ותראו 👀',
+          'שבוע טוב! {product} מחכה לכם עם {benefit}. 😊',
+        ],
+        bold:[
+          '{product}. {benefit}. נקודה. 🚀 {audience}, זה בשבילכם.',
+          'הפסיקו לחכות. {product} מביא {benefit} — עכשיו. 🔥',
+          'אם אתם {audience} ואתם רוצים {benefit} — {product} הוא הצעד הבא. 💥',
+        ],
+        luxury:[
+          '{product} — {benefit} ברמה שלא הכרתם. ל{audience} שמעריכים את הטוב ביותר. ✨',
+          'פרט אחר פרט, {product} מעניק {benefit} מושלם. גלו עוד. 🤍',
+          'האלגנטיות שבפשטות: {product}. #יוקרה',
+        ],
+        playful:[
+          '⚡ עצרו הכול! {product} כאן, ו{benefit} בא איתו. {audience}, בואו נחגוג 🎉',
+          'POV: גילית את {product} וקיבלת {benefit} 😍 ספרו לחברים!',
+          'קצת {benefit} לסוף השבוע? {product} דואג לכם 🙌',
+        ],
+      },
+      hero:{
+        professional:[
+          '{product}\nהדרך המקצועית ל{benefit}, בשביל {audience}.',
+          '{benefit} מתחיל כאן.\n{product} נותן ל{audience} את הכלים הנכונים.',
+          '{product} — פשוט, אמין, מדויק.\nכל מה ש{audience} צריכים כדי להשיג {benefit}.',
+        ],
+        friendly:[
+          '{product}\nהופכים את {benefit} לקל, נעים ובהישג יד — במיוחד ל{audience}.',
+          'ברוכים הבאים ל{product}.\nיחד נגיע ל{benefit}, צעד אחר צעד.',
+          '{benefit} לא צריך להיות מסובך.\n{product} כאן בשביל {audience}.',
+        ],
+        bold:[
+          '{product}\n{benefit}. בלי תירוצים. בשביל {audience} שרוצים יותר.',
+          'תפסיקו להתפשר.\n{product} מביא ל{audience} את {benefit} שמגיע להם.',
+          'זה {product}.\nוזה הרגע שבו {benefit} הופך למציאות.',
+        ],
+        luxury:[
+          '{product}\nמצוינות בכל פרט. {benefit} ל{audience} שדורשים את המושלם.',
+          'חוויה שמגדירה מחדש את {benefit}.\n{product} — לבחירי הטעם.',
+          '{product}\nיוקרה שקטה. {benefit} ללא פשרות.',
+        ],
+        playful:[
+          '{product}\n{benefit} עם חיוך — כי {audience} מגיע להם ליהנות.',
+          'קצת קסם, הרבה {benefit}.\n{product} כאן בשבילכם 🎈',
+          '{product}\nהדרך הכי כיפית להגיע ל{benefit}. קדימה, {audience}!',
+        ],
+      },
+    },
+    en:{
+      headline:{
+        professional:[
+          '{product} — the professional way to {benefit}',
+          'Meet {product}: built for {audience}',
+          '{product}. {benefit}, without compromise.',
+          'Why {audience} choose {product}',
+          'A new standard in {product}',
+          'Get {benefit} you can rely on, with {product}',
+          '{product}, done right from day one',
+        ],
+        friendly:[
+          'Meet {product} — simple, and made for you',
+          '{product} is here to make life easier for {audience}',
+          'Hey {audience}, {product} has something for you',
+          'Want {benefit}? {product} makes it happen',
+          '{product} — the easy way to {benefit}',
+          'Everything you wanted from {product}, in one place',
+        ],
+        bold:[
+          '{product}. Nothing will be the same.',
+          'Forget the rest — {product} is here',
+          '{benefit}. Now. With {product}.',
+          '{audience} don’t settle. Neither should you.',
+          'This is the era of {product}',
+          '{product} changes the game. Period.',
+        ],
+        luxury:[
+          '{product} — where excellence meets simplicity',
+          'An experience beyond compare: {product}',
+          '{product}. Luxury felt in every detail.',
+          'For {audience} who appreciate the very best',
+          '{benefit}, on an entirely different level',
+          '{product} — the choice of those who never settle',
+        ],
+        playful:[
+          '{product} — a little magic for your day',
+          'Psst… {audience}, you’ll want to meet {product}',
+          '{benefit}? Easy as one tap.',
+          '{product}: we love you back',
+          'Life’s short — {product} makes it fun',
+          'Even {audience} smile with {product}',
+        ],
+      },
+      ad:{
+        professional:[
+          '{product} gives {audience} {benefit} — precisely and reliably. Start today.',
+          'With {product} you get {benefit}, no wasted effort. Join now.',
+          '{audience} trust {product} to deliver {benefit}. You can too.',
+          '{product}: professional tools that bring {benefit}. Try it free.',
+        ],
+        friendly:[
+          'Want {benefit}? {product} is here for you — no headaches. Let’s start.',
+          '{product} makes life easier for {audience}. Come join us!',
+          'We built {product} so {audience} get {benefit} — simply and pleasantly.',
+          'Try {product} and watch {benefit} just happen.',
+        ],
+        bold:[
+          'Stop settling. {product} gives {audience} {benefit} — right now.',
+          '{benefit} starts the moment you choose {product}. Don’t wait.',
+          '{product}: you’re either in, or you’re missing out. {audience}, this is it.',
+          'Others talk. {product} simply delivers {benefit}.',
+        ],
+        luxury:[
+          '{product} grants {audience} {benefit} — to a standard that never compromises. Join the few.',
+          'Experience {product}: {benefit} wrapped in flawless service.',
+          '{product} is built for {audience} who demand perfection. Discover the difference.',
+          'Beyond ordinary. {product} turns {benefit} into a luxury experience.',
+        ],
+        playful:[
+          '{product} is here, and {benefit} is on its way! {audience}, hop in.',
+          'Why settle for less? {product} brings {audience} {benefit} — and a smile.',
+          'Knock knock, {audience}! It’s {product}, with {benefit} in its pocket.',
+          'Smell that? It’s {benefit} from {product}, heading your way.',
+        ],
+      },
+      social:{
+        professional:[
+          'We’ve upgraded how {audience} get {benefit}. Meet {product}. 🔗',
+          '{product} is live — {benefit} is one click away. Details in the link.',
+          'The results speak: {product} delivers {benefit} for {audience}. #built-to-perform',
+        ],
+        friendly:[
+          'Good news for {audience} 💜 {product} is here, and so is {benefit}!',
+          'Did we mention {product}? It makes {benefit} so simple. Come see 👀',
+          'Happy Monday! {product} is waiting for you with {benefit}. 😊',
+        ],
+        bold:[
+          '{product}. {benefit}. Period. 🚀 {audience}, this one’s for you.',
+          'Stop waiting. {product} brings {benefit} — now. 🔥',
+          'If you’re {audience} and you want {benefit} — {product} is your next move. 💥',
+        ],
+        luxury:[
+          '{product} — {benefit} at a level you haven’t seen. For {audience} with taste. ✨',
+          'Detail by detail, {product} delivers flawless {benefit}. Discover more. 🤍',
+          'The elegance of simplicity: {product}. #luxury',
+        ],
+        playful:[
+          '⚡ Stop everything! {product} is here, and {benefit} came with it. {audience}, let’s celebrate 🎉',
+          'POV: you found {product} and got {benefit} 😍 Tell your friends!',
+          'A little {benefit} for the weekend? {product} has you covered 🙌',
+        ],
+      },
+      hero:{
+        professional:[
+          '{product}\nThe professional path to {benefit}, for {audience}.',
+          '{benefit} starts here.\n{product} gives {audience} the right tools.',
+          '{product} — simple, reliable, precise.\nEverything {audience} need to reach {benefit}.',
+        ],
+        friendly:[
+          '{product}\nMaking {benefit} easy and within reach — especially for {audience}.',
+          'Welcome to {product}.\nTogether we’ll get to {benefit}, step by step.',
+          '{benefit} shouldn’t be complicated.\n{product} is here for {audience}.',
+        ],
+        bold:[
+          '{product}\n{benefit}. No excuses. For {audience} who want more.',
+          'Stop compromising.\n{product} brings {audience} the {benefit} they deserve.',
+          'This is {product}.\nAnd this is the moment {benefit} becomes real.',
+        ],
+        luxury:[
+          '{product}\nExcellence in every detail. {benefit} for {audience} who demand perfection.',
+          'An experience that redefines {benefit}.\n{product} — for the discerning few.',
+          '{product}\nQuiet luxury. {benefit}, without compromise.',
+        ],
+        playful:[
+          '{product}\n{benefit} with a smile — because {audience} deserve to enjoy it.',
+          'A little magic, a lot of {benefit}.\n{product} is here for you 🎈',
+          '{product}\nThe most fun way to reach {benefit}. Let’s go, {audience}!',
+        ],
+      },
+    },
+    ru:{
+      headline:{
+        professional:[
+          '{product} — профессиональный путь к {benefit}',
+          '{product}: создано для {audience}',
+          '{product}. {benefit} — без компромиссов.',
+          'Почему {audience} выбирают {product}',
+          'Новый стандарт — {product}',
+          '{benefit}, на которую можно положиться, с {product}',
+          '{product} — правильно с первого дня',
+        ],
+        friendly:[
+          'Знакомьтесь: {product} — просто и для вас',
+          '{product} упрощает жизнь для {audience}',
+          'Привет, {audience}! У {product} есть кое-что для вас',
+          'Хотите {benefit}? С {product} это реально',
+          '{product} — лёгкий путь к {benefit}',
+          'Всё, что вы хотели от {product}, в одном месте',
+        ],
+        bold:[
+          '{product}. Всё изменится.',
+          'Забудьте остальное — {product} уже здесь',
+          '{benefit}. Сейчас. С {product}.',
+          '{audience} не идут на компромисс. И вы не должны.',
+          'Время {product}',
+          '{product} меняет правила. Точка.',
+        ],
+        luxury:[
+          '{product} — где совершенство встречает простоту',
+          'Опыт вне сравнений: {product}',
+          '{product}. Роскошь в каждой детали.',
+          'Для {audience}, которые ценят лучшее',
+          '{benefit} — на совершенно ином уровне',
+          '{product} — выбор тех, кто не идёт на компромисс',
+        ],
+        playful:[
+          '{product} — немного волшебства для вашего дня',
+          'Тсс… {audience}, вам стоит узнать про {product}',
+          '{benefit}? Легко, в одно касание.',
+          '{product}: мы тоже вас любим',
+          'Жизнь коротка — {product} делает её ярче',
+          'Даже {audience} улыбаются с {product}',
+        ],
+      },
+      ad:{
+        professional:[
+          '{product} даёт {audience} {benefit} — точно и надёжно. Начните сегодня.',
+          'С {product} вы получаете {benefit} без лишних усилий. Присоединяйтесь.',
+          '{audience} доверяют {product} ради {benefit}. Вы тоже можете.',
+          '{product}: профессиональные инструменты, которые дают {benefit}. Попробуйте бесплатно.',
+        ],
+        friendly:[
+          'Хотите {benefit}? {product} здесь для вас — без хлопот. Начнём.',
+          '{product} упрощает жизнь для {audience}. Присоединяйтесь к нам!',
+          'Мы создали {product}, чтобы {audience} получали {benefit} — просто и приятно.',
+          'Попробуйте {product} — и {benefit} придёт само.',
+        ],
+        bold:[
+          'Хватит компромиссов. {product} даёт {audience} {benefit} — прямо сейчас.',
+          '{benefit} начинается в момент, когда вы выбираете {product}. Не ждите.',
+          '{product}: вы либо с нами, либо упускаете шанс. {audience}, вот он.',
+          'Другие говорят. {product} просто даёт {benefit}.',
+        ],
+        luxury:[
+          '{product} дарит {audience} {benefit} — по стандарту без компромиссов. Присоединяйтесь к избранным.',
+          'Почувствуйте {product}: {benefit} в безупречном сервисе.',
+          '{product} создан для {audience}, требующих совершенства. Ощутите разницу.',
+          'За гранью обычного. {product} превращает {benefit} в роскошь.',
+        ],
+        playful:[
+          '{product} уже здесь, и {benefit} на подходе! {audience}, запрыгивайте.',
+          'Зачем меньше? {product} несёт {audience} {benefit} — и улыбку.',
+          'Тук-тук, {audience}! Это {product} с {benefit} в кармане.',
+          'Чувствуете? Это {benefit} от {product} спешит к вам.',
+        ],
+      },
+      social:{
+        professional:[
+          'Мы улучшили то, как {audience} получают {benefit}. Знакомьтесь — {product}. 🔗',
+          '{product} уже доступен — {benefit} в одном клике. Подробности по ссылке.',
+          'Результаты говорят сами: {product} даёт {benefit} для {audience}. #качество',
+        ],
+        friendly:[
+          'Хорошие новости для {audience} 💜 {product} здесь, а с ним и {benefit}!',
+          'Мы рассказывали про {product}? Он делает {benefit} совсем простым. Загляните 👀',
+          'Хорошей недели! {product} ждёт вас с {benefit}. 😊',
+        ],
+        bold:[
+          '{product}. {benefit}. Точка. 🚀 {audience}, это для вас.',
+          'Хватит ждать. {product} несёт {benefit} — сейчас. 🔥',
+          'Если вы {audience} и хотите {benefit} — {product} ваш следующий шаг. 💥',
+        ],
+        luxury:[
+          '{product} — {benefit} на уровне, которого вы не видели. Для {audience} со вкусом. ✨',
+          'Деталь за деталью {product} даёт безупречную {benefit}. Узнайте больше. 🤍',
+          'Элегантность простоты: {product}. #премиум',
+        ],
+        playful:[
+          '⚡ Остановитесь! {product} здесь, и {benefit} вместе с ним. {audience}, давайте праздновать 🎉',
+          'POV: вы открыли {product} и получили {benefit} 😍 Расскажите друзьям!',
+          'Немного {benefit} на выходные? {product} обо всём позаботится 🙌',
+        ],
+      },
+      hero:{
+        professional:[
+          '{product}\nПрофессиональный путь к {benefit}, для {audience}.',
+          '{benefit} начинается здесь.\n{product} даёт {audience} нужные инструменты.',
+          '{product} — просто, надёжно, точно.\nВсё, что нужно {audience} для {benefit}.',
+        ],
+        friendly:[
+          '{product}\nДелаем {benefit} лёгким и доступным — особенно для {audience}.',
+          'Добро пожаловать в {product}.\nВместе придём к {benefit}, шаг за шагом.',
+          '{benefit} не должно быть сложным.\n{product} здесь для {audience}.',
+        ],
+        bold:[
+          '{product}\n{benefit}. Без отговорок. Для {audience}, которые хотят большего.',
+          'Хватит компромиссов.\n{product} даёт {audience} ту {benefit}, что они заслужили.',
+          'Это {product}.\nИ это момент, когда {benefit} становится реальностью.',
+        ],
+        luxury:[
+          '{product}\nСовершенство в каждой детали. {benefit} для {audience}, требующих идеала.',
+          'Опыт, который переопределяет {benefit}.\n{product} — для избранных.',
+          '{product}\nТихая роскошь. {benefit} без компромиссов.',
+        ],
+        playful:[
+          '{product}\n{benefit} с улыбкой — ведь {audience} заслужили удовольствие.',
+          'Немного волшебства, много {benefit}.\n{product} здесь для вас 🎈',
+          '{product}\nСамый весёлый путь к {benefit}. Вперёд, {audience}!',
+        ],
+      },
+    },
+  };
+
+  const ICON = {
+    copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+    check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  };
+
+  const STORE_KEY = 'kolkli_copy';
+  let lang='he', t=I18N.he;
+  let state = { product:'', audience:'', benefit:'', tone:'friendly', type:'headline' };
+  let variations = [];   // array of strings currently shown
+  let seed = 0;          // rotation offset for regenerate
+
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+
+  /* ------------------------------ persistence ------------------------------ */
+  function saveState(){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(_){}
+  }
+  function loadState(){
+    try{
+      const raw=ls(STORE_KEY); if(!raw) return;
+      const s=JSON.parse(raw);
+      if(s && typeof s==='object'){
+        if(typeof s.product==='string') state.product=s.product;
+        if(typeof s.audience==='string') state.audience=s.audience;
+        if(typeof s.benefit==='string') state.benefit=s.benefit;
+        if(TONES.includes(s.tone)) state.tone=s.tone;
+        if(TYPES.includes(s.type)) state.type=s.type;
+      }
+    }catch(_){}
+  }
+
+  /* ------------------------------ generation ------------------------------- *
+   *  We pick a template, then fill placeholders. When an optional field is    *
+   *  empty, we DON'T inject an awkward literal — we tidy the sentence:        *
+   *   - {audience} empty  -> use a soft fallback OR drop the trailing clause  *
+   *   - {benefit}  empty  -> use a soft fallback                              *
+   *  Then we normalise Hebrew "ל{...}" / "ב{...}" prefixes and clean spacing. *
+   * ------------------------------------------------------------------------ */
+
+  // Hebrew inseparable prepositions get glued to the following word (ל+word).
+  // If the product/benefit starts with a definite article "ה", drop it after the preposition
+  // so we don't produce "להה..." — keep it simple: just glue, Hebrew readers parse it fine.
+  function fill(tpl){
+    const p = state.product.trim();
+    const aRaw = state.audience.trim();
+    const bRaw = state.benefit.trim();
+    const a = aRaw || t.fbAudience;
+    const b = bRaw || t.fbBenefit;
+
+    let s = tpl;
+    s = s.replace(/\{product\}/g, p);
+    s = s.replace(/\{audience\}/g, a);
+    s = s.replace(/\{benefit\}/g, b);
+
+    // tidy: collapse doubled spaces, fix space before punctuation
+    s = s.replace(/[ \t]{2,}/g,' ')
+         .replace(/\s+([,.!?…])/g, '$1')
+         .replace(/^\s+|\s+$/g,'');
+    return s;
+  }
+
+  // Build the full ordered candidate list for the current type+tone, filled.
+  function buildAll(){
+    const bank = (T[lang] && T[lang][state.type] && T[lang][state.type][state.tone]) || [];
+    // Fill every template, dedupe identical outputs (can happen when fallbacks collapse).
+    const seen = new Set();
+    const out = [];
+    bank.forEach(tpl=>{
+      const s = fill(tpl);
+      if(s && !seen.has(s)){ seen.add(s); out.push(s); }
+    });
+    return out;
+  }
+
+  function generate(reshuffle){
+    state.product = el('product').value;
+    state.audience = el('audience').value;
+    state.benefit = el('benefit').value;
+    el('optErr').textContent='';
+
+    if(!state.product.trim()){
+      variations=[]; renderCards();
+      el('optErr').textContent=t.errNoProduct;
+      return false;
+    }
+    if(reshuffle) seed++;
+
+    const all = buildAll();
+    // rotate by seed so "Shuffle" surfaces a different slice/order, then keep 6-8.
+    const n = all.length;
+    const take = Math.min(n, Math.max(6, Math.min(8, n)));
+    const rotated = [];
+    for(let i=0;i<n;i++){ rotated.push(all[(i+seed)%n]); }
+    variations = rotated.slice(0, take);
+
+    saveState();
+    renderCards();
+    return true;
+  }
+
+  /* ------------------------------ rendering ------------------------------- */
+  function renderCards(){
+    const wrap = el('cards'), empty = el('empty');
+    if(!variations.length){
+      wrap.innerHTML='';
+      empty.style.display='';
+      el('outMeta').textContent='';
+      el('copyAllBtn').style.display='none';
+      el('regenBtn').style.display= state.product.trim()? '' : 'none';
+      return;
+    }
+    empty.style.display='none';
+    el('copyAllBtn').style.display='';
+    el('regenBtn').style.display='';
+    el('outMeta').textContent = t.outMeta(variations.length, t.types[state.type], t.tones[state.tone]);
+    const heroCls = state.type==='hero' ? ' hero' : '';
+    wrap.innerHTML = variations.map((v,i)=>{
+      const chars = [...v].length;
+      return `<div class="vcard${heroCls}">
+        <div class="txt">${escapeHtml(v)}</div>
+        <div class="foot">
+          <div class="badges">
+            <span class="chip cc">${escapeHtml(t.types[state.type])}</span>
+            <span class="chip">${chars} ${escapeHtml(t.charsLbl)}</span>
+          </div>
+          <button class="cpbtn" data-cp="${i}">${ICON.copy}<span>${escapeHtml(t.copyOne)}</span></button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  /* ------------------------------ pickers -------------------------------- */
+  function renderSegs(){
+    el('toneSeg').innerHTML = TONES.map(x=>`
+      <button type="button" data-tone="${x}" class="${x===state.tone?'on':''}">
+        <span class="ic">${TONE_ICON[x]}</span><span>${escapeHtml(t.tones[x])}</span>
+      </button>`).join('');
+    el('typeSeg').innerHTML = TYPES.map(x=>`
+      <button type="button" data-type="${x}" class="${x===state.type?'on':''}">
+        <span class="ic">${TYPE_ICON[x]}</span><span>${escapeHtml(t.types[x])}</span>
+      </button>`).join('');
+  }
+
+  /* ------------------------------ clipboard ------------------------------ */
+  function copyText(str,cb){
+    const done=()=>cb&&cb();
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(str).then(done).catch(()=>fallback(str,done)); }
+    else fallback(str,done);
+  }
+  function fallback(str,cb){ const ta=document.createElement('textarea'); ta.value=str; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); cb&&cb(); }
+
+  /* ------------------------------ i18n + theme --------------------------- */
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder', t[k]); });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderSegs();
+    // regenerate output so the shown copy switches language too
+    if(state.product.trim()){ generate(false); } else { renderCards(); }
+  }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen && I18N[chosen]) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  /* ------------------------------ events --------------------------------- */
+  el('genBtn').addEventListener('click',()=>generate(false));
+  el('regenBtn').addEventListener('click',()=>{ if(!generate(true)) return; toast(t.regenBtn); });
+
+  el('product').addEventListener('input',()=>{ state.product=el('product').value; saveState(); if(el('optErr').textContent) el('optErr').textContent=''; });
+  el('audience').addEventListener('input',()=>{ state.audience=el('audience').value; saveState(); });
+  el('benefit').addEventListener('input',()=>{ state.benefit=el('benefit').value; saveState(); });
+
+  el('toneSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-tone]'); if(!b) return;
+    state.tone=b.getAttribute('data-tone'); renderSegs(); saveState();
+    if(state.product.trim()) generate(false); });
+  el('typeSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-type]'); if(!b) return;
+    state.type=b.getAttribute('data-type'); renderSegs(); saveState();
+    if(state.product.trim()) generate(false); });
+
+  el('cards').addEventListener('click',e=>{
+    const b=e.target.closest('[data-cp]'); if(!b) return;
+    const i=+b.getAttribute('data-cp'); const v=variations[i]; if(v==null) return;
+    copyText(v, ()=>{
+      b.classList.add('done');
+      b.innerHTML = ICON.check+'<span>'+escapeHtml(t.copiedOne)+'</span>';
+      toast(t.copied);
+      clearTimeout(b._t);
+      b._t=setTimeout(()=>{ b.classList.remove('done'); b.innerHTML = ICON.copy+'<span>'+escapeHtml(t.copyOne)+'</span>'; }, 1600);
+    });
+  });
+
+  el('copyAllBtn').addEventListener('click',()=>{
+    if(!variations.length) return;
+    copyText(variations.join('\n\n'), ()=>toast(t.copiedAll));
+  });
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  /* ------------------------------ init ----------------------------------- */
+  loadState();
+  applyTheme(ls('theme')||'light');
+  // populate inputs from persisted state
+  el('product').value=state.product;
+  el('audience').value=state.audience;
+  el('benefit').value=state.benefit;
+  applyLang(detectLang());   // renders segs + (if product present) generates
+  if(!state.product.trim()) renderCards();
+})();
+</script>
+</body>
+</html>

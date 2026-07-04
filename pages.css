@@ -131,7 +131,7 @@ a.chip.hov:hover{border-color:var(--accent);}
 a.aicard.hov:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:var(--shadow-lg);}
 
 /* ---------- pricing ---------- */
-.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start;}
+.plans{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;align-items:start;}
 .plan{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px 24px;box-shadow:var(--shadow);}
 .plan.pop{border-color:var(--accent);box-shadow:var(--shadow-lg);}
 .plan .ribbon{position:absolute;top:-11px;inset-inline-start:24px;background:var(--grad);color:#fff;font-size:11px;font-weight:700;
@@ -176,23 +176,28 @@ details.q .ans{padding:0 0 18px;font-size:14px;color:var(--muted);line-height:1.
 .c-documents{--ci:#ef7a3a;--ci-bg:#fdeee2;}
 .c-converters{--ci:#d6489a;--ci-bg:#fce7f3;}
 .c-compress{--ci:#0fa6ab;--ci-bg:#def5f5;}
+.c-dev{--ci:#e0447a;--ci-bg:#fde7f0;}
+.c-marketing{--ci:#c98a1e;--ci-bg:#fbefd4;}
 html[data-theme="dark"] .c-audio{--ci-bg:#241a3a;}
 html[data-theme="dark"] .c-images{--ci-bg:#132a1c;}
 html[data-theme="dark"] .c-video{--ci-bg:#182338;}
 html[data-theme="dark"] .c-documents{--ci-bg:#2c2718;}
 html[data-theme="dark"] .c-converters{--ci-bg:#2a1622;}
 html[data-theme="dark"] .c-compress{--ci-bg:#11242a;}
+html[data-theme="dark"] .c-dev{--ci-bg:#2c1622;}
+html[data-theme="dark"] .c-marketing{--ci-bg:#2c2718;}
 
 /* ---------- responsive ---------- */
 @media (max-width:1180px){ .wrap{max-width:none;padding:0 26px;} }
+@media (max-width:1080px){ .plans{grid-template-columns:repeat(2,1fr);} }
 @media (max-width:860px){
   .g4{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:repeat(2,1fr);}
   .aigrid{grid-template-columns:repeat(2,1fr);}
-  .plans{grid-template-columns:1fr;}
 }
 @media (max-width:560px){
   .g4,.g3,.g2{grid-template-columns:1fr;}
   .aigrid{grid-template-columns:1fr;}
+  .plans{grid-template-columns:1fr;}
   .pagehead{padding-top:40px;}
 }
 @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} .card.hov:hover{transform:none;} }

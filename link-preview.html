@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — תצוגה מקדימה לקישור</title>
+<meta name="description" content="Compose and preview how your link looks when shared on Facebook, X/Twitter, LinkedIn, WhatsApp and Google. Generate copy-ready Open Graph and Twitter Card meta tags — all in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* form side */
+  .side{padding:18px;}
+  .side h3{font-size:15px;margin:0 0 4px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .side .sublbl{font-size:12px;color:var(--muted);margin:0 0 16px;}
+  .field{margin-bottom:15px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+  .field .lblrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px;}
+  .field .lblrow label{margin-bottom:0;}
+  .counter{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--faint);
+    background:var(--panel-2);border:1px solid var(--line);padding:2px 8px;border-radius:999px;white-space:nowrap;}
+  .counter.warn{color:var(--warn);background:var(--warm-soft);border-color:var(--warm-line);}
+  .counter.over{color:var(--err);background:var(--danger-soft);border-color:var(--err);}
+
+  .inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  textarea.inp{resize:vertical;min-height:66px;line-height:1.5;}
+
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+  .actions button{flex:1;min-width:120px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .actions button:hover{border-color:var(--accent);} .actions button:active{transform:translateY(1px);}
+  .actions svg{width:15px;height:15px;}
+
+  /* preview stack */
+  .previews{display:flex;flex-direction:column;gap:18px;}
+  .pvblock .pvhead{display:flex;align-items:center;gap:8px;margin-bottom:9px;padding:0 2px;}
+  .pvblock .pvhead .pn{font-size:12.5px;font-weight:700;color:var(--ink-2);letter-spacing:.01em;}
+  .pvblock .pvhead .badge{width:22px;height:22px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;}
+  .pvblock .pvhead .badge svg{width:13px;height:13px;}
+  .b-fb{background:#1877f2;} .b-x{background:#000;} .b-in{background:#0a66c2;}
+  .b-wa{background:#25d366;} .b-gg{background:#4285f4;}
+  html[data-theme="dark"] .b-x{background:#2b3140;}
+
+  /* generic social card — always LTR internally, like the real platforms render */
+  .sc{border:1px solid #dadde1;border-radius:8px;overflow:hidden;background:#fff;color:#1c1e21;
+    direction:ltr;text-align:left;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;box-shadow:var(--shadow-sm);}
+  html[data-theme="dark"] .sc{background:#242526;border-color:#3a3b3c;color:#e4e6eb;}
+  .sc .scimg{width:100%;aspect-ratio:1.91/1;object-fit:cover;display:block;background:#e4e6eb;}
+  html[data-theme="dark"] .sc .scimg{background:#3a3b3c;}
+  .sc .ph{width:100%;aspect-ratio:1.91/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    background:linear-gradient(135deg,#e9ebf0,#dfe3ea);color:#9aa1b1;font-size:12px;font-family:var(--mono);}
+  html[data-theme="dark"] .sc .ph{background:linear-gradient(135deg,#2c2f36,#22252b);color:#6b7280;}
+  .sc .ph svg{width:34px;height:34px;opacity:.55;}
+  .sc .scbody{padding:10px 12px;}
+  .sc .schost{font-size:11px;text-transform:uppercase;letter-spacing:.02em;color:#606770;margin-bottom:3px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  html[data-theme="dark"] .sc .schost{color:#b0b3b8;}
+  .sc .sctitle{font-size:15px;font-weight:700;line-height:1.28;margin-bottom:3px;color:inherit;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .sc .scdesc{font-size:13px;line-height:1.35;color:#606770;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  html[data-theme="dark"] .sc .scdesc{color:#b0b3b8;}
+
+  /* X large summary card — rounded, host overlaid style */
+  .sc.x{border-radius:14px;border-color:#cfd9de;}
+  html[data-theme="dark"] .sc.x{border-color:#2f3336;background:#000;}
+  .sc.x .scbody{padding:10px 14px;}
+  .sc.x .sctitle{font-size:14px;font-weight:600;-webkit-line-clamp:1;}
+  .sc.x .scdesc{font-size:13px;-webkit-line-clamp:2;}
+  .sc.x .schost{text-transform:none;font-size:12.5px;order:2;margin:4px 0 0;}
+  .sc.x .scbody{display:flex;flex-direction:column;}
+  .sc.x .sctitle{order:0;} .sc.x .scdesc{order:1;}
+
+  /* LinkedIn — square-ish, bold title, host under */
+  .sc.in{border-radius:2px;border-color:#e0e0e0;}
+  html[data-theme="dark"] .sc.in{border-color:#38434f;}
+  .sc.in .scbody{padding:12px 14px;background:#fff;}
+  html[data-theme="dark"] .sc.in .scbody{background:#1b1f23;}
+  .sc.in .sctitle{font-size:14px;font-weight:600;margin-bottom:5px;}
+  .sc.in .schost{font-size:12px;text-transform:none;color:#00000099;}
+  html[data-theme="dark"] .sc.in .schost{color:#ffffff99;}
+  .sc.in .scdesc{display:none;}
+
+  /* WhatsApp / Telegram — compact chat bubble, thumbnail left */
+  .wa{max-width:340px;}
+  .wa .bubble{background:#dcf8c6;border-radius:8px 8px 8px 2px;padding:4px;box-shadow:0 1px 1px rgba(0,0,0,.12);
+    direction:ltr;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;}
+  html[data-theme="dark"] .wa .bubble{background:#005c4b;}
+  .wa .prev{background:#d1f0bb;border-radius:6px;overflow:hidden;}
+  html[data-theme="dark"] .wa .prev{background:#025043;}
+  .wa .prev.tg{background:#eef6fc;border-inline-start:3px solid #40a7e3;border-radius:4px;}
+  html[data-theme="dark"] .wa .prev.tg{background:#182b38;}
+  .wa .wimg{width:100%;aspect-ratio:1.91/1;object-fit:cover;display:block;background:#c4e4a8;}
+  .wa .wph{width:100%;aspect-ratio:2.4/1;display:flex;align-items:center;justify-content:center;background:#c4e4a8;color:#7a9a5c;}
+  html[data-theme="dark"] .wa .wph{background:#02463b;color:#4d7a63;}
+  .wa .wph svg{width:26px;height:26px;opacity:.6;}
+  .wa .wbody{padding:7px 9px 8px;}
+  .wa .wtitle{font-size:12.5px;font-weight:700;color:#111b21;line-height:1.25;margin-bottom:2px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  html[data-theme="dark"] .wa .wtitle{color:#e9edef;}
+  .wa .wdesc{font-size:11.5px;color:#3b4a54;line-height:1.3;margin-bottom:3px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  html[data-theme="dark"] .wa .wdesc{color:#b3c0c8;}
+  .wa .whost{font-size:11px;color:#667781;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  html[data-theme="dark"] .wa .whost{color:#8696a0;}
+  .wa .prev.tg .wtitle{color:#1c93e3;} .wa .prev.tg .wdesc{color:#2b2b2b;} .wa .prev.tg .whost{color:#40a7e3;}
+  html[data-theme="dark"] .wa .prev.tg .wtitle{color:#62b8f0;} html[data-theme="dark"] .wa .prev.tg .wdesc{color:#c3d3de;}
+  .wa .link{font-size:11px;color:#53bdeb;padding:3px 5px 1px;direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  html[data-theme="dark"] .wa .link{color:#53bdeb;}
+
+  /* Google search result snippet */
+  .gg{direction:ltr;text-align:left;font-family:arial,sans-serif;background:transparent;}
+  .gg .gfav{display:flex;align-items:center;gap:9px;margin-bottom:3px;}
+  .gg .gfav .fv{width:26px;height:26px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;}
+  .gg .gfav .gmeta{min-width:0;}
+  .gg .gfav .gsite{font-size:14px;color:#202124;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  html[data-theme="dark"] .gg .gfav .gsite{color:#dadce0;}
+  .gg .gfav .gurl{font-size:12px;color:#4d5156;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  html[data-theme="dark"] .gg .gfav .gurl{color:#bdc1c6;}
+  .gg .gtitle{font-size:20px;line-height:1.3;color:#1a0dab;font-weight:400;margin-bottom:3px;
+    display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+  html[data-theme="dark"] .gg .gtitle{color:#8ab4f8;}
+  .gg .gdesc{font-size:14px;line-height:1.45;color:#4d5156;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  html[data-theme="dark"] .gg .gdesc{color:#bdc1c6;}
+
+  /* meta tag output */
+  .outwrap{position:relative;}
+  .outta{width:100%;min-height:230px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
+    border-radius:12px;font-family:var(--mono);font-size:12px;line-height:1.6;padding:14px 14px;resize:vertical;
+    direction:ltr;text-align:left;white-space:pre;overflow:auto;}
+  .outta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .copybtn{position:absolute;top:10px;inset-inline-end:10px;display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:12px;padding:0 14px;height:32px;border-radius:9px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
+  .copybtn:hover{filter:brightness(1.05);} .copybtn svg{width:14px;height:14px;}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid">
+    <!-- form -->
+    <div class="col">
+      <div class="card side">
+        <h3>
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span data-i18n="formTitle"></span>
+        </h3>
+        <p class="sublbl" data-i18n="formSub"></p>
+
+        <div class="field">
+          <label for="fUrl" data-i18n="urlLbl"></label>
+          <input class="inp" id="fUrl" type="text" dir="ltr" placeholder="https://example.com/page" autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="field">
+          <div class="lblrow"><label for="fTitle" data-i18n="titleLbl"></label><span class="counter" id="cTitle"></span></div>
+          <input class="inp" id="fTitle" type="text" maxlength="180" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <div class="lblrow"><label for="fDesc" data-i18n="descLbl"></label><span class="counter" id="cDesc"></span></div>
+          <textarea class="inp" id="fDesc" maxlength="400"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="fImg" data-i18n="imgLbl"></label>
+          <input class="inp" id="fImg" type="text" dir="ltr" placeholder="https://example.com/cover.jpg" autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="field">
+          <label for="fSite" data-i18n="siteLbl"></label>
+          <input class="inp" id="fSite" type="text" maxlength="120" autocomplete="off">
+        </div>
+
+        <div class="actions">
+          <button type="button" id="sampleBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg>
+            <span data-i18n="sampleBtn"></span>
+          </button>
+          <button type="button" id="clearBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span data-i18n="clearBtn"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- meta tags output -->
+      <div class="card side" style="margin-top:18px">
+        <h3>
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span data-i18n="metaTitle"></span>
+        </h3>
+        <p class="sublbl" data-i18n="metaSub"></p>
+        <div class="outwrap">
+          <textarea class="outta" id="metaOut" readonly spellcheck="false"></textarea>
+          <button class="copybtn" type="button" id="copyBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span data-i18n="copyBtn"></span>
+          </button>
+        </div>
+        <div class="seam">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-i18n="seam"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- live previews -->
+    <div class="col">
+      <div class="card side">
+        <h3>
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span data-i18n="pvTitle"></span>
+        </h3>
+        <p class="sublbl" data-i18n="pvSub"></p>
+
+        <div class="previews">
+
+          <!-- Facebook -->
+          <div class="pvblock">
+            <div class="pvhead"><span class="badge b-fb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12c0-6.6-5.4-12-12-12S0 5.4 0 12c0 6 4.4 11 10.1 11.9v-8.4H7.1V12h3v-2.6c0-3 1.8-4.6 4.5-4.6 1.3 0 2.7.2 2.7.2v2.9h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4C19.6 23 24 18 24 12z"/></svg></span><span class="pn">Facebook</span></div>
+            <div class="sc" id="pvFb">
+              <div class="scimg-wrap" id="fbImgWrap"></div>
+              <div class="scbody">
+                <div class="schost" id="fbHost"></div>
+                <div class="sctitle" id="fbTitle"></div>
+                <div class="scdesc" id="fbDesc"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- X / Twitter -->
+          <div class="pvblock">
+            <div class="pvhead"><span class="badge b-x"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 1.2h3.7l-8 9.1L24 22.8h-7.4l-5.8-7.6-6.6 7.6H.5l8.6-9.8L0 1.2h7.6l5.2 6.9 6.1-6.9zm-1.3 19.4h2L6.5 3.3H4.4l13.2 17.3z"/></svg></span><span class="pn">X (Twitter)</span></div>
+            <div class="sc x" id="pvX">
+              <div class="scimg-wrap" id="xImgWrap"></div>
+              <div class="scbody">
+                <div class="sctitle" id="xTitle"></div>
+                <div class="scdesc" id="xDesc"></div>
+                <div class="schost" id="xHost"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LinkedIn -->
+          <div class="pvblock">
+            <div class="pvhead"><span class="badge b-in"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 2h-17A1.5 1.5 0 0 0 2 3.5v17A1.5 1.5 0 0 0 3.5 22h17a1.5 1.5 0 0 0 1.5-1.5v-17A1.5 1.5 0 0 0 20.5 2zM8 19H5v-9h3zM6.5 8.3a1.7 1.7 0 1 1 0-3.5 1.7 1.7 0 0 1 0 3.5zM19 19h-3v-4.7c0-1.1 0-2.5-1.5-2.5S12.7 13 12.7 14.2V19h-3v-9h2.9v1.2h.04a3.2 3.2 0 0 1 2.9-1.6c3 0 3.6 2 3.6 4.6z"/></svg></span><span class="pn">LinkedIn</span></div>
+            <div class="sc in" id="pvIn">
+              <div class="scimg-wrap" id="inImgWrap"></div>
+              <div class="scbody">
+                <div class="sctitle" id="inTitle"></div>
+                <div class="schost" id="inHost"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- WhatsApp / Telegram -->
+          <div class="pvblock">
+            <div class="pvhead"><span class="badge b-wa"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.7.1s-.7 1-.9 1.2c-.2.2-.3.2-.6.1a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.6-2c-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5a.5.5 0 0 0 0-.5c0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6a1.1 1.1 0 0 0-.8.4c-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.2 3.4 5.3 4.7 2.6 1.1 3.1.9 3.7.8.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.3A10 10 0 1 0 12 2z"/></svg></span><span class="pn" data-i18n="waLbl"></span></div>
+            <div class="wa">
+              <div class="bubble">
+                <div class="prev" id="pvWa">
+                  <div class="wimg-wrap" id="waImgWrap"></div>
+                  <div class="wbody">
+                    <div class="wtitle" id="waTitle"></div>
+                    <div class="wdesc" id="waDesc"></div>
+                    <div class="whost" id="waHost"></div>
+                  </div>
+                </div>
+                <div class="link" id="waLink"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Google -->
+          <div class="pvblock">
+            <div class="pvhead"><span class="badge b-gg"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 11v3.3h4.6c-.2 1.2-1.5 3.5-4.6 3.5A5 5 0 0 1 12 7a4.5 4.5 0 0 1 3.2 1.2l2.2-2.1A8 8 0 1 0 12 20c4.6 0 7.7-3.2 7.7-7.8 0-.5 0-.9-.1-1.3H12z"/></svg></span><span class="pn" data-i18n="ggLbl"></span></div>
+            <div class="gg" id="pvGg">
+              <div class="gfav">
+                <div class="fv" id="ggFav">K</div>
+                <div class="gmeta">
+                  <div class="gsite" id="ggSite"></div>
+                  <div class="gurl" id="ggUrl"></div>
+                </div>
+              </div>
+              <div class="gtitle" id="ggTitle"></div>
+              <div class="gdesc" id="ggDesc"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN',
+      kick:'שיווק · תצוגה מקדימה לקישור',
+      pageTitle:'תצוגה מקדימה לקישור ותגי OG',
+      pageSub:'הרכיבו איך הקישור שלכם ייראה כשמשתפים אותו ברשתות — פייסבוק, X, לינקדאין, וואטסאפ וגוגל — וקבלו תגי Open Graph מוכנים להעתקה. הכול רץ בדפדפן שלכם, בלי לשלוח דבר לשרת.',
+      formTitle:'פרטי הקישור',
+      formSub:'מלאו את השדות והתצוגות מתעדכנות בזמן אמת.',
+      urlLbl:'כתובת הקישור (URL)',
+      titleLbl:'כותרת',
+      descLbl:'תיאור',
+      imgLbl:'כתובת תמונה (Image URL)',
+      siteLbl:'שם האתר',
+      sampleBtn:'מלאו לדוגמה',
+      clearBtn:'ניקוי',
+      metaTitle:'תגי מטא מוכנים להעתקה',
+      metaSub:'הדביקו לתוך תגית ה-head של הדף.',
+      copyBtn:'העתקה',
+      pvTitle:'תצוגות מקדימות חיות',
+      pvSub:'כך הקישור ייראה בכל פלטפורמה.',
+      waLbl:'וואטסאפ / טלגרם',
+      ggLbl:'תוצאת חיפוש בגוגל',
+      seam:'אי אפשר למשוך תגי מטא מכתובת חיצונית מדפדפן (חסימת CORS), ולכן זהו מרכיב תצוגה — אתם מזינים את הערכים ורואים תצוגה נאמנה. הפלטפורמות עשויות לחתוך טקסט או להשתמש בממטמון, אז ראו בזה קירוב.',
+      foot:'KOLKLI · תצוגה מקדימה לקישור · מרכיב תגי OG, ישירות בדפדפן',
+      copied:'התגים הועתקו ✓',
+      copiedEmpty:'אין מה להעתיק עדיין',
+      noTitle:'הכותרת שלכם תופיע כאן',
+      noDesc:'התיאור שלכם יופיע כאן — כמה מילים שמסבירות על מה הדף.',
+      hintG:'לגוגל', hintS:'לרשתות',
+      s_title:'שירותי הקבצים של KOLKLI — הכול בדפדפן',
+      s_desc:'המירו, כווצו וחתכו קבצים ישירות בדפדפן. פרטי, מהיר, בלי העלאות לשרת.',
+      s_site:'KOLKLI',
+    },
+    en:{
+      dir:'ltr', langIco:'עב',
+      kick:'Marketing · Link Preview',
+      pageTitle:'Link Preview & OG Tags',
+      pageSub:'Compose how your link looks when shared across Facebook, X, LinkedIn, WhatsApp and Google — and get copy-ready Open Graph tags. Everything runs in your browser, nothing is sent to a server.',
+      formTitle:'Link details',
+      formSub:'Fill in the fields and the previews update live.',
+      urlLbl:'Link URL',
+      titleLbl:'Title',
+      descLbl:'Description',
+      imgLbl:'Image URL',
+      siteLbl:'Site name',
+      sampleBtn:'Fill sample',
+      clearBtn:'Clear',
+      metaTitle:'Copy-ready meta tags',
+      metaSub:'Paste these into your page’s head tag.',
+      copyBtn:'Copy',
+      pvTitle:'Live previews',
+      pvSub:'How the link renders on each platform.',
+      waLbl:'WhatsApp / Telegram',
+      ggLbl:'Google search result',
+      seam:'A browser cannot fetch meta tags from a remote URL (CORS blocks it), so this is a composer — you type the values and see a faithful preview. Real platforms may truncate text or use a cache, so treat this as a close approximation.',
+      foot:'KOLKLI · Link Preview · OG tag composer, right in your browser',
+      copied:'Tags copied ✓',
+      copiedEmpty:'Nothing to copy yet',
+      noTitle:'Your title appears here',
+      noDesc:'Your description appears here — a line that explains what the page is about.',
+      hintG:'Google', hintS:'Social',
+      s_title:'KOLKLI file tools — all in your browser',
+      s_desc:'Convert, compress and cut files right in your browser. Private, fast, no uploads.',
+      s_site:'KOLKLI',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Маркетинг · Превью ссылки',
+      pageTitle:'Превью ссылки и OG-теги',
+      pageSub:'Соберите, как ваша ссылка выглядит при публикации в Facebook, X, LinkedIn, WhatsApp и Google, и получите готовые к копированию теги Open Graph. Всё работает в браузере, ничего не отправляется на сервер.',
+      formTitle:'Данные ссылки',
+      formSub:'Заполните поля — превью обновляются в реальном времени.',
+      urlLbl:'URL ссылки',
+      titleLbl:'Заголовок',
+      descLbl:'Описание',
+      imgLbl:'URL изображения',
+      siteLbl:'Название сайта',
+      sampleBtn:'Заполнить пример',
+      clearBtn:'Очистить',
+      metaTitle:'Готовые к копированию мета-теги',
+      metaSub:'Вставьте в тег head вашей страницы.',
+      copyBtn:'Копировать',
+      pvTitle:'Живые превью',
+      pvSub:'Как ссылка отображается на каждой платформе.',
+      waLbl:'WhatsApp / Telegram',
+      ggLbl:'Результат поиска Google',
+      seam:'Браузер не может получить мета-теги с внешнего URL (блокирует CORS), поэтому это конструктор — вы вводите значения и видите точное превью. Реальные платформы могут обрезать текст или использовать кэш, так что это приближение.',
+      foot:'KOLKLI · Превью ссылки · Конструктор OG-тегов, прямо в браузере',
+      copied:'Теги скопированы ✓',
+      copiedEmpty:'Пока нечего копировать',
+      noTitle:'Здесь появится ваш заголовок',
+      noDesc:'Здесь появится ваше описание — строка о том, чему посвящена страница.',
+      hintG:'Google', hintS:'Соцсети',
+      s_title:'Файловые инструменты KOLKLI — всё в браузере',
+      s_desc:'Конвертируйте, сжимайте и обрезайте файлы прямо в браузере. Приватно, быстро, без загрузок.',
+      s_site:'KOLKLI',
+    },
+  };
+
+  const IMG_PLACEHOLDER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>';
+
+  const LS_KEY = 'kolkli_ogp';
+  let lang='he', t=I18N.he;
+
+  const data = { url:'', title:'', desc:'', img:'', site:'' };
+
+  // ---- helpers ----
+  function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function escapeAttr(s){ return escapeHtml(s); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+
+  // parse the host + a display path from a possibly-partial URL
+  function parseUrl(raw){
+    let s=(raw||'').trim();
+    if(!s) return { host:'', display:'', full:'' };
+    let full=s;
+    if(!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(full)){ full='https://'+full; }
+    try{
+      const u=new URL(full);
+      const host=u.hostname.replace(/^www\./,'');
+      let path=u.pathname.replace(/\/$/,'');
+      let display=host+(path||'');
+      return { host, display, full:u.href };
+    }catch(_){
+      // fall back: strip protocol + www for a rough host
+      const noProto=s.replace(/^[a-z]+:\/\//i,'').replace(/^www\./,'');
+      const host=noProto.split(/[\/?#]/)[0];
+      return { host, display:noProto, full:s };
+    }
+  }
+  // google-style breadcrumb: host › segment › segment
+  function crumb(raw){
+    const p=parseUrl(raw);
+    if(!p.host) return '';
+    let out=p.host;
+    try{
+      const u=new URL(p.full);
+      const segs=u.pathname.split('/').filter(Boolean).slice(0,3);
+      if(segs.length) out += ' › ' + segs.map(s=>decodeURIComponent(s)).join(' › ');
+    }catch(_){}
+    return out;
+  }
+
+  // char-limit counters (Google vs social)
+  function setCounter(id, len, gLimit, sLimit){
+    const c=el(id);
+    const gTag = len>gLimit ? '<b style="color:var(--err)">'+len+'</b>' : len;
+    // decide worst state across both limits
+    let cls='';
+    if(len>gLimit || len>sLimit) cls='over';
+    else if(len>gLimit-6 || len>sLimit-6) cls='warn';
+    c.className='counter'+(cls?' '+cls:'');
+    c.textContent = `${len} · ${t.hintG} ${gLimit} / ${t.hintS} ${sLimit}`;
+  }
+
+  // ---- image render (with graceful placeholder + onerror fallback) ----
+  function fillImage(wrapId, imgClass, phClass){
+    const wrap=el(wrapId);
+    const src=(data.img||'').trim();
+    if(!src){
+      wrap.innerHTML = `<div class="${phClass}">${IMG_PLACEHOLDER}${phClass==='ph'?'<span>1200 × 630</span>':''}</div>`;
+      return;
+    }
+    const img=document.createElement('img');
+    img.className=imgClass;
+    img.alt='';
+    img.referrerPolicy='no-referrer';
+    img.onerror=function(){ wrap.innerHTML = `<div class="${phClass}">${IMG_PLACEHOLDER}${phClass==='ph'?'<span>image failed</span>':''}</div>`; };
+    img.src=src;
+    wrap.innerHTML='';
+    wrap.appendChild(img);
+  }
+
+  // ---- render everything ----
+  function render(){
+    const p=parseUrl(data.url);
+    const title = data.title.trim() || t.noTitle;
+    const desc  = data.desc.trim()  || t.noDesc;
+    const host  = p.host || 'example.com';
+    const site  = data.site.trim() || (p.host ? p.host : 'KOLKLI');
+
+    // counters
+    setCounter('cTitle', data.title.length, 60, 40);
+    setCounter('cDesc',  data.desc.length, 155, 65);
+
+    // Facebook
+    fillImage('fbImgWrap','scimg','ph');
+    el('fbHost').textContent  = host.toUpperCase();
+    el('fbTitle').textContent = title;
+    el('fbDesc').textContent  = desc;
+
+    // X / Twitter
+    fillImage('xImgWrap','scimg','ph');
+    el('xTitle').textContent = title;
+    el('xDesc').textContent  = desc;
+    el('xHost').textContent  = host;
+
+    // LinkedIn (no description in its card)
+    fillImage('inImgWrap','scimg','ph');
+    el('inTitle').textContent = title;
+    el('inHost').textContent  = host;
+
+    // WhatsApp / Telegram (compact)
+    fillImage('waImgWrap','wimg','wph');
+    el('waTitle').textContent = title;
+    el('waDesc').textContent  = desc;
+    el('waHost').textContent  = host;
+    el('waLink').textContent  = p.full || ('https://'+host);
+
+    // Google
+    el('ggSite').textContent  = site;
+    el('ggUrl').textContent   = crumb(data.url) || host;
+    el('ggTitle').textContent = title;
+    el('ggDesc').textContent  = desc;
+    el('ggFav').textContent   = (site.trim()[0] || 'K').toUpperCase();
+
+    // meta tags
+    renderMeta(p, site);
+  }
+
+  function renderMeta(p, site){
+    const url   = p.full || data.url.trim();
+    const title = data.title.trim();
+    const desc  = data.desc.trim();
+    const img   = data.img.trim();
+    const sname = site.trim();
+    const q = escapeHtml;
+    const lines = [
+      '<!-- Open Graph -->',
+      `<meta property="og:type" content="website">`,
+      `<meta property="og:title" content="${q(title)}">`,
+      `<meta property="og:description" content="${q(desc)}">`,
+      `<meta property="og:image" content="${q(img)}">`,
+      `<meta property="og:url" content="${q(url)}">`,
+      `<meta property="og:site_name" content="${q(sname)}">`,
+      '',
+      '<!-- Twitter Card -->',
+      `<meta name="twitter:card" content="summary_large_image">`,
+      `<meta name="twitter:title" content="${q(title)}">`,
+      `<meta name="twitter:description" content="${q(desc)}">`,
+      `<meta name="twitter:image" content="${q(img)}">`,
+    ];
+    el('metaOut').value = lines.join('\n');
+  }
+
+  // ---- persistence ----
+  function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(data)); }catch(_){}
+  }
+  function load(){
+    try{
+      const raw=ls(LS_KEY); if(!raw) return false;
+      const o=JSON.parse(raw); if(!o||typeof o!=='object') return false;
+      ['url','title','desc','img','site'].forEach(k=>{ if(typeof o[k]==='string') data[k]=o[k]; });
+      return true;
+    }catch(_){ return false; }
+  }
+  function syncInputs(){
+    el('fUrl').value=data.url; el('fTitle').value=data.title; el('fDesc').value=data.desc;
+    el('fImg').value=data.img; el('fSite').value=data.site;
+  }
+  function readInputs(){
+    data.url=el('fUrl').value; data.title=el('fTitle').value; data.desc=el('fDesc').value;
+    data.img=el('fImg').value; data.site=el('fSite').value;
+  }
+
+  function fillSample(){
+    data.url   = 'https://kolkli.com/tools/heic-to-jpg';
+    data.title = t.s_title;
+    data.desc  = t.s_desc;
+    data.img   = 'https://picsum.photos/seed/kolkli/1200/630';
+    data.site  = t.s_site;
+    syncInputs(); render(); save();
+  }
+  function clearAll(){
+    data.url=data.title=data.desc=data.img=data.site='';
+    syncInputs(); render(); save();
+  }
+
+  // ---- clipboard ----
+  function copyText(str){
+    const done=()=>toast(t.copied);
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(str).then(done).catch(()=>fallback(str,done)); }
+    else fallback(str,done);
+  }
+  function fallback(str,cb){ const ta=document.createElement('textarea'); ta.value=str; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); cb&&cb(); }
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    render();
+  }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  ['fUrl','fTitle','fDesc','fImg','fSite'].forEach(id=>{
+    el(id).addEventListener('input',()=>{ readInputs(); render(); save(); });
+  });
+  el('sampleBtn').addEventListener('click',fillSample);
+  el('clearBtn').addEventListener('click',clearAll);
+  el('copyBtn').addEventListener('click',()=>{ const v=el('metaOut').value; if(!v.trim()){ toast(t.copiedEmpty); return; } copyText(v); });
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  load();
+  syncInputs();
+  applyLang(detectLang());
+})();
+</script>
+</body>
+</html>

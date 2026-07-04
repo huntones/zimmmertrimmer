@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל UUID</title>
+<meta name="description" content="Generate cryptographically-random UUID v4 identifiers in bulk, right in your browser. Uppercase, no-hyphen and braces options. Nothing leaves your machine.">
+<link rel="stylesheet" href="./calc.css">
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="title"></h1>
+    <p data-i18n="sub"></p>
+  </div>
+
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <div class="rowflex" style="justify-content:space-between;margin-bottom:14px">
+          <h2 data-i18n="outTitle" style="margin:0"></h2>
+          <button class="copy" id="copyAll"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copyAll"></span></button>
+        </div>
+        <textarea class="inp mono" id="out" rows="12" readonly spellcheck="false" style="direction:ltr"></textarea>
+        <div class="btnrow" style="margin-top:14px">
+          <button class="btn" id="genBtn"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><span data-i18n="genBtn"></span></button>
+          <button class="btn ghost" id="dlBtn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span data-i18n="dlBtn"></span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h2 data-i18n="optTitle"></h2>
+        <p class="csub" data-i18n="optSub"></p>
+        <div class="field">
+          <label data-i18n="countLbl"></label>
+          <input class="inp" id="count" type="number" min="1" max="1000" value="5">
+        </div>
+        <div class="field">
+          <label data-i18n="verLbl"></label>
+          <select class="inp" id="ver">
+            <option value="v4" data-i18n="verV4"></option>
+            <option value="nil" data-i18n="verNil"></option>
+          </select>
+        </div>
+        <div class="divider"></div>
+        <label class="check"><input type="checkbox" id="optUpper"><span class="box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span data-i18n="optUpper"></span></label>
+        <label class="check"><input type="checkbox" id="optHyphen" checked><span class="box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span data-i18n="optHyphen"></span></label>
+        <label class="check"><input type="checkbox" id="optBraces"><span class="box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span data-i18n="optBraces"></span></label>
+        <div class="note">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-i18n="note"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="pgfoot" data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./calc.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'חישובים והמרות · UUID',
+      title:'מחולל UUID',
+      sub:'צרו מזהי UUID אקראיים (v4) בכמות, ישירות בדפדפן. אידיאלי למפתחים, בסיסי נתונים ומערכות. שום דבר לא נשלח לשרת.',
+      outTitle:'המזהים שנוצרו', copyAll:'העתקת הכול',
+      genBtn:'צרו UUID', dlBtn:'הורדה כקובץ',
+      optTitle:'הגדרות', optSub:'בחרו כמות ופורמט.',
+      countLbl:'כמה מזהים (1–1000)', verLbl:'גרסה',
+      verV4:'v4 — אקראי', verNil:'Nil — אפסים',
+      optUpper:'אותיות גדולות', optHyphen:'עם מקפים', optBraces:'בסוגריים { }',
+      note:'המזהים נוצרים מקומית באמצעות crypto.getRandomValues של הדפדפן — אקראיות קריפטוגרפית אמיתית.',
+      foot:'KOLKLI · מחולל UUID · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הועתק ✓' },
+    en:{ dir:'ltr',
+      kick:'Calc & Convert · UUID',
+      title:'UUID Generator',
+      sub:'Generate random UUID v4 identifiers in bulk, right in your browser. Great for developers, databases and systems. Nothing is sent to a server.',
+      outTitle:'Generated IDs', copyAll:'Copy all',
+      genBtn:'Generate UUIDs', dlBtn:'Download .txt',
+      optTitle:'Options', optSub:'Pick how many and the format.',
+      countLbl:'How many (1–1000)', verLbl:'Version',
+      verV4:'v4 — random', verNil:'Nil — all zeros',
+      optUpper:'Uppercase', optHyphen:'With hyphens', optBraces:'Wrap in { }',
+      note:'IDs are generated locally with the browser’s crypto.getRandomValues — true cryptographic randomness.',
+      foot:'KOLKLI · UUID Generator · Private and fast, right in your browser',
+      copied:'Copied ✓' },
+    ru:{ dir:'ltr',
+      kick:'Расчёты · UUID',
+      title:'Генератор UUID',
+      sub:'Создавайте случайные идентификаторы UUID v4 пакетно, прямо в браузере. Отлично для разработчиков, баз данных и систем. Ничего не отправляется на сервер.',
+      outTitle:'Готовые идентификаторы', copyAll:'Копировать всё',
+      genBtn:'Создать UUID', dlBtn:'Скачать .txt',
+      optTitle:'Настройки', optSub:'Выберите количество и формат.',
+      countLbl:'Сколько (1–1000)', verLbl:'Версия',
+      verV4:'v4 — случайный', verNil:'Nil — нули',
+      optUpper:'Верхний регистр', optHyphen:'С дефисами', optBraces:'В скобках { }',
+      note:'Идентификаторы создаются локально через crypto.getRandomValues браузера — настоящая криптослучайность.',
+      foot:'KOLKLI · Генератор UUID · Приватно и быстро, прямо в браузере',
+      copied:'Скопировано ✓' }
+  };
+
+  function uuid4(){
+    const b = crypto.getRandomValues(new Uint8Array(16));
+    b[6] = (b[6] & 0x0f) | 0x40;
+    b[8] = (b[8] & 0x3f) | 0x80;
+    const h = Array.from(b, x => x.toString(16).padStart(2,'0'));
+    return h.slice(0,4).join('')+'-'+h.slice(4,6).join('')+'-'+h.slice(6,8).join('')+'-'+h.slice(8,10).join('')+'-'+h.slice(10,16).join('');
+  }
+  const NIL = '00000000-0000-0000-0000-000000000000';
+
+  function fmt(u){
+    if(!el('optHyphen').checked) u = u.replace(/-/g,'');
+    if(el('optUpper').checked) u = u.toUpperCase();
+    if(el('optBraces').checked) u = '{'+u+'}';
+    return u;
+  }
+  function generate(){
+    let n = parseInt(el('count').value,10);
+    if(!isFinite(n)) n = 1;
+    n = Math.max(1, Math.min(1000, n));
+    el('count').value = n;
+    const nil = el('ver').value === 'nil';
+    const out = [];
+    for(let i=0;i<n;i++) out.push(fmt(nil ? NIL : uuid4()));
+    el('out').value = out.join('\n');
+  }
+  function copyAll(){
+    if(!el('out').value) return;
+    KolkliTool.copy(el('out').value, el('copyAll'));
+    KolkliTool.toast(APP.t().copied);
+  }
+  function download(){
+    const blob = new Blob([el('out').value+'\n'], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'uuids.txt';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  }
+
+  el('genBtn').addEventListener('click', generate);
+  el('copyAll').addEventListener('click', copyAll);
+  el('dlBtn').addEventListener('click', download);
+  ['optUpper','optHyphen','optBraces','ver','count'].forEach(id=>el(id).addEventListener('change', generate));
+
+  const APP = KolkliTool.init(I18N, function(){});
+  generate();
+})();
+</script>
+</body>
+</html>

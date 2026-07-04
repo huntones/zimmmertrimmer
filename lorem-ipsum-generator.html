@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל Lorem Ipsum</title>
+<meta name="description" content="Generate Lorem Ipsum placeholder text — paragraphs, sentences, words or list items, with optional HTML tags. Runs entirely in your browser.">
+<link rel="stylesheet" href="./calc.css">
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="title"></h1>
+    <p data-i18n="sub"></p>
+  </div>
+
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <div class="rowflex" style="justify-content:space-between;margin-bottom:14px">
+          <h2 data-i18n="outTitle" style="margin:0"></h2>
+          <span class="muted mono" id="stats" style="font-size:12px"></span>
+        </div>
+        <textarea class="inp" id="out" rows="14" readonly spellcheck="false"></textarea>
+        <div class="btnrow" style="margin-top:14px">
+          <button class="btn" id="genBtn"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><span data-i18n="genBtn"></span></button>
+          <button class="btn ghost" id="copyBtn"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copyBtn"></span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h2 data-i18n="optTitle"></h2>
+        <p class="csub" data-i18n="optSub"></p>
+        <div class="field">
+          <label data-i18n="typeLbl"></label>
+          <select class="inp" id="type">
+            <option value="paragraphs" data-i18n="typePara"></option>
+            <option value="sentences" data-i18n="typeSent"></option>
+            <option value="words" data-i18n="typeWord"></option>
+            <option value="list" data-i18n="typeList"></option>
+          </select>
+        </div>
+        <div class="field">
+          <label id="countLbl2"></label>
+          <input class="inp" id="count" type="number" min="1" max="200" value="4">
+        </div>
+        <div class="divider"></div>
+        <label class="check"><input type="checkbox" id="startLorem" checked><span class="box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span data-i18n="startLorem"></span></label>
+        <label class="check"><input type="checkbox" id="html"><span class="box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span><span data-i18n="htmlTags"></span></label>
+      </div>
+    </div>
+  </div>
+
+  <footer class="pgfoot" data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./calc.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'חישובים והמרות · Lorem Ipsum',
+      title:'מחולל Lorem Ipsum',
+      sub:'טקסט דמה לעיצוב ופריסה — פסקאות, משפטים, מילים או פריטי רשימה, עם אפשרות לתגי HTML. הכול רץ בדפדפן.',
+      outTitle:'הטקסט שנוצר',
+      genBtn:'צרו טקסט', copyBtn:'העתקה',
+      optTitle:'הגדרות', optSub:'בחרו מה ליצור וכמה.',
+      typeLbl:'סוג', typePara:'פסקאות', typeSent:'משפטים', typeWord:'מילים', typeList:'פריטי רשימה',
+      cntPara:'כמה פסקאות', cntSent:'כמה משפטים', cntWord:'כמה מילים', cntList:'כמה פריטים',
+      startLorem:'להתחיל ב־"Lorem ipsum…"', htmlTags:'לעטוף בתגי HTML',
+      statWords:'מילים', statChars:'תווים',
+      foot:'KOLKLI · מחולל Lorem Ipsum · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הטקסט הועתק ✓' },
+    en:{ dir:'ltr',
+      kick:'Calc & Convert · Lorem Ipsum',
+      title:'Lorem Ipsum Generator',
+      sub:'Placeholder text for design and layout — paragraphs, sentences, words or list items, with optional HTML tags. Everything runs in your browser.',
+      outTitle:'Generated text',
+      genBtn:'Generate text', copyBtn:'Copy',
+      optTitle:'Options', optSub:'Pick what to generate and how much.',
+      typeLbl:'Type', typePara:'Paragraphs', typeSent:'Sentences', typeWord:'Words', typeList:'List items',
+      cntPara:'How many paragraphs', cntSent:'How many sentences', cntWord:'How many words', cntList:'How many items',
+      startLorem:'Start with “Lorem ipsum…”', htmlTags:'Wrap in HTML tags',
+      statWords:'words', statChars:'chars',
+      foot:'KOLKLI · Lorem Ipsum Generator · Private and fast, right in your browser',
+      copied:'Text copied ✓' },
+    ru:{ dir:'ltr',
+      kick:'Расчёты · Lorem Ipsum',
+      title:'Генератор Lorem Ipsum',
+      sub:'Текст-заполнитель для дизайна и вёрстки — абзацы, предложения, слова или пункты списка, с тегами HTML по желанию. Всё работает в браузере.',
+      outTitle:'Готовый текст',
+      genBtn:'Создать текст', copyBtn:'Копировать',
+      optTitle:'Настройки', optSub:'Выберите, что и сколько создать.',
+      typeLbl:'Тип', typePara:'Абзацы', typeSent:'Предложения', typeWord:'Слова', typeList:'Пункты списка',
+      cntPara:'Сколько абзацев', cntSent:'Сколько предложений', cntWord:'Сколько слов', cntList:'Сколько пунктов',
+      startLorem:'Начать с «Lorem ipsum…»', htmlTags:'Обернуть в теги HTML',
+      statWords:'слов', statChars:'симв.',
+      foot:'KOLKLI · Генератор Lorem Ipsum · Приватно и быстро, прямо в браузере',
+      copied:'Текст скопирован ✓' }
+  };
+
+  const WORDS = ('lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et '+
+    'dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo '+
+    'consequat duis aute irure in reprehenderit voluptate velit esse cillum eu fugiat nulla pariatur excepteur sint '+
+    'occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum at vero eos accusamus '+
+    'iusto odio dignissimos ducimus blanditiis praesentium voluptatum deleniti atque corrupti quos dolores quas '+
+    'molestias excepturi obcaecati cupiditate similique mollitia animi dolorum fuga harum quidem rerum facilis').split(' ');
+  const START = 'lorem ipsum dolor sit amet consectetur adipiscing elit'.split(' ');
+
+  let seed = 0;
+  function rnd(max){ // deterministic-ish spread without Math.random reliance
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return seed % max;
+  }
+  function pick(){ return WORDS[rnd(WORDS.length)]; }
+  function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function sentence(useStart){
+    const len = 8 + rnd(9);
+    const w = [];
+    for(let i=0;i<len;i++){
+      if(useStart && i < START.length) w.push(START[i]); else w.push(pick());
+    }
+    // sprinkle a comma
+    if(len > 6){ const c = 3 + rnd(len-5); w[c] += ','; }
+    return cap(w.join(' ')) + '.';
+  }
+  function paragraph(useStart){
+    const n = 3 + rnd(4);
+    const s = [];
+    for(let i=0;i<n;i++) s.push(sentence(useStart && i===0));
+    return s.join(' ');
+  }
+
+  function generate(){
+    seed = (Date.parse(new Date().toString()) || 1) ^ (seed + 2654435761); // reseed each click
+    seed &= 0x7fffffff;
+    const type = el('type').value;
+    let n = parseInt(el('count').value,10); if(!isFinite(n)) n = 1;
+    const cap200 = type==='words' ? 500 : 200;
+    n = Math.max(1, Math.min(cap200, n));
+    el('count').value = n;
+    const useStart = el('startLorem').checked;
+    const html = el('html').checked;
+    let out = '';
+
+    if(type==='words'){
+      const w = [];
+      for(let i=0;i<n;i++){ if(useStart && i<START.length) w.push(START[i]); else w.push(pick()); }
+      out = cap(w.join(' '));
+      if(html) out = '<p>'+out+'</p>';
+    } else if(type==='sentences'){
+      const arr = [];
+      for(let i=0;i<n;i++) arr.push(sentence(useStart && i===0));
+      out = arr.join(' ');
+      if(html) out = '<p>'+out+'</p>';
+    } else if(type==='list'){
+      const arr = [];
+      for(let i=0;i<n;i++){ const s = sentence(useStart && i===0).replace(/\.$/,''); arr.push(html ? '  <li>'+s+'</li>' : '• '+s); }
+      out = html ? '<ul>\n'+arr.join('\n')+'\n</ul>' : arr.join('\n');
+    } else {
+      const arr = [];
+      for(let i=0;i<n;i++){ const p = paragraph(useStart && i===0); arr.push(html ? '<p>'+p+'</p>' : p); }
+      out = arr.join(html ? '\n' : '\n\n');
+    }
+    el('out').value = out;
+    stats();
+  }
+  function stats(){
+    const t = APP.t();
+    const v = el('out').value;
+    const words = v.trim() ? v.replace(/<[^>]+>/g,' ').trim().split(/\s+/).length : 0;
+    el('stats').textContent = words + ' ' + t.statWords + ' · ' + v.length + ' ' + t.statChars;
+  }
+  function relabelCount(){
+    const t = APP.t();
+    const map = { paragraphs:t.cntPara, sentences:t.cntSent, words:t.cntWord, list:t.cntList };
+    el('countLbl2').textContent = map[el('type').value] || t.cntPara;
+  }
+  function copyOut(){
+    if(!el('out').value) return;
+    KolkliTool.copy(el('out').value, el('copyBtn'));
+    KolkliTool.toast(APP.t().copied);
+  }
+
+  el('genBtn').addEventListener('click', generate);
+  el('copyBtn').addEventListener('click', copyOut);
+  el('type').addEventListener('change', ()=>{ relabelCount(); generate(); });
+  ['count','startLorem','html'].forEach(id=>el(id).addEventListener('change', generate));
+
+  const APP = KolkliTool.init(I18N, ()=>{ relabelCount(); stats(); });
+  relabelCount();
+  generate();
+})();
+</script>
+</body>
+</html>

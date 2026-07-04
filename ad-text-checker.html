@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — בודק אורך טקסט למודעות</title>
+<meta name="description" content="Live character-count checker for ad and social copy. Google Ads, Meta, Instagram, X, LinkedIn, YouTube, TikTok and more — see when each field is within limit, near the edge, or over. Runs 100% in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* platform picker */
+  .picker{padding:18px;margin-bottom:18px;}
+  .picker h3{font-size:15px;margin:0 0 12px;font-weight:700;}
+  .plats{display:flex;flex-wrap:wrap;gap:8px;}
+  .plat{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;
+    border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);cursor:pointer;
+    font-family:var(--sans);font-size:13px;font-weight:600;transition:border-color .12s,background .12s,color .12s,transform .08s;}
+  .plat:hover{border-color:var(--accent);}
+  .plat:active{transform:scale(.97);}
+  .plat.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  .plat .pemoji{font-size:15px;line-height:1;}
+
+  /* fields */
+  .fields{display:flex;flex-direction:column;gap:16px;}
+  .field{padding:16px;}
+  .fhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:9px;}
+  .fhead .flabel{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .fhead .fhint{font-size:11px;color:var(--faint);font-family:var(--mono);}
+  .fcount{display:inline-flex;align-items:baseline;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:700;
+    white-space:nowrap;}
+  .fcount .cnum{color:var(--ink);}
+  .fcount .climit{color:var(--faint);}
+  .fcount .crem{font-size:11px;font-weight:600;color:var(--muted);}
+  .field.warn .fcount .cnum{color:var(--warn);} .field.warn .fcount .crem{color:var(--warn);}
+  .field.over .fcount .cnum{color:var(--err);} .field.over .fcount .crem{color:var(--err);}
+
+  textarea.inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;resize:vertical;min-height:52px;line-height:1.5;
+    transition:border-color .12s,box-shadow .12s;}
+  textarea.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .field.warn textarea.inp{border-color:var(--warm-line);}
+  .field.over textarea.inp{border-color:var(--danger);}
+
+  .pbar{height:6px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);margin-top:10px;}
+  .pbar i{display:block;height:100%;width:0;background:var(--success);border-radius:999px;transition:width .12s ease,background .12s;}
+  .field.warn .pbar i{background:var(--warn);}
+  .field.over .pbar i{background:var(--err);}
+
+  .frow2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap;}
+  .fmeta{font-size:11px;color:var(--muted);font-family:var(--mono);}
+  .fmeta b{color:var(--ink-2);}
+  .field.over .fmeta.overmsg{color:var(--err);font-weight:700;}
+  .copybtn{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:600;
+    cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);
+    transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .copybtn:hover{border-color:var(--accent);} .copybtn:active{transform:translateY(1px);}
+  .copybtn svg{width:13px;height:13px;}
+
+  /* status side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .status{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;margin-bottom:16px;
+    border:1px solid var(--success-soft);background:var(--success-soft);}
+  .status.bad{border-color:var(--danger-soft);background:var(--danger-soft);}
+  .status .sico{width:38px;height:38px;flex-shrink:0;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    background:var(--success);color:#fff;}
+  .status.bad .sico{background:var(--danger);}
+  .status .sico svg{width:20px;height:20px;}
+  .status .stxt{min-width:0;}
+  .status .stxt .st{font-size:14px;font-weight:700;color:var(--ink);}
+  .status .stxt .ss{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:2px;}
+
+  .refnote{padding:14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line-2);}
+  .refnote h4{font-size:12.5px;margin:0 0 10px;font-weight:700;color:var(--ink-2);}
+  .reflist{display:flex;flex-direction:column;gap:8px;}
+  .refrow{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:11.5px;}
+  .refrow .rlbl{color:var(--muted);min-width:0;}
+  .refrow .rval{font-family:var(--mono);font-weight:700;color:var(--ink-2);white-space:nowrap;}
+  .refrow .rval .soft{color:var(--warn);}
+
+  .clearbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;
+    padding:11px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .clearbtn:hover{border-color:var(--accent);} .clearbtn:active{transform:translateY(1px);}
+  .clearbtn svg{width:15px;height:15px;}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="card picker">
+    <h3 data-i18n="platTitle"></h3>
+    <div class="plats" id="plats"></div>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+      <div class="fields" id="fields"></div>
+    </div>
+
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="statusTitle"></h3>
+        <div class="status" id="status">
+          <div class="sico" id="sico"></div>
+          <div class="stxt">
+            <div class="st" id="stText"></div>
+            <div class="ss" id="stSub"></div>
+          </div>
+        </div>
+
+        <div class="refnote">
+          <h4 data-i18n="refTitle"></h4>
+          <div class="reflist" id="reflist"></div>
+        </div>
+
+        <button class="clearbtn" id="clearBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span data-i18n="clearBtn"></span>
+        </button>
+
+        <div class="seam">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-i18n="seam"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  // ---- platform + field model -----------------------------------------------
+  // Each platform: { id, emoji, name:{he,en,ru}, fields:[ {id, label:{he,en,ru}, rec?, max?, multiline?} ] }
+  // rec = soft "recommended" limit, max = hard maximum. A field may have either or both.
+  const PLATFORMS = [
+    { id:'googleSearch', emoji:'🔍',
+      name:{he:'גוגל אדס — חיפוש', en:'Google Ads Search', ru:'Google Ads Поиск'},
+      fields:[
+        { id:'headline', max:30, label:{he:'כותרת', en:'Headline', ru:'Заголовок'} },
+        { id:'desc', max:90, multiline:true, label:{he:'תיאור', en:'Description', ru:'Описание'} },
+        { id:'path', max:15, label:{he:'נתיב תצוגה', en:'Display path', ru:'Отображаемый путь'} },
+      ] },
+    { id:'googleBusiness', emoji:'📍',
+      name:{he:'גוגל לעסק — פוסט', en:'Google Business Post', ru:'Google Бизнес — пост'},
+      fields:[
+        { id:'post', max:1500, multiline:true, label:{he:'טקסט הפוסט', en:'Post text', ru:'Текст поста'} },
+      ] },
+    { id:'meta', emoji:'📘',
+      name:{he:'מטא / פייסבוק — מודעה', en:'Meta / Facebook Ad', ru:'Meta / Facebook — реклама'},
+      fields:[
+        { id:'primary', rec:125, multiline:true, label:{he:'טקסט ראשי', en:'Primary text', ru:'Основной текст'} },
+        { id:'headline', max:40, label:{he:'כותרת', en:'Headline', ru:'Заголовок'} },
+        { id:'linkdesc', max:30, label:{he:'תיאור הקישור', en:'Link description', ru:'Описание ссылки'} },
+      ] },
+    { id:'instagram', emoji:'📸',
+      name:{he:'אינסטגרם', en:'Instagram', ru:'Instagram'},
+      fields:[
+        { id:'caption', max:2200, multiline:true, label:{he:'כיתוב', en:'Caption', ru:'Подпись'} },
+        { id:'bio', max:150, multiline:true, label:{he:'ביו', en:'Bio', ru:'Био'} },
+      ] },
+    { id:'x', emoji:'✖️',
+      name:{he:'X / טוויטר', en:'X / Twitter', ru:'X / Twitter'},
+      fields:[
+        { id:'post', max:280, multiline:true, label:{he:'ציוץ', en:'Post', ru:'Пост'} },
+      ] },
+    { id:'linkedin', emoji:'💼',
+      name:{he:'לינקדאין', en:'LinkedIn', ru:'LinkedIn'},
+      fields:[
+        { id:'post', max:3000, multiline:true, label:{he:'פוסט', en:'Post', ru:'Пост'} },
+        { id:'headline', max:220, label:{he:'כותרת פרופיל', en:'Headline', ru:'Заголовок'} },
+      ] },
+    { id:'youtube', emoji:'▶️',
+      name:{he:'יוטיוב', en:'YouTube', ru:'YouTube'},
+      fields:[
+        { id:'title', max:100, label:{he:'כותרת', en:'Title', ru:'Название'} },
+        { id:'desc', max:5000, multiline:true, label:{he:'תיאור', en:'Description', ru:'Описание'} },
+      ] },
+    { id:'tiktok', emoji:'🎵',
+      name:{he:'טיקטוק', en:'TikTok', ru:'TikTok'},
+      fields:[
+        { id:'caption', max:2200, multiline:true, label:{he:'כיתוב', en:'Caption', ru:'Подпись'} },
+      ] },
+    { id:'email', emoji:'✉️',
+      name:{he:'שורת נושא במייל', en:'Email Subject', ru:'Тема письма'},
+      fields:[
+        { id:'subject', rec:60, label:{he:'שורת נושא', en:'Subject line', ru:'Тема'} },
+      ] },
+  ];
+
+  const I18N = {
+    he:{
+      dir:'rtl',
+      kick:'שיווק · בודק אורך טקסט',
+      pageTitle:'בודק אורך טקסט למודעות',
+      pageSub:'בחרו פלטפורמה, הדביקו את הטקסט לכל שדה, וראו בזמן אמת אם אתם בתוך המגבלה, מתקרבים אליה או חורגים ממנה. הכול רץ בדפדפן שלכם — שום דבר לא נשלח לשרת.',
+      platTitle:'בחרו פלטפורמה',
+      statusTitle:'סטטוס כללי',
+      refTitle:'מגבלות התווים לפלטפורמה זו',
+      clearBtn:'ניקוי כל השדות',
+      copy:'העתקה',
+      allGood:'הכול תקין',
+      allGoodSub:'כל השדות בתוך המגבלה',
+      overOne:n=>`שדה אחד חורג מהמגבלה`,
+      overMany:n=>`${n} שדות חורגים מהמגבלה`,
+      remaining:n=>`${n} נותרו`,
+      overBy:n=>`חריגה של ${n}`,
+      charsUnit:'תווים',
+      recLbl:'מומלץ',
+      maxLbl:'מקסימום',
+      recNote:n=>`מומלץ עד ${n} תווים (רך)`,
+      maxNote:n=>`מקסימום ${n} תווים`,
+      recMaxNote:(r,m)=>`מומלץ ${r} · מקסימום ${m}`,
+      overMax:'חריגה מהמקסימום — הטקסט ייחתך',
+      overRec:'מעל המומלץ — עדיין עשוי לעבוד, אך עלול להיחתך בתצוגה',
+      seam:'כל הבדיקה מתבצעת מקומית בדפדפן — הטקסט שלכם אף פעם לא נשלח לשרת. המגבלות הן ערכי ייחוס נפוצים; פלטפורמות משנות אותן מדי פעם, אז בדקו לפני העלאה.',
+      foot:'KOLKLI · בודק אורך טקסט למודעות · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הועתק ✓',
+      copyEmpty:'אין מה להעתיק',
+    },
+    en:{
+      dir:'ltr',
+      kick:'Marketing · Text length checker',
+      pageTitle:'Ad Text Length Checker',
+      pageSub:'Pick a platform, paste your copy into each field, and see live whether you are within the limit, near it, or over. Everything runs in your browser — nothing is sent to a server.',
+      platTitle:'Choose a platform',
+      statusTitle:'Overall status',
+      refTitle:'Character limits for this platform',
+      clearBtn:'Clear all fields',
+      copy:'Copy',
+      allGood:'All good',
+      allGoodSub:'Every field is within limit',
+      overOne:n=>`1 field over limit`,
+      overMany:n=>`${n} fields over limit`,
+      remaining:n=>`${n} left`,
+      overBy:n=>`${n} over`,
+      charsUnit:'chars',
+      recLbl:'rec.',
+      maxLbl:'max',
+      recNote:n=>`Recommended up to ${n} chars (soft)`,
+      maxNote:n=>`Max ${n} chars`,
+      recMaxNote:(r,m)=>`Rec. ${r} · Max ${m}`,
+      overMax:'Over the maximum — text will be truncated',
+      overRec:'Over the recommended length — may still work but can get cut off',
+      seam:'All checking happens locally in your browser — your text is never uploaded. Limits are common reference values; platforms change them from time to time, so double-check before you publish.',
+      foot:'KOLKLI · Ad Text Length Checker · Private and fast, right in your browser',
+      copied:'Copied ✓',
+      copyEmpty:'Nothing to copy',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Маркетинг · Проверка длины текста',
+      pageTitle:'Проверка длины текста объявлений',
+      pageSub:'Выберите платформу, вставьте текст в каждое поле и в реальном времени смотрите, укладываетесь ли вы в лимит, близки к нему или превысили его. Всё работает в браузере — ничего не отправляется на сервер.',
+      platTitle:'Выберите платформу',
+      statusTitle:'Общий статус',
+      refTitle:'Лимиты символов для этой платформы',
+      clearBtn:'Очистить все поля',
+      copy:'Копировать',
+      allGood:'Всё в порядке',
+      allGoodSub:'Все поля в пределах лимита',
+      overOne:n=>`1 поле превышает лимит`,
+      overMany:n=>`Полей с превышением: ${n}`,
+      remaining:n=>`осталось ${n}`,
+      overBy:n=>`превышение ${n}`,
+      charsUnit:'симв.',
+      recLbl:'реком.',
+      maxLbl:'макс.',
+      recNote:n=>`Рекомендуется до ${n} символов (мягкий лимит)`,
+      maxNote:n=>`Максимум ${n} символов`,
+      recMaxNote:(r,m)=>`Реком. ${r} · Макс. ${m}`,
+      overMax:'Превышен максимум — текст будет обрезан',
+      overRec:'Превышена рекомендуемая длина — может сработать, но текст может обрезаться',
+      seam:'Вся проверка выполняется локально в вашем браузере — ваш текст никогда не загружается. Лимиты — это распространённые справочные значения; платформы иногда их меняют, поэтому перепроверьте перед публикацией.',
+      foot:'KOLKLI · Проверка длины текста объявлений · Приватно и быстро, прямо в браузере',
+      copied:'Скопировано ✓',
+      copyEmpty:'Нечего копировать',
+    },
+  };
+
+  const ICON = {
+    copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+    check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+  };
+
+  let lang='he', t=I18N.he;
+  let curPlat = PLATFORMS[0].id;
+  // per-platform-field text store so switching platforms keeps what you typed
+  const store = {}; // key `${platId}.${fieldId}` -> string
+
+  const AMBER = 0.9; // within ~10% of the effective limit -> amber
+
+  function el2(sel){ return document.querySelector(sel); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+  function plat(){ return PLATFORMS.find(p=>p.id===curPlat); }
+  function nm(obj){ return obj[lang] || obj.en; }
+  function key(pid,fid){ return pid+'.'+fid; }
+
+  // ---- clipboard (per contract) --------------------------------------------
+  function copyText(str){
+    if(!str){ toast(t.copyEmpty); return; }
+    const done=()=>toast(t.copied);
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(str).then(done).catch(()=>fallback(str,done)); }
+    else fallback(str,done);
+  }
+  function fallback(str,cb){ const ta=document.createElement('textarea'); ta.value=str; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); cb&&cb(); }
+
+  // ---- platform picker ------------------------------------------------------
+  function renderPlats(){
+    el('plats').innerHTML = PLATFORMS.map(p=>`
+      <button type="button" class="plat ${p.id===curPlat?'on':''}" data-plat="${p.id}">
+        <span class="pemoji">${p.emoji}</span><span>${nm(p.name)}</span>
+      </button>`).join('');
+  }
+
+  // ---- fields ---------------------------------------------------------------
+  function renderFields(){
+    const p = plat();
+    el('fields').innerHTML = p.fields.map(f=>{
+      const stored = store[key(p.id,f.id)] || '';
+      const hintParts = [];
+      if(f.rec!=null) hintParts.push(t.recLbl+' '+f.rec);
+      if(f.max!=null) hintParts.push(t.maxLbl+' '+f.max);
+      const hint = hintParts.join(' · ');
+      return `
+        <div class="card field" data-field="${f.id}">
+          <div class="fhead">
+            <span class="flabel">${nm(f.label)}</span>
+            <span class="fcount">
+              <span class="cnum" data-count>0</span><span class="climit"></span>
+              <span class="crem" data-rem></span>
+            </span>
+          </div>
+          <textarea class="inp" data-input rows="${f.multiline?3:1}" spellcheck="false">${escapeHtml(stored)}</textarea>
+          <div class="pbar"><i data-bar></i></div>
+          <div class="frow2">
+            <span class="fmeta" data-note>${hint}</span>
+            <button type="button" class="copybtn" data-copy>${ICON.copy}<span>${t.copy}</span></button>
+          </div>
+        </div>`;
+    }).join('');
+    // wire each field
+    p.fields.forEach(f=>{
+      const row = el2(`.field[data-field="${f.id}"]`);
+      const ta = row.querySelector('[data-input]');
+      ta.addEventListener('input', ()=>{
+        store[key(p.id,f.id)] = ta.value;
+        updateField(f, row);
+        updateStatus();
+      });
+      row.querySelector('[data-copy]').addEventListener('click', ()=>copyText(store[key(p.id,f.id)]||''));
+      updateField(f, row);
+    });
+    updateStatus();
+  }
+
+  // returns true if the field is OVER its hard limit (max) — that is what "over limit" means for status
+  function fieldOver(f){
+    const val = store[key(curPlat,f.id)] || '';
+    if(f.max==null) return false; // rec-only fields never count as hard "over"
+    return charLen(val) > f.max;
+  }
+
+  function charLen(s){ return Array.from(s).length; } // count by code points (emoji-safe)
+
+  function updateField(f, row){
+    const val = store[key(curPlat,f.id)] || '';
+    const n = charLen(val);
+    // effective limit for the bar/near-limit coloring: prefer max, else rec
+    const effLimit = (f.max!=null) ? f.max : f.rec;
+    const displayLimit = (f.max!=null) ? f.max : f.rec;
+
+    const cnum = row.querySelector('[data-count]');
+    const climit = row.querySelector('[data-limit], .climit');
+    const rem = row.querySelector('[data-rem]');
+    const bar = row.querySelector('[data-bar]');
+    const note = row.querySelector('[data-note]');
+
+    cnum.textContent = n;
+    climit.textContent = ' / ' + displayLimit;
+
+    const pct = effLimit ? Math.min(100, Math.round(n/effLimit*100)) : 0;
+    bar.style.width = pct + '%';
+
+    let cls = ''; // '', 'warn', 'over'
+    let overMax = (f.max!=null) && n > f.max;
+    let overRec = (f.rec!=null) && n > f.rec;
+
+    if(overMax || (f.max==null && overRec)){
+      cls = 'over';
+      const overCount = n - (f.max!=null ? f.max : f.rec);
+      rem.textContent = '· ' + t.overBy(overCount);
+    } else if(effLimit && n >= effLimit*AMBER){
+      cls = 'warn';
+      rem.textContent = '· ' + t.remaining(effLimit - n);
+    } else {
+      cls = '';
+      rem.textContent = effLimit ? '· ' + t.remaining(effLimit - n) : '';
+    }
+
+    row.classList.remove('warn','over');
+    if(cls) row.classList.add(cls);
+
+    // note text: describe the situation
+    let noteTxt;
+    let noteOver = false;
+    if(overMax){ noteTxt = t.overMax; noteOver = true; }
+    else if(f.max==null && overRec){ noteTxt = t.overRec; noteOver = true; }
+    else if(f.rec!=null && f.max!=null){ noteTxt = t.recMaxNote(f.rec, f.max); }
+    else if(f.rec!=null){ noteTxt = t.recNote(f.rec); }
+    else { noteTxt = t.maxNote(f.max); }
+    note.textContent = noteTxt;
+    note.classList.toggle('overmsg', noteOver);
+  }
+
+  function updateStatus(){
+    const p = plat();
+    const overCount = p.fields.filter(f=>fieldOver(f)).length;
+    const box = el('status'), sico = el('sico'), stText = el('stText'), stSub = el('stSub');
+    if(overCount === 0){
+      box.classList.remove('bad');
+      sico.innerHTML = ICON.check;
+      stText.textContent = t.allGood;
+      stSub.textContent = t.allGoodSub;
+    } else {
+      box.classList.add('bad');
+      sico.innerHTML = ICON.warn;
+      stText.textContent = overCount === 1 ? t.overOne(1) : t.overMany(overCount);
+      // list which fields
+      const names = p.fields.filter(f=>fieldOver(f)).map(f=>nm(f.label));
+      stSub.textContent = names.join(' · ');
+    }
+    renderRef();
+  }
+
+  // ---- reference note -------------------------------------------------------
+  function renderRef(){
+    const p = plat();
+    el('reflist').innerHTML = p.fields.map(f=>{
+      let val;
+      if(f.rec!=null && f.max!=null) val = `<span class="soft">${f.rec}</span> / ${f.max}`;
+      else if(f.rec!=null) val = `<span class="soft">${f.rec}</span> ${t.recLbl}`;
+      else val = `${f.max}`;
+      return `<div class="refrow"><span class="rlbl">${nm(f.label)}</span><span class="rval">${val} ${t.charsUnit}</span></div>`;
+    }).join('');
+  }
+
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  // ---- clear ----------------------------------------------------------------
+  function clearAll(){
+    const p = plat();
+    p.fields.forEach(f=>{ store[key(p.id,f.id)] = ''; });
+    renderFields();
+  }
+
+  // ---- i18n + theme ---------------------------------------------------------
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderPlats();
+    renderFields(); // re-renders fields + status + ref in the new language, preserving typed text
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ---------------------------------------------------------------
+  el('plats').addEventListener('click', e=>{
+    const b=e.target.closest('[data-plat]'); if(!b) return;
+    curPlat = b.getAttribute('data-plat');
+    renderPlats();
+    renderFields();
+  });
+  el('clearBtn').addEventListener('click', clearAll);
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init -----------------------------------------------------------------
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+# ============================================================
+# Cloudflare Pages response headers (also works on Netlify).
+# This file only takes effect once the site is deployed to Pages —
+# it's inert on the local python server, so it's safe to commit now.
+#
+# These are CONSERVATIVE, security-by-default headers that won't break
+# the app (vendored WASM engines, the api.country.is lookup, data: and
+# baked images all keep working). The stricter blocks (CSP, cross-origin
+# isolation) are left commented with notes — turn them on deliberately.
+# ============================================================
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Permissions-Policy: geolocation=(), payment=(), usb=()
+
+# Cache the vendored engines & static assets hard (they're versioned by
+# content and never change in place).
+/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# ------------------------------------------------------------------
+# OPTIONAL — Content-Security-Policy. Start in report-only, watch the
+# console for violations, then promote to an enforcing "Content-Security-
+# Policy" header. 'unsafe-inline' is required because pages use inline
+# <script>/<style>; connect-src must list Supabase + the country lookup.
+# Replace <your-project> with your Supabase ref before enabling.
+# ------------------------------------------------------------------
+# /*
+#   Content-Security-Policy-Report-Only: default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; connect-src 'self' https://<your-project>.supabase.co https://api.country.is; worker-src 'self' blob:; frame-ancestors 'self'
+
+# ------------------------------------------------------------------
+# OPTIONAL — cross-origin isolation, ONLY if you later switch to a
+# MULTI-THREADED ffmpeg core (needs SharedArrayBuffer). It can break
+# loading of third-party/data resources, so test carefully first.
+# ------------------------------------------------------------------
+# /app.html
+#   Cross-Origin-Opener-Policy: same-origin
+#   Cross-Origin-Embedder-Policy: require-corp

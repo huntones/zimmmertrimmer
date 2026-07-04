@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחשבון אחוזים</title>
+<meta name="description" content="A percentage calculator for discounts, VAT, markups, percent change, tips and splitting. Fast, live results, right in your browser.">
+<link rel="stylesheet" href="./calc.css">
+<link rel="stylesheet" href="./header.css">
+<style>
+  .mode{display:none;}
+  .mode.on{display:block;}
+  .preset{display:flex;gap:8px;flex-wrap:wrap;margin-top:-4px;margin-bottom:16px;}
+  .preset button{border:1px solid var(--line);background:var(--panel-2);color:var(--muted);border-radius:999px;
+    padding:6px 13px;font-family:var(--sans);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .12s;}
+  .preset button:hover,.preset button.on{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="title"></h1>
+    <p data-i18n="sub"></p>
+  </div>
+
+  <div class="card" style="max-width:680px;margin:0 auto">
+    <div class="segtabs" id="tabs">
+      <button class="seg on" data-mode="of" data-i18n="tOf"></button>
+      <button class="seg" data-mode="what" data-i18n="tWhat"></button>
+      <button class="seg" data-mode="change" data-i18n="tChange"></button>
+      <button class="seg" data-mode="addsub" data-i18n="tAddsub"></button>
+      <button class="seg" data-mode="tip" data-i18n="tTip"></button>
+    </div>
+
+    <!-- X% of Y -->
+    <div class="mode on" data-mode="of">
+      <div class="pair">
+        <div class="field"><label data-i18n="ofPct"></label><div class="addon"><input class="inp" id="of_p" type="number" value="20"><span class="unit">%</span></div></div>
+        <div class="field"><label data-i18n="ofBase"></label><input class="inp" id="of_b" type="number" value="250"></div>
+      </div>
+    </div>
+
+    <!-- A is what % of B -->
+    <div class="mode" data-mode="what">
+      <div class="pair">
+        <div class="field"><label data-i18n="whatA"></label><input class="inp" id="what_a" type="number" value="45"></div>
+        <div class="field"><label data-i18n="whatB"></label><input class="inp" id="what_b" type="number" value="180"></div>
+      </div>
+    </div>
+
+    <!-- % change A -> B -->
+    <div class="mode" data-mode="change">
+      <div class="pair">
+        <div class="field"><label data-i18n="chFrom"></label><input class="inp" id="ch_a" type="number" value="120"></div>
+        <div class="field"><label data-i18n="chTo"></label><input class="inp" id="ch_b" type="number" value="150"></div>
+      </div>
+    </div>
+
+    <!-- add / subtract % (VAT, discount, markup) -->
+    <div class="mode" data-mode="addsub">
+      <div class="segtabs" style="margin-bottom:14px">
+        <button class="seg on" id="dir_add" data-i18n="dirAdd"></button>
+        <button class="seg" id="dir_sub" data-i18n="dirSub"></button>
+      </div>
+      <div class="pair">
+        <div class="field"><label data-i18n="asAmount"></label><input class="inp" id="as_amt" type="number" value="200"></div>
+        <div class="field"><label data-i18n="asPct"></label><div class="addon"><input class="inp" id="as_pct" type="number" value="18"><span class="unit">%</span></div></div>
+      </div>
+      <div class="preset" id="asPreset">
+        <button data-p="17">מע״מ 17%</button>
+        <button data-p="18" class="on">מע״מ 18%</button>
+        <button data-p="10">10%</button>
+        <button data-p="25">25%</button>
+        <button data-p="50">50%</button>
+      </div>
+    </div>
+
+    <!-- tip + split -->
+    <div class="mode" data-mode="tip">
+      <div class="pair3">
+        <div class="field"><label data-i18n="tipBill"></label><input class="inp" id="tip_bill" type="number" value="240"></div>
+        <div class="field"><label data-i18n="tipPct"></label><div class="addon"><input class="inp" id="tip_pct" type="number" value="12"><span class="unit">%</span></div></div>
+        <div class="field"><label data-i18n="tipPpl"></label><input class="inp" id="tip_ppl" type="number" min="1" value="4"></div>
+      </div>
+    </div>
+
+    <div class="result" id="result">
+      <div class="rlabel" id="rLabel"></div>
+      <div class="rbig" id="rBig">—</div>
+      <div class="rsub" id="rSub"></div>
+    </div>
+    <div class="stats" id="stats" style="margin-top:14px"></div>
+  </div>
+
+  <footer class="pgfoot" data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./calc.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'חישובים והמרות · אחוזים',
+      title:'מחשבון אחוזים',
+      sub:'חשבו הנחות, מע״מ, תוספות, שינוי באחוזים, טיפ וחלוקה — התוצאה מתעדכנת מיד תוך כדי הקלדה.',
+      tOf:'אחוז מתוך', tWhat:'כמה אחוז', tChange:'שינוי %', tAddsub:'הנחה / תוספת', tTip:'טיפ וחלוקה',
+      ofPct:'אחוז', ofBase:'מתוך', ofLabel:'התוצאה',
+      whatA:'החלק', whatB:'מתוך הכל', whatLabel:'החלק מהווה',
+      chFrom:'מערך התחלתי', chTo:'לערך סופי', chLabel:'שינוי',
+      dirAdd:'הוספה (מע״מ / תוספת)', dirSub:'הפחתה (הנחה)',
+      asAmount:'סכום', asPct:'אחוז', asAddLabel:'הסכום אחרי תוספת', asSubLabel:'הסכום אחרי הנחה',
+      tipBill:'סכום החשבון', tipPct:'טיפ', tipPpl:'מספר אנשים', tipLabel:'טיפ',
+      sOf:'חישוב', sDelta:'הפרש', sBase:'בסיס', sTotal:'סה״כ', sTip:'טיפ', sPer:'לאדם', sFinal:'סופי',
+      foot:'KOLKLI · מחשבון אחוזים · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'Calc & Convert · Percentages',
+      title:'Percentage Calculator',
+      sub:'Work out discounts, VAT, markups, percent change, tips and splitting — the result updates live as you type.',
+      tOf:'% of', tWhat:'What %', tChange:'% change', tAddsub:'Add / discount', tTip:'Tip & split',
+      ofPct:'Percent', ofBase:'Of', ofLabel:'Result',
+      whatA:'The part', whatB:'Of the whole', whatLabel:'The part is',
+      chFrom:'From value', chTo:'To value', chLabel:'Change',
+      dirAdd:'Add (VAT / markup)', dirSub:'Subtract (discount)',
+      asAmount:'Amount', asPct:'Percent', asAddLabel:'Amount after adding', asSubLabel:'Amount after discount',
+      tipBill:'Bill amount', tipPct:'Tip', tipPpl:'People', tipLabel:'Tip',
+      sOf:'Result', sDelta:'Difference', sBase:'Base', sTotal:'Total', sTip:'Tip', sPer:'Per person', sFinal:'Final',
+      foot:'KOLKLI · Percentage Calculator · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'Расчёты · Проценты',
+      title:'Калькулятор процентов',
+      sub:'Считайте скидки, НДС, наценки, изменение в процентах, чаевые и деление счёта — результат обновляется на лету.',
+      tOf:'% от', tWhat:'Сколько %', tChange:'Изм. %', tAddsub:'Наценка / скидка', tTip:'Чаевые',
+      ofPct:'Процент', ofBase:'От', ofLabel:'Результат',
+      whatA:'Часть', whatB:'От целого', whatLabel:'Часть составляет',
+      chFrom:'Начальное значение', chTo:'Конечное значение', chLabel:'Изменение',
+      dirAdd:'Добавить (НДС / наценка)', dirSub:'Вычесть (скидка)',
+      asAmount:'Сумма', asPct:'Процент', asAddLabel:'Сумма с наценкой', asSubLabel:'Сумма со скидкой',
+      tipBill:'Сумма счёта', tipPct:'Чаевые', tipPpl:'Человек', tipLabel:'Чаевые',
+      sOf:'Результат', sDelta:'Разница', sBase:'База', sTotal:'Итого', sTip:'Чаевые', sPer:'На человека', sFinal:'Итог',
+      foot:'KOLKLI · Калькулятор процентов · Приватно и быстро, прямо в браузере' }
+  };
+
+  let mode = 'of';
+  let addDir = 'add';
+
+  function num(id){ const v = parseFloat(el(id).value); return isFinite(v) ? v : 0; }
+  function fmt(n){
+    if(!isFinite(n)) return '—';
+    const r = Math.round(n*100)/100;
+    return (Object.is(r,-0)?0:r).toLocaleString(undefined,{maximumFractionDigits:2});
+  }
+  function pct(n){ return fmt(n) + '%'; }
+
+  function statCard(k,v){ return `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`; }
+
+  function compute(){
+    const t = APP.t();
+    let big='—', label='', sub='', stats='';
+
+    if(mode==='of'){
+      const p=num('of_p'), b=num('of_b'), res=p/100*b;
+      label=t.ofLabel; big=fmt(res);
+      sub=`${fmt(p)}% × ${fmt(b)}`;
+      stats = statCard(t.sBase, fmt(b)) + statCard(t.sOf, pct(p)) + statCard(t.sDelta, fmt(res));
+    } else if(mode==='what'){
+      const a=num('what_a'), b=num('what_b'), res=b?a/b*100:NaN;
+      label=t.whatLabel; big=isFinite(res)?pct(res):'—';
+      sub=`${fmt(a)} / ${fmt(b)}`;
+      stats = statCard(t.sBase, fmt(b)) + statCard('', fmt(a)) + statCard(t.sOf, isFinite(res)?pct(res):'—');
+    } else if(mode==='change'){
+      const a=num('ch_a'), b=num('ch_b'), res=a?(b-a)/a*100:NaN;
+      label=t.chLabel; big=isFinite(res)?(res>0?'+':'')+pct(res):'—';
+      sub=`${fmt(a)} → ${fmt(b)}`;
+      stats = statCard(t.sDelta, (b-a>0?'+':'')+fmt(b-a)) + statCard(t.sBase, fmt(a)) + statCard(t.sTotal, fmt(b));
+    } else if(mode==='addsub'){
+      const amt=num('as_amt'), p=num('as_pct'), delta=amt*p/100;
+      const res = addDir==='add' ? amt+delta : amt-delta;
+      label = addDir==='add' ? t.asAddLabel : t.asSubLabel;
+      big=fmt(res);
+      sub=`${fmt(amt)} ${addDir==='add'?'+':'−'} ${fmt(p)}%`;
+      stats = statCard(t.sBase, fmt(amt)) + statCard(t.sDelta, (addDir==='add'?'+':'−')+fmt(delta)) + statCard(t.sFinal, fmt(res));
+    } else if(mode==='tip'){
+      const bill=num('tip_bill'), p=num('tip_pct'); let ppl=parseInt(el('tip_ppl').value,10); if(!(ppl>=1)) ppl=1;
+      const tip=bill*p/100, total=bill+tip, per=total/ppl;
+      label=t.tipLabel; big=fmt(tip);
+      sub=`${fmt(bill)} + ${fmt(p)}%`;
+      stats = statCard(t.sTip, fmt(tip)) + statCard(t.sTotal, fmt(total)) + statCard(t.sPer+' ×'+ppl, fmt(per));
+    }
+    el('rLabel').textContent = label;
+    el('rBig').textContent = big;
+    el('rSub').textContent = sub;
+    el('stats').innerHTML = stats;
+  }
+
+  function setMode(m){
+    mode = m;
+    document.querySelectorAll('#tabs .seg').forEach(s=>s.classList.toggle('on', s.getAttribute('data-mode')===m));
+    document.querySelectorAll('.mode').forEach(d=>d.classList.toggle('on', d.getAttribute('data-mode')===m));
+    compute();
+  }
+
+  el('tabs').addEventListener('click', e=>{ const s=e.target.closest('[data-mode]'); if(s) setMode(s.getAttribute('data-mode')); });
+  el('dir_add').addEventListener('click', ()=>{ addDir='add'; el('dir_add').classList.add('on'); el('dir_sub').classList.remove('on'); compute(); });
+  el('dir_sub').addEventListener('click', ()=>{ addDir='sub'; el('dir_sub').classList.add('on'); el('dir_add').classList.remove('on'); compute(); });
+  el('asPreset').addEventListener('click', e=>{
+    const b=e.target.closest('[data-p]'); if(!b) return;
+    el('as_pct').value = b.getAttribute('data-p');
+    el('asPreset').querySelectorAll('button').forEach(x=>x.classList.toggle('on', x===b));
+    compute();
+  });
+  document.querySelectorAll('input.inp').forEach(i=>i.addEventListener('input', compute));
+
+  const APP = KolkliTool.init(I18N, compute);
+})();
+</script>
+</body>
+</html>

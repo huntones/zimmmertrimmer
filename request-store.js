@@ -27,42 +27,88 @@
   KR.ls = function (k) { try { return localStorage.getItem(k); } catch (_) { return null; } };
   KR.lsSet = function (k, v) { try { localStorage.setItem(k, v); } catch (_) {} };
 
+  // Every owner sees only their own local demo records. Public upload links
+  // still work via a token -> owner index, but dashboard/manage lists never
+  // read another owner's array.
+  function safeOwnerId(v) {
+    return String(v || 'guest').toLowerCase().replace(/[^a-z0-9_.@-]+/g, '_') || 'guest';
+  }
+  function currentOwnerId() {
+    var email = (KR.ls('ac_session') || '').toLowerCase();
+    if (!email) return 'guest';
+    try {
+      var users = JSON.parse(KR.ls('ac_users') || '[]') || [];
+      for (var i = 0; i < users.length; i++) {
+        if ((users[i].email || '').toLowerCase() === email) return safeOwnerId(users[i].id || users[i].userId || email);
+      }
+    } catch (_) {}
+    return safeOwnerId(email);
+  }
+  function scopedKey(base, owner) { return base + '::' + safeOwnerId(owner || currentOwnerId()); }
+  function loadIndex() { try { return JSON.parse(KR.ls(INDEX_KEY) || '{}') || {}; } catch (_) { return {}; } }
+  function saveIndex(idx) { KR.lsSet(INDEX_KEY, JSON.stringify(idx || {})); }
+  function ownerForToken(token) {
+    var idx = loadIndex();
+    return idx[token] || currentOwnerId();
+  }
+  function readRequests(owner) {
+    try {
+      var a = JSON.parse(KR.ls(scopedKey(REQ_KEY, owner)) || '[]');
+      return Array.isArray(a) ? a : [];
+    } catch (_) { return []; }
+  }
+  function writeRequests(owner, arr) {
+    KR.lsSet(scopedKey(REQ_KEY, owner), JSON.stringify(arr || []));
+  }
+
   // ---------- requests (metadata) ----------
-  var REQ_KEY = 'kr_requests', FOLDER_KEY = 'kr_folders';
+  var REQ_KEY = 'kr_requests', FOLDER_KEY = 'kr_folders', INDEX_KEY = 'kr_request_owners';
 
   KR.loadRequests = function () {
-    try { var a = JSON.parse(KR.ls(REQ_KEY) || '[]'); return Array.isArray(a) ? a : []; }
-    catch (_) { return []; }
+    var owner = currentOwnerId();
+    return readRequests(owner).filter(function (r) { return !r.ownerId || r.ownerId === owner; });
   };
-  KR.saveRequests = function (arr) { KR.lsSet(REQ_KEY, JSON.stringify(arr || [])); };
+  KR.saveRequests = function (arr) {
+    var owner = currentOwnerId(), idx = loadIndex();
+    (arr || []).forEach(function (r) { if (r && r.token) { r.ownerId = r.ownerId || owner; idx[r.token] = r.ownerId; } });
+    writeRequests(owner, arr || []);
+    saveIndex(idx);
+  };
   KR.getRequest = function (token) {
-    var a = KR.loadRequests();
+    var owner = ownerForToken(token);
+    var a = readRequests(owner);
     for (var i = 0; i < a.length; i++) if (a[i].token === token) return a[i];
+    a = readRequests(currentOwnerId());
+    for (var j = 0; j < a.length; j++) if (a[j].token === token) return a[j];
     return null;
   };
   KR.upsertRequest = function (req) {
-    var a = KR.loadRequests(), found = false;
+    var owner = req.ownerId || ownerForToken(req.token);
+    req.ownerId = owner;
+    var a = readRequests(owner), found = false;
     for (var i = 0; i < a.length; i++) if (a[i].token === req.token) { a[i] = req; found = true; break; }
     if (!found) a.push(req);
-    KR.saveRequests(a);
+    writeRequests(owner, a);
+    var idx = loadIndex(); idx[req.token] = owner; saveIndex(idx);
   };
   KR.deleteRequest = function (token) {
-    var req = KR.getRequest(token), chain = Promise.resolve();
+    var req = KR.getRequest(token), owner = (req && req.ownerId) || ownerForToken(token), chain = Promise.resolve();
     if (req && req.files) req.files.forEach(function (f) {
       chain = chain.then(function () { return KR.delBlob(f.id).catch(function () {}); });
     });
     return chain.then(function () {
-      KR.saveRequests(KR.loadRequests().filter(function (r) { return r.token !== token; }));
+      writeRequests(owner, readRequests(owner).filter(function (r) { return r.token !== token; }));
+      var idx = loadIndex(); delete idx[token]; saveIndex(idx);
     });
   };
 
   // ---------- target folders (self-contained labels) ----------
   KR.loadFolders = function () {
-    try { var a = JSON.parse(KR.ls(FOLDER_KEY) || 'null'); if (Array.isArray(a) && a.length) return a; }
+    try { var a = JSON.parse(KR.ls(scopedKey(FOLDER_KEY)) || 'null'); if (Array.isArray(a) && a.length) return a; }
     catch (_) {}
     return ['Inbox'];
   };
-  KR.saveFolders = function (arr) { KR.lsSet(FOLDER_KEY, JSON.stringify(arr || [])); };
+  KR.saveFolders = function (arr) { KR.lsSet(scopedKey(FOLDER_KEY), JSON.stringify(arr || [])); };
   KR.addFolder = function (name) {
     name = (name || '').trim(); if (!name) return;
     var a = KR.loadFolders(); if (a.indexOf(name) < 0) { a.push(name); KR.saveFolders(a); }

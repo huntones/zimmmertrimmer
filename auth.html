@@ -295,6 +295,9 @@
       errMatch:'הסיסמאות לא תואמות', errTaken:'כבר קיים חשבון עם האימייל הזה', errNoUser:'לא נמצא חשבון עם האימייל הזה',
       errWrongPass:'סיסמה שגויה',
       forgotMsg:'איפוס סיסמה יעבוד כשנחבר את השרת. בינתיים אפשר ליצור חשבון חדש.',
+      checkEmail:'שלחנו לכם מייל אימות — אשרו אותו ואז התחברו.',
+      resetSent:'שלחנו קישור לאיפוס סיסמה למייל שלכם.',
+      resetNeedEmail:'הזינו קודם את כתובת האימייל.',
       foot:'KOLKLI · ההרשמה מקומית להדגמה · העריכה תמיד רצה בדפדפן שלכם',
     },
     en:{
@@ -318,6 +321,9 @@
       errMatch:'Passwords don’t match', errTaken:'An account with this email already exists', errNoUser:'No account found with this email',
       errWrongPass:'Wrong password',
       forgotMsg:'Password reset will work once the server is connected. For now you can create a new account.',
+      checkEmail:'We sent you a confirmation email — confirm it, then sign in.',
+      resetSent:'We emailed you a password-reset link.',
+      resetNeedEmail:'Enter your email address first.',
       foot:'KOLKLI · Accounts are local (demo) · Editing always runs in your browser',
     },
     ru:{
@@ -341,6 +347,9 @@
       errMatch:'Пароли не совпадают', errTaken:'Аккаунт с этой почтой уже существует', errNoUser:'Аккаунт с этой почтой не найден',
       errWrongPass:'Неверный пароль',
       forgotMsg:'Сброс пароля заработает после подключения сервера. Пока можно создать новый аккаунт.',
+      checkEmail:'Мы отправили письмо для подтверждения — подтвердите и войдите.',
+      resetSent:'Мы отправили ссылку для сброса пароля на вашу почту.',
+      resetNeedEmail:'Сначала введите адрес электронной почты.',
       foot:'KOLKLI · Аккаунты локальные (демо) · Редактирование всегда идёт в вашем браузере',
     },
   };
@@ -418,10 +427,25 @@
 
     el('submitBtn').disabled=true;
     try{
-      if(mode==='signup'){
+      // Backend seam: real server when Supabase is wired up, else demo store.
+      if(window.KolkliAuth && window.KolkliAuth.configured()){
+        if(mode==='signup'){
+          const r=await window.KolkliAuth.signUp({ name, email, password:pass });
+          if(r.ok){ if(r.code==='confirm'){ showMsg(t.checkEmail,'info'); } else { showSigned(name, email, t.accountCreated); } }
+          else if(r.code==='taken'){ setErr('emailField','emailErr',t.errTaken); }
+          else if(r.code==='weak'){ setErr('passField','passErr',t.errPassShort); }
+          else { showMsg(r.message||t.errRequired,'err'); }
+        } else {
+          const r=await window.KolkliAuth.signIn({ email, password:pass });
+          if(r.ok){ const su=findUser(email); showSigned(su?su.name:email.split('@')[0], email, t.welcomeBack); }
+          else if(r.code==='confirm'){ showMsg(t.checkEmail,'info'); }
+          else if(r.code==='invalid'){ setErr('passField','passErr',t.errWrongPass); }
+          else { showMsg(r.message||t.errRequired,'err'); }
+        }
+      } else if(mode==='signup'){
         if(findUser(email)){ setErr('emailField','emailErr',t.errTaken); return; }
         const users=loadUsers();
-        users.push({ name, email, pass:await hashPass(pass), created:Date.now() });
+        users.push({ name, email, pass:await hashPass(pass), role:'user', plan:'free', created:Date.now() });
         saveUsers(users);
         setSession(email);
         showSigned(name, email, t.accountCreated);
@@ -504,13 +528,32 @@
   el('tabSignup').addEventListener('click',()=>setMode('signup'));
   el('switchLink').addEventListener('click',()=>setMode(mode==='login'?'signup':'login'));
   el('authForm').addEventListener('submit',onSubmit);
-  el('forgotLink').addEventListener('click',()=>showMsg(t.forgotMsg,'info'));
+  el('forgotLink').addEventListener('click',()=>{
+    if(window.KolkliAuth && window.KolkliAuth.configured()){
+      const em=el('emailInput').value.trim().toLowerCase();
+      if(!em || !EMAIL_RE.test(em)){ showMsg(t.resetNeedEmail,'info'); return; }
+      window.KolkliAuth.resetPassword(em).then(r=>showMsg(r.ok?t.resetSent:(r.message||t.forgotMsg), r.ok?'info':'err'));
+      return;
+    }
+    showMsg(t.forgotMsg,'info');
+  });
   el('passEye').addEventListener('click',()=>{
     const inp=el('passInput'), show=inp.type==='password';
     inp.type=show?'text':'password';
     el('eyeOpen').style.display=show?'none':''; el('eyeShut').style.display=show?'':'none';
   });
-  el('logoutBtn').addEventListener('click',()=>{ clearSession(); setMode('login'); showForm(); el('authForm').reset(); });
+  el('logoutBtn').addEventListener('click',()=>{
+    if(window.KolkliAuth && window.KolkliAuth.configured()) window.KolkliAuth.signOut();
+    else clearSession();
+    setMode('login'); showForm(); el('authForm').reset();
+  });
+  // Supabase restores the session asynchronously; when auth-store.js has synced
+  // it (fires kolkli:auth), reflect the signed-in state on this page too.
+  window.addEventListener('kolkli:auth',()=>{
+    const sess=currentSession();
+    if(sess){ const u=findUser(sess); showSigned(u?u.name:sess.split('@')[0], sess); }
+    else { showForm(); }
+  });
   window.__setLang=applyLang;
   el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
 

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל קישור וואטסאפ</title>
+<meta name="description" content="Create a wa.me WhatsApp click-to-chat link with a country code, phone number and a pre-filled message. Copy the link or an HTML snippet, or open the chat instantly. Fast, private, all in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px;}
+  .card h3{font-size:15px;margin:0 0 16px;font-weight:700;display:flex;align-items:center;gap:9px;}
+  .card h3 .dot{width:26px;height:26px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .card h3 .dot svg{width:15px;height:15px;}
+
+  /* fields */
+  .field{margin-bottom:16px;}
+  .field:last-child{margin-bottom:0;}
+  .field > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+  .inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  select.inp{cursor:pointer;}
+  textarea.inp{resize:vertical;min-height:96px;line-height:1.5;}
+
+  /* phone row: country select + number */
+  .phonerow{display:grid;grid-template-columns:minmax(0,190px) 1fr;gap:9px;}
+  @media (max-width:480px){ .phonerow{grid-template-columns:1fr;} }
+  .dialtag{font-family:var(--mono);font-size:12px;color:var(--accent-dim);font-weight:700;
+    background:var(--accent-soft);padding:2px 9px;border-radius:999px;margin-inline-start:8px;}
+  .fieldhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;flex-wrap:wrap;gap:6px;}
+  .fieldhead label{margin:0;font-size:12.5px;font-weight:600;color:var(--ink-2);}
+  .counter{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .hint{font-size:11.5px;margin-top:7px;min-height:15px;font-family:var(--mono);}
+  .hint.bad{color:var(--warn);}
+  .hint.ok{color:var(--success-dim);}
+  .hint.muted{color:var(--faint);}
+
+  /* output card */
+  .outbox{margin-bottom:16px;}
+  .outbox:last-child{margin-bottom:0;}
+  .outbox .olabel{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px;flex-wrap:wrap;}
+  .outbox .olabel span{font-size:12.5px;font-weight:600;color:var(--ink-2);}
+  .mono-out{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--mono);font-size:12.5px;padding:11px 12px;line-height:1.55;resize:none;overflow-x:auto;
+    word-break:break-all;white-space:pre-wrap;}
+  .mono-out:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+
+  /* copy button (secondary) */
+  .cbtn{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:600;
+    cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);
+    transition:border-color .12s,color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .cbtn:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .cbtn:active{transform:translateY(1px);}
+  .cbtn svg{width:14px;height:14px;}
+
+  /* action buttons */
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+  .actions > *{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 18px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;text-align:center;}
+  .actions svg{width:17px;height:17px;flex-shrink:0;}
+  .btn-primary{color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .btn-primary:hover{filter:brightness(1.05);} .btn-primary:active{transform:translateY(1px);}
+  .btn-open{color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),#25d366;
+    text-shadow:0 1px 2px rgba(0,0,0,.2);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 20px rgba(37,211,102,.35);
+    transition:filter .14s,transform .08s;}
+  .btn-open:hover{filter:brightness(1.05);} .btn-open:active{transform:translateY(1px);}
+  .btn-open.dis,.btn-primary.dis{opacity:.45;pointer-events:none;filter:none;transform:none;}
+
+  /* quick message chips */
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;}
+  .chip{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;
+    transition:border-color .12s,color .12s,background .12s;}
+  .chip:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+
+  /* preview line */
+  .preview{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:12px;margin-top:2px;
+    background:var(--panel-2);border:1px solid var(--line-2);}
+  .preview .wa{width:38px;height:38px;flex-shrink:0;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    background:rgba(37,211,102,.14);color:#1faa52;}
+  .preview .wa svg{width:20px;height:20px;}
+  .preview .pv{min-width:0;flex:1;}
+  .preview .pv .pn{font-size:13.5px;font-weight:700;font-family:var(--mono);color:var(--ink);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .preview .pv .pm{font-size:12px;color:var(--muted);margin-top:2px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid">
+    <!-- left: form -->
+    <div class="col">
+      <div class="card">
+        <h3>
+          <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 0-8.9 14.5L2 22l5.6-1.1A10 10 0 1 0 12 2z"/></svg></span>
+          <span data-i18n="formTitle"></span>
+        </h3>
+
+        <div class="field">
+          <label data-i18n="phoneLbl"></label>
+          <div class="phonerow">
+            <select class="inp" id="country"></select>
+            <input class="inp" id="phone" type="tel" inputmode="tel" autocomplete="tel" data-i18n-ph="phonePh" placeholder="">
+          </div>
+          <div class="hint" id="phoneHint"></div>
+        </div>
+
+        <div class="field">
+          <div class="fieldhead">
+            <label data-i18n="msgLbl" for="msg"></label>
+            <span class="counter"><span id="charCount">0</span> <span data-i18n="charsWord"></span></span>
+          </div>
+          <textarea class="inp" id="msg" data-i18n-ph="msgPh" placeholder=""></textarea>
+          <div class="chips" id="msgChips"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- right: live output -->
+    <div class="col">
+      <div class="card">
+        <h3>
+          <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>
+          <span data-i18n="outTitle"></span>
+        </h3>
+
+        <div class="preview">
+          <span class="wa"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.9 14.2c-.25.7-1.45 1.34-2 1.37-.51.03-.51.4-3.23-.68-2.73-1.09-4.44-3.86-4.57-4.04-.13-.18-1.08-1.44-1.08-2.75 0-1.3.68-1.94.93-2.2.24-.27.53-.34.7-.34l.5.01c.16 0 .38-.06.6.46.24.57.8 1.97.87 2.11.07.13.11.29.02.47-.09.18-.14.29-.27.45-.14.16-.29.35-.41.47-.14.14-.28.29-.12.56.16.27.71 1.17 1.53 1.9 1.05.93 1.94 1.22 2.21 1.36.27.13.43.11.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.22.6-.13.25.09 1.57.74 1.84.87.27.14.45.2.51.31.07.11.07.64-.18 1.35z"/></svg></span>
+          <div class="pv">
+            <div class="pn" id="pvNumber">—</div>
+            <div class="pm" id="pvMsg"></div>
+          </div>
+        </div>
+
+        <div class="outbox" style="margin-top:16px">
+          <div class="olabel">
+            <span data-i18n="linkLbl"></span>
+            <button class="cbtn" type="button" id="copyLink">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span data-i18n="copyWord"></span>
+            </button>
+          </div>
+          <textarea class="mono-out" id="linkOut" rows="2" readonly></textarea>
+        </div>
+
+        <div class="actions">
+          <button class="btn-primary" type="button" id="copyLinkBig">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span data-i18n="copyLinkBtn"></span>
+          </button>
+          <a class="btn-open" id="openBtn" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span data-i18n="openBtn"></span>
+          </a>
+        </div>
+
+        <div class="outbox" style="margin-top:18px">
+          <div class="olabel">
+            <span data-i18n="htmlLbl"></span>
+            <button class="cbtn" type="button" id="copyHtml">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span data-i18n="copyWord"></span>
+            </button>
+          </div>
+          <textarea class="mono-out" id="htmlOut" rows="2" readonly></textarea>
+        </div>
+
+        <div class="seam">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-i18n="seam"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  // ~20 common countries with dial code + flag emoji. Israel is the default.
+  const COUNTRIES = [
+    { cc:'IL', dial:'972', flag:'🇮🇱', he:'ישראל',              en:'Israel',          ru:'Израиль' },
+    { cc:'US', dial:'1',   flag:'🇺🇸', he:'ארה״ב',              en:'United States',   ru:'США' },
+    { cc:'GB', dial:'44',  flag:'🇬🇧', he:'בריטניה',            en:'United Kingdom',  ru:'Великобритания' },
+    { cc:'CA', dial:'1',   flag:'🇨🇦', he:'קנדה',               en:'Canada',          ru:'Канада' },
+    { cc:'AU', dial:'61',  flag:'🇦🇺', he:'אוסטרליה',           en:'Australia',       ru:'Австралия' },
+    { cc:'DE', dial:'49',  flag:'🇩🇪', he:'גרמניה',             en:'Germany',         ru:'Германия' },
+    { cc:'FR', dial:'33',  flag:'🇫🇷', he:'צרפת',               en:'France',          ru:'Франция' },
+    { cc:'ES', dial:'34',  flag:'🇪🇸', he:'ספרד',               en:'Spain',           ru:'Испания' },
+    { cc:'IT', dial:'39',  flag:'🇮🇹', he:'איטליה',             en:'Italy',           ru:'Италия' },
+    { cc:'NL', dial:'31',  flag:'🇳🇱', he:'הולנד',              en:'Netherlands',     ru:'Нидерланды' },
+    { cc:'RU', dial:'7',   flag:'🇷🇺', he:'רוסיה',              en:'Russia',          ru:'Россия' },
+    { cc:'UA', dial:'380', flag:'🇺🇦', he:'אוקראינה',           en:'Ukraine',         ru:'Украина' },
+    { cc:'IN', dial:'91',  flag:'🇮🇳', he:'הודו',               en:'India',           ru:'Индия' },
+    { cc:'BR', dial:'55',  flag:'🇧🇷', he:'ברזיל',              en:'Brazil',          ru:'Бразилия' },
+    { cc:'MX', dial:'52',  flag:'🇲🇽', he:'מקסיקו',             en:'Mexico',          ru:'Мексика' },
+    { cc:'AE', dial:'971', flag:'🇦🇪', he:'איחוד האמירויות',    en:'UAE',             ru:'ОАЭ' },
+    { cc:'TR', dial:'90',  flag:'🇹🇷', he:'טורקיה',             en:'Turkey',          ru:'Турция' },
+    { cc:'ZA', dial:'27',  flag:'🇿🇦', he:'דרום אפריקה',        en:'South Africa',    ru:'ЮАР' },
+    { cc:'AR', dial:'54',  flag:'🇦🇷', he:'ארגנטינה',           en:'Argentina',       ru:'Аргентина' },
+    { cc:'PL', dial:'48',  flag:'🇵🇱', he:'פולין',              en:'Poland',          ru:'Польша' },
+  ];
+
+  const I18N = {
+    he:{
+      dir:'rtl',
+      kick:'שיווק · מחולל קישור וואטסאפ',
+      pageTitle:'מחוללל קישור וואטסאפ לצ׳אט מיידי',
+      pageSub:'בנו קישור wa.me עם קידומת מדינה, מספר טלפון והודעה מוכנה מראש. העתיקו את הקישור, קבלו קטע HTML מוכן להטמעה, או פִּתחו את הצ׳אט מיד — הכול רץ בדפדפן שלכם.',
+      formTitle:'פרטי הקישור',
+      phoneLbl:'מספר טלפון', phonePh:'50 123 4567',
+      msgLbl:'הודעה מוכנה מראש', msgPh:'שלום! ראיתי את הפרסום שלכם ורציתי לשאול…',
+      charsWord:'תווים',
+      outTitle:'הקישור שלכם',
+      linkLbl:'קישור wa.me', htmlLbl:'קטע HTML להטמעה',
+      copyWord:'העתקה', copyLinkBtn:'העתקת הקישור', openBtn:'פתחו בוואטסאפ',
+      chatText:'שוחחו איתנו בוואטסאפ',
+      previewEmpty:'הזינו מספר כדי לראות תצוגה',
+      hintEmpty:'הזינו מספר טלפון (ספרות בלבד).',
+      hintShort:'המספר קצר מדי — בדקו שוב.',
+      hintOk:n=>`מספר תקין · ${n} ספרות`,
+      chips:['שלום! 👋','אשמח לפרטים נוספים','מתעניין/ת במחיר','אפשר לקבוע פגישה?'],
+      seam:'הכול נבנה מקומית בדפדפן — שום מספר או הודעה לא נשלחים לשרת. הקישור עצמו נפתח באפליקציית וואטסאפ של הנמען.',
+      foot:'KOLKLI · מחולל קישור וואטסאפ · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הקישור הועתק ✓', copiedHtml:'ה-HTML הועתק ✓',
+    },
+    en:{
+      dir:'ltr',
+      kick:'Marketing · WhatsApp Link Generator',
+      pageTitle:'Generate a WhatsApp click-to-chat link',
+      pageSub:'Build a wa.me link with a country code, phone number and a pre-filled message. Copy the link, grab a ready-to-embed HTML snippet, or open the chat instantly — everything runs in your browser.',
+      formTitle:'Link details',
+      phoneLbl:'Phone number', phonePh:'50 123 4567',
+      msgLbl:'Pre-filled message', msgPh:'Hi! I saw your ad and wanted to ask…',
+      charsWord:'chars',
+      outTitle:'Your link',
+      linkLbl:'wa.me link', htmlLbl:'Embeddable HTML snippet',
+      copyWord:'Copy', copyLinkBtn:'Copy link', openBtn:'Open in WhatsApp',
+      chatText:'Chat with us on WhatsApp',
+      previewEmpty:'Enter a number to see a preview',
+      hintEmpty:'Enter a phone number (digits only).',
+      hintShort:'That number looks too short — double-check it.',
+      hintOk:n=>`Valid number · ${n} digits`,
+      chips:['Hi there! 👋','I’d love more details','Interested in the price','Can we set up a call?'],
+      seam:'Everything is built locally in your browser — no number or message is ever sent to a server. The link itself opens in the recipient’s WhatsApp app.',
+      foot:'KOLKLI · WhatsApp Link Generator · Private and fast, right in your browser',
+      copied:'Link copied ✓', copiedHtml:'HTML copied ✓',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Маркетинг · Генератор ссылки WhatsApp',
+      pageTitle:'Создайте ссылку WhatsApp для мгновенного чата',
+      pageSub:'Соберите ссылку wa.me с кодом страны, номером телефона и заранее заготовленным сообщением. Скопируйте ссылку, получите готовый HTML-фрагмент или откройте чат сразу — всё работает в вашем браузере.',
+      formTitle:'Данные ссылки',
+      phoneLbl:'Номер телефона', phonePh:'50 123 4567',
+      msgLbl:'Готовое сообщение', msgPh:'Здравствуйте! Увидел вашу рекламу и хотел спросить…',
+      charsWord:'симв.',
+      outTitle:'Ваша ссылка',
+      linkLbl:'Ссылка wa.me', htmlLbl:'HTML-фрагмент для вставки',
+      copyWord:'Копировать', copyLinkBtn:'Копировать ссылку', openBtn:'Открыть в WhatsApp',
+      chatText:'Напишите нам в WhatsApp',
+      previewEmpty:'Введите номер, чтобы увидеть превью',
+      hintEmpty:'Введите номер телефона (только цифры).',
+      hintShort:'Номер выглядит слишком коротким — проверьте его.',
+      hintOk:n=>`Верный номер · ${n} цифр`,
+      chips:['Здравствуйте! 👋','Хочу больше деталей','Интересует цена','Можем созвониться?'],
+      seam:'Всё собирается локально в вашем браузере — ни номер, ни сообщение не отправляются на сервер. Сама ссылка открывается в приложении WhatsApp получателя.',
+      foot:'KOLKLI · Генератор ссылки WhatsApp · Приватно и быстро, прямо в браузере',
+      copied:'Ссылка скопирована ✓', copiedHtml:'HTML скопирован ✓',
+    },
+  };
+
+  const LS_KEY = 'kolkli_wa';
+  let lang='he', t=I18N.he;
+  let state = { cc:'IL', phone:'', msg:'' };
+
+  // ---- helpers ----
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function toast(m){ const e=el('toast'); e.textContent=m; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+
+  function copyText(str){
+    const done=()=>{};
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(str).then(done).catch(()=>fallback(str,done)); }
+    else fallback(str,done);
+  }
+  function fallback(str,cb){ const ta=document.createElement('textarea'); ta.value=str; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); cb&&cb(); }
+
+  function currentCountry(){ return COUNTRIES.find(c=>c.cc===state.cc) || COUNTRIES[0]; }
+
+  // Normalize phone: keep digits only, drop ONE leading zero (national trunk prefix).
+  function normalizedDigits(){
+    let d = (state.phone||'').replace(/\D+/g,'');
+    d = d.replace(/^0+/, m => m.length ? '' : m); // drop leading zero(s)
+    return d;
+  }
+  function fullNumber(){
+    const nat = normalizedDigits();
+    if(!nat) return '';
+    return currentCountry().dial + nat;
+  }
+
+  // ---- persistence ----
+  function save(){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(_){}
+  }
+  function load(){
+    try{
+      const raw = ls(LS_KEY); if(!raw) return;
+      const o = JSON.parse(raw);
+      if(o && typeof o==='object'){
+        if(o.cc && COUNTRIES.some(c=>c.cc===o.cc)) state.cc=o.cc;
+        if(typeof o.phone==='string') state.phone=o.phone;
+        if(typeof o.msg==='string') state.msg=o.msg;
+      }
+    }catch(_){}
+  }
+
+  // ---- build outputs ----
+  function build(){
+    const num = fullNumber();
+    const rawMsg = state.msg || '';
+    const link = num ? ('https://wa.me/'+num + (rawMsg.trim() ? '?text='+encodeURIComponent(rawMsg) : '')) : '';
+
+    // link field
+    el('linkOut').value = link;
+
+    // html snippet
+    const html = link ? '<a href="'+escapeHtml(link)+'">'+escapeHtml(t.chatText)+'</a>' : '';
+    el('htmlOut').value = html;
+
+    // open button
+    const openBtn = el('openBtn');
+    if(link){ openBtn.href=link; openBtn.classList.remove('dis'); }
+    else{ openBtn.removeAttribute('href'); openBtn.classList.add('dis'); }
+    el('copyLinkBig').classList.toggle('dis', !link);
+
+    // preview
+    const c = currentCountry();
+    el('pvNumber').textContent = num ? ('+'+c.dial+' '+normalizedDigits()) : t.previewEmpty;
+    const pm = el('pvMsg');
+    if(num && rawMsg.trim()){ pm.textContent='“'+rawMsg.replace(/\s+/g,' ').trim()+'”'; pm.style.display=''; }
+    else { pm.textContent=''; pm.style.display='none'; }
+
+    // char counter
+    el('charCount').textContent = rawMsg.length;
+
+    // phone hint / validation
+    const hint = el('phoneHint');
+    const nat = normalizedDigits();
+    hint.className='hint';
+    if(!nat){ hint.classList.add('muted'); hint.textContent=t.hintEmpty; }
+    else if((c.dial+nat).length < 8){ hint.classList.add('bad'); hint.textContent=t.hintShort; }
+    else { hint.classList.add('ok'); hint.textContent=t.hintOk(nat.length); }
+
+    save();
+  }
+
+  // ---- render country <select> + chips (rebuilt on language change) ----
+  function renderCountry(){
+    const sel = el('country');
+    sel.innerHTML = COUNTRIES.map(c=>
+      `<option value="${c.cc}">${c.flag} ${escapeHtml(c[lang]||c.en)} (+${c.dial})</option>`
+    ).join('');
+    sel.value = state.cc;
+  }
+  function renderChips(){
+    el('msgChips').innerHTML = (t.chips||[]).map((m,i)=>
+      `<button type="button" class="chip" data-chip="${i}">${escapeHtml(m)}</button>`
+    ).join('');
+  }
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder', t[k]); });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderCountry(); renderChips();
+    build();
+  }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  el('country').addEventListener('change',()=>{ state.cc=el('country').value; build(); });
+  el('phone').addEventListener('input',()=>{ state.phone=el('phone').value; build(); });
+  el('msg').addEventListener('input',()=>{ state.msg=el('msg').value; build(); });
+
+  el('msgChips').addEventListener('click',e=>{
+    const b=e.target.closest('[data-chip]'); if(!b) return;
+    const txt=(t.chips||[])[+b.getAttribute('data-chip')]||'';
+    state.msg = txt;
+    el('msg').value = txt;
+    build();
+  });
+
+  el('copyLink').addEventListener('click',()=>{ const v=el('linkOut').value; if(!v) return; copyText(v); toast(t.copied); });
+  el('copyLinkBig').addEventListener('click',()=>{ const v=el('linkOut').value; if(!v) return; copyText(v); toast(t.copied); });
+  el('copyHtml').addEventListener('click',()=>{ const v=el('htmlOut').value; if(!v) return; copyText(v); toast(t.copiedHtml); });
+
+  window.__setLang=applyLang;
+  const tt=el('themeToggle'); if(tt) tt.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  load();
+  el('phone').value = state.phone;
+  el('msg').value = state.msg;
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+})();
+</script>
+</body>
+</html>

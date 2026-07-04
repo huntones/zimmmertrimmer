@@ -208,7 +208,7 @@
   .step p{font-size:13.7px;color:var(--muted);margin:0;}
 
   /* ---------- pricing ---------- */
-  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start;}
+  .plans{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;align-items:start;}
   .plan{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px 24px;box-shadow:var(--shadow);}
   .plan.pop{border-color:var(--accent);box-shadow:var(--shadow-lg);}
   .plan .ribbon{position:absolute;top:-11px;inset-inline-start:24px;background:var(--grad);color:#fff;font-size:11px;font-weight:700;
@@ -257,15 +257,15 @@
     .navlinks{display:none;}
     .menuBtn{display:inline-flex;}
   }
-  @media (max-width:1080px){ .hero3d{display:none;} }
+  @media (max-width:1080px){ .hero3d{display:none;} .plans{grid-template-columns:repeat(2,1fr);} }
   @media (max-width:860px){
     .g4{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:repeat(2,1fr);}
     .aigrid{grid-template-columns:repeat(2,1fr);}
-    .plans{grid-template-columns:1fr;}
     .fcols{grid-template-columns:1fr 1fr;}
   }
   @media (max-width:560px){
     .g4,.g3,.g2,.steps{grid-template-columns:1fr;}
+    .plans{grid-template-columns:1fr;}
     .aigrid{grid-template-columns:1fr;}
     .fcols{grid-template-columns:1fr;}
     .hero{padding:48px 0 18px;}
@@ -543,7 +543,7 @@
 <section class="hero">
   <span class="orb a"></span><span class="orb b"></span><span class="orb c"></span>
   <div class="wrap">
-    <h1 class="big"><span data-i18n="heroT1"></span> <span class="gtext" data-i18n="heroT2"></span></h1>
+    <h1 class="big"><span data-i18n="heroT1"></span><br><span class="gtext" data-i18n="heroT2"></span></h1>
     <p class="sub" data-i18n="heroSub"></p>
 
     <div class="herofeats">
@@ -718,7 +718,7 @@
       navHome:'בית', navSend:'שליחת קבצים', navAI:'כלי AI', navAudio:'אודיו', navImages:'תמונות', navVideo:'וידאו',
       navDocs:'מסמכים', navConvert:'ממירים', navCompress:'דחיסה', navPricing:'מסלולים ומחירים', navSignin:'התחברות', navStart:'התחילו',
       heroBadge:'100+ כלים · הכול בדפדפן',
-      heroT1:'כל הכלים הדיגיטליים שלך,', heroT2:'במקום אחד.',
+      heroT1:'כל הכלים החכמים לקבצים שלכם', heroT2:'במקום אחד.',
       heroSub:'העלאה, עריכה, המרה, ארגון ושליחה של קבצים — במהירות ובפשטות.',
       trust1:'בלי התקנה', trust2:'עריכה פרטית בדפדפן', trust3:'עובד בכל מכשיר',
       hb1t:'בלי להתקין תוכנה', hb2t:'100% מאובטח ופרטי', hb3t:'מהיר במיוחד, מבוסס ענן', hb4t:'עובד בכל מכשיר ובכל מקום',
@@ -731,7 +731,7 @@
       kPopular:'הכלים הפופולריים', popularH:'כל מה שצריך לעבודה עם קבצים', popularP:'בוחרים כלי ויוצאים לדרך — כל הבסיס במקום אחד.',
       kAI:'סטודיו AI', newBadge:'חדש', aiH:'כלים חכמים יותר, מבוססי AI', aiP:'הכלים המתקדמים ביותר שלנו — נחשפים בקרוב.',
       kTools:'כל הכלים', toolsAllH:'כל כלי שצריך לעבודה עם קבצים', toolsAllP:'ארגז הכלים המקוון שלכם — כאן וחינם לתמיד!',
-      tabAll:'הכול', tabAudio:'אודיו', tabImages:'תמונות', tabVideo:'וידאו', tabDocs:'מסמכים', tabConvert:'המרה', tabCompress:'דחיסה',
+      tabAll:'הכול', tabAudio:'אודיו', tabImages:'תמונות', tabVideo:'וידאו', tabDocs:'מסמכים', tabConvert:'המרה', tabCompress:'דחיסה', tabMarketing:'שיווק',
       kCats:'קטגוריות', catsH:'בית לכל סוג קובץ', catsP:'קפצו לכלים לאודיו, תמונות, וידאו, מסמכים ועוד.',
       kSend:'שליחת קבצים גדולים', sendH:'שתפו קבצים גדולים, בפשטות', sendP:'מעלים פעם אחת ושולחים לינק — עם סיסמה, תפוגה והתראות הורדה.',
       kWhy:'למה KOLKLI', whyH:'מהיר, פרטי, הכול במקום אחד', whyP:'הבסיס נעשה נכון — בלי לקפוץ בין עשרה אתרים שונים.',
@@ -749,7 +749,7 @@
       navHome:'Home', navSend:'Send Files', navAI:'AI Tools', navAudio:'Audio', navImages:'Images', navVideo:'Video',
       navDocs:'Documents', navConvert:'Converters', navCompress:'Compress', navPricing:'Pricing', navSignin:'Sign In', navStart:'Get started',
       heroBadge:'100+ tools · all in your browser',
-      heroT1:'All your digital tools,', heroT2:'in one place.',
+      heroT1:'All your smart file tools,', heroT2:'in one place.',
       heroSub:'Upload, edit, convert, organize and send your files — fast and simple.',
       trust1:'No install', trust2:'Private in-browser editing', trust3:'Works on any device',
       hb1t:'No software required', hb2t:'100% Secure and private', hb3t:'Blazing fast cloud powered', hb4t:'Works everywhere any device',
@@ -762,7 +762,7 @@
       kPopular:'Popular tools', popularH:'Everything you need to work with files', popularP:'Pick a tool and go — the essentials, all in one place.',
       kAI:'AI Studio', newBadge:'New', aiH:'Smarter tools, powered by AI', aiP:'Our most advanced tools — rolling out soon.',
       kTools:'All Tools', toolsAllH:'Every tool you need to work with files', toolsAllP:'Your online toolbox is here — and forever free!',
-      tabAll:'All', tabAudio:'Audio', tabImages:'Images', tabVideo:'Video', tabDocs:'Documents', tabConvert:'Convert', tabCompress:'Compress',
+      tabAll:'All', tabAudio:'Audio', tabImages:'Images', tabVideo:'Video', tabDocs:'Documents', tabConvert:'Convert', tabCompress:'Compress', tabMarketing:'Marketing',
       kCats:'Categories', catsH:'A hub for every kind of file', catsP:'Jump into the tools for audio, images, video, documents and more.',
       kSend:'Send large files', sendH:'Share big files, simply', sendP:'Upload once and send a link — with passwords, expiry and download alerts.',
       kWhy:'Why KOLKLI', whyH:'Fast, private, all in one place', whyP:'The essentials done right — without juggling ten different sites.',
@@ -781,7 +781,7 @@
       navHome:'Главная', navSend:'Отправка файлов', navAI:'AI-инструменты', navAudio:'Аудио', navImages:'Изображения', navVideo:'Видео',
       navDocs:'Документы', navConvert:'Конвертеры', navCompress:'Сжатие', navPricing:'Цены', navSignin:'Вход', navStart:'Начать',
       heroBadge:'100+ инструментов · всё в браузере',
-      heroT1:'Все ваши цифровые инструменты', heroT2:'в одном месте.',
+      heroT1:'Все умные инструменты для файлов', heroT2:'в одном месте.',
       heroSub:'Загрузка, редактирование, конвертация, упорядочивание и отправка файлов — быстро и просто.',
       trust1:'Без установки', trust2:'Приватное редактирование в браузере', trust3:'Работает на любом устройстве',
       hb1t:'Без установки ПО', hb2t:'100% безопасно и приватно', hb3t:'Молниеносно, на базе облака', hb4t:'Работает везде и на любом устройстве',
@@ -794,7 +794,7 @@
       kPopular:'Популярные инструменты', popularH:'Всё, что нужно для работы с файлами', popularP:'Выберите инструмент и начните — всё основное в одном месте.',
       kAI:'AI-студия', newBadge:'Новое', aiH:'Умные инструменты на базе AI', aiP:'Наши самые продвинутые инструменты — скоро в доступе.',
       kTools:'Все инструменты', toolsAllH:'Каждый инструмент для работы с файлами', toolsAllP:'Ваш онлайн-набор инструментов здесь — и навсегда бесплатно!',
-      tabAll:'Все', tabAudio:'Аудио', tabImages:'Изображения', tabVideo:'Видео', tabDocs:'Документы', tabConvert:'Конвертация', tabCompress:'Сжатие',
+      tabAll:'Все', tabAudio:'Аудио', tabImages:'Изображения', tabVideo:'Видео', tabDocs:'Документы', tabConvert:'Конвертация', tabCompress:'Сжатие', tabMarketing:'Маркетинг',
       kCats:'Категории', catsH:'Дом для любого типа файлов', catsP:'Переходите к инструментам для аудио, изображений, видео, документов и не только.',
       kSend:'Отправка больших файлов', sendH:'Делитесь большими файлами — просто', sendP:'Загрузите один раз и отправьте ссылку — с паролем, сроком действия и уведомлениями о скачивании.',
       kWhy:'Почему KOLKLI', whyH:'Быстро, приватно, всё в одном месте', whyP:'Всё основное сделано правильно — без прыжков между десятком сайтов.',
@@ -831,7 +831,7 @@
       {i:'📕',status:'soon',he:['דחיסת PDF','הקטינו קובצי PDF.'],en:['Compress PDF','Shrink PDF files.'],ru:['Сжатие PDF','Уменьшайте PDF-файлы.']},
       {i:'📎',status:'soon',he:['מיזוג PDF','אחדו כמה קבצי PDF.'],en:['Merge PDF','Combine PDF files.'],ru:['Объединение PDF','Объединяйте PDF-файлы.']},
       {i:'🏞️',status:'live',href:'./pdf-to-jpg.html',he:['PDF ל-JPG','המירו עמודי PDF לתמונות.'],en:['PDF to JPG','Turn PDF pages into images.'],ru:['PDF в JPG','Превращайте страницы PDF в изображения.']},
-      {i:'🗂️',status:'live',href:'./files.html',he:['סידור קבצים','ארגנו קבצים בתיקיות ותגיות.'],en:['Organize Files','Sort files into folders & tags.'],ru:['Упорядочить файлы','Сортируйте файлы по папкам и тегам.']},
+      {i:'🗂️',status:'live',href:'./files.html',he:['ארגון קבצים','ארגנו קבצים בתיקיות ותגיות.'],en:['Organize Files','Sort files into folders & tags.'],ru:['Упорядочить файлы','Сортируйте файлы по папкам и тегам.']},
       {i:'✨',status:'soon',he:['שדרוג AI','שפרו איכות תמונה עם AI.'],en:['AI Upscaler','Enhance image quality with AI.'],ru:['AI-апскейлер','Улучшайте качество изображений с AI.']}
     ],
     ai:[
@@ -868,14 +868,25 @@
       {i:'📄', c:'b', cat:['documents','convert'], href:'./doc-to-pdf.html', he:['DOC ל-PDF','המירו מסמכי Word ל-PDF.'], en:['DOC to PDF','Convert Word docs to PDF.'], ru:['DOC в PDF','Конвертируйте документы Word в PDF.']},
       {i:'📝', c:'t', cat:['documents','convert'], href:'./doc-convert.html', new:true, he:['המרת מסמך','המירו בין פורמטים של מסמכים.'], en:['Convert Document','Convert between document formats.'], ru:['Конвертация документов','Конвертируйте между форматами документов.']},
       {i:'🔁', c:'y', cat:['convert'], href:'./convert.html', he:['ממיר קבצים','המרה בין מאות פורמטים.'], en:['Convert Files','Convert hundreds of formats.'], ru:['Конвертация файлов','Конвертируйте сотни форматов.']},
-      {i:'🗂️', c:'p', cat:['documents'], href:'./files.html', he:['סידור קבצים','ארגנו בתיקיות ותגיות.'], en:['Organize Files','Sort into folders & tags.'], ru:['Упорядочить файлы','Сортируйте по папкам и тегам.']},
+      {i:'🗂️', c:'p', cat:['documents'], href:'./files.html', he:['ארגון קבצים','ארגנו בתיקיות ותגיות.'], en:['Organize Files','Sort into folders & tags.'], ru:['Упорядочить файлы','Сортируйте по папкам и тегам.']},
       {i:'🗄️', c:'y', cat:['convert'], href:'./archive-convert.html', new:true, he:['ממיר ארכיונים','ארזו קבצים ל-ZIP או GZIP.'], en:['Archive Converter','Bundle files into ZIP or GZIP.'], ru:['Конвертер архивов','Упакуйте файлы в ZIP или GZIP.']},
       {i:'🔤', c:'v', cat:['convert'], href:'./font-convert.html', new:true, he:['ממיר גופנים','המירו גופנים בין פורמטים.'], en:['Font Converter','Convert fonts between formats.'], ru:['Конвертер шрифтов','Конвертируйте шрифты между форматами.']},
       {i:'📚', c:'b', cat:['convert'], href:'./ebook-convert.html', new:true, he:['ממיר ספרים','EPUB ל-PDF, HTML או טקסט.'], en:['Ebook Converter','EPUB to PDF, HTML or text.'], ru:['Конвертер эл. книг','EPUB в PDF, HTML или текст.']},
       {i:'📊', c:'g', cat:['convert'], href:'./spreadsheet-convert.html', new:true, he:['ממיר גיליונות','XLSX, CSV, ODS ו-HTML.'], en:['Spreadsheet Converter','XLSX, CSV, ODS & HTML.'], ru:['Конвертер таблиц','XLSX, CSV, ODS и HTML.']},
       {i:'📽️', c:'t', cat:['convert'], href:'./presentation-convert.html', new:true, he:['ממיר מצגות','PPTX ל-PDF, HTML או טקסט.'], en:['Presentation Converter','PPTX to PDF, HTML or text.'], ru:['Конвертер презентаций','PPTX в PDF, HTML или текст.']},
       {i:'🧾', c:'v', cat:['documents'], href:'./ai-summarize-pdf.html', new:true, he:['סיכום PDF AI','תקציר חכם לכל מסמך PDF.'], en:['AI Summarize PDF','A smart summary of any PDF.'], ru:['AI-конспект PDF','Умное резюме любого PDF.']},
-      {i:'☁️', c:'b', cat:[], href:'./send.html', he:['שליחת קבצים','שלחו קבצים גדולים בלינק אחד.'], en:['Send Files','Share big files with one link.'], ru:['Отправка файлов','Делитесь большими файлами одной ссылкой.']}
+      {i:'☁️', c:'b', cat:[], href:'./send.html', he:['שליחת קבצים','שלחו קבצים גדולים בלינק אחד.'], en:['Send Files','Share big files with one link.'], ru:['Отправка файлов','Делитесь большими файлами одной ссылкой.']},
+      {i:'✅', c:'p', cat:[], href:'./review.html', new:true, he:['אישור לקוח','שלחו עבודה ללקוח לצפייה, הערות ואישור.'], en:['Client Review','Send work to a client for sign-off.'], ru:['Одобрение клиента','Отправьте работу клиенту на просмотр и одобрение.']},
+      {i:'🔗', c:'b', cat:['marketing'], href:'./utm-builder.html', new:true, he:['בונה קישורי UTM','בנו קישורים מסודרים למעקב קמפיינים.'], en:['UTM Link Builder','Build tidy links to track campaigns.'], ru:['UTM-конструктор','Создавайте аккуратные ссылки для отслеживания кампаний.']},
+      {i:'🔳', c:'v', cat:['marketing'], href:'./qr-generator.html', new:true, he:['מחולל QR Code','QR לקישור, וואטסאפ, תפריט או קובץ.'], en:['QR Code Generator','QR for a link, WhatsApp, menu or file.'], ru:['Генератор QR-кодов','QR для ссылки, WhatsApp, меню или файла.']},
+      {i:'💬', c:'g', cat:['marketing'], href:'./whatsapp-link.html', new:true, he:['קישור וואטסאפ','קישור עם הודעה מוכנה מראש.'], en:['WhatsApp Link','A link with a ready-to-send message.'], ru:['Ссылка WhatsApp','Ссылка с готовым сообщением.']},
+      {i:'✉️', c:'y', cat:['marketing'], href:'./mailto-link.html', new:true, he:['קישור Mailto','פתיחת מייל עם נושא וטקסט מוכנים.'], en:['Mailto Link','Open an email with subject and body ready.'], ru:['Mailto-ссылка','Открытие письма с готовой темой и текстом.']},
+      {i:'📏', c:'t', cat:['marketing'], href:'./ad-text-checker.html', new:true, he:['בודק אורך למודעות','בדקו אורך כותרת, תיאור ו-CTA.'], en:['Ad Text Length Checker','Check headline, description and CTA length.'], ru:['Проверка длины текста','Проверяйте длину заголовка, описания и CTA.']},
+      {i:'🎯', c:'p', cat:['marketing'], href:'./cta-generator.html', new:true, he:['מחולל CTA','כפתורי פעולה קצרים לפי מטרה.'], en:['CTA Generator','Short action buttons by goal.'], ru:['CTA-генератор','Короткие кнопки действий по цели.']},
+      {i:'✍️', c:'v', cat:['marketing'], href:'./copy-generator.html', new:true, he:['מחולל קופי קצר','וריאציות לכותרות, מודעות ופוסטים.'], en:['Copy Generator','Variations for headlines, ads and posts.'], ru:['Генератор текстов','Варианты заголовков, объявлений и постов.']},
+      {i:'👁️', c:'b', cat:['marketing'], href:'./link-preview.html', new:true, he:['תצוגה מקדימה לקישור','איך הקישור ייראה בשיתוף.'], en:['Link Preview','See how your link looks when shared.'], ru:['Превью ссылки','Как ссылка выглядит при отправке.']},
+      {i:'🧩', c:'g', cat:['marketing'], href:'./embed-code.html', new:true, he:['קוד הטמעה','iframe לסרטון, מפה, טופס או קובץ.'], en:['Embed Code','iframe for a video, map, form or file.'], ru:['Код вставки','iframe для видео, карты, формы или файла.']},
+      {i:'↪️', c:'y', cat:['marketing'], href:'./redirect-generator.html', new:true, he:['מחולל Redirect','יצירת הפניה מהירה לקישור יעד.'], en:['Redirect Generator','Create a quick redirect to a target link.'], ru:['Генератор редиректа','Создайте быстрый редирект на нужную ссылку.']}
     ],
     cats:[
       {i:'🎵',href:'./audio/',he:['אודיו','חיתוך, המרה, מיזוג ושיפור.'],en:['Audio','Cut, convert, merge & enhance.'],ru:['Аудио','Обрезка, конвертация, объединение и улучшение.'],cap:{he:'12 כלים',en:'12 tools',ru:'12 инструментов'}},
@@ -883,7 +894,8 @@
       {i:'🎬',href:'./video/',he:['וידאו','חיתוך, המרה ודחיסה.'],en:['Video','Trim, convert & compress.'],ru:['Видео','Обрезка, конвертация и сжатие.'],cap:{he:'9 כלים',en:'9 tools',ru:'9 инструментов'}},
       {i:'📄',href:'./documents/',he:['מסמכים','PDF, OCR וכלי מסמכים.'],en:['Documents','PDF, OCR & document tools.'],ru:['Документы','PDF, OCR и инструменты для документов.'],cap:{he:'10 כלים',en:'10 tools',ru:'10 инструментов'}},
       {i:'🔄',href:'./converters/',he:['ממירים','המרה בין פורמטים.'],en:['Converters','Convert between formats.'],ru:['Конвертеры','Конвертация между форматами.'],cap:{he:'המרות רבות',en:'1000+ conversions',ru:'1000+ конвертаций'}},
-      {i:'📦',href:'./compress/',he:['דחיסה','הקטינו כל סוג קובץ.'],en:['Compress','Shrink any file type.'],ru:['Сжатие','Уменьшайте любой тип файлов.'],cap:{he:'5 כלים',en:'5 tools',ru:'5 инструментов'}}
+      {i:'📦',href:'./compress/',he:['דחיסה','הקטינו כל סוג קובץ.'],en:['Compress','Shrink any file type.'],ru:['Сжатие','Уменьшайте любой тип файлов.'],cap:{he:'5 כלים',en:'5 tools',ru:'5 инструментов'}},
+      {i:'📣',href:'./marketing/',he:['שיווק וקישורים','UTM, QR, קופי וקודי הטמעה.'],en:['Marketing & Links','UTM, QR, copy & embeds.'],ru:['Маркетинг и ссылки','UTM, QR, тексты и вставки.'],cap:{he:'10 כלים',en:'10 tools',ru:'10 инструментов'}}
     ],
     hubs:[
       {id:'audio', i:'🎵', cta:{href:'./app.html', k:'ctaEditor'},
@@ -902,10 +914,10 @@
        ru:['Видео','Обрезайте, конвертируйте, сжимайте и извлекайте звук.'],
        tools:[{he:'חיתוך',en:'Trim',ru:'Обрезка',s:'live'},{he:'דחיסה',en:'Compress',ru:'Сжатие',s:'soon'},{he:'המרה',en:'Convert',ru:'Конвертация',s:'soon'},{he:'חילוץ אודיו',en:'Extract Audio',ru:'Извлечь звук',s:'soon'},{he:'השתקה',en:'Mute',ru:'Без звука',s:'soon'},{he:'שינוי גודל',en:'Resize',ru:'Размер',s:'soon'},{he:'יצירת שורטס',en:'Shorts Maker',ru:'Создание Shorts',s:'soon'},{he:'כתוביות AI',en:'AI Subtitle',ru:'AI-субтитры',s:'live'},{he:'שדרוג AI',en:'AI Upscale',ru:'AI-апскейл',s:'soon'}]},
       {id:'documents', i:'📄', cta:{href:'./files.html', k:'ctaOrganize'},
-       he:['מסמכים','כלי PDF, OCR וסידור קבצים.'],
+       he:['מסמכים','כלי PDF, OCR וארגון קבצים.'],
        en:['Documents','PDF tools, OCR and file organizing.'],
        ru:['Документы','Инструменты PDF, OCR и упорядочивание файлов.'],
-       tools:[{he:'מיזוג PDF',en:'Merge PDF',ru:'Объединить PDF',s:'soon'},{he:'פיצול PDF',en:'Split PDF',ru:'Разделить PDF',s:'soon'},{he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF',s:'soon'},{he:'PDF ל-JPG',en:'PDF to JPG',ru:'PDF в JPG',s:'live'},{he:'OCR',en:'OCR',ru:'OCR',s:'soon'},{he:'חתימת PDF',en:'Sign PDF',ru:'Подпись PDF',s:'soon'},{he:'הגנת PDF',en:'Protect PDF',ru:'Защита PDF',s:'soon'},{he:'DOC ל-PDF',en:'DOC to PDF',ru:'DOC в PDF',s:'soon'},{he:'PDF ל-Word',en:'PDF to Word',ru:'PDF в Word',s:'soon'},{he:'סידור קבצים',en:'Organize',ru:'Упорядочить',s:'live'}]},
+       tools:[{he:'מיזוג PDF',en:'Merge PDF',ru:'Объединить PDF',s:'soon'},{he:'פיצול PDF',en:'Split PDF',ru:'Разделить PDF',s:'soon'},{he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF',s:'soon'},{he:'PDF ל-JPG',en:'PDF to JPG',ru:'PDF в JPG',s:'live'},{he:'OCR',en:'OCR',ru:'OCR',s:'soon'},{he:'חתימת PDF',en:'Sign PDF',ru:'Подпись PDF',s:'soon'},{he:'הגנת PDF',en:'Protect PDF',ru:'Защита PDF',s:'soon'},{he:'DOC ל-PDF',en:'DOC to PDF',ru:'DOC в PDF',s:'soon'},{he:'PDF ל-Word',en:'PDF to Word',ru:'PDF в Word',s:'soon'},{he:'ארגון קבצים',en:'Organize',ru:'Упорядочить',s:'live'}]},
       {id:'converters', i:'🔄',
        he:['ממירים','המירו בין מאות פורמטים של קבצים.'],
        en:['Converters','Convert between hundreds of file formats.'],
@@ -954,7 +966,16 @@
         {he:'קבצים נשמרים 30 יום',en:'Files kept for 30 days',ru:'Файлы хранятся 30 дней'},
         {he:'כל הכלים + כלי AI',en:'All tools + AI tools',ru:'Все инструменты + AI'},
         {he:'התראות הורדה',en:'Download notifications',ru:'Уведомления о скачивании'},
-        {he:'תמיכה מהירה בעדיפות',en:'Priority support',ru:'Приоритетная поддержка'}]}
+        {he:'תמיכה מהירה בעדיפות',en:'Priority support',ru:'Приоритетная поддержка'}]},
+      {price:'$39.99', he:['Business','לצוותים וארגונים'], en:['Business','For teams & orgs'], ru:['Business','Для команд и организаций'], cta:{he:'קחו Business',en:'Get Business',ru:'Выбрать Business'}, feats:[
+        {he:'5 מושבים כלולים (+$9 למושב)',en:'5 seats included (+$9/seat)',ru:'5 мест включено (+$9/место)'},
+        {he:'5TB אחסון משותף',en:'5TB shared storage',ru:'5 ТБ общего хранилища'},
+        {he:'שליחה עד 200GB בכל פעם',en:'Up to 200GB per transfer',ru:'До 200 ГБ за передачу'},
+        {he:'White-label ומיתוג מלא',en:'Full white-label branding',ru:'Полный white-label брендинг'},
+        {he:'ניהול צוות והרשאות',en:'Team management & roles',ru:'Управление командой и роли'},
+        {he:'חיוב מרוכז',en:'Centralized billing',ru:'Единый счёт'},
+        {he:'כל הכלים + כלי AI',en:'All tools + AI tools',ru:'Все инструменты + AI'},
+        {he:'תמיכה בעדיפות',en:'Priority support',ru:'Приоритетная поддержка'}]}
     ],
     faq:[
       {he:['זה בחינם?','כן — כלי הליבה חינמיים ורצים בדפדפן שלכם. חבילות בתשלום מוסיפות שליחה גדולה יותר, אחסון ושיתוף.'],
@@ -972,15 +993,15 @@
       {he:['צריך חשבון?','לא כדי להתחיל. חשבון מוסיף היסטוריה, לינקים שמורים ושיתוף.'],
        en:['Do I need an account?','Not to start. An account adds history, saved links and sharing.'],
        ru:['Нужен ли аккаунт?','Не для начала работы. Аккаунт добавляет историю, сохранённые ссылки и общий доступ.']},
-      {he:['יש מגבלת גודל?','בחינם עד 2GB לשליחה; חבילות Lite ו-Pro מעלות את המגבלה.'],
-       en:['Is there a size limit?','Free is up to 2GB per transfer; Lite and Pro raise the limit.'],
-       ru:['Есть ли ограничение по размеру?','Бесплатно — до 2 ГБ за передачу; Lite и Pro увеличивают лимит.']}
+      {he:['יש מגבלת גודל?','בחינם עד 2GB לשליחה; חבילות Lite, Pro ו-Business מעלות את המגבלה.'],
+       en:['Is there a size limit?','Free is up to 2GB per transfer; Lite, Pro and Business raise the limit.'],
+       ru:['Есть ли ограничение по размеру?','Бесплатно — до 2 ГБ за передачу; Lite, Pro и Business увеличивают лимит.']}
     ],
     footerCols:[
       {t:{he:'כלים',en:'Tools',ru:'Инструменты'}, links:[
         {he:'אודיו',en:'Audio',ru:'Аудио',href:'./app.html'},{he:'תמונות',en:'Images',ru:'Изображения',href:'./images/'},
         {he:'וידאו',en:'Video',ru:'Видео',href:'./video/'},{he:'מסמכים',en:'Documents',ru:'Документы',href:'./documents/'},
-        {he:'ממירים',en:'Converters',ru:'Конвертеры',href:'./converters/'},{he:'דחיסה',en:'Compress',ru:'Сжатие',href:'./compress/'}]},
+        {he:'ממירים',en:'Converters',ru:'Конвертеры',href:'./converters/'},{he:'דחיסה',en:'Compress',ru:'Сжатие',href:'./compress/'},{he:'שיווק',en:'Marketing',ru:'Маркетинг',href:'./marketing/'}]},
       {t:{he:'AI',en:'AI',ru:'AI'}, links:[
         {he:'סטודיו AI',en:'AI Studio',ru:'AI-студия',href:'./ai/'},{he:'חיתוך חכם',en:'Smart Crop',ru:'Умная обрезка',href:'./ai-smart-crop.html'},{he:'הסרת רקע',en:'Remove BG',ru:'Удалить фон',href:'./remove-bg.html'},
         {he:'ניקוי אודיו',en:'Audio Cleaner',ru:'Очистка звука',href:'./ai-audio-cleanup.html'},{he:'כתוביות',en:'Subtitles',ru:'Субтитры',href:'./subtitle-generator.html'},{he:'סיכום PDF',en:'Summarize PDF',ru:'Конспект PDF',href:'./ai-summarize-pdf.html'},{he:'שדרוג תמונה',en:'Upscaler',ru:'Апскейлер'}]},
@@ -1022,9 +1043,12 @@
     const [name,tagline] = p[L];
     const ribbon = p.pop ? `<span class="ribbon">${S.mostPopular}</span>` : '';
     const feats = p.feats.map(f=>`<li>${check}${f[L]}</li>`).join('');
+    // Free → sign-up; paid plans (Lite/Pro) → the checkout flow.
+    const slug = (p.en[0]||'').toLowerCase();
+    const href = slug==='free' ? './auth.html?mode=signup' : `./checkout.html?plan=${slug}`;
     const btn = p.pop
-      ? `<a class="cta" href="./auth.html">${p.cta[L]}</a>`
-      : `<a class="ghost" href="./auth.html">${p.cta[L]}</a>`;
+      ? `<a class="cta" href="${href}">${p.cta[L]}</a>`
+      : `<a class="ghost" href="${href}">${p.cta[L]}</a>`;
     return `<div class="plan ${p.pop?'pop':''}">${ribbon}<h3>${name}</h3>
       <div class="price">${p.price}<span>${S.perMonth}</span></div><p class="tagline">${tagline}</p>
       <ul>${feats}</ul>${btn}</div>`;
@@ -1036,7 +1060,7 @@
 
 
 
-    const TABS=[['all','tabAll'],['audio','tabAudio'],['images','tabImages'],['video','tabVideo'],['documents','tabDocs'],['convert','tabConvert'],['compress','tabCompress']];
+    const TABS=[['all','tabAll'],['audio','tabAudio'],['images','tabImages'],['video','tabVideo'],['documents','tabDocs'],['convert','tabConvert'],['compress','tabCompress'],['marketing','tabMarketing']];
     el('toolsTabs').innerHTML = TABS.map((t,i)=>
       `<button class="tab${i===0?' on':''}" data-cat="${t[0]}">${S[t[1]]}</button>`).join('');
     el('toolsAllGrid').innerHTML = DATA.tools.map(t=>{

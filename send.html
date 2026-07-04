@@ -85,7 +85,7 @@
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
 
   /* dropzone */
-  .drop{border:1.6px dashed var(--line);border-radius:16px;padding:42px 28px;text-align:center;cursor:pointer;
+  .drop{border:2.5px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:16px;padding:42px 28px;text-align:center;cursor:pointer;
     background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
   .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
   .drop .cloud{width:73px;height:73px;margin:0 auto 17px;border-radius:20px;display:flex;align-items:center;justify-content:center;
@@ -204,6 +204,38 @@
   .statline b{color:var(--ink);font-family:var(--mono);}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 
+  /* client branding */
+  .brandsec{border-top:1px dashed var(--line);margin-top:6px;padding-top:15px;}
+  .brandhead{display:block;font-size:12.5px;font-weight:700;color:var(--ink-2);margin-bottom:4px;}
+  .brandsub{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:11px;}
+  .tiles{display:flex;gap:9px;margin-bottom:11px;}
+  .tile{flex:1;position:relative;height:74px;border:1.4px dashed var(--line);border-radius:11px;background:var(--panel-2);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .12s,background .12s;}
+  .tile:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .tile-empty{display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--muted);font-size:11.5px;font-weight:600;pointer-events:none;}
+  .tile-empty svg{width:19px;height:19px;color:var(--accent);}
+  .tile.filled{border-style:solid;border-color:var(--line);background:#fff;}
+  .tile.filled .tile-empty{display:none;}
+  .tile-img{max-width:88%;max-height:60px;object-fit:contain;}
+  #bgTile.filled{background-size:cover;background-position:center;}
+  #bgTile.filled .tile-img{display:none;}
+  .tile-x{position:absolute;top:5px;inset-inline-end:5px;width:22px;height:22px;border-radius:7px;border:none;cursor:pointer;
+    background:rgba(10,12,20,.62);color:#fff;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;z-index:2;}
+  .tile-x:hover{background:var(--danger);}
+  .mini-lbl{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin:2px 0 8px;}
+  .swatches{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:13px;}
+  .swatch{width:25px;height:25px;border-radius:7px;cursor:pointer;border:2px solid var(--panel);outline:1px solid var(--line);
+    padding:0;transition:transform .1s;}
+  .swatch:hover{transform:scale(1.08);} .swatch.on{outline:2px solid var(--ink);outline-offset:1px;}
+  .colorpick{width:32px;height:27px;padding:0;border:1px solid var(--line);border-radius:7px;background:var(--panel);cursor:pointer;}
+  .bprev{position:relative;height:118px;border-radius:13px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-sm);}
+  .bprev-bg{position:absolute;inset:0;background-size:cover;background-position:center;}
+  .bprev-in{position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;}
+  .bprev-logo{background:#fff;border-radius:9px;padding:6px 10px;box-shadow:0 4px 12px rgba(0,0,0,.2);}
+  .bprev-logo img{display:block;max-height:26px;max-width:120px;object-fit:contain;}
+  .bprev-name{font-size:15px;font-weight:800;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.35);text-align:center;padding:0 8px;}
+  .bprev-hint{font-size:11px;color:var(--faint);text-align:center;margin-top:7px;}
+
   footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
     background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
@@ -287,6 +319,37 @@
 
         <div class="opt">
           <label class="chkline"><input type="checkbox" id="notifyToggle"><span data-i18n="notifyChk"></span></label>
+        </div>
+
+        <div class="opt brandsec" id="brandSec">
+          <label class="brandhead" data-i18n="brandLbl"></label>
+          <div class="brandsub" data-i18n="brandSub"></div>
+          <input class="inp" id="brandName" type="text" data-i18n-ph="brandNamePh" style="margin-bottom:9px">
+          <input class="inp" id="brandTagline" type="text" data-i18n-ph="brandTagPh" style="margin-bottom:11px">
+          <div class="tiles">
+            <div class="tile" id="logoTile" role="button" tabindex="0">
+              <div class="tile-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span data-i18n="brandLogo"></span></div>
+              <img class="tile-img hidden" id="logoImg" alt="">
+              <button class="tile-x hidden" id="logoX" type="button" aria-label="remove">✕</button>
+            </div>
+            <div class="tile" id="bgTile" role="button" tabindex="0">
+              <div class="tile-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg><span data-i18n="brandBg"></span></div>
+              <img class="tile-img hidden" id="bgImg" alt="">
+              <button class="tile-x hidden" id="bgX" type="button" aria-label="remove">✕</button>
+            </div>
+          </div>
+          <input type="file" id="logoInput" accept="image/png,image/jpeg,image/svg+xml,image/webp">
+          <input type="file" id="bgInput" accept="image/png,image/jpeg,image/webp">
+          <label class="mini-lbl" data-i18n="brandColor"></label>
+          <div class="swatches" id="swatches"></div>
+          <div class="bprev" id="bprev">
+            <div class="bprev-bg" id="bprevBg"></div>
+            <div class="bprev-in">
+              <div class="bprev-logo hidden" id="bprevLogo"><img id="bprevLogoImg" alt=""></div>
+              <div class="bprev-name" id="bprevName"></div>
+            </div>
+          </div>
+          <div class="bprev-hint" data-i18n="brandPreviewHint"></div>
         </div>
 
         <button class="sendbtn" id="sendBtn" type="button" disabled>
@@ -390,6 +453,10 @@
       seam:'זו הדגמה מקומית: הקבצים נשמרים בדפדפן הזה (IndexedDB) והקישור עובד באותו מחשב. עם חיבור השרת הקישור יעבוד לכל אחד, בכל מקום.',
       foot:'KOLKLI · שליחת קבצים · הדגמה מקומית עד לחיבור השרת',
       errNoFiles:'צריך לצרף לפחות קובץ אחד', errNoEmail:'הזינו לפחות נמען אחד', errNoPw:'הזינו סיסמה או בטלו את ההגנה',
+      brandLbl:'מיתוג ללקוח (לא חובה)', brandSub:'הוסיפו לוגו, רקע וצבע — והנמען יקבל עמוד הורדה ממותג בעיצוב שלכם.',
+      brandNamePh:'שם העסק שלכם', brandTagPh:'שורת תיאור קצרה (לא חובה)',
+      brandLogo:'לוגו', brandBg:'רקע', brandColor:'צבע המותג',
+      brandPreviewHint:'כך ייראה עמוד ההורדה של הנמען', brandYou:'העסק שלכם', brandImgErr:'לא הצלחנו לטעון את התמונה',
     },
     en:{
       dir:'ltr', langIco:'עב',
@@ -422,6 +489,10 @@
       seam:'This is a local demo: files are stored in this browser (IndexedDB) and the link works on this machine. Once the server is connected, the link will work for anyone, anywhere.',
       foot:'KOLKLI · File sending · Local demo until the server is connected',
       errNoFiles:'Attach at least one file', errNoEmail:'Enter at least one recipient', errNoPw:'Enter a password or turn protection off',
+      brandLbl:'Client branding (optional)', brandSub:'Add a logo, background and color — your recipient gets a download page in your brand.',
+      brandNamePh:'Your business name', brandTagPh:'Short tagline (optional)',
+      brandLogo:'Logo', brandBg:'Background', brandColor:'Brand color',
+      brandPreviewHint:'This is how your recipient’s download page will look', brandYou:'Your business', brandImgErr:'We couldn’t load that image',
     },
     ru:{
       dir:'ltr',
@@ -454,6 +525,10 @@
       seam:'Это локальная демонстрация: файлы хранятся в этом браузере (IndexedDB), и ссылка работает на этом устройстве. После подключения сервера ссылка будет работать для всех и везде.',
       foot:'KOLKLI · Отправка файлов · Локальная демонстрация до подключения сервера',
       errNoFiles:'Прикрепите хотя бы один файл', errNoEmail:'Введите хотя бы одного получателя', errNoPw:'Введите пароль или отключите защиту',
+      brandLbl:'Брендирование (необязательно)', brandSub:'Добавьте логотип, фон и цвет — получатель увидит страницу скачивания в вашем стиле.',
+      brandNamePh:'Название вашей компании', brandTagPh:'Короткий слоган (необязательно)',
+      brandLogo:'Логотип', brandBg:'Фон', brandColor:'Цвет бренда',
+      brandPreviewHint:'Так будет выглядеть страница скачивания получателя', brandYou:'Ваш бренд', brandImgErr:'Не удалось загрузить изображение',
     },
   };
 
@@ -476,6 +551,104 @@
   let files=[];   // {id,file,name,ext,kind,size}
   let method='link';
   let uid=1;
+
+  function safeOwnerId(v){ return String(v||'guest').toLowerCase().replace(/[^a-z0-9_.@-]+/g,'_') || 'guest'; }
+  function currentOwnerId(){
+    let email=''; try{ email=(localStorage.getItem('ac_session')||'').toLowerCase(); }catch(_){}
+    if(!email) return 'guest';
+    try{
+      const users=JSON.parse(localStorage.getItem('ac_users')||'[]')||[];
+      const u=users.find(x=>(x.email||'').toLowerCase()===email);
+      return safeOwnerId((u&&(u.id||u.userId))||email);
+    }catch(_){ return safeOwnerId(email); }
+  }
+  function scopedKey(base){ return base+'::'+currentOwnerId(); }
+  function sendIndex(){
+    try{ const a=JSON.parse(localStorage.getItem(scopedKey('kolkli_send_links'))||'[]'); return Array.isArray(a)?a:[]; }
+    catch(_){ return []; }
+  }
+  function saveSendIndex(a){ try{ localStorage.setItem(scopedKey('kolkli_send_links'), JSON.stringify((a||[]).slice(0,100))); }catch(_){} }
+  function upsertSendIndex(rec){
+    const a=sendIndex().filter(x=>x.token!==rec.token);
+    const bytes=(rec.files||[]).reduce((s,f)=>s+(f.size||0),0);
+    a.unshift({ token:rec.token, ownerId:rec.ownerId, createdAt:rec.createdAt, expiresAt:rec.expiresAt,
+      files:(rec.files||[]).length, bytes, downloads:rec.downloads||0 });
+    saveSendIndex(a);
+  }
+  function deleteSendIndex(token){ saveSendIndex(sendIndex().filter(x=>x.token!==token)); }
+
+  // ---- client branding (saved profile, reused across sends) ----
+  const DEFCLR='#7b34ff';
+  const SWATCHES=['#7b34ff','#3f85ff','#0ea5a5','#16a34a','#ef7d00','#e5484d','#ec4899','#0f172a'];
+  let brand=loadBrand();
+  function loadBrand(){
+    const d={name:'',tagline:'',logo:'',bg:'',color:DEFCLR};
+    try{ return Object.assign(d, JSON.parse(localStorage.getItem(scopedKey('kolkli_brand'))||'{}')); }catch(_){ return d; }
+  }
+  function saveBrand(){ try{ localStorage.setItem(scopedKey('kolkli_brand'), JSON.stringify(brand)); }catch(_){} }
+  function brandForRecord(){
+    const b=brand||{};
+    const any=(b.name&&b.name.trim())||b.logo||b.bg||((b.color||DEFCLR).toLowerCase()!==DEFCLR);
+    if(!any) return null;
+    return { name:(b.name||'').trim(), tagline:(b.tagline||'').trim(), logo:b.logo||'', bg:b.bg||'', color:b.color||DEFCLR };
+  }
+  function readImageScaled(file,maxW,maxH,mime,q){
+    return new Promise((resolve,reject)=>{
+      const url=URL.createObjectURL(file), img=new Image();
+      img.onload=()=>{
+        let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+        if(!w||!h){ URL.revokeObjectURL(url); return reject(new Error('dim')); }
+        const s=Math.min(1,maxW/w,maxH/h); w=Math.max(1,Math.round(w*s)); h=Math.max(1,Math.round(h*s));
+        const c=document.createElement('canvas'); c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        URL.revokeObjectURL(url);
+        try{ resolve(c.toDataURL(mime,q)); }catch(e){ reject(e); }
+      };
+      img.onerror=()=>{ URL.revokeObjectURL(url); reject(new Error('load')); };
+      img.src=url;
+    });
+  }
+  function hexRgb(h){ h=String(h||'').replace('#',''); if(h.length===3)h=h.split('').map(x=>x+x).join(''); if(!/^[0-9a-f]{6}$/i.test(h))return null; const n=parseInt(h,16); return {r:(n>>16)&255,g:(n>>8)&255,b:n&255}; }
+  function mixc(a,b,tt){ return {r:Math.round(a.r+(b.r-a.r)*tt),g:Math.round(a.g+(b.g-a.g)*tt),b:Math.round(a.b+(b.b-a.b)*tt)}; }
+  function hexOfc(c){ return '#'+[c.r,c.g,c.b].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join(''); }
+  function gradFor(hex){ const c=hexRgb(hex)||hexRgb(DEFCLR), l=mixc(c,{r:255,g:255,b:255},0.16); return 'linear-gradient(120deg,'+hexOfc(c)+' 0%,'+hexOfc(l)+' 100%)'; }
+  function buildSwatches(){
+    const wrap=el('swatches'); if(!wrap||wrap._built) return; wrap._built=true;
+    SWATCHES.forEach(clr=>{
+      const b=document.createElement('button'); b.type='button'; b.className='swatch'; b.dataset.c=clr; b.style.background=clr; b.title=clr;
+      b.addEventListener('click',()=>{ brand.color=clr; saveBrand(); renderBrandUI(); });
+      wrap.appendChild(b);
+    });
+    const pick=document.createElement('input'); pick.type='color'; pick.id='colorPick'; pick.className='colorpick'; pick.value=brand.color||DEFCLR;
+    pick.addEventListener('input',()=>{ brand.color=pick.value; saveBrand(); renderBrandUI(); });
+    wrap.appendChild(pick);
+  }
+  function tileFill(kind){
+    const tile=el(kind+'Tile'), img=el(kind+'Img'), x=el(kind+'X'), data=(kind==='logo')?brand.logo:brand.bg;
+    if(data){
+      tile.classList.add('filled'); x.classList.remove('hidden');
+      if(kind==='bg'){ tile.style.backgroundImage='url("'+data+'")'; img.classList.add('hidden'); }
+      else { img.src=data; img.classList.remove('hidden'); }
+    } else {
+      tile.classList.remove('filled'); x.classList.add('hidden');
+      if(kind==='bg') tile.style.backgroundImage='';
+      img.classList.add('hidden'); img.removeAttribute('src');
+    }
+  }
+  function renderBrandUI(){
+    if(!el('brandName')) return;
+    if(document.activeElement!==el('brandName')) el('brandName').value=brand.name||'';
+    if(document.activeElement!==el('brandTagline')) el('brandTagline').value=brand.tagline||'';
+    const pick=el('colorPick'); if(pick) pick.value=brand.color||DEFCLR;
+    tileFill('logo'); tileFill('bg');
+    document.querySelectorAll('#swatches .swatch').forEach(s=>s.classList.toggle('on',(s.dataset.c||'').toLowerCase()===(brand.color||'').toLowerCase()));
+    const bg=el('bprevBg');
+    if(brand.bg){ bg.style.background=''; bg.style.backgroundImage='linear-gradient(160deg,rgba(8,10,20,.28),rgba(8,10,20,.55)),url("'+brand.bg+'")'; }
+    else { bg.style.backgroundImage='none'; bg.style.background=gradFor(brand.color); }
+    if(brand.logo){ el('bprevLogoImg').src=brand.logo; el('bprevLogo').classList.remove('hidden'); }
+    else el('bprevLogo').classList.add('hidden');
+    el('bprevName').textContent=brand.name||t.brandYou;
+  }
 
   function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
   function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
@@ -538,7 +711,7 @@
     const days=+el('expiry').value;
     const token=randToken();
     const record={
-      token, createdAt:Date.now(), expiresAt:Date.now()+days*86400000,
+      token, ownerId:currentOwnerId(), createdAt:Date.now(), expiresAt:Date.now()+days*86400000,
       sender:'', message:el('message').value.trim(),
       recipients:method==='email'? el('recipients').value.trim() : '',
       password: pwOn? await hashPass(pwVal) : null,
@@ -546,6 +719,7 @@
       downloads:0,
       files: files.map(f=>({ name:f.name, size:f.size, type:f.file.type||'', blob:f.file })),
     };
+    record.brand = brandForRecord();
 
     const total=Math.max(totalBytes(),1); let done=0;
     // animate progress proportional to file sizes (purely visual for the demo)
@@ -554,6 +728,7 @@
       done+=files[i].size; setProg(Math.min(99, Math.round(done/total*100)));
     }
     await idbPut('t_'+token, record);
+    upsertSendIndex(record);
     setProg(100);
     await new Promise(r=>setTimeout(r,200));
 
@@ -664,6 +839,7 @@
     document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
     try{ localStorage.setItem('ac_lang', l); }catch(_){}
     renderFiles();
+    if(el('bprevName')) renderBrandUI();
   }
   function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
   function detectLang(){
@@ -707,9 +883,19 @@
   el('qrDlBtn').addEventListener('click',downloadQR);
   el('emailBtn').addEventListener('click',openMailto);
 
+  buildSwatches();
+  el('logoTile').addEventListener('click',()=>el('logoInput').click());
+  el('bgTile').addEventListener('click',()=>el('bgInput').click());
+  el('logoInput').addEventListener('change',async()=>{ const f=el('logoInput').files[0]; el('logoInput').value=''; if(!f)return; try{ brand.logo=await readImageScaled(f,400,200,'image/png',0.92); saveBrand(); renderBrandUI(); }catch(_){ toast(t.brandImgErr); } });
+  el('bgInput').addEventListener('change',async()=>{ const f=el('bgInput').files[0]; el('bgInput').value=''; if(!f)return; try{ brand.bg=await readImageScaled(f,1600,1000,'image/jpeg',0.82); saveBrand(); renderBrandUI(); }catch(_){ toast(t.brandImgErr); } });
+  el('logoX').addEventListener('click',e=>{ e.stopPropagation(); brand.logo=''; saveBrand(); renderBrandUI(); });
+  el('bgX').addEventListener('click',e=>{ e.stopPropagation(); brand.bg=''; saveBrand(); renderBrandUI(); });
+  el('brandName').addEventListener('input',()=>{ brand.name=el('brandName').value; saveBrand(); renderBrandUI(); });
+  el('brandTagline').addEventListener('input',()=>{ brand.tagline=el('brandTagline').value; saveBrand(); renderBrandUI(); });
+
   el('sendBtn').addEventListener('click',createLink);
   el('againBtn').addEventListener('click',reset);
-  el('delBtn').addEventListener('click',async()=>{ if(currentToken){ await idbDel('t_'+currentToken); } reset(); });
+  el('delBtn').addEventListener('click',async()=>{ if(currentToken){ await idbDel('t_'+currentToken); deleteSendIndex(currentToken); } reset(); });
   el('copyBtn').addEventListener('click',()=>{
     const url=el('shareLink').textContent;
     const done=()=>toast(t.copied);

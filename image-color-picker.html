@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — בחירת צבעים מתמונה</title>
+<meta name="description" content="Upload an image and pick any pixel color or auto-extract its dominant palette as HEX/RGB. Everything runs locally — your image never leaves your device.">
+<link rel="stylesheet" href="./calc.css">
+<link rel="stylesheet" href="./header.css">
+<style>
+  .canvaswrap{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel-2);
+    display:flex;align-items:center;justify-content:center;min-height:220px;}
+  #canvas{max-width:100%;height:auto;display:block;cursor:crosshair;}
+  .picked{display:flex;align-items:center;gap:14px;}
+  .picked .chip{width:64px;height:64px;border-radius:14px;border:1px solid var(--line);box-shadow:var(--shadow-sm);flex-shrink:0;}
+  .picked .info{flex:1;min-width:0;}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="title"></h1>
+    <p data-i18n="sub"></p>
+  </div>
+
+  <div id="emptyState">
+    <div class="drop" id="drop" style="max-width:680px;margin:0 auto">
+      <div class="cloud"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg></div>
+      <div class="big" data-i18n="dropBig"></div>
+      <div class="or" data-i18n="or"></div>
+      <button class="btn" id="chooseBtn" type="button"><span data-i18n="choose"></span></button>
+    </div>
+    <input type="file" id="fileInput" accept="image/*">
+  </div>
+
+  <div class="cols" id="workState" style="display:none">
+    <div class="col">
+      <div class="card">
+        <h2 data-i18n="imgTitle"></h2>
+        <p class="csub" data-i18n="imgSub"></p>
+        <div class="canvaswrap"><canvas id="canvas"></canvas></div>
+        <div class="btnrow" style="margin-top:14px">
+          <button class="btn ghost sm" id="changeBtn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span data-i18n="change"></span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h2 data-i18n="pickedTitle"></h2>
+        <p class="csub" data-i18n="pickedSub"></p>
+        <div class="picked">
+          <div class="chip" id="pickedChip" style="background:#7b34ff"></div>
+          <div class="info outlist" id="pickedCodes"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2 data-i18n="paletteTitle"></h2>
+        <p class="csub" data-i18n="paletteSub"></p>
+        <div class="swgrid" id="palette"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note" id="note" style="max-width:680px;margin:22px auto 0">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span data-i18n="note"></span>
+  </div>
+
+  <footer class="pgfoot" data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./calc.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'חישובים והמרות · צבעים',
+      title:'בחירת צבעים מתמונה',
+      sub:'העלו תמונה, לחצו על כל נקודה כדי לדגום צבע, או חלצו אוטומטית את פלטת הצבעים הדומיננטית. הכול מקומי — התמונה לא עוזבת את המכשיר.',
+      dropBig:'גררו תמונה לכאן', or:'או', choose:'בחרו תמונה',
+      imgTitle:'התמונה', imgSub:'לחצו על התמונה כדי לדגום צבע מכל פיקסל.', change:'החלפת תמונה',
+      pickedTitle:'הצבע שנבחר', pickedSub:'לחצו על התמונה לדגימה.', copyTitle:'העתקה',
+      paletteTitle:'פלטת הצבעים', paletteSub:'הצבעים הדומיננטיים בתמונה — לחצו כדי להעתיק.',
+      note:'עיבוד התמונה נעשה כולו בדפדפן שלכם דרך canvas — שום תמונה לא נשלחת לשרת.',
+      foot:'KOLKLI · בחירת צבעים מתמונה · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הקוד הועתק ✓' },
+    en:{ dir:'ltr',
+      kick:'Calc & Convert · Color',
+      title:'Image Color Picker',
+      sub:'Upload an image, click anywhere to sample a color, or auto-extract its dominant palette. Everything is local — your image never leaves your device.',
+      dropBig:'Drag an image here', or:'or', choose:'Choose image',
+      imgTitle:'Image', imgSub:'Click the image to sample the color of any pixel.', change:'Change image',
+      pickedTitle:'Picked color', pickedSub:'Click the image to sample.', copyTitle:'Copy',
+      paletteTitle:'Color palette', paletteSub:'The image’s dominant colors — click to copy.',
+      note:'Image processing happens entirely in your browser via canvas — no image is ever uploaded.',
+      foot:'KOLKLI · Image Color Picker · Private and fast, right in your browser',
+      copied:'Code copied ✓' },
+    ru:{ dir:'ltr',
+      kick:'Расчёты · Цвет',
+      title:'Пипетка цвета из изображения',
+      sub:'Загрузите изображение, кликните в любом месте, чтобы взять цвет, или извлеките его палитру автоматически. Всё локально — изображение не покидает устройство.',
+      dropBig:'Перетащите изображение сюда', or:'или', choose:'Выбрать изображение',
+      imgTitle:'Изображение', imgSub:'Кликните по изображению, чтобы взять цвет пикселя.', change:'Сменить изображение',
+      pickedTitle:'Выбранный цвет', pickedSub:'Кликните по изображению.', copyTitle:'Копировать',
+      paletteTitle:'Палитра', paletteSub:'Доминирующие цвета изображения — кликните, чтобы скопировать.',
+      note:'Обработка изображения происходит полностью в браузере через canvas — ничего не загружается на сервер.',
+      foot:'KOLKLI · Пипетка цвета · Приватно и быстро, прямо в браузере',
+      copied:'Код скопирован ✓' }
+  };
+
+  const canvas = el('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently:true });
+  let imgData = null;
+
+  function toHex(c){ return c.toString(16).padStart(2,'0'); }
+  function hexOf(r,g,b){ return ('#'+toHex(r)+toHex(g)+toHex(b)).toUpperCase(); }
+
+  function loadFile(file){
+    if(!file || !/^image\//.test(file.type)) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = ()=>{
+      const maxW = 900;
+      const scale = Math.min(1, maxW / img.naturalWidth);
+      canvas.width = Math.round(img.naturalWidth * scale);
+      canvas.height = Math.round(img.naturalHeight * scale);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+      el('emptyState').style.display = 'none';
+      el('workState').style.display = '';
+      el('note').style.display = 'none';
+      extractPalette();
+      // seed picked color with the top palette color
+    };
+    img.src = url;
+  }
+
+  function pickAt(clientX, clientY){
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((clientX - rect.left) / rect.width * canvas.width);
+    const y = Math.floor((clientY - rect.top) / rect.height * canvas.height);
+    if(x<0||y<0||x>=canvas.width||y>=canvas.height) return;
+    const i = (y*canvas.width + x) * 4;
+    const d = imgData.data;
+    showPicked(d[i], d[i+1], d[i+2]);
+  }
+
+  function showPicked(r,g,b){
+    const t = APP.t();
+    el('pickedChip').style.background = hexOf(r,g,b);
+    const codes = [['HEX', hexOf(r,g,b)], ['RGB', `rgb(${r}, ${g}, ${b})`]];
+    el('pickedCodes').innerHTML = codes.map(([tag,val])=>`
+      <div class="outrow" style="padding:9px 11px">
+        <span class="otag" style="min-width:42px">${tag}</span>
+        <span class="oval" style="font-size:14px">${val}</span>
+        <button class="copy" data-copy="${val}" title="${t.copyTitle}"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+      </div>`).join('');
+  }
+
+  // Downscale + bucket-count quantization to find dominant colors.
+  function extractPalette(){
+    const S = 64;
+    const tmp = document.createElement('canvas');
+    tmp.width = S; tmp.height = S;
+    const tctx = tmp.getContext('2d', { willReadFrequently:true });
+    tctx.drawImage(canvas, 0, 0, S, S);
+    const d = tctx.getImageData(0,0,S,S).data;
+    const buckets = new Map();
+    for(let i=0;i<d.length;i+=4){
+      const a = d[i+3]; if(a < 125) continue;
+      const r = d[i], g = d[i+1], b = d[i+2];
+      const key = (r>>4) + ',' + (g>>4) + ',' + (b>>4); // 16 levels/channel
+      let e = buckets.get(key);
+      if(!e){ e = {n:0, r:0, g:0, b:0}; buckets.set(key, e); }
+      e.n++; e.r+=r; e.g+=g; e.b+=b;
+    }
+    const list = Array.from(buckets.values())
+      .sort((a,b)=>b.n-a.n)
+      .slice(0,8)
+      .map(e=>({ r:Math.round(e.r/e.n), g:Math.round(e.g/e.n), b:Math.round(e.b/e.n) }));
+    const t = APP.t();
+    el('palette').innerHTML = list.map(c=>{
+      const hx = hexOf(c.r,c.g,c.b);
+      return `<div class="swatch"><div class="sw-color" style="background:${hx}"></div>
+        <div class="sw-meta"><span class="hex">${hx}</span>
+        <button class="copy" data-copy="${hx}" title="${t.copyTitle}" style="padding:4px 6px"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>`;
+    }).join('');
+    if(list.length) showPicked(list[0].r, list[0].g, list[0].b);
+  }
+
+  // events
+  const input = el('fileInput'), drop = el('drop');
+  el('chooseBtn').addEventListener('click', e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click', ()=>input.click());
+  el('changeBtn').addEventListener('click', ()=>input.click());
+  input.addEventListener('change', ()=>{ if(input.files[0]) loadFile(input.files[0]); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev, ()=>drop.classList.remove('over')));
+  drop.addEventListener('drop', e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+  document.addEventListener('dragover', e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop', e=>{ if(el('workState').style.display!=='none' && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  canvas.addEventListener('click', e=>{ if(imgData) pickAt(e.clientX, e.clientY); });
+  document.addEventListener('click', e=>{
+    const btn = e.target.closest('[data-copy]'); if(!btn) return;
+    KolkliTool.copy(btn.getAttribute('data-copy'), btn);
+    KolkliTool.toast(APP.t().copied);
+  });
+
+  const APP = KolkliTool.init(I18N, function(){ if(imgData) extractPalette(); });
+})();
+</script>
+</body>
+</html>

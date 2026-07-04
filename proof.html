@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — Review & approve</title>
+<meta name="description" content="Review the work, leave your comments and approve — no account needed.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;overflow-x:clip;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:960px;margin:0 auto;padding:18px 20px 60px;}
+
+  .topbar{display:flex;align-items:center;justify-content:flex-end;gap:9px;margin-bottom:14px;}
+  .pillbtn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:999px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;font-size:12.5px;font-weight:600;
+    box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s;}
+  .pillbtn:hover{border-color:var(--accent);} .pillbtn:active{transform:scale(0.97);}
+  .pillbtn.ico{width:36px;padding:0;justify-content:center;font-size:14px;}
+  .pillbtn svg{width:15px;height:15px;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:24px;}
+
+  /* branded hero (ported from download.html) */
+  .brandhero{position:relative;border-radius:20px;overflow:hidden;margin-bottom:16px;border:1px solid var(--line);box-shadow:var(--shadow-lg);}
+  .bh-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;}
+  .bh-scrim{position:absolute;inset:0;}
+  .bh-in{position:relative;padding:32px 22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:11px;}
+  .bh-logo{background:#fff;border-radius:15px;padding:11px 17px;box-shadow:0 8px 24px rgba(0,0,0,.20);}
+  .bh-logo img{display:block;max-height:50px;max-width:min(220px,60vw);object-fit:contain;}
+  .bh-name{font-size:clamp(19px,4vw,25px);font-weight:800;letter-spacing:-0.01em;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.30);}
+  .bh-tag{font-size:14px;color:rgba(255,255,255,.92);text-shadow:0 1px 8px rgba(0,0,0,.30);max-width:46ch;}
+
+  .dhead{text-align:center;margin-bottom:16px;}
+  .dhead h1{font-size:22px;margin:0 0 6px;font-weight:700;word-break:break-word;}
+  .dhead .who{font-size:13.5px;color:var(--muted);}
+  .msgbox{background:var(--panel-2);border:1px solid var(--line-2);border-radius:12px;padding:13px 15px;font-size:14px;color:var(--ink-2);
+    line-height:1.6;margin-bottom:16px;white-space:pre-wrap;word-break:break-word;}
+
+  /* version switch */
+  .vswitch{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:14px;justify-content:center;}
+  .vswitch .vlbl{font-size:12px;color:var(--muted);font-weight:600;}
+  .vbtn{height:32px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);cursor:pointer;font-size:12.5px;font-weight:600;font-family:var(--mono);}
+  .vbtn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dim);}
+
+  /* filmstrip */
+  .strip{display:flex;gap:9px;overflow-x:auto;padding:4px 2px 10px;margin-bottom:6px;}
+  .sthumb{flex:0 0 auto;width:88px;cursor:pointer;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--panel);transition:border-color .12s,transform .08s;position:relative;}
+  .sthumb:hover{border-color:var(--accent);} .sthumb.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .sthumb .sth{height:58px;display:flex;align-items:center;justify-content:center;background:var(--panel-2);color:var(--accent);overflow:hidden;}
+  .sthumb .sth img{width:100%;height:100%;object-fit:cover;} .sthumb .sth svg{width:22px;height:22px;}
+  .sthumb .snm{font-size:10px;padding:5px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);}
+  .sthumb .cc{position:absolute;top:5px;inset-inline-end:5px;font-family:var(--mono);font-size:9.5px;font-weight:700;background:var(--grad);color:#fff;border-radius:999px;padding:1px 6px;}
+
+  /* stage */
+  .stage{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start;}
+  @media (max-width:800px){ .stage{grid-template-columns:1fr;} }
+  .media{background:#0b0d14;border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:220px;display:flex;align-items:center;justify-content:center;}
+  .media img,.media video{max-width:100%;max-height:64vh;display:block;object-fit:contain;}
+  .media audio{width:92%;margin:26px 0;}
+  .media iframe{width:100%;height:66vh;border:none;background:#fff;}
+  .media .dlonly{padding:40px 20px;text-align:center;color:#c7ccda;}
+  .media .dlonly .di{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);color:#fff;}
+  .media .dlonly .di svg{width:28px;height:28px;}
+  .media .dlonly .nm{font-size:14px;font-weight:600;color:#fff;margin-bottom:14px;word-break:break-word;}
+
+  .side{display:flex;flex-direction:column;gap:12px;}
+  .sbar{display:flex;align-items:center;gap:10px;}
+  .sbar .snm2{flex:1;min-width:0;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .iconbtn{width:36px;height:36px;flex-shrink:0;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .iconbtn:hover{border-color:var(--accent);color:var(--accent);} .iconbtn svg{width:16px;height:16px;}
+
+  .thread{display:flex;flex-direction:column;gap:9px;max-height:44vh;overflow-y:auto;padding-inline-end:2px;}
+  .cmt{border:1px solid var(--line-2);border-radius:11px;padding:10px 12px;background:var(--panel-2);}
+  .cmt-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;}
+  .cmt-av{width:24px;height:24px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--grad);color:#fff;font-weight:700;font-size:11px;}
+  .cmt-who{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .cmt-pos{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--accent-dim);background:var(--accent-soft);border-radius:999px;padding:2px 8px;cursor:pointer;}
+  .cmt-pos svg{width:10px;height:10px;}
+  .cmt-when{font-size:10.5px;color:var(--faint);font-family:var(--mono);margin-inline-start:auto;}
+  .cmt-body{font-size:13px;color:var(--ink-2);line-height:1.5;white-space:pre-wrap;word-break:break-word;}
+  .cmt.mine{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 30%,var(--line));}
+  .threadEmpty{font-size:12.5px;color:var(--faint);text-align:center;padding:18px 10px;font-family:var(--mono);}
+
+  .addbox{border:1px solid var(--line);border-radius:12px;padding:11px;background:var(--panel);}
+  .addbox .nmrow{margin-bottom:8px;}
+  .inp,.ta{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13px;padding:9px 11px;transition:border-color .12s,box-shadow .12s;}
+  .inp:focus,.ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .ta{resize:vertical;min-height:56px;}
+  .addfoot{display:flex;align-items:center;gap:8px;margin-top:8px;}
+  .pinchip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent-dim);background:var(--accent-soft);border-radius:999px;padding:5px 10px;}
+  .pinchip svg{width:12px;height:12px;}
+  .pagepick{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);}
+  .pagepick input{width:52px;text-align:center;padding:6px 6px;}
+  .postbtn{margin-inline-start:auto;display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;cursor:pointer;
+    background:var(--grad-btn);font-weight:600;font-size:13px;padding:9px 16px;border-radius:999px;box-shadow:0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
+  .postbtn:hover{filter:brightness(1.05);} .postbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;} .postbtn svg{width:14px;height:14px;}
+  .viewonly{font-size:12px;color:var(--faint);text-align:center;padding:12px;font-family:var(--mono);border:1px dashed var(--line);border-radius:11px;}
+
+  /* decision bar */
+  .decidebar{margin-top:18px;border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--panel);box-shadow:var(--shadow);}
+  .decidebar h3{font-size:15px;margin:0 0 4px;font-weight:700;text-align:center;}
+  .decidebar .dsub{font-size:12.5px;color:var(--muted);text-align:center;margin:0 0 14px;}
+  .decrow{display:flex;gap:11px;flex-wrap:wrap;}
+  .decbtn{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 18px;border-radius:12px;
+    font-size:14.5px;font-weight:700;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);transition:filter .12s,border-color .12s,transform .08s;}
+  .decbtn:active{transform:translateY(1px);} .decbtn svg{width:18px;height:18px;}
+  .decbtn.approve{border:none;color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--success);box-shadow:0 8px 20px rgba(34,176,75,.32);}
+  .decbtn.approve:hover{filter:brightness(1.04);}
+  .decbtn.changes:hover{border-color:var(--warn);color:var(--warn);background:var(--warm-soft);}
+  .decstate{display:flex;align-items:center;gap:12px;padding:4px 2px;}
+  .decstate .di{width:46px;height:46px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .decstate .di svg{width:24px;height:24px;}
+  .decstate.approved .di{background:var(--success);color:#fff;} .decstate.changes .di{background:var(--warn);color:#fff;}
+  .decstate .dt b{display:block;font-size:15px;font-weight:700;color:var(--ink);}
+  .decstate .dt span{font-size:12.5px;color:var(--muted);}
+  .decstate .redo{margin-inline-start:auto;height:34px;padding:0 13px;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);cursor:pointer;font-size:12px;font-weight:600;}
+  .decstate .redo:hover{border-color:var(--accent);color:var(--accent-dim);}
+
+  /* states */
+  .state{text-align:center;padding:26px 12px;}
+  .state .si{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;}
+  .state .si.warn{background:var(--warm-soft);color:var(--warn);} .state .si.lock{background:var(--accent-soft);color:var(--accent);}
+  .state .si svg{width:32px;height:32px;}
+  .state h2{font-size:19px;margin:0 0 8px;}
+  .state p{font-size:14px;color:var(--muted);margin:0 auto 18px;max-width:44ch;line-height:1.6;}
+  .pwform{display:flex;gap:8px;max-width:340px;margin:0 auto;}
+  .pwform input{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;font-family:var(--sans);font-size:14px;padding:11px 13px;}
+  .pwform input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .pwform.bad input{border-color:var(--danger);}
+  .pwform button{border:none;color:#fff;cursor:pointer;border-radius:10px;padding:0 18px;font-weight:600;font-size:14px;background:var(--grad-btn);box-shadow:0 4px 12px var(--grad-btn-glow);}
+  .pwerr{font-size:12px;color:var(--danger);margin-top:10px;min-height:14px;}
+  .hidden{display:none !important;}
+
+  .poweredby{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin:22px auto 0;font-size:11.5px;color:var(--faint);font-family:var(--mono);letter-spacing:.02em;transition:opacity .12s;}
+  .poweredby:hover{opacity:.72;} .poweredby img{height:19px;width:auto;display:block;}
+  html[data-theme="dark"] .poweredby img{filter:brightness(1.12);}
+  .pbwrap{text-align:center;}
+  footer{margin-top:14px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <button class="pillbtn" id="langBtn" type="button" aria-label="Language">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/></svg>
+      <span id="langIco">עב</span>
+    </button>
+    <button class="pillbtn ico" id="themeToggle" type="button" aria-label="Theme"><span id="themeIco">🌙</span></button>
+  </div>
+
+  <div class="brandhero hidden" id="brandHero">
+    <div class="bh-bg" id="bhBg"></div>
+    <div class="bh-scrim" id="bhScrim"></div>
+    <div class="bh-in">
+      <div class="bh-logo hidden" id="bhLogo"><img id="bhLogoImg" alt=""></div>
+      <div class="bh-name hidden" id="bhName"></div>
+      <div class="bh-tag hidden" id="bhTag"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <!-- loading -->
+    <div class="state" id="loadingState">
+      <div class="si lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg></div>
+      <p data-i18n="loading"></p>
+    </div>
+
+    <!-- notice: expired / closed / not found -->
+    <div class="state hidden" id="noticeState">
+      <div class="si warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
+      <h2 id="noticeTitle"></h2>
+      <p id="noticeBody"></p>
+    </div>
+
+    <!-- password gate -->
+    <div class="state hidden" id="pwState">
+      <div class="si lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <h2 data-i18n="pwTitle"></h2>
+      <p data-i18n="pwSub"></p>
+      <form class="pwform" id="pwForm">
+        <input id="pwInput" type="password" dir="ltr" data-i18n-ph="pwPh" autocomplete="off">
+        <button type="submit" data-i18n="unlock"></button>
+      </form>
+      <div class="pwerr" id="pwErr"></div>
+    </div>
+
+    <!-- review -->
+    <div class="hidden" id="reviewView">
+      <div class="dhead">
+        <h1 id="projName"></h1>
+        <div class="who" id="projWho"></div>
+      </div>
+      <div class="msgbox hidden" id="msgBox"></div>
+      <div class="vswitch hidden" id="vSwitch"></div>
+      <div class="strip" id="strip"></div>
+      <div class="stage">
+        <div class="media" id="media"></div>
+        <div class="side">
+          <div class="sbar">
+            <div class="snm2" id="activeName"></div>
+            <button class="iconbtn hidden" id="dlBtn" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></button>
+          </div>
+          <div class="thread" id="thread"></div>
+          <div class="addbox" id="addBox">
+            <div class="nmrow"><input class="inp" id="cName" type="text" data-i18n-ph="yourNamePh"></div>
+            <textarea class="ta" id="cBody" data-i18n-ph="commentPh"></textarea>
+            <div class="addfoot" id="addFoot">
+              <button class="postbtn" id="postBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg><span data-i18n="post"></span></button>
+            </div>
+          </div>
+          <div class="viewonly hidden" id="viewOnly" data-i18n="viewOnly"></div>
+        </div>
+      </div>
+
+      <div class="decidebar hidden" id="decideBar"></div>
+    </div>
+  </div>
+
+  <div class="pbwrap">
+    <a class="poweredby" id="poweredBy" href="./index.html" aria-label="KOLKLI">
+      <span data-i18n="poweredBy"></span>
+      <img src="./assets/logo.png" alt="KOLKLI" width="139" height="34" decoding="async">
+    </a>
+  </div>
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./review-store.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const RV = window.RV;
+
+  const I18N = {
+    he:{ dir:'rtl', langIco:'EN',
+      loading:'טוען את הפרויקט…',
+      ntExpiredT:'הקישור פג תוקף', ntExpiredB:'הקישור לצפייה כבר לא פעיל. בקשו מבעל הפרויקט קישור חדש.',
+      ntClosedT:'הפרויקט נסגר', ntClosedB:'בעל הפרויקט סגר את הצפייה. בקשו קישור חדש אם צריך.',
+      ntMissingT:'הקישור לא נמצא', ntMissingB:'הקישור שגוי או שאינו קיים במכשיר הזה. ודאו שהעתקתם את הקישור המלא.',
+      pwTitle:'הפרויקט מוגן בסיסמה', pwSub:'הזינו את הסיסמה שקיבלתם כדי לצפות בחומרים.',
+      pwPh:'סיסמה', unlock:'כניסה', pwWrong:'סיסמה שגויה',
+      forClient:c=>`עבור ${c}`, reviewSub:'צפו בחומרים, הוסיפו הערות ואשרו.',
+      verLabel:'גרסה',
+      yourNamePh:'השם שלך', commentPh:'כתבו הערה…', post:'שליחה',
+      atNow:s=>`בזמן ${s}`, pagePick:'עמוד', threadEmpty:'עדיין אין הערות על הפריט הזה',
+      viewOnly:'צפייה בלבד — לא ניתן להוסיף הערות',
+      dlOnly:'קובץ להורדה', download:'הורדה',
+      decideTitle:'ההחלטה שלך', decideSub:'לאחר שסקרתם את החומרים, בחרו כיצד להמשיך.',
+      approve:'מאשר/ת', requestChanges:'בקשת תיקונים',
+      approvedT:'אישרת את הפרויקט', changesT:'ביקשת תיקונים', decidedAt:d=>`נשלח ${d}`, redo:'שינוי החלטה',
+      needName:'הוסיפו את שמכם לפני שליחת ההחלטה', changesPrompt:'מה צריך לתקן? (לא חובה)',
+      commentAdded:'ההערה נשלחה ✓', approvedToast:'הפרויקט אושר — תודה!', changesToast:'הבקשה נשלחה',
+      poweredBy:'מופעל על ידי', foot:'KOLKLI · Client Review · הדגמה מקומית',
+      close:'סגור', anon:'הלקוח',
+    },
+    en:{ dir:'ltr', langIco:'עב',
+      loading:'Loading the project…',
+      ntExpiredT:'This link has expired', ntExpiredB:'The review link is no longer active. Ask the project owner for a new link.',
+      ntClosedT:'This project is closed', ntClosedB:'The owner has closed the review. Ask for a new link if you still need it.',
+      ntMissingT:'Link not found', ntMissingB:'The link is invalid or doesn’t exist on this device. Make sure you copied the full link.',
+      pwTitle:'This project is password protected', pwSub:'Enter the password you received to view the materials.',
+      pwPh:'Password', unlock:'Enter', pwWrong:'Wrong password',
+      forClient:c=>`For ${c}`, reviewSub:'Review the materials, leave comments and approve.',
+      verLabel:'Version',
+      yourNamePh:'Your name', commentPh:'Write a comment…', post:'Send',
+      atNow:s=>`at ${s}`, pagePick:'Page', threadEmpty:'No comments on this item yet',
+      viewOnly:'View only — comments are turned off',
+      dlOnly:'Download file', download:'Download',
+      decideTitle:'Your decision', decideSub:'Once you’ve reviewed the materials, choose how to proceed.',
+      approve:'Approve', requestChanges:'Request changes',
+      approvedT:'You approved this project', changesT:'You requested changes', decidedAt:d=>`Sent ${d}`, redo:'Change decision',
+      needName:'Add your name before sending your decision', changesPrompt:'What needs changing? (optional)',
+      commentAdded:'Comment sent ✓', approvedToast:'Project approved — thank you!', changesToast:'Your request was sent',
+      poweredBy:'Powered by', foot:'KOLKLI · Client Review · Local demo',
+      close:'Close', anon:'The client',
+    },
+    ru:{ dir:'ltr', langIco:'EN',
+      loading:'Загрузка проекта…',
+      ntExpiredT:'Срок ссылки истёк', ntExpiredB:'Ссылка на просмотр больше не активна. Попросите у владельца проекта новую ссылку.',
+      ntClosedT:'Проект закрыт', ntClosedB:'Владелец закрыл просмотр. Попросите новую ссылку, если она ещё нужна.',
+      ntMissingT:'Ссылка не найдена', ntMissingB:'Ссылка неверна или не существует на этом устройстве. Убедитесь, что скопировали её полностью.',
+      pwTitle:'Проект защищён паролем', pwSub:'Введите полученный пароль, чтобы посмотреть материалы.',
+      pwPh:'Пароль', unlock:'Войти', pwWrong:'Неверный пароль',
+      forClient:c=>`Для ${c}`, reviewSub:'Посмотрите материалы, оставьте комментарии и одобрите.',
+      verLabel:'Версия',
+      yourNamePh:'Ваше имя', commentPh:'Напишите комментарий…', post:'Отправить',
+      atNow:s=>`на ${s}`, pagePick:'Стр.', threadEmpty:'Пока нет комментариев к этому элементу',
+      viewOnly:'Только просмотр — комментарии отключены',
+      dlOnly:'Файл для скачивания', download:'Скачать',
+      decideTitle:'Ваше решение', decideSub:'Просмотрев материалы, выберите, как продолжить.',
+      approve:'Одобрить', requestChanges:'Запросить правки',
+      approvedT:'Вы одобрили проект', changesT:'Вы запросили правки', decidedAt:d=>`Отправлено ${d}`, redo:'Изменить решение',
+      needName:'Укажите имя перед отправкой решения', changesPrompt:'Что нужно изменить? (необязательно)',
+      commentAdded:'Комментарий отправлен ✓', approvedToast:'Проект одобрен — спасибо!', changesToast:'Ваш запрос отправлен',
+      poweredBy:'Работает на', foot:'KOLKLI · Client Review · Локальная демонстрация',
+      close:'Закрыть', anon:'Клиент',
+    },
+  };
+
+  let lang='he', t=I18N.he;
+  let proj=null, token=null, brand=null;
+  let activeVer=1, activeId=null, activeMedia=null, activeUrl=null;
+  let viewedMarked=false;
+
+  function toast(msg){ const b=el('toast'); b.textContent=msg; b.classList.add('show'); clearTimeout(b._t); b._t=setTimeout(()=>b.classList.remove('show'),1900); }
+  function ls(k){ return RV.ls(k); }
+  function mmss(s){ s=Math.max(0,Math.floor(s||0)); const m=Math.floor(s/60), r=s%60; return m+':'+String(r).padStart(2,'0'); }
+  function clientName(){ return (el('cName').value||'').trim(); }
+  function fmtDateTime(ms){ const d=new Date(ms); try{ return d.toLocaleString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }catch(_){ return d.toISOString().slice(0,16).replace('T',' '); } }
+
+  function show(id){ ['loadingState','noticeState','pwState','reviewView'].forEach(s=>el(s).classList.toggle('hidden', s!==id)); }
+  function notice(tk,bk){ el('noticeTitle').textContent=t[tk]; el('noticeBody').textContent=t[bk]; show('noticeState'); }
+
+  // ---- client branding (ported from download.html) ----
+  function hexToRgb(h){ h=String(h||'').trim().replace('#',''); if(h.length===3)h=h.split('').map(c=>c+c).join(''); if(!/^[0-9a-f]{6}$/i.test(h))return null; const n=parseInt(h,16); return {r:(n>>16)&255,g:(n>>8)&255,b:n&255}; }
+  function mixc(a,b,tt){ return {r:Math.round(a.r+(b.r-a.r)*tt),g:Math.round(a.g+(b.g-a.g)*tt),b:Math.round(a.b+(b.b-a.b)*tt)}; }
+  function hexOf(c){ return '#'+[c.r,c.g,c.b].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join(''); }
+  function rgbStr(c){ return c.r+','+c.g+','+c.b; }
+  function applyBrand(b){
+    if(!b || !(b.logo||b.name||b.bg||b.color)) return;
+    brand=b;
+    const base=hexToRgb(b.color)||hexToRgb('#7b34ff');
+    if(base){
+      const light=mixc(base,{r:255,g:255,b:255},0.16), dim=mixc(base,{r:0,g:0,b:0},0.14);
+      const grad='linear-gradient(105deg,'+hexOf(base)+' 0%,'+hexOf(light)+' 100%)';
+      const st=document.documentElement.style;
+      st.setProperty('--accent',hexOf(base));
+      st.setProperty('--accent-dim',hexOf(dim));
+      st.setProperty('--accent-soft','rgba('+rgbStr(base)+',0.14)');
+      st.setProperty('--grad',grad); st.setProperty('--grad-btn',grad);
+      st.setProperty('--grad-soft','linear-gradient(120deg,rgba('+rgbStr(base)+',0.14),rgba('+rgbStr(light)+',0.10))');
+      st.setProperty('--grad-shadow','rgba('+rgbStr(base)+',0.32)');
+      st.setProperty('--grad-btn-glow','rgba('+rgbStr(base)+',0.40)');
+    }
+    const bg=el('bhBg'), scrim=el('bhScrim');
+    if(b.bg){ bg.style.backgroundImage='url("'+b.bg+'")'; scrim.style.background='linear-gradient(160deg,rgba(8,10,20,.30),rgba(8,10,20,.58))'; }
+    else { bg.style.background='var(--grad)'; scrim.style.background='linear-gradient(160deg,rgba(255,255,255,.12),rgba(0,0,0,.16))'; }
+    if(b.logo){ el('bhLogoImg').src=b.logo; el('bhLogo').classList.remove('hidden'); }
+    if(b.name){ el('bhName').textContent=b.name; el('bhName').classList.remove('hidden'); }
+    if(b.tagline){ el('bhTag').textContent=b.tagline; el('bhTag').classList.remove('hidden'); }
+    el('brandHero').classList.remove('hidden');
+  }
+
+  // ---- render ----
+  function itemsOf(v){ return RV.itemsOfVersion(proj, v); }
+  function activeItem(){ return (proj.items||[]).find(i=>i.id===activeId)||null; }
+
+  function renderHead(){
+    el('projName').textContent=proj.name;
+    el('projWho').textContent = proj.client? t.forClient(proj.client) : t.reviewSub;
+    if(proj.message){ el('msgBox').textContent=proj.message; el('msgBox').classList.remove('hidden'); } else el('msgBox').classList.add('hidden');
+  }
+  function renderVersions(){
+    const vs=el('vSwitch');
+    if((proj.maxVersion||1)>1){
+      vs.classList.remove('hidden');
+      let html=`<span class="vlbl">${t.verLabel}</span>`;
+      for(let v=1;v<=proj.maxVersion;v++) html+=`<button class="vbtn${v===activeVer?' on':''}" data-ver="${v}">${v}</button>`;
+      vs.innerHTML=html;
+    } else vs.classList.add('hidden');
+  }
+  function renderStrip(){
+    const items=itemsOf(activeVer);
+    el('strip').innerHTML = items.map(it=>{
+      const cc=RV.commentsOf(proj,it.id).length;
+      return `<div class="sthumb${it.id===activeId?' on':''}" data-item="${it.id}">
+        <div class="sth" data-sthumb="${it.id}">${RV.FICON[it.kind]||RV.FICON.doc}</div>
+        <div class="snm" title="${RV.escapeHtml(it.name)}">${RV.escapeHtml(it.name)}</div>
+        ${cc?`<span class="cc">${cc}</span>`:''}
+      </div>`;
+    }).join('');
+    fillStripThumbs(items);
+  }
+  async function fillStripThumbs(items){
+    for(const it of items){
+      if(it.kind!=='image') continue;
+      try{ const blob=await RV.getBlob(it.id); if(!blob) continue;
+        const holder=document.querySelector(`[data-sthumb="${it.id}"]`); if(!holder) continue;
+        holder.innerHTML=`<img src="${URL.createObjectURL(blob)}" alt="">`;
+      }catch(_){}
+    }
+  }
+  async function renderMedia(){
+    const it=activeItem(); const box=el('media'); activeMedia=null;
+    if(activeUrl){ try{ URL.revokeObjectURL(activeUrl); }catch(_){} activeUrl=null; }
+    el('activeName').textContent = it? it.name : '';
+    el('dlBtn').classList.toggle('hidden', !(it && proj.perms.download));
+    if(!it){ box.innerHTML=''; return; }
+    let blob=null; try{ blob=await RV.getBlob(it.id); }catch(_){}
+    if(!blob){ box.innerHTML=`<div class="dlonly"><div class="nm">${RV.escapeHtml(it.name)}</div></div>`; return; }
+    const url=URL.createObjectURL(blob); activeUrl=url;
+    if(it.kind==='image') box.innerHTML=`<img src="${url}" alt="${RV.escapeHtml(it.name)}">`;
+    else if(it.kind==='video'){ box.innerHTML=`<video src="${url}" controls playsinline></video>`; activeMedia=box.querySelector('video'); }
+    else if(it.kind==='audio'){ box.innerHTML=`<audio src="${url}" controls></audio>`; activeMedia=box.querySelector('audio'); }
+    else if(it.ext==='pdf') box.innerHTML=`<iframe src="${url}"></iframe>`;
+    else box.innerHTML=`<div class="dlonly"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg></div><div class="nm">${RV.escapeHtml(it.name)}</div></div>`;
+    if(activeMedia){ activeMedia.addEventListener('timeupdate',syncPin); }
+    renderAddFoot();
+  }
+  function renderThread(){
+    const it=activeItem(); if(!it){ el('thread').innerHTML=''; return; }
+    const me=(clientName()||'').toLowerCase();
+    const comments=RV.commentsOf(proj,it.id).slice().sort((a,b)=>a.at-b.at);
+    if(!comments.length){ el('thread').innerHTML=`<div class="threadEmpty">${t.threadEmpty}</div>`; return; }
+    el('thread').innerHTML=comments.map(c=>{
+      const who=(c.author&&c.author.trim())?c.author.trim():t.anon;
+      const av=(who||'?').trim().charAt(0).toUpperCase()||'?';
+      let pos='';
+      if(c.tcode!=null) pos=`<span class="cmt-pos" data-seek="${c.tcode}">${clockSvg()} ${mmss(c.tcode)}</span>`;
+      else if(c.page!=null) pos=`<span class="cmt-pos">${t.pagePick} ${c.page}</span>`;
+      const mine = me && who.toLowerCase()===me;
+      return `<div class="cmt${mine?' mine':''}">
+        <div class="cmt-top"><span class="cmt-av">${RV.escapeHtml(av)}</span><span class="cmt-who">${RV.escapeHtml(who)}</span>${pos}<span class="cmt-when">${fmtDateTime(c.at)}</span></div>
+        <div class="cmt-body">${RV.escapeHtml(c.body)}</div>
+      </div>`;
+    }).join('');
+    el('thread').scrollTop=el('thread').scrollHeight;
+  }
+  function renderAddFoot(){
+    const it=activeItem(); const foot=el('addFoot');
+    // remove any transient controls, keep the post button
+    foot.querySelectorAll('[data-transient]').forEach(n=>n.remove());
+    if(!it) return;
+    if(it.kind==='video'||it.kind==='audio'){
+      const chip=document.createElement('span'); chip.className='pinchip'; chip.setAttribute('data-transient','');
+      chip.innerHTML=`${clockSvg()} <span id="curTime">${t.atNow('0:00')}</span>`;
+      foot.insertBefore(chip, el('postBtn'));
+    } else if(it.ext==='pdf'){
+      const wrap=document.createElement('span'); wrap.className='pagepick'; wrap.setAttribute('data-transient','');
+      wrap.innerHTML=`${t.pagePick} <input class="inp" id="pageNum" type="number" min="1" value="1">`;
+      foot.insertBefore(wrap, el('postBtn'));
+    }
+  }
+  function syncPin(){ const c=el('curTime'); if(c && activeMedia) c.textContent=t.atNow(mmss(activeMedia.currentTime)); }
+
+  function selectItem(id){
+    activeId=id;
+    document.querySelectorAll('.sthumb').forEach(s=>s.classList.toggle('on', s.getAttribute('data-item')===id));
+    renderMedia(); renderThread();
+  }
+  function renderPerms(){
+    const canComment = proj.perms.comment && RV.statusOf(proj)!=='closed' && RV.statusOf(proj)!=='expired';
+    el('addBox').classList.toggle('hidden', !canComment);
+    el('viewOnly').classList.toggle('hidden', proj.perms.comment);
+    renderDecide();
+  }
+  function renderDecide(){
+    const bar=el('decideBar');
+    const st=RV.statusOf(proj);
+    if(!proj.perms.approve || st==='expired'){ bar.classList.add('hidden'); return; }
+    bar.classList.remove('hidden');
+    if(proj.decision){
+      const d=proj.decision, ap=d.state==='approved';
+      bar.innerHTML=`<div class="decstate ${ap?'approved':'changes'}">
+        <div class="di">${ap?checkSvg():refreshSvg()}</div>
+        <div class="dt"><b>${ap?t.approvedT:t.changesT}</b><span>${t.decidedAt(fmtDateTime(d.at))}</span></div>
+        ${st==='closed'?'':`<button class="redo" id="redoBtn" type="button">${t.redo}</button>`}
+      </div>`;
+    } else if(st==='closed'){
+      bar.classList.add('hidden');
+    } else {
+      bar.innerHTML=`<h3>${t.decideTitle}</h3><p class="dsub">${t.decideSub}</p>
+        <div class="decrow">
+          <button class="decbtn approve" id="approveBtn" type="button">${checkSvg()} ${t.approve}</button>
+          <button class="decbtn changes" id="changesBtn" type="button">${refreshSvg()} ${t.requestChanges}</button>
+        </div>`;
+    }
+  }
+
+  // ---- writes ----
+  function markViewed(){
+    if(viewedMarked) return; viewedMarked=true;
+    const fresh=RV.getProject(token); if(!fresh) return;
+    if(fresh.status==='draft'||fresh.status==='sent'){
+      fresh.status='viewed';
+      fresh.events=(fresh.events||[]).concat([{type:'viewed', at:Date.now(), who:clientName()}]);
+      RV.upsertProject(fresh); proj=fresh;
+      RV.post({type:'viewed', token, who:clientName()});
+    }
+  }
+  function addComment(){
+    const it=activeItem(); if(!it) return;
+    const body=(el('cBody').value||'').trim(); if(!body) return;
+    const fresh=RV.getProject(token); if(!fresh){ notice('ntMissingT','ntMissingB'); return; }
+    if(RV.statusOf(fresh)==='closed'){ notice('ntClosedT','ntClosedB'); return; }
+    const who=clientName();
+    const c={ id:'rc'+RV.randToken(), itemId:it.id, author:who, body, at:Date.now(), tcode:null, page:null, decision:null, resolved:false };
+    if((it.kind==='video'||it.kind==='audio') && activeMedia) c.tcode=Math.floor(activeMedia.currentTime||0);
+    else if(it.ext==='pdf'){ const pn=el('pageNum'); if(pn && +pn.value>0) c.page=+pn.value; }
+    fresh.comments=(fresh.comments||[]).concat([c]);
+    fresh.events=(fresh.events||[]).concat([{type:'commented', at:Date.now(), who}]);
+    if(fresh.status==='draft'||fresh.status==='sent') fresh.status='viewed';
+    RV.upsertProject(fresh); proj=fresh;
+    if(who) saveName(who);
+    RV.post({type:'commented', token, who});
+    el('cBody').value='';
+    renderThread(); renderStrip();
+    document.querySelectorAll('.sthumb').forEach(s=>s.classList.toggle('on', s.getAttribute('data-item')===activeId));
+    toast(t.commentAdded);
+  }
+  function decide(state){
+    const who=clientName();
+    if(!who){ el('cName').focus(); toast(t.needName); return; }
+    let note='';
+    if(state==='changes'){ note=(el('cBody').value||'').trim(); }
+    const fresh=RV.getProject(token); if(!fresh){ notice('ntMissingT','ntMissingB'); return; }
+    if(RV.statusOf(fresh)==='closed'){ notice('ntClosedT','ntClosedB'); return; }
+    fresh.decision={ state, by:who, at:Date.now(), version:activeVer };
+    fresh.status = state==='approved'? 'approved':'changes';
+    fresh.events=(fresh.events||[]).concat([{type:state, at:Date.now(), who}]);
+    // if the client left changes text, attach it as a comment on the active item
+    if(state==='changes' && note){
+      const it=activeItem();
+      if(it) fresh.comments=(fresh.comments||[]).concat([{ id:'rc'+RV.randToken(), itemId:it.id, author:who, body:note, at:Date.now(), tcode:null, page:null, decision:'changes', resolved:false }]);
+    }
+    RV.upsertProject(fresh); proj=fresh; saveName(who);
+    RV.post({type:state, token, who});
+    if(state==='changes') el('cBody').value='';
+    renderThread(); renderStrip(); renderDecide();
+    toast(state==='approved'? t.approvedToast : t.changesToast);
+  }
+  function redo(){
+    const fresh=RV.getProject(token); if(!fresh) return;
+    fresh.decision=null; fresh.status='viewed';
+    RV.upsertProject(fresh); proj=fresh; renderDecide();
+  }
+  function saveName(n){ RV.lsSet('rv_client_name', n); }
+
+  async function unlock(e){
+    e.preventDefault();
+    const val=el('pwInput').value;
+    if(await RV.hashPass(val)===proj.password){ el('pwForm').classList.remove('bad'); el('pwErr').textContent=''; enterReview(); }
+    else { el('pwForm').classList.add('bad'); el('pwErr').textContent=t.pwWrong; }
+  }
+
+  function enterReview(){
+    activeVer=proj.activeVersion||proj.maxVersion||1;
+    const items=itemsOf(activeVer); activeId=items.length? items[0].id : null;
+    const savedName=ls('rv_client_name'); if(savedName) el('cName').value=savedName;
+    renderHead(); renderVersions(); renderStrip(); renderPerms();
+    selectItem(activeId);
+    show('reviewView');
+    markViewed();
+  }
+
+  // ---- svg atoms ----
+  function clockSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'; }
+  function checkSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'; }
+  function refreshSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L3 8"/></svg>'; }
+
+  // ---- i18n + theme ----
+  function applyStatic(){
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
+  }
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    applyStatic(); RV.lsSet('ac_lang', l);
+    const li=el('langIco'); if(li) li.textContent=t.langIco;
+    if(proj && !el('reviewView').classList.contains('hidden')){
+      renderHead(); renderVersions(); renderStrip(); renderThread(); renderAddFoot(); renderPerms();
+      document.querySelectorAll('.sthumb').forEach(s=>s.classList.toggle('on', s.getAttribute('data-item')===activeId));
+    }
+  }
+  function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); const ti=el('themeIco'); if(ti) ti.textContent=dark?'☀️':'🌙'; RV.lsSet('theme',dark?'dark':'light'); }
+  function cycleLang(){ const order=['he','en','ru']; const i=order.indexOf(lang); applyLang(order[(i+1)%order.length]); }
+
+  // ---- events ----
+  el('strip').addEventListener('click',e=>{ const s=e.target.closest('[data-item]'); if(s) selectItem(s.getAttribute('data-item')); });
+  el('vSwitch').addEventListener('click',e=>{ const b=e.target.closest('[data-ver]'); if(!b) return; activeVer=+b.getAttribute('data-ver'); const items=itemsOf(activeVer); activeId=items.length?items[0].id:null; renderVersions(); renderStrip(); selectItem(activeId); });
+  el('thread').addEventListener('click',e=>{ const s=e.target.closest('[data-seek]'); if(s && activeMedia){ activeMedia.currentTime=+s.getAttribute('data-seek'); activeMedia.play&&activeMedia.play().catch(()=>{}); } });
+  el('postBtn').addEventListener('click',addComment);
+  el('dlBtn').addEventListener('click',async()=>{ const it=activeItem(); if(!it) return; const blob=await RV.getBlob(it.id); if(!blob) return; const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=it.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000); });
+  el('decideBar').addEventListener('click',e=>{
+    if(e.target.closest('#approveBtn')) decide('approved');
+    else if(e.target.closest('#changesBtn')) decide('changes');
+    else if(e.target.closest('#redoBtn')) redo();
+  });
+  el('pwForm').addEventListener('submit',unlock);
+  el('langBtn').addEventListener('click',cycleLang);
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+  window.__setLang=applyLang;
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(RV.detectLang());
+  token=(location.search.match(/[?&]p=([^&]+)/)||[])[1];
+  token = token? decodeURIComponent(token) : null;
+  if(!token){ notice('ntMissingT','ntMissingB'); return; }
+  proj=RV.getProject(token);
+  if(!proj){ notice('ntMissingT','ntMissingB'); return; }
+  applyBrand(proj.brand);
+  const st=RV.statusOf(proj);
+  if(st==='expired'){ notice('ntExpiredT','ntExpiredB'); return; }
+  if(st==='closed'){ notice('ntClosedT','ntClosedB'); return; }
+  if(proj.password){ show('pwState'); setTimeout(()=>el('pwInput').focus(),40); return; }
+  enterReview();
+})();
+</script>
+</body>
+</html>

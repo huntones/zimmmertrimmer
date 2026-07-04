@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל קוד צבע</title>
+<meta name="description" content="Pick a color and get its HEX, RGB, HSL and HSV codes instantly, with shades and tints. Copy any format in one click. Runs entirely in your browser.">
+<link rel="stylesheet" href="./calc.css">
+<link rel="stylesheet" href="./header.css">
+<style>
+  .bigsw{height:180px;border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow-sm);position:relative;overflow:hidden;}
+  .bigsw input[type=color]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;}
+  .slabel{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:5px;}
+  .slabel b{color:var(--ink);}
+  .sl-r::-webkit-slider-thumb{background:#e5484d;} .sl-g::-webkit-slider-thumb{background:#22b04b;} .sl-b::-webkit-slider-thumb{background:#3b82f6;}
+  .sl-r::-moz-range-thumb{background:#e5484d;} .sl-g::-moz-range-thumb{background:#22b04b;} .sl-b::-moz-range-thumb{background:#3b82f6;}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="title"></h1>
+    <p data-i18n="sub"></p>
+  </div>
+
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <div class="bigsw" id="bigsw"><input type="color" id="picker" value="#7b34ff"></div>
+        <div class="btnrow" style="margin-top:14px">
+          <button class="btn ghost sm" id="randBtn"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><span data-i18n="randBtn"></span></button>
+        </div>
+
+        <div class="divider"></div>
+        <div class="field">
+          <div class="slabel"><span data-i18n="red"></span><b id="rTxt">123</b></div>
+          <input type="range" class="range sl-r" id="r" min="0" max="255" value="123">
+        </div>
+        <div class="field">
+          <div class="slabel"><span data-i18n="green"></span><b id="gTxt">52</b></div>
+          <input type="range" class="range sl-g" id="g" min="0" max="255" value="52">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="slabel"><span data-i18n="blue"></span><b id="bTxt">255</b></div>
+          <input type="range" class="range sl-b" id="b" min="0" max="255" value="255">
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h2 data-i18n="codesTitle"></h2>
+        <p class="csub" data-i18n="codesSub"></p>
+        <div class="field">
+          <label data-i18n="hexLbl"></label>
+          <div class="addon">
+            <input class="inp mono" id="hexInp" maxlength="7" value="#7B34FF" style="direction:ltr">
+          </div>
+        </div>
+        <div class="outlist" id="codes"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 data-i18n="shadesTitle"></h2>
+    <p class="csub" data-i18n="shadesSub"></p>
+    <div class="swgrid" id="shades"></div>
+  </div>
+
+  <footer class="pgfoot" data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./calc.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'חישובים והמרות · צבעים',
+      title:'מחולל קוד צבע',
+      sub:'בחרו צבע וקבלו מיד את הקודים שלו — HEX, RGB, HSL ו-HSV — עם גוונים בהירים וכהים. העתקה בקליק. הכול בדפדפן.',
+      randBtn:'צבע אקראי',
+      red:'אדום', green:'ירוק', blue:'כחול',
+      codesTitle:'קודי הצבע', codesSub:'לחצו על העתקה לצד כל פורמט.', hexLbl:'קוד HEX',
+      shadesTitle:'גוונים', shadesSub:'מכהה לבהיר — לחצו כדי לבחור.', copyTitle:'העתקה',
+      foot:'KOLKLI · מחולל קוד צבע · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הקוד הועתק ✓' },
+    en:{ dir:'ltr',
+      kick:'Calc & Convert · Color',
+      title:'Color Code Generator',
+      sub:'Pick a color and instantly get its codes — HEX, RGB, HSL and HSV — plus shades and tints. Copy any format in one click. Everything in your browser.',
+      randBtn:'Random color',
+      red:'Red', green:'Green', blue:'Blue',
+      codesTitle:'Color codes', codesSub:'Hit copy next to any format.', hexLbl:'HEX code',
+      shadesTitle:'Shades & tints', shadesSub:'Dark to light — click to select.', copyTitle:'Copy',
+      foot:'KOLKLI · Color Code Generator · Private and fast, right in your browser',
+      copied:'Code copied ✓' },
+    ru:{ dir:'ltr',
+      kick:'Расчёты · Цвет',
+      title:'Генератор кода цвета',
+      sub:'Выберите цвет и мгновенно получите его коды — HEX, RGB, HSL и HSV — с оттенками. Копируйте любой формат в один клик. Всё в браузере.',
+      randBtn:'Случайный цвет',
+      red:'Красный', green:'Зелёный', blue:'Синий',
+      codesTitle:'Коды цвета', codesSub:'Нажмите «копировать» у любого формата.', hexLbl:'Код HEX',
+      shadesTitle:'Оттенки', shadesSub:'От тёмного к светлому — нажмите, чтобы выбрать.', copyTitle:'Копировать',
+      foot:'KOLKLI · Генератор кода цвета · Приватно и быстро, прямо в браузере',
+      copied:'Код скопирован ✓' }
+  };
+
+  let rgb = {r:123, g:52, b:255};
+
+  function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+  function toHex(c){ return c.toString(16).padStart(2,'0'); }
+  function hex(){ return '#'+toHex(rgb.r)+toHex(rgb.g)+toHex(rgb.b); }
+  function rgbToHsl(r,g,b){
+    r/=255; g/=255; b/=255;
+    const max=Math.max(r,g,b), min=Math.min(r,g,b);
+    let h,s,l=(max+min)/2;
+    if(max===min){ h=s=0; }
+    else{
+      const d=max-min;
+      s = l>0.5 ? d/(2-max-min) : d/(max+min);
+      switch(max){ case r: h=(g-b)/d+(g<b?6:0); break; case g: h=(b-r)/d+2; break; default: h=(r-g)/d+4; }
+      h/=6;
+    }
+    return { h:Math.round(h*360), s:Math.round(s*100), l:Math.round(l*100) };
+  }
+  function rgbToHsv(r,g,b){
+    r/=255; g/=255; b/=255;
+    const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+    let h; const s = max===0?0:d/max, v=max;
+    if(d===0) h=0;
+    else{ switch(max){ case r: h=((g-b)/d)%6; break; case g: h=(b-r)/d+2; break; default: h=(r-g)/d+4; } h*=60; if(h<0) h+=360; }
+    return { h:Math.round(h), s:Math.round(s*100), v:Math.round(v*100) };
+  }
+  function hslToRgb(h,s,l){
+    h/=360; s/=100; l/=100;
+    let r,g,b;
+    if(s===0){ r=g=b=l; }
+    else{
+      const hue2rgb=(p,q,t)=>{ if(t<0)t+=1; if(t>1)t-=1; if(t<1/6)return p+(q-p)*6*t; if(t<1/2)return q; if(t<2/3)return p+(q-p)*(2/3-t)*6; return p; };
+      const q = l<0.5 ? l*(1+s) : l+s-l*s;
+      const p = 2*l-q;
+      r=hue2rgb(p,q,h+1/3); g=hue2rgb(p,q,h); b=hue2rgb(p,q,h-1/3);
+    }
+    return { r:Math.round(r*255), g:Math.round(g*255), b:Math.round(b*255) };
+  }
+  function parseHex(v){
+    v = (v||'').trim().replace(/^#/,'');
+    if(/^[0-9a-fA-F]{3}$/.test(v)) v = v.split('').map(c=>c+c).join('');
+    if(!/^[0-9a-fA-F]{6}$/.test(v)) return null;
+    return { r:parseInt(v.slice(0,2),16), g:parseInt(v.slice(2,4),16), b:parseInt(v.slice(4,6),16) };
+  }
+
+  function codeStrings(){
+    const hsl = rgbToHsl(rgb.r,rgb.g,rgb.b);
+    const hsv = rgbToHsv(rgb.r,rgb.g,rgb.b);
+    return [
+      ['HEX', hex().toUpperCase()],
+      ['RGB', `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`],
+      ['HSL', `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`],
+      ['HSV', `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`]
+    ];
+  }
+
+  function renderCodes(){
+    const t = APP.t();
+    el('codes').innerHTML = codeStrings().map(([tag,val])=>`
+      <div class="outrow">
+        <span class="otag">${tag}</span>
+        <span class="oval">${val}</span>
+        <button class="copy" data-copy="${val.replace(/"/g,'&quot;')}" title="${t.copyTitle}"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+      </div>`).join('');
+  }
+  function renderShades(){
+    const hsl = rgbToHsl(rgb.r,rgb.g,rgb.b);
+    const steps = [8,20,32,44,56,68,80,92];
+    el('shades').innerHTML = steps.map(l=>{
+      const c = hslToRgb(hsl.h, hsl.s, l);
+      const hx = ('#'+toHex(c.r)+toHex(c.g)+toHex(c.b)).toUpperCase();
+      return `<div class="swatch" data-pick="${hx}"><div class="sw-color" style="background:${hx};cursor:pointer"></div><div class="sw-meta"><span class="hex">${hx}</span></div></div>`;
+    }).join('');
+  }
+
+  function paint(){
+    el('bigsw').style.background = hex();
+    el('picker').value = hex();
+    el('hexInp').value = hex().toUpperCase();
+    el('r').value = rgb.r; el('g').value = rgb.g; el('b').value = rgb.b;
+    el('rTxt').textContent = rgb.r; el('gTxt').textContent = rgb.g; el('bTxt').textContent = rgb.b;
+    renderCodes(); renderShades();
+  }
+  function setRgb(o){ rgb = { r:clamp(o.r|0,0,255), g:clamp(o.g|0,0,255), b:clamp(o.b|0,0,255) }; paint(); }
+
+  el('picker').addEventListener('input', e=>{ const p = parseHex(e.target.value); if(p) setRgb(p); });
+  el('hexInp').addEventListener('input', e=>{ const p = parseHex(e.target.value); if(p) setRgb(p); });
+  ['r','g','b'].forEach(k=>el(k).addEventListener('input', ()=>{
+    setRgb({ r:+el('r').value, g:+el('g').value, b:+el('b').value });
+  }));
+  el('randBtn').addEventListener('click', ()=>{
+    const buf = new Uint8Array(3); crypto.getRandomValues(buf);
+    setRgb({ r:buf[0], g:buf[1], b:buf[2] });
+  });
+  el('codes').addEventListener('click', e=>{
+    const btn = e.target.closest('[data-copy]'); if(!btn) return;
+    KolkliTool.copy(btn.getAttribute('data-copy'), btn);
+    KolkliTool.toast(APP.t().copied);
+  });
+  el('shades').addEventListener('click', e=>{
+    const s = e.target.closest('[data-pick]'); if(!s) return;
+    const p = parseHex(s.getAttribute('data-pick')); if(p) setRgb(p);
+  });
+
+  const APP = KolkliTool.init(I18N, renderCodes);
+  paint();
+})();
+</script>
+</body>
+</html>

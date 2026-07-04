@@ -26,15 +26,15 @@
   if (!mount) return;
 
   var T = {
-    he: { navTools:'כלים', navAI:'כלי AI', navConvert:'המרה', navCompress:'דחיסה',
-          navSend:'שליחת קבצים', navRequest:'בקשת קבצים', navProducts:'קבצים', navPricing:'מסלולים ומחירים', navAPI:'API', navSignin:'התחברות', navStart:'הרשמה', navNew:'חדש',
-          acctDash:'החשבון שלי', acctFiles:'הקבצים שלי', acctRequest:'בקשות קבצים', acctSettings:'הגדרות', acctAdmin:'ניהול', acctLogout:'התנתקות' },
-    en: { navTools:'Tools', navAI:'AI Tools', navConvert:'Convert', navCompress:'Compress',
-          navSend:'Send Files', navRequest:'Request Files', navProducts:'Files', navPricing:'Pricing', navAPI:'API', navSignin:'Login', navStart:'Sign Up', navNew:'New',
-          acctDash:'My Account', acctFiles:'My Files', acctRequest:'File Requests', acctSettings:'Settings', acctAdmin:'Admin', acctLogout:'Log out' },
-    ru: { navTools:'Инструменты', navAI:'AI-инструменты', navConvert:'Конвертация', navCompress:'Сжатие',
-          navSend:'Отправка файлов', navRequest:'Запрос файлов', navProducts:'Файлы', navPricing:'Цены', navAPI:'API', navSignin:'Вход', navStart:'Регистрация', navNew:'Новое',
-          acctDash:'Мой аккаунт', acctFiles:'Мои файлы', acctRequest:'Запросы файлов', acctSettings:'Настройки', acctAdmin:'Админ', acctLogout:'Выйти' }
+    he: { navTools:'כלים', navDev:'כלי עיצוב ופיתוח', navAI:'כלי AI', navConvert:'המרה', navCompress:'דחיסה', navMarketing:'כלי שיווק וקישורים',
+          navSend:'שליחת קבצים', navRequest:'בקשת קבצים', navProducts:'מוצרים', navPricing:'מסלולים ומחירים', navSignin:'התחברות', navStart:'הרשמה', navNew:'חדש',
+          acctDash:'החשבון שלי', acctFiles:'הקבצים שלי', acctRequest:'בקשות קבצים', acctReview:'אישורי לקוח', acctSettings:'הגדרות', acctLanguage:'שפה', acctAdmin:'ניהול', acctLogout:'התנתקות' },
+    en: { navTools:'Tools', navDev:'Design & Dev', navAI:'AI Tools', navConvert:'Convert', navCompress:'Compress', navMarketing:'Marketing & Links',
+          navSend:'Send Files', navRequest:'Request Files', navProducts:'Files', navPricing:'Pricing', navSignin:'Login', navStart:'Sign Up', navNew:'New',
+          acctDash:'My Account', acctFiles:'My Files', acctRequest:'File Requests', acctReview:'Client Review', acctSettings:'Settings', acctLanguage:'Language', acctAdmin:'Admin', acctLogout:'Log out' },
+    ru: { navTools:'Инструменты', navDev:'Дизайн и код', navAI:'AI-инструменты', navConvert:'Конвертация', navCompress:'Сжатие', navMarketing:'Маркетинг и ссылки',
+          navSend:'Отправка файлов', navRequest:'Запрос файлов', navProducts:'Файлы', navPricing:'Цены', navSignin:'Вход', navStart:'Регистрация', navNew:'Новое',
+          acctDash:'Мой аккаунт', acctFiles:'Мои файлы', acctRequest:'Запросы файлов', acctReview:'Одобрения', acctSettings:'Настройки', acctLanguage:'Язык', acctAdmin:'Админ', acctLogout:'Выйти' }
   };
 
   // The three interface languages. `name` is the endonym shown both in the
@@ -49,21 +49,47 @@
 
   // [ i18n key, page path from the site root ]  (navTools + navProducts are dropdowns → null path)
   var LINKS = [
-    ['navTools', null], ['navAI', 'ai/'], ['navConvert', 'converters/'],
-    ['navCompress', 'compress/'], ['navProducts', null], ['navPricing', 'pricing/'], ['navAPI', 'faq/']
+    ['navTools', null], ['navDev', null], ['navAI', 'ai/'], ['navMarketing', 'marketing/'],
+    ['navProducts', null], ['navPricing', 'pricing/']
   ];
 
   // "Products" dropdown: the three file-transfer product pages. Each links to its
   // own dedicated page. Labels + one-line descriptions carried inline per language
   // (mirrors the TOOLS mega-menu items), with an icon key from IC.
   var PRODUCTS = [
-    { ic:'send',   page:'send.html',    he:'שליחת קבצים', en:'Send Files',    ru:'Отправка файлов',
-      dhe:'שיתוף קבצים גדולים בקישור', den:'Share big files by link', dru:'Большие файлы по ссылке' },
-    { ic:'folder', page:'files.html',   he:'בחירת קבצים', en:'Choose Files',  ru:'Выбор файлов',
+    { ic:'folder', page:'files.html',   he:'ארגון קבצים', en:'Organize Files',  ru:'Упорядочить файлы',
       dhe:'בחירה וניהול הקבצים שלך', den:'Pick & manage your files', dru:'Выбор и управление файлами' },
     { ic:'inbox',  page:'request.html', he:'בקשת קבצים',  en:'Request Files', ru:'Запрос файлов',
-      dhe:'איסוף קבצים מאחרים', den:'Collect files from others', dru:'Сбор файлов от других' }
+      dhe:'איסוף קבצים מאחרים', den:'Collect files from others', dru:'Сбор файлов от других' },
+    { ic:'send',   page:'send.html',    he:'שליחת קבצים', en:'Send Files',    ru:'Отправка файлов',
+      dhe:'שיתוף קבצים גדולים בקישור', den:'Share big files by link', dru:'Большие файлы по ссылке' },
+    { ic:'check',  page:'review.html',  he:'אישור לקוח',  en:'Client Review', ru:'Одобрение клиента',
+      dhe:'שליחה לאישור הלקוח', den:'Send work for client sign-off', dru:'Отправка работы на одобрение' }
   ];
+
+  // "AI Tools" dropdown: the AI-powered tools, each a row like the Products menu
+  // (colored icon tile + name + one-line description). Mirrors the wording used in
+  // the AI grid on the landing page. Icon keys come from IC below.
+  var AITOOLS = [
+    { ic:'headphones', page:'ai-audio-cleanup.html', he:'ניקוי אודיו AI', en:'AI Audio Cleanup', ru:'AI-очистка аудио',
+      dhe:'הסרת רעש ושיפור קול', den:'Remove noise, enhance voice', dru:'Убрать шум, улучшить голос' },
+    { ic:'sparkle', page:'ai-master.html', he:'מאסטרינג AI', en:'AI Mastering', ru:'AI-мастеринг',
+      dhe:'מאסטרינג אוטומטי לשיר', den:'Auto-master your track', dru:'Автомастеринг трека' },
+    { ic:'crop', page:'ai-smart-crop.html', he:'חיתוך חכם AI', en:'AI Smart Crop', ru:'AI-умная обрезка',
+      dhe:'AI ממקם את החיתוך על הנושא', den:'AI centers the crop', dru:'AI центрирует кадр' },
+    { ic:'wand', page:'ai-object-remover.html', he:'הסרת אובייקטים AI', en:'AI Object Remover', ru:'AI-удаление объектов',
+      dhe:'מחקו כל דבר מהתמונה', den:'Erase anything from a photo', dru:'Сотрите что угодно с фото' },
+    { ic:'eraser', page:'remove-bg.html', he:'הסרת רקע AI', en:'AI Remove Background', ru:'AI-удаление фона',
+      dhe:'הסרת רקע בקליק', den:'Delete the background in a click', dru:'Удалить фон в один клик' },
+    { ic:'sparkles', page:'restore-image.html', he:'שחזור תמונה AI', en:'AI Photo Restore', ru:'AI-восстановление фото',
+      dhe:'שיפור תמונות ישנות', den:'Revive old photos', dru:'Оживите старые фото' },
+    { ic:'captions', page:'subtitle-generator.html', he:'כתוביות AI', en:'AI Subtitles', ru:'AI-субтитры',
+      dhe:'תמלול וכתוביות אוטומטי', den:'Auto transcript & captions', dru:'Авто-транскрипция и субтитры' },
+    { ic:'text', page:'ai-summarize-pdf.html', he:'סיכום PDF AI', en:'AI Summarize PDF', ru:'AI-конспект PDF',
+      dhe:'תקציר חכם לכל PDF', den:'A smart summary of any PDF', dru:'Умное резюме любого PDF' }
+  ];
+  // Full-width footer link at the bottom of the AI menu → the AI hub page.
+  var AI_FOOT = { he:'לכל כלי ה-AI ←', en:'All AI tools →', ru:'Все AI-инструменты →' };
 
   // Depth-aware root prefix. The shared header is loaded both at the site root
   // (index.html, app.html, ...) and one level deep inside folder pages
@@ -83,6 +109,7 @@
   var IC = {
     scissors:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/>',
     refresh:'<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+    flip:'<polyline points="17 2 21 6 17 10"/><path d="M3 12V9a3 3 0 0 1 3-3h15"/><polyline points="7 22 3 18 7 14"/><path d="M21 12v3a3 3 0 0 1-3 3H3"/>',
     merge:'<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>',
     pulse:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
     maximize:'<path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/>',
@@ -104,7 +131,24 @@
     droplet:'<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
     archive:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>',
     send:'<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
-    inbox:'<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>'
+    inbox:'<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+    check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+    swatch:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+    palette:'<circle cx="13.5" cy="6.5" r="1.2"/><circle cx="17" cy="10" r="1.2"/><circle cx="8" cy="6" r="1.2"/><circle cx="6" cy="11" r="1.2"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10a2 2 0 0 0 2-2c0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2a1.5 1.5 0 0 1 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4.5-8-10-8z"/>',
+    contrast:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z"/>',
+    gradient:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m21 5-16 16"/><path d="m21 11-10 10"/><path d="m21 17-4 4"/>',
+    shadow:'<rect x="3" y="3" width="13" height="13" rx="2"/><path d="M21 8v11a2 2 0 0 1-2 2H8"/>',
+    radius:'<path d="M21 21v-6a8 8 0 0 0-8-8H7"/><path d="M3 3v3"/><path d="M3 3h3"/>',
+    minify:'<path d="M4 9V6a2 2 0 0 1 2-2h3"/><path d="M20 9V6a2 2 0 0 0-2-2h-3"/><path d="M4 15v3a2 2 0 0 0 2 2h3"/><path d="M20 15v3a2 2 0 0 1-2 2h-3"/><line x1="7" y1="12" x2="17" y2="12"/>',
+    braces:'<path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1"/><path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1"/>',
+    link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    tags:'<path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1"/>',
+    text:'<path d="M4 7V5h16v2"/><path d="M9 19h6"/><path d="M12 5v14"/>',
+    star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+    ruler:'<path d="M21.3 8.7 8.7 21.3a1 1 0 0 1-1.4 0l-4.6-4.6a1 1 0 0 1 0-1.4L15.3 2.7a1 1 0 0 1 1.4 0l4.6 4.6a1 1 0 0 1 0 1.4z"/><path d="m9 11 1.5 1.5"/><path d="m12 8 1.5 1.5"/><path d="m6 14 1.5 1.5"/><path d="m15 5 1.5 1.5"/>',
+    ratio:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 4 20 16"/>',
+    eraser:'<path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4L14 4a2 2 0 0 1 2.8 0l4.2 4.2a2 2 0 0 1 0 2.8L12 20"/><path d="M22 21H7"/><path d="m5 13 6 6"/>'
   };
   function svg(name) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (IC[name] || '') + '</svg>'; }
 
@@ -115,19 +159,15 @@
     { c:'audio', i:'🎵', hash:'#audio', he:'אודיו', en:'Audio', ru:'Аудио', items:[
       { he:'חותך אודיו', en:'Audio Cutter', ru:'Обрезка аудио', dhe:'חיתוך וקיצוץ MP3', den:'Trim & cut MP3', dru:'Обрезка и нарезка MP3', ic:'scissors', page:'./app.html' },
       { he:'המרת אודיו', en:'Convert Audio', ru:'Конвертация аудио', dhe:'MP3, WAV, FLAC ועוד', den:'MP3, WAV, FLAC…', dru:'MP3, WAV, FLAC…', ic:'refresh', page:'./convert.html' },
-      { he:'מיזוג אודיו', en:'Merge Audio', ru:'Объединение аудио', dhe:'איחוד רצועות לקובץ', den:'Join tracks into one', dru:'Склейка треков в один', ic:'merge', page:'./merge-audio.html' },
       { he:'עורך אודיו', en:'Audio Editor', ru:'Аудиоредактор', dhe:'עריכה חזותית עם גלי קול', den:'Visual waveform editor', dru:'Редактор с волновой формой', ic:'editwave', page:'./audio-editor.html' },
       { he:'מאסטרינג AI', en:'AI Mastering', ru:'AI-мастеринг', dhe:'מאסטרינג אוטומטי לשיר', den:'Auto-master your track', dru:'Автомастеринг трека', ic:'sparkle', page:'./ai-master.html' },
       { he:'ניקוי אודיו AI', en:'AI Audio Cleanup', ru:'AI-очистка аудио', dhe:'הסרת רעש ושיפור קול', den:'Remove noise, enhance voice', dru:'Убрать шум, улучшить голос', ic:'headphones', page:'./ai-audio-cleanup.html' }
     ]},
     { c:'image', i:'🖼️', hash:'#images', he:'תמונות', en:'Images', ru:'Изображения', items:[
       { he:'שינוי גודל', en:'Resize Image', ru:'Изменение размера', dhe:'שינוי מידות מהיר', den:'Change dimensions', dru:'Изменить размеры', ic:'maximize', page:'./resize-image.html' },
-      { he:'חיתוך תמונה', en:'Crop Image', ru:'Обрезка изображения', dhe:'חיתוך ויישור', den:'Crop & straighten', dru:'Обрезка и выравнивание', ic:'crop', page:'./crop-image.html' },
       { he:'סימן מים', en:'Watermark', ru:'Водяной знак', dhe:'טקסט או לוגו על התמונה', den:'Add text or a logo', dru:'Текст или логотип на фото', ic:'droplet', page:'./watermark.html' },
       { he:'חיתוך חכם AI', en:'AI Smart Crop', ru:'AI-умная обрезка', dhe:'AI ממקם את החיתוך על הנושא', den:'AI centers the crop', dru:'AI центрирует кадр', ic:'sparkle', page:'./ai-smart-crop.html' },
-      { he:'הסרת רקע', en:'Remove Background', ru:'Удаление фона', dhe:'הסרה בקליק אחד', den:'One-click cutout', dru:'Вырезка в один клик', ic:'sparkle', page:'./remove-bg.html' },
       { he:'שחזור תמונה AI', en:'AI Photo Restore', ru:'AI-восстановление фото', dhe:'שיפור תמונות ישנות', den:'Revive old photos', dru:'Оживите старые фото', ic:'sparkles', page:'./restore-image.html' },
-      { he:'HEIC ל-JPG', en:'HEIC to JPG', ru:'HEIC в JPG', dhe:'המרת תמונות אייפון', den:'Convert iPhone photos', dru:'Конвертация фото с iPhone', ic:'image', page:'./heic-to-jpg.html' },
       { he:'הסרת אובייקטים AI', en:'AI Object Remover', ru:'AI-удаление объектов', dhe:'מחקו כל דבר מהתמונה', den:'Erase anything from a photo', dru:'Сотрите что угодно с фото', ic:'wand', page:'./ai-object-remover.html' }
     ]},
     { c:'video', i:'🎬', hash:'#video', he:'וידאו', en:'Video', ru:'Видео', items:[
@@ -141,7 +181,7 @@
       { he:'מיזוג PDF', en:'Merge PDF', ru:'Объединить PDF', dhe:'איחוד קבצי PDF', den:'Combine PDFs', dru:'Склейка PDF-файлов', ic:'layers', page:'./merge-pdf.html' },
       { he:'PDF ל-JPG', en:'PDF to JPG', ru:'PDF в JPG', dhe:'המרת עמודים לתמונות', den:'Pages to images', dru:'Страницы в изображения', ic:'image', page:'./pdf-to-jpg.html' },
       { he:'DOC ל-PDF', en:'DOC to PDF', ru:'DOC в PDF', dhe:'המרת Word ל-PDF', den:'Word to PDF', dru:'Word в PDF', ic:'file', page:'./doc-to-pdf.html' },
-      { he:'סידור קבצים', en:'Organize Files', ru:'Упорядочить файлы', dhe:'מיון ושינוי שמות', den:'Sort & rename', dru:'Сортировка и переименование', ic:'folder', page:'./files.html' }
+      { he:'ארגון קבצים', en:'Organize Files', ru:'Упорядочить файлы', dhe:'מיון ושינוי שמות', den:'Sort & rename', dru:'Сортировка и переименование', ic:'folder', page:'./files.html' }
     ]},
     { c:'conv', i:'🔄', hash:'#converters', he:'ממירים', en:'Converters', ru:'Конвертеры', items:[
       { he:'ממיר אודיו', en:'Audio Converter', ru:'Аудиоконвертер', dhe:'כל פורמט אודיו', den:'Any audio format', dru:'Любой аудиоформат', ic:'headphones', page:'./convert.html' },
@@ -149,10 +189,6 @@
       { he:'ממיר תמונות', en:'Image Converter', ru:'Конвертер изображений', dhe:'PNG, JPG, WebP ועוד', den:'PNG, JPG, WebP…', dru:'PNG, JPG, WebP…', ic:'image', page:'./image-convert.html' },
       { he:'ממיר מסמכים', en:'Document Converter', ru:'Конвертер документов', dhe:'מסמכים וגיליונות', den:'Docs & sheets', dru:'Документы и таблицы', ic:'file', page:'./doc-convert.html' },
       { he:'ממיר ארכיונים', en:'Archive Converter', ru:'Конвертер архивов', dhe:'ZIP, GZIP ועוד', den:'ZIP, GZIP & more', dru:'ZIP, GZIP и другие', ic:'archive', page:'./archive-convert.html' },
-      { he:'ממיר גופנים', en:'Font Converter', ru:'Конвертер шрифтов', dhe:'TTF, OTF, WOFF', den:'TTF, OTF, WOFF', dru:'TTF, OTF, WOFF', ic:'file', page:'./font-convert.html' },
-      { he:'ממיר ספרים', en:'Ebook Converter', ru:'Конвертер эл. книг', dhe:'EPUB ל-PDF/HTML', den:'EPUB to PDF/HTML', dru:'EPUB в PDF/HTML', ic:'layers', page:'./ebook-convert.html' },
-      { he:'ממיר גיליונות', en:'Spreadsheet Converter', ru:'Конвертер таблиц', dhe:'XLSX, CSV, ODS', den:'XLSX, CSV, ODS', dru:'XLSX, CSV, ODS', ic:'file', page:'./spreadsheet-convert.html' },
-      { he:'ממיר מצגות', en:'Presentation Converter', ru:'Конвертер презентаций', dhe:'PPTX ל-PDF/HTML', den:'PPTX to PDF/HTML', dru:'PPTX в PDF/HTML', ic:'image', page:'./presentation-convert.html' }
     ]},
     { c:'comp', i:'📦', hash:'#compress', he:'דחיסה', en:'Compress', ru:'Сжатие', items:[
       { he:'דחיסת תמונה', en:'Compress Image', ru:'Сжать изображение', dhe:'תמונות קטנות יותר', den:'Smaller images', dru:'Уменьшить изображения', ic:'image', page:'./compress-image.html' },
@@ -190,6 +226,70 @@
     return '<div class="sh-mega-in">' + cols + '</div><div class="sh-mega-foot">' + foot + '</div>';
   }
 
+  // ============================================================
+  //  "Design & Dev Tools" mega-menu. A second #shDevMega element
+  //  reuses the .sh-mega styling; its columns group the 18 design/
+  //  developer utilities. Only tools with a real page link out; the
+  //  rest point at the /dev-tools/ hub until they ship.
+  // ============================================================
+  var DEVTOOLS = [
+    { c:'color', i:'🎨', he:'צבע', en:'Color', ru:'Цвет', items:[
+      { he:'ממיר צבעים', en:'Color Converter', ru:'Конвертер цвета', dhe:'HEX, RGB, HSL, CMYK', den:'HEX, RGB, HSL, CMYK', dru:'HEX, RGB, HSL, CMYK', ic:'swatch', page:'./color-convert.html' },
+      { he:'מחולל פלטת צבעים', en:'Palette Generator', ru:'Генератор палитр', dhe:'פלטה מצבע או מתמונה', den:'From a color or image', dru:'Из цвета или картинки', ic:'palette' },
+      { he:'בודק ניגודיות', en:'Contrast Checker', ru:'Проверка контраста', dhe:'קריאות טקסט על רקע', den:'Text vs. background', dru:'Текст на фоне', ic:'contrast' }
+    ]},
+    { c:'css', i:'🧩', he:'CSS', en:'CSS', ru:'CSS', items:[
+      { he:'מחולל Gradient', en:'Gradient Generator', ru:'Генератор градиентов', dhe:'גרדיאנט + קוד CSS', den:'Gradient + CSS code', dru:'Градиент + CSS', ic:'gradient' },
+      { he:'מחולל Box Shadow', en:'Box Shadow', ru:'Box Shadow', dhe:'צל + קוד CSS', den:'Shadow + CSS code', dru:'Тень + CSS', ic:'shadow' },
+      { he:'מחולל Border Radius', en:'Border Radius', ru:'Border Radius', dhe:'פינות מעוגלות + CSS', den:'Rounded corners + CSS', dru:'Скругление + CSS', ic:'radius' }
+    ]},
+    { c:'code', i:'⌨️', he:'קוד ונתונים', en:'Code & Data', ru:'Код и данные', items:[
+      { he:'תמונה ל-Base64', en:'Image to Base64', ru:'Изображение в Base64', dhe:'הטמעת תמונה בקוד', den:'Inline an image', dru:'Встроить картинку', ic:'image' },
+      { he:'כיווץ CSS / JS', en:'Minify CSS / JS', ru:'Минификация CSS/JS', dhe:'הקטנת קוד', den:'Shrink your code', dru:'Уменьшить код', ic:'minify' },
+      { he:'JSON Formatter', en:'JSON Formatter', ru:'JSON-форматтер', dhe:'סידור ובדיקת JSON', den:'Prettify & validate', dru:'Форматирование JSON', ic:'braces' },
+      { he:'URL Encoder / Decoder', en:'URL Encoder / Decoder', ru:'URL-кодировщик', dhe:'קידוד ופענוח כתובות', den:'Encode & decode URLs', dru:'Кодирование URL', ic:'link' },
+      { he:'היפוך טקסט', en:'KolKli Reverse', ru:'Обратный текст', dhe:'היפוך חכם עם פיסוק וסוגריים', den:'Smart reverse with punctuation', dru:'Умный переворот текста', ic:'flip', page:'./text-tools.html#reverse' },
+      { he:'מנקה HTML', en:'HTML Cleaner', ru:'Очистка HTML', dhe:'הסרת תגיות מיותרות', den:'Strip junk tags', dru:'Убрать лишние теги', ic:'eraser' }
+    ]},
+    { c:'seo', i:'🔎', he:'SEO ו-Meta', en:'SEO & Meta', ru:'SEO и Meta', items:[
+      { he:'מחולל Meta Tags', en:'Meta Tags Generator', ru:'Генератор Meta-тегов', dhe:'Title, OG ו-SEO', den:'Title, OG & SEO', dru:'Title, OG и SEO', ic:'tags' },
+      { he:'בודק אורך Meta', en:'Meta Length Checker', ru:'Длина Meta', dhe:'Title ו-Description', den:'Title & description', dru:'Title и Description', ic:'text' },
+      { he:'מחולל Favicon', en:'Favicon Generator', ru:'Генератор Favicon', dhe:'אייקון מלוגו או תמונה', den:'Icon from a logo', dru:'Иконка из логотипа', ic:'star' },
+      { he:'מחולל קוד Embed', en:'Embed Code', ru:'Код встраивания', dhe:'סרטון, מפה או טופס', den:'Video, map or form', dru:'Видео, карта, форма', ic:'code' }
+    ]},
+    { c:'layout', i:'📐', he:'מסך ומידות', en:'Layout & Units', ru:'Экран и размеры', items:[
+      { he:'ממיר מידות מסך', en:'Screen Units', ru:'Единицы экрана', dhe:'PX ל-REM, EM, VW, VH', den:'PX to REM, EM, VW, VH', dru:'PX в REM, EM, VW, VH', ic:'ruler' },
+      { he:'מחשבון יחס תמונה', en:'Aspect Ratio', ru:'Соотношение сторон', dhe:'16:9, 1:1, 4:5, 9:16', den:'16:9, 1:1, 4:5, 9:16', dru:'16:9, 1:1, 4:5, 9:16', ic:'ratio' },
+      { he:'מחולל Placeholder', en:'Placeholder Generator', ru:'Генератор заглушок', dhe:'תמונת דמה עם מידות', den:'Dummy image with size', dru:'Заглушка с размерами', ic:'crop' }
+    ]}
+  ];
+
+  var DEV_FOOT = {
+    he: ['חדש', 'כלים חינמיים למעצבים ולמפתחים — הכול בדפדפן', 'לכל כלי העיצוב ←'],
+    en: ['NEW', 'Free tools for designers & developers — all in-browser', 'All design tools →'],
+    ru: ['НОВОЕ', 'Бесплатные инструменты для дизайнеров и разработчиков', 'Все инструменты →']
+  };
+
+  function devMegaHtml(lang) {
+    var hub = link('dev-tools/');
+    var cols = DEVTOOLS.map(function (c) {
+      var items = c.items.map(function (t) {
+        var itemHref = t.page ? link(t.page.replace(/^\.\//, '')) : hub;
+        return '<a class="sh-item" href="' + itemHref + '" role="menuitem">' +
+          '<span class="it-ic">' + svg(t.ic) + '</span>' +
+          '<span class="it-tx"><span class="it-t">' + t[lang] + '</span>' +
+          '<span class="it-d">' + t['d' + lang] + '</span></span></a>';
+      }).join('');
+      return '<div class="sh-col c-' + c.c + '">' +
+        '<a class="sh-col-h" href="' + hub + '"><span class="sh-col-i">' + c.i + '</span>' + c[lang] + '</a>' +
+        items + '</div>';
+    }).join('');
+    var f = DEV_FOOT[lang] || DEV_FOOT.en;
+    var foot = '<span class="sh-foot-t"><span class="sh-foot-badge">' + f[0] + '</span> ' + f[1] + '</span>' +
+      '<a class="sh-foot-cta" href="' + hub + '">' + f[2] + '</a>';
+    return '<div class="sh-mega-in sh-mega-in-dev">' + cols + '</div><div class="sh-mega-foot">' + foot + '</div>';
+  }
+
   // Rows of the Products dropdown: colored icon tile + name + one-line description,
   // each linking to its dedicated product page.
   function productsHtml(lang) {
@@ -207,6 +307,14 @@
       return '<div class="sh-drop" id="shDrop">' +
         '<button class="sh-tlink" id="shToolsBtn" type="button" aria-haspopup="true" aria-controls="shMega" aria-expanded="false">' +
           '<span data-k="navTools"></span>' + CHEV +
+        '</button>' +
+      '</div>';
+    }
+    if (l[0] === 'navDev') {
+      // "Design & Dev Tools" is a click-to-open mega-menu, like "Tools".
+      return '<div class="sh-drop sh-devdrop" id="shDevDrop">' +
+        '<button class="sh-tlink" id="shDevBtn" type="button" aria-haspopup="true" aria-controls="shDevMega" aria-expanded="false">' +
+          '<span data-k="navDev"></span>' + CHEV +
         '</button>' +
       '</div>';
     }
@@ -253,6 +361,7 @@
           '<button class="sh-pill sh-icon sh-menu" id="shMenuBtn" type="button" aria-label="Menu">☰</button>' +
         '</nav>' +
         '<div class="sh-mega" id="shMega" role="menu"></div>' +
+        '<div class="sh-mega" id="shDevMega" role="menu"></div>' +
       '</div>' +
       '<div class="sh-panel" id="shPanel"></div>' +
     '</header>';
@@ -292,13 +401,16 @@
               return '<a class="sh-panel-sub" href="' + link(p.page) + '">' + p[curLang()] + '</a>';
             }).join('');
         }
-        var h = (l[0] === 'navTools') ? homeHash('#popular') : link(l[1]);
+        var h = (l[0] === 'navTools') ? homeHash('#popular') : (l[0] === 'navDev') ? link('dev-tools/') : link(l[1]);
         return '<a href="' + h + '">' + d[l[0]] + '</a>';
       }).join('') +
       panelAuthHtml(d) + '</div>';
     // (re)build the Tools mega-menu in the current language
     var mega = mount.querySelector('#shMega');
     if (mega) mega.innerHTML = megaHtml(curLang());
+    // (re)build the Design & Dev mega-menu in the current language
+    var devmega = mount.querySelector('#shDevMega');
+    if (devmega) devmega.innerHTML = devMegaHtml(curLang());
     // (re)build the Products dropdown in the current language
     var prod = mount.querySelector('#shProdMenu');
     if (prod) prod.innerHTML = productsHtml(curLang());
@@ -342,13 +454,30 @@
     gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>',
     logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
     inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
-    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>'
+    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
+    check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+    globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/>'
   };
   function asvg(n) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (AIC[n] || '') + '</svg>'; }
 
   function avatarInner(u) {
     if (u.avatar) return '<img class="sh-avatar-img" src="' + esc(u.avatar) + '" alt="">';
     return esc((acctName(u) || '?').charAt(0).toUpperCase());
+  }
+
+  function acctLangHtml(d) {
+    var cur = curLang();
+    var opts = LANGS.map(function (L) {
+      return '<button class="sh-acct-langopt' + (L.code === cur ? ' active' : '') + '" type="button" data-acct-lang="' + L.code + '" lang="' + L.code + '" dir="' + L.dir + '">' +
+        '<span>' + L.name + '</span>' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>' +
+      '</button>';
+    }).join('');
+    return '<div class="sh-acct-langbox" role="group" aria-label="' + esc(d.acctLanguage) + '">' +
+      '<div class="sh-acct-langhead">' + asvg('globe') +
+        '<span>' + esc(d.acctLanguage) + '</span><b>' + esc(LNAME[cur]) + '</b></div>' +
+      '<div class="sh-acct-langopts">' + opts + '</div>' +
+    '</div>';
   }
 
   // Desktop account button + dropdown menu markup for a signed-in user.
@@ -374,7 +503,9 @@
         '<a class="sh-acct-item" role="menuitem" href="' + link('dashboard.html') + '">' + asvg('grid') + '<span>' + esc(d.acctDash) + '</span></a>' +
         '<a class="sh-acct-item" role="menuitem" href="' + link('files.html') + '">' + asvg('folder') + '<span>' + esc(d.acctFiles) + '</span></a>' +
         '<a class="sh-acct-item" role="menuitem" href="' + link('request.html') + '">' + asvg('inbox') + '<span>' + esc(d.acctRequest) + '</span></a>' +
+        '<a class="sh-acct-item" role="menuitem" href="' + link('review.html') + '">' + asvg('check') + '<span>' + esc(d.acctReview) + '</span></a>' +
         '<a class="sh-acct-item" role="menuitem" href="' + link('dashboard.html') + '#settings">' + asvg('gear') + '<span>' + esc(d.acctSettings) + '</span></a>' +
+        acctLangHtml(d) +
         '<div class="sh-acct-sep"></div>' +
         '<button class="sh-acct-item sh-acct-out" role="menuitem" type="button" id="shLogout">' + asvg('logout') + '<span>' + esc(d.acctLogout) + '</span></button>' +
       '</div>' +
@@ -389,6 +520,7 @@
       '<a href="' + link('dashboard.html') + '">' + esc(d.acctDash) + '</a>' +
       '<a href="' + link('files.html') + '">' + esc(d.acctFiles) + '</a>' +
       '<a href="' + link('request.html') + '">' + esc(d.acctRequest) + '</a>' +
+      '<a href="' + link('review.html') + '">' + esc(d.acctReview) + '</a>' +
       '<a href="' + link('dashboard.html') + '#settings">' + esc(d.acctSettings) + '</a>' +
       '<a href="#" data-sh-logout>' + esc(d.acctLogout) + '</a>';
   }
@@ -399,6 +531,7 @@
     if (!area) return;
     var d = T[curLang()];
     var u = currentUser();
+    mount.classList.toggle('sh-signed-in', !!u);
     if (u) {
       area.innerHTML = acctMenuHtml(u, d);
       wireAcct();
@@ -422,6 +555,15 @@
     });
     var out = mount.querySelector('#shLogout');
     if (out) out.addEventListener('click', function (e) { e.preventDefault(); doLogout(); });
+    var menu = mount.querySelector('#shAcctMenu');
+    if (menu) menu.addEventListener('click', function (e) {
+      var lang = e.target.closest('[data-acct-lang]');
+      if (!lang) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setLang(lang.getAttribute('data-acct-lang'));
+      closeAcct();
+    });
   }
 
   function closeAcct() {
@@ -527,6 +669,12 @@
   // panels never overlap. Manipulates the DOM directly because each menu's own
   // close helper is scoped to its wiring block below.
   function closeAllMenus(except) {
+    if (except !== 'dev') {
+      var dd = mount.querySelector('#shDevDrop'), dmg = mount.querySelector('#shDevMega'), db = mount.querySelector('#shDevBtn');
+      if (dd) dd.classList.remove('open');
+      if (dmg) dmg.classList.remove('open');
+      if (db) db.setAttribute('aria-expanded', 'false');
+    }
     if (except !== 'tools') {
       var d = mount.querySelector('#shDrop'), mg = mount.querySelector('#shMega'), tb = mount.querySelector('#shToolsBtn');
       if (d) d.classList.remove('open');
@@ -566,6 +714,30 @@
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrop(); });
   }
 
+  // Design & Dev mega-menu (desktop): click to open, click-away / Esc to close.
+  var devDrop = mount.querySelector('#shDevDrop');
+  var devBtn = mount.querySelector('#shDevBtn');
+  var devMegaEl = mount.querySelector('#shDevMega');
+  if (devDrop && devBtn) {
+    var closeDev = function () {
+      devDrop.classList.remove('open');
+      if (devMegaEl) devMegaEl.classList.remove('open');
+      devBtn.setAttribute('aria-expanded', 'false');
+    };
+    devBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var open = devDrop.classList.toggle('open');
+      if (devMegaEl) devMegaEl.classList.toggle('open', open);
+      devBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) closeAllMenus('dev');
+    });
+    if (devMegaEl) devMegaEl.addEventListener('click', function (e) { if (e.target.closest('a')) closeDev(); });
+    document.addEventListener('click', function (e) {
+      if (!devDrop.contains(e.target) && (!devMegaEl || !devMegaEl.contains(e.target))) closeDev();
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDev(); });
+  }
+
   // Products dropdown (desktop): click to open, click-away / Esc to close.
   var prodDrop = mount.querySelector('#shProdDrop');
   var prodBtn = mount.querySelector('#shProdBtn');
@@ -595,6 +767,21 @@
   // (Every page sets html lang/dir/data-theme in its applyLang()/applyTheme().)
   new MutationObserver(function () { translate(); syncIcons(); renderAuthArea(); })
     .observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir', 'data-theme'] });
+
+  // Backend seam: load the Supabase config + auth adapter on EVERY page
+  // (including auth.html). auth-store.js restores the signed-in session and
+  // keeps ac_session / ac_users in sync so the header + dashboard just work.
+  // Order matters (config before adapter), so async=false preserves it; when
+  // no real credentials are set, auth-store.js is a light no-op fallback.
+  if (!document.getElementById('sb-loader')) {
+    ['supabase-config.js', 'auth-store.js'].forEach(function (f, i) {
+      var sb = document.createElement('script');
+      if (i === 0) sb.id = 'sb-loader';
+      sb.src = link(f);
+      sb.async = false;                          // keep execution order
+      document.head.appendChild(sb);
+    });
+  }
 
   // Floating login / sign-up popup: load it on every page except auth.html
   // (which IS the full-page version). Once loaded it intercepts clicks on any

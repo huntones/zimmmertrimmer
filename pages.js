@@ -23,7 +23,7 @@
       prKick:'מסלולים ומחירים', prTitle:'תמחור פשוט ושקוף', prSub:'מתחילים בחינם. משדרגים כשצריך יותר.',
       perMonth:'/לחודש', mostPopular:'הכי פופולרי',
       finalH:'מוכנים להתחיל?', finalP:'העלו את הקובץ הראשון — זה לוקח כמה שניות בלבד.', finalCta:'בואו נתחיל',
-      fHome:'בית', fPricing:'מסלולים ומחירים', fFaq:'שאלות נפוצות', fAI:'כלי AI', fSend:'שליחת קבצים',
+      fHome:'בית', fPricing:'מסלולים ומחירים', fFaq:'שאלות נפוצות', fAI:'כלי AI', fSend:'שליחת קבצים', fReview:'אישור לקוח',
       cp:'KOLKLI · העריכה רצה בדפדפן שלכם · הקבצים נשארים אצלכם.'
     },
     en: {
@@ -34,7 +34,7 @@
       prKick:'Pricing', prTitle:'Simple, transparent pricing', prSub:'Start free. Upgrade when you need more.',
       perMonth:'/mo', mostPopular:'Most Popular',
       finalH:'Ready to get started?', finalP:'Upload your first file — it takes just a few seconds.', finalCta:'Get started',
-      fHome:'Home', fPricing:'Pricing', fFaq:'FAQ', fAI:'AI Tools', fSend:'Send Files',
+      fHome:'Home', fPricing:'Pricing', fFaq:'FAQ', fAI:'AI Tools', fSend:'Send Files', fReview:'Client Review',
       cp:'KOLKLI · Editing runs in your browser · Your files stay with you.'
     },
     ru: {
@@ -45,7 +45,7 @@
       prKick:'Цены', prTitle:'Простые и прозрачные цены', prSub:'Начните бесплатно. Обновляйтесь, когда нужно больше.',
       perMonth:'/мес', mostPopular:'Самый популярный',
       finalH:'Готовы начать?', finalP:'Загрузите первый файл — это займёт всего несколько секунд.', finalCta:'Начать',
-      fHome:'Главная', fPricing:'Цены', fFaq:'FAQ', fAI:'AI-инструменты', fSend:'Отправка файлов',
+      fHome:'Главная', fPricing:'Цены', fFaq:'FAQ', fAI:'AI-инструменты', fSend:'Отправка файлов', fReview:'Одобрение клиента',
       cp:'KOLKLI · Редактирование в вашем браузере · Ваши файлы остаются у вас.'
     }
   };
@@ -70,7 +70,18 @@
     headphones:'<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>',
     sparkles:'<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/>',
     wand:'<path d="m3 21 9-9"/><path d="M15 4V2"/><path d="M15 16v-2"/><path d="M8 9h2"/><path d="M20 9h2"/><path d="M17.8 11.8 19 13"/><path d="M15 9h.01"/><path d="M17.8 6.2 19 5"/><path d="M12.2 6.2 11 5"/>',
-    droplet:'<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>'
+    droplet:'<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+    link2:'<path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/>',
+    qr:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><line x1="14" y1="14" x2="14" y2="17"/><line x1="18" y1="14" x2="21" y2="14"/><line x1="21" y1="17" x2="21" y2="21"/><line x1="14" y1="21" x2="18" y2="21"/>',
+    chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    type:'<polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>',
+    code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+    swatch:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+    palette:'<circle cx="13.5" cy="6.5" r="1.2"/><circle cx="17" cy="10" r="1.2"/><circle cx="8" cy="6" r="1.2"/><circle cx="6" cy="11" r="1.2"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10a2 2 0 0 0 2-2c0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2a1.5 1.5 0 0 1 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4.5-8-10-8z"/>',
+    contrast:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z"/>',
+    gradient:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m21 5-16 16"/><path d="m21 11-10 10"/><path d="m21 17-4 4"/>',
+    braces:'<path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1"/><path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1"/>',
+    tags:'<path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1"/>'
   };
   function svg(name) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (IC[name] || '') + '</svg>'; }
   var CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
@@ -78,6 +89,38 @@
 
   /* ---------- category data (featured cards from header.js TOOLS, all-tools chips from index DATA.hubs) ---------- */
   var CATS = {
+    dev: { i:'🎨', cta:{ href:'../color-convert.html', he:'פתחו את ממיר הצבעים', en:'Open Color Converter', ru:'Открыть конвертер цвета' },
+      he:['כלי עיצוב ופיתוח','ממירים, מחוללים ובודקים לצבע, CSS, קוד ו-SEO — הכול בדפדפן.'],
+      en:['Design & Dev Tools','Converters, generators & checkers for color, CSS, code & SEO — all in your browser.'],
+      ru:['Инструменты дизайна и кода','Конвертеры, генераторы и проверки для цвета, CSS, кода и SEO — прямо в браузере.'],
+      feat:[
+        {he:'ממיר צבעים',en:'Color Converter',ru:'Конвертер цвета',dhe:'HEX, RGB, HSL, CMYK',den:'HEX, RGB, HSL, CMYK',dru:'HEX, RGB, HSL, CMYK',ic:'swatch',page:'../color-convert.html'},
+        {he:'מחולל פלטת צבעים',en:'Palette Generator',ru:'Генератор палитр',dhe:'פלטה מצבע או מתמונה',den:'From a color or image',dru:'Из цвета или картинки',ic:'palette'},
+        {he:'בודק ניגודיות',en:'Contrast Checker',ru:'Проверка контраста',dhe:'קריאות טקסט על רקע',den:'Text vs. background',dru:'Текст на фоне',ic:'contrast'},
+        {he:'מחולל Gradient',en:'Gradient Generator',ru:'Генератор градиентов',dhe:'גרדיאנט + קוד CSS',den:'Gradient + CSS code',dru:'Градиент + CSS',ic:'gradient'},
+        {he:'JSON Formatter',en:'JSON Formatter',ru:'JSON-форматтер',dhe:'סידור ובדיקת JSON',den:'Prettify & validate',dru:'Форматирование JSON',ic:'braces'},
+        {he:'מחולל Meta Tags',en:'Meta Tags Generator',ru:'Генератор Meta-тегов',dhe:'Title, OG ו-SEO',den:'Title, OG & SEO',dru:'Title, OG и SEO',ic:'tags'}
+      ],
+      all:[
+        {he:'ממיר צבעים',en:'Color Converter',ru:'Конвертер цвета',s:'live',href:'../color-convert.html'},
+        {he:'פלטת צבעים',en:'Palette Generator',ru:'Генератор палитр',s:'soon'},
+        {he:'בודק ניגודיות',en:'Contrast Checker',ru:'Проверка контраста',s:'soon'},
+        {he:'מחולל Gradient',en:'CSS Gradient',ru:'Градиент',s:'soon'},
+        {he:'Box Shadow',en:'Box Shadow',ru:'Box Shadow',s:'soon'},
+        {he:'Border Radius',en:'Border Radius',ru:'Border Radius',s:'soon'},
+        {he:'תמונה ל-Base64',en:'Image to Base64',ru:'Изображение в Base64',s:'soon'},
+        {he:'כיווץ CSS/JS',en:'Minify CSS/JS',ru:'Минификация',s:'soon'},
+        {he:'JSON Formatter',en:'JSON Formatter',ru:'JSON-форматтер',s:'soon'},
+        {he:'URL Encoder/Decoder',en:'URL Encoder/Decoder',ru:'URL-кодировщик',s:'soon'},
+        {he:'מחולל Meta Tags',en:'Meta Tags',ru:'Meta-теги',s:'soon'},
+        {he:'בודק אורך Meta',en:'Meta Length',ru:'Длина Meta',s:'soon'},
+        {he:'מחולל Favicon',en:'Favicon',ru:'Favicon',s:'soon'},
+        {he:'מחולל Embed',en:'Embed Code',ru:'Код встраивания',s:'soon'},
+        {he:'ממיר מידות מסך',en:'Screen Units',ru:'Единицы экрана',s:'soon'},
+        {he:'יחס תמונה',en:'Aspect Ratio',ru:'Соотношение сторон',s:'soon'},
+        {he:'מחולל Placeholder',en:'Placeholder',ru:'Заглушка',s:'soon'},
+        {he:'מנקה HTML',en:'HTML Cleaner',ru:'Очистка HTML',s:'soon'}
+      ]},
     audio: { i:'🎵', cta:{ href:'../app.html', he:'פתחו את העורך', en:'Open the Editor', ru:'Открыть редактор' },
       he:['אודיו','חתכו, נרמלו, המירו ועשו מאסטרינג — הכול בדפדפן.'],
       en:['Audio','Cut, normalize, convert & master — all in your browser.'],
@@ -137,7 +180,7 @@
         {he:'יצירת שורטס',en:'Shorts Maker',ru:'Создание Shorts',s:'soon'},{he:'כתוביות AI',en:'AI Subtitle',ru:'AI-субтитры',s:'live',href:'../subtitle-generator.html'},{he:'שדרוג AI',en:'AI Upscale',ru:'AI-апскейл',s:'soon'}
       ]},
     documents: { i:'📄', cta:{ href:'../files.html', he:'לסידור הקבצים', en:'Organize Files', ru:'Упорядочить файлы' },
-      he:['מסמכים','כלי PDF, OCR וסידור קבצים.'],
+      he:['מסמכים','כלי PDF, OCR וארגון קבצים.'],
       en:['Documents','PDF tools, OCR and file organizing.'],
       ru:['Документы','Инструменты PDF, OCR и упорядочивание файлов.'],
       feat:[
@@ -145,14 +188,14 @@
         {he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF',dhe:'הקטנת נפח PDF',den:'Reduce PDF size',dru:'Уменьшить размер PDF',ic:'minimize',page:'../compress-pdf.html'},
         {he:'PDF ל-JPG',en:'PDF to JPG',ru:'PDF в JPG',dhe:'המרת עמודים לתמונות',den:'Pages to images',dru:'Страницы в изображения',ic:'image',page:'../pdf-to-jpg.html'},
         {he:'DOC ל-PDF',en:'DOC to PDF',ru:'DOC в PDF',dhe:'המרת Word ל-PDF',den:'Word to PDF',dru:'Word в PDF',ic:'file',page:'../doc-to-pdf.html'},
-        {he:'סידור קבצים',en:'Organize Files',ru:'Упорядочить файлы',dhe:'מיון ושינוי שמות',den:'Sort & rename',dru:'Сортировка и переименование',ic:'folder',page:'../files.html'}
+        {he:'ארגון קבצים',en:'Organize Files',ru:'Упорядочить файлы',dhe:'מיון ושינוי שמות',den:'Sort & rename',dru:'Сортировка и переименование',ic:'folder',page:'../files.html'}
       ],
       all:[
         {he:'מיזוג PDF',en:'Merge PDF',ru:'Объединить PDF',s:'live',href:'../merge-pdf.html'},{he:'פיצול PDF',en:'Split PDF',ru:'Разделить PDF',s:'soon'},
         {he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF',s:'live',href:'../compress-pdf.html'},{he:'PDF ל-JPG',en:'PDF to JPG',ru:'PDF в JPG',s:'live',href:'../pdf-to-jpg.html'},{he:'OCR',en:'OCR',ru:'OCR',s:'soon'},
         {he:'חתימת PDF',en:'Sign PDF',ru:'Подпись PDF',s:'soon'},{he:'הגנת PDF',en:'Protect PDF',ru:'Защита PDF',s:'soon'},
         {he:'DOC ל-PDF',en:'DOC to PDF',ru:'DOC в PDF',s:'live',href:'../doc-to-pdf.html'},{he:'PDF ל-Word',en:'PDF to Word',ru:'PDF в Word',s:'soon'},
-        {he:'סידור קבצים',en:'Organize',ru:'Упорядочить',s:'live',href:'../files.html'}
+        {he:'ארגון קבצים',en:'Organize',ru:'Упорядочить',s:'live',href:'../files.html'}
       ]},
     converters: { i:'🔄',
       he:['ממירים','המירו בין מאות פורמטים של קבצים.'],
@@ -184,6 +227,29 @@
         {he:'דחיסת וידאו',en:'Compress Video',ru:'Сжать видео',s:'live',href:'../compress-video.html'},{he:'דחיסת תמונה',en:'Compress Image',ru:'Сжать изображение',s:'live',href:'../compress-image.html'},
         {he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF',s:'live',href:'../compress-pdf.html'},{he:'דחיסת אודיו',en:'Compress Audio',ru:'Сжать аудио',s:'live',href:'../compress-audio.html'},
         {he:'דחיסת ZIP',en:'Compress ZIP',ru:'Сжать ZIP',s:'live',href:'../compress-zip.html'}
+      ]},
+    marketing: { i:'📣',
+      he:['שיווק וקישורים','בנו קישורים, קודי QR, קופי וקודי הטמעה — הכול בדפדפן.'],
+      en:['Marketing & Links','Build links, QR codes, copy and embed codes — all in your browser.'],
+      ru:['Маркетинг и ссылки','Создавайте ссылки, QR-коды, тексты и коды вставки — всё в браузере.'],
+      feat:[
+        {he:'בונה קישורי UTM',en:'UTM Builder',ru:'UTM-конструктор',dhe:'קישורים מסודרים לקמפיינים',den:'Tidy links for campaigns',dru:'Аккуратные ссылки для кампаний',ic:'link2',page:'../utm-builder.html'},
+        {he:'מחולל QR Code',en:'QR Code Generator',ru:'Генератор QR-кодов',dhe:'QR לקישור, וואטסאפ או קובץ',den:'QR for a link, WhatsApp or file',dru:'QR для ссылки, WhatsApp или файла',ic:'qr',page:'../qr-generator.html'},
+        {he:'קישור וואטסאפ',en:'WhatsApp Link',ru:'Ссылка WhatsApp',dhe:'קישור עם הודעה מוכנה',den:'A link with a ready message',dru:'Ссылка с готовым сообщением',ic:'chat',page:'../whatsapp-link.html'},
+        {he:'מחולל קופי קצר',en:'Copy Generator',ru:'Генератор текстов',dhe:'וריאציות לכותרות ומודעות',den:'Variations for headlines and ads',dru:'Варианты заголовков и объявлений',ic:'type',page:'../copy-generator.html'},
+        {he:'קוד הטמעה',en:'Embed Code',ru:'Код вставки',dhe:'iframe לסרטון, מפה או טופס',den:'iframe for a video, map or form',dru:'iframe для видео, карты или формы',ic:'code',page:'../embed-code.html'}
+      ],
+      all:[
+        {he:'בונה UTM',en:'UTM Builder',ru:'UTM-конструктор',s:'live',href:'../utm-builder.html'},
+        {he:'מחולל QR',en:'QR Code',ru:'QR-код',s:'live',href:'../qr-generator.html'},
+        {he:'קישור וואטסאפ',en:'WhatsApp Link',ru:'Ссылка WhatsApp',s:'live',href:'../whatsapp-link.html'},
+        {he:'קישור Mailto',en:'Mailto Link',ru:'Mailto-ссылка',s:'live',href:'../mailto-link.html'},
+        {he:'אורך מודעה',en:'Ad Length',ru:'Длина объявления',s:'live',href:'../ad-text-checker.html'},
+        {he:'מחולל CTA',en:'CTA Generator',ru:'CTA-генератор',s:'live',href:'../cta-generator.html'},
+        {he:'מחולל קופי',en:'Copy Generator',ru:'Генератор текстов',s:'live',href:'../copy-generator.html'},
+        {he:'תצוגת קישור',en:'Link Preview',ru:'Превью ссылки',s:'live',href:'../link-preview.html'},
+        {he:'קוד הטמעה',en:'Embed Code',ru:'Код вставки',s:'live',href:'../embed-code.html'},
+        {he:'מחולל Redirect',en:'Redirect',ru:'Редирект',s:'live',href:'../redirect-generator.html'}
       ]}
   };
 
@@ -205,7 +271,12 @@
     {price:'$14.99', he:['Pro','לעבודה מקצועית'], en:['Pro','For professional work'], ru:['Pro','Для профессионалов'], cta:{he:'קחו Pro',en:'Get Pro',ru:'Выбрать Pro'}, feats:[
       {he:'שליחה עד 100GB בכל פעם',en:'Up to 100GB per transfer',ru:'До 100 ГБ за передачу'},{he:'1TB אחסון בענן',en:'1TB cloud storage',ru:'1 ТБ в облаке'},
       {he:'קבצים נשמרים 30 יום',en:'Files kept for 30 days',ru:'Файлы хранятся 30 дней'},{he:'כל הכלים + כלי AI',en:'All tools + AI tools',ru:'Все инструменты + AI'},
-      {he:'התראות הורדה',en:'Download notifications',ru:'Уведомления о скачивании'},{he:'תמיכה מהירה בעדיפות',en:'Priority support',ru:'Приоритетная поддержка'}]}
+      {he:'התראות הורדה',en:'Download notifications',ru:'Уведомления о скачивании'},{he:'תמיכה מהירה בעדיפות',en:'Priority support',ru:'Приоритетная поддержка'}]},
+    {price:'$39.99', he:['Business','לצוותים וארגונים'], en:['Business','For teams & orgs'], ru:['Business','Для команд и организаций'], cta:{he:'קחו Business',en:'Get Business',ru:'Выбрать Business'}, feats:[
+      {he:'5 מושבים כלולים (+$9 למושב)',en:'5 seats included (+$9/seat)',ru:'5 мест включено (+$9/место)'},{he:'5TB אחסון משותף',en:'5TB shared storage',ru:'5 ТБ общего хранилища'},
+      {he:'שליחה עד 200GB בכל פעם',en:'Up to 200GB per transfer',ru:'До 200 ГБ за передачу'},{he:'White-label ומיתוג מלא',en:'Full white-label branding',ru:'Полный white-label брендинг'},
+      {he:'ניהול צוות והרשאות',en:'Team management & roles',ru:'Управление командой и роли'},{he:'חיוב מרוכז',en:'Centralized billing',ru:'Единый счёт'},
+      {he:'כל הכלים + כלי AI',en:'All tools + AI tools',ru:'Все инструменты + AI'},{he:'תמיכה בעדיפות',en:'Priority support',ru:'Приоритетная поддержка'}]}
   ];
   var FAQ = [
     {he:['זה בחינם?','כן — כלי הליבה חינמיים ורצים בדפדפן שלכם. חבילות בתשלום מוסיפות שליחה גדולה יותר, אחסון ושיתוף.'],
@@ -223,9 +294,9 @@
     {he:['צריך חשבון?','לא כדי להתחיל. חשבון מוסיף היסטוריה, לינקים שמורים ושיתוף.'],
      en:['Do I need an account?','Not to start. An account adds history, saved links and sharing.'],
      ru:['Нужен ли аккаунт?','Не для начала работы. Аккаунт добавляет историю, сохранённые ссылки и общий доступ.']},
-    {he:['יש מגבלת גודל?','בחינם עד 2GB לשליחה; חבילות Lite ו-Pro מעלות את המגבלה.'],
-     en:['Is there a size limit?','Free is up to 2GB per transfer; Lite and Pro raise the limit.'],
-     ru:['Есть ли ограничение по размеру?','Бесплатно — до 2 ГБ за передачу; Lite и Pro увеличивают лимит.']}
+    {he:['יש מגבלת גודל?','בחינם עד 2GB לשליחה; חבילות Lite, Pro ו-Business מעלות את המגבלה.'],
+     en:['Is there a size limit?','Free is up to 2GB per transfer; Lite, Pro and Business raise the limit.'],
+     ru:['Есть ли ограничение по размеру?','Бесплатно — до 2 ГБ за передачу; Lite, Pro и Business увеличивают лимит.']}
   ];
 
   var lang = 'he';
@@ -251,8 +322,11 @@
     var name = p[L][0], tagline = p[L][1];
     var ribbon = p.pop ? '<span class="ribbon">' + S.mostPopular + '</span>' : '';
     var feats = p.feats.map(function (f) { return '<li>' + CHECK + f[L] + '</li>'; }).join('');
-    var btn = p.pop ? '<a class="cta" href="../auth.html">' + p.cta[L] + '</a>'
-                    : '<a class="ghost" href="../auth.html">' + p.cta[L] + '</a>';
+    // Free → sign-up; paid plans (Lite/Pro) → the checkout flow.
+    var slug = (p.en[0] || '').toLowerCase();
+    var href = slug === 'free' ? '../auth.html?mode=signup' : '../checkout.html?plan=' + slug;
+    var btn = p.pop ? '<a class="cta" href="' + href + '">' + p.cta[L] + '</a>'
+                    : '<a class="ghost" href="' + href + '">' + p.cta[L] + '</a>';
     return '<div class="plan ' + (p.pop ? 'pop' : '') + '">' + ribbon +
       '<h3>' + name + '</h3><div class="price">' + p.price + '<span>' + S.perMonth + '</span></div>' +
       '<p class="tagline">' + tagline + '</p><ul>' + feats + '</ul>' + btn + '</div>';
@@ -272,6 +346,7 @@
         '<a href="../">' + S.fHome + '</a><a href="../pricing/">' + S.fPricing + '</a>' +
         '<a href="../faq/">' + S.fFaq + '</a><a href="../ai/">' + S.fAI + '</a>' +
         '<a href="../send.html">' + S.fSend + '</a>' +
+        '<a href="../review.html">' + S.fReview + '</a>' +
       '</div><div class="cp">' + S.cp + '</div></div></div></footer>';
   }
 
@@ -320,7 +395,8 @@
   var TITLES = {
     audio:{he:'אודיו',en:'Audio',ru:'Аудио'}, images:{he:'תמונות',en:'Images',ru:'Изображения'}, video:{he:'וידאו',en:'Video',ru:'Видео'},
     documents:{he:'מסמכים',en:'Documents',ru:'Документы'}, converters:{he:'ממירים',en:'Converters',ru:'Конвертеры'}, compress:{he:'דחיסה',en:'Compress',ru:'Сжатие'},
-    ai:{he:'כלי AI',en:'AI Tools',ru:'AI-инструменты'}, faq:{he:'שאלות נפוצות',en:'FAQ',ru:'FAQ'}, pricing:{he:'מסלולים ומחירים',en:'Pricing',ru:'Цены'}
+    dev:{he:'כלי עיצוב ופיתוח',en:'Design & Dev Tools',ru:'Инструменты дизайна'},
+    ai:{he:'כלי AI',en:'AI Tools',ru:'AI-инструменты'}, faq:{he:'שאלות נפוצות',en:'FAQ',ru:'FAQ'}, pricing:{he:'מסלולים ומחירים',en:'Pricing',ru:'Цены'}, marketing:{he:'שיווק וקישורים',en:'Marketing & Links',ru:'Маркетинг и ссылки'}
   };
 
   function render() {

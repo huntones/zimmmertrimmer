@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — ממיר יחידות</title>
+<meta name="description" content="Convert units of length, weight, volume, temperature, area, speed, data and time. Live results and a full reference table, right in your browser.">
+<link rel="stylesheet" href="./calc.css">
+<link rel="stylesheet" href="./header.css">
+<style>
+  .convrow{display:grid;grid-template-columns:1fr 46px 1fr;gap:12px;align-items:end;}
+  @media (max-width:560px){ .convrow{grid-template-columns:1fr;} .convrow .swapwrap{justify-self:center;transform:rotate(90deg);} }
+  .swapwrap{display:flex;align-items:center;justify-content:center;padding-bottom:6px;}
+  .swap{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);color:var(--accent-dim);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .swap:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .swap svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="title"></h1>
+    <p data-i18n="sub"></p>
+  </div>
+
+  <div class="card" style="max-width:720px;margin:0 auto">
+    <div class="segtabs" id="cats"></div>
+
+    <div class="convrow">
+      <div class="field" style="margin:0">
+        <label data-i18n="fromLbl"></label>
+        <input class="inp mono" id="fromVal" type="number" value="1">
+        <select class="inp" id="fromU" style="margin-top:10px"></select>
+      </div>
+      <div class="swapwrap">
+        <button class="swap" id="swapBtn" title="swap"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
+      </div>
+      <div class="field" style="margin:0">
+        <label data-i18n="toLbl"></label>
+        <input class="inp mono" id="toVal" readonly>
+        <select class="inp" id="toU" style="margin-top:10px"></select>
+      </div>
+    </div>
+
+    <div class="result compact" style="margin-top:18px">
+      <div class="rbig" id="rBig">—</div>
+      <div class="rsub" id="rSub"></div>
+    </div>
+  </div>
+
+  <div class="card" style="max-width:720px;margin:18px auto 0">
+    <h2 data-i18n="tableTitle"></h2>
+    <p class="csub" id="tableSub"></p>
+    <table class="simple-table"><tbody id="tableBody"></tbody></table>
+  </div>
+
+  <footer class="pgfoot" data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./calc.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'חישובים והמרות · יחידות',
+      title:'ממיר יחידות',
+      sub:'המירו בין יחידות של אורך, משקל, נפח, טמפרטורה, שטח, מהירות, נתונים וזמן — התוצאה מתעדכנת מיד.',
+      fromLbl:'מ־', toLbl:'ל־', tableTitle:'טבלת המרה',
+      tableSubTpl:v=>`הערך ${v} בכל היחידות של הקטגוריה:`,
+      foot:'KOLKLI · ממיר יחידות · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'Calc & Convert · Units',
+      title:'Unit Converter',
+      sub:'Convert between units of length, weight, volume, temperature, area, speed, data and time — the result updates instantly.',
+      fromLbl:'From', toLbl:'To', tableTitle:'Conversion table',
+      tableSubTpl:v=>`${v} in every unit of this category:`,
+      foot:'KOLKLI · Unit Converter · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'Расчёты · Единицы',
+      title:'Конвертер единиц',
+      sub:'Конвертируйте единицы длины, веса, объёма, температуры, площади, скорости, данных и времени — результат мгновенно.',
+      fromLbl:'Из', toLbl:'В', tableTitle:'Таблица пересчёта',
+      tableSubTpl:v=>`${v} во всех единицах категории:`,
+      foot:'KOLKLI · Конвертер единиц · Приватно и быстро, прямо в браузере' }
+  };
+
+  // factor `f` = base units per one of this unit. Temperature is special-cased.
+  const DATA = {
+    length:{ he:'אורך', en:'Length', ru:'Длина', units:[
+      {k:'mm', he:'מילימטר', en:'Millimeter', ru:'Миллиметр', s:'mm', f:0.001},
+      {k:'cm', he:'סנטימטר', en:'Centimeter', ru:'Сантиметр', s:'cm', f:0.01},
+      {k:'m', he:'מטר', en:'Meter', ru:'Метр', s:'m', f:1},
+      {k:'km', he:'קילומטר', en:'Kilometer', ru:'Километр', s:'km', f:1000},
+      {k:'in', he:'אינץ׳', en:'Inch', ru:'Дюйм', s:'in', f:0.0254},
+      {k:'ft', he:'רגל', en:'Foot', ru:'Фут', s:'ft', f:0.3048},
+      {k:'yd', he:'יארד', en:'Yard', ru:'Ярд', s:'yd', f:0.9144},
+      {k:'mi', he:'מייל', en:'Mile', ru:'Миля', s:'mi', f:1609.344}
+    ]},
+    mass:{ he:'משקל', en:'Weight', ru:'Вес', units:[
+      {k:'mg', he:'מיליגרם', en:'Milligram', ru:'Миллиграмм', s:'mg', f:0.001},
+      {k:'g', he:'גרם', en:'Gram', ru:'Грамм', s:'g', f:1},
+      {k:'kg', he:'קילוגרם', en:'Kilogram', ru:'Килограмм', s:'kg', f:1000},
+      {k:'t', he:'טון', en:'Tonne', ru:'Тонна', s:'t', f:1e6},
+      {k:'oz', he:'אונקיה', en:'Ounce', ru:'Унция', s:'oz', f:28.349523125},
+      {k:'lb', he:'ליברה', en:'Pound', ru:'Фунт', s:'lb', f:453.59237},
+      {k:'st', he:'סטון', en:'Stone', ru:'Стоун', s:'st', f:6350.29318}
+    ]},
+    volume:{ he:'נפח', en:'Volume', ru:'Объём', units:[
+      {k:'ml', he:'מיליליטר', en:'Milliliter', ru:'Миллилитр', s:'ml', f:0.001},
+      {k:'l', he:'ליטר', en:'Liter', ru:'Литр', s:'L', f:1},
+      {k:'m3', he:'מטר מעוקב', en:'Cubic meter', ru:'Кубометр', s:'m³', f:1000},
+      {k:'tsp', he:'כפית', en:'Teaspoon', ru:'Ч. ложка', s:'tsp', f:0.00492892},
+      {k:'tbsp', he:'כף', en:'Tablespoon', ru:'Ст. ложка', s:'tbsp', f:0.0147868},
+      {k:'cup', he:'כוס', en:'Cup', ru:'Чашка', s:'cup', f:0.24},
+      {k:'floz', he:'אונקיית נוזל', en:'Fluid ounce', ru:'Жидк. унция', s:'fl oz', f:0.0295735},
+      {k:'gal', he:'גלון', en:'Gallon (US)', ru:'Галлон (US)', s:'gal', f:3.785411784}
+    ]},
+    temp:{ he:'טמפרטורה', en:'Temperature', ru:'Температура', temp:true, units:[
+      {k:'C', he:'צלזיוס', en:'Celsius', ru:'Цельсий', s:'°C'},
+      {k:'F', he:'פרנהייט', en:'Fahrenheit', ru:'Фаренгейт', s:'°F'},
+      {k:'K', he:'קלווין', en:'Kelvin', ru:'Кельвин', s:'K'}
+    ]},
+    area:{ he:'שטח', en:'Area', ru:'Площадь', units:[
+      {k:'cm2', he:'סמ״ר', en:'Sq centimeter', ru:'Кв. сантиметр', s:'cm²', f:0.0001},
+      {k:'m2', he:'מ״ר', en:'Sq meter', ru:'Кв. метр', s:'m²', f:1},
+      {k:'ha', he:'הקטר', en:'Hectare', ru:'Гектар', s:'ha', f:10000},
+      {k:'km2', he:'קמ״ר', en:'Sq kilometer', ru:'Кв. километр', s:'km²', f:1e6},
+      {k:'ft2', he:'רגל מרובעת', en:'Sq foot', ru:'Кв. фут', s:'ft²', f:0.09290304},
+      {k:'ac', he:'אקר', en:'Acre', ru:'Акр', s:'ac', f:4046.8564224},
+      {k:'du', he:'דונם', en:'Dunam', ru:'Дунам', s:'du', f:1000}
+    ]},
+    speed:{ he:'מהירות', en:'Speed', ru:'Скорость', units:[
+      {k:'ms', he:'מטר/שנייה', en:'Meter/sec', ru:'Метр/сек', s:'m/s', f:1},
+      {k:'kmh', he:'קמ״ש', en:'Km/hour', ru:'Км/ч', s:'km/h', f:0.2777778},
+      {k:'mph', he:'מייל/שעה', en:'Miles/hour', ru:'Миль/ч', s:'mph', f:0.44704},
+      {k:'kn', he:'קשר', en:'Knot', ru:'Узел', s:'kn', f:0.5144444},
+      {k:'fts', he:'רגל/שנייה', en:'Feet/sec', ru:'Фут/сек', s:'ft/s', f:0.3048}
+    ]},
+    data:{ he:'נתונים', en:'Data', ru:'Данные', units:[
+      {k:'B', he:'בייט', en:'Byte', ru:'Байт', s:'B', f:1},
+      {k:'KB', he:'קילובייט', en:'Kilobyte', ru:'Килобайт', s:'KB', f:1000},
+      {k:'MB', he:'מגהבייט', en:'Megabyte', ru:'Мегабайт', s:'MB', f:1e6},
+      {k:'GB', he:'גיגהבייט', en:'Gigabyte', ru:'Гигабайт', s:'GB', f:1e9},
+      {k:'TB', he:'טרהבייט', en:'Terabyte', ru:'Терабайт', s:'TB', f:1e12},
+      {k:'KiB', he:'קיביבייט', en:'Kibibyte', ru:'Кибибайт', s:'KiB', f:1024},
+      {k:'MiB', he:'מביבייט', en:'Mebibyte', ru:'Мебибайт', s:'MiB', f:1048576},
+      {k:'GiB', he:'גיביבייט', en:'Gibibyte', ru:'Гибибайт', s:'GiB', f:1073741824}
+    ]},
+    time:{ he:'זמן', en:'Time', ru:'Время', units:[
+      {k:'ms', he:'מילישנייה', en:'Millisecond', ru:'Миллисекунда', s:'ms', f:0.001},
+      {k:'s', he:'שנייה', en:'Second', ru:'Секунда', s:'s', f:1},
+      {k:'min', he:'דקה', en:'Minute', ru:'Минута', s:'min', f:60},
+      {k:'h', he:'שעה', en:'Hour', ru:'Час', s:'h', f:3600},
+      {k:'day', he:'יום', en:'Day', ru:'День', s:'d', f:86400},
+      {k:'week', he:'שבוע', en:'Week', ru:'Неделя', s:'wk', f:604800}
+    ]}
+  };
+  const ORDER = ['length','mass','volume','temp','area','speed','data','time'];
+
+  let cat = 'length', fromK, toK;
+
+  function tempToC(v,k){ return k==='C'?v : k==='F'?(v-32)*5/9 : v-273.15; }
+  function tempFromC(c,k){ return k==='C'?c : k==='F'?c*9/5+32 : c+273.15; }
+  function convert(v, fromU, toU){
+    if(DATA[cat].temp) return tempFromC(tempToC(v, fromU.k), toU.k);
+    return v * fromU.f / toU.f;
+  }
+  function fmtNum(n){
+    if(!isFinite(n)) return '—';
+    if(n===0) return '0';
+    const p = parseFloat(n.toPrecision(7));
+    return p.toLocaleString(undefined,{maximumFractionDigits:8});
+  }
+  function unitLabel(u){ const l=APP.lang(); return u[l] + ' (' + u.s + ')'; }
+
+  function renderCats(){
+    el('cats').innerHTML = ORDER.map(k=>`<button class="seg ${k===cat?'on':''}" data-cat="${k}">${DATA[k][APP.lang()]}</button>`).join('');
+  }
+  function renderUnits(){
+    const units = DATA[cat].units;
+    if(!units.find(u=>u.k===fromK)) fromK = units[0].k;
+    if(!units.find(u=>u.k===toK)) toK = (units[1]||units[0]).k;
+    const opts = sel => units.map(u=>`<option value="${u.k}" ${u.k===sel?'selected':''}>${unitLabel(u)}</option>`).join('');
+    el('fromU').innerHTML = opts(fromK);
+    el('toU').innerHTML = opts(toK);
+  }
+  function compute(){
+    const units = DATA[cat].units;
+    const fromU = units.find(u=>u.k===fromK), toU = units.find(u=>u.k===toK);
+    if(!fromU||!toU) return;
+    const v = parseFloat(el('fromVal').value);
+    const val = isFinite(v) ? v : 0;
+    const res = convert(val, fromU, toU);
+    el('toVal').value = fmtNum(res);
+    el('rBig').textContent = fmtNum(res) + ' ' + toU.s;
+    el('rSub').textContent = `${fmtNum(val)} ${fromU.s} =`;
+    // reference table
+    el('tableBody').innerHTML = units.map(u=>{
+      const r = convert(val, fromU, u);
+      const active = u.k===toU.k ? ' style="color:var(--accent-dim);font-weight:700"' : '';
+      return `<tr><td>${u[APP.lang()]}</td><td class="mono" style="text-align:end"${active}>${fmtNum(r)} ${u.s}</td></tr>`;
+    }).join('');
+    const t = APP.t();
+    el('tableSub').textContent = t.tableSubTpl(`${fmtNum(val)} ${fromU.s}`);
+  }
+
+  el('cats').addEventListener('click', e=>{ const b=e.target.closest('[data-cat]'); if(!b) return; cat=b.getAttribute('data-cat'); renderCats(); renderUnits(); compute(); });
+  el('fromU').addEventListener('change', ()=>{ fromK=el('fromU').value; compute(); });
+  el('toU').addEventListener('change', ()=>{ toK=el('toU').value; compute(); });
+  el('fromVal').addEventListener('input', compute);
+  el('swapBtn').addEventListener('click', ()=>{
+    const tmp=fromK; fromK=toK; toK=tmp;
+    // move the numeric result into the input for a natural back-and-forth
+    const cur = parseFloat(el('toVal').value.replace(/[^\d.\-]/g,''));
+    if(isFinite(cur)) el('fromVal').value = cur;
+    renderUnits(); compute();
+  });
+
+  const APP = KolkliTool.init(I18N, function(){ renderCats(); renderUnits(); compute(); });
+  renderCats(); renderUnits(); compute();
+})();
+</script>
+</body>
+</html>

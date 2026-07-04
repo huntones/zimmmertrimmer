@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל שמות קבצים</title>
+<meta name="description" content="Build consistent file names from a fixed template — client, project, date and a running sequence number — with padding, casing and cleanup. Batch generate and copy.">
+<link rel="stylesheet" href="./calc.css">
+<link rel="stylesheet" href="./header.css">
+<style>
+  .tokens{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;}
+  .tokens button{border:1px solid var(--line);background:var(--panel-2);color:var(--accent-dim);border-radius:8px;
+    padding:5px 10px;font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer;transition:all .12s;}
+  .tokens button:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .preview{background:var(--panel-2);border:1px dashed var(--line);border-radius:12px;padding:14px 16px;font-family:var(--mono);
+    font-size:15px;font-weight:700;color:var(--ink);word-break:break-all;direction:ltr;text-align:start;min-height:20px;}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="title"></h1>
+    <p data-i18n="sub"></p>
+  </div>
+
+  <div class="cols wide">
+    <div class="col">
+      <div class="card">
+        <h2 data-i18n="tplTitle"></h2>
+        <p class="csub" data-i18n="tplSub"></p>
+        <div class="field">
+          <input class="inp mono" id="tpl" value="{client}-{project}-{date}-{seq}" style="direction:ltr">
+          <div class="tokens" id="tokens">
+            <button data-tok="{client}">{client}</button>
+            <button data-tok="{project}">{project}</button>
+            <button data-tok="{date}">{date}</button>
+            <button data-tok="{seq}">{seq}</button>
+            <button data-tok="{custom}">{custom}</button>
+          </div>
+        </div>
+
+        <div class="pair">
+          <div class="field"><label data-i18n="clientLbl"></label><input class="inp" id="client" value="Acme"></div>
+          <div class="field"><label data-i18n="projectLbl"></label><input class="inp" id="project" value="Website"></div>
+        </div>
+        <div class="field"><label data-i18n="customLbl"></label><input class="inp" id="custom" data-i18n-ph="customPh"></div>
+
+        <div class="divider"></div>
+        <label class="field" style="display:block"><span data-i18n="previewLbl" style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px"></span></label>
+        <div class="preview" id="preview">—</div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h2 data-i18n="optTitle"></h2>
+        <div class="pair">
+          <div class="field"><label data-i18n="dateLbl"></label><input class="inp" id="date" type="date"></div>
+          <div class="field"><label data-i18n="dateFmtLbl"></label>
+            <select class="inp" id="dateFmt">
+              <option value="YYYY-MM-DD">2026-07-04</option>
+              <option value="YYYYMMDD">20260704</option>
+              <option value="DD-MM-YYYY">04-07-2026</option>
+              <option value="DDMMYY">040726</option>
+              <option value="YYYY_MM">2026_07</option>
+            </select>
+          </div>
+        </div>
+        <div class="pair3">
+          <div class="field"><label data-i18n="startLbl"></label><input class="inp" id="start" type="number" value="1"></div>
+          <div class="field"><label data-i18n="digitsLbl"></label><input class="inp" id="digits" type="number" min="1" max="8" value="3"></div>
+          <div class="field"><label data-i18n="countLbl"></label><input class="inp" id="count" type="number" min="1" max="500" value="5"></div>
+        </div>
+        <div class="pair">
+          <div class="field"><label data-i18n="caseLbl"></label>
+            <select class="inp" id="case">
+              <option value="asis" data-i18n="caseAsis"></option>
+              <option value="lower" data-i18n="caseLower"></option>
+              <option value="upper" data-i18n="caseUpper"></option>
+              <option value="title" data-i18n="caseTitle"></option>
+            </select>
+          </div>
+          <div class="field"><label data-i18n="sepLbl"></label>
+            <select class="inp" id="sep">
+              <option value="-">dash -</option>
+              <option value="_">underscore _</option>
+              <option value=".">dot .</option>
+              <option value="">none</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label data-i18n="extLbl"></label><input class="inp mono" id="ext" placeholder=".jpg" style="direction:ltr"></div>
+        <label class="check"><input type="checkbox" id="clean" checked><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span data-i18n="cleanLbl"></span></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="rowflex" style="justify-content:space-between;margin-bottom:14px">
+      <h2 data-i18n="outTitle" style="margin:0"></h2>
+      <div class="btnrow" style="flex:0">
+        <button class="copy" id="copyBtn"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copyBtn"></span></button>
+      </div>
+    </div>
+    <textarea class="inp mono" id="out" rows="8" readonly spellcheck="false" style="direction:ltr"></textarea>
+  </div>
+
+  <footer class="pgfoot" data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="./calc.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'חישובים והמרות · שמות קבצים',
+      title:'מחולל שמות קבצים',
+      sub:'בנו שמות קבצים אחידים לפי תבנית קבועה — לקוח, פרויקט, תאריך ומספר רץ — עם ריפוד ספרות, אותיות ותקינה. ייצרו רשימה שלמה בבת אחת.',
+      tplTitle:'התבנית', tplSub:'הוסיפו שדות בעזרת הכפתורים למטה. הכול מתעדכן בתצוגה המקדימה.',
+      clientLbl:'לקוח', projectLbl:'פרויקט', customLbl:'טקסט חופשי', customPh:'למשל: final, draft, v2',
+      previewLbl:'תצוגה מקדימה',
+      optTitle:'הגדרות',
+      dateLbl:'תאריך', dateFmtLbl:'פורמט תאריך',
+      startLbl:'מתחיל מ־', digitsLbl:'ספרות', countLbl:'כמות',
+      caseLbl:'אותיות', caseAsis:'כמו שהוקלד', caseLower:'קטנות', caseUpper:'גדולות', caseTitle:'ראשיות',
+      sepLbl:'מפריד רווחים', extLbl:'סיומת (רשות)',
+      cleanLbl:'ניקוי תווים לא חוקיים בשם קובץ',
+      outTitle:'השמות שנוצרו', copyBtn:'העתקה',
+      foot:'KOLKLI · מחולל שמות קבצים · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הרשימה הועתקה ✓' },
+    en:{ dir:'ltr',
+      kick:'Calc & Convert · File names',
+      title:'File Name Generator',
+      sub:'Build consistent file names from a fixed template — client, project, date and a running number — with zero-padding, casing and cleanup. Generate the whole batch at once.',
+      tplTitle:'Template', tplSub:'Insert fields with the buttons below. Everything updates in the live preview.',
+      clientLbl:'Client', projectLbl:'Project', customLbl:'Custom text', customPh:'e.g. final, draft, v2',
+      previewLbl:'Live preview',
+      optTitle:'Options',
+      dateLbl:'Date', dateFmtLbl:'Date format',
+      startLbl:'Start at', digitsLbl:'Digits', countLbl:'Count',
+      caseLbl:'Case', caseAsis:'As typed', caseLower:'lowercase', caseUpper:'UPPERCASE', caseTitle:'Title Case',
+      sepLbl:'Space separator', extLbl:'Extension (optional)',
+      cleanLbl:'Clean characters illegal in file names',
+      outTitle:'Generated names', copyBtn:'Copy',
+      foot:'KOLKLI · File Name Generator · Private and fast, right in your browser',
+      copied:'List copied ✓' },
+    ru:{ dir:'ltr',
+      kick:'Расчёты · Имена файлов',
+      title:'Генератор имён файлов',
+      sub:'Создавайте единообразные имена файлов по фиксированному шаблону — клиент, проект, дата и порядковый номер — с ведущими нулями, регистром и очисткой. Весь пакет сразу.',
+      tplTitle:'Шаблон', tplSub:'Вставляйте поля кнопками ниже. Всё обновляется в предпросмотре.',
+      clientLbl:'Клиент', projectLbl:'Проект', customLbl:'Свой текст', customPh:'напр.: final, draft, v2',
+      previewLbl:'Предпросмотр',
+      optTitle:'Настройки',
+      dateLbl:'Дата', dateFmtLbl:'Формат даты',
+      startLbl:'Начать с', digitsLbl:'Цифр', countLbl:'Количество',
+      caseLbl:'Регистр', caseAsis:'Как введено', caseLower:'строчные', caseUpper:'ЗАГЛАВНЫЕ', caseTitle:'Каждое Слово',
+      sepLbl:'Замена пробелов', extLbl:'Расширение (необяз.)',
+      cleanLbl:'Очистить недопустимые в именах символы',
+      outTitle:'Готовые имена', copyBtn:'Копировать',
+      foot:'KOLKLI · Генератор имён файлов · Приватно и быстро, прямо в браузере',
+      copied:'Список скопирован ✓' }
+  };
+
+  function dateParts(){
+    const v = el('date').value;
+    let d;
+    if(v){ const [y,m,dd]=v.split('-').map(Number); d={y,m,dd}; }
+    else { const n=new Date(); d={y:n.getFullYear(), m:n.getMonth()+1, dd:n.getDate()}; }
+    return d;
+  }
+  function fmtDate(){
+    const {y,m,dd} = dateParts();
+    const p = n => String(n).padStart(2,'0');
+    switch(el('dateFmt').value){
+      case 'YYYYMMDD': return `${y}${p(m)}${p(dd)}`;
+      case 'DD-MM-YYYY': return `${p(dd)}-${p(m)}-${y}`;
+      case 'DDMMYY': return `${p(dd)}${p(m)}${String(y).slice(-2)}`;
+      case 'YYYY_MM': return `${y}_${p(m)}`;
+      default: return `${y}-${p(m)}-${p(dd)}`;
+    }
+  }
+  function applyCase(s){
+    switch(el('case').value){
+      case 'lower': return s.toLowerCase();
+      case 'upper': return s.toUpperCase();
+      case 'title': return s.replace(/\b\w/g, c=>c.toUpperCase());
+      default: return s;
+    }
+  }
+  function clean(s){
+    if(!el('clean').checked) return s;
+    const sep = el('sep').value;
+    return s.replace(/[<>:"/\\|?*\x00-\x1f]/g,'')     // illegal on Windows
+            .replace(/\s+/g, sep)                      // spaces -> separator
+            .replace(new RegExp('\\'+(sep||'-')+'{2,}','g'), sep||'-') // collapse repeats
+            .replace(/^[-_.]+|[-_.]+$/g,'');           // trim edge separators
+  }
+  function extStr(){
+    let e = el('ext').value.trim();
+    if(!e) return '';
+    if(!e.startsWith('.')) e = '.'+e;
+    return e;
+  }
+  function build(i){
+    const start = parseInt(el('start').value,10) || 0;
+    let digits = parseInt(el('digits').value,10); if(!(digits>=1)) digits=1;
+    const seq = String(start + i).padStart(digits,'0');
+    let name = el('tpl').value
+      .replace(/\{client\}/g, el('client').value)
+      .replace(/\{project\}/g, el('project').value)
+      .replace(/\{date\}/g, fmtDate())
+      .replace(/\{seq\}/g, seq)
+      .replace(/\{custom\}/g, el('custom').value);
+    name = clean(applyCase(name));
+    return name + extStr();
+  }
+  function preview(){ el('preview').textContent = build(0) || '—'; }
+  function generate(){
+    let n = parseInt(el('count').value,10); if(!(n>=1)) n=1; n=Math.min(500,n);
+    const out=[]; for(let i=0;i<n;i++) out.push(build(i));
+    el('out').value = out.join('\n');
+  }
+  function update(){ preview(); generate(); }
+
+  el('tokens').addEventListener('click', e=>{
+    const b=e.target.closest('[data-tok]'); if(!b) return;
+    const inp=el('tpl'); const tok=b.getAttribute('data-tok');
+    const start=inp.selectionStart ?? inp.value.length;
+    inp.value = inp.value.slice(0,start) + tok + inp.value.slice(inp.selectionEnd ?? start);
+    update();
+  });
+  document.querySelectorAll('.card input, .card select').forEach(i=>i.addEventListener('input', update));
+  el('copyBtn').addEventListener('click', ()=>{ if(el('out').value){ KolkliTool.copy(el('out').value, el('copyBtn')); KolkliTool.toast(APP.t().copied); } });
+
+  const APP = KolkliTool.init(I18N, ()=>{ /* date format sample stays language-neutral */ });
+  update();
+})();
+</script>
+</body>
+</html>

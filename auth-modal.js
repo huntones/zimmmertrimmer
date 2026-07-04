@@ -44,7 +44,10 @@
       errRequired: 'שדה חובה', errEmail: 'כתובת אימייל לא תקינה', errPassShort: 'הסיסמה חייבת לפחות 6 תווים',
       errMatch: 'הסיסמאות לא תואמות', errTaken: 'כבר קיים חשבון עם האימייל הזה', errNoUser: 'לא נמצא חשבון עם האימייל הזה',
       errWrongPass: 'סיסמה שגויה',
-      forgotMsg: 'איפוס סיסמה יעבוד כשנחבר את השרת. בינתיים אפשר ליצור חשבון חדש.'
+      forgotMsg: 'איפוס סיסמה יעבוד כשנחבר את השרת. בינתיים אפשר ליצור חשבון חדש.',
+      checkEmail: 'שלחנו לכם מייל אימות — אשרו אותו ואז התחברו.',
+      resetSent: 'שלחנו קישור לאיפוס סיסמה למייל שלכם.',
+      resetNeedEmail: 'הזינו קודם את כתובת האימייל.'
     },
     en: {
       dir: 'ltr',
@@ -67,7 +70,10 @@
       errRequired: 'Required field', errEmail: 'Invalid email address', errPassShort: 'Password must be at least 6 characters',
       errMatch: 'Passwords don’t match', errTaken: 'An account with this email already exists', errNoUser: 'No account found with this email',
       errWrongPass: 'Wrong password',
-      forgotMsg: 'Password reset will work once the server is connected. For now you can create a new account.'
+      forgotMsg: 'Password reset will work once the server is connected. For now you can create a new account.',
+      checkEmail: 'We sent you a confirmation email — confirm it, then sign in.',
+      resetSent: 'We emailed you a password-reset link.',
+      resetNeedEmail: 'Enter your email address first.'
     },
     ru: {
       dir: 'ltr',
@@ -90,7 +96,10 @@
       errRequired: 'Обязательное поле', errEmail: 'Неверный адрес почты', errPassShort: 'Пароль должен быть не менее 6 символов',
       errMatch: 'Пароли не совпадают', errTaken: 'Аккаунт с этой почтой уже существует', errNoUser: 'Аккаунт с этой почтой не найден',
       errWrongPass: 'Неверный пароль',
-      forgotMsg: 'Сброс пароля заработает после подключения сервера. Пока можно создать новый аккаунт.'
+      forgotMsg: 'Сброс пароля заработает после подключения сервера. Пока можно создать новый аккаунт.',
+      checkEmail: 'Мы отправили письмо для подтверждения — подтвердите и войдите.',
+      resetSent: 'Мы отправили ссылку для сброса пароля на вашу почту.',
+      resetNeedEmail: 'Сначала введите адрес электронной почты.'
     }
   };
 
@@ -364,25 +373,49 @@
     if (!ok) return;
 
     q('amSubmit').disabled = true;
-    Promise.resolve().then(function () {
-      if (mode === 'signup') {
-        if (findUser(email)) { setErr('amEmailField', 'amEmailErr', t.errTaken); return; }
+
+    // Backend seam: when Supabase is wired up (see supabase-config.js) go
+    // through the real server; otherwise fall back to the localStorage demo.
+    var work;
+    if (window.KolkliAuth && window.KolkliAuth.configured()) {
+      work = (mode === 'signup')
+        ? window.KolkliAuth.signUp({ name: name, email: email, password: pass }).then(function (r) {
+            if (r.ok) {
+              if (r.code === 'confirm') { showMsg(t.checkEmail, 'info'); return; }
+              showSigned(name, email); return;
+            }
+            if (r.code === 'taken') { setErr('amEmailField', 'amEmailErr', t.errTaken); return; }
+            if (r.code === 'weak') { setErr('amPassField', 'amPassErr', t.errPassShort); return; }
+            showMsg(r.message || t.errRequired, 'err');
+          })
+        : window.KolkliAuth.signIn({ email: email, password: pass }).then(function (r) {
+            if (r.ok) { var su = findUser(email); showSigned(su ? su.name : email.split('@')[0], email); return; }
+            if (r.code === 'confirm') { showMsg(t.checkEmail, 'info'); return; }
+            if (r.code === 'invalid') { setErr('amPassField', 'amPassErr', t.errWrongPass); return; }
+            showMsg(r.message || t.errRequired, 'err');
+          });
+    } else {
+      work = Promise.resolve().then(function () {
+        if (mode === 'signup') {
+          if (findUser(email)) { setErr('amEmailField', 'amEmailErr', t.errTaken); return; }
+          return hashPass(pass).then(function (h) {
+            var users = loadUsers();
+            users.push({ name: name, email: email, pass: h, role: 'user', plan: 'free', created: Date.now() });
+            saveUsers(users);
+            setSession(email);
+            showSigned(name, email);
+          });
+        }
+        var u = findUser(email);
+        if (!u) { setErr('amEmailField', 'amEmailErr', t.errNoUser); return; }
         return hashPass(pass).then(function (h) {
-          var users = loadUsers();
-          users.push({ name: name, email: email, pass: h, created: Date.now() });
-          saveUsers(users);
+          if (u.pass !== h) { setErr('amPassField', 'amPassErr', t.errWrongPass); return; }
           setSession(email);
-          showSigned(name, email);
+          showSigned(u.name, email);
         });
-      }
-      var u = findUser(email);
-      if (!u) { setErr('amEmailField', 'amEmailErr', t.errNoUser); return; }
-      return hashPass(pass).then(function (h) {
-        if (u.pass !== h) { setErr('amPassField', 'amPassErr', t.errWrongPass); return; }
-        setSession(email);
-        showSigned(u.name, email);
       });
-    }).finally(function () { q('amSubmit').disabled = false; });
+    }
+    work.finally(function () { q('amSubmit').disabled = false; });
   }
 
   // =====================================================
@@ -506,14 +539,28 @@
     q('amTabSignup').addEventListener('click', function () { setMode('signup'); });
     q('amSwitchLink').addEventListener('click', function () { setMode(mode === 'login' ? 'signup' : 'login'); });
     q('amForm').addEventListener('submit', onSubmit);
-    q('amForgot').addEventListener('click', function () { showMsg(t.forgotMsg, 'info'); });
+    q('amForgot').addEventListener('click', function () {
+      if (window.KolkliAuth && window.KolkliAuth.configured()) {
+        var em = q('amEmail').value.trim().toLowerCase();
+        if (!em || !EMAIL_RE.test(em)) { showMsg(t.resetNeedEmail, 'info'); return; }
+        window.KolkliAuth.resetPassword(em).then(function (r) {
+          showMsg(r.ok ? t.resetSent : (r.message || t.forgotMsg), r.ok ? 'info' : 'err');
+        });
+        return;
+      }
+      showMsg(t.forgotMsg, 'info');
+    });
     q('amEye').addEventListener('click', function () {
       var inp = q('amPass'), show = inp.type === 'password';
       inp.type = show ? 'text' : 'password';
       q('amEyeOpen').style.display = show ? 'none' : '';
       q('amEyeShut').style.display = show ? '' : 'none';
     });
-    q('amLogout').addEventListener('click', function () { clearSession(); setMode('login'); showForm(); q('amForm').reset(); });
+    q('amLogout').addEventListener('click', function () {
+      if (window.KolkliAuth && window.KolkliAuth.configured()) window.KolkliAuth.signOut();
+      else clearSession();
+      setMode('login'); showForm(); q('amForm').reset();
+    });
     q('amClose').addEventListener('click', close);
     overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
 

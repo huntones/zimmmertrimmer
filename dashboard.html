@@ -114,6 +114,22 @@
   .project-nav.active{background:var(--accent-soft);color:var(--accent-dim);}
   .project-nav .pn-dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.65;flex-shrink:0;}
   .project-nav .pn-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  /* Editable nav-item labels (pencil + inline save) */
+  .subitem .lbl-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .subitem .lbl-btn{width:26px;height:26px;flex-shrink:0;border:none;background:none;border-radius:8px;color:inherit;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.5;
+    transition:opacity .12s,background .12s,color .12s;}
+  .subitem .lbl-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  /* rename pencil stays hidden until you hover (or keyboard-focus) its row — keeps the sidebar uncluttered */
+  .subitem .lbl-btn.edit{opacity:0;pointer-events:none;}
+  .subitem:hover .lbl-btn.edit,.subitem:focus-within .lbl-btn.edit{opacity:.85;pointer-events:auto;}
+  .subitem .lbl-btn.edit:hover{opacity:1;}
+  .subitem .lbl-btn:hover{background:var(--accent-soft);color:var(--accent-dim);opacity:1;}
+  .subitem .lbl-btn.save{color:var(--accent-dim);opacity:1;}
+  .subitem.editing{cursor:default;background:var(--panel-2);color:var(--ink-2);border-color:var(--line);}
+  .subitem.editing:hover{background:var(--panel-2);}
+  .subitem .lbl-input{flex:1;min-width:0;border:none;background:none;outline:none;color:var(--ink);
+    font-family:var(--sans);font-size:13.5px;font-weight:600;padding:0;}
 
   /* plan chip pinned at the bottom of the sidebar */
   .side-plan{margin-top:8px;border-top:1px solid var(--line);padding-top:12px;}
@@ -185,6 +201,7 @@
   .plan-badge.free{color:var(--muted);background:var(--panel);border:1px solid var(--line);}
   .plan-badge.lite{color:var(--info-dim);background:var(--info-soft);border:1px solid var(--info);}
   .plan-badge.pro{color:#fff;background:var(--grad);border:1px solid transparent;box-shadow:0 4px 12px var(--grad-shadow);}
+  .plan-badge.business{color:#fff;background:linear-gradient(135deg,#1f2937,#4338ca);border:1px solid transparent;box-shadow:0 4px 12px rgba(67,56,202,.35);}
   .sc-price{font-size:14px;color:var(--muted);margin-top:10px;}
   .sc-price b{font-size:22px;color:var(--ink);font-weight:800;}
   .sc-actions{display:flex;flex-direction:column;gap:10px;align-items:stretch;}
@@ -282,6 +299,42 @@
   .danger-zone{border-color:var(--danger);}
   .danger-zone > h2{color:var(--danger);}
 
+  /* ---------- team / organization ---------- */
+  .team-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
+  .team-head h2{margin:0;}
+  .team-head .csub{margin:4px 0 0;}
+  .team-meta{text-align:end;}
+  .team-meta .opt-t{font-size:14px;font-weight:700;}
+  .team-meta .opt-d{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .tm-row{gap:12px;}
+  .tm-row .opt-t,.tm-row .opt-d{display:block;}
+  .tm-row .opt-t .tm-you{display:inline;margin-inline-start:5px;}
+  .tm-id{display:flex;align-items:center;gap:11px;}
+  .tm-av{width:36px;height:36px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);color:#fff;font-size:15px;font-weight:700;box-shadow:0 3px 9px var(--grad-shadow);}
+  .tm-you{font-size:11px;color:var(--muted);font-weight:600;}
+  .tm-ctrl{display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .tm-role{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:9px;font-family:var(--sans);
+    font-size:13px;font-weight:600;padding:8px 10px;cursor:pointer;}
+  .tm-badge{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;}
+  .tm-badge.owner{color:var(--accent-dim);background:var(--accent-soft);border-color:transparent;}
+  .tm-badge svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .btn.tm-rm{padding:8px 10px;}
+  .btn.tm-rm svg{margin:0;}
+  .tm-invite{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .tm-invite input[type="email"]{flex:1;min-width:200px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
+    border-radius:10px;font-family:var(--sans);font-size:14px;padding:11px 13px;}
+  .tm-invite input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .tm-invite select{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:14px;font-weight:600;padding:11px 12px;cursor:pointer;}
+  .tm-err{font-size:12.5px;color:var(--danger);margin-top:6px;min-height:1px;}
+  .tm-link{margin-top:12px;}
+  .tm-linkrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .tm-linkrow input{flex:1;min-width:220px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
+    border-radius:9px;font-family:var(--mono);font-size:12.5px;padding:10px 12px;}
+  .team-head + .card{margin-top:0;}
+
   /* ---------- payments ---------- */
   .payrow{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
   .pm-empty{display:flex;align-items:center;gap:12px;background:var(--panel-2);border:1px dashed var(--line);border-radius:12px;padding:16px;}
@@ -367,6 +420,101 @@
     .project-actions{align-items:stretch;justify-content:stretch;}
     .project-actions .btn,.project-status{width:100%;}
   }
+
+  /* ===== KOLKLI Request inbox (my-requests) — its own look, inspired not copied ===== */
+  .ri-card{padding:20px 22px 22px;}
+  .ri-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
+  .ri-head h2{font-size:17px;font-weight:700;margin:0 0 4px;letter-spacing:-0.01em;}
+  .ri-head .csub{font-size:13px;color:var(--muted);margin:0;}
+  .ri-newbtn{white-space:nowrap;}
+  .ri-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  .ri-search{position:relative;flex:1;min-width:180px;}
+  .ri-search svg{position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--faint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;}
+  .ri-search input{width:100%;height:40px;padding:0 14px;padding-inline-start:36px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);color:var(--ink);font-family:var(--sans);font-size:13.5px;outline:none;transition:border-color .12s;}
+  .ri-search input:focus{border-color:var(--accent);}
+  .ri-sort{height:40px;padding:0 12px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);color:var(--ink-2);font-family:var(--sans);font-size:13px;cursor:pointer;}
+  .ri-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .ri-chip{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--muted);font-family:var(--sans);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .12s;}
+  .ri-chip:hover{border-color:var(--accent);color:var(--ink-2);}
+  .ri-chip.on{background:var(--accent-soft);border-color:transparent;color:var(--accent-dim);}
+  .ri-chip .n{font-family:var(--mono);font-size:11px;background:var(--panel-2);border-radius:999px;padding:1px 7px;color:var(--muted);}
+  .ri-chip.on .n{background:var(--panel);color:var(--accent-dim);}
+  .ri-body{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start;}
+  .ri-list{display:flex;flex-direction:column;gap:10px;min-width:0;}
+  .ri-row{position:relative;display:flex;align-items:flex-start;gap:13px;padding:14px 15px;border:1px solid var(--line);border-radius:14px;background:var(--panel);cursor:pointer;transition:border-color .12s,box-shadow .12s;box-shadow:var(--shadow-sm);}
+  .ri-row:hover{border-color:var(--accent);}
+  .ri-row.on{border-color:transparent;box-shadow:0 0 0 1.6px var(--accent),var(--shadow);}
+  .ri-mark{flex-shrink:0;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:var(--grad-soft);color:var(--accent-dim);}
+  .ri-mark svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .ri-rmain{flex:1;min-width:0;}
+  .ri-rtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .ri-name{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  .ri-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:5px;}
+  .ri-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--faint);flex-shrink:0;}
+  .ri-meta b{color:var(--ink-2);font-weight:600;}
+  .ri-badge{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:0.01em;}
+  .ri-badge.active{background:var(--success-soft);color:var(--success-dim);}
+  .ri-badge.expired{background:var(--danger-soft);color:var(--danger);}
+  .ri-badge.closed{background:var(--panel-2);color:var(--faint);border:1px solid var(--line);}
+  .ri-exp{font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:4px;}
+  .ri-exp svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .ri-unseen{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--grad);color:#fff;box-shadow:0 2px 8px var(--grad-shadow);}
+  .ri-kebab{flex-shrink:0;width:32px;height:32px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .12s;}
+  .ri-kebab:hover{background:var(--panel-2);border-color:var(--line);color:var(--ink-2);}
+  .ri-kebab svg{width:18px;height:18px;}
+  .ri-kebab svg circle{fill:currentColor;stroke:none;}
+  .ri-menu{position:absolute;top:48px;inset-inline-end:12px;z-index:30;min-width:186px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);padding:6px;display:none;}
+  .ri-menu.open{display:block;}
+  .ri-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:9px 11px;border:none;border-radius:8px;background:transparent;color:var(--ink-2);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;text-align:start;transition:background .12s;}
+  .ri-menu button:hover{background:var(--panel-2);}
+  .ri-menu button.danger{color:var(--danger);}
+  .ri-menu button svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .ri-menu .sep{height:1px;background:var(--line-2);margin:5px 4px;}
+  .ri-detail{position:sticky;top:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel-2);padding:18px;min-height:220px;}
+  .ri-dempty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:44px 16px;color:var(--faint);}
+  .ri-dempty svg{width:34px;height:34px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+  .ri-dempty p{margin:0;font-size:13px;max-width:230px;}
+  .ri-dhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+  .ri-dhead h3{font-size:16px;font-weight:700;margin:0 0 7px;letter-spacing:-0.01em;word-break:break-word;}
+  .ri-dhead .btn{white-space:nowrap;}
+  .ri-dstats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .ri-stat{flex:1;min-width:74px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 11px;}
+  .ri-stat .v{font-size:16px;font-weight:700;color:var(--ink);font-family:var(--mono);}
+  .ri-stat .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+  .ri-dlink{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:8px 10px;margin-bottom:14px;}
+  .ri-dlink .lk{flex:1;min-width:0;font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:start;}
+  .ri-dlink button{flex-shrink:0;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .12s;}
+  .ri-dlink button:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .ri-dlink button svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .ri-sub{border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-bottom:10px;overflow:hidden;}
+  .ri-sub-h{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-bottom:1px solid var(--line-2);}
+  .ri-ava{flex-shrink:0;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--grad);color:#fff;font-weight:700;font-size:13px;}
+  .ri-sub-id{min-width:0;flex:1;}
+  .ri-sub-name{font-size:13px;font-weight:700;color:var(--ink);word-break:break-word;}
+  .ri-sub-when{font-size:11px;color:var(--faint);margin-top:1px;}
+  .ri-sub-contact{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+  .ri-cchip{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);background:var(--panel-2);border:1px solid var(--line-2);border-radius:999px;padding:2px 8px;direction:ltr;}
+  .ri-cchip svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .ri-note{font-size:12px;color:var(--ink-2);background:var(--panel-2);border:1px solid var(--line-2);border-radius:8px;padding:7px 9px;margin:8px 12px 0;white-space:pre-wrap;word-break:break-word;}
+  .ri-files{padding:6px;}
+  .ri-frow{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:9px;transition:background .12s;}
+  .ri-frow:hover{background:var(--panel-2);}
+  .ri-fico{flex-shrink:0;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--panel-2);color:var(--muted);}
+  .ri-fico svg{width:16px;height:16px;}
+  .ri-fico.image{color:var(--info-dim);}.ri-fico.video{color:#c026d3;}.ri-fico.audio{color:var(--accent-dim);}.ri-fico.doc{color:var(--muted);}
+  .ri-fn{flex:1;min-width:0;}
+  .ri-fn .nm{font-size:12.5px;font-weight:600;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ri-fn .sz{font-size:11px;color:var(--faint);margin-top:1px;}
+  .ri-fdl{flex-shrink:0;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .12s;}
+  .ri-fdl:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .ri-fdl svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .ri-noresults{text-align:center;color:var(--faint);font-size:13px;padding:30px 10px;}
+  .ri-toast{position:fixed;bottom:24px;inset-inline:0;margin-inline:auto;width:max-content;max-width:90vw;background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:10px 18px;border-radius:999px;box-shadow:var(--shadow-lg);z-index:9999;opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s;pointer-events:none;}
+  .ri-toast.show{opacity:1;transform:translateY(0);}
+  @media(max-width:860px){
+    .ri-body{grid-template-columns:1fr;}
+    .ri-detail{position:static;}
+  }
 </style>
 <link rel="stylesheet" href="./header.css">
 </head>
@@ -392,6 +540,7 @@
 </div>
 <div class="side-scrim" id="sideScrim"></div>
 
+<script src="./request-store.js"></script>
 <script>
 (function(){
   var el = function(id){ return document.getElementById(id); };
@@ -422,7 +571,7 @@
       quickTitle:'קיצורי דרך',
       qAudioT:'עריכת אודיו', qAudioD:'חיתוך, נרמול והמרה',
       qVideoT:'עריכת וידאו', qVideoD:'חיתוך, המרה ודחיסה',
-      qOrgT:'סידור קבצים', qOrgD:'מיון, תיוק וארגון',
+      qOrgT:'ארגון קבצים', qOrgD:'מיון, תיוק וארגון',
       qSendT:'שליחת קבצים', qSendD:'לינק לשיתוף מהיר',
       /* account details */
       detailsTitle:'פרטי חשבון', detailsSub:'המידע האישי המשויך לחשבון שלכם.',
@@ -456,12 +605,21 @@
       videoTitle:'הווידאו שלי', videoSub:'הקליפים והפרויקטים שערכתם ב-KOLKLI Video.',
       videoEmptyT:'אין עדיין קבצי וידאו', videoEmptyP:'פתחו את חותך הווידאו כדי לחתוך, להמיר ולדחוס קליפים.',
       openVideo:'פתחו את חותך הווידאו',
+      /* my images */
+      imgTitle:'התמונות שלי', imgSub:'הקבצים שערכתם והמרתם בכלי התמונות של KOLKLI.',
+      imgEmptyT:'אין עדיין תמונות', imgEmptyP:'חתכו, שנו גודל, המירו ודחסו תמונות — או הסירו רקע ב-AI, הכול בדפדפן.',
+      openImg:'פתחו את כלי התמונות',
+      /* my documents */
+      docTitle:'המסמכים שלי', docSub:'הקבצים שהמרתם, מיזגתם ודחסתם בכלי המסמכים של KOLKLI.',
+      docEmptyT:'אין עדיין מסמכים', docEmptyP:'המירו מסמכים, צרו PDF, מזגו ודחסו — או סכמו מסמך ב-AI, הכול בדפדפן.',
+      openDoc:'פתחו את כלי המסמכים',
       /* organize */
       orgTitle:'הלקוחות שלי', orgSub:'נהלו את כל הפרויקטים והגלריות של הלקוחות במקום אחד.',
       orgEmptyT:'אין עדיין פרויקטים', orgEmptyP:'צרו פרויקט חדש כדי להתחיל לארגן קבצים לפי לקוח.',
       openOrg:'פתחו פרויקט',
       clientsTitle:'הלקוחות שלי', clientsSub:'כל שמות הפרויקטים מסודרים לפי לקוח, סטטוס ועדכון אחרון.',
       newProject:'פרויקט חדש', projectPrompt:'שם הפרויקט החדש',
+      editLabel:'עריכת שם', saveLabel:'שמירה',
       projectClient:'לקוח', projectFiles:'קבצים', projectSelected:'נבחרו', projectUpdated:'עודכן',
       projectOpen:'פתיחה', projectShare:'שליחת קישור',
       projectStatusDraft:'טיוטה', projectStatusEditing:'בעריכה', projectStatusSent:'נשלח ללקוח', projectStatusApproved:'מאושר',
@@ -469,10 +627,29 @@
       sendTitle:'השליחות שלי', sendSub:'הקבצים ששלחתם והלינקים הפעילים שלכם.',
       sendEmptyT:'אין שליחות פעילות', sendEmptyP:'העלו קבצים וקבלו לינק לשיתוף מהיר, עם הגנה בסיסמה ותאריך תפוגה.',
       openSend:'שליחת קבצים חדשה',
+      inviteMember:'הזמנת חבר צוות',
       openAudio:'עריכת אודיו חדשה', openVideo:'עריכת וידאו חדשה',
       reqTitle:'הבקשות שלי', reqSub:'קישורי העלאה שיצרתם והקבצים שהתקבלו מהלקוחות.',
       reqEmptyT:'עדיין אין בקשות', reqEmptyP:'צרו קישור העלאה, שלחו ללקוח, וקבלו את הקבצים ישירות לתיקייה מסודרת.',
       openReq:'בקשה חדשה', reqNew:'בקשה חדשה', reqManage:'ניהול הבקשות',
+      ri:{
+        searchPh:'חיפוש בקשות…',
+        sort_new:'החדשות ביותר', sort_old:'הישנות ביותר', sort_name:'לפי שם', sort_files:'הכי הרבה קבצים',
+        fAll:'הכול', fActive:'פעילות', fExpired:'פגות תוקף', fClosed:'סגורות',
+        active:'פעילה', expired:'פג תוקף', closed:'סגורה',
+        expToday:'מסתיים היום', expDays:function(n){ return 'עוד '+n+' ימים'; }, expiredOn:'פג תוקף',
+        nSubs:function(n){ return n===1?'לקוח 1':n+' לקוחות'; },
+        nFiles:function(n){ return n===1?'קובץ 1':n+' קבצים'; },
+        nUnseen:function(n){ return n+' חדשים'; },
+        untitled:'בקשה ללא שם', anon:'ללא שם',
+        more:'פעולות', aOpen:'פתיחת עמוד הבקשות', aCopy:'העתקת קישור', aDup:'שכפול', aClose:'סגירת בקשה', aDel:'מחיקה',
+        copied:'הקישור הועתק!', dupSuffix:' (עותק)',
+        confClose:'לסגור את הבקשה? לא ניתן יהיה להעלות קבצים חדשים.', confDel:'למחוק את הבקשה ואת כל הקבצים שהתקבלו?',
+        selectHint:'בחרו בקשה כדי לראות את הקבצים שהתקבלו',
+        kSubs:'לקוחות', kFiles:'קבצים', kSize:'נפח',
+        openFull:'עמוד מלא', detNoFiles:'עדיין לא התקבלו קבצים', dl:'הורדה', noResults:'לא נמצאו בקשות'
+      },
+      reviewTitle:'האישורים שלי', reviewSub:'פרויקטים ששלחתם ללקוח לצפייה, הערות ואישור.', reviewEmptyT:'עדיין אין פרויקטים', reviewEmptyP:'צרו פרויקט, העלו חומרים, ושתפו קישור ממותג לצפייה ואישור.', openReview:'פרויקט חדש', reviewNew:'פרויקט חדש', reviewManage:'ניהול הפרויקטים',
       footer:'KOLKLI · העריכה רצה בדפדפן שלכם · הקבצים נשארים אצלכם.'
     },
     en:{
@@ -525,21 +702,47 @@
       videoTitle:'My video', videoSub:'Clips and projects you edited in KOLKLI Video.',
       videoEmptyT:'No video files yet', videoEmptyP:'Open the video cutter to trim, convert and compress clips.',
       openVideo:'Open the video cutter',
+      imgTitle:'My images', imgSub:'Images you edited and converted with KOLKLI image tools.',
+      imgEmptyT:'No images yet', imgEmptyP:'Crop, resize, convert and compress images — or remove the background with AI, right in your browser.',
+      openImg:'Open the image tools',
+      docTitle:'My documents', docSub:'Files you converted, merged and compressed with KOLKLI document tools.',
+      docEmptyT:'No documents yet', docEmptyP:'Convert documents, make a PDF, merge and compress — or summarize with AI, right in your browser.',
+      openDoc:'Open the document tools',
       orgTitle:'My clients', orgSub:'Manage every client project and gallery in one place.',
       orgEmptyT:'No projects yet', orgEmptyP:'Create a new project to start organizing files by client.',
       openOrg:'Open project',
       clientsTitle:'My clients', clientsSub:'Project names arranged by client, status and recent activity.',
       newProject:'New project', projectPrompt:'New project name',
+      editLabel:'Edit name', saveLabel:'Save',
       projectClient:'Client', projectFiles:'Files', projectSelected:'Selected', projectUpdated:'Updated',
       projectOpen:'Open', projectShare:'Send link',
       projectStatusDraft:'Draft', projectStatusEditing:'Editing', projectStatusSent:'Sent to client', projectStatusApproved:'Approved',
       sendTitle:'My transfers', sendSub:'Files you sent and your active links.',
       sendEmptyT:'No active transfers', sendEmptyP:'Upload files and get a share link fast, with password protection and an expiry date.',
       openSend:'New file transfer',
+      inviteMember:'Invite a teammate',
       openAudio:'New audio edit', openVideo:'New video edit',
       reqTitle:'My requests', reqSub:'Upload links you created and the files clients sent back.',
       reqEmptyT:'No requests yet', reqEmptyP:'Create an upload link, send it to a client, and receive files straight into an organized folder.',
       openReq:'New request', reqNew:'New request', reqManage:'Manage requests',
+      ri:{
+        searchPh:'Search requests…',
+        sort_new:'Newest first', sort_old:'Oldest first', sort_name:'By name', sort_files:'Most files',
+        fAll:'All', fActive:'Active', fExpired:'Expired', fClosed:'Closed',
+        active:'Active', expired:'Expired', closed:'Closed',
+        expToday:'Ends today', expDays:function(n){ return n+' days left'; }, expiredOn:'Expired',
+        nSubs:function(n){ return n===1?'1 client':n+' clients'; },
+        nFiles:function(n){ return n===1?'1 file':n+' files'; },
+        nUnseen:function(n){ return n+' new'; },
+        untitled:'Untitled request', anon:'No name',
+        more:'Actions', aOpen:'Open requests page', aCopy:'Copy link', aDup:'Duplicate', aClose:'Close request', aDel:'Delete',
+        copied:'Link copied!', dupSuffix:' (copy)',
+        confClose:'Close this request? No new files can be uploaded.', confDel:'Delete this request and all received files?',
+        selectHint:'Select a request to see the files clients sent',
+        kSubs:'Clients', kFiles:'Files', kSize:'Size',
+        openFull:'Full page', detNoFiles:'No files received yet', dl:'Download', noResults:'No requests found'
+      },
+      reviewTitle:'My reviews', reviewSub:'Projects you sent to a client to view, comment on and approve.', reviewEmptyT:'No projects yet', reviewEmptyP:'Create a project, upload materials, and share a branded link to view and approve.', openReview:'New project', reviewNew:'New project', reviewManage:'Manage projects',
       footer:'KOLKLI · Editing runs in your browser · Your files stay with you.'
     },
     ru:{
@@ -592,21 +795,47 @@
       videoTitle:'Моё видео', videoSub:'Клипы и проекты, отредактированные в KOLKLI Video.',
       videoEmptyT:'Пока нет видеофайлов', videoEmptyP:'Откройте видеорезак, чтобы обрезать, конвертировать и сжимать клипы.',
       openVideo:'Открыть видеорезак',
+      imgTitle:'Мои изображения', imgSub:'Изображения, отредактированные и конвертированные в инструментах KOLKLI.',
+      imgEmptyT:'Пока нет изображений', imgEmptyP:'Обрезайте, меняйте размер, конвертируйте и сжимайте — или удаляйте фон с помощью AI, прямо в браузере.',
+      openImg:'Открыть инструменты изображений',
+      docTitle:'Мои документы', docSub:'Файлы, конвертированные, объединённые и сжатые в инструментах KOLKLI.',
+      docEmptyT:'Пока нет документов', docEmptyP:'Конвертируйте документы, создавайте PDF, объединяйте и сжимайте — или делайте AI-резюме, прямо в браузере.',
+      openDoc:'Открыть инструменты документов',
       orgTitle:'Мои клиенты', orgSub:'Управляйте проектами и галереями клиентов в одном месте.',
       orgEmptyT:'Пока нет проектов', orgEmptyP:'Создайте новый проект, чтобы организовать файлы по клиентам.',
       openOrg:'Открыть проект',
       clientsTitle:'Мои клиенты', clientsSub:'Проекты упорядочены по клиенту, статусу и последнему обновлению.',
       newProject:'Новый проект', projectPrompt:'Название нового проекта',
+      editLabel:'Изменить название', saveLabel:'Сохранить',
       projectClient:'Клиент', projectFiles:'Файлы', projectSelected:'Выбрано', projectUpdated:'Обновлено',
       projectOpen:'Открыть', projectShare:'Отправить ссылку',
       projectStatusDraft:'Черновик', projectStatusEditing:'В работе', projectStatusSent:'Отправлено клиенту', projectStatusApproved:'Одобрено',
       sendTitle:'Мои передачи', sendSub:'Отправленные файлы и активные ссылки.',
       sendEmptyT:'Нет активных передач', sendEmptyP:'Загрузите файлы и быстро получите ссылку с защитой паролем и сроком действия.',
       openSend:'Новая передача файлов',
+      inviteMember:'Пригласить участника',
       openAudio:'Новый аудиопроект', openVideo:'Новый видеопроект',
       reqTitle:'Мои запросы', reqSub:'Созданные ссылки для загрузки и файлы, присланные клиентами.',
       reqEmptyT:'Запросов пока нет', reqEmptyP:'Создайте ссылку для загрузки, отправьте клиенту и получайте файлы прямо в упорядоченную папку.',
       openReq:'Новый запрос', reqNew:'Новый запрос', reqManage:'Управление запросами',
+      ri:{
+        searchPh:'Поиск запросов…',
+        sort_new:'Сначала новые', sort_old:'Сначала старые', sort_name:'По имени', sort_files:'Больше файлов',
+        fAll:'Все', fActive:'Активные', fExpired:'Истёкшие', fClosed:'Закрытые',
+        active:'Активен', expired:'Истёк', closed:'Закрыт',
+        expToday:'Истекает сегодня', expDays:function(n){ return 'осталось '+n+' дн.'; }, expiredOn:'Истёк',
+        nSubs:function(n){ return n===1?'1 клиент':n+' клиентов'; },
+        nFiles:function(n){ return n===1?'1 файл':n+' файлов'; },
+        nUnseen:function(n){ return n+' новых'; },
+        untitled:'Запрос без названия', anon:'Без имени',
+        more:'Действия', aOpen:'Открыть страницу запросов', aCopy:'Копировать ссылку', aDup:'Дублировать', aClose:'Закрыть запрос', aDel:'Удалить',
+        copied:'Ссылка скопирована!', dupSuffix:' (копия)',
+        confClose:'Закрыть запрос? Новые файлы загрузить будет нельзя.', confDel:'Удалить запрос и все полученные файлы?',
+        selectHint:'Выберите запрос, чтобы увидеть присланные файлы',
+        kSubs:'Клиенты', kFiles:'Файлы', kSize:'Объём',
+        openFull:'Вся страница', detNoFiles:'Файлы ещё не получены', dl:'Скачать', noResults:'Запросы не найдены'
+      },
+      reviewTitle:'Мои одобрения', reviewSub:'Проекты, отправленные клиенту для просмотра, комментариев и одобрения.', reviewEmptyT:'Проектов пока нет', reviewEmptyP:'Создайте проект, загрузите материалы и поделитесь брендированной ссылкой для просмотра и одобрения.', openReview:'Новый проект', reviewNew:'Новый проект', reviewManage:'Управление проектами',
       footer:'KOLKLI · Редактирование в вашем браузере · Ваши файлы остаются у вас.'
     }
   };
@@ -636,12 +865,17 @@
         he:['שליחה עד 100GB בכל פעם','1TB אחסון בענן','קבצים נשמרים 30 יום','כל הכלים + כלי AI','התראות הורדה','תמיכה מהירה בעדיפות','בלי פרסומות'],
         en:['Up to 100GB per transfer','1TB cloud storage','Files kept for 30 days','All tools + AI tools','Download notifications','Priority support','No ads'],
         ru:['До 100 ГБ за передачу','1 ТБ в облаке','Файлы хранятся 30 дней','Все инструменты + AI','Уведомления о скачивании','Приоритетная поддержка','Без рекламы']
+      }},
+    business:{ key:'business', name:'Business', price:39.99,
+      limits:{ storageGB:5120, transferGB:200, transfersMo:INF, files:INF, links:INF, keepDays:90 },
+      feats:{
+        he:['5 מושבים לצוות (+$9 למושב)','5TB אחסון משותף','שליחה עד 200GB בכל פעם','White-label ומיתוג מלא','ניהול צוות והרשאות','חיוב מרוכז','קבצים נשמרים 90 יום','כל הכלים + AI','תמיכה בעדיפות'],
+        en:['5 team seats (+$9/seat)','5TB shared storage','Up to 200GB per transfer','Full white-label branding','Team management & roles','Centralized billing','Files kept for 90 days','All tools + AI','Priority support'],
+        ru:['5 мест для команды (+$9/место)','5 ТБ общего хранилища','До 200 ГБ за передачу','Полный white-label брендинг','Управление командой и роли','Единый счёт','Файлы хранятся 90 дней','Все инструменты + AI','Приоритетная поддержка']
       }}
   };
-  var PLAN_ORDER = ['free','lite','pro'];
+  var PLAN_ORDER = ['free','lite','pro','business'];
   // demo usage in absolute terms; bars shrink as the plan grows (motivates upgrade)
-  var USAGE = { storageGB:1.62, transfersMo:8, files:34, links:3 };
-
   /* =====================================================
      Navigation model (labels live here; arrow = collapsible)
      ===================================================== */
@@ -652,11 +886,17 @@
       { id:'settings', he:'הגדרות חשבון',  en:'Account Settings', ru:'Настройки аккаунта' },
       { id:'payments', he:'תשלומים',       en:'Payments',         ru:'Платежи' }
     ]},
-    { id:'audio', icon:'music', he:'KOLKLI Audio', en:'KOLKLI Audio', ru:'KOLKLI Audio', add:{ href:'audio/', label:'openAudio' }, items:[
-      { id:'my-audio', he:'האודיו שלי', en:'My Audio', ru:'Моё аудио' }
+    { id:'teamsec', icon:'users', he:'צוות', en:'Team', ru:'Команда', open:true, add:{ view:'team', label:'inviteMember' }, items:[
+      { id:'team', he:'הצוות שלי', en:'My Team', ru:'Моя команда', editable:true }
     ]},
-    { id:'video', icon:'film', he:'KOLKLI Video', en:'KOLKLI Video', ru:'KOLKLI Video', add:{ href:'video/', label:'openVideo' }, items:[
-      { id:'my-video', he:'הווידאו שלי', en:'My Video', ru:'Моё видео' }
+    // "My File Tools" — one central home for the user's OWN files & actions
+    // (edit / convert / compress / AI) across every file type. Deliberately
+    // separate from the client-facing tools below (Organize / Send / Request).
+    { id:'mytools', icon:'files', he:'כלי הקבצים שלי', en:'My File Tools', ru:'Мои файлы и инструменты', items:[
+      { id:'my-audio',  he:'אודיו',   en:'Audio',     ru:'Аудио' },
+      { id:'my-video',  he:'וידאו',   en:'Video',     ru:'Видео' },
+      { id:'my-images', he:'תמונות',  en:'Images',    ru:'Изображения' },
+      { id:'my-docs',   he:'מסמכים',  en:'Documents', ru:'Документы' }
     ]},
     { id:'organize', icon:'folder', he:'KOLKLI Organize', en:'KOLKLI Organize', ru:'KOLKLI Organize', items:[
       { id:'my-files', he:'הלקוחות שלי', en:'My Clients', ru:'Мои клиенты' }
@@ -666,6 +906,9 @@
     ]},
     { id:'request', icon:'inbox', he:'KOLKLI Request', en:'KOLKLI Request', ru:'KOLKLI Request', add:{ href:'request.html', label:'reqNew' }, items:[
       { id:'my-requests', he:'הבקשות שלי', en:'My Requests', ru:'Мои запросы' }
+    ]},
+    { id:'review', icon:'check', he:'KOLKLI Review', en:'KOLKLI Review', ru:'KOLKLI Review', add:{ href:'review.html', label:'reviewNew' }, items:[
+      { id:'my-reviews', he:'האישורים שלי', en:'My Reviews', ru:'Мои одобрения' }
     ]}
   ];
 
@@ -674,7 +917,10 @@
      ===================================================== */
   function s(inner){ return '<svg viewBox="0 0 24 24">'+inner+'</svg>'; }
   var ICON = {
+    check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
     user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/>',
+    users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
     music:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
     film:'<rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/>',
     folder:'<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
@@ -697,22 +943,40 @@
     logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
     trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
     plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+    pencil:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
     minimize:'<polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/>',
     info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
     shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
-    camera:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>'
+    camera:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+    dots:'<circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>',
+    search:'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+    download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+    phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+    mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
+    openext:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>'
   };
-  var PLAN_ICON = { free:'zap', lite:'zap', pro:'crown' };
+  var PLAN_ICON = { free:'zap', lite:'zap', pro:'crown', business:'shield' };
 
   /* =====================================================
      State
      ===================================================== */
-  var USERS_KEY='ac_users', SESSION_KEY='ac_session', PLAN_KEY='ac_plan', NOTIF_KEY='ac_notif', PROJECTS_KEY='ac_projects';
+  var USERS_KEY='ac_users', SESSION_KEY='ac_session', NOTIF_KEY='ac_notif', PROJECTS_KEY='ac_projects', LABELS_KEY='ac_navlabels';
   function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
   function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
   function loadUsers(){ try{ return JSON.parse(lsGet(USERS_KEY))||[]; }catch(e){ return []; } }
   function saveUsers(u){ lsSet(USERS_KEY, JSON.stringify(u)); }
+  function safeOwnerId(v){ return String(v||'guest').toLowerCase().replace(/[^a-z0-9_.@-]+/g,'_') || 'guest'; }
+  function currentOwnerId(){
+    var email=(lsGet(SESSION_KEY)||'').toLowerCase();
+    if(!email) return 'guest';
+    var u=loadUsers().find(function(x){ return (x.email||'').toLowerCase()===email; });
+    return safeOwnerId((u&&(u.id||u.userId))||email);
+  }
+  function scopedKey(k){ return k+'::'+currentOwnerId(); }
+  function lsGetOwn(k){ return lsGet(scopedKey(k)); }
+  function lsSetOwn(k,v){ return lsSet(scopedKey(k), v); }
 
   // Bootstrap owner(s) are always admin; anyone else can be granted role:'admin'
   // from admin.html. The link below only appears for admins.
@@ -727,42 +991,52 @@
 
   var lang='he', t=I18N.he;
   var view='account';
+  var reqState={ sel:null, filter:'all', q:'', sort:'new' };
+  var reqBC=null;
   var user=null, isGuest=false, plan='free';
   var activeProjectId=null;
-  var notif = (function(){ try{ return JSON.parse(lsGet(NOTIF_KEY))||{download:true,updates:false}; }catch(e){ return {download:true,updates:false}; } })();
+  var editingLabel=null; // id of the nav item whose label is being renamed inline
+  var focusInvite=false; // set by the sidebar "+" so loadTeam focuses the invite email
+  // User-customized sidebar labels (white-label: rename "My Clients" etc. per studio)
+  function loadLabels(){ try{ return JSON.parse(lsGetOwn(LABELS_KEY))||{}; }catch(e){ return {}; } }
+  var navLabels=loadLabels();
+  function labelFor(id, fallback){ var v=navLabels[id]; return (v&&String(v).trim()) ? v : fallback; }
+  function setLabel(id, val){
+    val=String(val||'').trim();
+    if(val){ navLabels[id]=val; } else { delete navLabels[id]; }
+    lsSetOwn(LABELS_KEY, JSON.stringify(navLabels));
+  }
+  var notif = (function(){ try{ return JSON.parse(lsGetOwn(NOTIF_KEY))||{download:true,updates:false}; }catch(e){ return {download:true,updates:false}; } })();
 
   function loadUser(){
     var email = lsGet(SESSION_KEY);
     var u = email ? loadUsers().find(function(x){ return x.email===email; }) : null;
-    if(u){ isGuest=false; user=u; plan = u.plan || lsGet(PLAN_KEY) || 'free'; }
-    else { isGuest=true; user={ name:'Guest', email:'', created:Date.now() }; plan = lsGet(PLAN_KEY) || 'free'; }
+    if(u){ isGuest=false; user=u; plan = /^(free|lite|pro|business)$/.test(u.plan||'') ? u.plan : 'free'; }
+    else { isGuest=true; user={ name:'Guest', email:'', created:Date.now(), plan:'free' }; plan = 'free'; }
     if(!PLANS[plan]) plan='free';
   }
   function setPlan(p){
     if(!PLANS[p]) return;
-    plan=p; lsSet(PLAN_KEY, p);
-    if(!isGuest){
-      var users=loadUsers(), i=users.findIndex(function(x){ return x.email===user.email; });
-      if(i>-1){ users[i].plan=p; saveUsers(users); user=users[i]; }
-    }
-    render();
+    // Plan changes must come from checkout/billing, not a dashboard preview.
   }
-  function defaultProjects(){
+  function defaultProjects(){ return [];
+    /*
     return [
       { id:'pr-37734', name:'אלבום יום הולדת 60', client:'משפחת דוזדו', status:'editing', files:489, selected:0, sizeMB:465, updated:'2026-07-03' },
       { id:'pr-45572', name:'יום הולדת 40 - לאוהד', client:'מיכל ואביב', status:'sent', files:589, selected:1, sizeMB:870, updated:'2026-06-21' },
       { id:'pr-46211', name:'בחירת תמונות בקליק', client:'ספיר אברהם', status:'sent', files:130, selected:1, sizeMB:56, updated:'2026-06-09' },
       { id:'pr-46806', name:'גלריית לקוח - מאיר', client:'אגמון סטודיו', status:'approved', files:214, selected:38, sizeMB:312, updated:'2026-05-29' }
     ];
+    */
   }
   function loadProjects(){
     try{
-      var list=JSON.parse(lsGet(PROJECTS_KEY));
+      var list=JSON.parse(lsGetOwn(PROJECTS_KEY));
       if(Array.isArray(list)) return list;
     }catch(e){}
-    return defaultProjects();
+    return [];
   }
-  function saveProjects(list){ lsSet(PROJECTS_KEY, JSON.stringify(list)); }
+  function saveProjects(list){ lsSetOwn(PROJECTS_KEY, JSON.stringify(list)); }
   function projectStatusText(st){
     return ({
       draft:t.projectStatusDraft,
@@ -781,22 +1055,8 @@
     mb=Number(mb)||0;
     return mb>=1024 ? (Math.round(mb/1024*10)/10)+' GB' : Math.round(mb)+' MB';
   }
-  function createProject(){
-    var name=prompt(t.projectPrompt || 'Project name');
-    if(name==null) return;
-    name=name.trim();
-    if(!name) return;
-    var list=loadProjects();
-    var p={ id:'pr-'+Date.now(), name:name, client:name, status:'draft', files:0, selected:0, sizeMB:0, updated:new Date().toISOString().slice(0,10) };
-    list.unshift(p);
-    saveProjects(list);
-    activeProjectId=p.id;
-    view='my-files';
-    var org=NAV.find(function(c){ return c.id==='organize'; });
-    if(org) org.open=true;
-    closeDrawer();
-    render();
-  }
+  // "New project" / sidebar "+" no longer prompts here — it navigates to the
+  // album-settings page (files.html?new=1) where the client/album is filled in.
 
   /* =====================================================
      Helpers
@@ -807,6 +1067,37 @@
   function nameFor(o){ return o[lang]||o.en; }
   function pct(used,limit){ if(limit===INF||limit===0) return 6; return Math.max(3, Math.min(100, Math.round(used/limit*100))); }
   function displayName(){ return (user.name && user.name.trim()) ? user.name.trim() : (user.email ? user.email.split('@')[0] : 'Guest'); }
+  function readOwnArray(k){ try{ var a=JSON.parse(lsGetOwn(k)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+  function activeRecord(x){ return !x.expiresAt || Date.now() <= x.expiresAt; }
+  function sameMonth(ms){
+    var d=new Date(ms||0), n=new Date();
+    return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth();
+  }
+  function currentUsage(){
+    var projects=loadProjects();
+    var reqs=window.KR ? KR.loadRequests() : readOwnArray('kr_requests');
+    var sends=readOwnArray('kolkli_send_links');
+    var reviews=readOwnArray('rv_projects');
+    var bytes=0, filesCount=0, activeLinks=0;
+    projects.forEach(function(p){ filesCount+=Number(p.files)||0; bytes+=(Number(p.sizeMB)||0)*1048576; });
+    reqs.forEach(function(r){
+      var fs=r.files||[]; filesCount+=fs.length; activeLinks+=activeRecord(r)?1:0;
+      bytes+=fs.reduce(function(s,f){ return s+(Number(f.size)||0); },0);
+    });
+    sends.forEach(function(s){
+      filesCount+=Number(s.files)||0; bytes+=Number(s.bytes)||0; activeLinks+=activeRecord(s)?1:0;
+    });
+    reviews.forEach(function(p){
+      var items=p.items||[]; filesCount+=items.length; activeLinks+=activeRecord(p)?1:0;
+      bytes+=items.reduce(function(s,f){ return s+(Number(f.size)||0); },0);
+    });
+    return {
+      storageGB: Math.round((bytes/1073741824)*100)/100,
+      transfersMo: sends.filter(function(s){ return sameMonth(s.createdAt); }).length,
+      files: filesCount,
+      links: activeLinks
+    };
+  }
   function initial(){ return displayName().charAt(0).toUpperCase(); }
   function avatarInner(){
     if(user.avatar) return '<img class="avatar-img" src="'+esc(user.avatar)+'" alt="">';
@@ -858,7 +1149,7 @@
   }
   function memberYear(){ var d=new Date(user.created||Date.now()); return d.getFullYear(); }
   function currentTitle(){
-    for(var i=0;i<NAV.length;i++){ for(var j=0;j<NAV[i].items.length;j++){ if(NAV[i].items[j].id===view) return nameFor(NAV[i].items[j]); } }
+    for(var i=0;i<NAV.length;i++){ for(var j=0;j<NAV[i].items.length;j++){ if(NAV[i].items[j].id===view) return labelFor(NAV[i].items[j].id, nameFor(NAV[i].items[j])); } }
     return 'KOLKLI';
   }
   function nextBillDate(){
@@ -871,6 +1162,21 @@
   /* =====================================================
      Sidebar render
      ===================================================== */
+  // A sidebar item whose label the user can rename (pencil → inline input → save).
+  function editableItem(id, label, active){
+    if(editingLabel===id){
+      return '<div class="subitem editing">'+
+        '<span class="dot"></span>'+
+        '<input class="lbl-input" type="text" maxlength="40" value="'+esc(label)+'" data-label-input="'+id+'" />'+
+        '<button class="lbl-btn save" type="button" data-savelabel="'+esc(id)+'" title="'+esc(t.saveLabel)+'" aria-label="'+esc(t.saveLabel)+'">'+s(ICON.check)+'</button>'+
+      '</div>';
+    }
+    return '<div class="subitem '+(active?'active':'')+'" data-view="'+esc(id)+'">'+
+      '<span class="dot"></span><span class="lbl-txt">'+esc(label)+'</span>'+
+      '<button class="lbl-btn edit" type="button" data-editlabel="'+esc(id)+'" title="'+esc(t.editLabel)+'" aria-label="'+esc(t.editLabel)+'">'+s(ICON.pencil)+'</button>'+
+    '</div>';
+  }
+
   function renderSide(){
     var html='';
     if(isAdmin()){
@@ -881,24 +1187,18 @@
       var open = cat.open || isOn;
       var subs;
       if(cat.id==='organize'){
-        var projects=loadProjects();
-        var projectRows=projects.map(function(p){
-          return '<button class="project-nav '+(activeProjectId===p.id?'active':'')+'" type="button" data-project="'+esc(p.id)+'">'+
-            '<span class="pn-dot"></span><span class="pn-name">'+esc(p.name)+'</span></button>';
-        }).join('');
         subs = '<div class="client-subbar">'+
-          '<div class="subitem '+(view==='my-files' && !activeProjectId?'active':'')+'" data-view="my-files">'+
-            '<span class="dot"></span><span>'+esc(t.clientsTitle)+'</span></div>'+
+          editableItem('my-files', labelFor('my-files', t.clientsTitle), view==='my-files' && !activeProjectId)+
           '<button class="side-add-project" type="button" id="sideNewProject" title="'+esc(t.newProject)+'" aria-label="'+esc(t.newProject)+'">'+s(ICON.plus)+'</button>'+
-        '</div>'+
-        '<div class="side-projects">'+projectRows+'</div>';
+        '</div>';
       } else if(cat.add){
         var first=cat.items[0], rest=cat.items.slice(1);
         var addLbl=t[cat.add.label]||'';
+        // add.view → open a dashboard view in place; add.href → navigate to a page
+        var addAttr=cat.add.view ? 'data-add-view="'+esc(cat.add.view)+'"' : 'data-add-href="'+esc(cat.add.href)+'"';
         subs = '<div class="client-subbar">'+
-          '<div class="subitem '+(first.id===view?'active':'')+'" data-view="'+first.id+'">'+
-            '<span class="dot"></span><span>'+esc(nameFor(first))+'</span></div>'+
-          '<button class="side-add-project" type="button" data-add-href="'+esc(cat.add.href)+'" title="'+esc(addLbl)+'" aria-label="'+esc(addLbl)+'">'+s(ICON.plus)+'</button>'+
+          editableItem(first.id, labelFor(first.id, nameFor(first)), first.id===view)+
+          '<button class="side-add-project" type="button" '+addAttr+' title="'+esc(addLbl)+'" aria-label="'+esc(addLbl)+'">'+s(ICON.plus)+'</button>'+
         '</div>'+
         rest.map(function(it){
           return '<div class="subitem '+(it.id===view?'active':'')+'" data-view="'+it.id+'">'+
@@ -906,6 +1206,7 @@
         }).join('');
       } else {
         subs = cat.items.map(function(it){
+          if(it.editable) return editableItem(it.id, labelFor(it.id, nameFor(it)), it.id===view);
           return '<div class="subitem '+(it.id===view?'active':'')+'" data-view="'+it.id+'">'+
             '<span class="dot"></span><span>'+esc(nameFor(it))+'</span></div>';
         }).join('');
@@ -927,7 +1228,7 @@
         '<span class="pc-ic">'+s(ICON[PLAN_ICON[plan]])+'</span>'+
         '<span class="pc-tx"><span class="pc-lbl">'+esc(t.yourPlan)+'</span><span class="pc-name">'+esc(P.name)+'</span></span>'+
       '</div>'+
-      (plan==='pro' ? '' :
+      (plan==='business' ? '' :
         '<button class="upg" type="button" id="sideUpg">'+s(ICON.zap)+'<span>'+esc(t.upgrade)+'</span></button>')+
     '</div>';
 
@@ -948,12 +1249,9 @@
   function viewAccount(){
     var P=PLANS[plan], L=P.limits;
     // subscription card
-    var actions = plan==='pro'
+    var actions = plan==='business'
       ? '<div class="sc-top-plan">'+s(ICON.check)+esc(t.topPlan)+' 🎉</div>'
       : '<a class="btn-up" href="pricing/">'+s(ICON.zap)+esc(t.upgrade)+'</a>';
-    var seg = PLAN_ORDER.map(function(k){
-      return '<button class="seg-btn '+(k===plan?'on':'')+'" type="button" data-setplan="'+k+'">'+esc(PLANS[k].name)+'</button>';
-    }).join('');
     var sub = '<div class="card subcard">'+
       '<div class="sc-top">'+
         '<div class="sc-info">'+
@@ -964,19 +1262,19 @@
         '</div>'+
         '<div class="sc-actions">'+actions+'</div>'+
       '</div>'+
-      '<div class="demoswitch"><div class="ds-lbl">'+esc(t.demoLabel)+'</div><div class="seg">'+seg+'</div></div>'+
     '</div>';
 
     // usage
-    var sWarn=pct(USAGE.storageGB,L.storageGB)>=80, tWarn=pct(USAGE.transfersMo,L.transfersMo)>=80,
-        fWarn=pct(USAGE.files,L.files)>=80, lWarn=pct(USAGE.links,L.links)>=80;
+    var usageNow=currentUsage();
+    var sWarn=pct(usageNow.storageGB,L.storageGB)>=80, tWarn=pct(usageNow.transfersMo,L.transfersMo)>=80,
+        fWarn=pct(usageNow.files,L.files)>=80, lWarn=pct(usageNow.links,L.links)>=80;
     var usage = '<div class="card">'+
       '<h2>'+esc(t.usageTitle)+'</h2><p class="csub">'+esc(t.usageSub)+'</p>'+
       '<div class="metrics">'+
-        metricCard('drive', t.mStorage,   fmtGB(USAGE.storageGB), fmtGB(L.storageGB), pct(USAGE.storageGB,L.storageGB), sWarn)+
-        metricCard('swap',  t.mTransfers, fmtNum(USAGE.transfersMo), fmtNum(L.transfersMo), pct(USAGE.transfersMo,L.transfersMo), tWarn)+
-        metricCard('files', t.mFiles,     fmtNum(USAGE.files), fmtNum(L.files), pct(USAGE.files,L.files), fWarn)+
-        metricCard('link',  t.mLinks,     fmtNum(USAGE.links), fmtNum(L.links), pct(USAGE.links,L.links), lWarn)+
+        metricCard('drive', t.mStorage,   fmtGB(usageNow.storageGB), fmtGB(L.storageGB), pct(usageNow.storageGB,L.storageGB), sWarn)+
+        metricCard('swap',  t.mTransfers, fmtNum(usageNow.transfersMo), fmtNum(L.transfersMo), pct(usageNow.transfersMo,L.transfersMo), tWarn)+
+        metricCard('files', t.mFiles,     fmtNum(usageNow.files), fmtNum(L.files), pct(usageNow.files,L.files), fWarn)+
+        metricCard('link',  t.mLinks,     fmtNum(usageNow.links), fmtNum(L.links), pct(usageNow.links,L.links), lWarn)+
       '</div>'+
     '</div>';
 
@@ -1059,9 +1357,16 @@
     var billLine = P.price===0
       ? '<div class="opt-d">'+esc(t.freeNoBill)+'</div>'
       : '<div class="opt-d">'+esc(t.nextBill)+': '+esc(nextBillDate())+'</div>';
-    var manageBtn = plan==='pro'
-      ? '<a class="btn ghost" href="pricing/">'+esc(t.manage)+'</a>'
-      : '<a class="btn primary" href="pricing/">'+s(ICON.zap)+esc(t.upgrade)+'</a>';
+    var manageBtn;
+    if(billingOn()){
+      manageBtn = (plan!=='free')
+        ? '<button class="btn ghost" type="button" data-billing-portal>'+esc(t.manage)+'</button>'
+        : '<button class="btn primary" type="button" data-billing-checkout="business">'+s(ICON.zap)+esc(t.upgrade)+'</button>';
+    } else {
+      manageBtn = (plan==='pro'||plan==='business')
+        ? '<a class="btn ghost" href="pricing/">'+esc(t.manage)+'</a>'
+        : '<a class="btn primary" href="pricing/">'+s(ICON.zap)+esc(t.upgrade)+'</a>';
+    }
 
     // demo billing history: paid rows only for paid plans
     var hist;
@@ -1150,23 +1455,525 @@
     '</div>';
   }
 
+  /* =====================================================
+     Team / Organization (B2B) — talks to Supabase when
+     configured (supabase-orgs-schema.sql), else a local demo.
+     ===================================================== */
+  var TEAM_I18N = {
+    he:{ loading:'טוען…', title:'הצוות שלי', sub:'הזמינו חברי צוות לארגון, נהלו תפקידים ומושבים.',
+      planLabel:'חבילה', seats:'{u} מתוך {t} מושבים בשימוש',
+      roleOwner:'בעלים', roleAdmin:'מנהל', roleMember:'חבר', you:'(אתה)',
+      membersTitle:'חברי הצוות', inviteTitle:'הזמנת חבר צוות', emailPh:'email@company.com', inviteBtn:'שליחת הזמנה',
+      pendingTitle:'הזמנות ממתינות', noPending:'אין הזמנות ממתינות.',
+      copyLink:'העתקת קישור', copied:'הועתק!', revoke:'ביטול', removeMember:'הסרה', removeConfirm:'להסיר את החבר מהארגון?',
+      inviteCreated:'ההזמנה נוצרה — שתפו את הקישור:', errEmail:'כתובת אימייל לא תקינה',
+      errSeats:'אין מספיק מושבים בחבילה — שדרגו כדי להוסיף חברים.', errGeneric:'שגיאה, נסו שוב.',
+      demoNote:'מצב דמו — סנכרון צוות מלא מופעל כשמחברים את Supabase.', noOrg:'לא נמצא ארגון עבור החשבון.',
+      joinFail:'לא ניתן להצטרף לארגון', joinDemo:'הזמנות צוות עובדות כשמחברים שרת (Supabase).' },
+    en:{ loading:'Loading…', title:'My Team', sub:'Invite teammates to your organization, manage roles and seats.',
+      planLabel:'Plan', seats:'{u} of {t} seats used',
+      roleOwner:'Owner', roleAdmin:'Admin', roleMember:'Member', you:'(you)',
+      membersTitle:'Team members', inviteTitle:'Invite a teammate', emailPh:'email@company.com', inviteBtn:'Send invite',
+      pendingTitle:'Pending invites', noPending:'No pending invites.',
+      copyLink:'Copy link', copied:'Copied!', revoke:'Revoke', removeMember:'Remove', removeConfirm:'Remove this member from the organization?',
+      inviteCreated:'Invite created — share this link:', errEmail:'Invalid email address',
+      errSeats:'Not enough seats on your plan — upgrade to add members.', errGeneric:'Something went wrong, try again.',
+      demoNote:'Demo mode — full team sync activates once Supabase is connected.', noOrg:'No organization found for this account.',
+      joinFail:'Could not join the organization', joinDemo:'Team invites work once the server (Supabase) is connected.' },
+    ru:{ loading:'Загрузка…', title:'Моя команда', sub:'Приглашайте коллег в организацию, управляйте ролями и местами.',
+      planLabel:'Тариф', seats:'{u} из {t} мест занято',
+      roleOwner:'Владелец', roleAdmin:'Админ', roleMember:'Участник', you:'(вы)',
+      membersTitle:'Участники команды', inviteTitle:'Пригласить коллегу', emailPh:'email@company.com', inviteBtn:'Отправить приглашение',
+      pendingTitle:'Ожидающие приглашения', noPending:'Нет ожидающих приглашений.',
+      copyLink:'Копировать ссылку', copied:'Скопировано!', revoke:'Отозвать', removeMember:'Удалить', removeConfirm:'Удалить участника из организации?',
+      inviteCreated:'Приглашение создано — поделитесь ссылкой:', errEmail:'Неверный адрес почты',
+      errSeats:'Недостаточно мест в тарифе — обновите, чтобы добавить участников.', errGeneric:'Что-то пошло не так, попробуйте снова.',
+      demoNote:'Демо-режим — полная синхронизация команды включится после подключения Supabase.', noOrg:'Организация для этого аккаунта не найдена.',
+      joinFail:'Не удалось присоединиться к организации', joinDemo:'Приглашения работают после подключения сервера (Supabase).' }
+  };
+  function tt(){ return TEAM_I18N[lang] || TEAM_I18N.en; }
+  function roleName(r){ var x=tt(); return r==='owner'?x.roleOwner:r==='admin'?x.roleAdmin:x.roleMember; }
+  var EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function inviteLink(token){
+    var base=location.href.replace(/#.*$/,'').replace(/[?].*$/,'');
+    return base+'#join='+token;
+  }
+
+  var Team = (function(){
+    var orgId=null, myId=null;
+    function demoInvites(){ try{ return JSON.parse(lsGet('kolkli_demo_invites'))||[]; }catch(e){ return []; } }
+    function saveDemoInvites(a){ lsSet('kolkli_demo_invites', JSON.stringify(a)); }
+    function sb(){ return (window.KolkliAuth && window.KolkliAuth.configured()) ? window.KolkliAuth.getClient() : Promise.resolve(null); }
+
+    async function load(){
+      var c=await sb();
+      if(!c){
+        return { demo:true, org:{ name:(user.name||'My')+' · '+(({he:'סביבת עבודה',en:'workspace',ru:'рабочая область'})[lang]||'workspace'), plan:plan, seats:3 },
+          role:'owner', members:[{ id:'me', name:user.name||((user.email||'you').split('@')[0]), email:user.email||'you@example.com', role:'owner', you:true }],
+          invites:demoInvites() };
+      }
+      myId=await window.KolkliAuth.userId();
+      var orgs=((await c.from('organizations').select('id,name,plan,seats,owner')).data)||[];
+      if(!orgs.length) return { org:null, members:[], invites:[], role:null };
+      var mine=null; for(var i=0;i<orgs.length;i++){ if(orgs[i].owner===myId){ mine=orgs[i]; break; } }
+      mine=mine||orgs[0]; orgId=mine.id;
+      var mem=((await c.from('org_members').select('user_id,role').eq('org_id',orgId)).data)||[];
+      var ids=mem.map(function(m){ return m.user_id; });
+      var profs=ids.length ? (((await c.from('profiles').select('id,full_name,email').in('id',ids)).data)||[]) : [];
+      var pmap={}; profs.forEach(function(p){ pmap[p.id]=p; });
+      var members=mem.map(function(m){ var p=pmap[m.user_id]||{}; return { id:m.user_id, name:p.full_name||'', email:p.email||'', role:m.role, you:m.user_id===myId }; });
+      members.sort(function(a,b){ var o={owner:0,admin:1,member:2}; return (o[a.role]-o[b.role]); });
+      var myRole=(members.find(function(m){ return m.you; })||{}).role||'member';
+      var invites=((await c.from('org_invites').select('id,email,role,token').eq('org_id',orgId).eq('accepted',false)).data)||[];
+      return { org:mine, members:members, invites:invites, role:myRole };
+    }
+    async function invite(email, role){
+      var c=await sb();
+      if(!c){ var a=demoInvites(); var tok='demo-'+Math.random().toString(36).slice(2,10); a.push({ id:'d'+a.length+'-'+tok, email:email, role:role, token:tok }); saveDemoInvites(a); return { ok:true, token:tok }; }
+      var res=await c.from('org_invites').insert({ org_id:orgId, email:email.toLowerCase(), role:role }).select('token').single();
+      return res.error ? { ok:false, message:res.error.message } : { ok:true, token:res.data.token };
+    }
+    async function revokeInvite(id){
+      var c=await sb();
+      if(!c){ saveDemoInvites(demoInvites().filter(function(x){ return x.id!==id; })); return { ok:true }; }
+      var res=await c.from('org_invites').delete().eq('id',id); return { ok:!res.error, message:res.error&&res.error.message };
+    }
+    async function setRole(uid, role){ var c=await sb(); if(!c) return { ok:true }; var res=await c.from('org_members').update({ role:role }).eq('org_id',orgId).eq('user_id',uid); return { ok:!res.error, message:res.error&&res.error.message }; }
+    async function removeMember(uid){ var c=await sb(); if(!c) return { ok:true }; var res=await c.from('org_members').delete().eq('org_id',orgId).eq('user_id',uid); return { ok:!res.error, message:res.error&&res.error.message }; }
+    async function acceptInvite(token){ var c=await sb(); if(!c) return { ok:false, message:'not configured' }; var res=await c.rpc('accept_invite',{ invite_token:token }); return res.error ? { ok:false, message:res.error.message } : { ok:true, orgId:res.data }; }
+    return { load:load, invite:invite, revokeInvite:revokeInvite, setRole:setRole, removeMember:removeMember, acceptInvite:acceptInvite };
+  })();
+
+  /* Billing (Stripe) — real Checkout/Portal when the billing Worker is
+     configured (supabase-config.js + worker-billing/), else the pricing page. */
+  function billingOn(){ return !!(typeof kolkliWorker==='function' && kolkliWorker('billing') && window.KolkliAuth && window.KolkliAuth.configured()); }
+  async function billingGo(path, extra){
+    var base=(typeof kolkliWorker==='function') && kolkliWorker('billing');
+    if(!base){ location.href='pricing/'; return; }
+    try{
+      var token=await window.KolkliAuth.getToken();
+      var d=await Team.load();
+      var orgId=d && d.org && d.org.id;
+      if(!token || !orgId){ location.href='pricing/'; return; }
+      var payload=Object.assign({ orgId:orgId }, extra||{});
+      if(path==='/checkout' && !payload.seats) payload.seats=Math.max(1, (d.members||[]).length);
+      var r=await fetch(base+path, { method:'POST', headers:{ authorization:'Bearer '+token, 'content-type':'application/json' }, body:JSON.stringify(payload) }).then(function(x){ return x.json(); });
+      if(r && r.url){ location.href=r.url; } else { alert((r && r.error) || tt().errGeneric); }
+    }catch(e){ location.href='pricing/'; }
+  }
+  function billingCheckout(planName){ return billingGo('/checkout', { plan:planName }); }
+  function billingPortal(){ return billingGo('/portal', {}); }
+
+  function teamAvatar(m){
+    var ch=((m.name||m.email||'?').trim().charAt(0)||'?').toUpperCase();
+    return '<span class="tm-av">'+esc(ch)+'</span>';
+  }
+  function buildTeam(d){
+    var x=tt();
+    if(!d.org){ return '<p class="csub">'+esc(x.noOrg)+'</p>'; }
+    var canManage=(d.role==='owner'||d.role==='admin');
+    var used=d.members.length, total=d.org.seats||1;
+    var head='<div class="team-head">'+
+      '<div><h2>'+esc(x.title)+'</h2><p class="csub">'+esc(x.sub)+'</p></div>'+
+      '<div class="team-meta"><div class="opt-t">'+esc(x.planLabel)+': '+esc((PLANS[d.org.plan]||PLANS.free).name)+'</div>'+
+        '<div class="opt-d">'+esc(x.seats.replace('{u}',used).replace('{t}',total))+'</div></div>'+
+    '</div>';
+    var rows=d.members.map(function(m){
+      var ctrl='';
+      if(canManage && !m.you && m.role!=='owner'){
+        ctrl='<select class="tm-role" data-role-user="'+esc(m.id)+'">'+
+            '<option value="admin"'+(m.role==='admin'?' selected':'')+'>'+esc(x.roleAdmin)+'</option>'+
+            '<option value="member"'+(m.role==='member'?' selected':'')+'>'+esc(x.roleMember)+'</option>'+
+          '</select>'+
+          '<button class="btn ghost tm-rm" type="button" data-remove-user="'+esc(m.id)+'" title="'+esc(x.removeMember)+'">'+s(ICON.trash)+'</button>';
+      } else {
+        ctrl='<span class="tm-badge'+(m.role==='owner'?' owner':'')+'">'+(m.role==='owner'?s(ICON.crown):'')+esc(roleName(m.role))+'</span>';
+      }
+      return '<div class="optrow tm-row">'+
+        '<div class="opt-tx tm-id">'+teamAvatar(m)+'<span><span class="opt-t">'+esc(m.name||m.email.split('@')[0])+(m.you?(' <span class="tm-you">'+esc(x.you)+'</span>'):'')+'</span>'+
+          '<span class="opt-d" dir="ltr">'+esc(m.email)+'</span></span></div>'+
+        '<div class="tm-ctrl">'+ctrl+'</div>'+
+      '</div>';
+    }).join('');
+    var membersCard='<div class="card"><h2>'+esc(x.membersTitle)+'</h2><p class="csub"></p>'+rows+'</div>';
+
+    var inviteCard='';
+    if(canManage){
+      var seatsFull=used>=total;
+      inviteCard='<div class="card"><h2>'+esc(x.inviteTitle)+'</h2><p class="csub"></p>'+
+        '<div class="tm-invite">'+
+          '<input id="tmEmail" type="email" dir="ltr" placeholder="'+esc(x.emailPh)+'"'+(seatsFull?' disabled':'')+'>'+
+          '<select id="tmRole"'+(seatsFull?' disabled':'')+'><option value="member">'+esc(x.roleMember)+'</option><option value="admin">'+esc(x.roleAdmin)+'</option></select>'+
+          '<button class="btn primary" id="tmInvite" type="button"'+(seatsFull?' disabled':'')+'>'+s(ICON.plus)+esc(x.inviteBtn)+'</button>'+
+        '</div>'+
+        (seatsFull?('<div class="tm-err" style="margin-top:8px">'+esc(x.errSeats)+' <a href="pricing/" style="color:var(--accent-dim);font-weight:600">'+esc(t.upgrade)+'</a></div>'):'')+
+        '<div class="tm-err" id="tmErr"></div>'+
+        '<div class="tm-link" id="tmLink"></div>'+
+      '</div>';
+    }
+
+    var pend='';
+    if(d.invites && d.invites.length){
+      pend=d.invites.map(function(iv){
+        return '<div class="optrow tm-row"><div class="opt-tx"><span class="opt-t" dir="ltr">'+esc(iv.email)+'</span>'+
+          '<span class="opt-d">'+esc(roleName(iv.role))+'</span></div>'+
+          '<div class="tm-ctrl">'+
+            '<button class="btn ghost" type="button" data-copy-token="'+esc(iv.token)+'">'+s(ICON.copy)+esc(x.copyLink)+'</button>'+
+            '<button class="btn ghost tm-rm" type="button" data-revoke-invite="'+esc(iv.id)+'">'+esc(x.revoke)+'</button>'+
+          '</div></div>';
+      }).join('');
+    } else { pend='<p class="csub" style="margin:0">'+esc(x.noPending)+'</p>'; }
+    var pendCard=canManage ? ('<div class="card"><h2>'+esc(x.pendingTitle)+'</h2><p class="csub"></p>'+pend+'</div>') : '';
+
+    var demo = d.demo ? ('<div class="guestnote">'+s(ICON.info)+'<span>'+esc(x.demoNote)+'</span></div>') : '';
+    return demo+head+membersCard+inviteCard+pendCard;
+  }
+
+  function loadTeam(){
+    var root=el('teamRoot'); if(!root) return Promise.resolve();
+    return Team.load().then(function(d){
+      var r=el('teamRoot'); if(!r) return;      // view may have changed while loading
+      r.innerHTML = buildTeam(d);
+      wireTeam(r);
+      if(focusInvite){ focusInvite=false; var em=el('tmEmail'); if(em){ em.focus(); em.scrollIntoView({block:'center'}); } }
+    }).catch(function(e){
+      var r=el('teamRoot'); if(r) r.innerHTML='<p class="tm-err">'+esc(tt().errGeneric)+'</p>';
+    });
+  }
+  // Show the shareable invite link in #tmLink and bind its copy button.
+  // Called AFTER loadTeam() rebuilds the panel, so it isn't wiped out.
+  function showInviteLink(token){
+    var x=tt(), lk=el('tmLink'); if(!lk) return;
+    var link=inviteLink(token);
+    lk.innerHTML='<div class="opt-d" style="margin-bottom:6px">'+esc(x.inviteCreated)+'</div>'+
+      '<div class="tm-linkrow"><input type="text" readonly dir="ltr" value="'+esc(link)+'">'+
+      '<button class="btn ghost" type="button" data-copy-token="'+esc(token)+'">'+s(ICON.copy)+esc(x.copyLink)+'</button></div>';
+    var cb=lk.querySelector('[data-copy-token]');
+    if(cb) cb.addEventListener('click', function(){
+      var done=function(){ var old=cb.innerHTML; cb.innerHTML=s(ICON.check)+esc(x.copied); setTimeout(function(){ cb.innerHTML=old; }, 1400); };
+      try{ navigator.clipboard.writeText(link).then(done, done); }catch(e){ done(); }
+    });
+  }
+  function wireTeam(root){
+    var x=tt();
+    var inv=el('tmInvite');
+    if(inv) inv.addEventListener('click', function(){
+      var email=(el('tmEmail').value||'').trim().toLowerCase();
+      var role=el('tmRole').value;
+      var errBox=el('tmErr'); errBox.textContent='';
+      if(!EMAIL_RE.test(email)){ errBox.textContent=x.errEmail; return; }
+      inv.disabled=true;
+      Team.invite(email, role).then(function(r){
+        inv.disabled=false;
+        if(!r.ok){ errBox.textContent=r.message||x.errGeneric; return; }
+        // refresh the whole panel (new pending row + seat count), THEN
+        // re-show the shareable link so the rebuild doesn't wipe it.
+        loadTeam().then(function(){ showInviteLink(r.token); });
+      });
+    });
+    root.querySelectorAll('[data-role-user]').forEach(function(sel){
+      sel.addEventListener('change', function(){ Team.setRole(sel.getAttribute('data-role-user'), sel.value).then(loadTeam); });
+    });
+    root.querySelectorAll('[data-remove-user]').forEach(function(b){
+      b.addEventListener('click', function(){ if(confirm(x.removeConfirm)) Team.removeMember(b.getAttribute('data-remove-user')).then(loadTeam); });
+    });
+    root.querySelectorAll('[data-revoke-invite]').forEach(function(b){
+      b.addEventListener('click', function(){ Team.revokeInvite(b.getAttribute('data-revoke-invite')).then(loadTeam); });
+    });
+    root.querySelectorAll('[data-copy-token]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var link=inviteLink(b.getAttribute('data-copy-token'));
+        var done=function(){ var old=b.innerHTML; b.innerHTML=s(ICON.check)+esc(x.copied); setTimeout(function(){ b.innerHTML=old; }, 1400); };
+        try{ navigator.clipboard.writeText(link).then(done, done); }catch(e){ done(); }
+      });
+    });
+  }
+  function viewTeam(){
+    return '<div id="teamRoot"><div class="card"><p class="csub">'+esc(tt().loading)+'</p></div></div>';
+  }
+
+  /* =====================================================
+     KOLKLI Request — inbox for the "my-requests" view.
+     Rows = upload links (window.KR / request-store.js).
+     Inbox + detail render inline; New request + full
+     preview deep-link to request.html.
+     ===================================================== */
+  function riReqs(){ return (window.KR ? KR.loadRequests() : []).slice(); }
+  function riStatus(r){ return window.KR ? KR.statusOf(r) : 'active'; }
+  function riStatusLabel(st){ return t.ri[st] || st; }
+  function riExpiry(r){
+    if(!r.expiresAt) return '';
+    var ms=r.expiresAt-Date.now();
+    if(ms<=0) return t.ri.expiredOn;
+    var d=Math.ceil(ms/86400000);
+    return d<=1 ? t.ri.expToday : t.ri.expDays(d);
+  }
+  function riUploadUrl(token){
+    var base=location.href.split(/[?#]/)[0].replace(/[^\/]*$/,'');
+    return base+'upload.html?req='+token;
+  }
+  function riFiltered(){
+    var arr=riReqs();
+    var q=reqState.q.trim().toLowerCase();
+    if(q) arr=arr.filter(function(r){ return (r.name||'').toLowerCase().indexOf(q)>=0; });
+    if(reqState.filter!=='all') arr=arr.filter(function(r){ return riStatus(r)===reqState.filter; });
+    arr.sort(function(a,b){
+      if(reqState.sort==='old') return a.createdAt-b.createdAt;
+      if(reqState.sort==='name') return (a.name||'').localeCompare(b.name||'');
+      if(reqState.sort==='files') return ((b.files||[]).length)-((a.files||[]).length);
+      return b.createdAt-a.createdAt;
+    });
+    return arr;
+  }
+
+  function viewRequests(){
+    var all=riReqs();
+    if(!all.length){
+      return emptyPanel({ icon:'inbox', title:t.reqTitle, sub:t.reqSub,
+        emptyT:t.reqEmptyT, emptyP:t.reqEmptyP, cta:{href:'request.html',label:t.openReq},
+        tools:[{ic:'link',href:'request.html',label:t.reqNew},{ic:'drive',href:'request.html?tab=manage',label:t.reqManage}] });
+    }
+    var counts={ all:all.length, active:0, expired:0, closed:0 };
+    all.forEach(function(r){ counts[riStatus(r)]++; });
+    var chips=[['all',t.ri.fAll],['active',t.ri.fActive],['expired',t.ri.fExpired],['closed',t.ri.fClosed]].map(function(c){
+      return '<button type="button" class="ri-chip'+(reqState.filter===c[0]?' on':'')+'" data-rfilter="'+c[0]+'">'+
+        esc(c[1])+'<span class="n">'+counts[c[0]]+'</span></button>';
+    }).join('');
+    var sortOpts=['new','old','name','files'].map(function(k){
+      return '<option value="'+k+'"'+(reqState.sort===k?' selected':'')+'>'+esc(t.ri['sort_'+k])+'</option>';
+    }).join('');
+    return '<div class="card ri-card">'+
+      '<div class="ri-head"><div><h2>'+esc(t.reqTitle)+'</h2><p class="csub">'+esc(t.reqSub)+'</p></div>'+
+        '<a class="btn primary ri-newbtn" href="request.html" style="text-decoration:none">'+s(ICON.plus)+esc(t.reqNew)+'</a></div>'+
+      '<div class="ri-toolbar">'+
+        '<div class="ri-search">'+s(ICON.search)+'<input type="text" id="riSearch" placeholder="'+esc(t.ri.searchPh)+'" value="'+esc(reqState.q)+'"></div>'+
+        '<select class="ri-sort" id="riSort" aria-label="'+esc(t.ri.sort_new)+'">'+sortOpts+'</select>'+
+      '</div>'+
+      '<div class="ri-filters" id="riFilters">'+chips+'</div>'+
+      '<div class="ri-body">'+
+        '<div class="ri-list" id="riList"></div>'+
+        '<aside class="ri-detail" id="riDetail"></aside>'+
+      '</div>'+
+    '</div>';
+  }
+
+  function riRowHtml(r){
+    var st=riStatus(r);
+    var files=(r.files||[]).length, subs=(r.submissions||[]).length;
+    var unseen=window.KR?KR.reqUnseen(r):0;
+    var bytes=window.KR?KR.reqBytes(r):0;
+    var exp=riExpiry(r);
+    var meta='<b>'+esc(t.ri.nSubs(subs))+'</b><span class="dot"></span><b>'+esc(t.ri.nFiles(files))+'</b>'+
+      '<span class="dot"></span>'+esc(window.KR?KR.fmtBytes(bytes):bytes)+'<span class="dot"></span>'+esc(fmtProjectDate(r.createdAt));
+    return '<article class="ri-row'+(reqState.sel===r.token?' on':'')+'" data-rtoken="'+esc(r.token)+'">'+
+      '<span class="ri-mark">'+s(ICON.inbox)+'</span>'+
+      '<div class="ri-rmain">'+
+        '<div class="ri-rtop">'+
+          '<span class="ri-name">'+esc(r.name||t.ri.untitled)+'</span>'+
+          '<span class="ri-badge '+st+'">'+esc(riStatusLabel(st))+'</span>'+
+          ((st==='active'&&exp)?'<span class="ri-exp">'+s(ICON.clock)+esc(exp)+'</span>':'')+
+          (unseen?'<span class="ri-unseen">'+esc(t.ri.nUnseen(unseen))+'</span>':'')+
+        '</div>'+
+        '<div class="ri-meta">'+meta+'</div>'+
+      '</div>'+
+      '<button type="button" class="ri-kebab" data-rmenu="'+esc(r.token)+'" aria-label="'+esc(t.ri.more)+'">'+s(ICON.dots)+'</button>'+
+      '<div class="ri-menu" data-menu-for="'+esc(r.token)+'">'+
+        '<button type="button" data-ract="open" data-rtoken="'+esc(r.token)+'">'+s(ICON.openext)+esc(t.ri.aOpen)+'</button>'+
+        '<button type="button" data-ract="copy" data-rtoken="'+esc(r.token)+'">'+s(ICON.link)+esc(t.ri.aCopy)+'</button>'+
+        '<button type="button" data-ract="dup" data-rtoken="'+esc(r.token)+'">'+s(ICON.copy)+esc(t.ri.aDup)+'</button>'+
+        (st!=='closed'?'<button type="button" data-ract="close" data-rtoken="'+esc(r.token)+'">'+s(ICON.check)+esc(t.ri.aClose)+'</button>':'')+
+        '<div class="sep"></div>'+
+        '<button type="button" class="danger" data-ract="del" data-rtoken="'+esc(r.token)+'">'+s(ICON.trash)+esc(t.ri.aDel)+'</button>'+
+      '</div>'+
+    '</article>';
+  }
+
+  function renderReqList(){
+    var listEl=el('riList'); if(!listEl) return;
+    var arr=riFiltered();
+    if(!reqState.sel || !arr.some(function(r){ return r.token===reqState.sel; })){
+      reqState.sel = arr.length ? arr[0].token : null;
+    }
+    listEl.innerHTML = arr.length ? arr.map(riRowHtml).join('') : '<div class="ri-noresults">'+esc(t.ri.noResults)+'</div>';
+    var fEl=el('riFilters');
+    if(fEl) fEl.querySelectorAll('[data-rfilter]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-rfilter')===reqState.filter); });
+    renderReqDetail();
+  }
+
+  function renderReqDetail(){
+    var box=el('riDetail'); if(!box) return;
+    var r=(reqState.sel && window.KR) ? KR.getRequest(reqState.sel) : null;
+    if(!r){ box.innerHTML='<div class="ri-dempty">'+s(ICON.inbox)+'<p>'+esc(t.ri.selectHint)+'</p></div>'; return; }
+    var st=riStatus(r), files=(r.files||[]), subs=(r.submissions||[]).slice();
+    subs.sort(function(a,b){ return b.at-a.at; });
+    var stats='<div class="ri-stat"><div class="v">'+subs.length+'</div><div class="k">'+esc(t.ri.kSubs)+'</div></div>'+
+      '<div class="ri-stat"><div class="v">'+files.length+'</div><div class="k">'+esc(t.ri.kFiles)+'</div></div>'+
+      '<div class="ri-stat"><div class="v">'+esc(KR.fmtBytes(KR.reqBytes(r)))+'</div><div class="k">'+esc(t.ri.kSize)+'</div></div>';
+    var subHtml=subs.map(function(sub){
+      var sfiles=files.filter(function(f){ return f.subId===sub.id; });
+      if(!sfiles.length) return '';
+      var contact=[];
+      if(sub.phone) contact.push('<span class="ri-cchip">'+s(ICON.phone)+esc(sub.phone)+'</span>');
+      if(sub.email) contact.push('<span class="ri-cchip">'+s(ICON.mail)+esc(sub.email)+'</span>');
+      var initial=((sub.name||'?').trim().charAt(0)||'?').toUpperCase();
+      var frows=sfiles.map(function(f){
+        return '<div class="ri-frow">'+
+          '<span class="ri-fico '+esc(f.kind)+'">'+(KR.FICON[f.kind]||'')+'</span>'+
+          '<span class="ri-fn"><div class="nm" title="'+esc(f.name)+'">'+esc(f.name)+'</div>'+
+            '<div class="sz">'+esc(KR.fmtBytes(f.size))+'</div></span>'+
+          '<button type="button" class="ri-fdl" data-rdl="'+esc(f.id)+'" aria-label="'+esc(t.ri.dl)+'">'+s(ICON.download)+'</button>'+
+        '</div>';
+      }).join('');
+      return '<div class="ri-sub">'+
+        '<div class="ri-sub-h"><span class="ri-ava">'+esc(initial)+'</span>'+
+          '<div class="ri-sub-id"><div class="ri-sub-name">'+esc(sub.name||t.ri.anon)+'</div>'+
+            '<div class="ri-sub-when">'+esc(fmtProjectDate(sub.at))+'</div>'+
+            (contact.length?'<div class="ri-sub-contact">'+contact.join('')+'</div>':'')+
+          '</div></div>'+
+        (sub.note?'<div class="ri-note">'+esc(sub.note)+'</div>':'')+
+        '<div class="ri-files">'+frows+'</div>'+
+      '</div>';
+    }).filter(Boolean).join('');
+    box.innerHTML=
+      '<div class="ri-dhead"><div><h3>'+esc(r.name||t.ri.untitled)+'</h3>'+
+        '<span class="ri-badge '+st+'">'+esc(riStatusLabel(st))+'</span></div>'+
+        '<a class="btn ghost" href="request.html?tab=manage" style="text-decoration:none">'+s(ICON.openext)+esc(t.ri.openFull)+'</a></div>'+
+      '<div class="ri-dstats">'+stats+'</div>'+
+      '<div class="ri-dlink"><span class="lk">'+esc(riUploadUrl(r.token))+'</span>'+
+        '<button type="button" data-rcopy="'+esc(r.token)+'" aria-label="'+esc(t.ri.aCopy)+'">'+s(ICON.copy)+'</button></div>'+
+      (files.length ? subHtml : '<div class="ri-noresults">'+esc(t.ri.detNoFiles)+'</div>');
+  }
+
+  function riCloseMenus(){ document.querySelectorAll('.ri-menu.open').forEach(function(m){ m.classList.remove('open'); }); }
+  function riToast(msg){
+    var box=el('riToast');
+    if(!box){ box=document.createElement('div'); box.id='riToast'; box.className='ri-toast'; document.body.appendChild(box); }
+    box.textContent=msg; box.classList.add('show');
+    clearTimeout(box._t); box._t=setTimeout(function(){ box.classList.remove('show'); }, 1600);
+  }
+  function riCopy(token){
+    var url=riUploadUrl(token), done=function(){ riToast(t.ri.copied); };
+    try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done,done); return; } }catch(e){}
+    var ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(_){ } ta.remove(); done();
+  }
+  function riDownload(id){
+    if(!window.KR) return;
+    KR.getBlob(id).then(function(blob){
+      if(!blob) return;
+      var r=KR.getRequest(reqState.sel), f=r&&(r.files||[]).filter(function(x){ return x.id===id; })[0];
+      var url=URL.createObjectURL(blob), a=document.createElement('a');
+      a.href=url; a.download=(f&&f.name)||'file'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+    });
+  }
+  function riDuplicate(token){
+    if(!window.KR) return;
+    var src=KR.getRequest(token); if(!src) return;
+    var copy=JSON.parse(JSON.stringify(src));
+    copy.token=KR.randToken(); copy.name=(src.name||'')+t.ri.dupSuffix; copy.createdAt=Date.now();
+    copy.status='active'; copy.submissions=[]; copy.files=[];
+    if(src.expiresAt){ var span=src.expiresAt-src.createdAt; copy.expiresAt=Date.now()+Math.max(span,86400000); }
+    KR.upsertRequest(copy); reqState.sel=copy.token; renderMain();
+  }
+  function riClose(token){
+    if(!window.KR || !confirm(t.ri.confClose)) return;
+    var r=KR.getRequest(token); if(!r) return; r.status='closed'; KR.upsertRequest(r); renderMain();
+  }
+  function riDelete(token){
+    if(!window.KR || !confirm(t.ri.confDel)) return;
+    KR.deleteRequest(token).then(function(){ if(reqState.sel===token) reqState.sel=null; renderMain(); });
+  }
+  function riMarkSeen(token){
+    if(!window.KR) return;
+    var r=KR.getRequest(token); if(!r) return;
+    var ch=false; (r.files||[]).forEach(function(f){ if(!f.seen){ f.seen=true; ch=true; } });
+    if(ch) KR.upsertRequest(r);
+  }
+
+  function wireReqInbox(){
+    var listEl=el('riList'); if(!listEl) return;
+    renderReqList();
+    var search=el('riSearch');
+    if(search) search.addEventListener('input', function(){ reqState.q=search.value; renderReqList(); });
+    var sort=el('riSort');
+    if(sort) sort.addEventListener('change', function(){ reqState.sort=sort.value; renderReqList(); });
+    var filters=el('riFilters');
+    if(filters) filters.addEventListener('click', function(e){
+      var b=e.target.closest('[data-rfilter]'); if(!b) return;
+      reqState.filter=b.getAttribute('data-rfilter'); renderReqList();
+    });
+    listEl.addEventListener('click', function(e){
+      var actBtn=e.target.closest('[data-ract]');
+      if(actBtn){
+        e.stopPropagation(); riCloseMenus();
+        var act=actBtn.getAttribute('data-ract'), token=actBtn.getAttribute('data-rtoken');
+        if(act==='open') location.href='request.html?tab=manage';
+        else if(act==='copy') riCopy(token);
+        else if(act==='dup') riDuplicate(token);
+        else if(act==='close') riClose(token);
+        else if(act==='del') riDelete(token);
+        return;
+      }
+      var kb=e.target.closest('[data-rmenu]');
+      if(kb){
+        e.stopPropagation();
+        var tk=kb.getAttribute('data-rmenu');
+        var menu=listEl.querySelector('.ri-menu[data-menu-for="'+(window.CSS&&CSS.escape?CSS.escape(tk):tk)+'"]');
+        var wasOpen=menu&&menu.classList.contains('open');
+        riCloseMenus();
+        if(menu&&!wasOpen) menu.classList.add('open');
+        return;
+      }
+      var row=e.target.closest('[data-rtoken]');
+      if(row){
+        riCloseMenus();
+        reqState.sel=row.getAttribute('data-rtoken');
+        riMarkSeen(reqState.sel);
+        renderReqList();
+      }
+    });
+    var detail=el('riDetail');
+    if(detail) detail.addEventListener('click', function(e){
+      var dl=e.target.closest('[data-rdl]'); if(dl){ riDownload(dl.getAttribute('data-rdl')); return; }
+      var cp=e.target.closest('[data-rcopy]'); if(cp){ riCopy(cp.getAttribute('data-rcopy')); return; }
+    });
+    if(!wireReqInbox._docBound){
+      document.addEventListener('click', function(e){
+        if(!e.target.closest('.ri-menu') && !e.target.closest('[data-rmenu]')) riCloseMenus();
+      });
+      wireReqInbox._docBound=true;
+    }
+    if(!reqBC && window.KR && KR.listen){
+      reqBC=KR.listen(function(){ if(view==='my-requests') renderMain(); });
+    }
+  }
+
   var VIEWS = {
     account: viewAccount,
+    team: viewTeam,
     details: viewDetails,
     settings: viewSettings,
     payments: viewPayments,
     'my-audio': function(){ return emptyPanel({ icon:'music', title:t.audioTitle, sub:t.audioSub,
       emptyT:t.audioEmptyT, emptyP:t.audioEmptyP, cta:{href:'app.html',label:t.openAudio},
-      tools:[{ic:'scissors',href:'app.html',label:t.qAudioT},{ic:'merge',href:'merge-audio.html',label:({he:'מיזוג אודיו',en:'Merge Audio',ru:'Объединение'})[lang]},{ic:'refresh',href:'convert.html',label:({he:'המרת אודיו',en:'Convert Audio',ru:'Конвертация'})[lang]}] }); },
+      tools:[{ic:'scissors',href:'app.html',label:({he:'עריכת אודיו',en:'Edit Audio',ru:'Редактор'})[lang]},{ic:'merge',href:'merge-audio.html',label:({he:'מיזוג',en:'Merge',ru:'Объединить'})[lang]},{ic:'refresh',href:'convert.html',label:({he:'המרה',en:'Convert',ru:'Конвертация'})[lang]},{ic:'minimize',href:'compress-audio.html',label:({he:'דחיסה',en:'Compress',ru:'Сжатие'})[lang]},{ic:'zap',href:'ai-audio-cleanup.html',label:({he:'ניקוי AI',en:'AI Cleanup',ru:'AI-очистка'})[lang]}] }); },
     'my-video': function(){ return emptyPanel({ icon:'film', title:t.videoTitle, sub:t.videoSub,
       emptyT:t.videoEmptyT, emptyP:t.videoEmptyP, cta:{href:'video-cut.html',label:t.openVideo},
-      tools:[{ic:'scissors',href:'video-cut.html',label:({he:'חותך וידאו',en:'Video Cutter',ru:'Обрезка видео'})[lang]},{ic:'refresh',href:'video-convert.html',label:({he:'המרת וידאו',en:'Convert Video',ru:'Конвертация'})[lang]},{ic:'minimize',href:'compress-video.html',label:({he:'דחיסת וידאו',en:'Compress',ru:'Сжатие'})[lang]}] }); },
+      tools:[{ic:'scissors',href:'video-cut.html',label:({he:'חיתוך',en:'Cut',ru:'Обрезка'})[lang]},{ic:'refresh',href:'video-convert.html',label:({he:'המרה',en:'Convert',ru:'Конвертация'})[lang]},{ic:'minimize',href:'compress-video.html',label:({he:'דחיסה',en:'Compress',ru:'Сжатие'})[lang]},{ic:'music',href:'mp4-to-mp3.html',label:({he:'חילוץ אודיו',en:'Extract Audio',ru:'Извлечь аудио'})[lang]},{ic:'files',href:'subtitle-generator.html',label:({he:'כתוביות',en:'Subtitles',ru:'Субтитры'})[lang]}] }); },
+    'my-images': function(){ return emptyPanel({ icon:'camera', title:t.imgTitle, sub:t.imgSub,
+      emptyT:t.imgEmptyT, emptyP:t.imgEmptyP, cta:{href:'image-convert.html',label:t.openImg},
+      tools:[{ic:'scissors',href:'crop-image.html',label:({he:'חיתוך',en:'Crop',ru:'Обрезка'})[lang]},{ic:'swap',href:'resize-image.html',label:({he:'שינוי גודל',en:'Resize',ru:'Размер'})[lang]},{ic:'refresh',href:'image-convert.html',label:({he:'המרה',en:'Convert',ru:'Конвертация'})[lang]},{ic:'minimize',href:'compress-image.html',label:({he:'דחיסה',en:'Compress',ru:'Сжатие'})[lang]},{ic:'zap',href:'remove-bg.html',label:({he:'הסרת רקע',en:'Remove BG',ru:'Удалить фон'})[lang]}] }); },
+    'my-docs': function(){ return emptyPanel({ icon:'files', title:t.docTitle, sub:t.docSub,
+      emptyT:t.docEmptyT, emptyP:t.docEmptyP, cta:{href:'doc-convert.html',label:t.openDoc},
+      tools:[{ic:'refresh',href:'doc-convert.html',label:({he:'המרת מסמך',en:'Convert',ru:'Конвертация'})[lang]},{ic:'files',href:'doc-to-pdf.html',label:({he:'ל-PDF',en:'To PDF',ru:'В PDF'})[lang]},{ic:'merge',href:'merge-pdf.html',label:({he:'מיזוג PDF',en:'Merge PDF',ru:'Объединить PDF'})[lang]},{ic:'minimize',href:'compress-pdf.html',label:({he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF'})[lang]},{ic:'zap',href:'ai-summarize-pdf.html',label:({he:'סיכום AI',en:'AI Summary',ru:'AI-резюме'})[lang]}] }); },
     'my-files': viewProjects,
     'my-transfers': function(){ return emptyPanel({ icon:'send', title:t.sendTitle, sub:t.sendSub,
       emptyT:t.sendEmptyT, emptyP:t.sendEmptyP, cta:{href:'send.html',label:t.openSend} }); },
-    'my-requests': function(){ return emptyPanel({ icon:'inbox', title:t.reqTitle, sub:t.reqSub,
-      emptyT:t.reqEmptyT, emptyP:t.reqEmptyP, cta:{href:'request.html',label:t.openReq},
-      tools:[{ic:'link',href:'request.html',label:t.reqNew},{ic:'drive',href:'request.html?tab=manage',label:t.reqManage}] }); }
+    'my-requests': viewRequests,
+    'my-reviews': function(){ return emptyPanel({ icon:'check', title:t.reviewTitle, sub:t.reviewSub,
+      emptyT:t.reviewEmptyT, emptyP:t.reviewEmptyP, cta:{href:'review.html',label:t.openReview},
+      tools:[{ic:'link',href:'review.html',label:t.reviewNew},{ic:'drive',href:'review.html?tab=manage',label:t.reviewManage}] }); }
   };
 
   /* =====================================================
@@ -1206,6 +2013,17 @@
   function openDrawer(){ el('side').classList.add('open'); el('sideScrim').classList.add('open'); }
   function closeDrawer(){ el('side').classList.remove('open'); el('sideScrim').classList.remove('open'); }
 
+  function commitLabel(id){
+    var inp=el('side').querySelector('[data-label-input="'+id+'"]');
+    if(inp) setLabel(id, inp.value);
+    editingLabel=null;
+    renderSide();
+  }
+  function focusLabelInput(){
+    var inp=el('side').querySelector('.lbl-input');
+    if(inp){ inp.focus(); try{ inp.select(); }catch(e){} }
+  }
+
   function wireSide(){
     el('side').addEventListener('click', function(e){
       var tog=e.target.closest('[data-cattoggle]');
@@ -1216,10 +2034,18 @@
         renderSide();
         return;
       }
+      // rename a sidebar label — must run before the data-view (navigate) check
+      var editBtn=e.target.closest('[data-editlabel]');
+      if(editBtn){ editingLabel=editBtn.getAttribute('data-editlabel'); renderSide(); focusLabelInput(); return; }
+      var saveBtn=e.target.closest('[data-savelabel]');
+      if(saveBtn){ commitLabel(saveBtn.getAttribute('data-savelabel')); return; }
+      if(e.target.closest('.lbl-input')) return; // clicks inside the input shouldn't navigate
       var addProject=e.target.closest('#sideNewProject');
-      if(addProject){ createProject(); return; }
+      if(addProject){ location.href='files.html?new=1'; return; }
       var addNav=e.target.closest('[data-add-href]');
       if(addNav){ location.href=addNav.getAttribute('data-add-href'); return; }
+      var addView=e.target.closest('[data-add-view]');
+      if(addView){ focusInvite=true; selectView(addView.getAttribute('data-add-view')); return; }
       var project=e.target.closest('[data-project]');
       if(project){ activeProjectId=project.getAttribute('data-project'); selectView('my-files'); return; }
       var item=e.target.closest('[data-view]');
@@ -1231,12 +2057,18 @@
       var upg=e.target.closest('#sideUpg');
       if(upg){ location.href='pricing/'; }
     });
+    el('side').addEventListener('keydown', function(e){
+      var inp=e.target.closest('[data-label-input]');
+      if(!inp) return;
+      if(e.key==='Enter'){ e.preventDefault(); commitLabel(inp.getAttribute('data-label-input')); }
+      else if(e.key==='Escape'){ e.preventDefault(); editingLabel=null; renderSide(); }
+    });
   }
 
   function wireMain(){
     var host=el('main');
     host.querySelectorAll('[data-new-project]').forEach(function(b){
-      b.addEventListener('click', createProject);
+      b.addEventListener('click', function(){ location.href='files.html?new=1'; });
     });
     // account header: change / remove profile picture
     var avBtn=el('avatarBtn'), avFile=el('avatarFile'), avRem=el('avatarRemove');
@@ -1246,10 +2078,6 @@
     }
     if(avRem) avRem.addEventListener('click', function(){
       delete user.avatar; persistUser(); render();
-    });
-    // plan demo switch
-    host.querySelectorAll('[data-setplan]').forEach(function(b){
-      b.addEventListener('click', function(){ setPlan(b.getAttribute('data-setplan')); });
     });
     // settings: language
     host.querySelectorAll('[data-setlang]').forEach(function(b){
@@ -1262,7 +2090,7 @@
     // settings: toggles
     host.querySelectorAll('[data-toggle]').forEach(function(b){
       b.addEventListener('click', function(){
-        var k=b.getAttribute('data-toggle'); notif[k]=!notif[k]; lsSet(NOTIF_KEY, JSON.stringify(notif));
+        var k=b.getAttribute('data-toggle'); notif[k]=!notif[k]; lsSetOwn(NOTIF_KEY, JSON.stringify(notif));
         b.classList.toggle('on', notif[k]);
       });
     });
@@ -1291,6 +2119,16 @@
     });
     var addc=el('addCard');
     if(addc) addc.addEventListener('click', function(){ location.href='pricing/'; });
+    // billing: Stripe checkout / portal (falls back to pricing/ if unconfigured)
+    host.querySelectorAll('[data-billing-checkout]').forEach(function(b){
+      b.addEventListener('click', function(){ billingCheckout(b.getAttribute('data-billing-checkout')); });
+    });
+    var bportal=host.querySelector('[data-billing-portal]');
+    if(bportal) bportal.addEventListener('click', function(){ billingPortal(); });
+    // team view loads its data (Supabase / demo) after the shell renders
+    if(view==='team') loadTeam();
+    // request inbox binds its list/detail interactions after the shell renders
+    if(view==='my-requests') wireReqInbox();
   }
 
   /* =====================================================
@@ -1335,8 +2173,32 @@
 
   applyTheme(lsGet('theme')||'light');
   loadUser();
+  // Invite deep-link: dashboard.html#join=TOKEN → accept it, then open Team.
+  (function handleJoin(){
+    var m=(location.hash||'').match(/^#join=([A-Za-z0-9\-]+)/);
+    if(!m) return;
+    var token=m[1];
+    try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+    if(window.KolkliAuth && window.KolkliAuth.configured()){
+      Team.acceptInvite(token).then(function(r){
+        if(r.ok){ selectView('team'); }
+        else { alert(tt().joinFail+(r.message?(': '+r.message):'')); }
+      });
+    } else {
+      alert(tt().joinDemo);
+    }
+  })();
   var hv=viewFromHash(); if(hv) view=hv;
   window.addEventListener('hashchange', function(){ var v=viewFromHash(); if(v) selectView(v); });
+  // auth-store.js loads async and fires kolkli:auth once the Supabase session
+  // is synced. Re-render then so the account + billing buttons reflect the
+  // real signed-in state (guarded to the session actually changing, so a
+  // periodic token refresh doesn't wipe a form the user is filling in).
+  window.addEventListener('kolkli:auth', function(){
+    var before = user && user.email;
+    loadUser();
+    if((user && user.email) !== before) render();
+  });
   wireSide();
   el('mMenuBtn').addEventListener('click', openDrawer);
   el('sideScrim').addEventListener('click', closeDrawer);

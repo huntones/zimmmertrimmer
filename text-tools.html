@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — כלי טקסט</title>
+<meta name="description" content="Free text tools that run in your browser — reverse, sort, dedupe, clean whitespace, split & join, change case, extract emails/links, count words, make hashtags, slugify, URL encode/decode, format JSON and clean CSV. Nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* layout: tool list + workspace */
+  .tt-grid{display:grid;grid-template-columns:250px 1fr;gap:18px;align-items:start;}
+  @media (max-width:900px){ .tt-grid{grid-template-columns:1fr;} }
+
+  /* sidebar */
+  .tt-side{padding:10px;position:sticky;top:88px;max-height:calc(100vh - 104px);overflow:auto;}
+  @media (max-width:900px){ .tt-side{position:static;max-height:none;} }
+  .tt-grp{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);
+    padding:12px 10px 6px;}
+  .tt-grp:first-child{padding-top:4px;}
+  .tt-nav{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-radius:11px;
+    background:none;cursor:pointer;text-align:start;color:var(--ink-2);font-family:var(--sans);font-size:13.5px;
+    font-weight:600;transition:background .12s,color .12s;}
+  .tt-nav:hover{background:var(--panel-2);color:var(--ink);}
+  .tt-nav.on{background:var(--accent-soft);color:var(--accent-dim);}
+  .tt-nav .nvi{width:30px;height:30px;flex-shrink:0;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    background:var(--panel-2);color:var(--muted);transition:background .12s,color .12s;}
+  .tt-nav:hover .nvi{color:var(--ink);}
+  .tt-nav.on .nvi{background:var(--panel);color:var(--accent);}
+  .tt-nav .nvi svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .tt-nav span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* workspace */
+  .tt-work{min-width:0;}
+  .tt-toolhead{display:flex;align-items:center;gap:13px;margin-bottom:14px;}
+  .tt-toolhead .thi{width:46px;height:46px;flex-shrink:0;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .tt-toolhead .thi svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .tt-toolhead h3{font-size:19px;font-weight:700;margin:0 0 2px;}
+  .tt-toolhead p{font-size:13px;color:var(--muted);margin:0;}
+
+  /* options bar */
+  .tt-opts{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:flex-end;padding:15px 16px;margin-bottom:16px;}
+  .tt-opts:empty{display:none;}
+  .tt-opt{display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .tt-opt > label{font-size:11.5px;font-weight:700;color:var(--ink-2);}
+  .tt-opt select,.tt-opt input[type=text],.tt-opt input[type=number]{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:9px;
+    font-family:var(--sans);font-size:13px;padding:8px 11px;transition:border-color .12s,box-shadow .12s;}
+  .tt-opt input[type=text]{min-width:150px;}
+  .tt-opt input[type=number]{width:92px;}
+  .tt-opt select{cursor:pointer;}
+  .tt-opt select:focus,.tt-opt input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .tt-checks{display:flex;flex-wrap:wrap;gap:8px;}
+  .tt-check{display:inline-flex;align-items:center;gap:7px;cursor:pointer;user-select:none;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:7px 13px;
+    font-size:12.5px;font-weight:600;color:var(--ink-2);transition:border-color .12s,background .12s,color .12s;}
+  .tt-check:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));}
+  .tt-check input{accent-color:var(--accent);width:15px;height:15px;margin:0;cursor:pointer;}
+  .tt-check.on{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));color:var(--accent-dim);}
+
+  /* input / output panes */
+  .tt-io{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+  @media (max-width:820px){ .tt-io{grid-template-columns:1fr;} }
+  .tt-pane{display:flex;flex-direction:column;min-width:0;}
+  .tt-pane-h{display:flex;align-items:center;gap:10px;margin-bottom:8px;min-height:32px;}
+  .tt-pane-h .ttl{font-size:13px;font-weight:700;color:var(--ink-2);}
+  .tt-pane-h .stat{font-family:var(--mono);font-size:10.5px;color:var(--faint);white-space:nowrap;}
+  .tt-pane-h .sp{flex:1;}
+  .tt-mini{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 11px;border-radius:9px;
+    border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;
+    font-size:12px;font-weight:600;font-family:var(--sans);transition:border-color .12s,color .12s,background .12s;}
+  .tt-mini:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .tt-mini svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .tt-mini.primary{color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px var(--grad-btn-glow);}
+  .tt-mini.primary:hover{filter:brightness(1.06);color:#fff;}
+  textarea.tt-ta{width:100%;min-height:360px;resize:vertical;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--ink);padding:14px 15px;font-family:var(--mono);font-size:13px;line-height:1.6;
+    box-shadow:var(--shadow-sm);transition:border-color .12s,box-shadow .12s;}
+  textarea.tt-ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  textarea.tt-ta[readonly]{background:var(--panel-2);}
+
+  /* validity / error note under the output */
+  .tt-note{margin-top:12px;font-size:12.5px;min-height:16px;display:flex;align-items:center;gap:8px;}
+  .tt-note.ok{color:var(--success-dim);}
+  .tt-note.err{color:var(--danger);}
+  .tt-note svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+  /* counter stats grid (replaces the output textarea for the counter tool) */
+  .tt-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  .tt-stat-card{border:1px solid var(--line-2);border-radius:13px;background:var(--panel-2);padding:14px 15px;}
+  .tt-stat-card .num{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--accent-dim);line-height:1.1;}
+  .tt-stat-card .lab{font-size:12px;color:var(--muted);margin-top:4px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" id="kick"></span>
+    <h2 id="pageTitle"></h2>
+    <p id="pageSub"></p>
+  </div>
+
+  <div class="tt-grid">
+    <aside class="tt-side card" id="ttSide"></aside>
+
+    <div class="tt-work">
+      <div class="tt-toolhead">
+        <span class="thi" id="thIcon"></span>
+        <div>
+          <h3 id="thName"></h3>
+          <p id="thDesc"></p>
+        </div>
+      </div>
+
+      <div class="tt-opts card" id="ttOpts"></div>
+
+      <div class="tt-io">
+        <div class="tt-pane">
+          <div class="tt-pane-h">
+            <span class="ttl" id="inLabel"></span>
+            <span class="stat" id="inStat"></span>
+            <span class="sp"></span>
+            <button class="tt-mini" id="sampleBtn" type="button"></button>
+            <button class="tt-mini" id="clearBtn" type="button"></button>
+          </div>
+          <textarea class="tt-ta" id="ttIn" dir="auto" spellcheck="false"></textarea>
+        </div>
+
+        <div class="tt-pane">
+          <div class="tt-pane-h">
+            <span class="ttl" id="outLabel"></span>
+            <span class="stat" id="outStat"></span>
+            <span class="sp"></span>
+            <button class="tt-mini" id="copyBtn" type="button"></button>
+            <button class="tt-mini primary" id="dlBtn" type="button"></button>
+          </div>
+          <textarea class="tt-ta" id="ttOut" dir="auto" spellcheck="false" readonly></textarea>
+          <div class="tt-stats" id="ttStats" style="display:none"></div>
+        </div>
+      </div>
+
+      <div class="tt-note" id="ttNote"></div>
+    </div>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  /* ---------- icons (Feather-style, inherit currentColor) ---------- */
+  const IC = {
+    flip:'<polyline points="17 2 21 6 17 10"/><path d="M3 12V9a3 3 0 0 1 3-3h15"/><polyline points="7 22 3 18 7 14"/><path d="M21 12v3a3 3 0 0 1-3 3H3"/>',
+    type:'<polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>',
+    link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    wind:'<path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>',
+    eraser:'<path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/>',
+    sort:'<path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="m3 17 3 3 3-3"/><path d="M6 18V4"/>',
+    copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+    scissors:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/>',
+    merge:'<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>',
+    plus:'<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>',
+    listnum:'<line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-1.5 2-2.5S5 14 4 14.5"/>',
+    at:'<circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/>',
+    hash:'<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
+    table:'<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="9" x2="12" y2="21"/>',
+    braces:'<path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1"/>',
+    copyIco:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+    dl:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+    trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+    spark:'<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/>',
+    ok:'<path d="M20 6 9 17l-5-5"/>',
+    warn:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'
+  };
+  const svg = n => '<svg viewBox="0 0 24 24" aria-hidden="true">'+(IC[n]||'')+'</svg>';
+
+  /* ---------- helpers ---------- */
+  const linesOf = s => s.split(/\r?\n/);
+  const nl = a => a.join('\n');
+  const escapeReg = s => String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  function alpha(i, upper){ let s=''; i=Math.max(1,i); while(i>0){ i--; s=String.fromCharCode(65+(i%26))+s; i=Math.floor(i/26); } return upper?s:s.toLowerCase(); }
+  function sortKeys(v){ if(Array.isArray(v)) return v.map(sortKeys); if(v && typeof v==='object'){ const o={}; Object.keys(v).sort().forEach(k=>o[k]=sortKeys(v[k])); return o; } return v; }
+  const EMAIL_RE = /[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/g;
+  function dedupeArr(arr, ci){ const seen=new Set(), out=[]; arr.forEach(x=>{ const k=ci?x.toLowerCase():x; if(!seen.has(k)){ seen.add(k); out.push(x); } }); return out; }
+  function parseCSV(text, delim){
+    const rows=[]; let row=[], cur='', i=0, q=false;
+    while(i<text.length){
+      const ch=text[i];
+      if(q){ if(ch==='"'){ if(text[i+1]==='"'){ cur+='"'; i+=2; continue; } q=false; i++; continue; } cur+=ch; i++; continue; }
+      if(ch==='"'){ q=true; i++; continue; }
+      if(ch===delim){ row.push(cur); cur=''; i++; continue; }
+      if(ch==='\n' || ch==='\r'){ if(ch==='\r' && text[i+1]==='\n') i++; row.push(cur); rows.push(row); row=[]; cur=''; i++; continue; }
+      cur+=ch; i++;
+    }
+    row.push(cur); rows.push(row);
+    if(rows.length && rows[rows.length-1].length===1 && rows[rows.length-1][0]==='') rows.pop();
+    return rows;
+  }
+  const csvCell = (c, d) => (c.indexOf(d)>-1 || c.indexOf('"')>-1 || /[\n\r]/.test(c)) ? '"'+c.replace(/"/g,'""')+'"' : c;
+  const PAIRS = {'(':')',')':'(', '[':']',']':'[', '{':'}','}':'{', '<':'>','>':'<', '“':'”','”':'“', '‘':'’','’':'‘', '«':'»','»':'«'};
+  const OPENERS = {'(':')','[':']','{':'}','<':'>'};
+  const QUOTES = {'"':'"', "'":"'", '׳':'׳', '״':'״', '“':'”', '‘':'’', '«':'»'};
+  const isSpace = ch => /\s/.test(ch);
+  const isWordChar = ch => /[\p{L}\p{N}_-]/u.test(ch);
+  const isPunct = ch => /[.,!?;:…،؛]/u.test(ch);
+  const isInternalQuote = (arr,i) => ['"', "'", '׳', '״'].indexOf(arr[i])>-1 && i>0 && i<arr.length-1 && isWordChar(arr[i-1]) && isWordChar(arr[i+1]);
+  const mirrorChar = ch => PAIRS[ch] || ch;
+  function reverseGraphemes(text){
+    return Array.from(text).reverse().map(mirrorChar).join('');
+  }
+  function findMatching(arr,start,close){
+    var depth=1;
+    for(var i=start+1;i<arr.length;i++){
+      if(arr[i]===arr[start]) depth++;
+      else if(arr[i]===close){ depth--; if(depth===0) return i; }
+    }
+    return -1;
+  }
+  function findQuote(arr,start,close){
+    for(var i=start+1;i<arr.length;i++){ if(arr[i]===close) return i; }
+    return -1;
+  }
+  function tokenizeSmartLine(line){
+    const arr=Array.from(line), units=[];
+    for(let i=0;i<arr.length;){
+      const ch=arr[i];
+      if(isSpace(ch)){
+        let j=i+1; while(j<arr.length && isSpace(arr[j])) j++;
+        units.push({type:'space', text:arr.slice(i,j).join('')}); i=j; continue;
+      }
+      if(OPENERS[ch]){
+        const j=findMatching(arr,i,OPENERS[ch]);
+        if(j>-1){ units.push({type:'group', open:ch, close:OPENERS[ch], text:arr.slice(i+1,j).join(''), suffix:''}); i=j+1; continue; }
+      }
+      if(QUOTES[ch] && !isInternalQuote(arr,i)){
+        const j=findQuote(arr,i,QUOTES[ch]);
+        if(j>-1){ units.push({type:'group', open:ch, close:QUOTES[ch], text:arr.slice(i+1,j).join(''), suffix:''}); i=j+1; continue; }
+      }
+      if(isWordChar(ch) || isInternalQuote(arr,i)){
+        let j=i+1;
+        while(j<arr.length && (isWordChar(arr[j]) || isInternalQuote(arr,j))) j++;
+        units.push({type:'word', text:arr.slice(i,j).join(''), suffix:''}); i=j; continue;
+      }
+      if(isPunct(ch)){
+        let j=i+1; while(j<arr.length && isPunct(arr[j])) j++;
+        const p=arr.slice(i,j).join('');
+        const prev=units[units.length-1];
+        if(prev && prev.type!=='space') prev.suffix=(prev.suffix||'')+p;
+        else units.push({type:'raw', text:p});
+        i=j; continue;
+      }
+      units.push({type:'raw', text:mirrorChar(ch)}); i++;
+    }
+    return units;
+  }
+  function renderSmartUnit(u){
+    if(u.type==='space') return u.text;
+    if(u.type==='word') return reverseGraphemes(u.text)+(u.suffix||'');
+    if(u.type==='group') return mirrorChar(u.close)+reverseSmartLine(u.text)+mirrorChar(u.open)+(u.suffix||'');
+    return reverseGraphemes(u.text||'')+(u.suffix||'');
+  }
+  function reverseSmartLine(line){
+    return tokenizeSmartLine(line).reverse().map(renderSmartUnit).join('');
+  }
+  function reverseSmartText(input){
+    return input.split(/(\r\n|\n|\r)/).map(part => /\r\n|\n|\r/.test(part) ? part : reverseSmartLine(part)).join('');
+  }
+
+  /* ---------- tool registry ----------
+     Each tool: id, grp, ic, names {he,en,ru}, desc {he,en,ru},
+     opts [ {k,type,label{},...} ], run(input, o) -> string (may throw for invalid input),
+     optional ext / mime for download.  */
+  function sel(k, def, label, options){ return {k,type:'select',def,label,options}; }
+  function chk(k, def, label){ return {k,type:'check',def,label}; }
+  function txt(k, def, label, ph){ return {k,type:'text',def,label,ph}; }
+  function numf(k, def, label, min){ return {k,type:'number',def,label,min}; }
+  function o3(he,en,ru){ return {he,en,ru}; }
+
+  const TOOLS = [
+    /* ===== group: edit ===== */
+    { id:'reverse', grp:'edit', ic:'flip',
+      names:o3('היפוך טקסט','KolKli Reverse','Обратный текст'),
+      desc:o3('היפוך טקסט חכם בזמן אמת, עם שמירת שורות, סוגריים, מרכאות ופיסוק.','Smart real-time text reversal that keeps lines, brackets, quotes and punctuation tidy.','Умный переворот текста с сохранением строк, скобок, кавычек и пунктуации.'),
+      opts:[ sel('mode','smart', o3('היפוך לפי','Reverse by','Перевернуть по'), [
+        {v:'smart', ...o3('חכם','Smart','Умно')},
+        {v:'chars', ...o3('תווים פשוט','Plain characters','Символам')},
+        {v:'words', ...o3('מילים','Words','Словам')},
+        {v:'lines', ...o3('שורות','Lines','Строкам')} ]) ],
+      run(input,o){ const L=linesOf(input);
+        if(o.mode==='lines') return nl(L.slice().reverse());
+        if(o.mode==='words') return nl(L.map(l=>(l.match(/\S+/g)||[]).reverse().join(' ')));
+        if(o.mode==='smart') return reverseSmartText(input);
+        return nl(L.map(l=>Array.from(l).reverse().join(''))); } },
+
+    { id:'case', grp:'edit', ic:'type',
+      names:o3('שינוי אותיות','Change Case','Изменить регистр'),
+      desc:o3('אותיות גדולות, קטנות, Title Case ו־Sentence case.','UPPERCASE, lowercase, Title Case and Sentence case.','ПРОПИСНЫЕ, строчные, Title Case и Sentence case.'),
+      opts:[ sel('mode','upper', o3('סגנון','Style','Стиль'), [
+        {v:'upper', ...o3('אותיות גדולות','UPPERCASE','ПРОПИСНЫЕ')},
+        {v:'lower', ...o3('אותיות קטנות','lowercase','строчные')},
+        {v:'title', ...o3('Title Case','Title Case','Title Case')},
+        {v:'sentence', ...o3('Sentence case','Sentence case','Sentence case')},
+        {v:'capital', ...o3('Capitalize Each Word','Capitalize Words','Каждое Слово')} ]) ],
+      run(input,o){
+        switch(o.mode){
+          case 'upper': return input.toUpperCase();
+          case 'lower': return input.toLowerCase();
+          case 'title': return input.replace(/\b\w[\w']*/g, w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase());
+          case 'capital': return input.replace(/\b\w/g, c=>c.toUpperCase());
+          case 'sentence': return input.toLowerCase().replace(/(^\s*|[.!?]\s+)([a-z])/g,(m,p,c)=>p+c.toUpperCase());
+          default: return input; } } },
+
+    { id:'slug', grp:'edit', ic:'link', ext:'txt',
+      names:o3('המרה ל־Slug','Slugify','Slug из текста'),
+      desc:o3('כתובת URL נקייה לכל שורה — לכותרות עמודים.','A clean URL slug for each line — great for page titles.','Чистый URL-slug для каждой строки — для заголовков страниц.'),
+      opts:[
+        sel('sep','dash', o3('מפריד','Separator','Разделитель'), [
+          {v:'dash', ...o3('מקף -','Hyphen -','Дефис -')}, {v:'underscore', ...o3('קו תחתון _','Underscore _','Подчёркивание _')} ]),
+        chk('lower',true, o3('אותיות קטנות','Lowercase','Строчные')),
+        chk('ascii',false, o3('ASCII בלבד','ASCII only','Только ASCII')) ],
+      run(input,o){ const sp=o.sep==='underscore'?'_':'-';
+        return nl(linesOf(input).map(line=>{ let s=line.trim(); if(o.lower) s=s.toLowerCase();
+          if(o.ascii){ s=s.normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,sp); }
+          else { s=s.replace(/[^\p{L}\p{N}]+/gu,sp); }
+          return s.replace(new RegExp(escapeReg(sp)+'{2,}','g'),sp).replace(new RegExp('^'+escapeReg(sp)+'+|'+escapeReg(sp)+'+$','g'),''); })); } },
+
+    { id:'whitespace', grp:'edit', ic:'wind',
+      names:o3('ניקוי רווחים','Clean Whitespace','Очистка пробелов'),
+      desc:o3('הסרת רווחים מיותרים, טאבים ושורות ריקות.','Remove extra spaces, tabs and empty lines.','Убрать лишние пробелы, табы и пустые строки.'),
+      opts:[
+        chk('collapse',true, o3('איחוד רווחים כפולים','Collapse spaces','Схлопнуть пробелы')),
+        chk('trimLines',true, o3('גזירת קצות שורה','Trim each line','Обрезать строки')),
+        chk('tabs',false, o3('טאבים לרווח','Tabs → space','Табы → пробел')),
+        chk('blank',true, o3('איחוד שורות ריקות','Collapse blank lines','Схлопнуть пустые')),
+        chk('noEmpty',false, o3('הסרת כל השורות הריקות','Remove empty lines','Удалить пустые строки')) ],
+      run(input,o){ let s=input;
+        if(o.tabs) s=s.replace(/\t/g,' ');
+        if(o.collapse) s=s.replace(/[ \t]{2,}/g,' ');
+        let L=s.split(/\r?\n/);
+        if(o.trimLines) L=L.map(x=>x.trim());
+        if(o.blank) L=L.filter((x,i)=>!(x.trim()==='' && i>0 && L[i-1].trim()===''));
+        if(o.noEmpty) L=L.filter(x=>x.trim()!=='');
+        return L.join('\n').replace(/^\n+|\n+$/g,''); } },
+
+    { id:'strip', grp:'edit', ic:'eraser',
+      names:o3('הסרת אימוג׳ים ותווים','Strip Emoji & Symbols','Убрать эмодзи и символы'),
+      desc:o3('הסרת אימוג׳ים, תווים מיוחדים או תווים לא לטיניים.','Remove emojis, special characters or non-ASCII.','Убрать эмодзи, спецсимволы или не-ASCII.'),
+      opts:[
+        chk('emoji',true, o3('הסרת אימוג׳ים','Remove emojis','Убрать эмодзи')),
+        chk('special',false, o3('הסרת תווים מיוחדים','Remove symbols','Убрать символы')),
+        chk('nonascii',false, o3('הסרת תווים לא-ASCII','Remove non-ASCII','Убрать не-ASCII')),
+        chk('collapse',true, o3('איחוד רווחים','Collapse spaces','Схлопнуть пробелы')) ],
+      run(input,o){ let s=input;
+        if(o.emoji) s=s.replace(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}‍️⃣]/gu,'');
+        if(o.special) s=s.replace(/[^\p{L}\p{N}\s]/gu,'');
+        if(o.nonascii) s=s.replace(/[^\x00-\x7F]/g,'');
+        if(o.collapse) s=s.replace(/[ \t]{2,}/g,' ').replace(/ +\n/g,'\n');
+        return s; } },
+
+    /* ===== group: list ===== */
+    { id:'sort', grp:'list', ic:'sort',
+      names:o3('מיון רשימה','Sort List','Сортировать список'),
+      desc:o3('A–Z, Z–A, מספרי, לפי אורך או אקראי.','A–Z, Z–A, numeric, by length or random.','A–Z, Z–A, по числам, длине или случайно.'),
+      opts:[
+        sel('order','az', o3('סדר','Order','Порядок'), [
+          {v:'az', ...o3('A → Z','A → Z','A → Z')}, {v:'za', ...o3('Z → A','Z → A','Z → A')},
+          {v:'num', ...o3('מספרי','Numeric','По числам')}, {v:'len', ...o3('לפי אורך','By length','По длине')},
+          {v:'rand', ...o3('אקראי','Random','Случайно')} ]),
+        chk('ci',true, o3('התעלמות מאותיות','Ignore case','Игнор. регистр')),
+        chk('trim',true, o3('גזירת רווחים','Trim lines','Обрезать')),
+        chk('noEmpty',true, o3('דילוג על ריקות','Skip empty','Пропустить пустые')) ],
+      run(input,o){ let L=linesOf(input);
+        if(o.trim) L=L.map(x=>x.trim());
+        if(o.noEmpty) L=L.filter(x=>x.length);
+        const key=o.ci?(x=>x.toLowerCase()):(x=>x);
+        if(o.order==='az') L.sort((a,b)=>key(a).localeCompare(key(b)));
+        else if(o.order==='za') L.sort((a,b)=>key(b).localeCompare(key(a)));
+        else if(o.order==='num') L.sort((a,b)=>(parseFloat(a)||0)-(parseFloat(b)||0));
+        else if(o.order==='len') L.sort((a,b)=>a.length-b.length || key(a).localeCompare(key(b)));
+        else if(o.order==='rand'){ for(let i=L.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=L[i];L[i]=L[j];L[j]=t; } }
+        return nl(L); } },
+
+    { id:'dedupe', grp:'list', ic:'copy',
+      names:o3('הסרת כפילויות','Remove Duplicates','Убрать дубликаты'),
+      desc:o3('שורות, מילים או כתובות אימייל כפולות.','Duplicate lines, words or email addresses.','Дубликаты строк, слов или email-адресов.'),
+      opts:[
+        sel('unit','lines', o3('יחידה','Unit','Единица'), [
+          {v:'lines', ...o3('שורות','Lines','Строки')}, {v:'words', ...o3('מילים','Words','Слова')}, {v:'emails', ...o3('אימיילים','Emails','Email')} ]),
+        chk('ci',true, o3('התעלמות מאותיות','Ignore case','Игнор. регистр')),
+        chk('trim',true, o3('גזירת רווחים','Trim','Обрезать')) ],
+      run(input,o){
+        if(o.unit==='emails'){ return nl(dedupeArr(input.match(EMAIL_RE)||[], o.ci)); }
+        if(o.unit==='words'){ return dedupeArr(input.match(/\S+/g)||[], o.ci).join(' '); }
+        let L=linesOf(input); if(o.trim) L=L.map(x=>x.trim());
+        return nl(dedupeArr(L, o.ci)); } },
+
+    { id:'split', grp:'list', ic:'scissors',
+      names:o3('פיצול טקסט','Split Text','Разбить текст'),
+      desc:o3('פיצול רשימה לפי פסיק, שורה, מקף או תו מותאם.','Split a list by comma, line, dash or a custom character.','Разбить список по запятой, строке, дефису или своему символу.'),
+      opts:[
+        sel('by','comma', o3('פיצול לפי','Split by','Разбить по'), [
+          {v:'comma', ...o3('פסיק ,','Comma ,','Запятой ,')}, {v:'newline', ...o3('שורה','New line','Строке')},
+          {v:'space', ...o3('רווח','Space','Пробелу')}, {v:'semicolon', ...o3('נקודה-פסיק ;','Semicolon ;','Точке с запятой ;')},
+          {v:'dash', ...o3('מקף -','Dash -','Дефису -')}, {v:'custom', ...o3('תו מותאם…','Custom…','Свой…')} ]),
+        txt('custom','', o3('תו מותאם','Custom char','Свой символ'), o3('לדוגמה |','e.g. |','напр. |')),
+        chk('trim',true, o3('גזירת רווחים','Trim','Обрезать')),
+        chk('noEmpty',true, o3('דילוג על ריקים','Skip empty','Пропустить пустые')) ],
+      run(input,o){ let d;
+        switch(o.by){ case 'comma':d=/\s*,\s*/;break; case 'space':d=/\s+/;break; case 'semicolon':d=/\s*;\s*/;break;
+          case 'dash':d=/\s*-\s*/;break; case 'custom':d=o.custom?new RegExp(escapeReg(o.custom)):/\r?\n/;break; default:d=/\r?\n/; }
+        let p=input.split(d);
+        if(o.trim) p=p.map(x=>x.trim());
+        if(o.noEmpty) p=p.filter(x=>x.length);
+        return nl(p); } },
+
+    { id:'join', grp:'list', ic:'merge',
+      names:o3('איחוד שורות','Join Lines','Объединить строки'),
+      desc:o3('להפוך שורות לרשימה מופרדת בפסיקים, נקודות או |.','Turn lines into a list joined by commas, semicolons or |.','Объединить строки в список через запятые, точки с запятой или |.'),
+      opts:[
+        sel('by','comma', o3('מפריד','Separator','Разделитель'), [
+          {v:'comma', ...o3('פסיק + רווח','Comma + space','Запятая + пробел')}, {v:'commaNS', ...o3('פסיק','Comma','Запятая')},
+          {v:'semicolon', ...o3('נקודה-פסיק','Semicolon','Точка с запятой')}, {v:'pipe', ...o3('קו | ','Pipe |','Вертик. |')},
+          {v:'space', ...o3('רווח','Space','Пробел')}, {v:'custom', ...o3('מותאם…','Custom…','Свой…')} ]),
+        txt('custom','', o3('מפריד מותאם','Custom separator','Свой разделитель'), o3('לדוגמה  · ','e.g.  · ','напр.  · ')),
+        sel('wrap','none', o3('עטיפת פריט','Wrap each','Обернуть'), [
+          {v:'none', ...o3('ללא','None','Нет')}, {v:'quote', ...o3('גרשיים "…"','Quotes "…"','Кавычки "…"')}, {v:'single', ...o3("גרש '…'","Single '…'","Апостроф '…'")} ]),
+        chk('trim',true, o3('גזירת רווחים','Trim','Обрезать')),
+        chk('noEmpty',true, o3('דילוג על ריקות','Skip empty','Пропустить пустые')) ],
+      run(input,o){ let L=linesOf(input);
+        if(o.trim) L=L.map(x=>x.trim());
+        if(o.noEmpty) L=L.filter(x=>x.length);
+        if(o.wrap==='quote') L=L.map(x=>'"'+x+'"'); else if(o.wrap==='single') L=L.map(x=>"'"+x+"'");
+        let sep; switch(o.by){ case 'comma':sep=', ';break; case 'commaNS':sep=',';break; case 'semicolon':sep='; ';break;
+          case 'pipe':sep=' | ';break; case 'space':sep=' ';break; case 'custom':sep=o.custom||'';break; default:sep=', '; }
+        return L.join(sep); } },
+
+    { id:'affix', grp:'list', ic:'plus',
+      names:o3('הוספת טקסט לכל שורה','Add to Each Line','Добавить к строкам'),
+      desc:o3('קידומת, סיומת או מספר רץ לכל שורה.','A prefix, suffix or running number on every line.','Префикс, суффикс или нумерация к каждой строке.'),
+      opts:[
+        txt('prefix','', o3('קידומת','Prefix','Префикс'), o3('לדוגמה - ','e.g. - ','напр. - ')),
+        txt('suffix','', o3('סיומת','Suffix','Суффикс'), o3('לדוגמה ;','e.g. ;','напр. ;')),
+        chk('number',false, o3('מספר רץ','Running number','Нумерация')),
+        numf('start',1, o3('התחלה מ־','Start at','Начать с'),0),
+        chk('noEmpty',true, o3('דילוג על ריקות','Skip empty','Пропустить пустые')) ],
+      run(input,o){ let n=parseInt(o.start,10); if(isNaN(n)) n=1;
+        return nl(linesOf(input).map(l=>{ if(o.noEmpty && l.trim()==='') return l;
+          const num=o.number?(n++ +'. '):''; return (o.prefix||'')+num+l+(o.suffix||''); })); } },
+
+    { id:'number', grp:'list', ic:'listnum',
+      names:o3('מספור אוטומטי','Auto Numbering','Автонумерация'),
+      desc:o3('1, 2, 3 או A, B, C בתחילת כל שורה.','1, 2, 3 or A, B, C at the start of each line.','1, 2, 3 или A, B, C в начале каждой строки.'),
+      opts:[
+        sel('style','dot', o3('סגנון','Style','Стиль'), [
+          {v:'dot', ...o3('1.','1.','1.')}, {v:'paren', ...o3('1)','1)','1)')}, {v:'bracket', ...o3('(1)','(1)','(1)')},
+          {v:'dash', ...o3('1 -','1 -','1 -')}, {v:'upper', ...o3('A.','A.','A.')}, {v:'lower', ...o3('a.','a.','a.')} ]),
+        numf('start',1, o3('התחלה מ־','Start at','Начать с'),0),
+        chk('noEmpty',true, o3('דילוג על ריקות','Skip empty','Пропустить пустые')) ],
+      run(input,o){ let n=parseInt(o.start,10); if(isNaN(n)) n=1;
+        const label=i=>{ switch(o.style){ case 'paren':return i+') '; case 'bracket':return '('+i+') '; case 'dash':return i+' - ';
+          case 'upper':return alpha(i,true)+'. '; case 'lower':return alpha(i,false)+'. '; default:return i+'. '; } };
+        return nl(linesOf(input).map(l=>{ if(o.noEmpty && l.trim()==='') return l; return label(n++)+l; })); } },
+
+    /* ===== group: dev ===== */
+    { id:'extract', grp:'dev', ic:'at',
+      names:o3('חילוץ מתוך טקסט','Extract from Text','Извлечь из текста'),
+      desc:o3('חילוץ כתובות אימייל, מספרי טלפון או קישורים.','Pull out email addresses, phone numbers or links.','Извлечь email-адреса, телефоны или ссылки.'),
+      opts:[
+        sel('type','emails', o3('לחלץ','Extract','Извлечь'), [
+          {v:'emails', ...o3('אימיילים','Emails','Email')}, {v:'urls', ...o3('קישורים','Links / URLs','Ссылки')}, {v:'phones', ...o3('טלפונים','Phone numbers','Телефоны')} ]),
+        chk('dedupe',true, o3('הסרת כפילויות','Dedupe','Без дублей')),
+        chk('sort',false, o3('מיון','Sort','Сортировать')) ],
+      run(input,o){ let re;
+        if(o.type==='emails') re=EMAIL_RE;
+        else if(o.type==='urls') re=/\b(?:https?:\/\/|www\.)[^\s<>()"']+/gi;
+        else re=/(?:(?:\+|00)\d{1,3}[\s.\-]?)?(?:\(?\d{2,4}\)?[\s.\-]?){1,4}\d{2,4}/g;
+        let m=input.match(re)||[];
+        if(o.type==='phones') m=m.filter(x=>x.replace(/\D/g,'').length>=7);
+        if(o.dedupe) m=dedupeArr(m,true);
+        if(o.sort) m.sort((a,b)=>a.localeCompare(b));
+        return nl(m); } },
+
+    { id:'count', grp:'dev', ic:'hash', stats:true,
+      names:o3('מונה תווים ומילים','Character & Word Counter','Счётчик слов'),
+      desc:o3('ספירת תווים, מילים, שורות, משפטים וזמן קריאה.','Count characters, words, lines, sentences and reading time.','Подсчёт символов, слов, строк, предложений и времени чтения.'),
+      opts:[],
+      run(input){ return input; } },
+
+    { id:'hashtags', grp:'dev', ic:'hash',
+      names:o3('יצירת האשטגים','Hashtag Maker','Генератор хэштегов'),
+      desc:o3('ניקוי, הסרת כפילויות והוספת # לכל מונח.','Clean each term, dedupe and prepend a #.','Очистить, убрать дубли и добавить # к каждому.'),
+      opts:[
+        sel('sep','space', o3('מפריד','Separator','Разделитель'), [
+          {v:'space', ...o3('רווח','Space','Пробел')}, {v:'newline', ...o3('שורה','New line','Строка')}, {v:'comma', ...o3('פסיק','Comma','Запятая')} ]),
+        chk('camel',true, o3('CamelCase','CamelCase','CamelCase')),
+        chk('lower',false, o3('אותיות קטנות','lowercase','строчные')),
+        chk('dedupe',true, o3('הסרת כפילויות','Dedupe','Без дублей')) ],
+      run(input,o){
+        let toks=input.split(/[,\n]+/).map(x=>x.trim()).filter(Boolean);
+        let tags=toks.map(t=>{ const words=(t.replace(/^#+/,'').match(/[\p{L}\p{N}]+/gu))||[]; if(!words.length) return '';
+          let core = o.camel ? words.map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join('') : words.join('');
+          if(o.lower) core=core.toLowerCase();
+          return core?'#'+core:''; }).filter(Boolean);
+        if(o.dedupe) tags=dedupeArr(tags,true);
+        const sep=o.sep==='newline'?'\n':(o.sep==='comma'?', ':' ');
+        return tags.join(sep); } },
+
+    { id:'csv', grp:'dev', ic:'table', ext:'csv', mime:'text/csv',
+      names:o3('ניקוי CSV','CSV Cleaner','Очистка CSV'),
+      desc:o3('ניקוי רשימות שמודבקות מאקסל או CRM.','Clean up lists pasted from Excel or a CRM.','Очистить списки, вставленные из Excel или CRM.'),
+      opts:[
+        sel('delim','comma', o3('מפריד מקור','Input delimiter','Разделитель'), [
+          {v:'comma', ...o3('פסיק ,','Comma ,','Запятая ,')}, {v:'semicolon', ...o3('נקודה-פסיק ;','Semicolon ;','Точка с запятой ;')}, {v:'tab', ...o3('טאב','Tab','Таб')} ]),
+        chk('trim',true, o3('גזירת תאים','Trim cells','Обрезать ячейки')),
+        chk('collapse',true, o3('איחוד רווחים','Collapse spaces','Схлопнуть пробелы')),
+        chk('noEmpty',true, o3('הסרת שורות ריקות','Drop empty rows','Убрать пустые строки')),
+        chk('dedupe',false, o3('הסרת שורות כפולות','Dedupe rows','Без дублей строк')) ],
+      run(input,o){ const d=o.delim==='semicolon'?';':(o.delim==='tab'?'\t':',');
+        let rows=parseCSV(input,d);
+        if(o.trim) rows=rows.map(r=>r.map(c=>c.trim()));
+        if(o.collapse) rows=rows.map(r=>r.map(c=>c.replace(/\s{2,}/g,' ')));
+        if(o.noEmpty) rows=rows.filter(r=>r.some(c=>c.trim()!==''));
+        if(o.dedupe){ const seen=new Set(); rows=rows.filter(r=>{ const k=r.join(''); if(seen.has(k)) return false; seen.add(k); return true; }); }
+        return rows.map(r=>r.map(c=>csvCell(c,',')).join(',')).join('\n'); } },
+
+    { id:'url', grp:'dev', ic:'link',
+      names:o3('קידוד ופענוח URL','URL Encode / Decode','URL: кодирование'),
+      desc:o3('קידוד ופענוח כתובות — למנהלי אתרים וקמפיינים.','Encode or decode URLs — for site owners and campaigns.','Кодировать или декодировать URL — для сайтов и кампаний.'),
+      opts:[
+        sel('mode','encode', o3('פעולה','Action','Действие'), [
+          {v:'encode', ...o3('קידוד','Encode','Кодировать')}, {v:'decode', ...o3('פענוח','Decode','Декодировать')} ]),
+        chk('component',true, o3('רכיב בלבד (encodeURIComponent)','Component (encodeURIComponent)','Компонент (encodeURIComponent)')) ],
+      run(input,o){ if(input==='') return '';
+        try{ if(o.mode==='encode') return o.component?encodeURIComponent(input):encodeURI(input);
+          return o.component?decodeURIComponent(input):decodeURI(input); }
+        catch(e){ throw new Error('__URL_ERR__'); } } },
+
+    { id:'json', grp:'dev', ic:'braces', ext:'json', mime:'application/json',
+      names:o3('JSON Formatter','JSON Formatter','JSON Formatter'),
+      desc:o3('סידור ובדיקת תקינות של JSON.','Format, minify and validate JSON.','Форматирование, минификация и проверка JSON.'),
+      opts:[
+        sel('mode','pretty', o3('פעולה','Action','Действие'), [
+          {v:'pretty', ...o3('סידור','Beautify','Форматировать')}, {v:'min', ...o3('כיווץ','Minify','Минифицировать')} ]),
+        sel('indent','2', o3('הזחה','Indent','Отступ'), [
+          {v:'2', ...o3('2 רווחים','2 spaces','2 пробела')}, {v:'4', ...o3('4 רווחים','4 spaces','4 пробела')}, {v:'tab', ...o3('טאב','Tab','Таб')} ]),
+        chk('sort',false, o3('מיון מפתחות','Sort keys','Сортировать ключи')) ],
+      run(input,o){ if(input.trim()==='') return '';
+        let data; try{ data=JSON.parse(input); }catch(e){ throw new Error('__JSON__'+e.message); }
+        if(o.sort) data=sortKeys(data);
+        if(o.mode==='min') return JSON.stringify(data);
+        const ind=o.indent==='tab'?'\t':(o.indent==='4'?4:2);
+        return JSON.stringify(data,null,ind); } }
+  ];
+  const TOOL_BY_ID = {}; TOOLS.forEach(t=>TOOL_BY_ID[t.id]=t);
+
+  /* ---------- per-tool sample inputs ---------- */
+  const SAMPLES = {
+    reverse:'שלום, עולם!\nצה"ל בדק (טקסט לדוגמה)\nKolKli Reverse 123',
+    case:'the QUICK brown Fox. jumps OVER the lazy dog.',
+    slug:'My First Blog Post!\n10 Tips & Tricks for 2026\n  Hello   World  ',
+    whitespace:'  too    many     spaces   \n\n\n\tand tabs\n   \n  last line  ',
+    strip:'Great job 🎉🔥 — really 👍 awesome!! (100%) café',
+    sort:'banana\nApple\ncherry\n10\n2\nDate',
+    dedupe:'apple\nApple\nbanana\napple\ncherry\nbanana',
+    split:'red, green, blue, red, yellow',
+    join:'red\ngreen\nblue\nyellow',
+    affix:'Milk\nEggs\nBread\nButter',
+    number:'First item\nSecond item\nThird item',
+    extract:'Contact us at sales@kolkli.com or support@kolkli.com.\nCall +1 (555) 123-4567 or visit https://kolkli.com and www.example.org today!',
+    count:'The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs.\n\nHello world!',
+    hashtags:'Product launch\nnew feature\nProduct launch\nweb design',
+    csv:' Name , Email , City \n"Doe, John", john@x.com ,  Tel Aviv \n\nJane ,  jane@x.com , Haifa \n"Doe, John", john@x.com ,  Tel Aviv ',
+    url:'https://kolkli.com/search?q=טקסט & tools=100%',
+    json:'{"name":"Kolkli","tools":["reverse","sort","json"],"live":true,"count":17,"nested":{"b":2,"a":1}}'
+  };
+
+  /* ---------- UI strings ---------- */
+  const UI = {
+    he:{ dir:'rtl',
+      kick:'כלים · כלי טקסט', title:'כלי טקסט', sub:'אוסף כלים מהירים לעיבוד טקסט — היפוך, מיון, ניקוי, פיצול, איחוד, חילוץ, ספירה ועוד. הכול רץ בדפדפן שלכם, שום טקסט לא נשלח לשרת.',
+      grp:{edit:'עיבוד טקסט', list:'רשימות', dev:'חילוץ וקוד'},
+      inLabel:'קלט', outLabel:'פלט', copy:'העתקה', copied:'הועתק ✓', download:'הורדה', clear:'ניקוי', sample:'דוגמה',
+      ph:'הדביקו או הקלידו טקסט כאן…',
+      stat:(c,w,l)=>`${c} תווים · ${w} מילים · ${l} שורות`,
+      cnt:{chars:'תווים', charsNs:'תווים ללא רווחים', words:'מילים', lines:'שורות', sentences:'משפטים', paragraphs:'פסקאות', read:'זמן קריאה', min:'דק׳'},
+      okJson:'JSON תקין', errJson:'JSON לא תקין: ', errUrl:'לא ניתן לפענח — הקידוד פגום',
+      foot:'KOLKLI · כלי טקסט · הכול רץ בדפדפן שלכם, פרטי ומהיר' },
+    en:{ dir:'ltr',
+      kick:'Tools · Text Tools', title:'Text Tools', sub:'A quick toolbox for working with text — reverse, sort, clean, split, join, extract, count and more. Everything runs in your browser; no text is ever sent to a server.',
+      grp:{edit:'Edit Text', list:'Lists', dev:'Extract & Code'},
+      inLabel:'Input', outLabel:'Output', copy:'Copy', copied:'Copied ✓', download:'Download', clear:'Clear', sample:'Sample',
+      ph:'Paste or type your text here…',
+      stat:(c,w,l)=>`${c} chars · ${w} words · ${l} lines`,
+      cnt:{chars:'Characters', charsNs:'Characters (no spaces)', words:'Words', lines:'Lines', sentences:'Sentences', paragraphs:'Paragraphs', read:'Reading time', min:'min'},
+      okJson:'Valid JSON', errJson:'Invalid JSON: ', errUrl:'Cannot decode — malformed encoding',
+      foot:'KOLKLI · Text Tools · Runs entirely in your browser, private and fast' },
+    ru:{ dir:'ltr',
+      kick:'Инструменты · Текст', title:'Текстовые инструменты', sub:'Быстрый набор инструментов для работы с текстом — переворот, сортировка, очистка, разбивка, объединение, извлечение, подсчёт и другое. Всё работает в браузере; текст не отправляется на сервер.',
+      grp:{edit:'Обработка текста', list:'Списки', dev:'Извлечение и код'},
+      inLabel:'Ввод', outLabel:'Результат', copy:'Копировать', copied:'Скопировано ✓', download:'Скачать', clear:'Очистить', sample:'Пример',
+      ph:'Вставьте или введите текст…',
+      stat:(c,w,l)=>`${c} симв. · ${w} слов · ${l} строк`,
+      cnt:{chars:'Символы', charsNs:'Символы (без пробелов)', words:'Слова', lines:'Строки', sentences:'Предложения', paragraphs:'Абзацы', read:'Время чтения', min:'мин'},
+      okJson:'Корректный JSON', errJson:'Некорректный JSON: ', errUrl:'Не удалось декодировать — повреждённая кодировка',
+      foot:'KOLKLI · Текстовые инструменты · Работает в браузере, приватно и быстро' }
+  };
+
+  /* ---------- state ---------- */
+  let lang='he', t=UI.he;
+  let curId = 'reverse';
+  let vals = {};              // current option values for the active tool
+
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1600); }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  const debounce=(fn,ms)=>{ let h; return function(){ clearTimeout(h); h=setTimeout(fn,ms); }; };
+
+  function statLine(s){ const c=Array.from(s).length; const w=(s.match(/\S+/g)||[]).length; const l=s===''?0:s.split(/\r?\n/).length; return t.stat(c,w,l); }
+
+  /* ---------- sidebar ---------- */
+  function renderSide(){
+    const groups=['edit','list','dev'];
+    let html='';
+    groups.forEach(g=>{
+      html+='<div class="tt-grp">'+t.grp[g]+'</div>';
+      TOOLS.filter(x=>x.grp===g).forEach(tool=>{
+        html+='<button type="button" class="tt-nav'+(tool.id===curId?' on':'')+'" data-id="'+tool.id+'">'+
+          '<span class="nvi">'+svg(tool.ic)+'</span><span>'+tool.names[lang]+'</span></button>';
+      });
+    });
+    el('ttSide').innerHTML=html;
+  }
+
+  /* ---------- options ---------- */
+  function renderOpts(tool){
+    vals={};
+    let checks=[]; let blocks=[];
+    tool.opts.forEach(op=>{
+      vals[op.k] = op.def;
+      if(op.type==='check'){
+        checks.push('<label class="tt-check'+(op.def?' on':'')+'"><input type="checkbox" data-k="'+op.k+'"'+(op.def?' checked':'')+'><span>'+op.label[lang]+'</span></label>');
+      } else if(op.type==='select'){
+        const options=op.options.map(o=>'<option value="'+o.v+'"'+(o.v===op.def?' selected':'')+'>'+o[lang]+'</option>').join('');
+        blocks.push('<div class="tt-opt"><label>'+op.label[lang]+'</label><select data-k="'+op.k+'">'+options+'</select></div>');
+      } else if(op.type==='text'){
+        const ph=op.ph?op.ph[lang]:'';
+        blocks.push('<div class="tt-opt"><label>'+op.label[lang]+'</label><input type="text" data-k="'+op.k+'" placeholder="'+ph.replace(/"/g,'&quot;')+'" value="'+String(op.def).replace(/"/g,'&quot;')+'"></div>');
+      } else if(op.type==='number'){
+        blocks.push('<div class="tt-opt"><label>'+op.label[lang]+'</label><input type="number" data-k="'+op.k+'" value="'+op.def+'"'+(op.min!=null?' min="'+op.min+'"':'')+'></div>');
+      }
+    });
+    if(checks.length) blocks.push('<div class="tt-checks">'+checks.join('')+'</div>');
+    el('ttOpts').innerHTML=blocks.join('');
+  }
+  function readOpts(){
+    el('ttOpts').querySelectorAll('[data-k]').forEach(n=>{
+      const k=n.getAttribute('data-k');
+      vals[k] = (n.type==='checkbox') ? n.checked : n.value;
+    });
+  }
+
+  /* ---------- run + render output ---------- */
+  function selectTool(id, fromHash){
+    const tool=TOOL_BY_ID[id]||TOOLS[0];
+    curId=tool.id;
+    if(!fromHash){ try{ history.replaceState(null,'','#'+tool.id); }catch(_){ location.hash=tool.id; } }
+    renderSide();
+    el('thIcon').innerHTML=svg(tool.ic);
+    el('thName').textContent=tool.names[lang];
+    el('thDesc').textContent=tool.desc[lang];
+    renderOpts(tool);
+    // stats-only tools (counter) hide the output textarea
+    const stats=!!tool.stats;
+    el('ttOut').style.display=stats?'none':'';
+    el('ttStats').style.display=stats?'grid':'none';
+    el('copyBtn').style.display = ''; el('dlBtn').style.display = stats?'none':'';
+    run();
+  }
+
+  function run(){
+    readOpts();
+    const tool=TOOL_BY_ID[curId];
+    const input=el('ttIn').value;
+    el('inStat').textContent = statLine(input);
+    const note=el('ttNote'); note.className='tt-note'; note.innerHTML='';
+
+    if(tool.stats){ renderCount(input); el('outStat').textContent=''; return; }
+
+    let out='';
+    try{
+      out=tool.run(input, vals);
+      el('ttOut').value=out;
+      el('outStat').textContent = statLine(out);
+      if(tool.id==='json' && input.trim()!==''){ note.className='tt-note ok'; note.innerHTML=svg('ok')+'<span>'+t.okJson+'</span>'; }
+    }catch(err){
+      const msg=String(err && err.message || err);
+      if(msg.indexOf('__JSON__')===0){ el('ttOut').value=''; el('outStat').textContent=''; note.className='tt-note err'; note.innerHTML=svg('warn')+'<span>'+t.errJson+escapeHtml(msg.slice(8))+'</span>'; }
+      else if(msg.indexOf('__URL_ERR__')===0){ el('ttOut').value=''; el('outStat').textContent=''; note.className='tt-note err'; note.innerHTML=svg('warn')+'<span>'+t.errUrl+'</span>'; }
+      else { el('ttOut').value=''; el('outStat').textContent=''; note.className='tt-note err'; note.innerHTML=svg('warn')+'<span>'+escapeHtml(msg)+'</span>'; }
+    }
+  }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function renderCount(input){
+    const chars=Array.from(input).length;
+    const charsNs=Array.from(input.replace(/\s/g,'')).length;
+    const words=(input.match(/\S+/g)||[]).length;
+    const lines=input===''?0:input.split(/\r?\n/).length;
+    const sentences=(input.match(/[^.!?…]+[.!?…]+/g)||[]).length;
+    const paras=input.trim()===''?0:input.trim().split(/\n\s*\n/).filter(p=>p.trim()!=='').length;
+    const read=Math.max(words?1:0, Math.ceil(words/200));
+    const C=t.cnt;
+    const cards=[[C.chars,chars],[C.charsNs,charsNs],[C.words,words],[C.lines,lines],[C.sentences,sentences],[C.paragraphs,paras],[C.read,read+' '+C.min]];
+    el('ttStats').innerHTML=cards.map(c=>'<div class="tt-stat-card"><div class="num">'+c[1]+'</div><div class="lab">'+c[0]+'</div></div>').join('');
+  }
+  function countSummary(input){
+    renderCount(input);
+    const chars=Array.from(input).length, words=(input.match(/\S+/g)||[]).length, lines=input===''?0:input.split(/\r?\n/).length;
+    const C=t.cnt; return C.chars+': '+chars+'\n'+C.words+': '+words+'\n'+C.lines+': '+lines;
+  }
+
+  /* ---------- actions ---------- */
+  function copyOut(){
+    const tool=TOOL_BY_ID[curId];
+    const text = tool.stats ? countSummary(el('ttIn').value) : el('ttOut').value;
+    const done=()=>toast(t.copied);
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done)); }
+    else fallbackCopy(text,done);
+  }
+  function fallbackCopy(text,done){ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(_){} ta.remove(); }
+  function downloadOut(){
+    const tool=TOOL_BY_ID[curId];
+    const text=el('ttOut').value; if(!text) return;
+    const ext=tool.ext||'txt', mime=tool.mime||'text/plain';
+    const blob=new Blob([text],{type:mime+';charset=utf-8'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download='kolkli-'+tool.id+'.'+ext; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+
+  /* ---------- language + theme ---------- */
+  function applyChrome(){
+    el('kick').textContent=t.kick;
+    el('pageTitle').textContent=t.title;
+    el('pageSub').textContent=t.sub;
+    el('inLabel').textContent=t.inLabel;
+    el('outLabel').textContent=t.outLabel;
+    el('ttIn').placeholder=t.ph;
+    el('sampleBtn').innerHTML=svg('spark')+'<span>'+t.sample+'</span>';
+    el('clearBtn').innerHTML=svg('trash')+'<span>'+t.clear+'</span>';
+    el('copyBtn').innerHTML=svg('copyIco')+'<span>'+t.copy+'</span>';
+    el('dlBtn').innerHTML=svg('dl')+'<span>'+t.download+'</span>';
+    el('foot').textContent=t.foot;
+    document.title='KOLKLI — '+t.title;
+  }
+  function applyLang(l){
+    lang=l; t=UI[l]||UI.he;
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    applyChrome();
+    selectTool(curId, true);   // re-render tool UI in the new language (input preserved)
+  }
+  window.__setLang=applyLang;
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  /* ---------- events ---------- */
+  el('ttSide').addEventListener('click', e=>{ const b=e.target.closest('[data-id]'); if(b) selectTool(b.getAttribute('data-id')); });
+  el('ttOpts').addEventListener('input', e=>{ const c=e.target.closest('.tt-check'); if(c) c.classList.toggle('on', e.target.checked); run(); });
+  el('ttOpts').addEventListener('change', run);
+  el('ttIn').addEventListener('input', debounce(run, 90));
+  el('sampleBtn').addEventListener('click', ()=>{ el('ttIn').value = SAMPLES[curId]||''; run(); });
+  el('clearBtn').addEventListener('click', ()=>{ el('ttIn').value=''; el('ttIn').focus(); run(); });
+  el('copyBtn').addEventListener('click', copyOut);
+  el('dlBtn').addEventListener('click', downloadOut);
+  window.addEventListener('hashchange', ()=>{ const id=location.hash.replace(/^#/,''); if(id && TOOL_BY_ID[id] && id!==curId) selectTool(id, true); });
+
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click', ()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  /* ---------- init ---------- */
+  applyTheme(ls('theme')||'light');
+  const startId=location.hash.replace(/^#/,''); if(startId && TOOL_BY_ID[startId]) curId=startId;
+  applyLang(detectLang());
+})();
+</script>
+</body>
+</html>

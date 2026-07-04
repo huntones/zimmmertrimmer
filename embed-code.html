@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל קוד הטמעה</title>
+<meta name="description" content="Generate responsive embed code for any website, YouTube or Vimeo video, Google Map, form, document or downloadable file — right in your browser. Live preview, copy in one click, no API key needed.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+  .pad{padding:18px;}
+
+  /* type tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .tab{display:inline-flex;align-items:center;gap:8px;padding:10px 15px;border-radius:999px;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink-2);font-size:13.5px;font-weight:600;
+    transition:border-color .12s,background .12s,color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .tab:hover{border-color:var(--accent);}
+  .tab:active{transform:translateY(1px);}
+  .tab svg{width:16px;height:16px;flex-shrink:0;}
+  .tab.on{color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+
+  /* form */
+  .side h3{font-size:15px;margin:0 0 4px;font-weight:700;}
+  .side .desc{font-size:12.5px;color:var(--muted);margin:0 0 16px;}
+  .opt{margin-bottom:15px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+  .opt.hide{display:none;}
+  .inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  textarea.inp{resize:vertical;min-height:64px;line-height:1.5;}
+  select.inp{cursor:pointer;}
+  .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .inp::placeholder{color:var(--faint);}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:520px){ .two{grid-template-columns:1fr;} }
+
+  /* toggles / switches */
+  .toggles{display:flex;flex-direction:column;gap:2px;margin-top:2px;}
+  .sw{display:flex;align-items:center;gap:11px;padding:9px 2px;cursor:pointer;user-select:none;}
+  .sw input{position:absolute;opacity:0;width:0;height:0;}
+  .sw .track{width:38px;height:22px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);
+    position:relative;flex-shrink:0;transition:background .15s,border-color .15s;}
+  .sw .track::after{content:'';position:absolute;top:2px;inset-inline-start:2px;width:16px;height:16px;border-radius:50%;
+    background:var(--faint);transition:transform .16s,background .15s;}
+  .sw input:checked + .track{background:var(--accent-soft);border-color:var(--accent);}
+  .sw input:checked + .track::after{background:var(--accent);transform:translateX(16px);}
+  html[dir="rtl"] .sw input:checked + .track::after{transform:translateX(-16px);}
+  .sw .lbl{font-size:13px;font-weight:600;color:var(--ink-2);}
+
+  /* quick-pick chips */
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;}
+  .chip{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:7px;padding:4px 10px;transition:all .12s;}
+  .chip:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .chip:active{transform:scale(.96);}
+
+  .hinttxt{font-size:11px;color:var(--faint);margin-top:6px;font-family:var(--mono);line-height:1.5;}
+  .fielderr{font-size:11.5px;color:var(--danger);margin-top:6px;min-height:14px;}
+
+  /* output */
+  .outhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+  .outhead h3{font-size:15px;margin:0;font-weight:700;}
+  .codebox{position:relative;}
+  .code{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:12px;
+    font-family:var(--mono);font-size:12px;line-height:1.6;padding:14px 15px;min-height:118px;resize:vertical;
+    white-space:pre-wrap;word-break:break-all;}
+  .code:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .copybtn{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:999px;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink-2);font-size:12.5px;font-weight:600;
+    transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .copybtn:hover{border-color:var(--accent);} .copybtn:active{transform:translateY(1px);}
+  .copybtn svg{width:14px;height:14px;}
+
+  /* live preview */
+  .pvlabel{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.05em;font-family:var(--mono);margin:20px 0 10px;}
+  .pvlabel svg{width:14px;height:14px;color:var(--accent);}
+  .preview{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--panel-2);min-height:120px;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .preview.empty{color:var(--faint);font-size:13px;text-align:center;font-family:var(--mono);padding:34px 14px;}
+  .preview > *{max-width:100%;}
+  .preview iframe{display:block;border:0;background:#fff;}
+  .pv-dl{display:inline-flex;align-items:center;gap:8px;}
+  .pv-dl.aslink{color:var(--accent-dim);font-weight:600;text-decoration:underline;text-underline-offset:3px;font-size:14px;}
+  .pv-dl.asbtn{color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);
+    font-weight:600;font-size:14px;padding:12px 24px;border-radius:999px;cursor:pointer;}
+  .pv-dl svg{width:16px;height:16px;}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:18px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <!-- type tabs -->
+  <div class="tabs" id="tabs"></div>
+
+  <div class="grid">
+    <!-- form -->
+    <div class="col">
+      <div class="card pad side">
+        <h3 id="formTitle"></h3>
+        <p class="desc" id="formDesc"></p>
+
+        <!-- URL / address -->
+        <div class="opt" id="optUrl">
+          <label id="lblUrl"></label>
+          <input type="text" class="inp" id="fUrl" autocomplete="off" spellcheck="false">
+          <div class="chips" id="urlChips"></div>
+          <div class="hinttxt" id="urlHint"></div>
+          <div class="fielderr" id="urlErr"></div>
+        </div>
+
+        <!-- link text (file) -->
+        <div class="opt hide" id="optText">
+          <label id="lblText"></label>
+          <input type="text" class="inp" id="fText" autocomplete="off">
+        </div>
+
+        <!-- width / height -->
+        <div class="opt hide" id="optSize">
+          <div class="two">
+            <div>
+              <label id="lblWidth"></label>
+              <input type="text" class="inp" id="fWidth" autocomplete="off">
+            </div>
+            <div>
+              <label id="lblHeight"></label>
+              <input type="text" class="inp" id="fHeight" autocomplete="off">
+            </div>
+          </div>
+        </div>
+
+        <!-- height only (map) -->
+        <div class="opt hide" id="optHeight">
+          <label id="lblHeightOnly"></label>
+          <input type="text" class="inp" id="fHeightOnly" autocomplete="off">
+        </div>
+
+        <!-- video options -->
+        <div class="opt hide" id="optVideo">
+          <div class="two">
+            <div>
+              <label id="lblStart"></label>
+              <input type="text" class="inp" id="fStart" autocomplete="off" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- file style -->
+        <div class="opt hide" id="optFileStyle">
+          <label id="lblFileStyle"></label>
+          <select class="inp" id="fFileStyle">
+            <option value="link" id="optStyleLink"></option>
+            <option value="button" id="optStyleButton"></option>
+          </select>
+        </div>
+
+        <!-- shared toggles -->
+        <div class="opt" id="optToggles">
+          <div class="toggles">
+            <label class="sw" id="swVideoAutoplay">
+              <input type="checkbox" id="tAutoplay">
+              <span class="track"></span>
+              <span class="lbl" id="lblAutoplay"></span>
+            </label>
+            <label class="sw" id="swRounded">
+              <input type="checkbox" id="tRounded" checked>
+              <span class="track"></span>
+              <span class="lbl" id="lblRounded"></span>
+            </label>
+            <label class="sw" id="swFullscreen">
+              <input type="checkbox" id="tFullscreen" checked>
+              <span class="track"></span>
+              <span class="lbl" id="lblFullscreen"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- output + preview -->
+    <div class="col">
+      <div class="card pad">
+        <div class="outhead">
+          <h3 id="codeTitle"></h3>
+          <button class="copybtn" id="copyBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span id="copyLbl"></span>
+          </button>
+        </div>
+        <div class="codebox">
+          <textarea class="code" id="codeOut" readonly spellcheck="false"></textarea>
+        </div>
+
+        <div class="pvlabel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span id="pvLbl"></span>
+        </div>
+        <div class="preview empty" id="preview"></div>
+
+        <div class="seam">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span id="seamTxt"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl',
+      kick:'שיווק · מחולל קוד הטמעה',
+      pageTitle:'מחולל קוד הטמעה',
+      pageSub:'צרו קוד הטמעה רספונסיבי לכל אתר, סרטון יוטיוב או וימאו, מפת גוגל, טופס, מסמך או קובץ להורדה — עם תצוגה מקדימה חיה והעתקה בלחיצה. הכול רץ בדפדפן, בלי מפתח API ובלי שרת.',
+      tabs:{ site:'אתר', video:'סרטון', map:'מפה', form:'טופס / מסמך', file:'קובץ' },
+      forms:{
+        site:{ title:'הטמעת אתר', desc:'הדביקו כתובת של דף כלשהו וקבלו iframe רספונסיבי.' },
+        video:{ title:'הטמעת סרטון', desc:'הדביקו קישור יוטיוב או וימאו — נזהה את מזהה הסרטון וניצור עוטף רספונסיבי ביחס 16:9.' },
+        map:{ title:'הטמעת מפת גוגל', desc:'הקלידו כתובת או שם מקום — מפת גוגל מוטמעת בלי מפתח API.' },
+        form:{ title:'הטמעת טופס / מסמך', desc:'הדביקו כתובת של טופס גוגל, מסמך או כל דף להטמעה ב-iframe.' },
+        file:{ title:'קישור להורדת קובץ', desc:'הדביקו כתובת של קובץ וקבלו קישור או כפתור הורדה מוכן.' },
+      },
+      lblUrl:{ site:'כתובת האתר', video:'קישור לסרטון (יוטיוב / וימאו)', map:'כתובת או שם מקום', form:'כתובת הטופס / המסמך', file:'כתובת הקובץ' },
+      urlHint:{
+        site:'לדוגמה: https://example.com/page',
+        video:'תומך ב-youtube.com/watch, youtu.be, /shorts/, /embed/ ו-vimeo.com/מזהה',
+        map:'לדוגמה: תל אביב, רחוב דיזנגוף 100 — או כל שם מקום',
+        form:'לדוגמה: קישור ״published״ של טופס גוגל או מסמך',
+        file:'לדוגמה: https://example.com/files/brochure.pdf',
+      },
+      lblText:'טקסט הקישור', lblWidth:'רוחב', lblHeight:'גובה', lblHeightOnly:'גובה',
+      lblStart:'זמן התחלה (שניות)',
+      lblFileStyle:'סגנון', fileStyleLink:'קישור טקסט', fileStyleButton:'כפתור',
+      lblAutoplay:'ניגון אוטומטי', lblRounded:'פינות מעוגלות', lblFullscreen:'אפשר מסך מלא',
+      codeTitle:'קוד ההטמעה', copy:'העתקה', pvLbl:'תצוגה מקדימה חיה',
+      pvEmpty:{
+        site:'הזינו כתובת אתר כדי לראות תצוגה מקדימה',
+        video:'הדביקו קישור לסרטון כדי לראות תצוגה מקדימה',
+        map:'הזינו כתובת כדי לראות את המפה',
+        form:'הזינו כתובת כדי לראות תצוגה מקדימה',
+        file:'הזינו כתובת קובץ כדי לראות את הקישור',
+      },
+      badVideo:'לא זוהה מזהה סרטון תקין מהקישור הזה',
+      badUrl:'כתובת לא תקינה — צריך להתחיל ב-http:// או https://',
+      defText:'הורדת הקובץ',
+      seamTxt:'הקוד נוצר כולו בדפדפן שלכם — שום כתובת או תוכן לא נשלחים לשרת. פשוט מעתיקים ומדביקים ב-HTML של האתר.',
+      foot:'KOLKLI · מחולל קוד הטמעה · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הקוד הועתק ✓',
+    },
+    en:{
+      dir:'ltr',
+      kick:'Marketing · Embed Code Generator',
+      pageTitle:'Embed Code Generator',
+      pageSub:'Generate responsive embed code for any website, YouTube or Vimeo video, Google Map, form, document or downloadable file — with a live preview and one-click copy. It all runs in your browser, no API key and no server.',
+      tabs:{ site:'Website', video:'Video', map:'Map', form:'Form / Doc', file:'File' },
+      forms:{
+        site:{ title:'Embed a website', desc:'Paste any page URL and get a responsive iframe.' },
+        video:{ title:'Embed a video', desc:'Paste a YouTube or Vimeo link — we detect the video id and build a responsive 16:9 wrapper.' },
+        map:{ title:'Embed a Google Map', desc:'Type an address or place name — an embedded Google Map, no API key required.' },
+        form:{ title:'Embed a form / document', desc:'Paste a Google Form, document or any page URL to embed in an iframe.' },
+        file:{ title:'File download link', desc:'Paste a file URL and get a ready-made download link or button.' },
+      },
+      lblUrl:{ site:'Website URL', video:'Video link (YouTube / Vimeo)', map:'Address or place name', form:'Form / document URL', file:'File URL' },
+      urlHint:{
+        site:'e.g. https://example.com/page',
+        video:'Supports youtube.com/watch, youtu.be, /shorts/, /embed/ and vimeo.com/id',
+        map:'e.g. 100 Dizengoff St, Tel Aviv — or any place name',
+        form:'e.g. a Google Form or document “published” link',
+        file:'e.g. https://example.com/files/brochure.pdf',
+      },
+      lblText:'Link text', lblWidth:'Width', lblHeight:'Height', lblHeightOnly:'Height',
+      lblStart:'Start time (seconds)',
+      lblFileStyle:'Style', fileStyleLink:'Text link', fileStyleButton:'Button',
+      lblAutoplay:'Autoplay', lblRounded:'Rounded corners', lblFullscreen:'Allow fullscreen',
+      codeTitle:'Embed code', copy:'Copy', pvLbl:'Live preview',
+      pvEmpty:{
+        site:'Enter a website URL to see a preview',
+        video:'Paste a video link to see a preview',
+        map:'Enter an address to see the map',
+        form:'Enter a URL to see a preview',
+        file:'Enter a file URL to see the link',
+      },
+      badVideo:'No valid video id detected in this link',
+      badUrl:'Invalid URL — it should start with http:// or https://',
+      defText:'Download file',
+      seamTxt:'The code is generated entirely in your browser — no URL or content is sent to a server. Just copy it and paste into your site’s HTML.',
+      foot:'KOLKLI · Embed Code Generator · Private and fast, right in your browser',
+      copied:'Code copied ✓',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Маркетинг · Генератор кода вставки',
+      pageTitle:'Генератор кода вставки',
+      pageSub:'Создавайте адаптивный код вставки для любого сайта, видео YouTube или Vimeo, карты Google, формы, документа или файла для скачивания — с живым предпросмотром и копированием в один клик. Всё работает в браузере, без ключа API и без сервера.',
+      tabs:{ site:'Сайт', video:'Видео', map:'Карта', form:'Форма / документ', file:'Файл' },
+      forms:{
+        site:{ title:'Вставка сайта', desc:'Вставьте адрес любой страницы и получите адаптивный iframe.' },
+        video:{ title:'Вставка видео', desc:'Вставьте ссылку YouTube или Vimeo — мы определим id видео и создадим адаптивную обёртку 16:9.' },
+        map:{ title:'Вставка карты Google', desc:'Введите адрес или название места — встроенная карта Google без ключа API.' },
+        form:{ title:'Вставка формы / документа', desc:'Вставьте ссылку на форму Google, документ или любую страницу для вставки в iframe.' },
+        file:{ title:'Ссылка на скачивание', desc:'Вставьте адрес файла и получите готовую ссылку или кнопку скачивания.' },
+      },
+      lblUrl:{ site:'Адрес сайта', video:'Ссылка на видео (YouTube / Vimeo)', map:'Адрес или название места', form:'Адрес формы / документа', file:'Адрес файла' },
+      urlHint:{
+        site:'напр. https://example.com/page',
+        video:'Поддержка youtube.com/watch, youtu.be, /shorts/, /embed/ и vimeo.com/id',
+        map:'напр. Тель-Авив, ул. Дизенгоф 100 — или любое название места',
+        form:'напр. «опубликованная» ссылка на форму или документ Google',
+        file:'напр. https://example.com/files/brochure.pdf',
+      },
+      lblText:'Текст ссылки', lblWidth:'Ширина', lblHeight:'Высота', lblHeightOnly:'Высота',
+      lblStart:'Начало (секунды)',
+      lblFileStyle:'Стиль', fileStyleLink:'Текстовая ссылка', fileStyleButton:'Кнопка',
+      lblAutoplay:'Автовоспроизведение', lblRounded:'Скруглённые углы', lblFullscreen:'Разрешить полный экран',
+      codeTitle:'Код вставки', copy:'Копировать', pvLbl:'Живой предпросмотр',
+      pvEmpty:{
+        site:'Введите адрес сайта для предпросмотра',
+        video:'Вставьте ссылку на видео для предпросмотра',
+        map:'Введите адрес, чтобы увидеть карту',
+        form:'Введите адрес для предпросмотра',
+        file:'Введите адрес файла, чтобы увидеть ссылку',
+      },
+      badVideo:'В этой ссылке не найден корректный id видео',
+      badUrl:'Неверный адрес — он должен начинаться с http:// или https://',
+      defText:'Скачать файл',
+      seamTxt:'Код полностью создаётся в вашем браузере — ни один адрес или содержимое не отправляются на сервер. Просто скопируйте и вставьте в HTML вашего сайта.',
+      foot:'KOLKLI · Генератор кода вставки · Приватно и быстро, прямо в браузере',
+      copied:'Код скопирован ✓',
+    },
+  };
+
+  const TABS = ['site','video','map','form','file'];
+  const TAB_ICON = {
+    site:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    video:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>',
+    map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    form:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/></svg>',
+    file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  };
+  const URL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+
+  let lang='he', t=I18N.he;
+  let tab='site';
+  // per-tab persisted values so switching tabs keeps input
+  const vals = {
+    site:{ url:'', width:'100%', height:'600' },
+    video:{ url:'', start:'', autoplay:false },
+    map:{ url:'', height:'450' },
+    form:{ url:'', width:'100%', height:'700' },
+    file:{ url:'', text:'', style:'link' },
+  };
+  let rounded=true, fullscreen=true;
+
+  // ---------- helpers ----------
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function escAttr(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+
+  // normalize a URL: add https:// if it looks like a bare domain
+  function normalizeUrl(raw){
+    let s=(raw||'').trim();
+    if(!s) return '';
+    if(/^\/\//.test(s)) s='https:'+s;
+    else if(!/^https?:\/\//i.test(s)){
+      // looks like a domain / path? prepend https://
+      if(/^[\w-]+(\.[\w-]+)+/.test(s)) s='https://'+s;
+    }
+    return s;
+  }
+  function isHttpUrl(s){ return /^https?:\/\/\S+/i.test(s||''); }
+  // width/height: number -> "600px"; "100%" stays; anything with unit stays
+  function dim(v, fallback){
+    let s=(v==null?'':String(v)).trim();
+    if(!s) return fallback;
+    if(/^\d+(\.\d+)?$/.test(s)) return s+'px';
+    if(/%$/.test(s)) return s;
+    if(/^\d+(\.\d+)?(px|em|rem|vh|vw)$/i.test(s)) return s;
+    return s;
+  }
+  function intOnly(v){ const m=(v==null?'':String(v)).match(/\d+/); return m?parseInt(m[0],10):0; }
+
+  // parse a YouTube / Vimeo url -> {provider, id} or null
+  function parseVideo(raw){
+    const s=(raw||'').trim();
+    if(!s) return null;
+    let u;
+    try{ u=new URL(/^https?:\/\//i.test(s)?s:'https://'+s); }catch(_){
+      // maybe a bare id?
+      if(/^[\w-]{11}$/.test(s)) return { provider:'youtube', id:s };
+      if(/^\d{6,}$/.test(s)) return { provider:'vimeo', id:s };
+      return null;
+    }
+    const host=u.hostname.replace(/^www\./,'').toLowerCase();
+    // YouTube
+    if(host==='youtu.be'){
+      const id=u.pathname.split('/').filter(Boolean)[0];
+      if(id) return { provider:'youtube', id };
+    }
+    if(host.endsWith('youtube.com')||host==='youtube-nocookie.com'){
+      const v=u.searchParams.get('v');
+      if(v) return { provider:'youtube', id:v };
+      const parts=u.pathname.split('/').filter(Boolean);
+      // /shorts/ID, /embed/ID, /v/ID, /live/ID
+      const i=parts.findIndex(p=>['shorts','embed','v','live'].includes(p));
+      if(i>=0 && parts[i+1]) return { provider:'youtube', id:parts[i+1] };
+    }
+    // Vimeo
+    if(host==='vimeo.com'||host.endsWith('.vimeo.com')){
+      const parts=u.pathname.split('/').filter(Boolean);
+      // /<id> or /video/<id> or /channels/x/<id>
+      for(let k=parts.length-1;k>=0;k--){ if(/^\d{5,}$/.test(parts[k])) return { provider:'vimeo', id:parts[k] }; }
+    }
+    if(host==='player.vimeo.com'){
+      const parts=u.pathname.split('/').filter(Boolean);
+      const i=parts.indexOf('video');
+      if(i>=0 && /^\d+$/.test(parts[i+1]||'')) return { provider:'vimeo', id:parts[i+1] };
+    }
+    return null;
+  }
+
+  // ---------- code generation ----------
+  // returns { code:'', preview:HTMLstring or null, error:'' }
+  function generate(){
+    const radius = rounded ? 'border-radius:14px;' : '';
+    const fs = fullscreen;
+    if(tab==='site' || tab==='form'){
+      const v=vals[tab];
+      const url=normalizeUrl(v.url);
+      if(!v.url.trim()) return { code:'', preview:null };
+      if(!isHttpUrl(url)) return { code:'', preview:null, error:t.badUrl };
+      const w=dim(v.width, tab==='form'?'100%':'100%');
+      const h=dim(v.height, tab==='form'?'700px':'600px');
+      const style=`width:${w};max-width:100%;height:${h};border:1px solid #e5e8f0;${radius}`;
+      const fsAttr = fs ? ' allowfullscreen' : '';
+      const code =
+`<iframe src="${escAttr(url)}"
+        style="${style}"
+        loading="lazy"${fsAttr}></iframe>`;
+      const pvStyle=`width:100%;height:280px;border:0;${rounded?'border-radius:10px;':''}`;
+      const preview=`<iframe src="${escAttr(url)}" style="${pvStyle}" loading="lazy"${fsAttr}></iframe>`;
+      return { code, preview };
+    }
+
+    if(tab==='video'){
+      const v=vals[tab];
+      if(!v.url.trim()) return { code:'', preview:null };
+      const info=parseVideo(v.url);
+      if(!info) return { code:'', preview:null, error:t.badVideo };
+      const start=intOnly(v.start);
+      const auto=v.autoplay;
+      let src, allow;
+      if(info.provider==='youtube'){
+        const p=[];
+        if(auto){ p.push('autoplay=1'); p.push('mute=1'); }
+        if(start>0) p.push('start='+start);
+        p.push('rel=0');
+        src='https://www.youtube-nocookie.com/embed/'+info.id + (p.length?('?'+p.join('&')):'');
+        allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      }else{
+        const p=[];
+        if(auto){ p.push('autoplay=1'); p.push('muted=1'); }
+        if(start>0) p.push('#t='+start+'s');
+        // vimeo: query params before hash
+        const q=p.filter(x=>!x.startsWith('#'));
+        const hash=p.filter(x=>x.startsWith('#'));
+        src='https://player.vimeo.com/video/'+info.id + (q.length?('?'+q.join('&')):'') + (hash.length?hash.join(''):'');
+        allow='autoplay; fullscreen; picture-in-picture';
+      }
+      const fsAttr = fs ? ' allowfullscreen' : '';
+      const wrapStyle=`position:relative;padding-top:56.25%;width:100%;overflow:hidden;${radius}`;
+      const ifStyle='position:absolute;top:0;left:0;width:100%;height:100%;border:0;';
+      const code =
+`<div style="${wrapStyle}">
+  <iframe src="${escAttr(src)}"
+          style="${ifStyle}"
+          allow="${allow}"${fsAttr}
+          loading="lazy"></iframe>
+</div>`;
+      const preview =
+`<div style="position:relative;padding-top:56.25%;width:100%;overflow:hidden;${rounded?'border-radius:10px;':''}">
+  <iframe src="${escAttr(src)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="${allow}"${fsAttr} loading="lazy"></iframe>
+</div>`;
+      return { code, preview };
+    }
+
+    if(tab==='map'){
+      const v=vals[tab];
+      const addr=(v.url||'').trim();
+      if(!addr) return { code:'', preview:null };
+      const src='https://maps.google.com/maps?q='+encodeURIComponent(addr)+'&output=embed';
+      const h=dim(v.height,'450px');
+      const fsAttr = fs ? ' allowfullscreen' : '';
+      const style=`width:100%;height:${h};border:0;${radius}`;
+      const code =
+`<iframe src="${escAttr(src)}"
+        style="${style}"
+        loading="lazy" referrerpolicy="no-referrer-when-downgrade"${fsAttr}></iframe>`;
+      const pvStyle=`width:100%;height:280px;border:0;${rounded?'border-radius:10px;':''}`;
+      const preview=`<iframe src="${escAttr(src)}" style="${pvStyle}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"${fsAttr}></iframe>`;
+      return { code, preview };
+    }
+
+    if(tab==='file'){
+      const v=vals[tab];
+      const url=normalizeUrl(v.url);
+      if(!v.url.trim()) return { code:'', preview:null };
+      if(!isHttpUrl(url)) return { code:'', preview:null, error:t.badUrl };
+      const txt=(v.text||'').trim() || t.defText;
+      let code, preview;
+      if(v.style==='button'){
+        const btnStyle='display:inline-block;padding:12px 24px;background:#7b34ff;color:#fff;font-family:sans-serif;font-weight:600;text-decoration:none;border-radius:999px;';
+        code =
+`<a href="${escAttr(url)}" download
+   style="${btnStyle}">${escapeHtml(txt)}</a>`;
+        preview=`<a href="${escAttr(url)}" download class="pv-dl asbtn" onclick="return false">${URL_ICON}<span>${escapeHtml(txt)}</span></a>`;
+      }else{
+        code = `<a href="${escAttr(url)}" download>${escapeHtml(txt)}</a>`;
+        preview=`<a href="${escAttr(url)}" download class="pv-dl aslink" onclick="return false">${URL_ICON}<span>${escapeHtml(txt)}</span></a>`;
+      }
+      return { code, preview };
+    }
+    return { code:'', preview:null };
+  }
+
+  // ---------- rendering the form for the current tab ----------
+  function show(id, on){ el(id).classList.toggle('hide', !on); }
+  function renderForm(){
+    const v=vals[tab];
+    // titles
+    el('formTitle').textContent = t.forms[tab].title;
+    el('formDesc').textContent = t.forms[tab].desc;
+    el('lblUrl').textContent = t.lblUrl[tab];
+    el('urlHint').textContent = t.urlHint[tab];
+    el('fUrl').placeholder = t.urlHint[tab].replace(/^[^:]+:\s*/,'').replace(/\s*—.*$/,'');
+
+    // which fields to show
+    show('optText', tab==='file');
+    show('optSize', tab==='site'||tab==='form');
+    show('optHeight', tab==='map');
+    show('optVideo', tab==='video');
+    show('optFileStyle', tab==='file');
+
+    // toggles visibility per tab
+    show('swVideoAutoplay', tab==='video');
+    // rounded applies to iframe tabs + file-button; show for all except plain file-link is fine too
+    show('swRounded', tab!=='file');
+    show('swFullscreen', tab==='site'||tab==='form'||tab==='video'||tab==='map');
+    // hide the whole toggles block if nothing visible (file/link)
+    const anyToggle = (tab==='video') || (tab!=='file') || (tab==='site'||tab==='form'||tab==='video'||tab==='map');
+    show('optToggles', anyToggle && tab!=='file' || tab==='video');
+    if(tab==='file') show('optToggles', false);
+
+    // labels
+    el('lblText').textContent=t.lblText;
+    el('lblWidth').textContent=t.lblWidth;
+    el('lblHeight').textContent=t.lblHeight;
+    el('lblHeightOnly').textContent=t.lblHeightOnly;
+    el('lblStart').textContent=t.lblStart;
+    el('lblFileStyle').textContent=t.lblFileStyle;
+    el('optStyleLink').textContent=t.fileStyleLink;
+    el('optStyleButton').textContent=t.fileStyleButton;
+    el('lblAutoplay').textContent=t.lblAutoplay;
+    el('lblRounded').textContent=t.lblRounded;
+    el('lblFullscreen').textContent=t.lblFullscreen;
+
+    // values into inputs
+    el('fUrl').value = v.url||'';
+    if(tab==='file'){ el('fText').value = v.text||''; el('fFileStyle').value = v.style||'link'; }
+    if(tab==='site'||tab==='form'){ el('fWidth').value=v.width||''; el('fHeight').value=v.height||''; }
+    if(tab==='map'){ el('fHeightOnly').value=v.height||''; }
+    if(tab==='video'){ el('fStart').value=v.start||''; el('tAutoplay').checked=!!v.autoplay; }
+    el('tRounded').checked=rounded;
+    el('tFullscreen').checked=fullscreen;
+
+    // quick chips
+    renderChips();
+  }
+
+  function renderChips(){
+    const box=el('urlChips');
+    let chips=[];
+    if(tab==='map'){
+      chips = lang==='he'
+        ? ['תל אביב','ירושלים','חיפה','אילת']
+        : lang==='ru'
+        ? ['Тель-Авив','Иерусалим','Хайфа','Эйлат']
+        : ['Tel Aviv','Jerusalem','New York','London'];
+    }
+    if(!chips.length){ box.innerHTML=''; return; }
+    box.innerHTML = chips.map(c=>`<span class="chip" data-chip="${escAttr(c)}">${escapeHtml(c)}</span>`).join('');
+  }
+
+  // ---------- main update ----------
+  function update(){
+    const res=generate();
+    el('codeOut').value = res.code || '';
+    el('urlErr').textContent = res.error || '';
+    // preview
+    const pv=el('preview');
+    if(res.preview){
+      pv.classList.remove('empty');
+      pv.innerHTML=res.preview;
+    }else{
+      pv.classList.add('empty');
+      pv.textContent = res.error ? res.error : t.pvEmpty[tab];
+    }
+  }
+
+  function renderTabs(){
+    el('tabs').innerHTML = TABS.map(k=>`
+      <button type="button" class="tab ${k===tab?'on':''}" data-tab="${k}">
+        ${TAB_ICON[k]}<span>${escapeHtml(t.tabs[k])}</span>
+      </button>`).join('');
+  }
+
+  // ---------- clipboard ----------
+  function copyText(str){
+    const done=()=>toast(t.copied);
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(str).then(done).catch(()=>fallback(str,done)); }
+    else fallback(str,done);
+  }
+  function fallback(str,cb){ const ta=document.createElement('textarea'); ta.value=str; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); cb&&cb(); }
+
+  // ---------- i18n + theme ----------
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    el('copyLbl').textContent=t.copy;
+    el('codeTitle').textContent=t.codeTitle;
+    el('pvLbl').textContent=t.pvLbl;
+    el('seamTxt').textContent=t.seamTxt;
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderTabs(); renderForm(); update();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---------- events ----------
+  el('tabs').addEventListener('click',e=>{
+    const b=e.target.closest('[data-tab]'); if(!b) return;
+    tab=b.getAttribute('data-tab');
+    renderTabs(); renderForm(); update();
+  });
+
+  el('fUrl').addEventListener('input',()=>{ vals[tab].url=el('fUrl').value; if(tab==='map') renderChips(); update(); });
+  el('fText').addEventListener('input',()=>{ vals.file.text=el('fText').value; update(); });
+  el('fFileStyle').addEventListener('change',()=>{ vals.file.style=el('fFileStyle').value; update(); });
+  el('fWidth').addEventListener('input',()=>{ vals[tab].width=el('fWidth').value; update(); });
+  el('fHeight').addEventListener('input',()=>{ vals[tab].height=el('fHeight').value; update(); });
+  el('fHeightOnly').addEventListener('input',()=>{ vals.map.height=el('fHeightOnly').value; update(); });
+  el('fStart').addEventListener('input',()=>{ vals.video.start=el('fStart').value; update(); });
+  el('tAutoplay').addEventListener('change',()=>{ vals.video.autoplay=el('tAutoplay').checked; update(); });
+  el('tRounded').addEventListener('change',()=>{ rounded=el('tRounded').checked; update(); });
+  el('tFullscreen').addEventListener('change',()=>{ fullscreen=el('tFullscreen').checked; update(); });
+
+  el('urlChips').addEventListener('click',e=>{
+    const c=e.target.closest('[data-chip]'); if(!c) return;
+    const val=c.getAttribute('data-chip');
+    vals[tab].url=val; el('fUrl').value=val; update();
+  });
+
+  el('copyBtn').addEventListener('click',()=>{ const code=el('codeOut').value; if(code) copyText(code); });
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---------- init ----------
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+})();
+</script>
+</body>
+</html>

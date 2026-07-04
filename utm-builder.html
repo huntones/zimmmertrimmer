@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — בונה קישורי UTM</title>
+<meta name="description" content="Build tagged campaign URLs with UTM parameters right in your browser. Add utm_source, medium, campaign and more, copy the link or Markdown, and track every click. Fully client-side, nothing leaves your machine.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px;}
+  .card h3{font-size:15px;margin:0 0 4px;font-weight:700;}
+  .card .csub{font-size:12px;color:var(--muted);margin:0 0 16px;}
+
+  /* fields */
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:6px;}
+  .field label .req{color:var(--danger);margin-inline-start:3px;}
+  .field label .opt{color:var(--faint);font-family:var(--mono);font-size:10.5px;font-weight:600;margin-inline-start:6px;text-transform:uppercase;letter-spacing:.04em;}
+  .field .hint{font-size:11px;color:var(--faint);margin-top:5px;font-family:var(--mono);line-height:1.5;}
+  .inp{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .inp.mono{font-family:var(--mono);font-size:12.5px;}
+  .inp.err{border-color:var(--danger);}
+  .inp::placeholder{color:var(--faint);}
+
+  /* quick-pick chips */
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .chip{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.02em;color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer;
+    transition:border-color .12s,background .12s,color .12s,transform .08s;}
+  .chip:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .chip:active{transform:scale(.95);}
+  .chip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  .chiplbl{font-size:11px;color:var(--faint);font-weight:600;font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;margin-top:12px;}
+
+  /* output */
+  .outbox{position:relative;}
+  .outta{width:100%;min-height:96px;resize:vertical;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
+    border-radius:12px;font-family:var(--mono);font-size:13px;line-height:1.6;padding:13px 14px;word-break:break-all;}
+  .outta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .outmeta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;font-family:var(--mono);
+    font-size:11px;color:var(--faint);}
+  .outmeta .cc b{color:var(--accent-dim);}
+
+  .copybtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:14px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .copybtn:hover{filter:brightness(1.05);} .copybtn:active{transform:translateY(1px);}
+  .copybtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .copybtn svg{width:17px;height:17px;}
+
+  .row2{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+  .row2 button{flex:1;min-width:130px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 button:hover{border-color:var(--accent);} .row2 button:active{transform:translateY(1px);}
+  .row2 svg{width:15px;height:15px;}
+
+  /* breakdown table */
+  .brk{margin-top:18px;}
+  .brk .bhead{font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:9px;}
+  table.tbl{width:100%;border-collapse:collapse;font-size:12.5px;overflow:hidden;border-radius:11px;border:1px solid var(--line-2);}
+  table.tbl th{text-align:start;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--faint);font-weight:600;padding:9px 12px;background:var(--panel-2);border-bottom:1px solid var(--line-2);}
+  table.tbl td{padding:9px 12px;border-bottom:1px solid var(--line-2);vertical-align:top;}
+  table.tbl tr:last-child td{border-bottom:none;}
+  table.tbl td.k{font-family:var(--mono);color:var(--accent-dim);font-weight:600;white-space:nowrap;width:1%;}
+  table.tbl td.v{font-family:var(--mono);color:var(--ink);word-break:break-all;}
+  .brk .empty{font-size:12px;color:var(--faint);font-family:var(--mono);padding:14px 4px;text-align:center;
+    border:1px dashed var(--line);border-radius:11px;}
+
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:18px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: form -->
+    <div class="col">
+      <div class="card">
+        <h3 data-i18n="formTitle"></h3>
+        <p class="csub" data-i18n="formSub"></p>
+
+        <div class="field">
+          <label for="baseUrl" data-i18n="baseLbl"></label>
+          <input type="text" class="inp mono" id="baseUrl" spellcheck="false" autocomplete="off" placeholder="example.com/landing">
+          <div class="hint" data-i18n="baseHint"></div>
+        </div>
+
+        <div class="field">
+          <label for="utm_source"><span data-i18n="sourceLbl"></span><span class="req">*</span></label>
+          <input type="text" class="inp mono" id="utm_source" spellcheck="false" autocomplete="off" placeholder="google">
+          <div class="chiplbl" data-i18n="sourcePick"></div>
+          <div class="chips" id="sourceChips"></div>
+        </div>
+
+        <div class="field">
+          <label for="utm_medium"><span data-i18n="mediumLbl"></span><span class="req">*</span></label>
+          <input type="text" class="inp mono" id="utm_medium" spellcheck="false" autocomplete="off" placeholder="cpc">
+          <div class="chiplbl" data-i18n="mediumPick"></div>
+          <div class="chips" id="mediumChips"></div>
+        </div>
+
+        <div class="field">
+          <label for="utm_campaign"><span data-i18n="campaignLbl"></span><span class="req">*</span></label>
+          <input type="text" class="inp mono" id="utm_campaign" spellcheck="false" autocomplete="off" placeholder="summer_sale">
+        </div>
+
+        <div class="field">
+          <label for="utm_term"><span data-i18n="termLbl"></span><span class="opt" data-i18n="optTag"></span></label>
+          <input type="text" class="inp mono" id="utm_term" spellcheck="false" autocomplete="off" placeholder="running+shoes">
+        </div>
+
+        <div class="field">
+          <label for="utm_content"><span data-i18n="contentLbl"></span><span class="opt" data-i18n="optTag"></span></label>
+          <input type="text" class="inp mono" id="utm_content" spellcheck="false" autocomplete="off" placeholder="logolink">
+        </div>
+
+        <div class="field">
+          <label for="utm_id"><span data-i18n="idLbl"></span><span class="opt" data-i18n="optTag"></span></label>
+          <input type="text" class="inp mono" id="utm_id" spellcheck="false" autocomplete="off" placeholder="abc-123">
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: output -->
+    <div class="col">
+      <div class="card">
+        <h3 data-i18n="outTitle"></h3>
+        <p class="csub" data-i18n="outSub"></p>
+
+        <div class="outbox">
+          <textarea class="outta" id="outUrl" readonly spellcheck="false"></textarea>
+          <div class="outmeta">
+            <span class="cc"><span data-i18n="charLbl"></span> <b id="charCount">0</b></span>
+            <span id="paramCount"></span>
+          </div>
+        </div>
+
+        <button class="copybtn" id="copyBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span data-i18n="copyBtn"></span>
+        </button>
+
+        <div class="row2">
+          <button id="copyMdBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+            <span data-i18n="copyMdBtn"></span>
+          </button>
+          <button id="clearBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span data-i18n="clearBtn"></span>
+          </button>
+        </div>
+
+        <div class="brk">
+          <div class="bhead" data-i18n="brkTitle"></div>
+          <div id="brkBody"></div>
+        </div>
+
+        <div class="seam">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-i18n="seam"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl',
+      kick:'שיווק · בונה קישורי UTM',
+      pageTitle:'בנו קישורי UTM למעקב קמפיינים',
+      pageSub:'הרכיבו כתובת מתויגת עם פרמטרים של UTM — מקור, מדיום, קמפיין ועוד. הקישור נבנה בזמן אמת בזמן ההקלדה, מוכן להעתקה. הכול מתבצע בדפדפן שלכם — שום נתון לא נשלח לשרת.',
+      formTitle:'פרטי הקמפיין',
+      formSub:'מלאו את השדות והקישור מתעדכן מיד. שדות עם ✱ מומלצים לכל תיוג.',
+      baseLbl:'כתובת בסיס', baseHint:'הכתובת שאליה מפנים. אם חסר http, נוסיף https:// אוטומטית.',
+      sourceLbl:'utm_source · מקור', sourcePick:'בחירה מהירה',
+      mediumLbl:'utm_medium · מדיום', mediumPick:'בחירה מהירה',
+      campaignLbl:'utm_campaign · קמפיין',
+      termLbl:'utm_term · מילת מפתח', contentLbl:'utm_content · תוכן', idLbl:'utm_id · מזהה',
+      optTag:'רשות',
+      outTitle:'הקישור המוכן',
+      outSub:'הכתובת המלאה המתויגת. מתעדכנת עם כל הקשה.',
+      charLbl:'תווים', paramCount:n=>`${n} ${n===1?'פרמטר':'פרמטרים'}`,
+      copyBtn:'העתקת הקישור', copyMdBtn:'העתקה כ-Markdown', clearBtn:'ניקוי',
+      brkTitle:'פירוט הפרמטרים',
+      thParam:'פרמטר', thValue:'ערך',
+      brkEmpty:'אין עדיין פרמטרים — התחילו למלא את השדות.',
+      needBase:'הזינו קודם כתובת בסיס',
+      seam:'הכול רץ מקומית בדפדפן — הכתובות שלכם אף פעם לא נשלחות לשרת. הקלט האחרון נשמר רק אצלכם, ב-localStorage של הדפדפן.',
+      foot:'KOLKLI · בונה קישורי UTM · פרטי ומהיר, ישירות בדפדפן',
+      copied:'הקישור הועתק ✓', copiedMd:'ה-Markdown הועתק ✓',
+      cleared:'נוקה ✓', nothing:'אין מה להעתיק',
+    },
+    en:{
+      dir:'ltr',
+      kick:'Marketing · UTM Link Builder',
+      pageTitle:'Build UTM links to track your campaigns',
+      pageSub:'Assemble a tagged URL with UTM parameters — source, medium, campaign and more. The link builds live as you type and is ready to copy. Everything runs in your browser — no data ever leaves your machine.',
+      formTitle:'Campaign details',
+      formSub:'Fill the fields and the link updates instantly. Fields with ✱ are recommended for every tag.',
+      baseLbl:'Base URL', baseHint:'The destination you are linking to. Missing http? We add https:// automatically.',
+      sourceLbl:'utm_source', sourcePick:'Quick pick',
+      mediumLbl:'utm_medium', mediumPick:'Quick pick',
+      campaignLbl:'utm_campaign',
+      termLbl:'utm_term', contentLbl:'utm_content', idLbl:'utm_id',
+      optTag:'optional',
+      outTitle:'Your link',
+      outSub:'The full tagged URL. Updates on every keystroke.',
+      charLbl:'Characters', paramCount:n=>`${n} ${n===1?'param':'params'}`,
+      copyBtn:'Copy link', copyMdBtn:'Copy as Markdown', clearBtn:'Clear',
+      brkTitle:'Parameter breakdown',
+      thParam:'Parameter', thValue:'Value',
+      brkEmpty:'No parameters yet — start filling the fields.',
+      needBase:'Enter a base URL first',
+      seam:'Everything runs locally in your browser — your URLs are never uploaded. Your last input is saved only on your device, in the browser localStorage.',
+      foot:'KOLKLI · UTM Link Builder · Private and fast, right in your browser',
+      copied:'Link copied ✓', copiedMd:'Markdown copied ✓',
+      cleared:'Cleared ✓', nothing:'Nothing to copy',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Маркетинг · UTM-конструктор',
+      pageTitle:'Создавайте UTM-ссылки для отслеживания кампаний',
+      pageSub:'Соберите размеченную ссылку с UTM-параметрами — источник, канал, кампания и другие. Ссылка строится в реальном времени по мере ввода и готова к копированию. Всё работает в вашем браузере — никакие данные не покидают устройство.',
+      formTitle:'Данные кампании',
+      formSub:'Заполните поля — ссылка обновится сразу. Поля с ✱ рекомендуются для каждой метки.',
+      baseLbl:'Базовый URL', baseHint:'Адрес назначения. Нет http? Мы добавим https:// автоматически.',
+      sourceLbl:'utm_source · источник', sourcePick:'Быстрый выбор',
+      mediumLbl:'utm_medium · канал', mediumPick:'Быстрый выбор',
+      campaignLbl:'utm_campaign · кампания',
+      termLbl:'utm_term · ключевое слово', contentLbl:'utm_content · содержание', idLbl:'utm_id · идентификатор',
+      optTag:'необязательно',
+      outTitle:'Готовая ссылка',
+      outSub:'Полный размеченный URL. Обновляется при каждом нажатии клавиши.',
+      charLbl:'Символов', paramCount:n=>`${n} ${n===1?'параметр':(n>=2&&n<=4?'параметра':'параметров')}`,
+      copyBtn:'Копировать ссылку', copyMdBtn:'Копировать как Markdown', clearBtn:'Очистить',
+      brkTitle:'Разбор параметров',
+      thParam:'Параметр', thValue:'Значение',
+      brkEmpty:'Параметров пока нет — начните заполнять поля.',
+      needBase:'Сначала введите базовый URL',
+      seam:'Всё работает локально в вашем браузере — ваши ссылки никогда не загружаются. Последний ввод сохраняется только на вашем устройстве, в localStorage браузера.',
+      foot:'KOLKLI · UTM-конструктор · Приватно и быстро, прямо в браузере',
+      copied:'Ссылка скопирована ✓', copiedMd:'Markdown скопирован ✓',
+      cleared:'Очищено ✓', nothing:'Нечего копировать',
+    },
+  };
+
+  const SOURCE_CHIPS = ['google','facebook','instagram','tiktok','linkedin','youtube','twitter','newsletter'];
+  const MEDIUM_CHIPS = ['cpc','social','email','organic','banner','referral','affiliate'];
+  // order matters — this is the assembled param order
+  const FIELDS = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','utm_id'];
+  const ALL_INPUTS = ['baseUrl'].concat(FIELDS);
+  const STORE_KEY = 'kolkli_utm';
+
+  let lang='he', t=I18N.he;
+
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  // ---- clipboard ----
+  function copyText(str){
+    const done=()=>toast(t.copied);
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(str).then(done).catch(()=>fallback(str,done)); }
+    else fallback(str,done);
+  }
+  function fallback(str,cb){ const ta=document.createElement('textarea'); ta.value=str; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); cb&&cb(); }
+  function toast(m){ const e=el('toast'); e.textContent=m; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+
+  // ---- assembly ----
+  function normalizeBase(raw){
+    let b=(raw||'').trim();
+    if(!b) return '';
+    if(!/^[a-z][a-z0-9+.-]*:\/\//i.test(b) && !/^\/\//.test(b)){ b='https://'+b; }
+    return b;
+  }
+  // returns { url, params:[{key,value}] }  — url '' when no base
+  function build(){
+    const base = normalizeBase(el('baseUrl').value);
+    const params=[];
+    FIELDS.forEach(k=>{
+      const v=(el(k).value||'').trim();
+      if(v) params.push({ key:k, value:v });
+    });
+    if(!base) return { url:'', params, base:'' };
+    const query = params.map(p=>encodeURIComponent(p.key)+'='+encodeURIComponent(p.value)).join('&');
+    let url=base;
+    if(query){
+      const sep = base.indexOf('?')>=0 ? (/[?&]$/.test(base)?'':'&') : '?';
+      url = base + sep + query;
+    }
+    return { url, params, base };
+  }
+
+  function markdown(res){
+    const label=(el('utm_campaign').value||'').trim() || 'link';
+    return `[${label}](${res.url})`;
+  }
+
+  // ---- render ----
+  function render(){
+    const res=build();
+    const out=el('outUrl');
+    if(!res.base){ out.value=''; out.placeholder=t.needBase; }
+    else { out.value=res.url; out.placeholder=''; }
+
+    const shown = out.value;
+    el('charCount').textContent = shown.length;
+    el('paramCount').textContent = t.paramCount(res.params.length);
+
+    // breakdown
+    const body=el('brkBody');
+    if(!res.params.length){
+      body.innerHTML = `<div class="empty">${escapeHtml(t.brkEmpty)}</div>`;
+    } else {
+      const rows = res.params.map(p=>`<tr><td class="k">${escapeHtml(p.key)}</td><td class="v">${escapeHtml(p.value)}</td></tr>`).join('');
+      body.innerHTML = `<table class="tbl"><thead><tr><th>${escapeHtml(t.thParam)}</th><th>${escapeHtml(t.thValue)}</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    save();
+  }
+
+  function save(){
+    try{
+      const data={}; ALL_INPUTS.forEach(id=>{ data[id]=el(id).value; });
+      localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    }catch(_){}
+  }
+  function restore(){
+    let data=null;
+    try{ data=JSON.parse(ls(STORE_KEY)||'null'); }catch(_){ data=null; }
+    if(data && typeof data==='object'){
+      ALL_INPUTS.forEach(id=>{ if(typeof data[id]==='string') el(id).value=data[id]; });
+    }
+  }
+
+  function syncChips(){
+    document.querySelectorAll('#sourceChips .chip').forEach(c=>c.classList.toggle('on', c.dataset.val===(el('utm_source').value||'').trim()));
+    document.querySelectorAll('#mediumChips .chip').forEach(c=>c.classList.toggle('on', c.dataset.val===(el('utm_medium').value||'').trim()));
+  }
+
+  function renderChips(){
+    el('sourceChips').innerHTML = SOURCE_CHIPS.map(v=>`<button type="button" class="chip" data-val="${v}" data-target="utm_source">${v}</button>`).join('');
+    el('mediumChips').innerHTML = MEDIUM_CHIPS.map(v=>`<button type="button" class="chip" data-val="${v}" data-target="utm_medium">${v}</button>`).join('');
+    syncChips();
+  }
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    render(); // regenerate dynamic output (char count, param count, breakdown, placeholders)
+  }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  ALL_INPUTS.forEach(id=>{
+    el(id).addEventListener('input',()=>{ if(id==='utm_source'||id==='utm_medium') syncChips(); render(); });
+  });
+
+  function chipHandler(e){
+    const b=e.target.closest('.chip'); if(!b) return;
+    const target=b.dataset.target, val=b.dataset.val;
+    const cur=(el(target).value||'').trim();
+    el(target).value = (cur===val) ? '' : val; // toggle off if already set to this
+    syncChips(); render();
+  }
+  el('sourceChips').addEventListener('click',chipHandler);
+  el('mediumChips').addEventListener('click',chipHandler);
+
+  el('copyBtn').addEventListener('click',()=>{
+    const res=build();
+    if(!res.url){ toast(t.nothing); return; }
+    copyText(res.url);
+  });
+  el('copyMdBtn').addEventListener('click',()=>{
+    const res=build();
+    if(!res.url){ toast(t.nothing); return; }
+    const done=()=>toast(t.copiedMd);
+    const md=markdown(res);
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(md).then(done).catch(()=>fallback(md,done)); }
+    else fallback(md,done);
+  });
+  el('clearBtn').addEventListener('click',()=>{
+    ALL_INPUTS.forEach(id=>{ el(id).value=''; });
+    syncChips(); render(); toast(t.cleared);
+    el('baseUrl').focus();
+  });
+
+  el('outUrl').addEventListener('focus',()=>el('outUrl').select());
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  renderChips();
+  restore();
+  applyLang(detectLang());
+  syncChips();
+})();
+</script>
+</body>
+</html>

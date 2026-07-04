@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — תשלום</title>
+<meta name="description" content="Secure KOLKLI checkout — upgrade to Lite or Pro. Encrypted payment, cancel anytime, 14-day money-back guarantee.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;
+    display:flex;flex-direction:column;min-height:100vh;overflow-x:clip;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+
+  /* soft background orbs, like the landing hero / auth page */
+  .orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.4;z-index:0;pointer-events:none;}
+  .orb.a{width:440px;height:440px;background:radial-gradient(circle,#8b2fe0,transparent 66%);top:-160px;inset-inline-start:-140px;}
+  .orb.b{width:480px;height:480px;background:radial-gradient(circle,#3f85ff,transparent 66%);bottom:-200px;inset-inline-end:-160px;opacity:.3;}
+
+  /* ---------- layout ---------- */
+  .co-wrap{position:relative;z-index:2;flex:1;width:100%;max-width:1140px;margin:0 auto;padding:24px 22px 72px;}
+  .back{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--muted);
+    margin-bottom:16px;transition:color .12s;}
+  .back:hover{color:var(--accent-dim);}
+  .back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  html[dir="ltr"] .back svg{transform:scaleX(-1);}
+
+  .co-head{margin:0 0 22px;}
+  .co-head .kick{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--accent-dim);background:var(--accent-soft);
+    padding:5px 11px;border-radius:999px;margin-bottom:12px;}
+  .co-head .kick svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .co-head h1{font-size:30px;font-weight:800;letter-spacing:-0.025em;margin:0 0 6px;line-height:1.1;}
+  .co-head p{font-size:15px;color:var(--muted);margin:0;max-width:560px;}
+
+  .co-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:24px;align-items:start;}
+
+  /* ---------- form column ---------- */
+  .co-form{display:flex;flex-direction:column;gap:16px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:22px 22px;}
+  .sec-head{display:flex;align-items:center;gap:11px;margin:0 0 16px;}
+  .sec-num{width:26px;height:26px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad-soft);color:var(--accent-dim);font-size:13px;font-weight:800;}
+  .sec-head h2{font-size:16px;font-weight:700;letter-spacing:-0.01em;margin:0;}
+
+  /* plan picker */
+  .plan-pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+  .plan-opt{position:relative;text-align:start;cursor:pointer;border:1.5px solid var(--line);border-radius:15px;
+    background:var(--panel-2);padding:15px 15px 14px;transition:border-color .14s,box-shadow .14s,background .14s;}
+  .plan-opt:hover{border-color:var(--accent);}
+  .plan-opt.on{border-color:var(--accent);background:var(--panel);box-shadow:0 0 0 3px var(--accent-soft);}
+  .plan-opt .po-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px;}
+  .plan-opt .po-nm{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0;}
+  .plan-opt .po-name{font-size:16px;font-weight:800;letter-spacing:-0.01em;}
+  .plan-opt .po-radio{width:20px;height:20px;flex-shrink:0;border-radius:50%;border:2px solid var(--line);position:relative;transition:border-color .14s;}
+  .plan-opt.on .po-radio{border-color:var(--accent);}
+  .plan-opt.on .po-radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--grad);}
+  .plan-opt .po-desc{font-size:12.5px;color:var(--muted);margin-bottom:9px;min-height:17px;}
+  .plan-opt .po-price{font-size:22px;font-weight:800;letter-spacing:-0.02em;}
+  .plan-opt .po-price span{font-size:12.5px;font-weight:500;color:var(--muted);}
+  .plan-opt .po-pop{font-family:var(--mono);font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    color:#fff;background:var(--grad);padding:3px 8px;border-radius:999px;box-shadow:0 3px 9px var(--grad-shadow);}
+
+  /* billing-cycle segmented control */
+  .cyc{display:flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:13px;padding:4px;}
+  .cyc-btn{flex:1;position:relative;height:46px;border:none;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;
+    font-family:var(--sans);font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;
+    transition:color .14s,background .14s,box-shadow .14s;}
+  .cyc-btn.on{background:var(--panel);color:var(--ink);box-shadow:var(--shadow-sm);}
+  .cyc-btn .save{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.03em;color:var(--success-dim);
+    background:var(--success-soft);padding:3px 7px;border-radius:999px;}
+
+  /* express pay */
+  .xpay{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px;}
+  .xbtn{height:48px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:7px;font-size:13.5px;font-weight:700;color:var(--ink);
+    transition:border-color .12s,transform .08s,background .12s;}
+  .xbtn:hover{border-color:var(--accent);background:var(--panel);}
+  .xbtn:active{transform:translateY(1px);}
+  .xbtn svg{height:19px;width:auto;display:block;}
+  .xbtn .pp-b{color:#003087;} .xbtn .pp-a{color:#009cde;}
+  html[data-theme="dark"] .xbtn .pp-b{color:#8ab4ff;}
+  .xdiv{display:flex;align-items:center;gap:12px;margin:16px 0 14px;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .xdiv::before,.xdiv::after{content:'';flex:1;height:1px;background:var(--line);}
+
+  /* fields */
+  .field{margin-bottom:13px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:6px;}
+  .inwrap{position:relative;display:flex;align-items:center;}
+  .field input,.field select{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:11px;
+    font-family:var(--sans);font-size:14px;padding:12px 13px;transition:border-color .12s,box-shadow .12s;appearance:none;}
+  .field input::placeholder{color:var(--faint);}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .field.bad input,.field.bad select{border-color:var(--danger);}
+  .field.bad input:focus{box-shadow:0 0 0 3px var(--danger-soft);}
+  .field .err{font-size:11.5px;color:var(--danger);margin-top:5px;min-height:0;line-height:1.3;}
+  .field.bad .err{min-height:14px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23727a8a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='4 6 8 10 12 6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;}
+  html[dir="rtl"] select{background-position:left 13px center;padding-right:13px;padding-left:34px;}
+
+  /* card field with brand badge */
+  .cardwrap input{padding-inline-end:56px;}
+  .card-brand{position:absolute;inset-inline-end:12px;height:22px;display:flex;align-items:center;pointer-events:none;}
+  .card-brand svg{height:22px;width:auto;}
+
+  /* company / vat toggle */
+  .linkbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--accent-dim);cursor:pointer;
+    background:none;border:none;padding:2px 0;margin-top:2px;}
+  .linkbtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s;}
+  .linkbtn.open svg{transform:rotate(45deg);}
+  .company{display:none;margin-top:12px;}
+  .company.show{display:block;}
+
+  /* form-level message */
+  .formmsg{font-size:13px;border-radius:11px;padding:11px 13px;margin-bottom:14px;display:none;line-height:1.5;}
+  .formmsg.show{display:flex;gap:8px;align-items:flex-start;}
+  .formmsg svg{width:16px;height:16px;flex-shrink:0;margin-top:1px;}
+  .formmsg.err{background:var(--danger-soft);color:var(--danger);}
+  .formmsg.info{background:var(--info-soft);color:var(--info-dim);}
+
+  /* ---------- summary column ---------- */
+  .aside{position:sticky;top:92px;display:flex;flex-direction:column;gap:14px;}
+  .sum{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-lg);overflow:hidden;}
+  .sum-top{background:var(--grad-soft);padding:18px 20px 16px;border-bottom:1px solid var(--line);}
+  .sum-top h2{font-size:13px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;color:var(--accent-dim);margin:0 0 12px;font-family:var(--mono);}
+  .sum-plan{display:flex;align-items:center;gap:12px;}
+  .sum-plan .sp-ic{width:44px;height:44px;flex-shrink:0;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);color:#fff;box-shadow:0 6px 16px var(--grad-shadow);}
+  .sum-plan .sp-ic svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .sum-plan .sp-tx{flex:1;min-width:0;}
+  .sum-plan .sp-name{font-size:17px;font-weight:800;letter-spacing:-0.01em;}
+  .sum-plan .sp-cyc{font-size:12.5px;color:var(--muted);}
+  .sum-plan .sp-change{font-size:12px;font-weight:700;color:var(--accent-dim);cursor:pointer;background:none;border:none;flex-shrink:0;}
+  .sum-plan .sp-change:hover{text-decoration:underline;}
+
+  .sum-body{padding:16px 20px 18px;}
+  .sum-feats{list-style:none;margin:0 0 16px;padding:0 0 16px;border-bottom:1px dashed var(--line);display:flex;flex-direction:column;gap:9px;}
+  .sum-feats li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--ink-2);}
+  .sum-feats li svg{width:15px;height:15px;flex-shrink:0;margin-top:2px;color:var(--success);stroke:currentColor;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+
+  .lines{display:flex;flex-direction:column;gap:9px;margin-bottom:14px;}
+  .lineitem{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13.5px;color:var(--muted);}
+  .lineitem b{color:var(--ink-2);font-weight:600;}
+  .lineitem.disc{color:var(--success-dim);}
+  .lineitem .num{font-variant-numeric:tabular-nums;direction:ltr;}
+
+  .total{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid var(--line);}
+  .total .tl{display:flex;flex-direction:column;}
+  .total .tl b{font-size:15px;font-weight:800;}
+  .total .tl small{font-size:11px;color:var(--faint);}
+  .total .tv{font-size:26px;font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;direction:ltr;}
+
+  /* promo */
+  .promo{display:flex;gap:8px;margin-bottom:14px;}
+  .promo input{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:11px;
+    font-family:var(--sans);font-size:13.5px;padding:11px 12px;letter-spacing:.02em;transition:border-color .12s,box-shadow .12s;}
+  .promo input::placeholder{color:var(--faint);letter-spacing:0;}
+  .promo input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .promo button{flex-shrink:0;padding:0 16px;border-radius:11px;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink-2);font-weight:700;font-size:13px;cursor:pointer;transition:border-color .12s,background .12s;}
+  .promo button:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim);}
+  .promo-msg{font-size:11.5px;margin:-8px 0 12px;min-height:0;}
+  .promo-msg.ok{color:var(--success-dim);} .promo-msg.no{color:var(--danger);}
+
+  /* pay button */
+  .paybtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:10px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:700;font-size:16px;padding:15px 20px;border-radius:14px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 10px 24px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .paybtn:hover{filter:brightness(1.05);} .paybtn:active{transform:translateY(1px);}
+  .paybtn:disabled{opacity:.7;cursor:default;filter:none;transform:none;}
+  .paybtn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .spinner{width:18px;height:18px;border:2.4px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;
+    animation:spin .7s linear infinite;display:none;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .paying .spinner{display:block;} .paying .paylabel,.paying .paylock{display:none;}
+
+  .trust{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;font-size:11.5px;color:var(--muted);text-align:center;}
+  .trust svg{width:14px;height:14px;color:var(--success);stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .brands{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;opacity:.9;flex-wrap:wrap;}
+  .brands svg{height:22px;width:auto;}
+  .fineprint{font-size:11px;color:var(--faint);line-height:1.6;text-align:center;margin-top:14px;}
+  .fineprint a{color:var(--accent-dim);}
+
+  /* guarantee badges under summary */
+  .guards{display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:15px 17px;}
+  .guard{display:flex;align-items:center;gap:11px;font-size:12.5px;color:var(--ink-2);}
+  .guard .g-ic{width:34px;height:34px;flex-shrink:0;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .guard .g-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .guard b{display:block;font-weight:700;font-size:13px;color:var(--ink);}
+
+  /* ---------- success view ---------- */
+  .done{display:none;max-width:560px;margin:10px auto 0;text-align:center;}
+  .done.show{display:block;}
+  .done .seal{width:78px;height:78px;margin:0 auto 20px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);color:#fff;box-shadow:0 12px 30px var(--grad-shadow);animation:pop .45s cubic-bezier(.2,1.3,.4,1);}
+  .done .seal svg{width:40px;height:40px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
+  @keyframes pop{0%{transform:scale(0);}100%{transform:scale(1);}}
+  .done h1{font-size:26px;font-weight:800;letter-spacing:-0.02em;margin:0 0 8px;}
+  .done .dsub{font-size:15px;color:var(--muted);margin:0 auto 22px;max-width:420px;}
+  .receipt{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);
+    padding:20px 22px;text-align:start;margin-bottom:22px;}
+  .receipt .rrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;font-size:14px;border-bottom:1px solid var(--line-2);}
+  .receipt .rrow:last-child{border-bottom:none;}
+  .receipt .rrow span{color:var(--muted);}
+  .receipt .rrow b{font-weight:700;font-variant-numeric:tabular-nums;}
+  .receipt .rrow.big b{font-size:18px;color:var(--accent-dim);}
+  .receipt .rrow .mono{font-family:var(--mono);direction:ltr;}
+  .done-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .btn-lg{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 22px;border-radius:12px;font-weight:700;font-size:14.5px;cursor:pointer;transition:filter .14s,transform .08s,border-color .12s;}
+  .btn-lg svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .btn-primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    box-shadow:0 8px 20px var(--grad-btn-glow);text-shadow:0 1px 2px rgba(0,0,0,.18);}
+  .btn-primary:hover{filter:brightness(1.05);} .btn-primary:active{transform:translateY(1px);}
+  .btn-soft{background:var(--panel);border:1px solid var(--line);color:var(--ink-2);box-shadow:var(--shadow-sm);}
+  .btn-soft:hover{border-color:var(--accent);}
+
+  footer{position:relative;z-index:2;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);padding:20px;}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:900px){
+    .co-grid{grid-template-columns:1fr;}
+    .aside{position:static;}
+    .co-head h1{font-size:25px;}
+  }
+  @media (max-width:520px){
+    .plan-pick{grid-template-columns:1fr;}
+    .row2{grid-template-columns:1fr;}
+    .xpay{grid-template-columns:1fr;}
+    .co-wrap{padding:18px 16px 56px;}
+    .card{padding:18px 16px;}
+  }
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<span class="orb a"></span><span class="orb b"></span>
+
+<div class="co-wrap">
+  <a class="back" href="./pricing/">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    <span data-i18n="back"></span>
+  </a>
+
+  <!-- ============ checkout view ============ -->
+  <div id="checkoutView">
+    <div class="co-head">
+      <div class="kick">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span data-i18n="secure"></span>
+      </div>
+      <h1 data-i18n="title"></h1>
+      <p data-i18n="subtitle"></p>
+    </div>
+
+    <div class="co-grid">
+      <!-- ---------- form ---------- -->
+      <form class="co-form" id="payForm" novalidate autocomplete="on">
+        <div class="formmsg" id="formMsg"></div>
+
+        <!-- 1. plan & billing -->
+        <div class="card">
+          <div class="sec-head"><span class="sec-num">1</span><h2 data-i18n="sec1"></h2></div>
+          <div class="plan-pick" id="planPick"></div>
+          <div class="cyc" id="cyc" role="tablist">
+            <button class="cyc-btn" type="button" data-cycle="monthly">
+              <span data-i18n="monthly"></span>
+            </button>
+            <button class="cyc-btn" type="button" data-cycle="yearly">
+              <span data-i18n="yearly"></span>
+              <span class="save" id="saveTag"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. account -->
+        <div class="card">
+          <div class="sec-head"><span class="sec-num">2</span><h2 data-i18n="sec2"></h2></div>
+          <div class="field" id="emailField">
+            <label for="email" data-i18n="emailLabel"></label>
+            <div class="inwrap"><input id="email" type="email" dir="ltr" autocomplete="email" data-i18n-ph="emailPh"></div>
+            <div class="err" id="emailErr"></div>
+          </div>
+        </div>
+
+        <!-- 3. payment -->
+        <div class="card">
+          <div class="sec-head"><span class="sec-num">3</span><h2 data-i18n="sec3"></h2></div>
+
+          <div class="xpay">
+            <button class="xbtn" type="button" data-express="apple" aria-label="Apple Pay">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.3 12.9c0-1.6 1.3-2.4 1.4-2.4-.8-1.1-1.9-1.3-2.3-1.3-1-.1-1.9.6-2.4.6s-1.3-.6-2.1-.6c-1.1 0-2.1.6-2.6 1.6-1.1 2-.3 4.9.8 6.5.5.8 1.2 1.7 2 1.6.8 0 1.1-.5 2.1-.5s1.2.5 2.1.5c.9 0 1.4-.8 1.9-1.5.6-.9.9-1.7.9-1.8 0 0-1.7-.7-1.7-2.7zM14.7 8.1c.4-.5.7-1.3.6-2-.6 0-1.4.4-1.9.9-.4.5-.7 1.2-.6 2 .7.1 1.4-.4 1.9-.9z"/></svg>
+              <span>Pay</span>
+            </button>
+            <button class="xbtn" type="button" data-express="google" aria-label="Google Pay">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M12.2 12.2v2.3h3.2c-.1.8-.9 2.4-3.2 2.4-1.9 0-3.5-1.6-3.5-3.6s1.6-3.6 3.5-3.6c1.1 0 1.8.5 2.2.9l1.5-1.5C15.1 8.7 13.8 8 12.2 8 9.3 8 7 10.4 7 13.3s2.3 5.3 5.2 5.3c3 0 5-2.1 5-5.1 0-.3 0-.6-.1-.8h-4.9z"/><path fill="#5F6368" d="M12.2 12.2z"/></svg>
+              <span>Pay</span>
+            </button>
+            <button class="xbtn" type="button" data-express="paypal" aria-label="PayPal">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path class="pp-b" fill="currentColor" d="M8.4 5h4.9c2.4 0 4.1 1.2 3.7 3.8-.4 2.7-2.3 3.9-4.8 3.9h-1.3c-.3 0-.5.2-.6.5l-.7 4.3c0 .2-.2.4-.5.4H6.9c-.3 0-.5-.3-.4-.6L8 5.5c.1-.3.2-.5.4-.5z"/><path class="pp-a" fill="currentColor" d="M10.6 8h4.5c1.9 0 3.3.8 3.4 2.8.1 2.7-1.9 4.2-4.6 4.2h-1.2c-.3 0-.5.2-.6.5l-.7 4.2c0 .2-.2.3-.4.3H8.1c-.3 0-.4-.2-.4-.5l1.5-9.3c.1-.3.3-.5.6-.5z" opacity=".75"/></svg>
+            </button>
+          </div>
+
+          <div class="xdiv"><span data-i18n="orCard"></span></div>
+
+          <div class="field cardwrap">
+            <label for="cardNum" data-i18n="cardLabel"></label>
+            <div class="inwrap">
+              <input id="cardNum" type="text" inputmode="numeric" dir="ltr" autocomplete="cc-number" placeholder="1234 5678 9012 3456" maxlength="23">
+              <span class="card-brand" id="cardBrand"></span>
+            </div>
+            <div class="err" id="cardErr"></div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="exp" data-i18n="expLabel"></label>
+              <div class="inwrap"><input id="exp" type="text" inputmode="numeric" dir="ltr" autocomplete="cc-exp" placeholder="MM/YY" maxlength="5"></div>
+              <div class="err" id="expErr"></div>
+            </div>
+            <div class="field">
+              <label for="cvc" data-i18n="cvcLabel"></label>
+              <div class="inwrap"><input id="cvc" type="text" inputmode="numeric" dir="ltr" autocomplete="cc-csc" placeholder="123" maxlength="4"></div>
+              <div class="err" id="cvcErr"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="cardName" data-i18n="nameLabel"></label>
+            <div class="inwrap"><input id="cardName" type="text" autocomplete="cc-name" data-i18n-ph="namePh"></div>
+            <div class="err" id="nameErr"></div>
+          </div>
+        </div>
+
+        <!-- 4. billing details -->
+        <div class="card">
+          <div class="sec-head"><span class="sec-num">4</span><h2 data-i18n="sec4"></h2></div>
+          <div class="field">
+            <label for="country" data-i18n="countryLabel"></label>
+            <div class="inwrap"><select id="country"></select></div>
+          </div>
+          <button class="linkbtn" id="companyToggle" type="button">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span data-i18n="addCompany"></span>
+          </button>
+          <div class="company" id="company">
+            <div class="field" style="margin-top:12px">
+              <label for="companyName" data-i18n="companyLabel"></label>
+              <div class="inwrap"><input id="companyName" type="text" autocomplete="organization" data-i18n-ph="companyPh"></div>
+            </div>
+            <div class="field">
+              <label for="vatId" data-i18n="vatLabel"></label>
+              <div class="inwrap"><input id="vatId" type="text" dir="ltr" data-i18n-ph="vatPh"></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="paybtn" id="payBtn" type="submit">
+          <span class="spinner"></span>
+          <svg class="paylock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span class="paylabel" id="payLabel"></span>
+        </button>
+
+        <div class="trust">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+          <span data-i18n="trust"></span>
+        </div>
+      </form>
+
+      <!-- ---------- summary ---------- -->
+      <aside class="aside">
+        <div class="sum">
+          <div class="sum-top">
+            <h2 data-i18n="orderSummary"></h2>
+            <div class="sum-plan">
+              <span class="sp-ic"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+              <div class="sp-tx">
+                <div class="sp-name" id="sumName"></div>
+                <div class="sp-cyc" id="sumCyc"></div>
+              </div>
+              <button class="sp-change" type="button" id="sumChange" data-i18n="change"></button>
+            </div>
+          </div>
+          <div class="sum-body">
+            <ul class="sum-feats" id="sumFeats"></ul>
+
+            <div class="promo">
+              <input id="promoInput" type="text" dir="ltr" data-i18n-ph="promoPh" autocomplete="off">
+              <button type="button" id="promoBtn" data-i18n="apply"></button>
+            </div>
+            <div class="promo-msg" id="promoMsg"></div>
+
+            <div class="lines" id="lines"></div>
+
+            <div class="total">
+              <div class="tl"><b data-i18n="totalToday"></b><small id="renewNote"></small></div>
+              <div class="tv" id="totalVal"></div>
+            </div>
+
+            <div class="brands">
+              <!-- Visa -->
+              <svg viewBox="0 0 48 30" aria-label="Visa"><rect width="48" height="30" rx="5" fill="#1a1f71"/><path d="M20 20l1.7-10h2.7L22.7 20H20zm12.7-9.7c-.5-.2-1.4-.4-2.4-.4-2.6 0-4.5 1.3-4.5 3.3 0 1.4 1.3 2.2 2.3 2.7 1 .5 1.4.8 1.4 1.2 0 .6-.8.9-1.5.9-1 0-1.5-.1-2.3-.5l-.3-.2-.3 2c.6.3 1.7.5 2.8.5 2.8 0 4.6-1.3 4.6-3.4 0-1.1-.7-2-2.2-2.7-.9-.5-1.5-.8-1.5-1.2 0-.4.5-.8 1.5-.8.8 0 1.4.2 1.9.4l.2.1.4-1.9zm5.8-.3h-2c-.6 0-1.1.2-1.4.9L34 20h2.8l.5-1.5h3.4l.3 1.5H43L40.5 10h-1.9zm-1.4 6.3l1-2.9.6 2.9h-2.4zm-19-6.3l-2.6 6.8-.3-1.4c-.5-1.7-2-3.5-3.7-4.4l2.4 9h2.8l4.2-10h-2.9z" fill="#fff"/><path d="M11.6 10H7.3l-.1.3c3.4.8 5.6 2.9 6.5 5.3l-.9-4.7c-.2-.7-.6-.9-1.2-.9z" fill="#f9a51a"/></svg>
+              <!-- Mastercard -->
+              <svg viewBox="0 0 48 30" aria-label="Mastercard"><rect width="48" height="30" rx="5" fill="#252525"/><circle cx="19" cy="15" r="8" fill="#eb001b"/><circle cx="29" cy="15" r="8" fill="#f79e1b"/><path d="M24 9a8 8 0 0 0 0 12 8 8 0 0 0 0-12z" fill="#ff5f00"/></svg>
+              <!-- Amex -->
+              <svg viewBox="0 0 48 30" aria-label="American Express"><rect width="48" height="30" rx="5" fill="#2e77bc"/><text x="24" y="19" font-family="Arial, sans-serif" font-size="8" font-weight="700" fill="#fff" text-anchor="middle">AMEX</text></svg>
+            </div>
+            <div class="fineprint" id="finePrint"></div>
+          </div>
+        </div>
+
+        <div class="guards">
+          <div class="guard">
+            <span class="g-ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+            <span><b data-i18n="g1t"></b><span data-i18n="g1d"></span></span>
+          </div>
+          <div class="guard">
+            <span class="g-ic"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3 3 3 9 9 9"/></svg></span>
+            <span><b data-i18n="g2t"></b><span data-i18n="g2d"></span></span>
+          </div>
+          <div class="guard">
+            <span class="g-ic"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+            <span><b data-i18n="g3t"></b><span data-i18n="g3d"></span></span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ============ success view ============ -->
+  <div class="done" id="doneView">
+    <div class="seal"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <h1 id="doneTitle"></h1>
+    <p class="dsub" id="doneSub"></p>
+    <div class="receipt" id="receipt"></div>
+    <div class="done-actions">
+      <a class="btn-lg btn-primary" href="./dashboard.html">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        <span data-i18n="goDash"></span>
+      </a>
+      <a class="btn-lg btn-soft" href="./index.html">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span data-i18n="goHome"></span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer data-i18n="foot"></footer>
+
+<script>
+/* ===================================================================
+   KOLKLI checkout — a professional, WeTransfer/TransferNow-style
+   upgrade flow. Fully client-side DEMO (mirrors auth.html / send.html):
+   it validates the card format and simulates the charge, then upgrades
+   the signed-in demo account (u.plan) and stores a scoped receipt.
+
+   --- SEAM: replace the simulated charge in `chargeAndFinish()` with a
+   POST to the billing Worker (see dashboard.html billingGo → /checkout)
+   which returns a real Stripe session. Everything else — the UI, plan
+   maths, i18n — stays as-is. ---
+   =================================================================== */
+(function(){
+  const el = id => document.getElementById(id);
+  const money = n => '$' + n.toFixed(2);
+
+  /* ---------- plans (mirror PLANS in pages.js / index.html) ---------- */
+  const PLANS = {
+    lite: { key:'lite', base:6.99, pop:true,
+      he:['Lite','לעבודה יומיומית'], en:['Lite','For everyday work'], ru:['Lite','Для повседневной работы'],
+      feats:{
+        he:['שליחה עד 20GB בכל פעם','100GB אחסון בענן','כל כלי העריכה','הגנה בסיסמה · בלי פרסומות'],
+        en:['Up to 20GB per transfer','100GB cloud storage','All editing tools','Password protection · no ads'],
+        ru:['До 20 ГБ за передачу','100 ГБ в облаке','Все инструменты','Защита паролем · без рекламы']
+      } },
+    pro: { key:'pro', base:14.99,
+      he:['Pro','לעבודה מקצועית'], en:['Pro','For professional work'], ru:['Pro','Для профессионалов'],
+      feats:{
+        he:['שליחה עד 100GB בכל פעם','1TB אחסון בענן','כל הכלים + כלי AI','התראות הורדה · תמיכה בעדיפות'],
+        en:['Up to 100GB per transfer','1TB cloud storage','All tools + AI tools','Download alerts · priority support'],
+        ru:['До 100 ГБ за передачу','1 ТБ в облаке','Все инструменты + AI','Уведомления · приоритетная поддержка']
+      } }
+  };
+  const YEAR_MONTHS = 10;                 // yearly = 10 months (2 free) → ~17% off
+  const SAVE_PCT = Math.round((1 - YEAR_MONTHS/12) * 100);
+
+  /* promo codes (demo) → fractional discount off the subtotal */
+  const PROMOS = { 'KOLKLI10':0.10, 'WELCOME15':0.15, 'SAVE20':0.20 };
+
+  /* VAT rates by country code (demo). Everything else → 0. */
+  const VAT = { IL:0.18, GB:0.20, DE:0.19, FR:0.20, ES:0.21, IT:0.22, NL:0.21 };
+  const COUNTRIES = [
+    { c:'IL', he:'ישראל', en:'Israel', ru:'Израиль' },
+    { c:'US', he:'ארצות הברית', en:'United States', ru:'США' },
+    { c:'GB', he:'בריטניה', en:'United Kingdom', ru:'Великобритания' },
+    { c:'DE', he:'גרמניה', en:'Germany', ru:'Германия' },
+    { c:'FR', he:'צרפת', en:'France', ru:'Франция' },
+    { c:'ES', he:'ספרד', en:'Spain', ru:'Испания' },
+    { c:'IT', he:'איטליה', en:'Italy', ru:'Италия' },
+    { c:'NL', he:'הולנד', en:'Netherlands', ru:'Нидерланды' },
+    { c:'CA', he:'קנדה', en:'Canada', ru:'Канада' },
+    { c:'AU', he:'אוסטרליה', en:'Australia', ru:'Австралия' },
+    { c:'RU', he:'רוסיה', en:'Russia', ru:'Россия' },
+    { c:'UA', he:'אוקראינה', en:'Ukraine', ru:'Украина' },
+    { c:'OT', he:'אחר', en:'Other', ru:'Другое' }
+  ];
+
+  /* ---------- i18n ---------- */
+  const I18N = {
+    he:{ dir:'rtl',
+      back:'חזרה למסלולים', secure:'תשלום מאובטח',
+      title:'סיום ההזמנה', subtitle:'עוד כמה פרטים ואתם בפנים. אפשר לבטל בכל רגע — בלי התחייבות.',
+      sec1:'המסלול והחיוב', sec2:'החשבון', sec3:'פרטי תשלום', sec4:'פרטי חיוב',
+      monthly:'חודשי', yearly:'שנתי', perMonth:'/לחודש', perYear:'/לשנה',
+      emailLabel:'אימייל לחשבונית', emailPh:'you@example.com',
+      orCard:'או בכרטיס אשראי',
+      cardLabel:'מספר כרטיס', expLabel:'תוקף', cvcLabel:'CVC',
+      nameLabel:'שם בעל הכרטיס', namePh:'כפי שמופיע על הכרטיס',
+      countryLabel:'מדינה', addCompany:'הוספת פרטי חברה / מע״מ',
+      companyLabel:'שם החברה', companyPh:'שם העסק (לא חובה)',
+      vatLabel:'מספר עוסק / מע״מ', vatPh:'מספר עוסק מורשה',
+      pay:'תשלום', payNow:'שלמו', trust:'התשלום מוצפן ומאובטח. אפשר לבטל בכל רגע.',
+      orderSummary:'סיכום הזמנה', change:'שינוי', apply:'החל',
+      promoPh:'קוד קופון', promoOk:'הקופון הופעל — {p}% הנחה 🎉', promoNo:'קוד קופון לא תקין',
+      subtotal:'סכום ביניים', discount:'הנחה', vat:'מע״מ ({p}%)',
+      totalToday:'לתשלום היום', renewM:'מתחדש ב־{v} בחודש', renewY:'מתחדש ב־{v} בשנה',
+      fine:'בלחיצה על ״תשלום״ אתם מאשרים את תנאי השימוש ומדיניות הפרטיות. המחירים בדולר ($) וכוללים מע״מ במקום שנדרש.',
+      g1t:'החזר כספי 14 יום', g1d:'לא מרוצים? מקבלים את הכסף בחזרה.',
+      g2t:'ביטול בכל רגע', g2d:'בלי התחייבות ובלי קנסות.',
+      g3t:'תשלום מוצפן', g3d:'הצפנת SSL 256־ביט בכל תשלום.',
+      foot:'KOLKLI · תשלום להדגמה · לא מתבצע חיוב אמיתי',
+      errEmail:'כתובת אימייל לא תקינה', errCard:'מספר כרטיס לא תקין', errExp:'תוקף לא תקין',
+      errExpPast:'הכרטיס פג תוקף', errCvc:'CVC לא תקין', errName:'נא להזין שם', errCountry:'נא לבחור מדינה',
+      formErr:'יש כמה שדות שצריך לתקן לפני התשלום.',
+      doneTitle:'התשלום התקבל! 🎉', doneSub:'ברוכים הבאים ל־KOLKLI {plan}. שדרגנו את החשבון שלכם והכול מוכן לעבודה.',
+      rPlan:'מסלול', rBilling:'מחזור חיוב', rEmail:'אימייל', rOrder:'מספר הזמנה', rNext:'חיוב הבא', rPaid:'שולם',
+      goDash:'לדשבורד שלי', goHome:'חזרה לכלים', billM:'חודשי', billY:'שנתי'
+    },
+    en:{ dir:'ltr',
+      back:'Back to plans', secure:'Secure checkout',
+      title:'Complete your order', subtitle:'A few details and you’re in. Cancel anytime — no commitment.',
+      sec1:'Plan & billing', sec2:'Account', sec3:'Payment details', sec4:'Billing details',
+      monthly:'Monthly', yearly:'Yearly', perMonth:'/mo', perYear:'/yr',
+      emailLabel:'Email for the receipt', emailPh:'you@example.com',
+      orCard:'or pay by card',
+      cardLabel:'Card number', expLabel:'Expiry', cvcLabel:'CVC',
+      nameLabel:'Name on card', namePh:'As shown on the card',
+      countryLabel:'Country', addCompany:'Add company / VAT details',
+      companyLabel:'Company name', companyPh:'Business name (optional)',
+      vatLabel:'VAT / Tax ID', vatPh:'Your VAT number',
+      pay:'Pay', payNow:'Pay', trust:'Your payment is encrypted & secure. Cancel anytime.',
+      orderSummary:'Order summary', change:'Change', apply:'Apply',
+      promoPh:'Promo code', promoOk:'Code applied — {p}% off 🎉', promoNo:'Invalid promo code',
+      subtotal:'Subtotal', discount:'Discount', vat:'VAT ({p}%)',
+      totalToday:'Total due today', renewM:'Renews at {v}/mo', renewY:'Renews at {v}/yr',
+      fine:'By clicking “Pay” you agree to the Terms and Privacy Policy. Prices in USD ($), VAT added where applicable.',
+      g1t:'14-day money-back', g1d:'Not happy? Get a full refund.',
+      g2t:'Cancel anytime', g2d:'No lock-in, no cancellation fees.',
+      g3t:'Encrypted payment', g3d:'256-bit SSL on every transaction.',
+      foot:'KOLKLI · Demo checkout · no real charge is made',
+      errEmail:'Invalid email address', errCard:'Invalid card number', errExp:'Invalid expiry',
+      errExpPast:'Card has expired', errCvc:'Invalid CVC', errName:'Enter the name on the card', errCountry:'Select a country',
+      formErr:'A few fields need fixing before you can pay.',
+      doneTitle:'Payment successful! 🎉', doneSub:'Welcome to KOLKLI {plan}. Your account is upgraded and ready to go.',
+      rPlan:'Plan', rBilling:'Billing cycle', rEmail:'Email', rOrder:'Order number', rNext:'Next charge', rPaid:'Paid',
+      goDash:'Go to my dashboard', goHome:'Back to tools', billM:'Monthly', billY:'Yearly'
+    },
+    ru:{ dir:'ltr',
+      back:'Назад к тарифам', secure:'Безопасная оплата',
+      title:'Оформление заказа', subtitle:'Пара деталей — и всё готово. Отмена в любой момент, без обязательств.',
+      sec1:'Тариф и оплата', sec2:'Аккаунт', sec3:'Данные оплаты', sec4:'Данные для счёта',
+      monthly:'Ежемесячно', yearly:'Ежегодно', perMonth:'/мес', perYear:'/год',
+      emailLabel:'Email для чека', emailPh:'you@example.com',
+      orCard:'или картой',
+      cardLabel:'Номер карты', expLabel:'Срок', cvcLabel:'CVC',
+      nameLabel:'Имя на карте', namePh:'Как указано на карте',
+      countryLabel:'Страна', addCompany:'Добавить компанию / НДС',
+      companyLabel:'Название компании', companyPh:'Название бизнеса (необязательно)',
+      vatLabel:'НДС / налоговый номер', vatPh:'Ваш номер НДС',
+      pay:'Оплатить', payNow:'Оплатить', trust:'Платёж зашифрован и защищён. Отмена в любой момент.',
+      orderSummary:'Итог заказа', change:'Изменить', apply:'Применить',
+      promoPh:'Промокод', promoOk:'Промокод применён — скидка {p}% 🎉', promoNo:'Неверный промокод',
+      subtotal:'Подытог', discount:'Скидка', vat:'НДС ({p}%)',
+      totalToday:'К оплате сегодня', renewM:'Продление {v}/мес', renewY:'Продление {v}/год',
+      fine:'Нажимая «Оплатить», вы принимаете Условия и Политику конфиденциальности. Цены в USD ($), НДС добавляется при необходимости.',
+      g1t:'Возврат 14 дней', g1d:'Не понравилось? Вернём деньги.',
+      g2t:'Отмена в любой момент', g2d:'Без привязки и штрафов.',
+      g3t:'Зашифрованный платёж', g3d:'256-битный SSL на каждой оплате.',
+      foot:'KOLKLI · Демо-оплата · реальное списание не производится',
+      errEmail:'Неверный адрес почты', errCard:'Неверный номер карты', errExp:'Неверный срок',
+      errExpPast:'Срок карты истёк', errCvc:'Неверный CVC', errName:'Введите имя на карте', errCountry:'Выберите страну',
+      formErr:'Перед оплатой исправьте несколько полей.',
+      doneTitle:'Оплата прошла! 🎉', doneSub:'Добро пожаловать в KOLKLI {plan}. Аккаунт обновлён и готов к работе.',
+      rPlan:'Тариф', rBilling:'Цикл оплаты', rEmail:'Email', rOrder:'Номер заказа', rNext:'Следующее списание', rPaid:'Оплачено',
+      goDash:'В личный кабинет', goHome:'Назад к инструментам', billM:'Ежемесячно', billY:'Ежегодно'
+    }
+  };
+
+  /* ---------- state ---------- */
+  let lang='he', t=I18N.he;
+  let plan='lite', cycle='monthly', promo=null, country='IL';
+
+  const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const CARD_BRANDS = {
+    visa:'<svg viewBox="0 0 48 30"><rect width="48" height="30" rx="5" fill="#1a1f71"/><text x="24" y="20" font-family="Arial" font-size="11" font-style="italic" font-weight="700" fill="#fff" text-anchor="middle">VISA</text></svg>',
+    mastercard:'<svg viewBox="0 0 48 30"><rect width="48" height="30" rx="5" fill="#252525"/><circle cx="20" cy="15" r="7.5" fill="#eb001b"/><circle cx="28" cy="15" r="7.5" fill="#f79e1b" fill-opacity=".9"/></svg>',
+    amex:'<svg viewBox="0 0 48 30"><rect width="48" height="30" rx="5" fill="#2e77bc"/><text x="24" y="19" font-family="Arial" font-size="7.5" font-weight="700" fill="#fff" text-anchor="middle">AMEX</text></svg>'
+  };
+
+  /* ---------- demo account store (shared with auth/dashboard) ---------- */
+  const USERS_KEY='ac_users', SESSION_KEY='ac_session', ORDERS_KEY='kolkli_orders';
+  const ls = k => { try{ return localStorage.getItem(k); }catch(_){ return null; } };
+  const lsSet = (k,v) => { try{ localStorage.setItem(k,v); }catch(_){} };
+  function loadUsers(){ try{ return JSON.parse(ls(USERS_KEY))||[]; }catch(_){ return []; } }
+  function currentUser(){
+    const em=ls(SESSION_KEY); if(!em) return null;
+    return loadUsers().find(u => (u.email||'').toLowerCase()===em.toLowerCase()) || null;
+  }
+  function safeOwnerId(v){ return String(v||'guest').toLowerCase().replace(/[^a-z0-9_.@-]+/g,'_') || 'guest'; }
+  function currentOwnerId(){
+    const u=currentUser();
+    if(u) return safeOwnerId(u.id||u.userId||u.email);
+    return 'guest';
+  }
+  function scopedKey(k){ return k+'::'+currentOwnerId(); }
+
+  /* ---------- price maths ---------- */
+  function calc(){
+    const p=PLANS[plan];
+    const months = cycle==='yearly' ? YEAR_MONTHS : 1;
+    const subtotal = p.base * months;
+    const discount = promo ? subtotal * promo.rate : 0;
+    const taxable = subtotal - discount;
+    const rate = VAT[country] || 0;
+    const vat = taxable * rate;
+    const total = taxable + vat;
+    const renewFull = cycle==='yearly' ? p.base*YEAR_MONTHS : p.base;   // sticker price at renewal
+    return { subtotal, discount, vat, vatRate:rate, total, renewFull, months };
+  }
+
+  /* ---------- renderers ---------- */
+  function fmtStr(s, map){ return s.replace(/\{(\w+)\}/g, (_,k)=> (map && map[k]!=null) ? map[k] : ''); }
+
+  function renderPlanPick(){
+    const host=el('planPick');
+    host.innerHTML = Object.keys(PLANS).map(function(k){
+      const p=PLANS[k], on=k===plan;
+      const price = cycle==='yearly' ? money(p.base*YEAR_MONTHS) : money(p.base);
+      const per = cycle==='yearly' ? t.perYear : t.perMonth;
+      const pop = p.pop ? '<span class="po-pop">★ '+ (lang==='he'?'הכי פופולרי':lang==='ru'?'Популярный':'Popular') +'</span>' : '';
+      return '<button type="button" class="plan-opt'+(on?' on':'')+'" data-plan="'+k+'">'+
+        '<div class="po-top">'+
+          '<span class="po-nm"><span class="po-name">'+p[lang][0]+'</span>'+pop+'</span>'+
+          '<span class="po-radio"></span>'+
+        '</div>'+
+        '<div class="po-desc">'+p[lang][1]+'</div>'+
+        '<div class="po-price">'+price+'<span> '+per+'</span></div>'+
+      '</button>';
+    }).join('');
+    host.querySelectorAll('[data-plan]').forEach(function(b){
+      b.addEventListener('click', function(){ plan=b.getAttribute('data-plan'); renderAll(); });
+    });
+  }
+
+  function renderCycle(){
+    el('saveTag').textContent = '−'+SAVE_PCT+'%';
+    el('cyc').querySelectorAll('[data-cycle]').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-cycle')===cycle);
+    });
+  }
+
+  function renderSummary(){
+    const p=PLANS[plan], c=calc();
+    el('sumName').textContent = p[lang][0];
+    el('sumCyc').textContent = (cycle==='yearly'? t.billY : t.billM) + ' · ' + p[lang][1];
+    el('sumFeats').innerHTML = p.feats[lang].map(function(f){
+      return '<li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+f+'</li>';
+    }).join('');
+
+    let rows = '<div class="lineitem"><span>'+t.subtotal+'</span><b class="num">'+money(c.subtotal)+'</b></div>';
+    if(c.discount>0){
+      rows += '<div class="lineitem disc"><span>'+t.discount+' · '+promo.code+'</span><b class="num" style="color:inherit">−'+money(c.discount)+'</b></div>';
+    }
+    if(c.vat>0){
+      rows += '<div class="lineitem"><span>'+fmtStr(t.vat,{p:Math.round(c.vatRate*100)})+'</span><b class="num">'+money(c.vat)+'</b></div>';
+    }
+    el('lines').innerHTML = rows;
+    el('totalVal').textContent = money(c.total);
+    el('renewNote').textContent = cycle==='yearly'
+      ? fmtStr(t.renewY,{v:money(c.renewFull)})
+      : fmtStr(t.renewM,{v:money(c.renewFull)});
+
+    el('payLabel').textContent = t.payNow + ' ' + money(c.total);
+    el('finePrint').textContent = t.fine;
+  }
+
+  function renderCountry(){
+    const sel=el('country');
+    sel.innerHTML = COUNTRIES.map(function(x){
+      return '<option value="'+x.c+'"'+(x.c===country?' selected':'')+'>'+x[lang]+'</option>';
+    }).join('');
+  }
+
+  function renderAll(){ renderPlanPick(); renderCycle(); renderSummary(); }
+
+  /* ---------- validation ---------- */
+  function luhn(num){
+    let sum=0, alt=false;
+    for(let i=num.length-1;i>=0;i--){
+      let d=parseInt(num[i],10);
+      if(alt){ d*=2; if(d>9) d-=9; }
+      sum+=d; alt=!alt;
+    }
+    return sum%10===0;
+  }
+  function cardBrand(digits){
+    if(/^4/.test(digits)) return 'visa';
+    if(/^(5[1-5]|2[2-7])/.test(digits)) return 'mastercard';
+    if(/^3[47]/.test(digits)) return 'amex';
+    return '';
+  }
+  function setErr(fieldId, errId, msg){
+    el(fieldId).classList.toggle('bad', !!msg);
+    el(errId).textContent = msg||'';
+  }
+  function clearErrors(){
+    [['emailField','emailErr'],['cardNum','cardErr'],['exp','expErr'],['cvc','cvcErr'],['cardName','nameErr']]
+      .forEach(function(f){ setErr(f[0].includes('Field')?f[0]:closestField(f[0]), f[1], ''); });
+    showMsg('');
+  }
+  function closestField(id){ return el(id).closest('.field').id || id; }
+  function fieldOf(id){ return el(id).closest('.field'); }
+  function markBad(inputId, errId, msg){
+    fieldOf(inputId).classList.toggle('bad', !!msg);
+    el(errId).textContent = msg||'';
+  }
+  function showMsg(text, kind){
+    const m=el('formMsg');
+    if(!text){ m.className='formmsg'; m.innerHTML=''; return; }
+    m.className='formmsg show '+(kind||'err');
+    m.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>'+text+'</span>';
+  }
+
+  function validate(){
+    let ok=true, firstBad=null;
+    const email=el('email').value.trim();
+    if(!EMAIL_RE.test(email)){ markBad('email','emailErr',t.errEmail); ok=false; firstBad=firstBad||'email'; }
+    else markBad('email','emailErr','');
+
+    const digits=el('cardNum').value.replace(/\D/g,'');
+    if(digits.length<13 || digits.length>19 || !luhn(digits)){ markBad('cardNum','cardErr',t.errCard); ok=false; firstBad=firstBad||'cardNum'; }
+    else markBad('cardNum','cardErr','');
+
+    const exp=el('exp').value.trim();
+    const m=exp.match(/^(\d{2})\/(\d{2})$/);
+    if(!m || +m[1]<1 || +m[1]>12){ markBad('exp','expErr',t.errExp); ok=false; firstBad=firstBad||'exp'; }
+    else {
+      const now=new Date(), yr=+('20'+m[2]), mo=+m[1];
+      const expDate=new Date(yr, mo, 1);            // first day AFTER the exp month
+      if(expDate <= new Date(now.getFullYear(), now.getMonth(), 1)){ markBad('exp','expErr',t.errExpPast); ok=false; firstBad=firstBad||'exp'; }
+      else markBad('exp','expErr','');
+    }
+
+    const cvc=el('cvc').value.trim();
+    const cvcLen = cardBrand(digits)==='amex' ? 4 : 3;
+    if(!/^\d{3,4}$/.test(cvc) || cvc.length<cvcLen){ markBad('cvc','cvcErr',t.errCvc); ok=false; firstBad=firstBad||'cvc'; }
+    else markBad('cvc','cvcErr','');
+
+    if(!el('cardName').value.trim()){ markBad('cardName','nameErr',t.errName); ok=false; firstBad=firstBad||'cardName'; }
+    else markBad('cardName','nameErr','');
+
+    if(!ok){ showMsg(t.formErr,'err'); if(firstBad){ el(firstBad).focus(); } }
+    else showMsg('');
+    return ok;
+  }
+
+  /* ---------- charge (DEMO) ---------- */
+  function orderId(){
+    const r=Math.floor(Math.random()*0xffffff).toString(16).toUpperCase().padStart(6,'0');
+    const d=new Date();
+    return 'KL-' + d.getFullYear() + '-' + r;
+  }
+  function nextBillingDate(){
+    const d=new Date();
+    if(cycle==='yearly') d.setFullYear(d.getFullYear()+1); else d.setMonth(d.getMonth()+1);
+    return d.toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US', {year:'numeric', month:'long', day:'numeric'});
+  }
+
+  function chargeAndFinish(){
+    const c=calc(), email=el('email').value.trim().toLowerCase();
+    const oid=orderId();
+
+    // Upgrade the signed-in demo account so the dashboard reflects the new plan.
+    // --- SEAM: in production the billing Worker + webhook set the real plan. ---
+    try{
+      const users=loadUsers(), u=currentUser();
+      if(u){
+        u.plan=plan; u.planCycle=cycle;
+        const i=users.findIndex(x=>(x.email||'').toLowerCase()===(u.email||'').toLowerCase());
+        if(i>-1){ users[i]=u; lsSet(USERS_KEY, JSON.stringify(users)); }
+      }
+    }catch(_){}
+
+    // Save a receipt for the account's order history.
+    try{
+      const orders=JSON.parse(ls(scopedKey(ORDERS_KEY))||'[]');
+      orders.unshift({ id:oid, plan:plan, cycle:cycle, amount:+c.total.toFixed(2), email:email,
+                       promo:promo?promo.code:null, at:new Date().toISOString() });
+      lsSet(scopedKey(ORDERS_KEY), JSON.stringify(orders.slice(0,50)));
+    }catch(_){}
+
+    try{ window.dispatchEvent(new CustomEvent('kolkli:auth')); }catch(_){}   // header/dashboard refresh
+
+    showDone(oid, c, email);
+  }
+
+  function showDone(oid, c, email){
+    const p=PLANS[plan];
+    el('checkoutView').style.display='none';
+    el('doneView').classList.add('show');
+    el('doneTitle').textContent=t.doneTitle;
+    el('doneSub').textContent=fmtStr(t.doneSub,{plan:p[lang][0]});
+    el('receipt').innerHTML=
+      '<div class="rrow"><span>'+t.rPlan+'</span><b>KOLKLI '+p[lang][0]+'</b></div>'+
+      '<div class="rrow"><span>'+t.rBilling+'</span><b>'+(cycle==='yearly'?t.billY:t.billM)+'</b></div>'+
+      (email?'<div class="rrow"><span>'+t.rEmail+'</span><b class="mono">'+email+'</b></div>':'')+
+      '<div class="rrow"><span>'+t.rOrder+'</span><b class="mono">'+oid+'</b></div>'+
+      '<div class="rrow"><span>'+t.rNext+'</span><b>'+nextBillingDate()+'</b></div>'+
+      '<div class="rrow big"><span>'+t.rPaid+'</span><b class="mono">'+money(c.total)+'</b></div>';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  /* ---------- input formatting ---------- */
+  function onCardInput(){
+    let d=el('cardNum').value.replace(/\D/g,'').slice(0,19);
+    const brand=cardBrand(d);
+    // Amex groups 4-6-5; everyone else in 4s.
+    let grouped;
+    if(brand==='amex'){ grouped=d.replace(/^(\d{0,4})(\d{0,6})(\d{0,5}).*/, function(_,a,b,c){ return [a,b,c].filter(Boolean).join(' '); }); }
+    else { grouped=d.replace(/(\d{4})(?=\d)/g,'$1 ').trim(); }
+    el('cardNum').value=grouped;
+    el('cardBrand').innerHTML = brand ? CARD_BRANDS[brand] : '';
+    el('cvc').maxLength = brand==='amex' ? 4 : 3;
+  }
+  function onExpInput(){
+    let d=el('exp').value.replace(/\D/g,'').slice(0,4);
+    if(d.length>=3) d=d.slice(0,2)+'/'+d.slice(2);
+    else if(d.length===2 && el('exp').value.length>2) d=d+'/';
+    el('exp').value=d;
+  }
+  function onCvcInput(){ el('cvc').value=el('cvc').value.replace(/\D/g,'').slice(0, el('cvc').maxLength); }
+
+  /* ---------- promo ---------- */
+  function applyPromo(){
+    const code=el('promoInput').value.trim().toUpperCase();
+    const msg=el('promoMsg');
+    if(!code){ promo=null; msg.textContent=''; msg.className='promo-msg'; renderSummary(); return; }
+    if(PROMOS[code]!=null){
+      promo={ code:code, rate:PROMOS[code] };
+      msg.textContent=fmtStr(t.promoOk,{p:Math.round(PROMOS[code]*100)}); msg.className='promo-msg ok';
+    } else {
+      promo=null;
+      msg.textContent=t.promoNo; msg.className='promo-msg no';
+    }
+    renderSummary();
+  }
+
+  /* ---------- i18n + theme ---------- */
+  function applyLang(l){
+    if(!I18N[l]) l='he';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(function(n){ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function(n){ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
+    lsSet('ac_lang', l);
+    document.title='KOLKLI — '+t.secure;
+    renderCountry();
+    renderAll();
+    if(promo){ el('promoMsg').textContent=fmtStr(t.promoOk,{p:Math.round(promo.rate*100)}); }
+  }
+  window.__setLang=applyLang;
+
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    lsSet('theme', dark?'dark':'light');
+  }
+
+  /* ---------- events + init ---------- */
+  el('cyc').addEventListener('click', function(e){
+    const b=e.target.closest('[data-cycle]'); if(!b) return;
+    cycle=b.getAttribute('data-cycle'); renderAll();
+  });
+  el('country').addEventListener('change', function(){ country=el('country').value; renderSummary(); });
+  el('promoBtn').addEventListener('click', applyPromo);
+  el('promoInput').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); applyPromo(); } });
+  el('cardNum').addEventListener('input', onCardInput);
+  el('exp').addEventListener('input', onExpInput);
+  el('cvc').addEventListener('input', onCvcInput);
+  el('sumChange').addEventListener('click', function(){ el('planPick').scrollIntoView({behavior:'smooth', block:'center'}); });
+
+  const compToggle=el('companyToggle');
+  compToggle.addEventListener('click', function(){
+    compToggle.classList.toggle('open');
+    el('company').classList.toggle('show');
+  });
+
+  el('payForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!validate()) return;
+    const btn=el('payBtn');
+    btn.disabled=true; btn.classList.add('paying');
+    // Simulate the gateway round-trip, then finish. (SEAM: real Stripe call here.)
+    setTimeout(chargeAndFinish, 1400);
+  });
+
+  // express-pay buttons: demo only — nudge the user to the card form.
+  document.querySelectorAll('[data-express]').forEach(function(b){
+    b.addEventListener('click', function(){
+      showMsg(t.orCard.charAt(0).toUpperCase()+t.orCard.slice(1), 'info');
+      el('cardNum').focus();
+      el('cardNum').scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  });
+
+  const themeBtn=el('themeToggle');
+  if(themeBtn) themeBtn.addEventListener('click', function(){
+    applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+  });
+
+  (function init(){
+    applyTheme(ls('theme')||'light');
+    // deep-link: ?plan=lite|pro & ?cycle=monthly|yearly
+    const qp=(location.search.match(/[?&]plan=(lite|pro)/)||[])[1];
+    const qc=(location.search.match(/[?&]cycle=(monthly|yearly)/)||[])[1];
+    if(qp) plan=qp;
+    if(qc) cycle=qc;
+    const cc=ls('ac_country'); if(cc && COUNTRIES.some(x=>x.c===cc)) country=cc;
+    applyLang(detectLang());
+    // prefill email from the signed-in demo account
+    const u=currentUser(); if(u && u.email) el('email').value=u.email;
+  })();
+
+  // Reflect a sign-in that lands after load (auth-store.js fires kolkli:auth).
+  window.addEventListener('kolkli:auth', function(){
+    const u=currentUser(); if(u && u.email && !el('email').value) el('email').value=u.email;
+  });
+})();
+</script>
+</body>
+</html>
