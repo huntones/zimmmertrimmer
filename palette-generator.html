@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל פלטת צבעים</title>
+<meta name="description" content="Free color palette generator — pick a base color and a harmony mode (complementary, analogous, triadic and more) to get a balanced 5-color palette with ready-to-copy CSS custom properties. Fast, private, right in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 22px;}
+  .pagehead h1{font-size:clamp(23px,3vw,32px);font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:12px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  .tool{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;}
+  @media (max-width:760px){ .tool{grid-template-columns:1fr;} }
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);}
+
+  /* preview + picker column */
+  .pickcol{padding:16px;position:sticky;top:16px;}
+  .preview{height:190px;border-radius:14px;display:flex;align-items:flex-end;justify-content:center;
+    padding:14px;transition:background .12s;position:relative;overflow:hidden;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
+    background-image:
+      linear-gradient(45deg,rgba(128,128,128,.10) 25%,transparent 25%,transparent 75%,rgba(128,128,128,.10) 75%),
+      linear-gradient(45deg,rgba(128,128,128,.10) 25%,transparent 25%,transparent 75%,rgba(128,128,128,.10) 75%);
+    background-size:20px 20px;background-position:0 0,10px 10px;}
+  .preview .pvhex{font-family:var(--mono);font-size:17px;font-weight:700;letter-spacing:.04em;
+    padding:5px 12px;border-radius:999px;background:rgba(0,0,0,.14);backdrop-filter:blur(2px);}
+  .pickrow{display:flex;gap:9px;margin-top:14px;}
+  input[type=color]{-webkit-appearance:none;appearance:none;width:56px;height:44px;padding:0;border:1px solid var(--line);
+    border-radius:12px;background:var(--panel-2);cursor:pointer;flex-shrink:0;}
+  input[type=color]::-webkit-color-swatch-wrapper{padding:4px;}
+  input[type=color]::-webkit-color-swatch{border:none;border-radius:8px;}
+  .hexfield{flex:1;display:flex;align-items:center;gap:2px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:12px;padding:0 12px;transition:border-color .12s,box-shadow .12s;}
+  .hexfield:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .hexfield .hash{color:var(--faint);font-family:var(--mono);font-size:16px;}
+  .hexfield input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font-family:var(--mono);
+    font-size:16px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:11px 0;outline:none;}
+  .btnrow{display:flex;gap:9px;margin-top:10px;}
+  .gbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);font-size:13px;font-weight:600;padding:10px 12px;border-radius:11px;
+    cursor:pointer;transition:all .12s;}
+  .gbtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .gbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .gbtn.hidden{display:none;}
+  .swatches{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;}
+  .swatches button{width:26px;height:26px;border-radius:8px;border:1px solid rgba(0,0,0,.12);cursor:pointer;padding:0;
+    transition:transform .1s;}
+  .swatches button:hover{transform:scale(1.12);}
+
+  /* formats column */
+  .formats{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:520px){ .formats{grid-template-columns:1fr;} }
+  .fcard{padding:15px 16px 16px;}
+  .fhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+  .ftitle{font-size:13px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;}
+  .copybtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--muted);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .copybtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .copybtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .fstr{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink);background:var(--panel-2);
+    border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;margin-bottom:12px;overflow-x:auto;white-space:nowrap;
+    direction:ltr;text-align:start;}
+  .finputs{display:flex;gap:8px;}
+  .finputs.wide{gap:8px;}
+  .fin{flex:1;min-width:0;}
+  .fin > span{display:block;font-size:10px;font-weight:700;color:var(--faint);text-align:center;margin-bottom:4px;font-family:var(--mono);letter-spacing:.06em;}
+  .fin input{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:9px;
+    font-family:var(--mono);font-size:13.5px;font-weight:600;text-align:center;padding:8px 4px;transition:border-color .12s,box-shadow .12s;}
+  .fin input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .fin.hex-in input{text-align:start;text-transform:uppercase;padding-inline:10px;}
+
+  .note{display:flex;align-items:flex-start;gap:9px;margin-top:18px;padding:12px 14px;border-radius:12px;
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+    font-size:12px;color:var(--ink-2);line-height:1.55;}
+  .note svg{width:16px;height:16px;color:var(--accent-dim);flex-shrink:0;margin-top:1px;
+    stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ==== palette-generator specific ==== */
+  .ctl-label{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);margin:18px 0 9px;}
+  .ctl-label:first-child{margin-top:0;}
+  .modes{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .modebtn{display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);font-size:12.5px;font-weight:600;padding:10px 8px;border-radius:11px;
+    cursor:pointer;transition:all .12s;line-height:1.25;min-height:44px;}
+  .modebtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .modebtn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);
+    box-shadow:0 4px 12px var(--grad-btn-glow);}
+
+  .paletteWrap{display:flex;flex-direction:column;gap:14px;}
+  .phead{display:flex;align-items:center;justify-content:space-between;}
+  .palette{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  @media (max-width:520px){ .palette{grid-template-columns:repeat(2,1fr);} }
+  .pchip{position:relative;height:180px;border-radius:14px;border:1px solid rgba(0,0,0,.08);cursor:pointer;padding:0;
+    display:flex;align-items:flex-end;justify-content:center;overflow:hidden;transition:transform .12s,box-shadow .12s;}
+  .pchip:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+  .pchip .plab{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;padding:5px 10px;
+    margin-bottom:12px;border-radius:999px;backdrop-filter:blur(2px);direction:ltr;unicode-bidi:isolate;}
+  .pchip .pcopy{position:absolute;top:10px;inset-inline-end:10px;opacity:0;transition:opacity .12s;
+    display:inline-flex;pointer-events:none;}
+  .pchip .pcopy svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .pchip:hover .pcopy{opacity:.9;}
+  .fstr.block{white-space:pre;line-height:1.7;font-size:13px;margin-bottom:0;}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="pageTitle"></h1>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="tool">
+    <!-- controls -->
+    <div class="card pickcol">
+      <div class="ctl-label" data-i18n="baseLabel"></div>
+      <div class="pickrow">
+        <input type="color" id="colorPick" value="#7b34ff" aria-label="pick">
+        <div class="hexfield">
+          <span class="hash">#</span>
+          <input type="text" id="hexIn" spellcheck="false" maxlength="7" value="7B34FF" aria-label="hex">
+        </div>
+      </div>
+      <div class="btnrow">
+        <button class="gbtn" id="randomBtn" type="button">
+          <svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3l-7.5 7.5"/><path d="M3 21l7.5-7.5"/><path d="M16 21h5v-5"/><path d="M14.5 14.5 21 21"/></svg>
+          <span data-i18n="randomBtn"></span>
+        </button>
+        <button class="gbtn hidden" id="eyedropBtn" type="button">
+          <svg viewBox="0 0 24 24"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 0 1 3 3L18 9l.4.4a2.1 2.1 0 0 1 0 3l-1.8 1.8a2.1 2.1 0 0 1-3 0l-7.8-7.8a2.1 2.1 0 0 1 0-3l1.8-1.8a2.1 2.1 0 0 1 3 0z"/></svg>
+          <span data-i18n="eyedropBtn"></span>
+        </button>
+      </div>
+      <div class="ctl-label" data-i18n="harmonyLabel"></div>
+      <div class="modes" id="modes"></div>
+    </div>
+
+    <!-- palette output -->
+    <div class="paletteWrap">
+      <div class="phead">
+        <span class="ftitle" data-i18n="paletteLabel"></span>
+        <button class="copybtn" id="copyAllBtn" type="button"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copyAll"></span></button>
+      </div>
+      <div class="palette" id="palette"></div>
+
+      <div class="card fcard">
+        <div class="fhead"><span class="ftitle">CSS</span>
+          <button class="copybtn" id="cssCopyBtn" type="button"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copy"></span></button>
+        </div>
+        <div class="fstr block" id="cssStr"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <span data-i18n="note"></span>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'מחולל פלטת צבעים',
+      pageTitle:'מחולל פלטת צבעים — הרמוניות צבע ל-CSS',
+      pageSub:'בחרו צבע בסיס ובחרו סוג הרמוניה — קומפלמנטרי, אנלוגי, טריאדי ועוד — וקבלו מייד פלטה הרמונית של 5 צבעים עם קוד CSS מוכן להעתקה. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      baseLabel:'צבע בסיס', harmonyLabel:'סוג הרמוניה', paletteLabel:'פלטה',
+      randomBtn:'צבע אקראי', eyedropBtn:'טפטפת', copy:'העתקה', copyAll:'העתקת הכול', copiedMsg:'הועתק ✓',
+      mComplementary:'קומפלמנטרי', mAnalogous:'אנלוגי', mTriadic:'טריאדי', mTetradic:'טטראדי',
+      mMono:'מונוכרומטי', mSplit:'קומפלמנטרי מפוצל',
+      note:'הפלטות מחושבות במרחב HSL והן נקודת פתיחה בלבד — כווננו את הצבעים לפי הטעם והצורך שלכם.',
+      foot:'KOLKLI · מחולל פלטת צבעים · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'Palette Generator',
+      pageTitle:'Color Palette Generator — Color Harmonies for CSS',
+      pageSub:'Pick a base color and a harmony mode — complementary, analogous, triadic and more — and instantly get a balanced 5-color palette with ready-to-copy CSS custom properties. Everything runs in your browser; nothing is sent to a server.',
+      baseLabel:'Base color', harmonyLabel:'Harmony mode', paletteLabel:'Palette',
+      randomBtn:'Random', eyedropBtn:'Eyedropper', copy:'Copy', copyAll:'Copy all', copiedMsg:'Copied ✓',
+      mComplementary:'Complementary', mAnalogous:'Analogous', mTriadic:'Triadic', mTetradic:'Tetradic',
+      mMono:'Monochromatic', mSplit:'Split-Complementary',
+      note:'Palettes are generated in HSL space and are just a starting point — tweak the colors to taste.',
+      foot:'KOLKLI · Palette Generator · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'Генератор палитры',
+      pageTitle:'Генератор цветовой палитры — гармонии цвета для CSS',
+      pageSub:'Выберите базовый цвет и тип гармонии — комплементарная, аналоговая, триада и другие — и мгновенно получите сбалансированную палитру из 5 цветов с готовыми CSS-переменными. Всё работает в браузере; ничего не отправляется на сервер.',
+      baseLabel:'Базовый цвет', harmonyLabel:'Тип гармонии', paletteLabel:'Палитра',
+      randomBtn:'Случайный', eyedropBtn:'Пипетка', copy:'Копировать', copyAll:'Копировать всё', copiedMsg:'Скопировано ✓',
+      mComplementary:'Комплементарная', mAnalogous:'Аналоговая', mTriadic:'Триада', mTetradic:'Тетрада',
+      mMono:'Монохромная', mSplit:'Раздельно-комплементарная',
+      note:'Палитры рассчитываются в пространстве HSL и являются лишь отправной точкой — настройте цвета по вкусу.',
+      foot:'KOLKLI · Генератор палитры · Приватно и быстро, прямо в браузере' }
+  };
+
+  const MODES = [
+    {id:'complementary', key:'mComplementary'},
+    {id:'analogous',     key:'mAnalogous'},
+    {id:'triadic',       key:'mTriadic'},
+    {id:'tetradic',      key:'mTetradic'},
+    {id:'mono',          key:'mMono'},
+    {id:'split',         key:'mSplit'}
+  ];
+
+  const COPY_SVG='<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+
+  let lang='he', t=I18N.he;
+  let rgb = {r:123, g:52, b:255};
+  let mode = 'complementary';
+
+  // ---- conversions ----
+  function clamp(v,a,b){ v=+v; if(isNaN(v)) v=0; return v<a?a:v>b?b:v; }
+  function toInt(v,max){ return Math.round(clamp(v,0,max)); }
+  function wrap(h){ return ((h%360)+360)%360; }
+  function hexToRgb(hex){
+    hex=String(hex).trim().replace(/^#/,'');
+    if(/^[0-9a-f]{3}$/i.test(hex)) hex=hex.split('').map(c=>c+c).join('');
+    if(!/^[0-9a-f]{6}$/i.test(hex)) return null;
+    const n=parseInt(hex,16);
+    return {r:(n>>16)&255, g:(n>>8)&255, b:n&255};
+  }
+  function rgbToHex(r,g,b){
+    return '#'+[r,g,b].map(x=>toInt(x,255).toString(16).padStart(2,'0')).join('').toUpperCase();
+  }
+  function rgbToHsl(r,g,b){
+    r/=255; g/=255; b/=255;
+    const max=Math.max(r,g,b), min=Math.min(r,g,b);
+    let h, s, l=(max+min)/2;
+    if(max===min){ h=0; s=0; }
+    else{
+      const d=max-min;
+      s = l>0.5 ? d/(2-max-min) : d/(max+min);
+      if(max===r) h=(g-b)/d+(g<b?6:0);
+      else if(max===g) h=(b-r)/d+2;
+      else h=(r-g)/d+4;
+      h/=6;
+    }
+    return {h:Math.round(h*360), s:Math.round(s*100), l:Math.round(l*100)};
+  }
+  function hslToRgb(h,s,l){
+    h=((h%360)+360)%360/360; s=clamp(s,0,100)/100; l=clamp(l,0,100)/100;
+    let r,g,b;
+    if(s===0){ r=g=b=l; }
+    else{
+      const hue2rgb=(p,q,x)=>{ if(x<0)x+=1; if(x>1)x-=1;
+        if(x<1/6)return p+(q-p)*6*x; if(x<1/2)return q; if(x<2/3)return p+(q-p)*(2/3-x)*6; return p; };
+      const q = l<0.5 ? l*(1+s) : l+s-l*s;
+      const p = 2*l-q;
+      r=hue2rgb(p,q,h+1/3); g=hue2rgb(p,q,h); b=hue2rgb(p,q,h-1/3);
+    }
+    return {r:Math.round(r*255), g:Math.round(g*255), b:Math.round(b*255)};
+  }
+  function luminance(r,g,b){
+    const a=[r,g,b].map(v=>{ v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4); });
+    return 0.2126*a[0]+0.7152*a[1]+0.0722*a[2];
+  }
+
+  // ---- palette math (in HSL) ----
+  function buildMode(m,H,S,L){
+    const P=(h,s,l)=>({h:wrap(h), s:clamp(s,0,100), l:clamp(l,8,92)});
+    switch(m){
+      case 'analogous':
+        return [P(H-40,S,L),P(H-20,S,L),P(H,S,L),P(H+20,S,L),P(H+40,S,L)];
+      case 'triadic':
+        return [P(H,S,L),P(H+120,S,L),P(H+240,S,L),P(H,S,L+15),P(H+120,S,L-15)];
+      case 'tetradic':
+        return [P(H,S,L),P(H+90,S,L),P(H+180,S,L),P(H+270,S,L),P(H,S,L+16)];
+      case 'mono':
+        return [20,36,52,68,84].map(l=>P(H,S,l));
+      case 'split':
+        return [P(H,S,L),P(H+150,S,L),P(H+210,S,L),P(H,S,L+15),P(H+150,S,L-15)];
+      case 'complementary':
+      default:
+        return [P(H,S,L),P(H+180,S,L),P(H,S,L+16),P(H+180,S,L-14),P(H,S,L-20)];
+    }
+  }
+  function paletteHexes(){
+    const base=rgbToHsl(rgb.r,rgb.g,rgb.b);
+    return buildMode(mode,base.h,base.s,base.l).map(c=>{
+      const o=hslToRgb(c.h,c.s,c.l); return rgbToHex(o.r,o.g,o.b);
+    });
+  }
+
+  // ---- render ----
+  function setVal(id,v,except){ if(id===except) return; const e=el(id); if(e && String(e.value)!==String(v)) e.value=v; }
+  function render(except){
+    const {r,g,b}=rgb;
+    const hex=rgbToHex(r,g,b);
+    setVal('colorPick',hex,except);
+    setVal('hexIn',hex.slice(1),except);
+    // active mode
+    document.querySelectorAll('.modebtn').forEach(bt=> bt.classList.toggle('active', bt.getAttribute('data-mode')===mode));
+    // swatches
+    const hexes=paletteHexes();
+    el('palette').innerHTML = hexes.map(h=>{
+      const c=hexToRgb(h);
+      const light = luminance(c.r,c.g,c.b) > 0.5;   // light swatch -> dark ink
+      const ink = light ? '#14171f' : '#ffffff';
+      const labBg = light ? 'rgba(255,255,255,.55)' : 'rgba(0,0,0,.22)';
+      return `<button type="button" class="pchip" data-h="${h}" title="${h}" style="background:${h};color:${ink}">`
+        +`<span class="pcopy">${COPY_SVG}</span>`
+        +`<span class="plab" style="background:${labBg}">${h}</span></button>`;
+    }).join('');
+    // css custom properties box
+    el('cssStr').textContent = ':root{\n'+hexes.map((h,i)=>`  --color-${i+1}: ${h};`).join('\n')+'\n}';
+  }
+
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1700); }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(fallbackCopy.bind(null,text)); }
+    else fallbackCopy(text);
+    toast(t.copiedMsg);
+  }
+  function fallbackCopy(text){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+  }
+
+  // ---- events ----
+  el('colorPick').addEventListener('input',e=>{ const c=hexToRgb(e.target.value); if(c){ rgb=c; render('colorPick'); } });
+  el('hexIn').addEventListener('input',e=>{ const c=hexToRgb(e.target.value); if(c){ rgb=c; render('hexIn'); } });
+  el('hexIn').addEventListener('blur',()=>render());
+
+  // harmony modes (built below, event-delegated)
+  el('modes').innerHTML = MODES.map(m=>`<button type="button" class="modebtn" data-mode="${m.id}" data-i18n="${m.key}"></button>`).join('');
+  el('modes').addEventListener('click',e=>{ const b=e.target.closest('[data-mode]'); if(!b) return; mode=b.getAttribute('data-mode'); render(); });
+
+  el('randomBtn').addEventListener('click',()=>{
+    rgb={ r:Math.floor(Math.random()*256), g:Math.floor(Math.random()*256), b:Math.floor(Math.random()*256) };
+    render();
+  });
+
+  // Eyedropper (Chromium) — only shown when supported.
+  if('EyeDropper' in window){
+    const eb=el('eyedropBtn'); eb.classList.remove('hidden');
+    eb.addEventListener('click',()=>{
+      try{
+        new window.EyeDropper().open().then(res=>{ const c=hexToRgb(res.sRGBHex); if(c){ rgb=c; render(); } }).catch(()=>{});
+      }catch(_){}
+    });
+  }
+
+  // click a swatch to copy its hex
+  el('palette').addEventListener('click',e=>{ const b=e.target.closest('[data-h]'); if(!b) return; copy(b.getAttribute('data-h')); });
+  // copy-all + css box
+  el('copyAllBtn').addEventListener('click',()=> copy(paletteHexes().join(', ')));
+  el('cssCopyBtn').addEventListener('click',()=> copy(el('cssStr').textContent));
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    if(!I18N[l]) l='en';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+  window.__setLang=applyLang;
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  render();
+})();
+</script>
+</body>
+</html>

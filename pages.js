@@ -23,7 +23,7 @@
       prKick:'מסלולים ומחירים', prTitle:'תמחור פשוט ושקוף', prSub:'מתחילים בחינם. משדרגים כשצריך יותר.',
       perMonth:'/לחודש', mostPopular:'הכי פופולרי',
       finalH:'מוכנים להתחיל?', finalP:'העלו את הקובץ הראשון — זה לוקח כמה שניות בלבד.', finalCta:'בואו נתחיל',
-      fHome:'בית', fPricing:'מסלולים ומחירים', fFaq:'שאלות נפוצות', fAI:'כלי AI', fSend:'שליחת קבצים', fReview:'אישור לקוח',
+      fHome:'בית', fPricing:'מסלולים ומחירים', fFaq:'שאלות נפוצות', fAI:'כלי AI', fSend:'שליחת קבצים', fReview:'משוב ואישור קבצים',
       cp:'KOLKLI · העריכה רצה בדפדפן שלכם · הקבצים נשארים אצלכם.'
     },
     en: {
@@ -88,7 +88,15 @@
     globe:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
     key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/>',
     pipette:'<path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 0 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"/>',
-    hash:'<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>'
+    hash:'<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
+    shadow:'<rect x="3" y="3" width="13" height="13" rx="2"/><path d="M21 8v11a2 2 0 0 1-2 2H8"/>',
+    radius:'<path d="M21 21v-6a8 8 0 0 0-8-8H7"/><path d="M3 3v3"/><path d="M3 3h3"/>',
+    minify:'<path d="M4 9V6a2 2 0 0 1 2-2h3"/><path d="M20 9V6a2 2 0 0 0-2-2h-3"/><path d="M4 15v3a2 2 0 0 0 2 2h3"/><path d="M20 15v3a2 2 0 0 1-2 2h-3"/><line x1="7" y1="12" x2="17" y2="12"/>',
+    link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    text:'<path d="M4 7V5h16v2"/><path d="M9 19h6"/><path d="M12 5v14"/>',
+    star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    ratio:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 4 20 16"/>',
+    eraser:'<path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4L14 4a2 2 0 0 1 2.8 0l4.2 4.2a2 2 0 0 1 0 2.8L12 20"/><path d="M22 21H7"/><path d="m5 13 6 6"/>'
   };
   function svg(name) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (IC[name] || '') + '</svg>'; }
   var CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
@@ -102,31 +110,31 @@
       ru:['Инструменты дизайна и кода','Конвертеры, генераторы и проверки для цвета, CSS, кода и SEO — прямо в браузере.'],
       feat:[
         {he:'ממיר צבעים',en:'Color Converter',ru:'Конвертер цвета',dhe:'HEX, RGB, HSL, CMYK',den:'HEX, RGB, HSL, CMYK',dru:'HEX, RGB, HSL, CMYK',ic:'swatch',page:'../color-convert.html'},
-        {he:'מחולל פלטת צבעים',en:'Palette Generator',ru:'Генератор палитр',dhe:'פלטה מצבע או מתמונה',den:'From a color or image',dru:'Из цвета или картинки',ic:'palette'},
-        {he:'בודק ניגודיות',en:'Contrast Checker',ru:'Проверка контраста',dhe:'קריאות טקסט על רקע',den:'Text vs. background',dru:'Текст на фоне',ic:'contrast'},
-        {he:'מחולל Gradient',en:'Gradient Generator',ru:'Генератор градиентов',dhe:'גרדיאנט + קוד CSS',den:'Gradient + CSS code',dru:'Градиент + CSS',ic:'gradient'},
-        {he:'JSON Formatter',en:'JSON Formatter',ru:'JSON-форматтер',dhe:'סידור ובדיקת JSON',den:'Prettify & validate',dru:'Форматирование JSON',ic:'braces'},
-        {he:'מחולל Meta Tags',en:'Meta Tags Generator',ru:'Генератор Meta-тегов',dhe:'Title, OG ו-SEO',den:'Title, OG & SEO',dru:'Title, OG и SEO',ic:'tags'}
+        {he:'מחולל פלטת צבעים',en:'Palette Generator',ru:'Генератор палитр',dhe:'פלטה מצבע או מתמונה',den:'From a color or image',dru:'Из цвета или картинки',ic:'palette',page:'../palette-generator.html'},
+        {he:'בודק ניגודיות',en:'Contrast Checker',ru:'Проверка контраста',dhe:'קריאות טקסט על רקע',den:'Text vs. background',dru:'Текст на фоне',ic:'contrast',page:'../contrast-checker.html'},
+        {he:'מחולל Gradient',en:'Gradient Generator',ru:'Генератор градиентов',dhe:'גרדיאנט + קוד CSS',den:'Gradient + CSS code',dru:'Градиент + CSS',ic:'gradient',page:'../gradient-generator.html'},
+        {he:'JSON Formatter',en:'JSON Formatter',ru:'JSON-форматтер',dhe:'סידור ובדיקת JSON',den:'Prettify & validate',dru:'Форматирование JSON',ic:'braces',page:'../json-formatter.html'},
+        {he:'מחולל Meta Tags',en:'Meta Tags Generator',ru:'Генератор Meta-тегов',dhe:'Title, OG ו-SEO',den:'Title, OG & SEO',dru:'Title, OG и SEO',ic:'tags',page:'../meta-tags.html'}
       ],
       all:[
-        {he:'ממיר צבעים',en:'Color Converter',ru:'Конвертер цвета',s:'live',href:'../color-convert.html'},
-        {he:'פלטת צבעים',en:'Palette Generator',ru:'Генератор палитр',s:'soon'},
-        {he:'בודק ניגודיות',en:'Contrast Checker',ru:'Проверка контраста',s:'soon'},
-        {he:'מחולל Gradient',en:'CSS Gradient',ru:'Градиент',s:'soon'},
-        {he:'Box Shadow',en:'Box Shadow',ru:'Box Shadow',s:'soon'},
-        {he:'Border Radius',en:'Border Radius',ru:'Border Radius',s:'soon'},
-        {he:'תמונה ל-Base64',en:'Image to Base64',ru:'Изображение в Base64',s:'soon'},
-        {he:'כיווץ CSS/JS',en:'Minify CSS/JS',ru:'Минификация',s:'soon'},
-        {he:'JSON Formatter',en:'JSON Formatter',ru:'JSON-форматтер',s:'soon'},
-        {he:'URL Encoder/Decoder',en:'URL Encoder/Decoder',ru:'URL-кодировщик',s:'soon'},
-        {he:'מחולל Meta Tags',en:'Meta Tags',ru:'Meta-теги',s:'soon'},
-        {he:'בודק אורך Meta',en:'Meta Length',ru:'Длина Meta',s:'soon'},
-        {he:'מחולל Favicon',en:'Favicon',ru:'Favicon',s:'soon'},
-        {he:'מחולל Embed',en:'Embed Code',ru:'Код встраивания',s:'soon'},
-        {he:'ממיר מידות מסך',en:'Screen Units',ru:'Единицы экрана',s:'soon'},
-        {he:'יחס תמונה',en:'Aspect Ratio',ru:'Соотношение сторон',s:'soon'},
-        {he:'מחולל Placeholder',en:'Placeholder',ru:'Заглушка',s:'soon'},
-        {he:'מנקה HTML',en:'HTML Cleaner',ru:'Очистка HTML',s:'soon'}
+        {ic:'swatch',he:'ממיר צבעים',en:'Color Converter',ru:'Конвертер цвета',s:'live',href:'../color-convert.html'},
+        {ic:'palette',he:'פלטת צבעים',en:'Palette Generator',ru:'Генератор палитр',s:'live',href:'../palette-generator.html'},
+        {ic:'contrast',he:'בודק ניגודיות',en:'Contrast Checker',ru:'Проверка контраста',s:'live',href:'../contrast-checker.html'},
+        {ic:'gradient',he:'מחולל Gradient',en:'CSS Gradient',ru:'Градиент',s:'live',href:'../gradient-generator.html'},
+        {ic:'shadow',he:'Box Shadow',en:'Box Shadow',ru:'Box Shadow',s:'live',href:'../box-shadow.html'},
+        {ic:'radius',he:'Border Radius',en:'Border Radius',ru:'Border Radius',s:'live',href:'../border-radius.html'},
+        {ic:'image',he:'תמונה ל-Base64',en:'Image to Base64',ru:'Изображение в Base64',s:'live',href:'../image-to-base64.html'},
+        {ic:'minify',he:'כיווץ CSS/JS',en:'Minify CSS/JS',ru:'Минификация',s:'live',href:'../minify.html'},
+        {ic:'braces',he:'JSON Formatter',en:'JSON Formatter',ru:'JSON-форматтер',s:'live',href:'../json-formatter.html'},
+        {ic:'link',he:'URL Encoder/Decoder',en:'URL Encoder/Decoder',ru:'URL-кодировщик',s:'live',href:'../url-encode.html'},
+        {ic:'tags',he:'מחולל Meta Tags',en:'Meta Tags',ru:'Meta-теги',s:'live',href:'../meta-tags.html'},
+        {ic:'text',he:'בודק אורך Meta',en:'Meta Length',ru:'Длина Meta',s:'live',href:'../meta-length.html'},
+        {ic:'star',he:'מחולל Favicon',en:'Favicon',ru:'Favicon',s:'live',href:'../favicon-generator.html'},
+        {ic:'code',he:'מחולל Embed',en:'Embed Code',ru:'Код встраивания',s:'live',href:'../embed-code.html'},
+        {ic:'ruler',he:'ממיר מידות מסך',en:'Screen Units',ru:'Единицы экрана',s:'live',href:'../screen-units.html'},
+        {ic:'ratio',he:'יחס תמונה',en:'Aspect Ratio',ru:'Соотношение сторон',s:'live',href:'../aspect-ratio.html'},
+        {ic:'crop',he:'מחולל Placeholder',en:'Placeholder',ru:'Заглушка',s:'live',href:'../placeholder-generator.html'},
+        {ic:'eraser',he:'מנקה HTML',en:'HTML Cleaner',ru:'Очистка HTML',s:'live',href:'../html-cleaner.html'}
       ]},
     audio: { i:'🎵', cta:{ href:'../app.html', he:'פתחו את העורך', en:'Open the Editor', ru:'Открыть редактор' },
       he:['אודיו','חתכו, נרמלו, המירו ועשו מאסטרינג — הכול בדפדפן.'],
@@ -187,7 +195,7 @@
         {he:'יצירת שורטס',en:'Shorts Maker',ru:'Создание Shorts',s:'soon'},{he:'כתוביות AI',en:'AI Subtitle',ru:'AI-субтитры',s:'live',href:'../subtitle-generator.html'},{he:'שדרוג AI',en:'AI Upscale',ru:'AI-апскейл',s:'soon'}
       ]},
     documents: { i:'📄', cta:{ href:'../files.html', he:'לסידור הקבצים', en:'Organize Files', ru:'Упорядочить файлы' },
-      he:['מסמכים','כלי PDF, OCR וארגון קבצים.'],
+      he:['מסמכים','כלי PDF, OCR ובחירת קבצים.'],
       en:['Documents','PDF tools, OCR and file organizing.'],
       ru:['Документы','Инструменты PDF, OCR и упорядочивание файлов.'],
       feat:[
@@ -195,14 +203,14 @@
         {he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF',dhe:'הקטנת נפח PDF',den:'Reduce PDF size',dru:'Уменьшить размер PDF',ic:'minimize',page:'../compress-pdf.html'},
         {he:'PDF ל-JPG',en:'PDF to JPG',ru:'PDF в JPG',dhe:'המרת עמודים לתמונות',den:'Pages to images',dru:'Страницы в изображения',ic:'image',page:'../pdf-to-jpg.html'},
         {he:'DOC ל-PDF',en:'DOC to PDF',ru:'DOC в PDF',dhe:'המרת Word ל-PDF',den:'Word to PDF',dru:'Word в PDF',ic:'file',page:'../doc-to-pdf.html'},
-        {he:'ארגון קבצים',en:'Organize Files',ru:'Упорядочить файлы',dhe:'מיון ושינוי שמות',den:'Sort & rename',dru:'Сортировка и переименование',ic:'folder',page:'../files.html'}
+        {he:'בחירת קבצים',en:'Organize Files',ru:'Упорядочить файлы',dhe:'מיון ושינוי שמות',den:'Sort & rename',dru:'Сортировка и переименование',ic:'folder',page:'../files.html'}
       ],
       all:[
         {he:'מיזוג PDF',en:'Merge PDF',ru:'Объединить PDF',s:'live',href:'../merge-pdf.html'},{he:'פיצול PDF',en:'Split PDF',ru:'Разделить PDF',s:'soon'},
         {he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF',s:'live',href:'../compress-pdf.html'},{he:'PDF ל-JPG',en:'PDF to JPG',ru:'PDF в JPG',s:'live',href:'../pdf-to-jpg.html'},{he:'OCR',en:'OCR',ru:'OCR',s:'soon'},
         {he:'חתימת PDF',en:'Sign PDF',ru:'Подпись PDF',s:'soon'},{he:'הגנת PDF',en:'Protect PDF',ru:'Защита PDF',s:'soon'},
         {he:'DOC ל-PDF',en:'DOC to PDF',ru:'DOC в PDF',s:'live',href:'../doc-to-pdf.html'},{he:'PDF ל-Word',en:'PDF to Word',ru:'PDF в Word',s:'soon'},
-        {he:'ארגון קבצים',en:'Organize',ru:'Упорядочить',s:'live',href:'../files.html'}
+        {he:'בחירת קבצים',en:'Organize',ru:'Упорядочить',s:'live',href:'../files.html'}
       ]},
     converters: { i:'🔄',
       he:['ממירים','המירו בין מאות פורמטים של קבצים.'],
@@ -297,7 +305,7 @@
   ];
   var PLANS = [
     {price:'$0', he:['חינם','להתחלה מהירה'], en:['Free','To get started'], ru:['Бесплатно','Для быстрого старта'], cta:{he:'התחילו',en:'Get Started',ru:'Начать'}, feats:[
-      {he:'עד 2GB לשליחה',en:'Up to 2GB per transfer',ru:'До 2 ГБ за передачу'},{he:'כלים בסיסיים',en:'Basic tools',ru:'Базовые инструменты'},
+      {he:'עד 3GB לשליחה',en:'Up to 3GB per transfer',ru:'До 3 ГБ за передачу'},{he:'כלים בסיסיים',en:'Basic tools',ru:'Базовые инструменты'},
       {he:'קבצים נשמרים 3 ימים',en:'Files kept for 3 days',ru:'Файлы хранятся 3 дня'},{he:'עריכה מקומית בדפדפן',en:'Local in-browser editing',ru:'Локальное редактирование в браузере'}]},
     {price:'$6.99', pop:true, he:['Lite','לעבודה יומיומית'], en:['Lite','For everyday work'], ru:['Lite','Для повседневной работы'], cta:{he:'קחו Lite',en:'Get Lite',ru:'Выбрать Lite'}, feats:[
       {he:'שליחה עד 20GB בכל פעם',en:'Up to 20GB per transfer',ru:'До 20 ГБ за передачу'},{he:'100GB אחסון בענן',en:'100GB cloud storage',ru:'100 ГБ в облаке'},
@@ -329,10 +337,19 @@
     {he:['צריך חשבון?','לא כדי להתחיל. חשבון מוסיף היסטוריה, לינקים שמורים ושיתוף.'],
      en:['Do I need an account?','Not to start. An account adds history, saved links and sharing.'],
      ru:['Нужен ли аккаунт?','Не для начала работы. Аккаунт добавляет историю, сохранённые ссылки и общий доступ.']},
-    {he:['יש מגבלת גודל?','בחינם עד 2GB לשליחה; חבילות Lite, Pro ו-Business מעלות את המגבלה.'],
-     en:['Is there a size limit?','Free is up to 2GB per transfer; Lite, Pro and Business raise the limit.'],
-     ru:['Есть ли ограничение по размеру?','Бесплатно — до 2 ГБ за передачу; Lite, Pro и Business увеличивают лимит.']}
+    {he:['יש מגבלת גודל?','בחינם עד 3GB לשליחה; חבילות Lite, Pro ו-Business מעלות את המגבלה.'],
+     en:['Is there a size limit?','Free is up to 3GB per transfer; Lite, Pro and Business raise the limit.'],
+     ru:['Есть ли ограничение по размеру?','Бесплатно — до 3 ГБ за передачу; Lite, Pro и Business увеличивают лимит.']}
   ];
+
+  /* ---------- editing-tools hub (all editing categories on one page) ---------- */
+  var EDIT = {
+    kick:{he:'כלי עריכה',en:'Editing Tools',ru:'Инструменты редактирования'},
+    he:['כל כלי העריכה במקום אחד','אודיו, תמונות, וידאו, מסמכים, ממירים ודחיסה — הכול רץ בדפדפן שלכם, בלי התקנות.'],
+    en:['All your editing tools in one place','Audio, images, video, documents, converters & compression — all in your browser, no installs.'],
+    ru:['Все инструменты редактирования в одном месте','Аудио, изображения, видео, документы, конвертеры и сжатие — всё в браузере, без установок.']
+  };
+  var EDIT_CATS = ['audio','images','video','documents','converters','compress'];
 
   var lang = 'he';
 
@@ -352,6 +369,13 @@
     return (t.s === 'live' && t.href)
       ? '<a class="chip hov" href="' + t.href + '">' + body + '</a>'
       : '<span class="chip">' + body + '</span>';
+  }
+  function allTile(t, L, S) {
+    var live = t.s === 'live' && t.href;
+    var inner = '<span class="tt-ic">' + svg(t.ic) + '</span>' +
+      '<span class="tt-name">' + t[L] + '</span>' + (live ? '' : badge(t.s, S));
+    return live ? '<a class="tool-tile hov" href="' + t.href + '">' + inner + '</a>'
+                : '<div class="tool-tile is-soon">' + inner + '</div>';
   }
   function planCard(p, L, S) {
     var name = p[L][0], tagline = p[L][1];
@@ -391,15 +415,35 @@
     var kick = '<span style="font-size:14px">' + c.i + '</span> ' + c[L][0];
     var ctaBtn = c.cta ? '<div style="text-align:center;margin:6px 0 4px"><a class="cta" href="' + c.cta.href + '">' + c.cta[L] + '</a></div>' : '';
     var feats = c.feat.map(function (t) { return featCard(t, L); }).join('');
-    var chips = c.all.map(function (t) { return chip(t, L, S); }).join('');
+    var useTiles = c.all.length && c.all.every(function (t) { return t.ic; });
+    var allHtml = useTiles
+      ? '<div class="tiles c-' + cat + '">' + c.all.map(function (t) { return allTile(t, L, S); }).join('') + '</div>'
+      : '<div class="chips">' + c.all.map(function (t) { return chip(t, L, S); }).join('') + '</div>';
     return head(kick, c[L][0], c[L][1]) +
       '<section><div class="wrap">' +
         '<div class="subhead"><h2>' + S.featured + '</h2><span class="line"></span></div>' +
         '<div class="grid g4 c-' + cat + '">' + feats + '</div>' +
         '<div class="subhead"><h2>' + S.allTools + '</h2><span class="line"></span></div>' +
-        '<div class="chips">' + chips + '</div>' +
+        allHtml +
         ctaBtn +
       '</div></section>' +
+      finalBand(S) + footer(S);
+  }
+  function renderEditing(L, S) {
+    var arrow = (L === 'he') ? '←' : '→';
+    var sections = EDIT_CATS.map(function (cat) {
+      var c = CATS[cat];
+      var feats = c.feat.map(function (t) { return featCard(t, L); }).join('');
+      return '<div class="subhead">' +
+          '<h2><span class="she">' + c.i + '</span>' + c[L][0] + '</h2>' +
+          '<span class="line"></span>' +
+          '<a class="seeall" href="../' + cat + '/">' + S.allTools + ' ' + arrow + '</a>' +
+        '</div>' +
+        '<div class="grid g4 c-' + cat + '">' + feats + '</div>';
+    }).join('');
+    var kick = '<span style="font-size:14px">🛠️</span> ' + EDIT.kick[L];
+    return head(kick, EDIT[L][0], EDIT[L][1]) +
+      '<section><div class="wrap">' + sections + '</div></section>' +
       finalBand(S) + footer(S);
   }
   function renderAI(L, S) {
@@ -432,6 +476,7 @@
     audio:{he:'אודיו',en:'Audio',ru:'Аудио'}, images:{he:'תמונות',en:'Images',ru:'Изображения'}, video:{he:'וידאו',en:'Video',ru:'Видео'},
     documents:{he:'מסמכים',en:'Documents',ru:'Документы'}, converters:{he:'ממירים',en:'Converters',ru:'Конвертеры'}, compress:{he:'דחיסה',en:'Compress',ru:'Сжатие'},
     dev:{he:'כלי עיצוב ופיתוח',en:'Design & Dev Tools',ru:'Инструменты дизайна'},
+    editing:{he:'כלי עריכה',en:'Editing Tools',ru:'Инструменты редактирования'},
     ai:{he:'כלי AI',en:'AI Tools',ru:'AI-инструменты'}, faq:{he:'שאלות נפוצות',en:'FAQ',ru:'FAQ'}, pricing:{he:'מסלולים ומחירים',en:'Pricing',ru:'Цены'}, marketing:{he:'שיווק וקישורים',en:'Marketing & Links',ru:'Маркетинг и ссылки'}, calc:{he:'חישובים והמרות',en:'Calculators & Converters',ru:'Калькуляторы'}
   };
 
@@ -440,6 +485,7 @@
     var host = el('page');
     if (!host) return;
     if (CATS[page]) host.innerHTML = renderCategory(page, L, S);
+    else if (page === 'editing') host.innerHTML = renderEditing(L, S);
     else if (page === 'ai') host.innerHTML = renderAI(L, S);
     else if (page === 'faq') host.innerHTML = renderFAQ(L, S);
     else if (page === 'pricing') host.innerHTML = renderPricing(L, S);

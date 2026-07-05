@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — URL Encoder / Decoder</title>
+<meta name="description" content="Free URL encoder & decoder — percent-encode or decode URLs and query strings instantly, with component vs full-URL modes and a live query-parameter breakdown. Fast, private, right in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 22px;}
+  .pagehead h1{font-size:clamp(23px,3vw,32px);font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:12px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);}
+
+  /* ---- controls ---- */
+  .controls{padding:16px 18px;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;}
+  .ctrlgroup{display:flex;flex-direction:column;gap:8px;}
+  .ctrllabel{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--faint);}
+  .seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;
+    transition:opacity .12s;}
+  .seg button{border:0;background:transparent;color:var(--muted);font-family:var(--sans);font-size:13px;font-weight:600;
+    padding:8px 16px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .seg button:not(.on):hover{color:var(--ink-2);}
+  .seg button.on{background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow-sm);}
+  .seg.disabled{opacity:.42;pointer-events:none;}
+
+  /* ---- input / output ---- */
+  .io{padding:16px 18px 18px;margin-top:18px;}
+  .iohead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;}
+  .iolabel{font-size:13px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;}
+  .iobtns{display:flex;gap:8px;}
+  .txtarea{width:100%;min-height:130px;resize:vertical;display:block;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:12px;color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.6;padding:12px 14px;
+    transition:border-color .12s,box-shadow .12s;
+    direction:ltr;unicode-bidi:isolate;text-align:start;}
+  .txtarea::placeholder{color:var(--faint);}
+  .txtarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .txtarea[readonly]{background:var(--panel);color:var(--ink-2);}
+  .swaprow{display:flex;justify-content:center;margin:14px 0;}
+
+  /* buttons (shared visual language with color-convert) */
+  .gbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);font-size:13px;font-weight:600;padding:10px 12px;border-radius:11px;
+    cursor:pointer;transition:all .12s;}
+  .gbtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .gbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .gbtn.hidden{display:none;}
+  .iobtns .gbtn,.swaprow .gbtn{flex:0 0 auto;}
+  .copybtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--muted);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .copybtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .copybtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ---- query params table ---- */
+  .params{padding:16px 18px 18px;margin-top:18px;}
+  .params.hidden{display:none;}
+  .ptablewrap{overflow-x:auto;margin-top:11px;}
+  .ptable{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .ptable th{text-align:start;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--faint);padding:0 12px 8px;border-bottom:1px solid var(--line);}
+  .ptable td{padding:9px 12px;border-bottom:1px solid var(--line-2);vertical-align:top;font-family:var(--mono);
+    word-break:break-word;direction:ltr;unicode-bidi:isolate;text-align:start;}
+  .ptable tr:last-child td{border-bottom:0;}
+  .ptable td.pkey{color:var(--accent-dim);font-weight:700;white-space:nowrap;}
+  .ptable td.pval{color:var(--ink);}
+
+  .note{display:flex;align-items:flex-start;gap:9px;margin-top:18px;padding:12px 14px;border-radius:12px;
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+    font-size:12px;color:var(--ink-2);line-height:1.55;}
+  .note svg{width:16px;height:16px;color:var(--accent-dim);flex-shrink:0;margin-top:1px;
+    stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .note.danger{background:var(--danger-soft);border-color:color-mix(in srgb,var(--danger) 32%,transparent);}
+  .note.danger svg{color:var(--danger);}
+  .note.hidden{display:none;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="pageTitle"></h1>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <!-- controls -->
+  <div class="card controls">
+    <div class="ctrlgroup">
+      <span class="ctrllabel" data-i18n="dirLabel"></span>
+      <div class="seg" id="dirSeg">
+        <button type="button" data-val="encode" class="on" data-i18n="encode"></button>
+        <button type="button" data-val="decode" data-i18n="decode"></button>
+      </div>
+    </div>
+    <div class="ctrlgroup">
+      <span class="ctrllabel" data-i18n="modeLabel"></span>
+      <div class="seg" id="modeSeg">
+        <button type="button" data-val="component" class="on" data-i18n="componentMode"></button>
+        <button type="button" data-val="full" data-i18n="fullUrlMode"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- input / output -->
+  <div class="card io">
+    <div class="iohead">
+      <span class="iolabel" data-i18n="inputLabel"></span>
+      <div class="iobtns">
+        <button class="gbtn" id="sampleBtn" type="button">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          <span data-i18n="sample"></span>
+        </button>
+        <button class="gbtn" id="clearBtn" type="button">
+          <svg viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          <span data-i18n="clear"></span>
+        </button>
+      </div>
+    </div>
+    <textarea class="txtarea" id="inBox" spellcheck="false" autocomplete="off" placeholder="https://example.com/?q=hello world"></textarea>
+
+    <div class="swaprow">
+      <button class="gbtn" id="swapBtn" type="button">
+        <svg viewBox="0 0 24 24"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+        <span data-i18n="swap"></span>
+      </button>
+    </div>
+
+    <div class="iohead">
+      <span class="iolabel" data-i18n="outputLabel"></span>
+      <button class="copybtn" id="copyBtn" type="button">
+        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span data-i18n="copy"></span>
+      </button>
+    </div>
+    <textarea class="txtarea" id="outBox" readonly spellcheck="false" tabindex="-1"></textarea>
+
+    <div class="note danger hidden" id="errNote">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      <span data-i18n="errDecode"></span>
+    </div>
+  </div>
+
+  <!-- query params breakdown -->
+  <div class="card params hidden" id="paramsCard">
+    <div class="iohead"><span class="iolabel" data-i18n="paramsTitle"></span></div>
+    <div class="ptablewrap">
+      <table class="ptable">
+        <thead><tr><th data-i18n="keyCol"></th><th data-i18n="valueCol"></th></tr></thead>
+        <tbody id="paramsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <span data-i18n="note"></span>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'קידוד ופענוח כתובות',
+      pageTitle:'URL Encoder / Decoder — קידוד ופענוח כתובות',
+      pageSub:'קודדו או פענחו כתובות URL באופן מיידי. במצב "רכיב" כל התווים המיוחדים מקודדים (מתאים לערכי פרמטרים בשאילתה), ובמצב "כתובת מלאה" נשמרים התווים המבניים של הקישור. הכול רץ בדפדפן — שום דבר לא נשלח לשרת.',
+      dirLabel:'פעולה', modeLabel:'סוג הקידוד',
+      encode:'קידוד', decode:'פענוח', componentMode:'רכיב', fullUrlMode:'כתובת מלאה',
+      inputLabel:'קלט', outputLabel:'פלט',
+      copy:'העתקה', copiedMsg:'הועתק ✓', swap:'החלפה', clear:'ניקוי', sample:'דוגמה',
+      paramsTitle:'פרמטרים בשאילתה', keyCol:'מפתח', valueCol:'ערך',
+      errDecode:'לא ניתן לפענח — הקלט מכיל רצף אחוזים לא תקין (למשל % בודד או ‎%ZZ‎).',
+      note:'טיפ: "רכיב" משתמש ב-encodeURIComponent ומקודד גם תווים שמורים כמו ? & = / , בעוד "כתובת מלאה" משתמש ב-encodeURI ושומר על מבנה הקישור. הפענוח תמיד משתמש ב-decodeURIComponent.',
+      foot:'KOLKLI · URL Encoder / Decoder · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'URL Encoder / Decoder',
+      pageTitle:'URL Encoder / Decoder — encode & decode URLs',
+      pageSub:'Encode or decode URLs instantly. “Component” mode escapes every reserved character (great for query values), while “Full URL” mode keeps the structural characters of a link intact. Everything runs in your browser — nothing is sent to a server.',
+      dirLabel:'Action', modeLabel:'Encoding type',
+      encode:'Encode', decode:'Decode', componentMode:'Component', fullUrlMode:'Full URL',
+      inputLabel:'Input', outputLabel:'Output',
+      copy:'Copy', copiedMsg:'Copied ✓', swap:'Swap', clear:'Clear', sample:'Sample',
+      paramsTitle:'Query parameters', keyCol:'Key', valueCol:'Value',
+      errDecode:'Can’t decode — the input contains an invalid percent sequence (e.g. a lone % or %ZZ).',
+      note:'Tip: “Component” uses encodeURIComponent and escapes reserved characters like ? & = / , too, while “Full URL” uses encodeURI and preserves a link’s structure. Decoding always uses decodeURIComponent.',
+      foot:'KOLKLI · URL Encoder / Decoder · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'URL-кодировщик',
+      pageTitle:'URL Encoder / Decoder — кодирование и декодирование ссылок',
+      pageSub:'Мгновенно кодируйте или декодируйте URL-адреса. Режим «Компонент» экранирует все зарезервированные символы (удобно для значений параметров), а режим «Полный URL» сохраняет структурные символы ссылки. Всё работает в браузере — ничего не отправляется на сервер.',
+      dirLabel:'Действие', modeLabel:'Тип кодирования',
+      encode:'Кодировать', decode:'Декодировать', componentMode:'Компонент', fullUrlMode:'Полный URL',
+      inputLabel:'Ввод', outputLabel:'Результат',
+      copy:'Копировать', copiedMsg:'Скопировано ✓', swap:'Поменять', clear:'Очистить', sample:'Пример',
+      paramsTitle:'Параметры запроса', keyCol:'Ключ', valueCol:'Значение',
+      errDecode:'Не удаётся декодировать — во вводе недопустимая процентная последовательность (например, одиночный % или %ZZ).',
+      note:'Совет: «Компонент» использует encodeURIComponent и экранирует зарезервированные символы (? & = / , и др.), а «Полный URL» использует encodeURI и сохраняет структуру ссылки. Декодирование всегда использует decodeURIComponent.',
+      foot:'KOLKLI · URL Encoder / Decoder · Приватно и быстро, прямо в браузере' }
+  };
+
+  const SAMPLES = {
+    encode:'https://example.com/search?name=John Doe&city=Tel Aviv&note=50% off!',
+    decode:'https://example.com/search?name=John%20Doe&city=Tel%20Aviv&note=50%25%20off%21'
+  };
+
+  let lang='he', t=I18N.he;
+  let op='encode';      // 'encode' | 'decode'
+  let mode='component'; // 'component' | 'full'
+
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1700); }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(fallbackCopy.bind(null,text)); }
+    else fallbackCopy(text);
+    toast(t.copiedMsg);
+  }
+  function fallbackCopy(text){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+  }
+
+  function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  // ---- core conversion ----
+  function convert(){
+    const input = el('inBox').value;
+    const err = el('errNote');
+    err.classList.add('hidden');
+    if(op==='encode'){
+      let out='';
+      try{ out = mode==='full' ? encodeURI(input) : encodeURIComponent(input); }catch(_){ out=''; }
+      el('outBox').value = out;
+    } else {
+      if(input===''){ el('outBox').value=''; }
+      else{
+        try{ el('outBox').value = decodeURIComponent(input); }
+        catch(_){ el('outBox').value=''; err.classList.remove('hidden'); }
+      }
+    }
+    renderParams();
+  }
+
+  // ---- query-string breakdown ----
+  function parseParams(str){
+    try{
+      if(!str) return [];
+      const q = str.indexOf('?'); if(q<0) return [];
+      let qs = str.slice(q+1);
+      const h = qs.indexOf('#'); if(h>=0) qs = qs.slice(0,h);
+      if(!qs) return [];
+      const out=[];
+      try{
+        const sp = new URLSearchParams(qs);
+        sp.forEach((v,k)=>out.push([k,v]));
+        if(out.length) return out;
+      }catch(_){ /* fall through to manual parse */ }
+      qs.split('&').forEach(pair=>{
+        if(!pair) return;
+        const i = pair.indexOf('=');
+        let k = i<0 ? pair : pair.slice(0,i);
+        let v = i<0 ? '' : pair.slice(i+1);
+        try{ k = decodeURIComponent(k.replace(/\+/g,' ')); }catch(_){}
+        try{ v = decodeURIComponent(v.replace(/\+/g,' ')); }catch(_){}
+        out.push([k,v]);
+      });
+      return out;
+    }catch(_){ return []; }
+  }
+  function renderParams(){
+    const card = el('paramsCard'), body = el('paramsBody');
+    const source = op==='decode' ? el('inBox').value : el('outBox').value;
+    const rows = parseParams(source);
+    if(!rows.length){ card.classList.add('hidden'); body.innerHTML=''; return; }
+    body.innerHTML = rows.map(([k,v])=>`<tr><td class="pkey">${esc(k)||'—'}</td><td class="pval">${esc(v)||'—'}</td></tr>`).join('');
+    card.classList.remove('hidden');
+  }
+
+  // ---- toggles ----
+  function segSet(id,val){ el(id).querySelectorAll('button[data-val]').forEach(b=>b.classList.toggle('on', b.getAttribute('data-val')===val)); }
+  function updateModeState(){ el('modeSeg').classList.toggle('disabled', op!=='encode'); }
+
+  el('dirSeg').addEventListener('click',e=>{
+    const b=e.target.closest('button[data-val]'); if(!b) return;
+    op=b.getAttribute('data-val'); segSet('dirSeg',op); updateModeState(); convert();
+  });
+  el('modeSeg').addEventListener('click',e=>{
+    const b=e.target.closest('button[data-val]'); if(!b) return;
+    mode=b.getAttribute('data-val'); segSet('modeSeg',mode); convert();
+  });
+
+  // ---- actions ----
+  el('inBox').addEventListener('input', convert);
+  el('copyBtn').addEventListener('click',()=>{ const v=el('outBox').value; if(v) copy(v); });
+  el('swapBtn').addEventListener('click',()=>{
+    el('inBox').value = el('outBox').value;
+    op = op==='encode' ? 'decode' : 'encode';
+    segSet('dirSeg',op); updateModeState(); convert();
+    el('inBox').focus();
+  });
+  el('clearBtn').addEventListener('click',()=>{
+    el('inBox').value=''; el('outBox').value='';
+    el('errNote').classList.add('hidden'); renderParams(); el('inBox').focus();
+  });
+  el('sampleBtn').addEventListener('click',()=>{
+    el('inBox').value = SAMPLES[op] || SAMPLES.encode; convert(); el('inBox').focus();
+  });
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    if(!I18N[l]) l='en';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+  window.__setLang=applyLang;
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  updateModeState();
+  convert();
+})();
+</script>
+</body>
+</html>

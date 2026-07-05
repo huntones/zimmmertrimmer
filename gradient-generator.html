@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל Gradient</title>
+<meta name="description" content="Free CSS gradient generator — build linear, radial and conic gradients visually. Pick colors, angle and stops, preview live and copy ready-to-use CSS. Fast, private, right in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 22px;}
+  .pagehead h1{font-size:clamp(23px,3vw,32px);font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:12px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  /* reused helpers */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);}
+  input[type=color]{-webkit-appearance:none;appearance:none;width:56px;height:44px;padding:0;border:1px solid var(--line);
+    border-radius:12px;background:var(--panel-2);cursor:pointer;flex-shrink:0;}
+  input[type=color]::-webkit-color-swatch-wrapper{padding:4px;}
+  input[type=color]::-webkit-color-swatch{border:none;border-radius:8px;}
+  .btnrow{display:flex;gap:9px;margin-top:10px;}
+  .gbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);font-size:13px;font-weight:600;padding:10px 12px;border-radius:11px;
+    cursor:pointer;transition:all .12s;}
+  .gbtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .gbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .fhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+  .ftitle{font-size:13px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;}
+  .copybtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--muted);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .copybtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .copybtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .fstr{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink);background:var(--panel-2);
+    border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;margin-bottom:12px;overflow-x:auto;white-space:nowrap;
+    direction:ltr;text-align:start;}
+
+  /* ---- gradient tool ---- */
+  .tool{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  @media (max-width:760px){ .tool{grid-template-columns:1fr;} }
+  .previewcard{padding:16px;position:sticky;top:16px;}
+  @media (max-width:760px){ .previewcard{position:static;} }
+  .gpreview{min-height:340px;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);
+    background:linear-gradient(90deg,#7B34FF 0%,#3F85FF 100%);transition:background .12s;}
+  @media (max-width:760px){ .gpreview{min-height:240px;} }
+
+  .ctrlcol{display:flex;flex-direction:column;gap:18px;}
+  .ctrlcard{padding:18px;}
+  .ctrlgroup{margin-bottom:16px;}
+  .ctrlgroup:last-child{margin-bottom:0;}
+  .clabel{display:block;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+
+  .seg{display:flex;gap:5px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:4px;}
+  .seg button{flex:1;border:0;background:transparent;color:var(--muted);font-family:var(--sans);font-size:13px;
+    font-weight:600;padding:8px 6px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .seg button:hover{color:var(--ink-2);}
+  .seg button.active{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+
+  .anglerow{display:flex;align-items:center;gap:10px;}
+  .anglerow input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:6px;cursor:pointer;}
+  .numfield{display:flex;align-items:center;gap:2px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:10px;padding:0 10px;transition:border-color .12s,box-shadow .12s;}
+  .numfield:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .numfield input{width:44px;border:0;background:transparent;color:var(--ink);font-family:var(--mono);font-size:14px;
+    font-weight:600;text-align:center;padding:9px 0;outline:none;}
+  .numfield .unit{color:var(--faint);font-family:var(--mono);font-size:14px;}
+
+  #shapeSel{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--sans);font-size:14px;font-weight:600;padding:10px 12px;cursor:pointer;}
+  #shapeSel:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+
+  .stops{display:flex;flex-direction:column;gap:8px;}
+  .stoprow{display:flex;align-items:center;gap:8px;}
+  .stoprow input[type=color]{width:46px;height:38px;}
+  .posfield{flex:1;display:flex;align-items:center;gap:2px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:10px;padding:0 10px;transition:border-color .12s,box-shadow .12s;}
+  .posfield:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .posfield input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font-family:var(--mono);
+    font-size:14px;font-weight:600;text-align:center;padding:9px 0;outline:none;}
+  .posfield .unit{color:var(--faint);font-family:var(--mono);font-size:14px;}
+  .rmbtn{flex-shrink:0;width:34px;height:34px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    border-radius:10px;font-size:18px;line-height:1;cursor:pointer;transition:all .12s;}
+  .rmbtn:hover:not(:disabled){border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .rmbtn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .presets{display:flex;flex-wrap:wrap;gap:8px;}
+  .presets button{width:52px;height:32px;border-radius:9px;border:1px solid rgba(0,0,0,.12);cursor:pointer;padding:0;
+    transition:transform .1s;}
+  .presets button:hover{transform:scale(1.08);}
+
+  .outcard{padding:16px;}
+  .outcard .fstr{margin-bottom:0;white-space:normal;word-break:break-all;}
+  .hidden{display:none;}
+
+  /* ---- export ---- */
+  .leftcol{display:flex;flex-direction:column;gap:18px;}
+  .exportcard{padding:16px;}
+  .exportcard .fhead{margin-bottom:12px;}
+  .sizefield{display:inline-flex;align-items:center;gap:4px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:9px;padding:1px 8px;transition:border-color .12s,box-shadow .12s;}
+  .sizefield:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .sizefield input{width:42px;border:0;background:transparent;color:var(--ink);font-family:var(--mono);font-size:12.5px;
+    font-weight:600;text-align:center;padding:6px 0;outline:none;}
+  .sizefield .x,.sizefield .unit{color:var(--faint);font-family:var(--mono);font-size:12px;}
+  .sizefield .unit{padding-inline-start:2px;}
+  .exportgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(66px,1fr));gap:8px;}
+  .xbtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.03em;
+    padding:12px 8px;border-radius:11px;cursor:pointer;transition:all .12s;}
+  .xbtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .xbtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);transform:translateY(-1px);}
+  .xbtn:active{transform:translateY(0);}
+
+  .note{display:flex;align-items:flex-start;gap:9px;margin-top:18px;padding:12px 14px;border-radius:12px;
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+    font-size:12px;color:var(--ink-2);line-height:1.55;}
+  .note svg{width:16px;height:16px;color:var(--accent-dim);flex-shrink:0;margin-top:1px;
+    stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="pageTitle"></h1>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="tool">
+    <!-- live preview + export -->
+    <div class="leftcol">
+      <div class="card previewcard">
+        <div class="gpreview" id="preview"></div>
+      </div>
+
+      <div class="card exportcard">
+        <div class="fhead">
+          <span class="ftitle" data-i18n="exportLabel"></span>
+          <div class="sizefield">
+            <input type="number" id="expW" min="16" max="8000" value="1600" aria-label="export width">
+            <span class="x">×</span>
+            <input type="number" id="expH" min="16" max="8000" value="900" aria-label="export height">
+            <span class="unit">px</span>
+          </div>
+        </div>
+        <div class="exportgrid" id="exportGrid">
+          <button class="xbtn" type="button" data-export="png"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>PNG</button>
+          <button class="xbtn" type="button" data-export="jpg"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>JPG</button>
+          <button class="xbtn" type="button" data-export="webp"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>WEBP</button>
+          <button class="xbtn" type="button" data-export="svg"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>SVG</button>
+          <button class="xbtn" type="button" data-export="pdf"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- controls + output -->
+    <div class="ctrlcol">
+      <div class="card ctrlcard">
+
+        <div class="ctrlgroup">
+          <label class="clabel" data-i18n="typeLabel"></label>
+          <div class="seg" id="typeSeg">
+            <button type="button" data-type="linear" class="active"><span data-i18n="typeLinear"></span></button>
+            <button type="button" data-type="radial"><span data-i18n="typeRadial"></span></button>
+            <button type="button" data-type="conic"><span data-i18n="typeConic"></span></button>
+          </div>
+        </div>
+
+        <div class="ctrlgroup" id="angleGroup">
+          <label class="clabel" data-i18n="angleLabel"></label>
+          <div class="anglerow">
+            <input type="range" id="angleRange" min="0" max="360" value="90" aria-label="angle">
+            <div class="numfield">
+              <input type="number" id="angleNum" min="0" max="360" value="90" aria-label="angle degrees">
+              <span class="unit">°</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctrlgroup hidden" id="shapeGroup">
+          <label class="clabel" data-i18n="shapeLabel"></label>
+          <select id="shapeSel">
+            <option value="circle" data-i18n="shapeCircle"></option>
+            <option value="ellipse" data-i18n="shapeEllipse"></option>
+          </select>
+        </div>
+
+        <div class="ctrlgroup">
+          <label class="clabel" data-i18n="stopsLabel"></label>
+          <div class="stops" id="stopsList"></div>
+          <div class="btnrow">
+            <button class="gbtn" id="addStop" type="button">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              <span data-i18n="addStop"></span>
+            </button>
+            <button class="gbtn" id="randomBtn" type="button">
+              <svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3l-7.5 7.5"/><path d="M3 21l7.5-7.5"/><path d="M16 21h5v-5"/><path d="M14.5 14.5 21 21"/></svg>
+              <span data-i18n="random"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="ctrlgroup">
+          <label class="clabel" data-i18n="presets"></label>
+          <div class="presets" id="presets"></div>
+        </div>
+
+      </div>
+
+      <div class="card outcard">
+        <div class="fhead">
+          <span class="ftitle" data-i18n="cssLabel"></span>
+          <button class="copybtn" data-copy="cssStr" type="button"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copy"></span></button>
+        </div>
+        <div class="fstr" id="cssStr">background: linear-gradient(90deg, #7B34FF 0%, #3F85FF 100%);</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <span data-i18n="note"></span>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'מחולל Gradient',
+      pageTitle:'מחולל Gradient ל-CSS',
+      pageSub:'בנו גרדיאנט לינארי, רדיאלי או קוני באופן ויזואלי — בחרו צבעים, זווית ונקודות עצירה, וקבלו מייד קוד CSS מוכן להעתקה. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      typeLabel:'סוג הגרדיאנט', typeLinear:'לינארי', typeRadial:'רדיאלי', typeConic:'קוני',
+      angleLabel:'זווית', shapeLabel:'צורה', shapeCircle:'עיגול', shapeEllipse:'אליפסה',
+      stopsLabel:'נקודות צבע', addStop:'הוספת צבע', random:'אקראי', presets:'תבניות מוכנות',
+      cssLabel:'קוד CSS', copy:'העתקה', copiedMsg:'הועתק ✓',
+      exportLabel:'ייצוא כתמונה', savedMsg:'ההורדה החלה ✓', exportErr:'הייצוא נכשל בדפדפן זה',
+      note:'הקוד עובד בכל דפדפן מודרני. גרדיאנט קוני (conic-gradient) נתמך בדפדפנים עדכניים — בדפדפנים ישנים מאוד ייתכן שיידרש קידומת או שהוא לא יוצג.',
+      foot:'KOLKLI · מחולל Gradient · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'Gradient Generator',
+      pageTitle:'CSS Gradient Generator',
+      pageSub:'Build a linear, radial or conic gradient visually — pick colors, angle and stops, and instantly get ready-to-copy CSS. Everything runs in your browser; nothing is sent to a server.',
+      typeLabel:'Gradient type', typeLinear:'Linear', typeRadial:'Radial', typeConic:'Conic',
+      angleLabel:'Angle', shapeLabel:'Shape', shapeCircle:'Circle', shapeEllipse:'Ellipse',
+      stopsLabel:'Color stops', addStop:'Add stop', random:'Random', presets:'Presets',
+      cssLabel:'CSS code', copy:'Copy', copiedMsg:'Copied ✓',
+      exportLabel:'Export as image', savedMsg:'Download started ✓', exportErr:'Export failed in this browser',
+      note:'The generated code works in every modern browser. Conic gradients are supported in current browsers — very old ones may need a prefix or may not show them.',
+      foot:'KOLKLI · Gradient Generator · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'Генератор градиентов',
+      pageTitle:'Генератор CSS-градиентов',
+      pageSub:'Создайте линейный, радиальный или конический градиент визуально — выберите цвета, угол и точки перехода и мгновенно получите готовый CSS для копирования. Всё работает в браузере; ничего не отправляется на сервер.',
+      typeLabel:'Тип градиента', typeLinear:'Линейный', typeRadial:'Радиальный', typeConic:'Конический',
+      angleLabel:'Угол', shapeLabel:'Форма', shapeCircle:'Круг', shapeEllipse:'Эллипс',
+      stopsLabel:'Точки цвета', addStop:'Добавить цвет', random:'Случайно', presets:'Пресеты',
+      cssLabel:'CSS-код', copy:'Копировать', copiedMsg:'Скопировано ✓',
+      exportLabel:'Экспорт изображения', savedMsg:'Загрузка началась ✓', exportErr:'Экспорт не удался в этом браузере',
+      note:'Сгенерированный код работает во всех современных браузерах. Конические градиенты поддерживаются в актуальных браузерах — очень старым может потребоваться префикс, или они не отобразятся.',
+      foot:'KOLKLI · Генератор градиентов · Приватно и быстро, прямо в браузере' }
+  };
+
+  const PRESETS = [
+    {type:'linear', angle:90,  stops:[{hex:'#7B34FF',pos:0},{hex:'#3F85FF',pos:100}]},
+    {type:'linear', angle:120, stops:[{hex:'#F5A623',pos:0},{hex:'#E0447A',pos:100}]},
+    {type:'linear', angle:135, stops:[{hex:'#0FA6AB',pos:0},{hex:'#22B04B',pos:100}]},
+    {type:'linear', angle:90,  stops:[{hex:'#FF6B6B',pos:0},{hex:'#FFD93D',pos:100}]},
+    {type:'linear', angle:160, stops:[{hex:'#7B34FF',pos:0},{hex:'#3F85FF',pos:50},{hex:'#E0447A',pos:100}]},
+    {type:'radial', angle:90,  shape:'circle', stops:[{hex:'#3F85FF',pos:0},{hex:'#0D0F14',pos:100}]},
+    {type:'conic',  angle:0,   stops:[{hex:'#7B34FF',pos:0},{hex:'#3F85FF',pos:50},{hex:'#E0447A',pos:100}]},
+    {type:'linear', angle:180, stops:[{hex:'#111827',pos:0},{hex:'#374151',pos:100}]}
+  ];
+
+  let lang='he', t=I18N.he;
+  let type='linear', angle=90, shape='circle';
+  let stops=[{hex:'#7B34FF',pos:0},{hex:'#3F85FF',pos:100}];
+
+  // ---- helpers ----
+  function clamp(v,a,b){ v=+v; if(isNaN(v)) v=a; return v<a?a:v>b?b:v; }
+  function randHex(){ return '#'+Math.floor(Math.random()*16777216).toString(16).padStart(6,'0').toUpperCase(); }
+
+  function gradFrom(p){
+    const ss=[...p.stops].sort((a,b)=>a.pos-b.pos).map(s=>`${s.hex.toUpperCase()} ${s.pos}%`).join(', ');
+    if(p.type==='radial') return `radial-gradient(${p.shape||'circle'}, ${ss})`;
+    if(p.type==='conic')  return `conic-gradient(from ${p.angle}deg, ${ss})`;
+    return `linear-gradient(${p.angle}deg, ${ss})`;
+  }
+  function buildGradient(){
+    return gradFrom({type, angle, shape, stops});
+  }
+
+  // ---- render ----
+  function renderStops(){
+    el('stopsList').innerHTML = stops.map((s,i)=>`
+      <div class="stoprow" data-i="${i}">
+        <input type="color" value="${s.hex}" data-role="color" aria-label="stop ${i+1} color">
+        <div class="posfield">
+          <input type="number" min="0" max="100" value="${s.pos}" data-role="pos" aria-label="stop ${i+1} position">
+          <span class="unit">%</span>
+        </div>
+        <button class="rmbtn" type="button" data-role="rm" ${stops.length<=2?'disabled':''} aria-label="remove stop ${i+1}">&times;</button>
+      </div>`).join('');
+  }
+  function render(){
+    const g=buildGradient();
+    el('preview').style.background=g;
+    el('cssStr').textContent=`background: ${g};`;
+    el('angleGroup').classList.toggle('hidden', type==='radial');
+    el('shapeGroup').classList.toggle('hidden', type!=='radial');
+    document.querySelectorAll('#typeSeg button').forEach(b=>b.classList.toggle('active', b.getAttribute('data-type')===type));
+  }
+
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1700); }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(fallbackCopy.bind(null,text)); }
+    else fallbackCopy(text);
+    toast(t.copiedMsg);
+  }
+  function fallbackCopy(text){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+  }
+
+  // ---- export as image ----
+  // Repaints the exact gradient onto a canvas so raster/PDF exports match the CSS preview.
+  function paintGradient(ctx,W,H,p){
+    const sorted=[...p.stops].sort((a,b)=>a.pos-b.pos);
+    const addStops=g=>{ sorted.forEach(s=>{ try{ g.addColorStop(clamp(s.pos,0,100)/100, s.hex); }catch(_){} }); };
+    if(p.type==='conic'){
+      if(ctx.createConicGradient){ const g=ctx.createConicGradient((p.angle-90)*Math.PI/180, W/2, H/2); addStops(g); ctx.fillStyle=g; }
+      else { ctx.fillStyle=sorted[0].hex; }
+      ctx.fillRect(0,0,W,H); return;
+    }
+    if(p.type==='radial'){
+      if(p.shape==='ellipse'){
+        ctx.save(); ctx.translate(W/2,H/2); ctx.scale(W/2,H/2);
+        const g=ctx.createRadialGradient(0,0,0,0,0,Math.SQRT2); addStops(g);
+        ctx.fillStyle=g; ctx.fillRect(-1,-1,2,2); ctx.restore();
+      } else {
+        const cx=W/2, cy=H/2, r=Math.sqrt(cx*cx+cy*cy);
+        const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r); addStops(g);
+        ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      }
+      return;
+    }
+    // linear — same gradient-line math the browser uses for `linear-gradient(Ndeg,...)`
+    const rad=p.angle*Math.PI/180, dx=Math.sin(rad), dy=-Math.cos(rad);
+    const cx=W/2, cy=H/2, len=Math.abs(W*Math.sin(rad))+Math.abs(H*Math.cos(rad));
+    const g=ctx.createLinearGradient(cx-dx*len/2, cy-dy*len/2, cx+dx*len/2, cy+dy*len/2);
+    addStops(g); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  }
+  function makeCanvas(W,H){
+    const c=document.createElement('canvas'); c.width=W; c.height=H;
+    paintGradient(c.getContext('2d'), W, H, {type,angle,shape,stops});
+    return c;
+  }
+  function expSize(){
+    return { w:Math.round(clamp(el('expW').value,16,8000)), h:Math.round(clamp(el('expH').value,16,8000)) };
+  }
+  function downloadBlob(blob,name){
+    const u=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(u),1500);
+  }
+
+  // vector SVG for linear/radial; conic falls back to an embedded raster (SVG has no conic)
+  function svgMarkup(W,H){
+    const sorted=[...stops].sort((a,b)=>a.pos-b.pos);
+    const st=sorted.map(s=>`<stop offset="${clamp(s.pos,0,100)}%" stop-color="${s.hex}"/>`).join('');
+    if(type==='linear'){
+      const rad=angle*Math.PI/180, dx=Math.sin(rad), dy=-Math.cos(rad);
+      const cx=W/2, cy=H/2, len=Math.abs(W*Math.sin(rad))+Math.abs(H*Math.cos(rad));
+      return `<defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="${(cx-dx*len/2).toFixed(2)}" y1="${(cy-dy*len/2).toFixed(2)}" x2="${(cx+dx*len/2).toFixed(2)}" y2="${(cy+dy*len/2).toFixed(2)}">${st}</linearGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/>`;
+    }
+    if(type==='radial'){
+      if(shape==='ellipse') return `<defs><radialGradient id="g" cx="50%" cy="50%" r="70.71%">${st}</radialGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/>`;
+      const cx=W/2, cy=H/2, r=Math.sqrt(cx*cx+cy*cy);
+      return `<defs><radialGradient id="g" gradientUnits="userSpaceOnUse" cx="${cx}" cy="${cy}" r="${r.toFixed(2)}">${st}</radialGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/>`;
+    }
+    return null;
+  }
+  function exportSVG(W,H){
+    const inner=svgMarkup(W,H); let svg;
+    if(inner) svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${inner}</svg>`;
+    else{
+      const url=makeCanvas(W,H).toDataURL('image/png');
+      svg=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><image width="${W}" height="${H}" xlink:href="${url}"/></svg>`;
+    }
+    downloadBlob(new Blob([svg],{type:'image/svg+xml'}), 'kolkli-gradient.svg');
+  }
+  // minimal single-page PDF that embeds the gradient as a JPEG (no external library)
+  function exportPDF(W,H){
+    const bin=atob(makeCanvas(W,H).toDataURL('image/jpeg',0.92).split(',')[1]);
+    const offsets=[]; let pdf='%PDF-1.3\n%\xFF\xFF\xFF\xFF\n';
+    const add=s=>{ offsets.push(pdf.length); pdf+=s; };
+    add('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+    add('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+    add('3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n');
+    add('4 0 obj\n<< /Type /XObject /Subtype /Image /Width '+W+' /Height '+H+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+bin.length+' >>\nstream\n'+bin+'\nendstream\nendobj\n');
+    const content='q '+W+' 0 0 '+H+' 0 0 cm /Im0 Do Q';
+    add('5 0 obj\n<< /Length '+content.length+' >>\nstream\n'+content+'\nendstream\nendobj\n');
+    const xrefPos=pdf.length;
+    let xref='xref\n0 6\n0000000000 65535 f \n';
+    offsets.forEach(o=>{ xref+=String(o).padStart(10,'0')+' 00000 n \n'; });
+    pdf+=xref+'trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n'+xrefPos+'\n%%EOF';
+    const bytes=new Uint8Array(pdf.length);
+    for(let i=0;i<pdf.length;i++) bytes[i]=pdf.charCodeAt(i)&0xff;
+    downloadBlob(new Blob([bytes],{type:'application/pdf'}), 'kolkli-gradient.pdf');
+  }
+  function doExport(fmt){
+    try{
+      const {w,h}=expSize();
+      if(fmt==='svg'){ exportSVG(w,h); toast(t.savedMsg); return; }
+      if(fmt==='pdf'){ exportPDF(w,h); toast(t.savedMsg); return; }
+      const mime = fmt==='jpg'?'image/jpeg' : fmt==='webp'?'image/webp' : 'image/png';
+      makeCanvas(w,h).toBlob(b=>{
+        if(!b){ toast(t.exportErr); return; }
+        downloadBlob(b, 'kolkli-gradient.'+fmt); toast(t.savedMsg);
+      }, mime, fmt==='png'?undefined:0.92);
+    }catch(_){ toast(t.exportErr); }
+  }
+  el('exportGrid').addEventListener('click',e=>{
+    const b=e.target.closest('[data-export]'); if(!b) return;
+    doExport(b.getAttribute('data-export'));
+  });
+
+  // ---- events ----
+  // gradient type
+  el('typeSeg').addEventListener('click',e=>{
+    const b=e.target.closest('[data-type]'); if(!b) return;
+    type=b.getAttribute('data-type'); render();
+  });
+
+  // angle
+  el('angleRange').addEventListener('input',e=>{ angle=clamp(e.target.value,0,360); el('angleNum').value=angle; render(); });
+  el('angleNum').addEventListener('input',e=>{ angle=clamp(e.target.value,0,360); el('angleRange').value=angle; render(); });
+  el('angleNum').addEventListener('blur',()=>{ el('angleNum').value=angle; });
+
+  // shape (radial)
+  el('shapeSel').addEventListener('change',e=>{ shape=e.target.value; render(); });
+
+  // stops (delegated; do NOT rebuild rows on color/pos edit so the native picker stays open)
+  el('stopsList').addEventListener('input',e=>{
+    const row=e.target.closest('.stoprow'); if(!row) return;
+    const i=+row.getAttribute('data-i'), role=e.target.getAttribute('data-role');
+    if(role==='color'){ stops[i].hex=e.target.value.toUpperCase(); render(); }
+    else if(role==='pos'){ stops[i].pos=clamp(e.target.value,0,100); render(); }
+  });
+  el('stopsList').addEventListener('blur',e=>{
+    if(e.target.getAttribute && e.target.getAttribute('data-role')==='pos'){
+      const i=+e.target.closest('.stoprow').getAttribute('data-i'); e.target.value=stops[i].pos;
+    }
+  }, true);
+  el('stopsList').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-role="rm"]'); if(!btn) return;
+    if(stops.length<=2) return;
+    const i=+btn.closest('.stoprow').getAttribute('data-i');
+    stops.splice(i,1); renderStops(); render();
+  });
+
+  // add stop
+  el('addStop').addEventListener('click',()=>{
+    if(stops.length>=6) return;
+    const sorted=[...stops].sort((a,b)=>a.pos-b.pos);
+    const last=sorted[sorted.length-1], prev=sorted[sorted.length-2];
+    const pos=clamp(Math.round((last.pos+(prev?prev.pos:0))/2),0,100);
+    stops.push({hex:randHex(), pos});
+    renderStops(); render();
+  });
+
+  // random
+  el('randomBtn').addEventListener('click',()=>{
+    stops.forEach(s=>s.hex=randHex());
+    if(type!=='radial'){ angle=Math.floor(Math.random()*361); el('angleRange').value=angle; el('angleNum').value=angle; }
+    renderStops(); render();
+  });
+
+  // copy
+  document.querySelectorAll('.copybtn').forEach(b=>{
+    b.addEventListener('click',()=>{ const target=el(b.getAttribute('data-copy')); if(target) copy(target.textContent); });
+  });
+
+  // presets
+  el('presets').innerHTML = PRESETS.map((p,i)=>`<button type="button" data-p="${i}" style="background:${gradFrom(p)}" title="preset ${i+1}"></button>`).join('');
+  el('presets').addEventListener('click',e=>{
+    const b=e.target.closest('[data-p]'); if(!b) return;
+    const p=PRESETS[+b.getAttribute('data-p')];
+    type=p.type; angle=p.angle; shape=p.shape||'circle';
+    stops=p.stops.map(s=>({hex:s.hex, pos:s.pos}));
+    el('angleRange').value=angle; el('angleNum').value=angle; el('shapeSel').value=shape;
+    renderStops(); render();
+  });
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    if(!I18N[l]) l='en';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+  window.__setLang=applyLang;
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  renderStops();
+  render();
+})();
+</script>
+</body>
+</html>

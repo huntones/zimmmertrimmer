@@ -47,7 +47,10 @@
   //   billing → worker-billing/ (Stripe checkout + portal)
   window.KOLKLI_WORKERS = {
     storage: 'YOUR_STORAGE_WORKER_URL',
-    billing: 'YOUR_BILLING_WORKER_URL'
+    billing: 'YOUR_BILLING_WORKER_URL',
+    // Optional separate URL. Leave as placeholder to reuse `storage`,
+    // because /usage/* lives in worker/src/index.js by default.
+    usage: 'YOUR_USAGE_WORKER_URL'
   };
   // Returns a usable worker base URL (no trailing slash) or '' if unset.
   window.kolkliWorker = function (name) {

@@ -20,6 +20,21 @@ ALLOWED_ORIGIN    = "*"
 #   R2_ACCESS_KEY_ID       ← from R2 → Manage API Tokens
 #   R2_SECRET_ACCESS_KEY   ← from R2 → Manage API Tokens
 
+# --- Durable Object: free/anonymous usage limits --------------------
+# Required for /usage/* quota enforcement. The object stores counters
+# by Israel calendar day and combines signed-in/free user id, anonymous
+# browser id, browser fingerprint and IP-based abuse limits.
+[[durable_objects.bindings]]
+name = "USAGE_LIMITER"
+class_name = "UsageLimiter"
+
+[[migrations]]
+tag = "v1"
+# SQLite-backed DO: runs on the Workers FREE plan (and paid). Uses the same
+# storage.get/put/transaction API the code already calls. Do NOT switch this
+# to new_classes after first deploy — the storage backend can't be changed.
+new_sqlite_classes = ["UsageLimiter"]
+
 # --- Optional: direct bucket binding --------------------------------
 # Only needed if you switch index.js to the "proxy upload" fallback
 # (streaming bytes through the Worker) instead of presigned URLs.

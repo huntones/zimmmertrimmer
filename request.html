@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{width:min(80vw,1380px);max-width:80vw;margin:0 auto;padding:16px 0 18px;}
+  .wrap{width:min(96vw,1760px);max-width:96vw;margin:0 auto;padding:16px 0 18px;}
   @media (max-width:840px){ .wrap{width:100%;max-width:none;padding:18px 14px 48px;} }
 
   /* page intro */
@@ -85,7 +85,7 @@
   .opt{margin-bottom:16px;}
   .opt > label,.optlbl{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
   .optlbl .req{color:var(--danger);}
-  .hint{font-size:11px;color:var(--faint);margin-top:6px;}
+  .hint{font-size:12px;color:var(--faint);margin-top:6px;}
   .inp,.ta{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
     font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
   .inp:focus,.ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
@@ -116,19 +116,19 @@
 
   /* live client preview */
   .side{padding:18px;position:sticky;top:16px;}
-  .side .plabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:10px;}
+  .side .plabel{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:10px;}
   .pvcard{border:1px solid var(--line-2);border-radius:14px;overflow:hidden;background:var(--panel-2);}
   .pvcard .pv-top{background:var(--grad-soft);padding:16px;text-align:center;border-bottom:1px solid var(--line-2);}
   .pvcard .pv-ava{width:46px;height:46px;margin:0 auto 10px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:#fff;color:var(--accent);box-shadow:var(--shadow-sm);}
   .pvcard .pv-ava svg{width:23px;height:23px;}
-  .pvcard .pv-name{font-size:15px;font-weight:700;color:var(--ink);word-break:break-word;}
-  .pvcard .pv-desc{font-size:12px;color:var(--muted);margin-top:4px;white-space:pre-wrap;word-break:break-word;}
+  .pvcard .pv-name{font-size:16px;font-weight:700;color:var(--ink);word-break:break-word;}
+  .pvcard .pv-desc{font-size:13px;color:var(--muted);margin-top:4px;white-space:pre-wrap;word-break:break-word;}
   .pvcard .pv-body{padding:14px;}
-  .pvcard .pv-drop{border:1.4px dashed var(--line);border-radius:11px;padding:18px;text-align:center;color:var(--faint);font-size:12px;background:var(--panel);}
+  .pvcard .pv-drop{border:1.4px dashed var(--line);border-radius:11px;padding:18px;text-align:center;color:var(--faint);font-size:13px;background:var(--panel);}
   .pvcard .pv-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
 
   /* chips */
-  .chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-family:var(--mono);color:var(--muted);
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-family:var(--mono);color:var(--muted);
     background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:5px 11px;}
   .chip svg{width:13px;height:13px;color:var(--accent);}
   .chip.warn{background:var(--warm-soft);border-color:var(--warm-line);color:var(--warn);}
@@ -136,15 +136,15 @@
 
   @media (min-width:841px){
     .wrap{padding-top:8px;padding-bottom:8px;}
-    .pagehead{margin-bottom:10px;}
-    .pagehead .kick{font-size:10.5px;padding:3px 9px;margin-bottom:7px;}
-    .pagehead h2{font-size:clamp(21px,2.3vw,27px);margin-bottom:3px;}
-    .pagehead p{font-size:13px;line-height:1.36;max-width:58ch;}
-    .tabs{margin-bottom:12px;}
-    .tab{height:34px;padding:0 13px;font-size:12.5px;}
+    .pagehead{margin-bottom:12px;}
+    .pagehead .kick{font-size:11.5px;padding:4px 10px;margin-bottom:8px;}
+    .pagehead h2{font-size:clamp(23px,2.5vw,30px);margin-bottom:4px;}
+    .pagehead p{font-size:14.5px;line-height:1.4;max-width:60ch;}
+    .tabs{margin-bottom:14px;}
+    .tab{height:38px;padding:0 15px;font-size:13.5px;}
     .grid{grid-template-columns:minmax(0,1fr) minmax(260px,320px);gap:14px;}
-    .form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 12px;padding:14px;}
-    .form h3{grid-column:1/-1;margin:0;font-size:14px;}
+    .form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px;padding:16px;}
+    .form h3{grid-column:1/-1;margin:0;font-size:15.5px;}
     .form > .opt{margin-bottom:0;}
     .form > .opt:nth-child(2),
     .form > .opt:nth-child(3),
@@ -152,17 +152,17 @@
     .form > .opt:nth-child(5),
     .form > .opt:nth-child(9){grid-column:span 2;}
     .form > .opt:nth-child(10){align-self:end;}
-    .form > .two{grid-column:span 2;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px;}
+    .form > .two{grid-column:span 2;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 10px;}
     .form > .two .opt{margin-bottom:0;}
-    .opt > label,.optlbl{font-size:12px;margin-bottom:4px;}
-    .inp,.ta{padding:7px 10px;font-size:12.5px;}
-    .ta{min-height:44px;}
-    .hint{margin-top:3px;line-height:1.25;}
-    .typechips{gap:6px;}
-    .tchip{padding:5px 9px;font-size:11.5px;}
+    .opt > label,.optlbl{font-size:13.5px;margin-bottom:5px;}
+    .inp,.ta{padding:9px 12px;font-size:14px;}
+    .ta{min-height:48px;}
+    .hint{margin-top:4px;line-height:1.3;}
+    .typechips{gap:7px;}
+    .tchip{padding:6px 11px;font-size:13px;}
     .chkline{margin-bottom:0;}
-    .primary{grid-column:span 2;align-self:end;min-height:38px;padding:9px 16px;margin-top:0;font-size:14px;}
-    .opterr{grid-column:span 2;margin-top:0;align-self:center;}
+    .primary{grid-column:1/-1;justify-self:center;width:min(480px,100%);align-self:center;min-height:44px;padding:12px 24px;margin-top:6px;font-size:15.5px;}
+    .opterr{grid-column:1/-1;margin-top:2px;align-self:center;}
     .side{position:static;padding:14px;}
     .side .plabel{margin-bottom:7px;}
     .pvcard .pv-top{padding:12px;}
@@ -185,21 +185,21 @@
 
   @media (min-width:1100px) and (min-height:760px){
     .wrap{padding-top:12px;padding-bottom:12px;}
-    .pagehead{margin-bottom:12px;}
-    .pagehead .kick{font-size:11px;padding:4px 10px;margin-bottom:8px;}
-    .pagehead h2{font-size:clamp(24px,2.35vw,31px);margin-bottom:4px;}
-    .pagehead p{font-size:14px;line-height:1.42;max-width:62ch;}
-    .tabs{margin-bottom:14px;}
-    .tab{height:36px;padding:0 15px;font-size:13px;}
+    .pagehead{margin-bottom:14px;}
+    .pagehead .kick{font-size:12px;padding:4px 11px;margin-bottom:9px;}
+    .pagehead h2{font-size:clamp(26px,2.7vw,34px);margin-bottom:6px;}
+    .pagehead p{font-size:15.5px;line-height:1.5;max-width:64ch;}
+    .tabs{margin-bottom:16px;}
+    .tab{height:40px;padding:0 17px;font-size:14.5px;}
     .grid{grid-template-columns:minmax(0,1fr) minmax(310px,380px);gap:16px;}
-    .form{gap:10px 14px;padding:18px;}
-    .form h3{font-size:15px;}
-    .opt > label,.optlbl{font-size:12.5px;margin-bottom:5px;}
-    .inp,.ta{font-size:13px;padding:8px 11px;}
-    .ta{min-height:52px;}
-    .typechips{gap:7px;}
-    .tchip{padding:6px 11px;font-size:12px;}
-    .primary{min-height:42px;padding:10px 18px;font-size:14.5px;}
+    .form{gap:12px 16px;padding:20px;}
+    .form h3{font-size:17px;}
+    .opt > label,.optlbl{font-size:14.5px;margin-bottom:6px;}
+    .inp,.ta{font-size:15px;padding:10px 13px;}
+    .ta{min-height:56px;}
+    .typechips{gap:8px;}
+    .tchip{padding:7px 13px;font-size:13.5px;}
+    .primary{min-height:48px;padding:13px 26px;font-size:16.5px;}
     .side{padding:16px;}
     .pvcard .pv-top{padding:15px;}
     .pvcard .pv-ava{width:44px;height:44px;margin-bottom:8px;}
@@ -431,7 +431,7 @@
               <div class="optlbl" data-i18n="fMaxCount"></div>
               <select class="inp" id="fMaxCount">
                 <option value="0" data-i18n="noLimit"></option>
-                <option value="5">5</option>
+                <option value="5" selected>5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
@@ -622,7 +622,7 @@
       pageTitle:'קבלו קבצים ישירות מהלקוחות שלכם',
       pageSub:'צרו קישור העלאה, שלחו ללקוח, וכל הקבצים נכנסים אוטומטית לתיקייה מסודרת אצלכם. הלקוח לא צריך חשבון או התחברות.',
       tabCreate:'בקשה חדשה', tabManage:'הזמנות שהתקבלו',
-      formTitle:'יצירת בקשת קבצים',
+      formTitle:'יצירת קישור לקבלת קבצים',
       fName:'שם הבקשה', fNamePh:'לדוגמה: תמונות לאירוע',
       fDesc:'הנחיות ללקוח', fDescPh:'מה בדיוק להעלות? כמה מילים שיראה הלקוח…',
       fFolder:'תיקיית יעד', fNewFolderPh:'שם תיקייה חדשה', newFolderOpt:'＋ תיקייה חדשה…',
@@ -643,7 +643,7 @@
       seam:'הדגמה מקומית: הבקשות והקבצים נשמרים בדפדפן הזה. עם חיבור השרת הקישור יעבוד לכל לקוח מכל מכשיר.',
       foot:'KOLKLI · Kolkli Request · הדגמה מקומית עד לחיבור השרת',
       mgTitle:'הזמנות שהתקבלו', newReq:'בקשה חדשה',
-      mgEmptyTitle:'עדיין אין בקשות', mgEmptyBody:'צרו בקשת קבצים ראשונה כדי לקבל קבצים מלקוחות בקישור אחד.',
+      mgEmptyTitle:'עדיין אין בקשות', mgEmptyBody:'צרו בקשה ראשונה כדי לקבל קבצים מלקוחות בקישור אחד.',
       stActive:'פעיל', stExpired:'פג תוקף', stClosed:'נסגר',
       chipFolder:f=>`תיקייה: ${f}`, chipFiles:n=>`${n} קבצים`, chipSize:s=>s,
       chipCreated:d=>`נוצר ${d}`, chipExpires:d=>`פג ${d}`, chipExpired:'פג תוקף', chipNoExpiry:'ללא תפוגה',
@@ -778,6 +778,10 @@
 
   // ---------- helpers ----------
   function toast(msg){ const b=el('toast'); b.textContent=msg; b.classList.add('show'); clearTimeout(b._t); b._t=setTimeout(()=>b.classList.remove('show'),1900); }
+  function withUsage(tool,payload,work){
+    if(window.KolkliUsage && window.KolkliUsage.guard) return window.KolkliUsage.guard(tool,payload,work);
+    return Promise.resolve().then(work);
+  }
   function confirmDialog(opts){
     return new Promise(resolve=>{
       const overlay=el('cf'), okBtn=el('cfConfirm'), cancelBtn=el('cfCancel'), ico=el('cfIco');
@@ -858,7 +862,7 @@
     const chosen=TYPE_KEYS.filter(k=>createTypes[k]);
     if(chosen.length && chosen.length<TYPE_KEYS.length) chips.push(chosen.map(k=>lblForType(k)).join(' · '));
     const mf=+el('fMaxFile').value; if(mf) chips.push('≤ '+(mf>=1000?(mf/1000)+' GB':mf+' MB'));
-    const mc=+el('fMaxCount').value; if(mc) chips.push('≤ '+mc);
+    const mc=+el('fMaxCount').value || 5; if(mc) chips.push('≤ '+mc);
     const ex=+el('fExpiry').value; if(ex) chips.push(daysWord(ex));
     if(el('fPwToggle').checked) chips.push('🔒');
     el('pvChips').innerHTML = chips.map(c=>`<span class="chip">${KR.escapeHtml(c)}</span>`).join('');
@@ -873,22 +877,33 @@
 
     let folder=el('fFolder').value;
     if(folder==='__new'){ folder=el('fNewFolder').value.trim() || 'Inbox'; }
-    KR.addFolder(folder);
 
-    const days=+el('fExpiry').value;
-    const req={
-      token: KR.randToken(),
-      name, desc: el('fDesc').value.trim(), folder,
-      types: TYPE_KEYS.filter(k=>createTypes[k]),
-      maxFileMB:+el('fMaxFile').value, maxCount:+el('fMaxCount').value, maxTotalMB:+el('fMaxTotal').value,
-      expiresAt: days? Date.now()+days*86400000 : 0,
-      createdAt: Date.now(),
-      password: pwOn? await KR.hashPass(pwVal) : null,
-      thankYou: el('fThanks').value.trim(),
-      notify: el('fNotify').checked,
-      status:'active', submissions:[], files:[]
-    };
-    KR.upsertRequest(req);
+    const rawMaxCount=+el('fMaxCount').value;
+    const effectiveMaxCount=rawMaxCount || 5;
+    let req;
+    try{
+      req = await withUsage('request-files', { files:effectiveMaxCount }, async()=>{
+        KR.addFolder(folder);
+        const days=+el('fExpiry').value;
+        const next={
+          token: KR.randToken(),
+          name, desc: el('fDesc').value.trim(), folder,
+          types: TYPE_KEYS.filter(k=>createTypes[k]),
+          maxFileMB:+el('fMaxFile').value, maxCount:effectiveMaxCount, maxTotalMB:+el('fMaxTotal').value,
+          expiresAt: days? Date.now()+days*86400000 : 0,
+          createdAt: Date.now(),
+          password: pwOn? await KR.hashPass(pwVal) : null,
+          thankYou: el('fThanks').value.trim(),
+          notify: el('fNotify').checked,
+          status:'active', submissions:[], files:[]
+        };
+        KR.upsertRequest(next);
+        return next;
+      });
+    }catch(err){
+      if(err && err.usage) return;
+      throw err;
+    }
     lastToken=req.token;
     showShare(req);
     updateCount();
@@ -931,7 +946,7 @@
     el('fName').value=''; el('fDesc').value=''; el('fThanks').value=''; el('fPassword').value='';
     el('fPwToggle').checked=false; el('fPassword').classList.add('hidden');
     el('fNotify').checked=true;
-    el('fMaxFile').value='0'; el('fMaxCount').value='0'; el('fMaxTotal').value='0'; el('fExpiry').value='7';
+    el('fMaxFile').value='0'; el('fMaxCount').value='5'; el('fMaxTotal').value='0'; el('fExpiry').value='7';
     createTypes={}; renderTypeChips(); fillFolders();
     el('fNewFolder').classList.add('hidden'); el('fNewFolder').value='';
     el('createErr').textContent=''; lastToken=null;

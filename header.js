@@ -27,8 +27,8 @@
 
   var T = {
     he: { navTools:'כלי עריכה', navDev:'כלי עיצוב ודיגיטל', navAI:'כלי AI', navText:'כלי טקסט', navConvert:'המרה', navCompress:'דחיסה', navMarketing:'כלי שיווק וקישורים', navCalc:'מחשבונים',
-          navSend:'שליחת קבצים', navRequest:'בקשת קבצים', navProducts:'כלי קבצים', navPricing:'מסלולים ומחירים', navSignin:'התחברות', navStart:'הרשמה', navNew:'חדש',
-          acctDash:'החשבון שלי', acctFiles:'הקבצים שלי', acctRequest:'בקשות קבצים', acctReview:'אישורי לקוח', acctSettings:'הגדרות', acctLanguage:'שפות', acctAdmin:'ניהול', acctLogout:'התנתקות' },
+          navSend:'שליחת קבצים', navRequest:'קבלת קבצים', navProducts:'כלי קבצים', navPricing:'מסלולים ומחירים', navSignin:'התחברות', navStart:'הרשמה', navNew:'חדש',
+          acctDash:'החשבון שלי', acctFiles:'הקבצים שלי', acctRequest:'קבלת קבצים', acctReview:'אישורי לקוח', acctSettings:'הגדרות', acctLanguage:'שפות', acctAdmin:'ניהול', acctLogout:'התנתקות' },
     en: { navTools:'Editing Tools', navDev:'Design & Digital', navAI:'AI Tools', navText:'Text Tools', navConvert:'Convert', navCompress:'Compress', navMarketing:'Marketing & Links', navCalc:'Calculators',
           navSend:'Send Files', navRequest:'Request Files', navProducts:'Files', navPricing:'Pricing', navSignin:'Login', navStart:'Sign Up', navNew:'New',
           acctDash:'My Account', acctFiles:'My Files', acctRequest:'File Requests', acctReview:'Client Review', acctSettings:'Settings', acctLanguage:'Language', acctAdmin:'Admin', acctLogout:'Log out' },
@@ -49,7 +49,7 @@
 
   // [ i18n key, page path from the site root ]  (navTools + navProducts are dropdowns → null path)
   var LINKS = [
-    ['navTools', null], ['navProducts', null], ['navPricing', 'pricing/'], ['navAI', 'ai/'], ['navDev', null], ['navText', null]
+    ['navTools', null], ['navProducts', null], ['navAI', 'ai/'], ['navPricing', 'pricing/'], ['navDev', null], ['navText', null]
   ];
 
   // "Products" dropdown: the three file-transfer product pages. Each links to its
@@ -58,11 +58,11 @@
   var PRODUCTS = [
     { ic:'folder', page:'files.html',   he:'ארגון קבצים', en:'Organize Files',  ru:'Упорядочить файлы',
       dhe:'בחירה וניהול הקבצים שלך', den:'Pick & manage your files', dru:'Выбор и управление файлами' },
-    { ic:'inbox',  page:'request.html', he:'בקשת קבצים',  en:'Request Files', ru:'Запрос файлов',
+    { ic:'inbox',  page:'request.html', he:'קבלת קבצים',  en:'Request Files', ru:'Запрос файлов',
       dhe:'איסוף קבצים מאחרים', den:'Collect files from others', dru:'Сбор файлов от других' },
     { ic:'send',   page:'send.html',    he:'שליחת קבצים', en:'Send Files',    ru:'Отправка файлов',
       dhe:'שיתוף קבצים גדולים בקישור', den:'Share big files by link', dru:'Большие файлы по ссылке' },
-    { ic:'check',  page:'review.html',  he:'אישור לקוח',  en:'Client Review', ru:'Одобрение клиента',
+    { ic:'check',  page:'review.html',  he:'משוב ואישור קבצים',  en:'Client Review', ru:'Одобрение клиента',
       dhe:'שליחה לאישור הלקוח', den:'Send work for client sign-off', dru:'Отправка работы на одобрение' }
   ];
 
@@ -229,7 +229,7 @@
     }).join('');
     var f = MEGA_FOOT[lang] || MEGA_FOOT.en;
     var foot = '<span class="sh-foot-t"><span class="sh-foot-badge">' + f[0] + '</span> ' + f[1] + '</span>' +
-      '<a class="sh-foot-cta" href="' + link('ai/') + '">' + f[2] + '</a>';
+      '<a class="sh-foot-cta" href="' + link('tools/') + '">' + f[2] + '</a>';
     return '<div class="sh-mega-in">' + cols + '</div><div class="sh-mega-foot">' + foot + '</div>';
   }
 
@@ -242,32 +242,32 @@
   var DEVTOOLS = [
     { c:'color', i:'🎨', he:'צבע', en:'Color', ru:'Цвет', items:[
       { he:'ממיר צבעים', en:'Color Converter', ru:'Конвертер цвета', dhe:'HEX, RGB, HSL, CMYK', den:'HEX, RGB, HSL, CMYK', dru:'HEX, RGB, HSL, CMYK', ic:'swatch', page:'./color-convert.html' },
-      { he:'מחולל פלטת צבעים', en:'Palette Generator', ru:'Генератор палитр', dhe:'פלטה מצבע או מתמונה', den:'From a color or image', dru:'Из цвета или картинки', ic:'palette' },
-      { he:'בודק ניגודיות', en:'Contrast Checker', ru:'Проверка контраста', dhe:'קריאות טקסט על רקע', den:'Text vs. background', dru:'Текст на фоне', ic:'contrast' }
+      { he:'מחולל פלטת צבעים', en:'Palette Generator', ru:'Генератор палитр', dhe:'פלטה מצבע או מתמונה', den:'From a color or image', dru:'Из цвета или картинки', ic:'palette', page:'./palette-generator.html' },
+      { he:'בודק ניגודיות', en:'Contrast Checker', ru:'Проверка контраста', dhe:'קריאות טקסט על רקע', den:'Text vs. background', dru:'Текст на фоне', ic:'contrast', page:'./contrast-checker.html' }
     ]},
     { c:'css', i:'🧩', he:'CSS', en:'CSS', ru:'CSS', items:[
-      { he:'מחולל Gradient', en:'Gradient Generator', ru:'Генератор градиентов', dhe:'גרדיאנט + קוד CSS', den:'Gradient + CSS code', dru:'Градиент + CSS', ic:'gradient' },
-      { he:'מחולל Box Shadow', en:'Box Shadow', ru:'Box Shadow', dhe:'צל + קוד CSS', den:'Shadow + CSS code', dru:'Тень + CSS', ic:'shadow' },
-      { he:'מחולל Border Radius', en:'Border Radius', ru:'Border Radius', dhe:'פינות מעוגלות + CSS', den:'Rounded corners + CSS', dru:'Скругление + CSS', ic:'radius' }
+      { he:'מחולל Gradient', en:'Gradient Generator', ru:'Генератор градиентов', dhe:'גרדיאנט + קוד CSS', den:'Gradient + CSS code', dru:'Градиент + CSS', ic:'gradient', page:'./gradient-generator.html' },
+      { he:'מחולל Box Shadow', en:'Box Shadow', ru:'Box Shadow', dhe:'צל + קוד CSS', den:'Shadow + CSS code', dru:'Тень + CSS', ic:'shadow', page:'./box-shadow.html' },
+      { he:'מחולל Border Radius', en:'Border Radius', ru:'Border Radius', dhe:'פינות מעוגלות + CSS', den:'Rounded corners + CSS', dru:'Скругление + CSS', ic:'radius', page:'./border-radius.html' }
     ]},
     { c:'code', i:'⌨️', he:'קוד ונתונים', en:'Code & Data', ru:'Код и данные', items:[
-      { he:'תמונה ל-Base64', en:'Image to Base64', ru:'Изображение в Base64', dhe:'הטמעת תמונה בקוד', den:'Inline an image', dru:'Встроить картинку', ic:'image' },
-      { he:'כיווץ CSS / JS', en:'Minify CSS / JS', ru:'Минификация CSS/JS', dhe:'הקטנת קוד', den:'Shrink your code', dru:'Уменьшить код', ic:'minify' },
-      { he:'JSON Formatter', en:'JSON Formatter', ru:'JSON-форматтер', dhe:'סידור ובדיקת JSON', den:'Prettify & validate', dru:'Форматирование JSON', ic:'braces' },
-      { he:'URL Encoder / Decoder', en:'URL Encoder / Decoder', ru:'URL-кодировщик', dhe:'קידוד ופענוח כתובות', den:'Encode & decode URLs', dru:'Кодирование URL', ic:'link' },
+      { he:'תמונה ל-Base64', en:'Image to Base64', ru:'Изображение в Base64', dhe:'הטמעת תמונה בקוד', den:'Inline an image', dru:'Встроить картинку', ic:'image', page:'./image-to-base64.html' },
+      { he:'כיווץ CSS / JS', en:'Minify CSS / JS', ru:'Минификация CSS/JS', dhe:'הקטנת קוד', den:'Shrink your code', dru:'Уменьшить код', ic:'minify', page:'./minify.html' },
+      { he:'JSON Formatter', en:'JSON Formatter', ru:'JSON-форматтер', dhe:'סידור ובדיקת JSON', den:'Prettify & validate', dru:'Форматирование JSON', ic:'braces', page:'./json-formatter.html' },
+      { he:'URL Encoder / Decoder', en:'URL Encoder / Decoder', ru:'URL-кодировщик', dhe:'קידוד ופענוח כתובות', den:'Encode & decode URLs', dru:'Кодирование URL', ic:'link', page:'./url-encode.html' },
       { he:'היפוך טקסט', en:'KolKli Reverse', ru:'Обратный текст', dhe:'היפוך חכם עם פיסוק וסוגריים', den:'Smart reverse with punctuation', dru:'Умный переворот текста', ic:'flip', page:'./text-tools.html#reverse' },
-      { he:'מנקה HTML', en:'HTML Cleaner', ru:'Очистка HTML', dhe:'הסרת תגיות מיותרות', den:'Strip junk tags', dru:'Убрать лишние теги', ic:'eraser' }
+      { he:'מנקה HTML', en:'HTML Cleaner', ru:'Очистка HTML', dhe:'הסרת תגיות מיותרות', den:'Strip junk tags', dru:'Убрать лишние теги', ic:'eraser', page:'./html-cleaner.html' }
     ]},
     { c:'seo', i:'🔎', he:'SEO ו-Meta', en:'SEO & Meta', ru:'SEO и Meta', items:[
-      { he:'מחולל Meta Tags', en:'Meta Tags Generator', ru:'Генератор Meta-тегов', dhe:'Title, OG ו-SEO', den:'Title, OG & SEO', dru:'Title, OG и SEO', ic:'tags' },
-      { he:'בודק אורך Meta', en:'Meta Length Checker', ru:'Длина Meta', dhe:'Title ו-Description', den:'Title & description', dru:'Title и Description', ic:'text' },
-      { he:'מחולל Favicon', en:'Favicon Generator', ru:'Генератор Favicon', dhe:'אייקון מלוגו או תמונה', den:'Icon from a logo', dru:'Иконка из логотипа', ic:'star' },
-      { he:'מחולל קוד Embed', en:'Embed Code', ru:'Код встраивания', dhe:'סרטון, מפה או טופס', den:'Video, map or form', dru:'Видео, карта, форма', ic:'code' }
+      { he:'מחולל Meta Tags', en:'Meta Tags Generator', ru:'Генератор Meta-тегов', dhe:'Title, OG ו-SEO', den:'Title, OG & SEO', dru:'Title, OG и SEO', ic:'tags', page:'./meta-tags.html' },
+      { he:'בודק אורך Meta', en:'Meta Length Checker', ru:'Длина Meta', dhe:'Title ו-Description', den:'Title & description', dru:'Title и Description', ic:'text', page:'./meta-length.html' },
+      { he:'מחולל Favicon', en:'Favicon Generator', ru:'Генератор Favicon', dhe:'אייקון מלוגו או תמונה', den:'Icon from a logo', dru:'Иконка из логотипа', ic:'star', page:'./favicon-generator.html' },
+      { he:'מחולל קוד Embed', en:'Embed Code', ru:'Код встраивания', dhe:'סרטון, מפה או טופס', den:'Video, map or form', dru:'Видео, карта, форма', ic:'code', page:'./embed-code.html' }
     ]},
     { c:'layout', i:'📐', he:'מסך ומידות', en:'Layout & Units', ru:'Экран и размеры', items:[
-      { he:'ממיר מידות מסך', en:'Screen Units', ru:'Единицы экрана', dhe:'PX ל-REM, EM, VW, VH', den:'PX to REM, EM, VW, VH', dru:'PX в REM, EM, VW, VH', ic:'ruler' },
-      { he:'מחשבון יחס תמונה', en:'Aspect Ratio', ru:'Соотношение сторон', dhe:'16:9, 1:1, 4:5, 9:16', den:'16:9, 1:1, 4:5, 9:16', dru:'16:9, 1:1, 4:5, 9:16', ic:'ratio' },
-      { he:'מחולל Placeholder', en:'Placeholder Generator', ru:'Генератор заглушок', dhe:'תמונת דמה עם מידות', den:'Dummy image with size', dru:'Заглушка с размерами', ic:'crop' }
+      { he:'ממיר מידות מסך', en:'Screen Units', ru:'Единицы экрана', dhe:'PX ל-REM, EM, VW, VH', den:'PX to REM, EM, VW, VH', dru:'PX в REM, EM, VW, VH', ic:'ruler', page:'./screen-units.html' },
+      { he:'מחשבון יחס תמונה', en:'Aspect Ratio', ru:'Соотношение сторон', dhe:'16:9, 1:1, 4:5, 9:16', den:'16:9, 1:1, 4:5, 9:16', dru:'16:9, 1:1, 4:5, 9:16', ic:'ratio', page:'./aspect-ratio.html' },
+      { he:'מחולל Placeholder', en:'Placeholder Generator', ru:'Генератор заглушок', dhe:'תמונת דמה עם מידות', den:'Dummy image with size', dru:'Заглушка с размерами', ic:'crop', page:'./placeholder-generator.html' }
     ]}
   ];
 
@@ -945,6 +945,17 @@
     });
   }
 
+  // Server-backed free/anonymous usage quotas. The script computes the
+  // anonymous browser id + fingerprint client-side, then asks the storage
+  // Worker's /usage/* endpoints to authorize and commit usage.
+  if (!document.getElementById('usage-loader')) {
+    var ul = document.createElement('script');
+    ul.id = 'usage-loader';
+    ul.src = link('usage-limits.js');
+    ul.async = false;
+    document.head.appendChild(ul);
+  }
+
   // Floating login / sign-up popup: load it on every page except auth.html
   // (which IS the full-page version). Once loaded it intercepts clicks on any
   // auth.html link — Login / Sign Up here, "Get started free" on the hero — and
@@ -955,5 +966,17 @@
     s.src = link('auth-modal.js');
     s.async = true;
     document.head.appendChild(s);
+  }
+
+  // Site-wide accessibility widget: self-contained, depth-aware, GDPR-friendly
+  // (no external calls, preferences saved only in the visitor's browser). Loaded
+  // on every header page from here; the standalone client pages (download /
+  // proof / select) include accessibility.js directly.
+  if (!document.getElementById('a11y-loader')) {
+    var ax = document.createElement('script');
+    ax.id = 'a11y-loader';
+    ax.src = link('accessibility.js');
+    ax.async = true;
+    document.head.appendChild(ax);
   }
 })();

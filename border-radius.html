@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל Border Radius</title>
+<meta name="description" content="Free CSS border-radius generator — round element corners with a live preview, control each corner or link them together, switch between px and %, and copy ready-to-use CSS. Fast, private, right in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 22px;}
+  .pagehead h1{font-size:clamp(23px,3vw,32px);font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:12px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  .tool{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;}
+  @media (max-width:760px){ .tool{grid-template-columns:1fr;} }
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);}
+
+  .gbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);font-size:13px;font-weight:600;padding:10px 12px;border-radius:11px;
+    cursor:pointer;transition:all .12s;}
+  .gbtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .gbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .gbtn.hidden{display:none;}
+
+  .copybtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--muted);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .copybtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .copybtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  .fstr{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink);background:var(--panel-2);
+    border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;margin-bottom:12px;overflow-x:auto;white-space:nowrap;
+    direction:ltr;text-align:start;}
+
+  .note{display:flex;align-items:flex-start;gap:9px;margin-top:18px;padding:12px 14px;border-radius:12px;
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+    font-size:12px;color:var(--ink-2);line-height:1.55;}
+  .note svg{width:16px;height:16px;color:var(--accent-dim);flex-shrink:0;margin-top:1px;
+    stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ---- border-radius tool ---- */
+  .previewcard{padding:20px;position:sticky;top:16px;}
+  .previewwrap{display:flex;align-items:center;justify-content:center;border-radius:14px;padding:18px;
+    background-image:
+      linear-gradient(45deg,rgba(128,128,128,.10) 25%,transparent 25%,transparent 75%,rgba(128,128,128,.10) 75%),
+      linear-gradient(45deg,rgba(128,128,128,.10) 25%,transparent 25%,transparent 75%,rgba(128,128,128,.10) 75%);
+    background-size:20px 20px;background-position:0 0,10px 10px;}
+  .previewbox{width:100%;height:220px;background:var(--grad);border-radius:24px;
+    box-shadow:0 8px 30px var(--grad-btn-glow);transition:border-radius .12s ease;}
+
+  .controls{display:flex;flex-direction:column;gap:18px;}
+  .ctrlcard{padding:18px;}
+  .outcard{padding:16px 18px 18px;}
+
+  .linkrow{display:flex;align-items:center;gap:12px;padding-bottom:16px;margin-bottom:16px;
+    border-bottom:1px solid var(--line);font-size:14px;font-weight:600;color:var(--ink-2);cursor:pointer;user-select:none;}
+  .switch{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0;direction:ltr;}
+  .switch input{opacity:0;width:0;height:0;position:absolute;margin:0;}
+  .switch .track{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:background .15s;}
+  .switch .track::before{content:'';position:absolute;height:20px;width:20px;left:3px;top:3px;background:#fff;
+    border-radius:50%;transition:transform .15s;box-shadow:var(--shadow-sm);}
+  .switch input:checked + .track{background:var(--accent);}
+  .switch input:checked + .track::before{transform:translateX(18px);}
+
+  .unitrow{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .ctrl-label{font-size:13px;font-weight:700;color:var(--muted);}
+  .seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px;direction:ltr;}
+  .seg-btn{border:0;background:transparent;color:var(--muted);font-family:var(--mono);font-size:13px;font-weight:700;
+    padding:6px 15px;border-radius:8px;cursor:pointer;transition:all .12s;}
+  .seg-btn:hover{color:var(--accent-dim);}
+  .seg-btn.active{background:var(--accent);color:var(--accent-ink);}
+
+  .corners{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;direction:ltr;}
+  @media (max-width:520px){ .corners{grid-template-columns:1fr;} }
+  .corner{background:var(--panel-2);border:1px solid var(--line-2);border-radius:12px;padding:12px 12px 13px;}
+  .corner-label{display:block;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--faint);margin-bottom:10px;text-align:center;}
+  .rng{width:100%;margin:0 0 11px;accent-color:var(--accent);cursor:pointer;display:block;}
+  .numwrap{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:9px;
+    padding:0 10px;transition:border-color .12s,box-shadow .12s;}
+  .numwrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .num{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font-family:var(--mono);font-size:14px;
+    font-weight:600;padding:8px 0;outline:none;text-align:center;}
+  .unitTag{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--faint);}
+
+  .fhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .ftitle{font-size:13px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;}
+  .btnrow{display:flex;gap:10px;margin-top:14px;}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="pageTitle"></h1>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="tool">
+    <!-- live preview -->
+    <div class="card previewcard">
+      <div class="previewwrap">
+        <div class="previewbox" id="previewBox"></div>
+      </div>
+    </div>
+
+    <!-- controls + output -->
+    <div class="controls">
+      <div class="card ctrlcard">
+        <label class="linkrow">
+          <span class="switch"><input type="checkbox" id="linkToggle" checked><span class="track"></span></span>
+          <span data-i18n="linkAll"></span>
+        </label>
+
+        <div class="unitrow">
+          <span class="ctrl-label" data-i18n="unitLabel"></span>
+          <div class="seg" id="unitSeg">
+            <button type="button" class="seg-btn active" data-unit="px">px</button>
+            <button type="button" class="seg-btn" data-unit="%">%</button>
+          </div>
+        </div>
+
+        <div class="corners">
+          <div class="corner">
+            <span class="corner-label" data-i18n="cornerTL"></span>
+            <input type="range" class="rng" id="rngTl" min="0" max="200" value="24" aria-label="top-left">
+            <div class="numwrap"><input type="number" class="num" id="numTl" min="0" max="200" value="24" aria-label="top-left value"><span class="unitTag" id="tagTl">px</span></div>
+          </div>
+          <div class="corner">
+            <span class="corner-label" data-i18n="cornerTR"></span>
+            <input type="range" class="rng" id="rngTr" min="0" max="200" value="24" aria-label="top-right">
+            <div class="numwrap"><input type="number" class="num" id="numTr" min="0" max="200" value="24" aria-label="top-right value"><span class="unitTag" id="tagTr">px</span></div>
+          </div>
+          <div class="corner">
+            <span class="corner-label" data-i18n="cornerBL"></span>
+            <input type="range" class="rng" id="rngBl" min="0" max="200" value="24" aria-label="bottom-left">
+            <div class="numwrap"><input type="number" class="num" id="numBl" min="0" max="200" value="24" aria-label="bottom-left value"><span class="unitTag" id="tagBl">px</span></div>
+          </div>
+          <div class="corner">
+            <span class="corner-label" data-i18n="cornerBR"></span>
+            <input type="range" class="rng" id="rngBr" min="0" max="200" value="24" aria-label="bottom-right">
+            <div class="numwrap"><input type="number" class="num" id="numBr" min="0" max="200" value="24" aria-label="bottom-right value"><span class="unitTag" id="tagBr">px</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card outcard">
+        <div class="fhead">
+          <span class="ftitle">CSS</span>
+          <button class="copybtn" id="copyBtn" type="button"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copy"></span></button>
+        </div>
+        <div class="fstr" id="cssStr">border-radius: 24px;</div>
+        <div class="btnrow">
+          <button class="gbtn" id="randomBtn" type="button">
+            <svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3l-7.5 7.5"/><path d="M3 21l7.5-7.5"/><path d="M16 21h5v-5"/><path d="M14.5 14.5 21 21"/></svg>
+            <span data-i18n="random"></span>
+          </button>
+          <button class="gbtn" id="resetBtn" type="button">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+            <span data-i18n="reset"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <span data-i18n="note"></span>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'מחולל Border Radius',
+      pageTitle:'מחולל Border Radius ל-CSS',
+      pageSub:'עגלו את פינות האלמנט עם תצוגה מקדימה חיה — שלטו בכל פינה בנפרד או בכולן יחד, החליפו בין px ל-%, והעתיקו את קוד ה-CSS המוכן. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      copy:'העתקה', copiedMsg:'הועתק ✓',
+      linkAll:'קשירת כל הפינות',
+      cornerTL:'למעלה משמאל', cornerTR:'למעלה מימין', cornerBR:'למטה מימין', cornerBL:'למטה משמאל',
+      unitLabel:'יחידה', random:'אקראי', reset:'איפוס',
+      note:'השתמשו ב-% לעיגול רספונסיבי שמשתנה עם גודל האלמנט, וב-px לפינות בגודל קבוע. ערך של 50% על ריבוע הופך אותו לעיגול מושלם.',
+      foot:'KOLKLI · מחולל Border Radius · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'Border Radius',
+      pageTitle:'CSS Border-Radius Generator',
+      pageSub:'Round the corners of any element with a live preview — control each corner on its own or all together, switch between px and %, and copy the ready-to-use CSS. Everything runs in your browser; nothing is sent to a server.',
+      copy:'Copy', copiedMsg:'Copied ✓',
+      linkAll:'Link all corners',
+      cornerTL:'Top-left', cornerTR:'Top-right', cornerBR:'Bottom-right', cornerBL:'Bottom-left',
+      unitLabel:'Unit', random:'Random', reset:'Reset',
+      note:'Use % for responsive rounding that scales with the element, and px for fixed-size corners. A value of 50% on a square turns it into a perfect circle.',
+      foot:'KOLKLI · Border-Radius Generator · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'Border Radius',
+      pageTitle:'Генератор CSS border-radius',
+      pageSub:'Скругляйте углы любого элемента с живым предпросмотром — управляйте каждым углом отдельно или всеми сразу, переключайтесь между px и %, и копируйте готовый CSS. Всё работает в браузере; ничего не отправляется на сервер.',
+      copy:'Копировать', copiedMsg:'Скопировано ✓',
+      linkAll:'Связать все углы',
+      cornerTL:'Верхний левый', cornerTR:'Верхний правый', cornerBR:'Нижний правый', cornerBL:'Нижний левый',
+      unitLabel:'Единица', random:'Случайно', reset:'Сброс',
+      note:'Используйте % для адаптивного скругления, которое масштабируется вместе с элементом, и px для фиксированных углов. Значение 50% на квадрате превращает его в идеальный круг.',
+      foot:'KOLKLI · Генератор border-radius · Приватно и быстро, прямо в браузере' }
+  };
+
+  let lang='he', t=I18N.he;
+
+  const CORNERS=['tl','tr','br','bl'];
+  let state={ tl:24, tr:24, br:24, bl:24, unit:'px', linked:true };
+
+  const cap = c => c.charAt(0).toUpperCase()+c.slice(1);
+  function maxFor(){ return state.unit==='%' ? 100 : 200; }
+  function clampV(v){ v=Math.round(+v); if(isNaN(v)) v=0; const m=maxFor(); return v<0?0:(v>m?m:v); }
+
+  function buildRadius(){
+    const {tl,tr,br,bl,unit}=state;
+    if(tl===tr && tr===br && br===bl) return tl+unit;
+    return [tl,tr,br,bl].map(v=>v+unit).join(' ');
+  }
+
+  function render(){
+    const val=buildRadius();
+    el('previewBox').style.borderRadius=val;
+    el('cssStr').textContent='border-radius: '+val+';';
+    const m=maxFor();
+    CORNERS.forEach(c=>{
+      const C=cap(c), rng=el('rng'+C), num=el('num'+C), tag=el('tag'+C);
+      if(String(rng.max)!==String(m)) rng.max=m;
+      if(String(num.max)!==String(m)) num.max=m;
+      if(String(rng.value)!==String(state[c])) rng.value=state[c];
+      if(document.activeElement!==num && String(num.value)!==String(state[c])) num.value=state[c];
+      if(tag) tag.textContent=state.unit;
+    });
+    document.querySelectorAll('#unitSeg .seg-btn').forEach(b=>b.classList.toggle('active', b.getAttribute('data-unit')===state.unit));
+    el('linkToggle').checked=state.linked;
+  }
+
+  function setCorner(c,v){
+    v=clampV(v);
+    if(state.linked){ CORNERS.forEach(k=>state[k]=v); }
+    else state[c]=v;
+    render();
+  }
+
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1700); }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(fallbackCopy.bind(null,text)); }
+    else fallbackCopy(text);
+    toast(t.copiedMsg);
+  }
+  function fallbackCopy(text){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+  }
+
+  // ---- events ----
+  CORNERS.forEach(c=>{
+    const C=cap(c);
+    el('rng'+C).addEventListener('input',e=>setCorner(c,e.target.value));
+    el('num'+C).addEventListener('input',e=>setCorner(c,e.target.value));
+    el('num'+C).addEventListener('blur',()=>{ el('num'+C).value=state[c]; render(); });
+  });
+
+  el('linkToggle').addEventListener('change',e=>{
+    state.linked=e.target.checked;
+    if(state.linked){ const v=state.tl; CORNERS.forEach(k=>state[k]=v); }
+    render();
+  });
+
+  document.querySelectorAll('#unitSeg .seg-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      state.unit=b.getAttribute('data-unit');
+      CORNERS.forEach(k=>state[k]=clampV(state[k]));
+      render();
+    });
+  });
+
+  el('randomBtn').addEventListener('click',()=>{
+    const m=maxFor(), rnd=()=>Math.floor(Math.random()*(m+1));
+    if(state.linked){ const v=rnd(); CORNERS.forEach(k=>state[k]=v); }
+    else CORNERS.forEach(k=>state[k]=rnd());
+    render();
+  });
+
+  el('resetBtn').addEventListener('click',()=>{
+    state={ tl:24, tr:24, br:24, bl:24, unit:'px', linked:true };
+    render();
+  });
+
+  el('copyBtn').addEventListener('click',()=>copy(el('cssStr').textContent));
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    if(!I18N[l]) l='en';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+  window.__setLang=applyLang;
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  render();
+})();
+</script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — תשלום</title>
-<meta name="description" content="Secure KOLKLI checkout — upgrade to Lite or Pro. Encrypted payment, cancel anytime, 14-day money-back guarantee.">
+<meta name="description" content="Secure KOLKLI checkout — upgrade to Lite, Pro or Business. Encrypted payment, cancel anytime, 14-day money-back guarantee.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -88,7 +88,7 @@
   .sec-head h2{font-size:16px;font-weight:700;letter-spacing:-0.01em;margin:0;}
 
   /* plan picker */
-  .plan-pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+  .plan-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;}
   .plan-opt{position:relative;text-align:start;cursor:pointer;border:1.5px solid var(--line);border-radius:15px;
     background:var(--panel-2);padding:15px 15px 14px;transition:border-color .14s,box-shadow .14s,background .14s;}
   .plan-opt:hover{border-color:var(--accent);}
@@ -529,13 +529,35 @@
         he:['שליחה עד 100GB בכל פעם','1TB אחסון בענן','כל הכלים + כלי AI','התראות הורדה · תמיכה בעדיפות'],
         en:['Up to 100GB per transfer','1TB cloud storage','All tools + AI tools','Download alerts · priority support'],
         ru:['До 100 ГБ за передачу','1 ТБ в облаке','Все инструменты + AI','Уведомления · приоритетная поддержка']
+      } },
+    business: { key:'business', base:39.99,
+      he:['Business','לצוותים ועסקים'], en:['Business','For teams & orgs'], ru:['Business','For teams & orgs'],
+      feats:{
+        he:['5 מושבים כלולים','5TB אחסון משותף','שליחה עד 200GB בכל פעם','ניהול צוות והרשאות'],
+        en:['5 seats included','5TB shared storage','Up to 200GB per transfer','Team management & roles'],
+        ru:['5 seats included','5TB shared storage','Up to 200GB per transfer','Team management & roles']
       } }
   };
   const YEAR_MONTHS = 10;                 // yearly = 10 months (2 free) → ~17% off
   const SAVE_PCT = Math.round((1 - YEAR_MONTHS/12) * 100);
 
   /* promo codes (demo) → fractional discount off the subtotal */
-  const PROMOS = { 'KOLKLI10':0.10, 'WELCOME15':0.15, 'SAVE20':0.20 };
+  const PROMOS = {
+    KOLKLI10: { rate:0.10 },
+    WELCOME15: { rate:0.15 },
+    SAVE20: { rate:0.20 },
+    KOLKLI2026: {
+      rate:1,
+      expiresAt:'2026-08-31T23:59:59+03:00',
+      plans:['lite','pro','business']
+    }
+  };
+  function promoIsActive(def, planKey){
+    if(!def) return false;
+    if(def.expiresAt && Date.now() > Date.parse(def.expiresAt)) return false;
+    return !def.plans || def.plans.indexOf(planKey) > -1;
+  }
+  function promoPercent(def){ return Math.round((def.rate || 0) * 100); }
 
   /* VAT rates by country code (demo). Everything else → 0. */
   const VAT = { IL:0.18, GB:0.20, DE:0.19, FR:0.20, ES:0.21, IT:0.22, NL:0.21 };
@@ -679,8 +701,8 @@
     const p=PLANS[plan];
     const months = cycle==='yearly' ? YEAR_MONTHS : 1;
     const subtotal = p.base * months;
-    const discount = promo ? subtotal * promo.rate : 0;
-    const taxable = subtotal - discount;
+    const discount = Math.min(subtotal, promo ? subtotal * promo.rate : 0);
+    const taxable = Math.max(0, subtotal - discount);
     const rate = VAT[country] || 0;
     const vat = taxable * rate;
     const total = taxable + vat;
@@ -720,6 +742,11 @@
   }
 
   function renderSummary(){
+    if(promo && !promoIsActive(PROMOS[promo.code], plan)){
+      promo=null;
+      const promoMsg=el('promoMsg');
+      if(promoMsg){ promoMsg.textContent=''; promoMsg.className='promo-msg'; }
+    }
     const p=PLANS[plan], c=calc();
     el('sumName').textContent = p[lang][0];
     el('sumCyc').textContent = (cycle==='yearly'? t.billY : t.billM) + ' · ' + p[lang][1];
@@ -796,6 +823,15 @@
     const email=el('email').value.trim();
     if(!EMAIL_RE.test(email)){ markBad('email','emailErr',t.errEmail); ok=false; firstBad=firstBad||'email'; }
     else markBad('email','emailErr','');
+
+    const paymentRequired = calc().total > 0.005;
+    if(!paymentRequired){
+      [['cardNum','cardErr'],['exp','expErr'],['cvc','cvcErr'],['cardName','nameErr']]
+        .forEach(function(f){ markBad(f[0], f[1], ''); });
+      if(!ok){ showMsg(t.formErr,'err'); if(firstBad){ el(firstBad).focus(); } }
+      else showMsg('');
+      return ok;
+    }
 
     const digits=el('cardNum').value.replace(/\D/g,'');
     if(digits.length<13 || digits.length>19 || !luhn(digits)){ markBad('cardNum','cardErr',t.errCard); ok=false; firstBad=firstBad||'cardNum'; }
@@ -905,9 +941,10 @@
     const code=el('promoInput').value.trim().toUpperCase();
     const msg=el('promoMsg');
     if(!code){ promo=null; msg.textContent=''; msg.className='promo-msg'; renderSummary(); return; }
-    if(PROMOS[code]!=null){
-      promo={ code:code, rate:PROMOS[code] };
-      msg.textContent=fmtStr(t.promoOk,{p:Math.round(PROMOS[code]*100)}); msg.className='promo-msg ok';
+    const def=PROMOS[code];
+    if(promoIsActive(def, plan)){
+      promo={ code:code, rate:def.rate };
+      msg.textContent=fmtStr(t.promoOk,{p:promoPercent(def)}); msg.className='promo-msg ok';
     } else {
       promo=null;
       msg.textContent=t.promoNo; msg.className='promo-msg no';
@@ -926,7 +963,7 @@
     document.title='KOLKLI — '+t.secure;
     renderCountry();
     renderAll();
-    if(promo){ el('promoMsg').textContent=fmtStr(t.promoOk,{p:Math.round(promo.rate*100)}); }
+    if(promo){ el('promoMsg').textContent=fmtStr(t.promoOk,{p:promoPercent(PROMOS[promo.code])}); }
   }
   window.__setLang=applyLang;
 
@@ -988,8 +1025,8 @@
 
   (function init(){
     applyTheme(ls('theme')||'light');
-    // deep-link: ?plan=lite|pro & ?cycle=monthly|yearly
-    const qp=(location.search.match(/[?&]plan=(lite|pro)/)||[])[1];
+    // deep-link: ?plan=lite|pro|business & ?cycle=monthly|yearly
+    const qp=(location.search.match(/[?&]plan=(lite|pro|business)/)||[])[1];
     const qc=(location.search.match(/[?&]cycle=(monthly|yearly)/)||[])[1];
     if(qp) plan=qp;
     if(qc) cycle=qc;

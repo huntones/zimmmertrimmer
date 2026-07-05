@@ -820,7 +820,7 @@
       {id:'share',  e:'📤', he:'שיתוף',  en:'Share',    ru:'Поделиться'}
     ],
     popular:[
-      {i:'☁️',status:'soon',he:['שליחת קבצים גדולים','שלחו עד 2GB בלינק אחד.'],en:['Send Large Files','Share up to 2GB with one link.'],ru:['Отправка больших файлов','Отправьте до 2 ГБ одной ссылкой.']},
+      {i:'☁️',status:'soon',he:['שליחת קבצים גדולים','שלחו עד 3GB בלינק אחד.'],en:['Send Large Files','Share up to 3GB with one link.'],ru:['Отправка больших файлов','Отправьте до 3 ГБ одной ссылкой.']},
       {i:'✂️',status:'live',href:'./app.html',he:['חותך אודיו','חתכו וערכו אודיו אונליין.'],en:['Audio Cutter','Cut & edit audio online.'],ru:['Обрезка аудио','Режьте и редактируйте аудио онлайн.']},
       {i:'🎬',status:'live',href:'./video-cut.html',he:['חותך וידאו','חתכו וקצרו סרטונים.'],en:['Video Cutter','Trim or cut video.'],ru:['Обрезка видео','Обрезайте или режьте видео.']},
       {i:'🪄',status:'live',href:'./remove-bg.html',he:['הסרת רקע','הסירו רקע מתמונות.'],en:['Remove Background','Erase image backgrounds.'],ru:['Удаление фона','Убирайте фон с изображений.']},
@@ -831,7 +831,7 @@
       {i:'📕',status:'soon',he:['דחיסת PDF','הקטינו קובצי PDF.'],en:['Compress PDF','Shrink PDF files.'],ru:['Сжатие PDF','Уменьшайте PDF-файлы.']},
       {i:'📎',status:'soon',he:['מיזוג PDF','אחדו כמה קבצי PDF.'],en:['Merge PDF','Combine PDF files.'],ru:['Объединение PDF','Объединяйте PDF-файлы.']},
       {i:'🏞️',status:'live',href:'./pdf-to-jpg.html',he:['PDF ל-JPG','המירו עמודי PDF לתמונות.'],en:['PDF to JPG','Turn PDF pages into images.'],ru:['PDF в JPG','Превращайте страницы PDF в изображения.']},
-      {i:'🗂️',status:'live',href:'./files.html',he:['ארגון קבצים','ארגנו קבצים בתיקיות ותגיות.'],en:['Organize Files','Sort files into folders & tags.'],ru:['Упорядочить файлы','Сортируйте файлы по папкам и тегам.']},
+      {i:'🗂️',status:'live',href:'./files.html',he:['בחירת קבצים','ארגנו קבצים בתיקיות ותגיות.'],en:['Organize Files','Sort files into folders & tags.'],ru:['Упорядочить файлы','Сортируйте файлы по папкам и тегам.']},
       {i:'✨',status:'soon',he:['שדרוג AI','שפרו איכות תמונה עם AI.'],en:['AI Upscaler','Enhance image quality with AI.'],ru:['AI-апскейлер','Улучшайте качество изображений с AI.']}
     ],
     ai:[
@@ -868,7 +868,7 @@
       {i:'📄', c:'b', cat:['documents','convert'], href:'./doc-to-pdf.html', he:['DOC ל-PDF','המירו מסמכי Word ל-PDF.'], en:['DOC to PDF','Convert Word docs to PDF.'], ru:['DOC в PDF','Конвертируйте документы Word в PDF.']},
       {i:'📝', c:'t', cat:['documents','convert'], href:'./doc-convert.html', new:true, he:['המרת מסמך','המירו בין פורמטים של מסמכים.'], en:['Convert Document','Convert between document formats.'], ru:['Конвертация документов','Конвертируйте между форматами документов.']},
       {i:'🔁', c:'y', cat:['convert'], href:'./convert.html', he:['ממיר קבצים','המרה בין מאות פורמטים.'], en:['Convert Files','Convert hundreds of formats.'], ru:['Конвертация файлов','Конвертируйте сотни форматов.']},
-      {i:'🗂️', c:'p', cat:['documents'], href:'./files.html', he:['ארגון קבצים','ארגנו בתיקיות ותגיות.'], en:['Organize Files','Sort into folders & tags.'], ru:['Упорядочить файлы','Сортируйте по папкам и тегам.']},
+      {i:'🗂️', c:'p', cat:['documents'], href:'./files.html', he:['בחירת קבצים','ארגנו בתיקיות ותגיות.'], en:['Organize Files','Sort into folders & tags.'], ru:['Упорядочить файлы','Сортируйте по папкам и тегам.']},
       {i:'🗄️', c:'y', cat:['convert'], href:'./archive-convert.html', new:true, he:['ממיר ארכיונים','ארזו קבצים ל-ZIP או GZIP.'], en:['Archive Converter','Bundle files into ZIP or GZIP.'], ru:['Конвертер архивов','Упакуйте файлы в ZIP или GZIP.']},
       {i:'🔤', c:'v', cat:['convert'], href:'./font-convert.html', new:true, he:['ממיר גופנים','המירו גופנים בין פורמטים.'], en:['Font Converter','Convert fonts between formats.'], ru:['Конвертер шрифтов','Конвертируйте шрифты между форматами.']},
       {i:'📚', c:'b', cat:['convert'], href:'./ebook-convert.html', new:true, he:['ממיר ספרים','EPUB ל-PDF, HTML או טקסט.'], en:['Ebook Converter','EPUB to PDF, HTML or text.'], ru:['Конвертер эл. книг','EPUB в PDF, HTML или текст.']},
@@ -876,8 +876,13 @@
       {i:'📽️', c:'t', cat:['convert'], href:'./presentation-convert.html', new:true, he:['ממיר מצגות','PPTX ל-PDF, HTML או טקסט.'], en:['Presentation Converter','PPTX to PDF, HTML or text.'], ru:['Конвертер презентаций','PPTX в PDF, HTML или текст.']},
       {i:'🧾', c:'v', cat:['documents'], href:'./ai-summarize-pdf.html', new:true, he:['סיכום PDF AI','תקציר חכם לכל מסמך PDF.'], en:['AI Summarize PDF','A smart summary of any PDF.'], ru:['AI-конспект PDF','Умное резюме любого PDF.']},
       {i:'🎨', c:'v', cat:[], href:'./color-convert.html', new:true, he:['ממיר צבעים','המרה בין HEX, RGB, HSL ו-CMYK.'], en:['Color Converter','Convert between HEX, RGB, HSL & CMYK.'], ru:['Конвертер цвета','Конвертация HEX, RGB, HSL и CMYK.']},
+      {i:'🎨', c:'g', cat:[], href:'./palette-generator.html', new:true, he:['מחולל פלטת צבעים','הרמוניות צבע מוכנות ל-CSS.'], en:['Palette Generator','Harmonious color palettes for CSS.'], ru:['Генератор палитр','Гармоничные палитры для CSS.']},
+      {i:'🌗', c:'y', cat:[], href:'./contrast-checker.html', new:true, he:['בודק ניגודיות','בדיקת קריאות טקסט לפי תקן WCAG.'], en:['Contrast Checker','Check text readability against WCAG.'], ru:['Проверка контраста','Проверка читаемости текста по WCAG.']},
+      {i:'🌈', c:'t', cat:[], href:'./gradient-generator.html', new:true, he:['מחולל Gradient','גרדיאנט חי עם קוד CSS מוכן.'], en:['Gradient Generator','Live gradients with ready CSS.'], ru:['Генератор градиентов','Живые градиенты с готовым CSS.']},
+      {i:'🟪', c:'p', cat:[], href:'./box-shadow.html', new:true, he:['מחולל Box Shadow','עיצוב צל עם תצוגה חיה וקוד CSS.'], en:['Box Shadow','Design shadows with live preview & CSS.'], ru:['Box Shadow','Тени с превью и готовым CSS.']},
+      {i:'⬜', c:'b', cat:[], href:'./border-radius.html', new:true, he:['מחולל Border Radius','פינות מעוגלות עם תצוגה חיה וקוד CSS.'], en:['Border Radius','Rounded corners with live preview & CSS.'], ru:['Border Radius','Скругление углов с превью и CSS.']},
       {i:'☁️', c:'b', cat:[], href:'./send.html', he:['שליחת קבצים','שלחו קבצים גדולים בלינק אחד.'], en:['Send Files','Share big files with one link.'], ru:['Отправка файлов','Делитесь большими файлами одной ссылкой.']},
-      {i:'✅', c:'p', cat:[], href:'./review.html', new:true, he:['אישור לקוח','שלחו עבודה ללקוח לצפייה, הערות ואישור.'], en:['Client Review','Send work to a client for sign-off.'], ru:['Одобрение клиента','Отправьте работу клиенту на просмотр и одобрение.']},
+      {i:'✅', c:'p', cat:[], href:'./review.html', new:true, he:['משוב ואישור קבצים','שלחו עבודה ללקוח לצפייה, הערות ואישור.'], en:['Client Review','Send work to a client for sign-off.'], ru:['Одобрение клиента','Отправьте работу клиенту на просмотр и одобрение.']},
       {i:'🔗', c:'b', cat:['marketing'], href:'./utm-builder.html', new:true, he:['בונה קישורי UTM','בנו קישורים מסודרים למעקב קמפיינים.'], en:['UTM Link Builder','Build tidy links to track campaigns.'], ru:['UTM-конструктор','Создавайте аккуратные ссылки для отслеживания кампаний.']},
       {i:'🔳', c:'v', cat:['marketing'], href:'./qr-generator.html', new:true, he:['מחולל QR Code','QR לקישור, וואטסאפ, תפריט או קובץ.'], en:['QR Code Generator','QR for a link, WhatsApp, menu or file.'], ru:['Генератор QR-кодов','QR для ссылки, WhatsApp, меню или файла.']},
       {i:'💬', c:'g', cat:['marketing'], href:'./whatsapp-link.html', new:true, he:['קישור וואטסאפ','קישור עם הודעה מוכנה מראש.'], en:['WhatsApp Link','A link with a ready-to-send message.'], ru:['Ссылка WhatsApp','Ссылка с готовым сообщением.']},
@@ -927,10 +932,10 @@
        ru:['Видео','Обрезайте, конвертируйте, сжимайте и извлекайте звук.'],
        tools:[{he:'חיתוך',en:'Trim',ru:'Обрезка',s:'live'},{he:'דחיסה',en:'Compress',ru:'Сжатие',s:'soon'},{he:'המרה',en:'Convert',ru:'Конвертация',s:'soon'},{he:'חילוץ אודיו',en:'Extract Audio',ru:'Извлечь звук',s:'soon'},{he:'השתקה',en:'Mute',ru:'Без звука',s:'soon'},{he:'שינוי גודל',en:'Resize',ru:'Размер',s:'soon'},{he:'יצירת שורטס',en:'Shorts Maker',ru:'Создание Shorts',s:'soon'},{he:'כתוביות AI',en:'AI Subtitle',ru:'AI-субтитры',s:'live'},{he:'שדרוג AI',en:'AI Upscale',ru:'AI-апскейл',s:'soon'}]},
       {id:'documents', i:'📄', cta:{href:'./files.html', k:'ctaOrganize'},
-       he:['מסמכים','כלי PDF, OCR וארגון קבצים.'],
+       he:['מסמכים','כלי PDF, OCR ובחירת קבצים.'],
        en:['Documents','PDF tools, OCR and file organizing.'],
        ru:['Документы','Инструменты PDF, OCR и упорядочивание файлов.'],
-       tools:[{he:'מיזוג PDF',en:'Merge PDF',ru:'Объединить PDF',s:'soon'},{he:'פיצול PDF',en:'Split PDF',ru:'Разделить PDF',s:'soon'},{he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF',s:'soon'},{he:'PDF ל-JPG',en:'PDF to JPG',ru:'PDF в JPG',s:'live'},{he:'OCR',en:'OCR',ru:'OCR',s:'soon'},{he:'חתימת PDF',en:'Sign PDF',ru:'Подпись PDF',s:'soon'},{he:'הגנת PDF',en:'Protect PDF',ru:'Защита PDF',s:'soon'},{he:'DOC ל-PDF',en:'DOC to PDF',ru:'DOC в PDF',s:'soon'},{he:'PDF ל-Word',en:'PDF to Word',ru:'PDF в Word',s:'soon'},{he:'ארגון קבצים',en:'Organize',ru:'Упорядочить',s:'live'}]},
+       tools:[{he:'מיזוג PDF',en:'Merge PDF',ru:'Объединить PDF',s:'soon'},{he:'פיצול PDF',en:'Split PDF',ru:'Разделить PDF',s:'soon'},{he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF',s:'soon'},{he:'PDF ל-JPG',en:'PDF to JPG',ru:'PDF в JPG',s:'live'},{he:'OCR',en:'OCR',ru:'OCR',s:'soon'},{he:'חתימת PDF',en:'Sign PDF',ru:'Подпись PDF',s:'soon'},{he:'הגנת PDF',en:'Protect PDF',ru:'Защита PDF',s:'soon'},{he:'DOC ל-PDF',en:'DOC to PDF',ru:'DOC в PDF',s:'soon'},{he:'PDF ל-Word',en:'PDF to Word',ru:'PDF в Word',s:'soon'},{he:'בחירת קבצים',en:'Organize',ru:'Упорядочить',s:'live'}]},
       {id:'converters', i:'🔄',
        he:['ממירים','המירו בין מאות פורמטים של קבצים.'],
        en:['Converters','Convert between hundreds of file formats.'],
@@ -962,7 +967,7 @@
     ],
     plans:[
       {price:'$0', he:['חינם','להתחלה מהירה'], en:['Free','To get started'], ru:['Бесплатно','Для быстрого старта'], cta:{he:'התחילו',en:'Get Started',ru:'Начать'}, feats:[
-        {he:'עד 2GB לשליחה',en:'Up to 2GB per transfer',ru:'До 2 ГБ за передачу'},
+        {he:'עד 3GB לשליחה',en:'Up to 3GB per transfer',ru:'До 3 ГБ за передачу'},
         {he:'כלים בסיסיים',en:'Basic tools',ru:'Базовые инструменты'},
         {he:'קבצים נשמרים 3 ימים',en:'Files kept for 3 days',ru:'Файлы хранятся 3 дня'},
         {he:'עריכה מקומית בדפדפן',en:'Local in-browser editing',ru:'Локальное редактирование в браузере'}]},
@@ -1006,9 +1011,9 @@
       {he:['צריך חשבון?','לא כדי להתחיל. חשבון מוסיף היסטוריה, לינקים שמורים ושיתוף.'],
        en:['Do I need an account?','Not to start. An account adds history, saved links and sharing.'],
        ru:['Нужен ли аккаунт?','Не для начала работы. Аккаунт добавляет историю, сохранённые ссылки и общий доступ.']},
-      {he:['יש מגבלת גודל?','בחינם עד 2GB לשליחה; חבילות Lite, Pro ו-Business מעלות את המגבלה.'],
-       en:['Is there a size limit?','Free is up to 2GB per transfer; Lite, Pro and Business raise the limit.'],
-       ru:['Есть ли ограничение по размеру?','Бесплатно — до 2 ГБ за передачу; Lite, Pro и Business увеличивают лимит.']}
+      {he:['יש מגבלת גודל?','בחינם עד 3GB לשליחה; חבילות Lite, Pro ו-Business מעלות את המגבלה.'],
+       en:['Is there a size limit?','Free is up to 3GB per transfer; Lite, Pro and Business raise the limit.'],
+       ru:['Есть ли ограничение по размеру?','Бесплатно — до 3 ГБ за передачу; Lite, Pro и Business увеличивают лимит.']}
     ],
     footerCols:[
       {t:{he:'כלים',en:'Tools',ru:'Инструменты'}, links:[

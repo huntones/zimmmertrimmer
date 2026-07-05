@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — Meta Length Checker</title>
+<meta name="description" content="Free meta length checker — see if your SEO title and meta description are the right length, with character counts, approximate Google pixel width and a live search-result preview. Fast, private, right in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 22px;}
+  .pagehead h1{font-size:clamp(23px,3vw,32px);font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:12px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);}
+
+  /* ---- meta length tool ---- */
+  .toolwrap{max-width:840px;margin:0 auto;display:grid;gap:18px;}
+  .toolwrap .note{margin-top:0;}
+
+  .fieldcard{padding:18px 18px 16px;}
+  .fieldhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+  .fieldname{font-size:13.5px;font-weight:800;letter-spacing:.045em;color:var(--ink-2);text-transform:uppercase;}
+
+  .statuspill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:700;
+    letter-spacing:.03em;padding:5px 12px;border-radius:999px;white-space:nowrap;transition:color .15s,background .15s;}
+  .statuspill::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
+  .statuspill.short{color:var(--warn);background:var(--warm-soft);}
+  .statuspill.good{color:var(--success-dim);background:var(--success-soft);}
+  .statuspill.long{color:var(--danger);background:var(--danger-soft);}
+
+  .metatext{width:100%;resize:vertical;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
+    border-radius:12px;font-family:var(--sans);font-size:15px;line-height:1.55;padding:12px 14px;
+    direction:inherit;transition:border-color .12s,box-shadow .12s;}
+  .metatext:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+
+  .meter{height:8px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line-2);
+    overflow:hidden;margin:12px 0 10px;}
+  .meterfill{height:100%;width:0;border-radius:999px;transition:width .2s ease,background .2s ease;}
+  .meterfill.short{background:var(--warn);}
+  .meterfill.good{background:var(--success);}
+  .meterfill.long{background:var(--danger);}
+
+  .readout{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;}
+  .readnum{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--ink-2);white-space:nowrap;}
+  .readguide{font-size:12.5px;color:var(--muted);margin:0;flex:1;min-width:200px;line-height:1.5;}
+
+  /* google serp preview */
+  .serphead{font-size:12px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
+  .serpcard{padding:18px;}
+  .serp{background:var(--panel-2);border:1px solid var(--line-2);border-radius:14px;padding:16px 18px;text-align:start;}
+  .serpurl{direction:ltr;unicode-bidi:isolate;font-family:var(--sans);font-size:13px;color:var(--success-dim);
+    margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .serptitle{font-size:20px;line-height:1.32;color:#1a0dab;font-weight:400;margin-bottom:4px;overflow-wrap:break-word;}
+  .serptitle:hover{text-decoration:underline;}
+  html[data-theme="dark"] .serptitle{color:#8ab4f8;}
+  .serpdesc{font-size:14px;line-height:1.58;color:var(--muted);overflow-wrap:break-word;}
+  .serptitle.placeholder,.serpdesc.placeholder{opacity:.5;font-style:italic;color:var(--faint);}
+
+  .note{display:flex;align-items:flex-start;gap:9px;margin-top:18px;padding:12px 14px;border-radius:12px;
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+    font-size:12px;color:var(--ink-2);line-height:1.55;}
+  .note svg{width:16px;height:16px;color:var(--accent-dim);flex-shrink:0;margin-top:1px;
+    stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="pageTitle"></h1>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="toolwrap">
+
+    <!-- TITLE field -->
+    <div class="card fieldcard">
+      <div class="fieldhead">
+        <span class="fieldname" data-i18n="titleField"></span>
+        <span class="statuspill good" id="titlePill"></span>
+      </div>
+      <textarea class="metatext" id="titleInput" rows="2" spellcheck="false">Free Online Meta Length Checker — SEO Title &amp; Meta Tag</textarea>
+      <div class="meter"><div class="meterfill good" id="titleMeter"></div></div>
+      <div class="readout">
+        <span class="readnum" id="titleCount"></span>
+        <p class="readguide" id="titleGuide"></p>
+      </div>
+    </div>
+
+    <!-- DESCRIPTION field -->
+    <div class="card fieldcard">
+      <div class="fieldhead">
+        <span class="fieldname" data-i18n="descField"></span>
+        <span class="statuspill good" id="descPill"></span>
+      </div>
+      <textarea class="metatext" id="descInput" rows="3" spellcheck="false">Check if your SEO title and meta description are the ideal length, with live character counts, pixel width, and a Google preview.</textarea>
+      <div class="meter"><div class="meterfill good" id="descMeter"></div></div>
+      <div class="readout">
+        <span class="readnum" id="descCount"></span>
+        <p class="readguide" id="descGuide"></p>
+      </div>
+    </div>
+
+    <!-- GOOGLE SERP preview -->
+    <div class="card serpcard">
+      <div class="serphead" data-i18n="serpTitle"></div>
+      <div class="serp">
+        <div class="serpurl" id="serpUrl">kolkli.com › page</div>
+        <div class="serptitle" id="serpTitleEl"></div>
+        <div class="serpdesc" id="serpDescEl"></div>
+      </div>
+    </div>
+
+    <div class="note">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      <span data-i18n="note"></span>
+    </div>
+
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'בודק אורך Meta',
+      pageTitle:'בודק אורך Meta — Title ו-Description',
+      pageSub:'בדקו אם כותרת ה-SEO ותיאור המטא באורך הנכון — עם ספירת תווים, רוחב משוער בפיקסלים בגוגל ותצוגה מקדימה חיה של תוצאת החיפוש. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      titleField:'כותרת (Title)',
+      descField:'תיאור מטא (Meta Description)',
+      stTooShort:'קצר מדי', stGood:'אורך מצוין', stTooLong:'ארוך מדי',
+      gTitleShort:'הכותרת קצרה מדי — הוסיפו מילות מפתח כדי להגיע ל-50–60 תווים.',
+      gTitleGood:'אורך מצוין — הכותרת אמורה להופיע במלואה בגוגל (50–60 תווים).',
+      gTitleLong:'הכותרת ארוכה מדי — גוגל עלול לקצר אותה. קצרו ל-60 תווים לכל היותר.',
+      gDescShort:'התיאור קצר מדי — הרחיבו ל-120–160 תווים כדי לנצל את כל השטח.',
+      gDescGood:'אורך מצוין — התיאור אמור להופיע במלואו (120–160 תווים).',
+      gDescLong:'התיאור ארוך מדי — גוגל עלול לקצר אותו. קצרו ל-160 תווים לכל היותר.',
+      charsUnit:'תווים', pxUnit:'px',
+      serpTitle:'תצוגה מקדימה בגוגל',
+      note:'רוחב הפיקסלים הוא הערכה בלבד, מבוססת על גופן Arial — גוגל עשוי להציג תוצאה מעט שונה בהתאם למכשיר, לשאילתה ולגופן בפועל.',
+      phTitle:'כותרת הדף שלכם תופיע כאן',
+      phDesc:'תיאור המטא של הדף יופיע כאן.',
+      copiedMsg:'הועתק ✓',
+      foot:'KOLKLI · בודק אורך Meta · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'Meta Length Checker',
+      pageTitle:'Meta Length Checker — Title & Meta Description',
+      pageSub:'Check whether your SEO title and meta description are the right length — with character counts, an approximate Google pixel width and a live search-result preview. Everything runs in your browser; nothing is sent to a server.',
+      titleField:'Title',
+      descField:'Meta Description',
+      stTooShort:'Too short', stGood:'Good', stTooLong:'Too long',
+      gTitleShort:'Your title is a bit short — add keywords to reach the ideal 50–60 characters.',
+      gTitleGood:'Great length — this title should show in full in Google (50–60 characters).',
+      gTitleLong:'This title is too long — Google may cut it off. Trim it to 60 characters or fewer.',
+      gDescShort:'Your description is too short — expand it to 120–160 characters to use the full space.',
+      gDescGood:'Great length — this description should show in full (120–160 characters).',
+      gDescLong:'This description is too long — Google may truncate it. Trim it to 160 characters or fewer.',
+      charsUnit:'characters', pxUnit:'px',
+      serpTitle:'Google preview',
+      note:'The pixel width is an estimate based on the Arial font — Google may show a slightly different result depending on the device, query and actual font.',
+      phTitle:'Your page title will appear here',
+      phDesc:'Your meta description preview will appear here.',
+      copiedMsg:'Copied ✓',
+      foot:'KOLKLI · Meta Length Checker · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'Длина Meta',
+      pageTitle:'Проверка длины Meta — Title и Description',
+      pageSub:'Проверьте, подходящей ли длины ваш SEO-заголовок и meta-описание — с подсчётом символов, приблизительной шириной в пикселях в Google и живым превью результата поиска. Всё работает в браузере; ничего не отправляется на сервер.',
+      titleField:'Заголовок (Title)',
+      descField:'Meta-описание',
+      stTooShort:'Слишком коротко', stGood:'Хорошо', stTooLong:'Слишком длинно',
+      gTitleShort:'Заголовок коротковат — добавьте ключевые слова, чтобы достичь 50–60 символов.',
+      gTitleGood:'Отличная длина — заголовок полностью поместится в выдаче Google (50–60 символов).',
+      gTitleLong:'Заголовок слишком длинный — Google может его обрезать. Сократите до 60 символов.',
+      gDescShort:'Описание слишком короткое — расширьте его до 120–160 символов, чтобы использовать всё место.',
+      gDescGood:'Отличная длина — описание поместится целиком (120–160 символов).',
+      gDescLong:'Описание слишком длинное — Google может его обрезать. Сократите до 160 символов.',
+      charsUnit:'символов', pxUnit:'px',
+      serpTitle:'Превью Google',
+      note:'Ширина в пикселях приблизительна и рассчитана для шрифта Arial — Google может показать немного другой результат в зависимости от устройства, запроса и шрифта.',
+      phTitle:'Здесь появится заголовок страницы',
+      phDesc:'Здесь появится превью meta-описания.',
+      copiedMsg:'Скопировано ✓',
+      foot:'KOLKLI · Проверка длины Meta · Приватно и быстро, прямо в браузере' }
+  };
+
+  let lang='he', t=I18N.he;
+
+  // ---- pixel measurement (canvas) ----
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const TITLE_FONT = '20px Arial';
+  const DESC_FONT  = '14px Arial';
+
+  function measurePx(text, font){ ctx.font = font; return Math.round(ctx.measureText(text).width); }
+  function charLen(text){ return [...text].length; }
+
+  // truncate to a pixel budget, then append an ellipsis (mirrors Google's cut-off)
+  function truncatePx(text, font, budget){
+    ctx.font = font;
+    if(ctx.measureText(text).width <= budget) return text;
+    const chars=[...text];
+    let out='';
+    for(let i=0;i<chars.length;i++){
+      if(ctx.measureText(out + chars[i] + '…').width > budget) break;
+      out += chars[i];
+    }
+    return out.replace(/\s+$/,'') + '…';
+  }
+
+  // ---- thresholds ----
+  function titleState(len, px){
+    if(len < 30 || px < 285) return 'short';
+    if(len > 60 || px > 600) return 'long';
+    return 'good';
+  }
+  function descState(len, px){
+    if(len < 70) return 'short';
+    if(len > 160 || px > 920) return 'long';
+    return 'good';
+  }
+
+  const WORD    = { short:'stTooShort', good:'stGood', long:'stTooLong' };
+  const T_GUIDE = { short:'gTitleShort', good:'gTitleGood', long:'gTitleLong' };
+  const D_GUIDE = { short:'gDescShort', good:'gDescGood', long:'gDescLong' };
+
+  function paint(cfg){
+    const val = el(cfg.input).value;
+    const len = charLen(val);
+    const px  = measurePx(val, cfg.font);
+    const state = cfg.state(len, px);
+    const pill = el(cfg.pill), meter = el(cfg.meter);
+    pill.textContent = t[WORD[state]];
+    pill.className = 'statuspill ' + state;
+    meter.className = 'meterfill ' + state;
+    meter.style.width = (Math.max(0, Math.min(1, len / cfg.max)) * 100) + '%';
+    el(cfg.count).textContent = len + ' ' + t.charsUnit + ' · ~' + px + t.pxUnit;
+    el(cfg.guide).textContent = t[cfg.guideMap[state]];
+  }
+
+  function renderSerp(input, elId, font, budget, ph){
+    const val = el(input).value;
+    const node = el(elId);
+    if(val.trim()){
+      node.textContent = truncatePx(val, font, budget);
+      node.classList.remove('placeholder');
+    } else {
+      node.textContent = t[ph];
+      node.classList.add('placeholder');
+    }
+  }
+
+  function update(){
+    paint({ input:'titleInput', pill:'titlePill', meter:'titleMeter', count:'titleCount', guide:'titleGuide',
+            font:TITLE_FONT, max:60, state:titleState, guideMap:T_GUIDE });
+    paint({ input:'descInput', pill:'descPill', meter:'descMeter', count:'descCount', guide:'descGuide',
+            font:DESC_FONT, max:160, state:descState, guideMap:D_GUIDE });
+    renderSerp('titleInput', 'serpTitleEl', TITLE_FONT, 600, 'phTitle');
+    renderSerp('descInput',  'serpDescEl',  DESC_FONT,  920, 'phDesc');
+  }
+
+  // ---- toast / copy helpers ----
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1700); }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(fallbackCopy.bind(null,text)); }
+    else fallbackCopy(text);
+    toast(t.copiedMsg);
+  }
+  function fallbackCopy(text){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+  }
+
+  // ---- events ----
+  ['titleInput','descInput'].forEach(id=> el(id).addEventListener('input', update));
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    if(!I18N[l]) l='en';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    update();
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+  window.__setLang=applyLang;
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  update();
+})();
+</script>
+</body>
+</html>

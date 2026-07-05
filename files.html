@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AudioCut — ארגון קבצים</title>
+<title>AudioCut — בחירת קבצים</title>
 <meta name="description" content="Organize, sort and tag your media files. Images, video, audio and documents — all in your browser. Nothing gets uploaded.">
 <style>
   :root {
@@ -99,15 +99,20 @@
     padding:0 12px;height:40px;flex:1 1 240px;min-width:180px;}
   .search svg{width:16px;height:16px;color:var(--faint);flex-shrink:0;}
   .search input{border:none;background:none;outline:none;color:var(--ink);font-family:var(--sans);font-size:14px;width:100%;}
-  .zoom{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);font-family:var(--mono);white-space:nowrap;}
+  .zoom{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--muted);font-family:var(--mono);white-space:nowrap;}
   .zoom input[type=range]{accent-color:var(--accent);width:118px;cursor:pointer;}
   .zbtn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 auto;
-    border-radius:7px;cursor:pointer;font-size:16px;font-weight:700;line-height:1;
-    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);transition:all .12s;user-select:none;}
+    border-radius:7px;cursor:pointer;font-size:0;line-height:0;
+    background-color:var(--panel);background-repeat:no-repeat;background-position:center;
+    border:1px solid var(--line);color:var(--ink-2);transition:all .12s;user-select:none;}
+  /* +/− drawn as centered bars (currentColor) so they sit dead-center regardless of font metrics */
+  #zoomMinus{background-image:linear-gradient(currentColor,currentColor);background-size:11px 2px;}
+  #zoomPlus{background-image:linear-gradient(currentColor,currentColor),linear-gradient(currentColor,currentColor);
+    background-size:11px 2px,2px 11px;}
   .zbtn:hover{border-color:var(--accent);color:var(--accent);}
-  .zbtn:active{background:var(--accent-soft);}
+  .zbtn:active{background-color:var(--accent-soft);}
   .zbtn:disabled{opacity:.4;cursor:default;border-color:var(--line);color:var(--ink-2);}
-  .toolchk{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);font-family:var(--mono);white-space:nowrap;cursor:pointer;user-select:none;}
+  .toolchk{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--muted);font-family:var(--mono);white-space:nowrap;cursor:pointer;user-select:none;}
   .toolchk input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;flex-shrink:0;}
   .selbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
   .selcount{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap;}
@@ -118,11 +123,46 @@
   .msgroup[hidden]{display:none;}
   .mscount b{color:var(--accent-dim);}
   html[data-theme="dark"] .mscount b{color:var(--accent);}
-  .msmovesel{height:38px;padding:0 12px;font-size:13px;color:var(--muted);background:var(--panel-2);
-    border:1px solid var(--line);border-radius:999px;cursor:pointer;transition:border-color .12s;}
-  .msmovesel:hover:not(:disabled){border-color:var(--accent);}
-  .msmovesel:focus{outline:none;border-color:var(--accent);}
-  .msmovesel:disabled{opacity:.5;cursor:not-allowed;}
+  /* custom "move to folder" dropdown (replaces the native <select> so the popup can be themed) */
+  .foldersel{position:relative;display:inline-block;}
+  .fs-trigger{display:inline-flex;align-items:center;gap:9px;height:38px;min-width:196px;padding:0 13px;
+    border-radius:999px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;
+    background:var(--panel-2);border:1px solid var(--line);color:var(--muted);
+    transition:border-color .14s,background .14s,box-shadow .14s,color .14s;}
+  .fs-trigger:hover:not(:disabled){border-color:var(--accent);color:var(--ink-2);}
+  .fs-trigger:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .fs-trigger:disabled{opacity:.5;cursor:not-allowed;}
+  .fs-folder{width:15px;height:15px;flex-shrink:0;color:var(--accent);}
+  .fs-label{flex:1;text-align:start;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fs-chev{width:14px;height:14px;flex-shrink:0;color:var(--faint);transition:transform .2s ease,color .14s;}
+  .foldersel.open .fs-trigger{border-color:var(--accent);background:var(--panel);color:var(--ink-2);box-shadow:0 0 0 3px var(--accent-soft);}
+  .foldersel.open .fs-chev{transform:rotate(180deg);color:var(--accent);}
+  /* the popup menu */
+  .fs-menu{position:absolute;top:calc(100% + 7px);inset-inline-start:0;z-index:120;
+    min-width:100%;width:max-content;max-width:min(340px,86vw);max-height:min(52vh,340px);overflow-y:auto;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px;
+    box-shadow:var(--shadow-lg);animation:fsIn .15s cubic-bezier(.2,.8,.25,1);}
+  .fs-menu[hidden]{display:none;}
+  @keyframes fsIn{from{opacity:0;transform:translateY(-6px) scale(.98);}to{opacity:1;transform:none;}}
+  .fs-item{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;cursor:pointer;
+    font-family:inherit;font-size:13px;font-weight:500;color:var(--ink-2);text-align:start;line-height:1.3;
+    padding:9px 11px;padding-inline-start:calc(11px + var(--fs-depth,0) * 15px);border-radius:9px;
+    transition:background .1s,color .1s;}
+  .fs-item:hover,.fs-item:focus-visible{background:var(--accent-soft);color:var(--accent-dim);outline:none;}
+  html[data-theme="dark"] .fs-item:hover,html[data-theme="dark"] .fs-item:focus-visible{color:var(--accent);}
+  .fs-mico{width:15px;height:15px;flex-shrink:0;color:var(--faint);transition:color .1s;}
+  .fs-item:hover .fs-mico,.fs-item:focus-visible .fs-mico{color:var(--accent);}
+  .fs-itext{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fs-item.none{color:var(--muted);font-weight:600;}
+  /* "no folder" row carries an inline "+" that creates a new folder (and moves the marked files into it) */
+  .fs-nonerow{display:flex;align-items:center;gap:2px;}
+  .fs-nonerow .fs-item{flex:1;min-width:0;}
+  .fs-newbtn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:0 0 auto;
+    margin-inline-end:4px;border:1px solid var(--line);background:transparent;border-radius:8px;cursor:pointer;
+    color:var(--accent);transition:background .1s,border-color .1s,color .1s;}
+  .fs-newbtn:hover,.fs-newbtn:focus-visible{background:var(--accent-soft);border-color:var(--accent);outline:none;}
+  .fs-newbtn .fs-mico{color:currentColor;}
+  .fs-sep{height:1px;background:var(--line);margin:5px 8px;}
   .btnline{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:999px;cursor:pointer;
     font-size:13px;font-weight:600;background:var(--panel);border:1px solid var(--line);color:var(--ink-2);transition:all .12s;}
   .btnline:hover{border-color:var(--accent);}
@@ -142,12 +182,12 @@
   .btnline.dlbtn-lg svg{width:17px;height:17px;}
 
   /* ---------- layout ---------- */
-  .organizer{display:grid;grid-template-columns:236px minmax(0,1fr);gap:18px;align-items:start;}
-  @media (max-width:980px){ .organizer{grid-template-columns:218px minmax(0,1fr);gap:14px;} }
+  .organizer{display:grid;grid-template-columns:350px minmax(0,1fr);gap:22px;align-items:start;}
+  @media (max-width:980px){ .organizer{grid-template-columns:286px minmax(0,1fr);gap:16px;} }
   @media (max-width:820px){ .organizer{grid-template-columns:1fr;} }
 
   /* ---------- sidebar / folders ---------- */
-  .side{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow);position:sticky;top:16px;}
+  .side{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow);position:sticky;top:16px;min-height:184px;}
   .side .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
   .side .sh b{font-size:13px;}
   .side .addf{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--accent);
@@ -164,6 +204,21 @@
   .fitem:hover{background:var(--panel-2);}
   .fitem.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dim);font-weight:600;}
   .fitem.dragover{background:var(--accent-soft);border-color:var(--accent);border-style:dashed;}
+  /* live insertion marker while dragging a folder to a new position */
+  .fitem.drop-before{box-shadow:inset 0 3px 0 -1px var(--accent);}
+  .fitem.drop-after{box-shadow:inset 0 -3px 0 -1px var(--accent);}
+  /* sequential order number (start of the row) */
+  .fitem .fi-num{flex-shrink:0;min-width:23px;height:20px;padding:0 5px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:10.5px;font-weight:800;letter-spacing:.03em;color:var(--muted);
+    background:var(--panel-2);border-radius:6px;font-variant-numeric:tabular-nums;}
+  .fitem.on .fi-num{background:var(--accent);color:#fff;}
+  /* six-dot drag handle — sits between the order number and the folder icon */
+  .fitem .fi-grip{flex-shrink:0;background:none;border:none;color:var(--faint);cursor:grab;touch-action:none;padding:2px;border-radius:5px;line-height:0;
+    display:flex;align-items:center;opacity:.4;transition:opacity .12s,color .12s;}
+  .fitem:hover .fi-grip{opacity:1;}
+  .fitem .fi-grip:hover{color:var(--accent);}
+  .fitem .fi-grip:active{cursor:grabbing;}
+  .fitem .fi-grip svg{width:13px;height:13px;}
   .fitem .fi-ic{width:17px;height:17px;flex-shrink:0;color:var(--muted);}
   .fitem.on .fi-ic{color:var(--accent);}
   .fitem .fi-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -185,12 +240,16 @@
   html[dir="rtl"] .fitem .fi-tw .tw.open{transform:rotate(0deg);}
   .fitem .fi-tw .tw svg{width:13px;height:13px;}
   .fitem .fi-tw .tw:hover{color:var(--accent);}
+  /* childless folders have no chevron — collapse the empty toggle slot so the
+     folder icon sits snug against the six-dot handle instead of floating ~15px away */
+  .fitem .fi-tw:empty{width:0;}
+  .fitem .fi-tw:empty + .fi-ic{margin-inline-start:-9px;}
   .fitem.dragging{opacity:.45;}
 
   /* ---------- main / dropzone (compact horizontal bar) ---------- */
   .main{min-width:0;}
   .drop{display:flex;align-items:center;gap:14px;border:2px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:14px;
-    padding:11px 15px;cursor:pointer;background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+    padding:11px 15px;padding-inline-start:28px;cursor:pointer;background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
   .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
   .drop .cloud{width:40px;height:40px;flex:0 0 auto;border-radius:12px;display:flex;align-items:center;
     justify-content:center;background:var(--accent-soft);color:var(--accent);}
@@ -288,13 +347,17 @@
   .statrow .statcard.total .cur,
   .statrow .statcard.videos .cur,
   .statrow .statcard.images .cur{color:var(--ink);}
+  .statrow .statcard.no-videos .cur{color:var(--muted);}
+  .statrow .statcard.no-videos .sep,
+  .statrow .statcard.no-videos .max,
+  .statrow .statcard.no-videos .st-bar{display:none;}
   .statrow .st-val .sep{color:var(--faint);font-size:22px;font-weight:700;}
   .statrow .st-val .max{color:var(--ink-2);font-size:22px;font-weight:800;}
   .statrow .st-ic{width:40px;height:40px;border-radius:12px;flex:0 0 auto;border:1px solid var(--line);}
   .statrow .st-ic svg{width:20px;height:20px;}
   .statrow .st-ic.g,.statrow .st-ic.v{background:var(--accent-soft);color:var(--accent);}
   .statrow .st-ic.i{background:var(--success-soft);color:var(--success);}
-  .statrow .st-bar{width:min(230px,82%);height:4px;margin:2px auto 0;direction:ltr;}
+  .statrow .st-bar{position:absolute;inset-inline:0;bottom:12px;width:min(230px,82%);height:4px;margin:0 auto;direction:ltr;}
   .statrow .st-bar.v span{background:var(--grad);}
   .statrow .st-bar.i span{background:linear-gradient(90deg,var(--success),var(--success-dim));}
   .statrow .st-bar.near span{background:linear-gradient(90deg,var(--warn),#f0b429);}
@@ -314,7 +377,7 @@
   }
 
   /* ---------- file grid ---------- */
-  .filegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,var(--card-size)),var(--card-size)));gap:14px;justify-content:center;}
+  .filegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(var(--card-size),100%),1fr));gap:14px;}
   .fcard{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);
     transition:transform .14s,border-color .14s,box-shadow .14s;display:flex;flex-direction:column;}
   .fcard:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:var(--shadow-lg);}
@@ -396,9 +459,24 @@
   .facts .ab.pick.on{background:var(--accent);border-color:var(--accent);box-shadow:0 2px 8px var(--grad-shadow);}
   .facts .ab.pick.on svg{opacity:1;color:#fff;}
   .facts .ab.pick.on:hover{background:var(--accent-dim);border-color:var(--accent-dim);}
-  .facts .movesel{flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:8px;
-    font-family:var(--mono);font-size:11px;padding:6px 6px;cursor:pointer;height:30px;}
-  .facts .movesel:focus{outline:none;border-color:var(--accent);}
+  /* per-card "move to folder" — themed trigger + shared rounded popup (matches the batch .foldersel) */
+  .facts .cardmove{flex:1;min-width:0;display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 9px;cursor:pointer;
+    background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:8px;
+    font-family:inherit;font-size:11.5px;font-weight:600;transition:border-color .12s,background .12s,color .12s,box-shadow .12s;}
+  .facts .cardmove:hover{border-color:var(--accent);color:var(--ink-2);}
+  .facts .cardmove:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .facts .cardmove.open{border-color:var(--accent);background:var(--panel);color:var(--ink-2);box-shadow:0 0 0 3px var(--accent-soft);}
+  .facts .cardmove .cm-ic{width:14px;height:14px;flex-shrink:0;color:var(--accent);}
+  .facts .cardmove .cm-label{flex:1;min-width:0;text-align:start;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .facts .cardmove .cm-chev{width:13px;height:13px;flex-shrink:0;color:var(--faint);transition:transform .2s ease,color .12s;}
+  .facts .cardmove.open .cm-chev{transform:rotate(180deg);color:var(--accent);}
+  /* per-card popup: an empty .fs-menu inside each card's wrapper, positioned by CSS (zoom-safe, unlike fixed+JS coords) */
+  .cardmovewrap{position:relative;flex:1;min-width:0;display:flex;}
+  .cardmove-menu{z-index:60;}
+  .cardmove-menu.up{top:auto;bottom:calc(100% + 6px);}
+  .fcard.cm-open{overflow:visible;z-index:40;}
+  .fs-item.on{background:var(--accent-soft);color:var(--accent-dim);font-weight:700;}
+  html[data-theme="dark"] .fs-item.on{color:var(--accent);}
 
   /* ---------- locked (assigned) card — shown but unavailable in "all files" ---------- */
   .fcard.locked{cursor:default;}
@@ -415,6 +493,12 @@
     background:var(--accent-soft);border:1px solid var(--accent);border-radius:8px;padding:7px 9px;overflow:hidden;}
   .fassigned svg{width:14px;height:14px;flex-shrink:0;color:var(--accent);}
   .fassigned span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .movemain{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:var(--sans);
+    font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent);
+    border-radius:8px;padding:9px 10px;cursor:pointer;transition:background .12s,color .12s,filter .1s;}
+  .movemain:hover{background:var(--accent);color:#fff;}
+  .movemain svg{width:15px;height:15px;flex-shrink:0;}
+  .movemain span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
   /* ---------- empty state ---------- */
   .empty{text-align:center;padding:60px 20px;color:var(--muted);}
@@ -506,8 +590,45 @@
   .cfield.full{grid-column:1 / -1;}
   .cfield label{font-size:12px;color:var(--muted);font-weight:600;}
   .cfield input,.cfield select{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
-    border-radius:10px;font-family:var(--sans);font-size:13.5px;padding:10px 12px;}
-  .cfield input:focus,.cfield select:focus{outline:none;border-color:var(--accent);}
+    border-radius:10px;font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .cfield input:focus,.cfield select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  /* native <select> paints its caret + focus differently per OS/direction, which made the
+     purple focus border read as a stray half-line; give every dropdown one themed appearance */
+  .cfield select{appearance:none;-webkit-appearance:none;cursor:pointer;background-repeat:no-repeat;background-size:15px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23727a8a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");}
+  html[data-theme="dark"] .cfield select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b93a4' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");}
+  html[dir="rtl"] .cfield select{background-position:left 12px center;padding-left:34px;}
+  html[dir="ltr"] .cfield select{background-position:right 12px center;padding-right:34px;}
+  /* a field that's locked out by a sibling control (e.g. watermark type=logo) */
+  .cfield-lockwrap{position:relative;width:100%;}
+  .cfield-lockwrap .cfield-lockic{position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);
+    width:17px;height:17px;color:var(--muted);pointer-events:none;display:none;}
+  .cfield-lockwrap .cfield-lockic svg{width:100%;height:100%;display:block;}
+  .cfield-lockwrap.locked input{opacity:.5;cursor:not-allowed;padding-inline-end:34px;color:var(--muted);}
+  .cfield-lockwrap.locked .cfield-lockic{display:block;}
+  /* ---------- logo uploader (branding) — feeds the "logo" watermark ---------- */
+  .logup{display:flex;align-items:center;gap:13px;}
+  .logup-prev{width:66px;height:66px;flex-shrink:0;border-radius:12px;border:1px solid var(--line);overflow:hidden;
+    display:flex;align-items:center;justify-content:center;background-color:var(--panel-2);
+    background-image:linear-gradient(45deg,rgba(128,128,128,.16) 25%,transparent 25%,transparent 75%,rgba(128,128,128,.16) 75%),
+                     linear-gradient(45deg,rgba(128,128,128,.16) 25%,transparent 25%,transparent 75%,rgba(128,128,128,.16) 75%);
+    background-size:14px 14px;background-position:0 0,7px 7px;}
+  .logup-prev img{width:100%;height:100%;object-fit:contain;}
+  .logup-ph{font-family:var(--mono);font-size:9px;color:var(--faint);text-align:center;padding:5px;letter-spacing:.03em;line-height:1.3;}
+  .logup-actions{display:flex;flex-direction:column;gap:8px;}
+  .logup-btn,.logup-rm{border-radius:9px;font-family:var(--sans);font-size:12.5px;font-weight:600;padding:8px 15px;cursor:pointer;}
+  .logup-btn{background:var(--accent-soft);color:var(--accent-dim);border:1px solid transparent;}
+  .logup-rm{background:transparent;color:var(--danger);border:1px solid var(--line);}
+  .logup-hint{display:block;margin-top:8px;font-size:11.5px;color:var(--muted);line-height:1.4;}
+  /* ---------- watermark overlay painted on gallery thumbnails ---------- */
+  .fwm{position:absolute;z-index:3;pointer-events:none;display:flex;align-items:center;justify-content:center;max-width:46%;max-height:46%;}
+  .fwm.pos-tl{top:8%;left:8%;} .fwm.pos-tr{top:8%;right:8%;}
+  .fwm.pos-bl{bottom:8%;left:8%;} .fwm.pos-br{bottom:8%;right:8%;}
+  .fwm.pos-c{top:50%;left:50%;transform:translate(-50%,-50%);max-width:74%;}
+  .fwm img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5));}
+  .fwm .fwm-tx{font-family:var(--sans);font-weight:800;color:#fff;font-size:12.5px;letter-spacing:.02em;line-height:1.15;
+    white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.65),0 0 2px rgba(0,0,0,.5);}
+  .fwm.pos-c .fwm-tx{font-size:16px;}
   .permlist{display:flex;flex-direction:column;}
   .permrow{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line-2);
     cursor:pointer;user-select:none;}
@@ -786,7 +907,14 @@
       <span class="msgroup" id="msGroup" hidden>
         <span class="selcount mscount" id="msCount"></span>
         <button class="btnline" id="msPickAllBtn" type="button"><span data-i18n="selectAll"></span></button>
-        <select class="msmovesel" id="msMoveSel" data-i18n-title="msMoveTitle" disabled></select>
+        <div class="foldersel" id="msMoveSel">
+          <button type="button" class="fs-trigger" id="msMoveTrigger" data-i18n-title="msMoveTitle" aria-haspopup="listbox" aria-expanded="false" disabled>
+            <svg class="fs-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+            <span class="fs-label" data-i18n="msPh"></span>
+            <svg class="fs-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="fs-menu" id="msMoveMenu" role="listbox" hidden></div>
+        </div>
         <button class="btnline danger" id="msDelBtn" type="button" disabled>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           <span data-i18n="delSelected"></span>
@@ -926,6 +1054,7 @@
   <div class="modal">
     <h3 id="confirmTitle"></h3>
     <p id="confirmBody"></p>
+    <label class="chkline" id="confirmDsaRow" style="display:none;"><input type="checkbox" id="confirmDsa"><span id="confirmDsaLabel"></span></label>
     <div class="mactions">
       <button class="mbtn danger" id="confirmYes" type="button"></button>
       <button class="mbtn ghost" id="confirmNo" type="button" data-i18n="cancel"></button>
@@ -1004,20 +1133,6 @@
             <div class="cfield full">
               <label data-i18n="alDescL"></label>
               <textarea id="alDesc" data-i18n-ph="alDescPh" spellcheck="false"></textarea>
-            </div>
-            <div class="cfield">
-              <label data-i18n="alEventTypeL"></label>
-              <select id="alEventType">
-                <option value="wedding" data-i18n="etWedding"></option>
-                <option value="party" data-i18n="etParty"></option>
-                <option value="corporate" data-i18n="etCorporate"></option>
-                <option value="portrait" data-i18n="etPortrait"></option>
-                <option value="other" data-i18n="etOther"></option>
-              </select>
-            </div>
-            <div class="cfield">
-              <label data-i18n="alLocationL"></label>
-              <input id="alLocation" type="text" data-i18n-ph="alLocationPh" spellcheck="false">
             </div>
             <div class="cfield full">
               <label data-i18n="alCoverL"></label>
@@ -1278,6 +1393,19 @@
               <input id="alBrandColor" type="color" value="#7c3aed">
             </div>
             <div class="cfield full">
+              <label data-i18n="alBrandLogoL"></label>
+              <div class="logup" id="alLogoUp">
+                <div class="logup-prev" id="alLogoPrev"><span class="logup-ph" data-i18n="alBrandLogoNone"></span></div>
+                <div class="logup-actions">
+                  <button type="button" class="logup-btn" id="alLogoPick" data-i18n="alBrandLogoUpload"></button>
+                  <button type="button" class="logup-rm hidden" id="alLogoRm" data-i18n="alBrandLogoRemove"></button>
+                </div>
+                <input type="file" id="alLogoFile" accept="image/*" hidden>
+                <input type="hidden" id="alBrandLogo">
+              </div>
+              <small class="logup-hint" data-i18n="alBrandLogoHint"></small>
+            </div>
+            <div class="cfield full">
               <label data-i18n="alWelcomeL"></label>
               <textarea id="alWelcome" data-i18n-ph="alWelcomePh" spellcheck="false"></textarea>
             </div>
@@ -1316,7 +1444,10 @@
             </div>
             <div class="cfield full">
               <label data-i18n="alWmTextL"></label>
-              <input id="alWmText" type="text" data-i18n-ph="alWmTextPh" spellcheck="false">
+              <div class="cfield-lockwrap" id="alWmTextWrap">
+                <input id="alWmText" type="text" data-i18n-ph="alWmTextPh" spellcheck="false">
+                <span class="cfield-lockic" id="alWmTextLock" aria-hidden="true"></span>
+              </div>
             </div>
             <div class="cfield full">
               <label data-i18n="alWmOpacityL"></label>
@@ -1629,7 +1760,7 @@
       dir:'rtl', langIco:'EN',
       toEditor:'לעורך', help:'עזרה', signin:'התחברות', send:'שליחת קבצים',
       kick:'מסך העבודה המרכזי',
-      pageTitle:'ארגון קבצים',
+      pageTitle:'בחירת קבצים',
       pageSub:'ארגנו, מיינו ותייגו את קבצי המדיה שלכם — תמונות, וידאו, אודיו ומסמכים. הכול רץ בדפדפן, שום קובץ לא עולה לשרת.',
       searchPh:'חיפוש קבצים…', gridSize:'גודל תצוגה',
       showMovedInMain:'הצג קבצים שהועברו בתיקייה הראשית',
@@ -1649,11 +1780,11 @@
       pickHint:'סמן / בטל סימון', msCount:n=>`<b>${n}</b> סומנו`, msPh:'העבר לתיקייה…', msMoveTitle:'העבר את המסומנים לתיקייה',
       delSelected:'מחק נבחרים',
       downloadZip:'הורדת הכל (ZIP)', preparingZip:'מכין…', zipName:'גלריה', zipError:'לא ניתן ליצור את קובץ ה־ZIP',
-      foldersTitle:'תיקיות', allFiles:'תיקייה ראשית', unsorted:'ללא תיקייה', folderSearchPh:'חיפוש קבצים…', noFolders:'אין תוצאות תואמות',
+      foldersTitle:'תיקיות', allFiles:'תיקייה ראשית', unsorted:'ללא תיקייה', folderSearchPh:'חיפוש קבצים…', noFolders:'אין תוצאות תואמות', reorderFolderTip:'גררו לשינוי סדר התיקיות',
       statTotal:'סה״כ קבצים', statImages:'תמונות', statVideos:'וידאו', statDocs:'מסמכים', statSize:'נפח כולל',
       statGalleryTotal:'\u05e1\u05d4\u05f4\u05db \u05e7\u05d1\u05e6\u05d9\u05dd \u05d1\u05d2\u05dc\u05e8\u05d9\u05d4', statImagesSelected:'\u05ea\u05de\u05d5\u05e0\u05d5\u05ea \u05e0\u05d1\u05d7\u05e8\u05d5', statVideosSelected:'\u05e1\u05e8\u05d8\u05d5\u05e0\u05d9\u05dd \u05e0\u05d1\u05d7\u05e8\u05d5', statSelectedTotal:'\u05e0\u05d1\u05d7\u05e8\u05d5 \u05e1\u05d4\u05f4\u05db',
       moreActions:'עוד פעולות', capLabel:'כיתוב לקובץ',
-      dropBig:'גררו קבצים או תיקיות לכאן', or:'או', choose:'בחירת קבצים', chooseFolder:'בחירת תיקייה',
+      dropBig:'גררו קבצים או תיקיות לכאן', or:'או', choose:'הוספת קבצים', chooseFolder:'הוספת תיקייה',
       fmts:'תמונות · וידאו · אודיו · מסמכים',
       sizeNote:'ניתן להעלות עד 2GB בכל פעם',
       emptyTitle:'אין כאן קבצים עדיין', emptySub:'גררו קבצים לכאן כדי להתחיל לארגן',
@@ -1670,9 +1801,11 @@
       confirmDelTitle:'למחוק קבצים?', confirmDelBody:n=>`${n} קבצים יוסרו מהרשימה. לא ניתן לבטל.`,
       confirmDelFolderTitle:'למחוק תיקייה?', confirmDelFolderBody:name=>`התיקייה "${name}" תימחק. הקבצים ותתי־התיקיות שבתוכה יועברו רמה אחת מעלה.`,
       confirmYes:'כן, מחק',
-      unassign:'בטל שיוך לתיקייה', unassignTitle:'להחזיר לתיקייה הראשית?',
-      unassignBody:'פעולה זו תחזיר את הקובץ לתיקייה הראשית.\nהאם ברצונך להמשיך?',
-      unassignConfirm:'כן, המשך', unassignDone:'הקובץ הוחזר לתיקייה הראשית',
+      unassign:'העבר לתיקייה הראשית', moveToMain:'העבר לתיקייה הראשית',
+      unassignTitle:'האם ברצונך להעביר קובץ זה לתיקייה הראשית?',
+      unassignBody:'הקובץ יוסר מהתיקייה הנוכחית ויועבר לתיקייה הראשית.',
+      unassignConfirm:'כן, העבר לתיקייה הראשית', unassignDone:'הקובץ הועבר לתיקייה הראשית',
+      dontShowAgain:'אל תציג לי הודעה זו שוב',
       moveChoiceTitle:n=>`נבחרו ${n} קבצים להעברה`,
       moveChoicePrompt:'לאיזו פעולה תרצה להמשיך?',
       moveAllSelected:name=>`העבר את כל הקבצים המסומנים לתיקייה „${name}“`,
@@ -1706,8 +1839,6 @@
       secAlbum:'פרטי הפרויקט',
       alTitleL:'שם הפרויקט', alTitlePh:'למשל: החתונה של דנה ויוסי',
       alDescL:'תיאור קצר', alDescPh:'כמה מילים על האירוע…',
-      alEventTypeL:'סוג האירוע', etWedding:'חתונה', etParty:'מסיבה', etCorporate:'אירוע עסקי', etPortrait:'צילומי פורטרט', etOther:'אחר',
-      alLocationL:'מיקום', alLocationPh:'עיר / אולם',
       alCoverL:'תמונת קאבר', alCoverBtn:'העלה תמונה',
       secVisibility:'נראות הפרויקט', alVisibilityL:'מי יכול לראות',
       visPrivate:'פרטי — רק אני', visLink:'כל מי שיש לו קישור', visPassword:'מוגן בסיסמה',
@@ -1736,6 +1867,8 @@
       alEditRequestsL:'אפשר בקשות עריכה', alEditRequestsD:'הלקוח משאיר הערה על תמונה (להחליף / למחוק / לערוך)',
       secBrand:'מיתוג אישי',
       alBrandNameL:'שם העסק', alBrandNamePh:'שם הסטודיו / העסק', alBrandColorL:'צבע מותג',
+      alBrandLogoL:'לוגו', alBrandLogoUpload:'העלה לוגו', alBrandLogoRemove:'הסר', alBrandLogoNone:'אין לוגו',
+      alBrandLogoHint:'ישמש כסימן מים כשסוג הסימן הוא "לוגו". אם לא הועלה לוגו — יוצג שם העסק כטקסט.',
       alWelcomeL:'הודעת פתיחה', alWelcomePh:'ברוכים הבאים לפרויקט…', alFooterL:'טקסט תחתון', alFooterPh:'נוצר באהבה על ידי…',
       secWm:'סימן מים', alWmOnL:'הפעל סימן מים', alWmOnD:'סימן מים יוצג על תמונות התצוגה',
       alWmTypeL:'סוג', wmLogo:'לוגו', wmText:'טקסט', alWmTextL:'טקסט הסימן', alWmTextPh:'© הסטודיו שלי',
@@ -1808,7 +1941,7 @@
       pickHint:'Mark / unmark', msCount:n=>`<b>${n}</b> marked`, msPh:'Move to folder…', msMoveTitle:'Move marked to folder',
       delSelected:'Delete',
       downloadZip:'Download all (ZIP)', preparingZip:'Preparing…', zipName:'gallery', zipError:'Could not create the ZIP',
-      foldersTitle:'Folders', allFiles:'All files', unsorted:'Unsorted', folderSearchPh:'Search files…', noFolders:'No matching results',
+      foldersTitle:'Folders', allFiles:'All files', unsorted:'Unsorted', folderSearchPh:'Search files…', noFolders:'No matching results', reorderFolderTip:'Drag to reorder folders',
       statTotal:'Total files', statImages:'Images', statVideos:'Video', statDocs:'Documents', statSize:'Total size',
       statGalleryTotal:'Files in gallery', statImagesSelected:'Photos selected', statVideosSelected:'Videos selected', statSelectedTotal:'Selected total',
       moreActions:'More actions', capLabel:'File caption',
@@ -1829,9 +1962,11 @@
       confirmDelTitle:'Delete files?', confirmDelBody:n=>`${n} files will be removed from the list. This can’t be undone.`,
       confirmDelFolderTitle:'Delete folder?', confirmDelFolderBody:name=>`The folder "${name}" will be deleted. Its files and subfolders move up one level.`,
       confirmYes:'Yes, delete',
-      unassign:'Remove from folder', unassignTitle:'Return to the main folder?',
-      unassignBody:'This action will return the file to the main folder.\nWould you like to continue?',
-      unassignConfirm:'Yes, continue', unassignDone:'The file was returned to the main folder',
+      unassign:'Move to main folder', moveToMain:'Move to main folder',
+      unassignTitle:'Move this file to the main folder?',
+      unassignBody:'The file will be removed from its current folder and moved to the main folder.',
+      unassignConfirm:'Yes, move to main folder', unassignDone:'The file was moved to the main folder',
+      dontShowAgain:"Don't show me this message again",
       moveChoiceTitle:n=>`${n} files selected to move`,
       moveChoicePrompt:'Which action would you like?',
       moveAllSelected:name=>`Move all selected files to “${name}”`,
@@ -1865,8 +2000,6 @@
       secAlbum:'Project details',
       alTitleL:'Project name', alTitlePh:'e.g. Dana & Joe’s wedding',
       alDescL:'Short description', alDescPh:'A few words about the event…',
-      alEventTypeL:'Event type', etWedding:'Wedding', etParty:'Party', etCorporate:'Corporate', etPortrait:'Portrait session', etOther:'Other',
-      alLocationL:'Location', alLocationPh:'City / venue',
       alCoverL:'Cover image', alCoverBtn:'Upload image',
       secVisibility:'Project visibility', alVisibilityL:'Who can view',
       visPrivate:'Private — only me', visLink:'Anyone with the link', visPassword:'Password protected',
@@ -1895,6 +2028,8 @@
       alEditRequestsL:'Allow edit requests', alEditRequestsD:'The client leaves a note on a photo (replace / delete / edit)',
       secBrand:'Personal branding',
       alBrandNameL:'Business name', alBrandNamePh:'Studio / business name', alBrandColorL:'Brand color',
+      alBrandLogoL:'Logo', alBrandLogoUpload:'Upload logo', alBrandLogoRemove:'Remove', alBrandLogoNone:'No logo',
+      alBrandLogoHint:'Used as the watermark when the type is “Logo”. If no logo is uploaded, the business name is shown as text instead.',
       alWelcomeL:'Welcome message', alWelcomePh:'Welcome to the project…', alFooterL:'Footer text', alFooterPh:'Made with love by…',
       secWm:'Watermark', alWmOnL:'Enable watermark', alWmOnD:'A watermark is shown on preview images',
       alWmTypeL:'Type', wmLogo:'Logo', wmText:'Text', alWmTextL:'Watermark text', alWmTextPh:'© My Studio',
@@ -1967,7 +2102,7 @@
       pickHint:'Отметить / снять', msCount:n=>`Отмечено: <b>${n}</b>`, msPh:'В папку…', msMoveTitle:'Переместить отмеченные в папку',
       delSelected:'Удалить',
       downloadZip:'Скачать всё (ZIP)', preparingZip:'Готовим…', zipName:'галерея', zipError:'Не удалось создать ZIP',
-      foldersTitle:'Папки', allFiles:'Все файлы', unsorted:'Без сортировки', folderSearchPh:'Поиск файлов…', noFolders:'Нет совпадений',
+      foldersTitle:'Папки', allFiles:'Все файлы', unsorted:'Без сортировки', folderSearchPh:'Поиск файлов…', noFolders:'Нет совпадений', reorderFolderTip:'Перетащите, чтобы изменить порядок',
       statTotal:'Всего файлов', statImages:'Фото', statVideos:'Видео', statDocs:'Документы', statSize:'Общий размер',
       statGalleryTotal:'\u0424\u0430\u0439\u043b\u043e\u0432 \u0432 \u0433\u0430\u043b\u0435\u0440\u0435\u0435', statImagesSelected:'\u0424\u043e\u0442\u043e \u0432\u044b\u0431\u0440\u0430\u043d\u043e', statVideosSelected:'\u0412\u0438\u0434\u0435\u043e \u0432\u044b\u0431\u0440\u0430\u043d\u043e', statSelectedTotal:'\u0412\u044b\u0431\u0440\u0430\u043d\u043e \u0432\u0441\u0435\u0433\u043e',
       moreActions:'Ещё действия', capLabel:'Подпись файла',
@@ -1988,9 +2123,11 @@
       confirmDelTitle:'Удалить файлы?', confirmDelBody:n=>`${n} файлов будет удалено из списка. Это нельзя отменить.`,
       confirmDelFolderTitle:'Удалить папку?', confirmDelFolderBody:name=>`Папка «${name}» будет удалена. Её файлы и подпапки поднимутся на уровень выше.`,
       confirmYes:'Да, удалить',
-      unassign:'Убрать из папки', unassignTitle:'Вернуть в основную папку?',
-      unassignBody:'Это действие вернёт файл в основную папку.\nПродолжить?',
-      unassignConfirm:'Да, продолжить', unassignDone:'Файл возвращён в основную папку',
+      unassign:'Переместить в основную папку', moveToMain:'Переместить в основную папку',
+      unassignTitle:'Переместить этот файл в основную папку?',
+      unassignBody:'Файл будет удалён из текущей папки и перемещён в основную папку.',
+      unassignConfirm:'Да, переместить в основную папку', unassignDone:'Файл перемещён в основную папку',
+      dontShowAgain:'Больше не показывать это сообщение',
       moveChoiceTitle:n=>`Выбрано файлов для перемещения: ${n}`,
       moveChoicePrompt:'Какое действие выполнить?',
       moveAllSelected:name=>`Переместить все выбранные файлы в «${name}»`,
@@ -2024,8 +2161,6 @@
       secAlbum:'Данные проекта',
       alTitleL:'Название проекта', alTitlePh:'напр.: Свадьба Даны и Йоси',
       alDescL:'Краткое описание', alDescPh:'Несколько слов о событии…',
-      alEventTypeL:'Тип события', etWedding:'Свадьба', etParty:'Вечеринка', etCorporate:'Корпоратив', etPortrait:'Портретная съёмка', etOther:'Другое',
-      alLocationL:'Место', alLocationPh:'Город / площадка',
       alCoverL:'Обложка', alCoverBtn:'Загрузить изображение',
       secVisibility:'Видимость проекта', alVisibilityL:'Кто может смотреть',
       visPrivate:'Приватный — только я', visLink:'Любой, у кого есть ссылка', visPassword:'Защищён паролем',
@@ -2054,6 +2189,8 @@
       alEditRequestsL:'Разрешить запросы правок', alEditRequestsD:'Клиент оставляет заметку к фото (заменить / удалить / отредактировать)',
       secBrand:'Личный бренд',
       alBrandNameL:'Название бизнеса', alBrandNamePh:'Название студии / бизнеса', alBrandColorL:'Цвет бренда',
+      alBrandLogoL:'Логотип', alBrandLogoUpload:'Загрузить логотип', alBrandLogoRemove:'Удалить', alBrandLogoNone:'Нет логотипа',
+      alBrandLogoHint:'Используется как водяной знак при типе «Логотип». Если логотип не загружен, показывается название бизнеса.',
       alWelcomeL:'Приветствие', alWelcomePh:'Добро пожаловать в проект…', alFooterL:'Нижний текст', alFooterPh:'Сделано с любовью…',
       secWm:'Водяной знак', alWmOnL:'Включить водяной знак', alWmOnD:'Водяной знак показывается на превью',
       alWmTypeL:'Тип', wmLogo:'Логотип', wmText:'Текст', alWmTextL:'Текст знака', alWmTextPh:'© Моя студия',
@@ -2128,10 +2265,61 @@
   let uid=1; const nid = () => 'x'+(uid++)+'_'+Date.now().toString(36);
   let albumMgr = null;            // cached client selection-limit config (drives the GREEN check quota); set in init()
   let quotaState = null;          // per-render snapshot of the active limit + live selected counts
+  let wmState = null;             // per-render snapshot of the resolved watermark (logo/text) to paint on thumbs
   let selConfirmed=false;         // client has locked in their album pick — green selection frozen
   let selPromptShown=false;       // the "are you finished?" dialog was already offered for the current full-cap state
+  let organizerUsageStarted=false;
 
   // ---- helpers ----
+  function organizerPayloadError(payload){
+    if(payload.files > 5) return { code:'payload_limit', field:'files', max:5, actual:payload.files };
+    if(payload.folders > 3) return { code:'payload_limit', field:'folders', max:3, actual:payload.folders };
+    return null;
+  }
+  function showOrganizerUsageLimit(info){
+    if(window.KolkliUsage && window.KolkliUsage.showBlocked) window.KolkliUsage.showBlocked(info,'organize-files');
+    else showToast(info && info.field==='folders' ? 'Folder limit reached' : 'File limit reached');
+  }
+  async function withOrganizerUsage(payload, work){
+    const localErr=organizerPayloadError(payload);
+    if(localErr){ showOrganizerUsageLimit(localErr); return false; }
+    if(window.KolkliUsage && window.KolkliUsage.guard && !organizerUsageStarted){
+      try{
+        await window.KolkliUsage.guard('organize-files', payload, async()=>{
+          const value=await work();
+          organizerUsageStarted=true;
+          return value;
+        });
+        return true;
+      }catch(err){
+        if(err && err.usage) return false;
+        throw err;
+      }
+    }
+    await work();
+    organizerUsageStarted=true;
+    return true;
+  }
+  function estimateNewFolders(items, baseParentId){
+    const seen=new Set();
+    let extra=0;
+    (items||[]).forEach(it=>{
+      let parent=baseParentId||null;
+      let pseudo='p:'+(parent||'root');
+      (it.segs||[]).forEach(seg=>{
+        const name=String(seg||'').trim();
+        if(!name) return;
+        const existing = (typeof parent === 'string' && parent.indexOf('new:') === 0)
+          ? null
+          : folders.find(x=>(x.parentId||null)===(parent||null) && x.name===name);
+        if(existing){ parent=existing.id; pseudo='p:'+parent; return; }
+        pseudo += '/' + name.toLowerCase();
+        if(!seen.has(pseudo)){ seen.add(pseudo); extra++; }
+        parent='new:'+pseudo;
+      });
+    });
+    return extra;
+  }
   function safeOwnerId(v){ return String(v||'guest').toLowerCase().replace(/[^a-z0-9_.@-]+/g,'_') || 'guest'; }
   function currentOwnerId(){
     let email=''; try{ email=(localStorage.getItem('ac_session')||'').toLowerCase(); }catch(_){}
@@ -2190,9 +2378,11 @@
     trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
     check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
     folder:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>',
+    undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>',
     layers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>',
     pencil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
     dots:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>',
+    grip:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>',
     noentry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/></svg>',
     chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
     folderplus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 10v6"/><path d="M9 13h6"/></svg>',
@@ -2252,7 +2442,9 @@
     const q=folderQuery.trim().toLowerCase();
     const show = q ? folderSearchSet(q) : null;
     let renderedFolders = 0;
+    let ordN = 0;   // running 1-based counter → the "01, 02, 03…" badge shown at the start of each folder row
     let html = `<div class="fitem ${currentFolder==='all'?'on':''}" data-folder="all" data-drop="all">
+        <span class="fi-num" dir="ltr" aria-hidden="true">ALL</span>
         <span class="fi-tw"></span>
         <span class="fi-ic">${ICON.layers}</span>
         <span class="fi-name">${escapeHtml(t.allFiles)}</span>
@@ -2266,7 +2458,11 @@
         const tw=hasKids
           ? `<button class="tw ${open?'open':''}" data-ftoggle="${fo.id}" aria-label="toggle">${ICON.chev}</button>`
           : '';
+        ordN++;
+        const num = ordN < 10 ? '0'+ordN : ''+ordN;   // zero-pad to at least two digits
         html+=`<div class="fitem ${currentFolder===fo.id?'on':''}" data-folder="${fo.id}" data-drop="${fo.id}" draggable="true">
+          <span class="fi-num" dir="ltr" aria-hidden="true">${num}</span>
+          <button class="fi-grip" data-fgrip="${fo.id}" title="${escapeHtml(t.reorderFolderTip||'')}" aria-label="${escapeHtml(t.reorderFolderTip||'')}">${ICON.grip}</button>
           <span class="fi-tw" style="margin-inline-start:${depth*15}px">${tw}</span>
           <span class="fi-ic">${ICON.folder}</span>
           <span class="fi-name" title="${escapeHtml(fo.name)}">${escapeHtml(fo.name)}</span>
@@ -2285,17 +2481,11 @@
     list.innerHTML=html;
   }
 
-  function moveOptions(sel){
-    let o=`<option value="" ${sel==null?'selected':''}>${escapeHtml(t.unsorted)}</option>`;
-    const walk=(parentId,depth)=>{
-      folders.filter(f=>(f.parentId||null)===parentId).forEach(fo=>{
-        const prefix = depth>0 ? '  '.repeat(depth)+'└ ' : '';
-        o+=`<option value="${fo.id}" ${sel===fo.id?'selected':''}>${escapeHtml(prefix+fo.name)}</option>`;
-        walk(fo.id, depth+1);
-      });
-    };
-    walk(null,0);
-    return o;
+  // label shown on a card's themed folder trigger: the file's current folder, or the "Folder" placeholder
+  function moveLabel(folderId){
+    if(folderId==null) return t.moveTo;
+    const f=folders.find(x=>x.id===folderId);
+    return f ? f.name : t.moveTo;
   }
 
   function thumbHtml(f){
@@ -2316,11 +2506,34 @@
     return `<span class="ph ${cls}">${ic}<span class="pext">${escapeHtml(f.ext.toUpperCase())}</span></span>`;
   }
 
+  // Resolve the album's saved watermark settings into what should actually paint on a thumb.
+  // type "logo" uses the uploaded brand logo; if none was uploaded it falls back to the
+  // watermark text, and then to the business name.
+  function computeWm(){
+    let a; try{ a=loadAlbum(); }catch(_){ return null; }
+    if(!a || !a.alWmOn) return null;
+    const pos=a.alWmPos||'br';
+    const op=Math.max(5, Math.min(100, +a.alWmOpacity||35))/100;
+    if(a.alWmType==='logo' && a.alBrandLogo){
+      return { kind:'logo', src:a.alBrandLogo, pos, op };
+    }
+    const txt=((a.alWmText||'').trim()) || ((a.alBrandName||'').trim());
+    if(!txt) return null;
+    return { kind:'text', text:txt, pos, op };
+  }
+  function wmOverlayHtml(f){
+    if(!wmState) return '';
+    if(f.kind!=='image' && f.kind!=='video') return ''; // only over visual media
+    const inner = wmState.kind==='logo'
+      ? `<img src="${wmState.src}" alt="">`
+      : `<span class="fwm-tx">${escapeHtml(wmState.text)}</span>`;
+    return `<div class="fwm pos-${wmState.pos}" style="opacity:${wmState.op}">${inner}</div>`;
+  }
+
   function fileXButtonHtml(f){
-    const assigned=f.folderId!=null;
-    const label=assigned ? t.unassign : t.del;
-    const action=assigned ? 'data-unassign' : 'data-del';
-    return `<button class="fdel-x" ${action}="${f.id}" title="${escapeHtml(label)}" aria-label="${escapeHtml(label)}">${ICON.xmark}</button>`;
+    // the corner red X always deletes the file — never "move to main". Moving a file out of
+    // a folder is done via the folder dropdown (active cards) or the "move to main" button (locked cards).
+    return `<button class="fdel-x" data-del="${f.id}" title="${escapeHtml(t.del)}" aria-label="${escapeHtml(t.del)}">${ICON.xmark}</button>`;
   }
 
   // Grab a still frame from a video clip to use as its thumbnail. Runs once per file,
@@ -2394,6 +2607,7 @@
         <div class="fthumb">
           <span class="fnum" title="${escapeHtml(t.orderTitle)}">${pad3(ord)}</span>
           ${thumbHtml(f)}
+          ${wmOverlayHtml(f)}
           ${fileXButtonHtml(f)}
           <div class="fcheck" data-check="${f.id}" title="${escapeHtml(t.selectHint)}">${ICON.check}</div>
           <div class="lockbadge">
@@ -2404,6 +2618,7 @@
         <div class="fmeta">
           ${f.note?`<div class="fcapview" title="${escapeHtml(f.note)}">${escapeHtml(f.note)}</div>`:''}
           <div class="fassigned">${ICON.folder}<span>${escapeHtml(fn)}</span></div>
+          <button class="movemain" data-unassign="${f.id}" type="button" title="${escapeHtml(t.moveToMain)}">${ICON.undo}<span>${escapeHtml(t.moveToMain)}</span></button>
         </div>
       </div>`;
   }
@@ -2414,6 +2629,7 @@
         <div class="fthumb" data-preview="${f.id}">
           <span class="fnum" title="${escapeHtml(t.orderTitle)}">${pad3(ord)}</span>
           ${thumbHtml(f)}
+          ${wmOverlayHtml(f)}
           ${fileXButtonHtml(f)}
           <div class="fcheck" data-check="${f.id}" title="${escapeHtml(t.selectHint)}">${ICON.check}</div>
           <div class="fname-ov">${escapeHtml(f.name)}</div>
@@ -2422,7 +2638,14 @@
           <input class="fcap" type="text" data-note="${f.id}" value="${escapeHtml(f.note||'')}" placeholder="${escapeHtml(t.addNote)}" spellcheck="false">
           <div class="facts">
             <button class="ab pick ${f.picked?'on':''}" data-pick="${f.id}" title="${escapeHtml(t.pickHint)}" aria-pressed="${f.picked?'true':'false'}">${ICON.check}</button>
-            <select class="movesel" data-move="${f.id}" title="${escapeHtml(t.moveTo)}">${moveOptions(f.folderId)}</select>
+            <div class="cardmovewrap">
+              <button type="button" class="cardmove" data-move="${f.id}" title="${escapeHtml(t.moveTo)}" aria-haspopup="listbox" aria-expanded="false">
+                <svg class="cm-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+                <span class="cm-label">${escapeHtml(moveLabel(f.folderId))}</span>
+                <svg class="cm-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="fs-menu cardmove-menu" role="listbox" hidden></div>
+            </div>
           </div>
         </div>
       </div>`;
@@ -2433,6 +2656,7 @@
     grid.className = 'filegrid';
     const vis=visibleFiles();
     quotaState=computeQuota(); // snapshot the limit + live counts once for this render pass
+    wmState=computeWm();       // snapshot the album watermark config once per render
     if(!vis.length){ grid.innerHTML=''; empty.classList.remove('hidden'); updateSelBar(); return; }
     empty.classList.add('hidden');
     const cardHtml = (f,i)=> isLocked(f) ? lockedCardHtml(f,i+1) : activeCardHtml(f,i+1);
@@ -2452,7 +2676,7 @@
     if(nPick>0){
       el('msCount').innerHTML = t.msCount(nPick);
       el('msDelBtn').disabled = false;
-      el('msMoveSel').disabled = false;
+      el('msMoveTrigger').disabled = false;
       const allPick = total>0 && vis.every(f=>f.picked);
       el('msPickAllBtn').querySelector('span').textContent = allPick? t.deselectAll : t.selectAll;
       refreshMsMove();
@@ -2462,9 +2686,17 @@
   function renderAll(){ renderFolders(); renderGrid(); renderStats(); }
 
   // ---- stats strip: gallery total + live client-pick quotas ----
+  function videosEnabled(m){
+    if(!m || !m.limitOn) return true;
+    return !(m.maxVideos===0 || m.preset==='album' || m.preset==='prints');
+  }
   function statQuota(){
     const m = albumMgr && albumMgr.limitOn ? albumMgr : null;
     if(!m) return { photos:50, videos:5, total:55 };
+    if(!videosEnabled(m)){
+      const photoCap = m.separate ? m.maxPhotos : m.maxTotal;
+      return { photos:photoCap, videos:null, total:photoCap };
+    }
     if(m.separate) return { photos:m.maxPhotos, videos:m.maxVideos, total:m.maxPhotos + m.maxVideos };
     return { photos:m.maxTotal, videos:m.maxTotal, total:m.maxTotal };
   }
@@ -2484,12 +2716,15 @@
     el('stGalleryTotal').textContent = nf(files.length);
     el('stImagesCur').textContent = nf(c.photos);
     el('stImagesMax').textContent = nf(q.photos);
-    el('stVideosCur').textContent = nf(c.videos);
-    el('stVideosMax').textContent = nf(q.videos);
-    el('stSelectedCur').textContent = nf(c.total);
+    const noVideos = q.videos == null;
+    const videoCard = el('stVideosCur').closest('.statcard');
+    if(videoCard) videoCard.classList.toggle('no-videos', noVideos);
+    el('stVideosCur').textContent = noVideos ? '—' : nf(c.videos);
+    el('stVideosMax').textContent = noVideos ? '' : nf(q.videos);
+    el('stSelectedCur').textContent = nf(noVideos ? c.photos : c.total);
     el('stSelectedMax').textContent = nf(q.total);
     setStatBar('stImagesBar', c.photos, q.photos);
-    setStatBar('stVideosBar', c.videos, q.videos);
+    setStatBar('stVideosBar', noVideos ? 0 : c.videos, noVideos ? 0 : q.videos);
     renderStatusCard();
   }
 
@@ -2576,7 +2811,7 @@
   // entry point for a plain FileList (file <input>; the folder <input webkitdirectory> also
   // lands here — its files carry a webkitRelativePath that rebuilds the tree).
   function addFiles(fileList){
-    intake(Array.from(fileList||[]).map(f=>({file:f, path:f.webkitRelativePath || f.name})));
+    intake(Array.from(fileList||[]).map(f=>({file:f, path:f.webkitRelativePath || f.name}))).catch(err=>console.error(err));
   }
 
   // entry point for a drag-drop — walks any dropped directories via the entries API so folders
@@ -2585,7 +2820,7 @@
     let items;
     try{ items = await filesFromDataTransfer(dt); }
     catch(_){ items = Array.from(dt.files||[]).map(f=>({file:f, path:f.webkitRelativePath||f.name})); }
-    intake(items);
+    await intake(items);
   }
   function filesFromDataTransfer(dt){
     const list = dt.items ? Array.from(dt.items) : [];
@@ -2616,7 +2851,7 @@
   let dupQueue=null;
   // Normalize a batch of {file,path} into accepted items, filtering unsupported types and
   // resolving each file's target folder from its path (nested under the current folder).
-  function intake(rawItems){
+  async function intake(rawItems){
     const incoming=(rawItems||[]).filter(r=>r && r.file);
     if(!incoming.length) return;
     const blocked=[], accepted=[];
@@ -2630,8 +2865,12 @@
     });
     if(blocked.length) showBlocked(blocked);
     if(!accepted.length){ return; }
-    accepted.forEach(it=>{ it.folderId = it.segs.length ? ensureFolderPath(it.segs, base) : base; });
-    processQueue(accepted);
+    const extraFolders=estimateNewFolders(accepted, base);
+    const ok=await withOrganizerUsage({ files:files.length + accepted.length, folders:folders.length + extraFolders }, async()=>{
+      accepted.forEach(it=>{ it.folderId = it.segs.length ? ensureFolderPath(it.segs, base) : base; });
+      processQueue(accepted);
+    });
+    if(!ok) return;
   }
 
   function processQueue(queue){
@@ -2715,8 +2954,12 @@
   //  FOLDERS
   // =====================================================
   let folderEditId=null;
-  function openFolderModal(editId){
+  let folderCreateMovePicked=false;   // when true, the marked files move into the folder created by the modal
+  let folderCreateMoveFileId=null;    // when set, this single file moves into the folder created by the modal
+  function openFolderModal(editId,opts){
     folderEditId=editId||null;
+    folderCreateMovePicked = !folderEditId && !!(opts && opts.movePicked);
+    folderCreateMoveFileId = (!folderEditId && opts && opts.moveFileId) ? opts.moveFileId : null;
     const isEdit=!!folderEditId;
     el('folderModalTitle').textContent = isEdit? t.renameFolderTitle : t.newFolderTitle;
     el('folderSave').textContent = isEdit? t.save : t.create;
@@ -2725,15 +2968,22 @@
     el('folderOverlay').classList.add('show');
     setTimeout(()=>inp.focus(),30);
   }
-  function saveFolder(){
+  async function saveFolder(){
     const name=el('folderNameInput').value.trim();
     if(!name){ el('folderNameInput').focus(); return; }
+    if(!folderEditId){
+      const ok=await withOrganizerUsage({ files:files.length, folders:folders.length + 1 }, async()=>true);
+      if(!ok) return;
+    }
     if(folderEditId){ const f=folders.find(x=>x.id===folderEditId); if(f) f.name=name; }
     else {
       const id=nid();
       folders.push({id,name,parentId:null,open:true});
+      if(folderCreateMovePicked){ files.forEach(f=>{ if(f.picked){ f.folderId=id; f.picked=false; } }); }  // opened from "move to folder" → carry the marked files in
+      else if(folderCreateMoveFileId){ const mf=fileById(folderCreateMoveFileId); if(mf) mf.folderId=id; }  // opened from a single card's "+" → carry just that file in
       currentFolder=id;
     }
+    folderCreateMovePicked=false; folderCreateMoveFileId=null;
     el('folderOverlay').classList.remove('show');
     renderAll();
   }
@@ -2757,6 +3007,23 @@
     f.parentId=newParentId;
     if(newParentId){ const p=folders.find(x=>x.id===newParentId); if(p) p.open=true; }
   }
+  // reorder a folder among its siblings by moving it just before/after another sibling in the
+  // `folders` array (sibling order = array order within each parent group). Numbering re-derives on render.
+  function reorderFolder(dragId, targetId, placeAfter){
+    if(dragId===targetId) return;
+    const from=folders.findIndex(f=>f.id===dragId); if(from<0) return;
+    const moved=folders.splice(from,1)[0];
+    const to=folders.findIndex(f=>f.id===targetId);
+    if(to<0){ folders.splice(from,0,moved); return; }   // target vanished — put it back
+    folders.splice(placeAfter?to+1:to, 0, moved);
+  }
+  function areFolderSiblings(aId, bId){
+    const a=folders.find(f=>f.id===aId), b=folders.find(f=>f.id===bId);
+    return !!(a && b && (a.parentId||null)===(b.parentId||null));
+  }
+  function clearFolderDropMarks(){
+    document.querySelectorAll('#folderList .drop-before,#folderList .drop-after').forEach(n=>n.classList.remove('drop-before','drop-after'));
+  }
   function deleteFolder(id){
     const fo=folders.find(f=>f.id===id); if(!fo) return;
     confirmAsk(t.confirmDelFolderTitle, t.confirmDelFolderBody(fo.name), ()=>{
@@ -2772,7 +3039,7 @@
   // =====================================================
   //  CONFIRM (generic)
   // =====================================================
-  let confirmCb=null;
+  let confirmCb=null, confirmDsaKey=null;
   function confirmAsk(title, body, cb, opts){
     opts=opts||{};
     el('confirmTitle').textContent=title; el('confirmBody').textContent=body;
@@ -2781,16 +3048,27 @@
     no.textContent=opts.cancelText||t.cancel;
     yes.classList.remove('danger','primary');
     yes.classList.add(opts.variant||'danger');
+    // optional "don't show this again" checkbox
+    const dsaRow=el('confirmDsaRow'), dsaChk=el('confirmDsa');
+    if(opts.dontShowKey){
+      confirmDsaKey=opts.dontShowKey;
+      dsaChk.checked=false;
+      el('confirmDsaLabel').textContent=opts.dontShowLabel||t.dontShowAgain;
+      dsaRow.style.display='';
+    } else {
+      confirmDsaKey=null;
+      dsaRow.style.display='none';
+    }
     confirmCb=cb; el('confirmOverlay').classList.add('show');
   }
 
   function unassignFile(f){
     if(!f || f.folderId==null) return;
-    confirmAsk(t.unassignTitle, t.unassignBody, ()=>{
-      f.folderId=null;
-      renderAll();
-      showToast(t.unassignDone);
-    }, { yesText:t.unassignConfirm, variant:'primary' });
+    const doMove=()=>{ f.folderId=null; renderAll(); showToast(t.unassignDone); };
+    let skip=false; try{ skip=localStorage.getItem('ac_skipmovemain')==='1'; }catch(_){}
+    if(skip){ doMove(); return; }
+    confirmAsk(t.unassignTitle, t.unassignBody, doMove,
+      { yesText:t.unassignConfirm, variant:'primary', dontShowKey:'ac_skipmovemain', dontShowLabel:t.dontShowAgain });
   }
 
   // move-to-folder disambiguation when a management multi-selection is active
@@ -2831,14 +3109,14 @@
   // ---- new album-level settings (stored under ac_album) ----
   // [id, kind, default] — kind: text|sel|date|chk|rng
   const ALBUM_FIELDS=[
-    ['alTitle','text',''],['alDesc','text',''],['alEventType','sel','wedding'],['alLocation','text',''],
+    ['alTitle','text',''],['alDesc','text',''],
     ['alVisibility','sel','link'],['alPwOn','chk',false],['alPw','text',''],
     ['alDlPhotos','chk',true],['alDlVideos','chk',true],['alDlZip','chk',true],['alDlOriginal','chk',false],
     ['alQuality','sel','full'],
     ['alGuestUpload','chk',false],['alGuestApproval','chk',true],['alApproval','chk',false],
     ['alComments','chk',true],['alCommentsGuests','chk',false],['alLikes','chk',true],
     ['alSort','sel','name'],['alView','sel','grid'],['alFavorites','chk',true],['alEditRequests','chk',false],
-    ['alBrandName','text',''],['alBrandColor','text','#7c3aed'],['alWelcome','text',''],['alFooter','text',''],
+    ['alBrandName','text',''],['alBrandColor','text','#7c3aed'],['alBrandLogo','text',''],['alWelcome','text',''],['alFooter','text',''],
     ['alWmOn','chk',false],['alWmType','sel','logo'],['alWmText','text',''],['alWmPos','sel','br'],['alWmOpacity','rng',35],
     ['alNotifNewFiles','chk',true],['alNotifGuestUpload','chk',true],['alNotifFavorites','chk',true],
     ['alNotifComments','chk',false],['alNotifExpiry','chk',true],
@@ -2855,6 +3133,35 @@
   function setField(id,kind,v){ const n=el(id); if(!n) return; if(kind==='chk') n.checked=!!v; else n.value=(v==null?'':v); }
   function getField(id,kind){ const n=el(id); if(!n) return null; if(kind==='chk') return !!n.checked; if(kind==='rng') return +n.value; return n.value; }
 
+  // paint the current logo (data URL held in the hidden #alBrandLogo input) into the preview box
+  function renderLogoPreview(){
+    const data=el('alBrandLogo').value;
+    const prev=el('alLogoPrev'), rm=el('alLogoRm');
+    if(data){ prev.innerHTML=`<img src="${data}" alt="">`; rm.classList.remove('hidden'); }
+    else { prev.innerHTML=`<span class="logup-ph">${escapeHtml(t.alBrandLogoNone||'')}</span>`; rm.classList.add('hidden'); }
+  }
+  // read the picked image, downscale it (keeps localStorage small + transparency intact), stash the data URL
+  function onLogoFile(e){
+    const file=e.target.files && e.target.files[0]; e.target.value='';
+    if(!file || !/^image\//.test(file.type)) return;
+    const rd=new FileReader();
+    rd.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const max=360; let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+        if(!w || !h){ el('alBrandLogo').value=rd.result; renderLogoPreview(); return; }
+        const s=Math.min(1, max/Math.max(w,h)); w=Math.max(1,Math.round(w*s)); h=Math.max(1,Math.round(h*s));
+        const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h);
+        let out; try{ out=cv.toDataURL('image/png'); }catch(_){ out=rd.result; }
+        el('alBrandLogo').value=out; renderLogoPreview();
+      };
+      img.onerror=()=>{ el('alBrandLogo').value=rd.result; renderLogoPreview(); };
+      img.src=rd.result;
+    };
+    rd.readAsDataURL(file);
+  }
+
   // isNew (from the dashboard "+ New project") opens a blank form for a fresh
   // album without touching stored data — nothing persists until Save.
   function openSettings(isNew){
@@ -2865,6 +3172,7 @@
     el('cEvent').value=c.event||''; el('cDeadline').value=c.deadline||''; el('cStatus').value=normStatus(c.status);
     PERM_KEYS.forEach(k=>{ const box=el('perm_'+k); if(box) box.checked=!!c.perms[k]; });
     ALBUM_FIELDS.forEach(([id,kind])=>setField(id,kind,a[id]));
+    renderLogoPreview();
     applyViewOnlyLock(); applySettingsDeps(); refreshStorage(); setActiveTab('general');
     el('settingsOverlay').classList.add('show');
   }
@@ -2885,6 +3193,11 @@
     el('alWmWrap').classList.toggle('hidden', !el('alWmOn').checked);
     el('alExpiryWrap').classList.toggle('hidden', !el('alExpiryOn').checked);
     el('alWmOpacityVal').textContent=el('alWmOpacity').value+'%';
+    // watermark type "logo" uses an image, not text: lock the text field + show a no-entry icon
+    const wmLogo=el('alWmType').value==='logo', wmLock=el('alWmTextLock');
+    if(wmLock && !wmLock.innerHTML) wmLock.innerHTML=ICON.noentry;
+    el('alWmText').disabled=wmLogo;
+    el('alWmTextWrap').classList.toggle('locked', wmLogo);
     // visibility drives the share link + extra protections: 'link' shows both, 'private' hides both
     const shared=el('alVisibility').value==='link';
     el('alShareRow').classList.toggle('hidden', !shared);
@@ -2938,6 +3251,7 @@
     try{ localStorage.setItem(scopedKey('ac_album'), JSON.stringify(a)); }catch(_){}
     el('settingsOverlay').classList.remove('show');
     renderStatusCard(); // reflect the new status on the strip immediately
+    renderGrid();       // repaint thumbnails so watermark / brand changes show at once
   }
 
   // =====================================================
@@ -2946,8 +3260,8 @@
   const AM_DEFAULT={ limitOn:false, separate:false, maxTotal:40, maxPhotos:40, maxVideos:5, message:'', preset:'' };
   // built-in presets: quick starting points for common album / collection selections
   const AM_PRESETS={
-    album:      { limitOn:true,  separate:false, maxTotal:40, maxPhotos:40, maxVideos:5, msg:'amPresetAlbumMsg' },
-    prints:     { limitOn:true,  separate:false, maxTotal:25, maxPhotos:25, maxVideos:5, msg:'amPresetPrintsMsg' },
+    album:      { limitOn:true,  separate:false, maxTotal:40, maxPhotos:40, maxVideos:0, msg:'amPresetAlbumMsg' },
+    prints:     { limitOn:true,  separate:false, maxTotal:25, maxPhotos:25, maxVideos:0, msg:'amPresetPrintsMsg' },
     mix:        { limitOn:true,  separate:true,  maxTotal:55, maxPhotos:50, maxVideos:5, msg:'amPresetMixMsg' },
     highlights: { limitOn:true,  separate:false, maxTotal:15, maxPhotos:15, maxVideos:3, msg:'amPresetHighlightsMsg' },
     free:       { limitOn:false, separate:false, maxTotal:40, maxPhotos:40, maxVideos:5, msg:'amPresetFreeMsg' },
@@ -3349,16 +3663,33 @@
         picked.forEach(revoke); files=files.filter(f=>!f.picked); renderAll();
       });
     });
-    el('msMoveSel').addEventListener('change',e=>{
-      const v=e.target.value; if(v==='__ph') return;
-      const target = v===''?null:v;
-      const picked=files.filter(f=>f.picked); if(!picked.length){ refreshMsMove(); return; }
-      picked.forEach(f=>{ f.folderId=target; f.picked=false; });
-      renderAll();
-    });
+    // custom move-to-folder dropdown (themed popup instead of a native <select>)
+    (function(){
+      const wrap=el('msMoveSel'), trig=el('msMoveTrigger'), menu=el('msMoveMenu');
+      const openMenu=()=>{ if(trig.disabled) return; refreshMsMove(); menu.hidden=false; wrap.classList.add('open'); trig.setAttribute('aria-expanded','true'); };
+      const closeMenu=()=>{ menu.hidden=true; wrap.classList.remove('open'); trig.setAttribute('aria-expanded','false'); };
+      const isOpen=()=>wrap.classList.contains('open');
+      trig.addEventListener('click',e=>{ e.stopPropagation(); isOpen()?closeMenu():openMenu(); });
+      trig.addEventListener('keydown',e=>{ if(e.key==='ArrowDown'||e.key==='Enter'||e.key===' '){ e.preventDefault(); openMenu(); const first=menu.querySelector('.fs-item'); if(first) first.focus(); } });
+      menu.addEventListener('click',e=>{
+        const add=e.target.closest('.fs-newbtn');
+        if(add){ closeMenu(); trig.focus(); openFolderModal(null,{movePicked:true}); return; }   // "+" on the "no folder" row → create a new folder and drop the marked files into it
+        const it=e.target.closest('.fs-item'); if(!it) return; closeMenu(); trig.focus(); doMsMove(it.getAttribute('data-val'));
+      });
+      menu.addEventListener('keydown',e=>{
+        const items=[...menu.querySelectorAll('.fs-item')]; if(!items.length) return;
+        const i=items.indexOf(document.activeElement);
+        if(e.key==='ArrowDown'){ e.preventDefault(); (items[i+1]||items[0]).focus(); }
+        else if(e.key==='ArrowUp'){ e.preventDefault(); (items[i-1]||items[items.length-1]).focus(); }
+        else if(e.key==='Escape'){ e.preventDefault(); closeMenu(); trig.focus(); }
+      });
+      document.addEventListener('click',e=>{ if(isOpen() && !wrap.contains(e.target)) closeMenu(); });
+      document.addEventListener('keydown',e=>{ if(e.key==='Escape' && isOpen()){ closeMenu(); trig.focus(); } });
+    })();
 
     // folders sidebar (delegated)
     el('folderList').addEventListener('click',e=>{
+      if(e.target.closest('[data-fgrip]')){ e.stopPropagation(); return; }   // grip is drag-only, never selects
       const tw=e.target.closest('[data-ftoggle]'); if(tw){ e.stopPropagation(); const f=folders.find(x=>x.id===tw.getAttribute('data-ftoggle')); if(f){ f.open=(f.open===false); renderFolders(); } return; }
       const editBtn=e.target.closest('[data-fedit]'); if(editBtn){ e.stopPropagation(); openFolderModal(editBtn.getAttribute('data-fedit')); return; }
       const delBtn=e.target.closest('[data-fdel]'); if(delBtn){ e.stopPropagation(); deleteFolder(delBtn.getAttribute('data-fdel')); return; }
@@ -3366,20 +3697,41 @@
     });
     el('addFolderBtn').addEventListener('click',()=>openFolderModal(null));
 
-    // folder drag-drop targets — accepts dragged file cards (assign) and dragged folder rows (reparent)
+    // folder drag-drop targets — three gestures:
+    //   • drag a file card onto a folder     → assign the file (draggingId)
+    //   • drag a folder row onto another      → reparent / nest it (draggingFolderId)
+    //   • drag a folder by its six-dot grip   → reorder it among its siblings (reorderFolderId)
+    el('folderList').addEventListener('pointerdown',e=>{ folderGripArmed=!!e.target.closest('[data-fgrip]'); });
     el('folderList').addEventListener('dragstart',e=>{
       const row=e.target.closest('.fitem[data-folder]'); if(!row) return;
       const fid=row.getAttribute('data-folder');
       if(fid==='all'){ e.preventDefault(); return; }
+      if(folderGripArmed){                                    // grip drag = reorder among siblings
+        reorderFolderId=fid; row.classList.add('dragging');
+        e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain','reorder:'+fid); }catch(_){}
+        return;
+      }
       draggingFolderId=fid; row.classList.add('dragging');
       e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain','folder:'+fid); }catch(_){}
     });
     el('folderList').addEventListener('dragend',()=>{
-      draggingFolderId=null;
+      draggingFolderId=null; reorderFolderId=null; folderGripArmed=false;
       document.querySelectorAll('#folderList .dragover').forEach(n=>n.classList.remove('dragover'));
       document.querySelectorAll('#folderList .dragging').forEach(n=>n.classList.remove('dragging'));
+      clearFolderDropMarks();
     });
     el('folderList').addEventListener('dragover',e=>{
+      if(reorderFolderId){                                    // reorder mode — show a before/after insertion line
+        const row=e.target.closest('.fitem[data-folder]');
+        clearFolderDropMarks();
+        if(!row) return;
+        const overId=row.getAttribute('data-folder');
+        if(overId==='all' || overId===reorderFolderId || !areFolderSiblings(reorderFolderId,overId)) return;
+        e.preventDefault();
+        const r=row.getBoundingClientRect();
+        row.classList.add(((e.clientY-r.top)>r.height/2) ? 'drop-after' : 'drop-before');
+        return;
+      }
       const item=e.target.closest('[data-drop]'); if(!item) return;
       const target=item.getAttribute('data-drop');
       if(draggingId){ e.preventDefault(); item.classList.add('dragover'); }
@@ -3387,6 +3739,20 @@
     });
     el('folderList').addEventListener('dragleave',e=>{ const item=e.target.closest('[data-drop]'); if(item) item.classList.remove('dragover'); });
     el('folderList').addEventListener('drop',e=>{
+      if(reorderFolderId){                                    // reorder mode — drop between siblings
+        const row=e.target.closest('.fitem[data-folder]');
+        clearFolderDropMarks();
+        if(row){
+          const overId=row.getAttribute('data-folder');
+          if(overId!=='all' && overId!==reorderFolderId && areFolderSiblings(reorderFolderId,overId)){
+            e.preventDefault();
+            const r=row.getBoundingClientRect();
+            reorderFolder(reorderFolderId, overId, (e.clientY-r.top)>r.height/2);
+            renderAll();
+          }
+        }
+        return;
+      }
       const item=e.target.closest('[data-drop]'); if(!item) return;
       const target=item.getAttribute('data-drop');
       if(draggingId){
@@ -3412,6 +3778,9 @@
       if(e.target.closest('.fcap')) return; // let the caption input handle its own clicks
       const chk=e.target.closest('[data-check]'); if(chk){ e.stopPropagation(); toggleSel(chk.getAttribute('data-check')); return; }
       const pk=e.target.closest('[data-pick]'); if(pk){ e.stopPropagation(); togglePick(pk.getAttribute('data-pick')); return; }
+      const cmNew=e.target.closest('.cardmove-menu .fs-newbtn'); if(cmNew){ e.stopPropagation(); cardMoveNewFolder(cmNew); return; }
+      const cmOpt=e.target.closest('.cardmove-menu .fs-item'); if(cmOpt){ e.stopPropagation(); cardMoveApply(cmOpt); return; }
+      const cm=e.target.closest('.cardmove'); if(cm){ e.stopPropagation(); toggleCardMove(cm); return; }
       const unassign=e.target.closest('[data-unassign]'); if(unassign){ e.stopPropagation(); const f=fileById(unassign.getAttribute('data-unassign')); if(f) unassignFile(f); return; }
       const del=e.target.closest('[data-del]'); if(del){ e.stopPropagation(); const f=fileById(del.getAttribute('data-del')); if(f){ confirmAsk(t.confirmDelTitle,t.confirmDelBody(1),()=>{ revoke(f); files=files.filter(x=>x.id!==f.id); renderAll(); }); } return; }
       const pv=e.target.closest('[data-preview]'); if(pv){ const f=fileById(pv.getAttribute('data-preview')); if(f) openPreview(f); return; }
@@ -3419,19 +3788,10 @@
     grid.addEventListener('input',e=>{
       const note=e.target.closest('[data-note]'); if(note){ const f=fileById(note.getAttribute('data-note')); if(f) f.note=note.value; }
     });
-    grid.addEventListener('change',e=>{
-      const mv=e.target.closest('[data-move]'); if(!mv) return;
-      const f=fileById(mv.getAttribute('data-move')); if(!f) return;
-      const target = mv.value===''?null:mv.value;
-      const picked=files.filter(x=>x.picked);
-      // multiple files are marked in the purple management selection - ask whether to move all of them or just this one
-      if(picked.length>=2){ askMoveChoice(target,f,picked.length); return; }
-      f.folderId=target; renderAll();
-    });
     // drag files to folders
     grid.addEventListener('dragstart',e=>{
       const card=e.target.closest('.fcard'); if(!card) return;
-      if(e.target.closest('.fcap')||e.target.closest('.movesel')||e.target.closest('.fdel-x')||e.target.closest('.cardmenu')||e.target.closest('[data-kebab]')){ e.preventDefault(); return; } // don't drag from controls inside the card
+      if(e.target.closest('.fcap')||e.target.closest('.cardmove')||e.target.closest('.fdel-x')||e.target.closest('.cardmenu')||e.target.closest('[data-kebab]')){ e.preventDefault(); return; } // don't drag from controls inside the card
       draggingId=card.getAttribute('data-id');
       const d=fileById(draggingId);
       if(d && d.picked){ document.querySelectorAll('.fcard.picked').forEach(n=>n.classList.add('dragging')); } // lift the whole management selection
@@ -3469,8 +3829,8 @@
     el('dupKeep').addEventListener('click',()=>resolveDup('keep'));
     el('dupReplace').addEventListener('click',()=>resolveDup('replace'));
     el('dupSkip').addEventListener('click',()=>resolveDup('skip'));
-    el('confirmYes').addEventListener('click',()=>{ el('confirmOverlay').classList.remove('show'); const cb=confirmCb; confirmCb=null; if(cb) cb(); });
-    el('confirmNo').addEventListener('click',()=>{ el('confirmOverlay').classList.remove('show'); confirmCb=null; });
+    el('confirmYes').addEventListener('click',()=>{ if(confirmDsaKey && el('confirmDsa').checked){ try{ localStorage.setItem(confirmDsaKey,'1'); }catch(_){} } el('confirmOverlay').classList.remove('show'); const cb=confirmCb; confirmCb=null; confirmDsaKey=null; if(cb) cb(); });
+    el('confirmNo').addEventListener('click',()=>{ el('confirmOverlay').classList.remove('show'); confirmCb=null; confirmDsaKey=null; });
     el('moveAll').addEventListener('click',()=>{ if(!moveCtx) return; const target=moveCtx.target; files.forEach(f=>{ if(f.picked){ f.folderId=target; f.picked=false; } }); closeMoveChoice(); });
     el('moveOne').addEventListener('click',()=>{ if(!moveCtx) return; moveCtx.curFile.folderId=moveCtx.target; closeMoveChoice(); });
     el('moveClose').addEventListener('click',closeMoveChoice);
@@ -3498,7 +3858,10 @@
     el('settingsClose').addEventListener('click',()=>el('settingsOverlay').classList.remove('show'));
     el('perm_viewOnly').addEventListener('change',applyViewOnlyLock);
     el('setTabs').addEventListener('click',e=>{ const b=e.target.closest('.settab'); if(b) setActiveTab(b.getAttribute('data-tab')); });
-    ['alPwOn','alWmOn','alExpiryOn','alGuestUpload','alComments','alVisibility'].forEach(id=>el(id).addEventListener('change',applySettingsDeps));
+    ['alPwOn','alWmOn','alWmType','alExpiryOn','alGuestUpload','alComments','alVisibility'].forEach(id=>el(id).addEventListener('change',applySettingsDeps));
+    el('alLogoPick').addEventListener('click',()=>el('alLogoFile').click());
+    el('alLogoFile').addEventListener('change',onLogoFile);
+    el('alLogoRm').addEventListener('click',()=>{ el('alBrandLogo').value=''; renderLogoPreview(); });
     el('alShareCopy').addEventListener('click',copyAlbumLink);
     el('alWmOpacity').addEventListener('input',()=>{ el('alWmOpacityVal').textContent=el('alWmOpacity').value+'%'; });
     el('alSelectionMode').addEventListener('change',applySelectionMode);
@@ -3543,7 +3906,7 @@
     el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
   }
 
-  let draggingId=null, draggingFolderId=null;
+  let draggingId=null, draggingFolderId=null, reorderFolderId=null, folderGripArmed=false;
   function fileById(id){ return files.find(f=>f.id===id); }
   // ---- album-selection quota (the GREEN check): count photos / videos across the WHOLE album ----
   function quotaKind(f){ return f.kind==='image'?'photo':(f.kind==='video'?'video':null); }
@@ -3559,6 +3922,7 @@
   function selAtCap(f){
     if(f.selected) return false;
     const q=quotaState; if(!q||!q.m) return false;
+    if(quotaKind(f)==='video' && !videosEnabled(q.m)) return true;
     if(q.m.separate){ const k=quotaKind(f);
       if(k==='photo') return q.c.photos>=q.m.maxPhotos;
       if(k==='video') return q.c.videos>=q.m.maxVideos;
@@ -3569,6 +3933,7 @@
   function selBlocked(f){
     const m=selLimit(); if(!m) return 0;
     const c=selCounts();
+    if(quotaKind(f)==='video' && !videosEnabled(m)) return -1;
     if(m.separate){ const k=quotaKind(f);
       if(k==='photo') return c.photos>=m.maxPhotos?m.maxPhotos:0;
       if(k==='video') return c.videos>=m.maxVideos?m.maxVideos:0;
@@ -3583,6 +3948,7 @@
   }
   function selLimitMsg(f){
     const m=selLimit(); if(!m) return '';
+    if(quotaKind(f)==='video' && !videosEnabled(m)) return t.limitVideos(0);
     if(m.separate){ const k=quotaKind(f);
       return k==='video'?t.limitVideos(m.maxVideos):t.limitPhotos(m.maxPhotos); }
     return t.limitTotal(m.maxTotal);
@@ -3590,6 +3956,7 @@
   // popup title for the "you hit the quota" dialog (photos / videos / total, per active limit)
   function selLimitTitle(f){
     const m=selLimit(); if(!m) return '';
+    if(quotaKind(f)==='video' && !videosEnabled(m)) return t.limitPopVideos(0);
     if(m.separate){ const k=quotaKind(f);
       return k==='video'?t.limitPopVideos(m.maxVideos):t.limitPopPhotos(m.maxPhotos); }
     return t.limitPopFiles(m.maxTotal);
@@ -3602,11 +3969,13 @@
   function selQuotaFull(){
     const m=selLimit(); if(!m) return false;
     const c=selCounts();
+    if(!videosEnabled(m)) return c.photos >= (m.separate ? m.maxPhotos : m.maxTotal);
     return m.separate ? (c.photos>=m.maxPhotos && c.videos>=m.maxVideos) : (c.total>=m.maxTotal);
   }
   function selDoneCountMsg(){
     const m=selLimit(); if(!m) return '';
     const c=selCounts();
+    if(!videosEnabled(m)) return t.selDoneCount(c.photos, m.separate ? m.maxPhotos : m.maxTotal);
     return m.separate ? t.selDoneCountSep(c.photos,m.maxPhotos,c.videos,m.maxVideos)
                       : t.selDoneCount(c.total,m.maxTotal);
   }
@@ -3637,7 +4006,108 @@
     maybePromptSelConfirm();
   }
   function togglePick(id){ const f=fileById(id); if(f && !isLocked(f)){ f.picked=!f.picked; renderGrid(); } }
-  function refreshMsMove(){ el('msMoveSel').innerHTML = `<option value="__ph" disabled selected hidden>${escapeHtml(t.msPh)}</option>` + moveOptions('__ph'); }
+  // build the themed folder list for the custom move-to-folder popup (mirrors moveOptions' tree)
+  function refreshMsMove(){
+    const menu=el('msMoveMenu'); if(!menu) return;
+    const folderRows=[];
+    const walk=(parentId,depth)=>{
+      folders.filter(f=>(f.parentId||null)===parentId).forEach(fo=>{
+        folderRows.push({val:fo.id,label:fo.name,depth});
+        walk(fo.id,depth+1);
+      });
+    };
+    walk(null,0);
+    const folderIco='<svg class="fs-mico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>';
+    const noneIco='<svg class="fs-mico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.69.9H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
+    const plusIco='<svg class="fs-mico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 10v6"/><path d="M9 13h6"/></svg>';
+    // "no folder" destination, with an inline "+" that creates a new folder and moves the marked files into it
+    let html =
+      '<div class="fs-nonerow">'
+      + `<button type="button" class="fs-item none" role="option" data-val="" style="--fs-depth:0">${noneIco}<span class="fs-itext">${escapeHtml(t.unsorted)}</span></button>`
+      + `<button type="button" class="fs-newbtn" data-newfolder="1" title="${escapeHtml(t.newFolderTitle)}" aria-label="${escapeHtml(t.newFolderTitle)}">${plusIco}</button>`
+      + '</div>';
+    if(folderRows.length){
+      html += '<div class="fs-sep"></div>'
+        + folderRows.map(r=>
+            `<button type="button" class="fs-item" role="option" data-val="${escapeHtml(r.val)}" style="--fs-depth:${r.depth}">${folderIco}<span class="fs-itext">${escapeHtml(r.label)}</span></button>`
+          ).join('');
+    }
+    menu.innerHTML = html;
+  }
+  function doMsMove(v){
+    const target = v===''?null:v;
+    const picked=files.filter(f=>f.picked); if(!picked.length){ refreshMsMove(); return; }
+    picked.forEach(f=>{ f.folderId=target; f.picked=false; });
+    renderAll();
+  }
+
+  // ---- per-card "move to folder": one empty .fs-menu per card, opened/positioned via CSS (zoom-safe) ----
+  const cmFolderIco='<svg class="fs-mico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>';
+  const cmNoneIco='<svg class="fs-mico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.69.9H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9"/><line x1="2" y1="2" x2="22" y2="22"/></svg>';
+  const cmPlusIco='<svg class="fs-mico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 10v6"/><path d="M9 13h6"/></svg>';
+  function cardMenuItemsHtml(currentId){
+    const rows=[];
+    const walk=(parentId,depth)=>{ folders.filter(f=>(f.parentId||null)===parentId).forEach(fo=>{ rows.push({val:fo.id,label:fo.name,depth}); walk(fo.id,depth+1); }); };
+    walk(null,0);
+    let html='<div class="fs-nonerow">'
+      + `<button type="button" class="fs-item none${currentId==null?' on':''}" role="option" data-val="" style="--fs-depth:0">${cmNoneIco}<span class="fs-itext">${escapeHtml(t.unsorted)}</span></button>`
+      + `<button type="button" class="fs-newbtn" data-newfolder="1" title="${escapeHtml(t.newFolderTitle)}" aria-label="${escapeHtml(t.newFolderTitle)}">${cmPlusIco}</button>`
+      + '</div>';
+    if(rows.length){
+      html+='<div class="fs-sep"></div>'
+        + rows.map(r=>`<button type="button" class="fs-item${r.val===currentId?' on':''}" role="option" data-val="${escapeHtml(r.val)}" style="--fs-depth:${r.depth}">${cmFolderIco}<span class="fs-itext">${escapeHtml(r.label)}</span></button>`).join('');
+    }
+    return html;
+  }
+  function closeAllCardMenus(){
+    document.querySelectorAll('.cardmove-menu:not([hidden])').forEach(m=>{ m.hidden=true; m.classList.remove('up'); });
+    document.querySelectorAll('.cardmove.open').forEach(b=>{ b.classList.remove('open'); b.setAttribute('aria-expanded','false'); });
+    document.querySelectorAll('.fcard.cm-open').forEach(c=>c.classList.remove('cm-open'));
+  }
+  function toggleCardMove(trigger){
+    const wrap=trigger.closest('.cardmovewrap'); if(!wrap) return;
+    const menu=wrap.querySelector('.cardmove-menu'); if(!menu) return;
+    const wasOpen=!menu.hidden;
+    closeAllCardMenus();
+    if(wasOpen) return;                                        // a second click on the same trigger just closes it
+    const f=fileById(trigger.getAttribute('data-move'));
+    menu.innerHTML=cardMenuItemsHtml(f?f.folderId:null);
+    menu.hidden=false;
+    trigger.classList.add('open'); trigger.setAttribute('aria-expanded','true');
+    const card=trigger.closest('.fcard'); if(card) card.classList.add('cm-open');   // .fcard clips overflow; reveal the popup while open
+    // flip upward only when the popup won't fit below and there IS room above
+    // (getBoundingClientRect + innerHeight share one coordinate space, so this stays correct under body zoom)
+    const tr=trigger.getBoundingClientRect(), mh=menu.getBoundingClientRect().height, pad=8;
+    if(tr.bottom+6+mh > window.innerHeight-pad && tr.top-6-mh > pad) menu.classList.add('up');
+  }
+  function cardMoveApply(itemEl){
+    const wrap=itemEl.closest('.cardmovewrap'); const trigger=wrap?wrap.querySelector('.cardmove'):null;
+    const f=trigger?fileById(trigger.getAttribute('data-move')):null;
+    closeAllCardMenus();
+    if(!f) return;
+    const val=itemEl.getAttribute('data-val'); const target=val===''?null:val;
+    const picked=files.filter(x=>x.picked);
+    if(picked.length>=2){ askMoveChoice(target,f,picked.length); return; }  // honor the purple multi-select "move all / just this one" prompt
+    f.folderId=target; renderAll();
+  }
+  function cardMoveNewFolder(itemEl){
+    const wrap=itemEl.closest('.cardmovewrap'); const trigger=wrap?wrap.querySelector('.cardmove'):null;
+    const f=trigger?fileById(trigger.getAttribute('data-move')):null;
+    closeAllCardMenus();
+    openFolderModal(null, f?{moveFileId:f.id}:undefined);
+  }
+  // close any open card folder-menu on an outside click or Escape; arrow keys navigate within an open menu
+  document.addEventListener('click',e=>{ if(!e.target.closest('.cardmovewrap')) closeAllCardMenus(); });
+  document.addEventListener('keydown',e=>{
+    const menu=e.target.closest('.cardmove-menu');
+    if(!menu){ if(e.key==='Escape') closeAllCardMenus(); return; }
+    const items=[...menu.querySelectorAll('.fs-item')]; if(!items.length) return;
+    const i=items.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){ e.preventDefault(); (items[i+1]||items[0]).focus(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); (items[i-1]||items[items.length-1]).focus(); }
+    else if(e.key==='Escape'){ e.preventDefault(); const b=menu.closest('.cardmovewrap').querySelector('.cardmove'); closeAllCardMenus(); if(b) b.focus(); }
+  });
+
   // files that move together on a folder drop: the whole management selection when the
   // dragged card is part of it, otherwise just the single dragged card.
   function dragTargets(){

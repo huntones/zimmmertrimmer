@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — מחולל Box Shadow</title>
+<meta name="description" content="Free CSS box-shadow generator — design a shadow with live preview by dragging offset, blur, spread, color and opacity, then copy ready-to-use CSS. Inset support. Fast, private, right in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 22px;}
+  .pagehead h1{font-size:clamp(23px,3vw,32px);font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:12px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  /* reused helpers (from color-convert.html) */
+  input[type=color]{-webkit-appearance:none;appearance:none;width:56px;height:44px;padding:0;border:1px solid var(--line);
+    border-radius:12px;background:var(--panel-2);cursor:pointer;flex-shrink:0;}
+  input[type=color]::-webkit-color-swatch-wrapper{padding:4px;}
+  input[type=color]::-webkit-color-swatch{border:none;border-radius:8px;}
+  .gbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);font-size:13px;font-weight:600;padding:10px 12px;border-radius:11px;
+    cursor:pointer;transition:all .12s;}
+  .gbtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .gbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .gbtn.hidden{display:none;}
+  .copybtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--muted);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .copybtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .copybtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .fstr{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink);background:var(--panel-2);
+    border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;margin-bottom:12px;overflow-x:auto;white-space:nowrap;
+    direction:ltr;text-align:start;}
+
+  /* ---- box-shadow tool ---- */
+  .tool{display:grid;grid-template-columns:1fr 350px;gap:18px;align-items:start;}
+  @media (max-width:820px){ .tool{grid-template-columns:1fr;} }
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);}
+
+  .pvcard{padding:18px;position:sticky;top:16px;}
+  .stage{border-radius:14px;min-height:320px;display:flex;align-items:center;justify-content:center;padding:44px;
+    transition:background .15s;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);}
+  .sample{width:150px;height:150px;border-radius:18px;flex-shrink:0;transition:background .15s;}
+  .pvcontrols{margin-top:16px;display:flex;flex-direction:column;gap:11px;}
+  .pvrow{display:flex;align-items:center;gap:11px;}
+  .pvrow > label{font-size:13px;font-weight:600;color:var(--muted);}
+  .bgpresets{display:flex;flex-wrap:wrap;gap:6px;margin-inline-start:auto;}
+  .bgpresets button{width:24px;height:24px;border-radius:7px;border:1px solid var(--line);cursor:pointer;padding:0;transition:transform .1s;}
+  .bgpresets button:hover{transform:scale(1.12);}
+
+  .ctrlcard{padding:18px;}
+  .ctrl{margin-bottom:15px;}
+  .ctrl.inline{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .ctrl.inline > label{font-size:13px;font-weight:600;color:var(--ink-2);}
+  .ctrl-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;}
+  .ctrl-head label{font-size:13px;font-weight:600;color:var(--ink-2);}
+  .numwrap{display:inline-flex;align-items:center;gap:5px;direction:ltr;}
+  .numin{width:58px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:9px;
+    font-family:var(--mono);font-size:13px;font-weight:600;text-align:center;padding:6px 4px;transition:border-color .12s,box-shadow .12s;}
+  .numin:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .numin::-webkit-outer-spin-button,.numin::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .unit{font-family:var(--mono);font-size:12px;color:var(--faint);}
+
+  .rng{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;cursor:pointer;margin:0;}
+  .rng:focus{outline:none;}
+  .rng::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:var(--line);}
+  .rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;
+    background:var(--accent);border:3px solid var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.28);margin-top:-6px;cursor:pointer;}
+  .rng:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px var(--accent-soft);}
+  .rng::-moz-range-track{height:6px;border-radius:999px;background:var(--line);}
+  .rng::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--accent);border:3px solid var(--panel);
+    box-shadow:0 1px 3px rgba(0,0,0,.28);cursor:pointer;}
+
+  .switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;direction:ltr;}
+  .switch input{position:absolute;opacity:0;width:0;height:0;}
+  .switch .track{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:background .15s;cursor:pointer;}
+  .switch .track::before{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+    background:var(--panel);box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .15s;}
+  .switch input:checked + .track{background:var(--accent);}
+  .switch input:checked + .track::before{transform:translateX(20px);}
+
+  .divider{height:1px;background:var(--line);margin:16px 0;border:0;}
+  .fhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+  .ftitle{font-size:13px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;}
+  #cssOut{white-space:normal;word-break:break-word;margin-bottom:0;}
+
+  .note{display:flex;align-items:flex-start;gap:9px;margin-top:18px;padding:12px 14px;border-radius:12px;
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+    font-size:12px;color:var(--ink-2);line-height:1.55;}
+  .note svg{width:16px;height:16px;color:var(--accent-dim);flex-shrink:0;margin-top:1px;
+    stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="pageTitle"></h1>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="tool">
+    <!-- preview stage -->
+    <div class="card pvcard">
+      <div class="stage" id="stage">
+        <div class="sample" id="sample"></div>
+      </div>
+      <div class="pvcontrols">
+        <div class="pvrow">
+          <label for="fillPick" data-i18n="fillLabel"></label>
+          <input type="color" id="fillPick" value="#ffffff" aria-label="fill">
+        </div>
+        <div class="pvrow">
+          <label for="bgPick" data-i18n="bgLabel"></label>
+          <input type="color" id="bgPick" value="#eef0f6" aria-label="background">
+          <div class="bgpresets" id="bgPresets"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- controls + output -->
+    <div class="card ctrlcard">
+      <div class="ctrl">
+        <div class="ctrl-head"><label for="xNum" data-i18n="offsetX"></label>
+          <span class="numwrap"><input type="number" id="xNum" class="numin" min="-50" max="50" value="0"><span class="unit">px</span></span>
+        </div>
+        <input type="range" id="xRng" class="rng" min="-50" max="50" value="0" aria-label="offset x">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><label for="yNum" data-i18n="offsetY"></label>
+          <span class="numwrap"><input type="number" id="yNum" class="numin" min="-50" max="50" value="8"><span class="unit">px</span></span>
+        </div>
+        <input type="range" id="yRng" class="rng" min="-50" max="50" value="8" aria-label="offset y">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><label for="blurNum" data-i18n="blur"></label>
+          <span class="numwrap"><input type="number" id="blurNum" class="numin" min="0" max="100" value="24"><span class="unit">px</span></span>
+        </div>
+        <input type="range" id="blurRng" class="rng" min="0" max="100" value="24" aria-label="blur">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><label for="spreadNum" data-i18n="spread"></label>
+          <span class="numwrap"><input type="number" id="spreadNum" class="numin" min="-50" max="50" value="0"><span class="unit">px</span></span>
+        </div>
+        <input type="range" id="spreadRng" class="rng" min="-50" max="50" value="0" aria-label="spread">
+      </div>
+
+      <hr class="divider">
+
+      <div class="ctrl inline">
+        <label for="colorPick" data-i18n="colorLabel"></label>
+        <input type="color" id="colorPick" value="#141822" aria-label="shadow color">
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><label for="opNum" data-i18n="opacity"></label>
+          <span class="numwrap"><input type="number" id="opNum" class="numin" min="0" max="100" value="24"><span class="unit">%</span></span>
+        </div>
+        <input type="range" id="opRng" class="rng" min="0" max="100" value="24" aria-label="opacity">
+      </div>
+
+      <div class="ctrl inline">
+        <label for="insetChk" data-i18n="inset"></label>
+        <label class="switch"><input type="checkbox" id="insetChk"><span class="track"></span></label>
+      </div>
+
+      <button class="gbtn" id="randomBtn" type="button" style="width:100%;margin-bottom:16px;">
+        <svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3l-7.5 7.5"/><path d="M3 21l7.5-7.5"/><path d="M16 21h5v-5"/><path d="M14.5 14.5 21 21"/></svg>
+        <span data-i18n="random"></span>
+      </button>
+
+      <hr class="divider">
+
+      <div class="fhead"><span class="ftitle">CSS</span>
+        <button class="copybtn" data-copy="cssOut" type="button"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copy"></span></button>
+      </div>
+      <div class="fstr" id="cssOut"></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <span data-i18n="note"></span>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'מחולל Box Shadow',
+      pageTitle:'מחולל Box Shadow ל-CSS',
+      pageSub:'עצבו צל לאלמנטים עם תצוגה חיה — הזיזו את הצל, שנו טשטוש, פיזור, צבע ושקיפות, והעתיקו את קוד ה-CSS המוכן. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      copy:'העתקה', copiedMsg:'הועתק ✓',
+      offsetX:'היסט אופקי (X)', offsetY:'היסט אנכי (Y)', blur:'טשטוש', spread:'פיזור',
+      colorLabel:'צבע הצל', opacity:'שקיפות', inset:'צל פנימי (inset)',
+      fillLabel:'צבע האלמנט', bgLabel:'רקע התצוגה', random:'צל אקראי',
+      note:'אפשר לשלב כמה צללים יחד — הפרידו ביניהם בפסיקים בתוך box-shadow כדי ליצור עומק (למתקדמים).',
+      foot:'KOLKLI · מחולל Box Shadow · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'Box-Shadow Generator',
+      pageTitle:'CSS Box-Shadow Generator',
+      pageSub:'Design a CSS box-shadow with a live preview — drag the offset, blur, spread, color and opacity, then copy the ready-made CSS. Everything runs in your browser; nothing is sent to a server.',
+      copy:'Copy', copiedMsg:'Copied ✓',
+      offsetX:'Offset X', offsetY:'Offset Y', blur:'Blur', spread:'Spread',
+      colorLabel:'Shadow color', opacity:'Opacity', inset:'Inset shadow',
+      fillLabel:'Element color', bgLabel:'Preview background', random:'Random shadow',
+      note:'You can stack several shadows — separate them with commas inside box-shadow to build up depth (advanced).',
+      foot:'KOLKLI · Box-Shadow Generator · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'Генератор Box-Shadow',
+      pageTitle:'Генератор CSS box-shadow',
+      pageSub:'Создайте CSS box-shadow с живым предпросмотром — меняйте смещение, размытие, разброс, цвет и прозрачность, затем скопируйте готовый CSS. Всё работает в браузере; ничего не отправляется на сервер.',
+      copy:'Копировать', copiedMsg:'Скопировано ✓',
+      offsetX:'Смещение X', offsetY:'Смещение Y', blur:'Размытие', spread:'Разброс',
+      colorLabel:'Цвет тени', opacity:'Прозрачность', inset:'Внутренняя тень',
+      fillLabel:'Цвет элемента', bgLabel:'Фон предпросмотра', random:'Случайная тень',
+      note:'Можно наложить несколько теней — перечислите их через запятую внутри box-shadow, чтобы создать глубину (для продвинутых).',
+      foot:'KOLKLI · Генератор Box-Shadow · Приватно и быстро, прямо в браузере' }
+  };
+
+  const BGPRESETS = ['#eef0f6','#ffffff','#1c2030','#0d0f14','#dbe4ff','#ffe4c4'];
+
+  let lang='he', t=I18N.he;
+  const state = { x:0, y:8, blur:24, spread:0, hex:'#141822', alpha:24, inset:false, fill:'#ffffff', bg:'#eef0f6' };
+
+  const PAIRS = [
+    ['xRng','xNum','x',-50,50],
+    ['yRng','yNum','y',-50,50],
+    ['blurRng','blurNum','blur',0,100],
+    ['spreadRng','spreadNum','spread',-50,50],
+    ['opRng','opNum','alpha',0,100]
+  ];
+
+  // ---- helpers ----
+  function clamp(v,a,b){ v=+v; if(isNaN(v)) v=0; return v<a?a:v>b?b:v; }
+  function toInt(v,a,b){ return Math.round(clamp(v,a,b)); }
+  function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+  function hexToRgb(hex){
+    hex=String(hex).trim().replace(/^#/,'');
+    if(/^[0-9a-f]{3}$/i.test(hex)) hex=hex.split('').map(c=>c+c).join('');
+    if(!/^[0-9a-f]{6}$/i.test(hex)) return null;
+    const n=parseInt(hex,16);
+    return {r:(n>>16)&255, g:(n>>8)&255, b:n&255};
+  }
+  function h2(n){ return n.toString(16).padStart(2,'0'); }
+
+  function buildShadow(){
+    const c=hexToRgb(state.hex)||{r:20,g:24,b:44};
+    const a=+(clamp(state.alpha,0,100)/100).toFixed(2);
+    const rgba='rgba('+c.r+','+c.g+','+c.b+','+a+')';
+    return (state.inset?'inset ':'')+state.x+'px '+state.y+'px '+state.blur+'px '+state.spread+'px '+rgba;
+  }
+
+  // ---- render ----
+  function setVal(id,v,except){ if(id===except) return; const e=el(id); if(e && String(e.value)!==String(v)) e.value=v; }
+  function render(except){
+    const val=buildShadow();
+    el('sample').style.boxShadow=val;
+    el('sample').style.background=state.fill;
+    el('stage').style.background=state.bg;
+    el('cssOut').textContent='box-shadow: '+val+';';
+    PAIRS.forEach(function(p){ setVal(p[0],state[p[2]],except); setVal(p[1],state[p[2]],except); });
+    setVal('colorPick',state.hex,except);
+    setVal('fillPick',state.fill,except);
+    setVal('bgPick',state.bg,except);
+    if(except!=='insetChk') el('insetChk').checked=state.inset;
+  }
+
+  // ---- toast + copy ----
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1700); }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(fallbackCopy.bind(null,text)); }
+    else fallbackCopy(text);
+    toast(t.copiedMsg);
+  }
+  function fallbackCopy(text){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+  }
+
+  // ---- events ----
+  PAIRS.forEach(function(p){
+    const rng=p[0], num=p[1], key=p[2], min=p[3], max=p[4];
+    el(rng).addEventListener('input',()=>{ state[key]=toInt(el(rng).value,min,max); render(rng); });
+    el(num).addEventListener('input',()=>{ const v=el(num).value; if(v===''||v==='-'||v==='+') return; state[key]=toInt(v,min,max); render(num); });
+    el(num).addEventListener('blur',()=>render());
+  });
+  el('colorPick').addEventListener('input',()=>{ state.hex=el('colorPick').value; render('colorPick'); });
+  el('fillPick').addEventListener('input',()=>{ state.fill=el('fillPick').value; render('fillPick'); });
+  el('bgPick').addEventListener('input',()=>{ state.bg=el('bgPick').value; render('bgPick'); });
+  el('insetChk').addEventListener('change',()=>{ state.inset=el('insetChk').checked; render('insetChk'); });
+
+  el('bgPresets').addEventListener('click',e=>{ const b=e.target.closest('[data-bg]'); if(!b) return; state.bg=b.getAttribute('data-bg'); render(); });
+
+  el('randomBtn').addEventListener('click',()=>{
+    state.x=rnd(-24,24); state.y=rnd(-24,24); state.blur=rnd(0,60); state.spread=rnd(-10,20);
+    state.hex='#'+h2(rnd(0,255))+h2(rnd(0,255))+h2(rnd(0,255)); state.alpha=rnd(10,45);
+    render();
+  });
+
+  document.querySelectorAll('.copybtn').forEach(b=>{
+    b.addEventListener('click',()=>{ const target=el(b.getAttribute('data-copy')); if(target) copy(target.textContent); });
+  });
+
+  // background presets
+  el('bgPresets').innerHTML = BGPRESETS.map(c=>`<button type="button" data-bg="${c}" style="background:${c}" title="${c}"></button>`).join('');
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    if(!I18N[l]) l='en';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+  window.__setLang=applyLang;
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  render();
+})();
+</script>
+</body>
+</html>

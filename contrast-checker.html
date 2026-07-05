@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — בודק ניגודיות</title>
+<meta name="description" content="Free WCAG color contrast checker — pick a text and background color and instantly see the contrast ratio plus AA/AAA pass/fail for normal and large text, with a live readability preview. Fast, private, right in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 22px;}
+  .pagehead h1{font-size:clamp(23px,3vw,32px);font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:12px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  .tool{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;}
+  @media (max-width:760px){ .tool{grid-template-columns:1fr;} }
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);}
+
+  /* picker markup */
+  .pickrow{display:flex;gap:9px;margin-top:14px;}
+  input[type=color]{-webkit-appearance:none;appearance:none;width:56px;height:44px;padding:0;border:1px solid var(--line);
+    border-radius:12px;background:var(--panel-2);cursor:pointer;flex-shrink:0;}
+  input[type=color]::-webkit-color-swatch-wrapper{padding:4px;}
+  input[type=color]::-webkit-color-swatch{border:none;border-radius:8px;}
+  .hexfield{flex:1;display:flex;align-items:center;gap:2px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:12px;padding:0 12px;transition:border-color .12s,box-shadow .12s;}
+  .hexfield:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .hexfield .hash{color:var(--faint);font-family:var(--mono);font-size:16px;}
+  .hexfield input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font-family:var(--mono);
+    font-size:16px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:11px 0;outline:none;}
+  .btnrow{display:flex;gap:9px;margin-top:10px;}
+  .gbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);font-size:13px;font-weight:600;padding:10px 12px;border-radius:11px;
+    cursor:pointer;transition:all .12s;}
+  .gbtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .gbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .gbtn.hidden{display:none;}
+
+  .copybtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--muted);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .copybtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .copybtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .fstr{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink);background:var(--panel-2);
+    border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;margin-bottom:12px;overflow-x:auto;white-space:nowrap;
+    direction:ltr;text-align:start;}
+
+  .note{display:flex;align-items:flex-start;gap:9px;margin-top:18px;padding:12px 14px;border-radius:12px;
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+    font-size:12px;color:var(--ink-2);line-height:1.55;}
+  .note svg{width:16px;height:16px;color:var(--accent-dim);flex-shrink:0;margin-top:1px;
+    stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ===== tool-specific ===== */
+  .pickcol{padding:18px;position:sticky;top:16px;}
+  .ctl{margin-top:16px;}
+  .ctl:first-child{margin-top:0;}
+  .clabel{display:block;font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.05em;font-family:var(--mono);}
+  .ctl .pickrow{margin-top:8px;}
+
+  .ratiobox{margin-top:18px;padding:18px 16px;border-radius:14px;background:var(--panel-2);
+    border:1px solid var(--line);text-align:center;}
+  .ratioword{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.06em;font-family:var(--mono);margin-bottom:8px;}
+  .ratioval{font-family:var(--mono);font-size:clamp(32px,7vw,44px);font-weight:700;letter-spacing:-0.01em;
+    color:var(--ink);line-height:1.1;}
+  .ratioval bdi{direction:ltr;unicode-bidi:isolate;}
+  .ratiobox .copybtn{margin-top:14px;}
+
+  .results{display:grid;gap:18px;}
+
+  /* live preview */
+  .pvcard{padding:0;overflow:hidden;}
+  .preview{padding:26px 24px;min-height:184px;display:flex;flex-direction:column;justify-content:center;gap:12px;
+    transition:background .12s ease,color .12s ease;}
+  .preview .pvheading{margin:0;font-size:22px;font-weight:700;letter-spacing:-0.01em;line-height:1.25;}
+  .preview .pvbody{margin:0;font-size:15px;line-height:1.6;}
+  .preview .pvlarge{margin:0;font-size:24px;font-weight:700;line-height:1.3;}
+
+  /* pass/fail badges */
+  .badges{padding:14px 16px;display:grid;gap:9px;}
+  .badge{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:12px;
+    background:var(--panel-2);border:1px solid var(--line);}
+  .badge .bico{width:26px;height:26px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;
+    flex-shrink:0;font-size:15px;font-weight:800;color:#fff;line-height:1;}
+  .badge.pass .bico{background:var(--ok);}
+  .badge.fail .bico{background:var(--err);}
+  .badge .btext{flex:1;min-width:0;}
+  .badge .blabel{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .badge .bmeta{font-size:11px;color:var(--muted);font-family:var(--mono);direction:ltr;text-align:start;}
+  .badge .bstate{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-family:var(--mono);}
+  .badge.pass .bstate{color:var(--ok);}
+  .badge.fail .bstate{color:var(--err);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="pageTitle"></h1>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="tool">
+    <!-- pickers + ratio -->
+    <div class="card pickcol">
+      <div class="ctl">
+        <span class="clabel" data-i18n="textLabel"></span>
+        <div class="pickrow">
+          <input type="color" id="fgColor" value="#1c2030" aria-label="text color">
+          <div class="hexfield">
+            <span class="hash">#</span>
+            <input type="text" id="fgHex" spellcheck="false" maxlength="7" value="1C2030" aria-label="text hex">
+          </div>
+        </div>
+      </div>
+      <div class="ctl">
+        <span class="clabel" data-i18n="bgLabel"></span>
+        <div class="pickrow">
+          <input type="color" id="bgColor" value="#eef0f6" aria-label="background color">
+          <div class="hexfield">
+            <span class="hash">#</span>
+            <input type="text" id="bgHex" spellcheck="false" maxlength="7" value="EEF0F6" aria-label="background hex">
+          </div>
+        </div>
+      </div>
+      <div class="btnrow">
+        <button class="gbtn" id="swapBtn" type="button">
+          <svg viewBox="0 0 24 24"><path d="M16 3l4 4-4 4"/><path d="M20 7H4"/><path d="M8 21l-4-4 4-4"/><path d="M4 17h16"/></svg>
+          <span data-i18n="swap"></span>
+        </button>
+        <button class="gbtn" id="randomBtn" type="button">
+          <svg viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3l-7.5 7.5"/><path d="M3 21l7.5-7.5"/><path d="M16 21h5v-5"/><path d="M14.5 14.5 21 21"/></svg>
+          <span data-i18n="random"></span>
+        </button>
+      </div>
+      <div class="ratiobox">
+        <div class="ratioword" data-i18n="ratioWord"></div>
+        <div class="ratioval" id="ratioVal"><bdi>0.00 : 1</bdi></div>
+        <button class="copybtn" id="copyRatio" type="button">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span data-i18n="copy"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- preview + badges -->
+    <div class="results">
+      <div class="card pvcard">
+        <div class="preview" id="preview">
+          <h3 class="pvheading" data-i18n="previewHeading"></h3>
+          <p class="pvbody" data-i18n="previewBody"></p>
+          <p class="pvlarge" data-i18n="previewLarge"></p>
+        </div>
+      </div>
+
+      <div class="card badges" id="badgeList">
+        <div class="badge" id="bAANormal">
+          <span class="bico"></span>
+          <div class="btext"><div class="blabel" data-i18n="aaNormal"></div><div class="bmeta">AA &middot; &ge; 4.5:1</div></div>
+          <span class="bstate"></span>
+        </div>
+        <div class="badge" id="bAALarge">
+          <span class="bico"></span>
+          <div class="btext"><div class="blabel" data-i18n="aaLarge"></div><div class="bmeta">AA &middot; &ge; 3:1</div></div>
+          <span class="bstate"></span>
+        </div>
+        <div class="badge" id="bAAANormal">
+          <span class="bico"></span>
+          <div class="btext"><div class="blabel" data-i18n="aaaNormal"></div><div class="bmeta">AAA &middot; &ge; 7:1</div></div>
+          <span class="bstate"></span>
+        </div>
+        <div class="badge" id="bAAALarge">
+          <span class="bico"></span>
+          <div class="btext"><div class="blabel" data-i18n="aaaLarge"></div><div class="bmeta">AAA &middot; &ge; 4.5:1</div></div>
+          <span class="bstate"></span>
+        </div>
+        <div class="badge" id="bUI">
+          <span class="bico"></span>
+          <div class="btext"><div class="blabel" data-i18n="uiGraphics"></div><div class="bmeta">&ge; 3:1</div></div>
+          <span class="bstate"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <span data-i18n="note"></span>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'בודק ניגודיות',
+      pageTitle:'בודק ניגודיות צבעים — תקן WCAG',
+      pageSub:'בדקו אם טקסט קריא מעל צבע רקע לפי תקן הנגישות WCAG — קבלו מייד את יחס הניגודיות ואת דירוגי AA ו-AAA לטקסט רגיל וגדול, עם תצוגה מקדימה חיה. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      copy:'העתקה', copiedMsg:'הועתק ✓',
+      textLabel:'צבע טקסט (חזית)', bgLabel:'צבע רקע',
+      swap:'החלפה', random:'אקראי',
+      ratioWord:'יחס ניגודיות', pass:'עובר', fail:'נכשל',
+      aaNormal:'AA — טקסט רגיל', aaLarge:'AA — טקסט גדול',
+      aaaNormal:'AAA — טקסט רגיל', aaaLarge:'AAA — טקסט גדול',
+      uiGraphics:'ממשק / גרפיקה',
+      previewHeading:'כותרת לדוגמה',
+      previewBody:'זהו טקסט גוף לדוגמה. שנו את צבעי הטקסט והרקע כדי לראות עד כמה השילוב קריא וברור לעין.',
+      previewLarge:'טקסט גדול לדוגמה',
+      note:'לפי WCAG, טקסט רגיל דורש יחס ניגודיות של לפחות 4.5:1 וטקסט גדול לפחות 3:1 לרמת AA; לרמת AAA נדרש 7:1 לטקסט רגיל ו-4.5:1 לטקסט גדול. "טקסט גדול" = 24px ומעלה, או 18.66px במודגש.',
+      foot:'KOLKLI · בודק ניגודיות · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'Contrast Checker',
+      pageTitle:'WCAG Color Contrast Checker',
+      pageSub:'Check whether text is readable over a background per the WCAG accessibility standard — instantly see the contrast ratio and AA/AAA ratings for normal and large text, with a live preview. Everything runs in your browser; nothing is sent to a server.',
+      copy:'Copy', copiedMsg:'Copied ✓',
+      textLabel:'Text color (foreground)', bgLabel:'Background color',
+      swap:'Swap', random:'Random',
+      ratioWord:'Contrast ratio', pass:'Pass', fail:'Fail',
+      aaNormal:'AA — Normal text', aaLarge:'AA — Large text',
+      aaaNormal:'AAA — Normal text', aaaLarge:'AAA — Large text',
+      uiGraphics:'UI / Graphics',
+      previewHeading:'Sample heading',
+      previewBody:'This is a sample paragraph of body text. Change the text and background colors to see how readable and clear the combination is.',
+      previewLarge:'Large sample text',
+      note:'Per WCAG, normal text needs a contrast ratio of at least 4.5:1 and large text at least 3:1 for level AA; level AAA requires 7:1 for normal text and 4.5:1 for large text. "Large text" means 24px or larger, or 18.66px bold.',
+      foot:'KOLKLI · Contrast Checker · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'Проверка контраста',
+      pageTitle:'Проверка контрастности цвета — стандарт WCAG',
+      pageSub:'Проверьте, читается ли текст на фоне по стандарту доступности WCAG — мгновенно узнайте коэффициент контрастности и оценки AA/AAA для обычного и крупного текста, с живым предпросмотром. Всё работает в браузере; ничего не отправляется на сервер.',
+      copy:'Копировать', copiedMsg:'Скопировано ✓',
+      textLabel:'Цвет текста (передний план)', bgLabel:'Цвет фона',
+      swap:'Поменять', random:'Случайно',
+      ratioWord:'Коэффициент контраста', pass:'Проходит', fail:'Не проходит',
+      aaNormal:'AA — обычный текст', aaLarge:'AA — крупный текст',
+      aaaNormal:'AAA — обычный текст', aaaLarge:'AAA — крупный текст',
+      uiGraphics:'Интерфейс / графика',
+      previewHeading:'Пример заголовка',
+      previewBody:'Это пример абзаца основного текста. Меняйте цвета текста и фона, чтобы увидеть, насколько читаемо и чётко выглядит сочетание.',
+      previewLarge:'Пример крупного текста',
+      note:'Согласно WCAG, обычному тексту требуется коэффициент контрастности не менее 4.5:1, а крупному — не менее 3:1 для уровня AA; для уровня AAA требуется 7:1 для обычного текста и 4.5:1 для крупного. «Крупный текст» — это 24px и больше или 18.66px полужирным.',
+      foot:'KOLKLI · Проверка контраста · Приватно и быстро, прямо в браузере' }
+  };
+
+  const BADGES = [
+    {id:'bAANormal', min:4.5},
+    {id:'bAALarge',  min:3},
+    {id:'bAAANormal',min:7},
+    {id:'bAAALarge', min:4.5},
+    {id:'bUI',       min:3}
+  ];
+
+  let lang='he', t=I18N.he;
+  let fg = {r:28, g:32, b:48};    // #1C2030
+  let bg = {r:238, g:240, b:246}; // #EEF0F6
+  let curRatio = 0;
+
+  // ---- color math (ported from color-convert) ----
+  function clamp(v,a,b){ v=+v; if(isNaN(v)) v=0; return v<a?a:v>b?b:v; }
+  function toInt(v,max){ return Math.round(clamp(v,0,max)); }
+  function hexToRgb(hex){
+    hex=String(hex).trim().replace(/^#/,'');
+    if(/^[0-9a-f]{3}$/i.test(hex)) hex=hex.split('').map(c=>c+c).join('');
+    if(!/^[0-9a-f]{6}$/i.test(hex)) return null;
+    const n=parseInt(hex,16);
+    return {r:(n>>16)&255, g:(n>>8)&255, b:n&255};
+  }
+  function rgbToHex(r,g,b){
+    return '#'+[r,g,b].map(x=>toInt(x,255).toString(16).padStart(2,'0')).join('').toUpperCase();
+  }
+  function luminance(r,g,b){
+    const a=[r,g,b].map(v=>{ v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4); });
+    return 0.2126*a[0]+0.7152*a[1]+0.0722*a[2];
+  }
+
+  // ---- render ----
+  function setVal(id,v,except){ if(id===except) return; const e=el(id); if(e && String(e.value)!==String(v)) e.value=v; }
+  function render(except){
+    const fgHex=rgbToHex(fg.r,fg.g,fg.b), bgHex=rgbToHex(bg.r,bg.g,bg.b);
+    // sync controls (skip the one being edited)
+    setVal('fgColor',fgHex,except); setVal('fgHex',fgHex.slice(1),except);
+    setVal('bgColor',bgHex,except); setVal('bgHex',bgHex.slice(1),except);
+    // contrast ratio
+    const L1=luminance(fg.r,fg.g,fg.b), L2=luminance(bg.r,bg.g,bg.b);
+    const ratio=(Math.max(L1,L2)+0.05)/(Math.min(L1,L2)+0.05);
+    curRatio=ratio;
+    el('ratioVal').innerHTML='<bdi>'+ratio.toFixed(2)+' : 1</bdi>';
+    // live preview
+    const pv=el('preview'); pv.style.background=bgHex; pv.style.color=fgHex;
+    // pass/fail badges
+    BADGES.forEach(bd=>{
+      const pass=ratio>=bd.min;
+      const node=el(bd.id);
+      node.classList.toggle('pass',pass);
+      node.classList.toggle('fail',!pass);
+      node.querySelector('.bico').textContent = pass?'✓':'✗';
+      node.querySelector('.bstate').textContent = pass?t.pass:t.fail;
+    });
+  }
+
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1700); }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(fallbackCopy.bind(null,text)); }
+    else fallbackCopy(text);
+    toast(t.copiedMsg);
+  }
+  function fallbackCopy(text){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+  }
+
+  // ---- events ----
+  el('fgColor').addEventListener('input',e=>{ const c=hexToRgb(e.target.value); if(c){ fg=c; render('fgColor'); } });
+  el('fgHex').addEventListener('input',e=>{ const c=hexToRgb(e.target.value); if(c){ fg=c; render('fgHex'); } });
+  el('fgHex').addEventListener('blur',()=>render());
+  el('bgColor').addEventListener('input',e=>{ const c=hexToRgb(e.target.value); if(c){ bg=c; render('bgColor'); } });
+  el('bgHex').addEventListener('input',e=>{ const c=hexToRgb(e.target.value); if(c){ bg=c; render('bgHex'); } });
+  el('bgHex').addEventListener('blur',()=>render());
+
+  el('swapBtn').addEventListener('click',()=>{ const tmp=fg; fg=bg; bg=tmp; render(); });
+  el('randomBtn').addEventListener('click',()=>{
+    const rnd=()=>({ r:Math.floor(Math.random()*256), g:Math.floor(Math.random()*256), b:Math.floor(Math.random()*256) });
+    fg=rnd(); bg=rnd(); render();
+  });
+  el('copyRatio').addEventListener('click',()=>{ copy(curRatio.toFixed(2)+':1'); });
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    if(!I18N[l]) l='en';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    render(); // refresh pass/fail wording in the new language
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+  window.__setLang=applyLang;
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  render();
+})();
+</script>
+</body>
+</html>

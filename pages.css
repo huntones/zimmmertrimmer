@@ -74,6 +74,9 @@ section{padding:26px 0;}
 .subhead{display:flex;align-items:center;gap:12px;margin:14px 0 18px;}
 .subhead h2{font-size:clamp(19px,2.6vw,24px);font-weight:700;letter-spacing:-.02em;margin:0;}
 .subhead .line{flex:1;height:1px;background:var(--line);}
+.subhead h2 .she{font-size:16px;margin-inline-end:8px;}
+.subhead .seeall{font-size:13px;font-weight:600;color:var(--accent);white-space:nowrap;}
+.subhead .seeall:hover{text-decoration:underline;}
 
 /* ---------- buttons ---------- */
 .cta{display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
@@ -121,6 +124,21 @@ a.card{display:block;}
   border:1px solid var(--line);border-radius:999px;padding:8px 14px;box-shadow:var(--shadow-sm);}
 .chip .badge{padding:1px 6px;font-size:9px;}
 a.chip.hov:hover{border-color:var(--accent);}
+
+/* ---------- clickable tool tiles (category "all tools") ---------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:12px;}
+.tool-tile{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);
+  border-radius:14px;padding:13px 15px;box-shadow:var(--shadow-sm);color:inherit;
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
+a.tool-tile{text-decoration:none;}
+.tool-tile.hov:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:var(--shadow-lg);}
+.tool-tile .tt-ic{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:var(--ci-bg,var(--accent-soft));color:var(--ci,var(--accent));}
+.tool-tile .tt-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tool-tile .tt-name{flex:1;min-width:0;font-size:14px;font-weight:600;line-height:1.3;letter-spacing:-0.01em;}
+.tool-tile .badge{flex-shrink:0;}
+.tool-tile.is-soon{opacity:.72;box-shadow:none;}
+.tool-tile.is-soon .tt-ic{background:var(--panel-2);color:var(--faint);}
 
 /* ---------- AI grid ---------- */
 .aigrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}

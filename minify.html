@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — כיווץ CSS / JS</title>
+<meta name="description" content="Free CSS & JavaScript minifier — paste your code and get a compact, minified version with comments and whitespace stripped, ready to copy or download. String- and comment-aware. Fast, private, right in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 22px;}
+  .pagehead h1{font-size:clamp(23px,3vw,32px);font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:12px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  /* reused helpers (from color-convert.html) */
+  .gbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);font-size:13px;font-weight:600;padding:10px 12px;border-radius:11px;
+    cursor:pointer;transition:all .12s;}
+  .gbtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .gbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .gbtn.hidden{display:none;}
+  .copybtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--muted);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .copybtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .copybtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .fstr{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink);background:var(--panel-2);
+    border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;margin-bottom:12px;overflow-x:auto;white-space:nowrap;
+    direction:ltr;text-align:start;}
+
+  /* ---- minify tool ---- */
+  .tool{display:flex;flex-direction:column;gap:18px;align-items:stretch;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);}
+  .panel{padding:18px;}
+
+  .toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px;}
+  .seg button{border:0;background:transparent;color:var(--muted);font-family:var(--sans);font-size:13px;font-weight:600;
+    padding:7px 15px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .seg button:hover{color:var(--ink-2);}
+  .seg button.active{background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow-sm);}
+  .modehint{font-family:var(--mono);font-size:12px;color:var(--muted);}
+  .modehint b{color:var(--accent-dim);font-weight:700;}
+
+  .chead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+  .ctitle{font-size:13px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;}
+  .cactions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .code{width:100%;min-height:220px;resize:vertical;display:block;background:var(--panel-2);border:1px solid var(--line);
+    color:var(--ink);border-radius:12px;font-family:var(--mono);font-size:13px;line-height:1.6;padding:13px 14px;
+    direction:ltr;text-align:left;transition:border-color .12s,box-shadow .12s;}
+  .code::placeholder{color:var(--faint);}
+  .code:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .code[readonly]{color:var(--ink-2);}
+
+  .btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px;}
+  .gbtn.primary{background:var(--grad-btn);color:#fff;border-color:transparent;box-shadow:0 2px 12px var(--grad-btn-glow);}
+  .gbtn.primary:hover{filter:brightness(1.06);color:#fff;background:var(--grad-btn);border-color:transparent;}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  @media (max-width:560px){ .stats{grid-template-columns:1fr;} }
+  .stat{background:var(--panel-2);border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;text-align:center;}
+  .stat .slabel{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--faint);margin-bottom:5px;}
+  .stat .sval{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink);direction:ltr;}
+  .stat.saved .sval{color:var(--success-dim);}
+
+  .divider{height:1px;background:var(--line);margin:16px 0;border:0;}
+
+  .switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;direction:ltr;}
+  .switch input{position:absolute;opacity:0;width:0;height:0;}
+  .switch .track{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:background .15s;cursor:pointer;}
+  .switch .track::before{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+    background:var(--panel);box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .15s;}
+  .switch input:checked + .track{background:var(--accent);}
+  .switch input:checked + .track::before{transform:translateX(20px);}
+
+  .note{display:flex;align-items:flex-start;gap:9px;margin-top:18px;padding:12px 14px;border-radius:12px;
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+    font-size:12px;color:var(--ink-2);line-height:1.55;}
+  .note svg{width:16px;height:16px;color:var(--accent-dim);flex-shrink:0;margin-top:1px;
+    stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="pageTitle"></h1>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="tool">
+    <!-- mode toggle -->
+    <div class="toolbar">
+      <div class="seg" id="modeSeg" role="group" aria-label="mode">
+        <button type="button" data-mode="auto" class="active" data-i18n="modeAuto"></button>
+        <button type="button" data-mode="css" data-i18n="modeCss"></button>
+        <button type="button" data-mode="js" data-i18n="modeJs"></button>
+      </div>
+      <span class="modehint" id="modeHint"></span>
+    </div>
+
+    <!-- input -->
+    <div class="card panel">
+      <div class="chead">
+        <span class="ctitle" data-i18n="inputTitle"></span>
+        <div class="cactions">
+          <button class="copybtn" id="sampleBtn" type="button"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span data-i18n="loadSample"></span></button>
+          <button class="copybtn" id="clearBtn" type="button"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg><span data-i18n="clear"></span></button>
+        </div>
+      </div>
+      <textarea class="code" id="input" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+      <div class="btnrow">
+        <button class="gbtn primary" id="minifyBtn" type="button">
+          <svg viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg>
+          <span data-i18n="minify"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- output -->
+    <div class="card panel">
+      <div class="chead">
+        <span class="ctitle" data-i18n="outputTitle"></span>
+        <div class="cactions">
+          <button class="copybtn" id="copyBtn" data-copy="output" type="button"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copy"></span></button>
+          <button class="copybtn" id="downloadBtn" type="button"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg><span data-i18n="download"></span></button>
+        </div>
+      </div>
+      <textarea class="code" id="output" readonly spellcheck="false"></textarea>
+      <hr class="divider">
+      <div class="stats">
+        <div class="stat"><div class="slabel" data-i18n="statOriginal"></div><div class="sval" id="origSize">0 B</div></div>
+        <div class="stat"><div class="slabel" data-i18n="statMinified"></div><div class="sval" id="minSize">0 B</div></div>
+        <div class="stat saved"><div class="slabel" data-i18n="statSaved"></div><div class="sval" id="savedPct">0%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <span data-i18n="note"></span>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'כיווץ CSS / JS',
+      pageTitle:'כיווץ CSS ו-JavaScript',
+      pageSub:'הדביקו קוד CSS או JavaScript, וקבלו גרסה מכווצת — בלי הערות ורווחים מיותרים — מוכנה להעתקה או הורדה. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      modeAuto:'זיהוי אוטומטי', modeCss:'CSS', modeJs:'JavaScript',
+      inputTitle:'קוד מקור', outputTitle:'פלט מכווץ',
+      inputPh:'הדביקו כאן קוד CSS או JavaScript…', outputPh:'התוצאה המכווצת תופיע כאן',
+      minify:'כיווץ', clear:'ניקוי', loadSample:'טעינת דוגמה',
+      copy:'העתקה', download:'הורדה', copiedMsg:'הועתק ✓',
+      statOriginal:'מקורי', statMinified:'מוקטן', statSaved:'נחסך',
+      emptyMsg:'הדביקו קוד קודם', detected:'זוהה',
+      note:'זהו מכווץ קל־משקל שרץ בדפדפן ומתאים לקוד רגיל. הוא מודע למחרוזות ולהערות, אך אינו מנתח את השפה לעומק — ביטויים רגולריים (regex) ומקרי קצה של הוספת נקודה-פסיק אוטומטית (ASI) עשויים לדרוש כלי בנייה (bundler/minifier) אמיתי.',
+      foot:'KOLKLI · כיווץ CSS / JS · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'Minify CSS / JS',
+      pageTitle:'CSS & JavaScript Minifier',
+      pageSub:'Paste CSS or JavaScript and get a minified version — comments and extra whitespace stripped — ready to copy or download. Everything runs in your browser; nothing is sent to a server.',
+      modeAuto:'Auto-detect', modeCss:'CSS', modeJs:'JavaScript',
+      inputTitle:'Source code', outputTitle:'Minified output',
+      inputPh:'Paste your CSS or JavaScript here…', outputPh:'Minified output appears here',
+      minify:'Minify', clear:'Clear', loadSample:'Load sample',
+      copy:'Copy', download:'Download', copiedMsg:'Copied ✓',
+      statOriginal:'Original', statMinified:'Minified', statSaved:'Saved',
+      emptyMsg:'Paste some code first', detected:'Detected',
+      note:'This is a lightweight in-browser minifier, best for straightforward code. It is string- and comment-aware but does not fully parse the language — regex literals and automatic semicolon insertion (ASI) edge cases may need a real bundler/minifier.',
+      foot:'KOLKLI · Minify CSS / JS · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'Сжатие CSS / JS',
+      pageTitle:'Минификатор CSS и JavaScript',
+      pageSub:'Вставьте CSS или JavaScript и получите сжатую версию — без комментариев и лишних пробелов — готовую для копирования или загрузки. Всё работает в браузере; ничего не отправляется на сервер.',
+      modeAuto:'Автоопределение', modeCss:'CSS', modeJs:'JavaScript',
+      inputTitle:'Исходный код', outputTitle:'Сжатый результат',
+      inputPh:'Вставьте сюда CSS или JavaScript…', outputPh:'Здесь появится сжатый результат',
+      minify:'Сжать', clear:'Очистить', loadSample:'Загрузить пример',
+      copy:'Копировать', download:'Скачать', copiedMsg:'Скопировано ✓',
+      statOriginal:'Исходный', statMinified:'Сжатый', statSaved:'Сэкономлено',
+      emptyMsg:'Сначала вставьте код', detected:'Определено',
+      note:'Это лёгкий минификатор в браузере, подходит для несложного кода. Он учитывает строки и комментарии, но не разбирает язык полностью — регулярные выражения и краевые случаи автоматической вставки точки с запятой (ASI) могут потребовать настоящего сборщика/минификатора.',
+      foot:'KOLKLI · Сжатие CSS / JS · Приватно и быстро, прямо в браузере' }
+  };
+
+  const SAMPLE_CSS =
+`/* Button component */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid #7b34ff;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #1c2030;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn:hover {
+  background: #7b34ff;
+  color: #ffffff;
+}
+
+@media (max-width: 600px) {
+  .btn { width: 100%; }
+}`;
+
+  const SAMPLE_JS =
+`// Debounce helper
+function debounce(fn, wait) {
+  let timer = null;
+  return function (...args) {
+    clearTimeout(timer);
+    /* wait before firing again */
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, wait);
+  };
+}
+
+const log = debounce((msg) => {
+  console.log("value:", msg);
+}, 250);`;
+
+  let lang='he', t=I18N.he;
+  let currentMode='auto';   // what the toggle is set to
+  let lastMode='css';       // last effective mode used (for download extension)
+
+  // ---- minifiers ----
+  function minifyCss(src){
+    return String(src)
+      .replace(/\/\*[\s\S]*?\*\//g, '')          // strip /* comments */
+      .replace(/\s+/g, ' ')                       // collapse whitespace runs
+      .replace(/\s*([{}:;,>+~])\s*/g, '$1')       // trim ws around punctuation
+      .replace(/;}/g, '}')                        // drop last ; before }
+      .trim();
+  }
+
+  // Conservative, string- & comment-aware JS minifier.
+  // Removes // and /* */ comments, collapses whitespace, and removes it
+  // entirely only around safe delimiters. Does NOT drop semicolons or rename.
+  function minifyJs(src){
+    src = String(src);
+    const SAFE = '{}()[];,:';
+    const isSafe = ch => ch && SAFE.indexOf(ch) >= 0;
+    let out = '';
+    let i = 0;
+    const n = src.length;
+    while(i < n){
+      const c = src[i], c2 = src[i+1];
+      // line comment
+      if(c === '/' && c2 === '/'){
+        i += 2;
+        while(i < n && src[i] !== '\n') i++;
+        continue;
+      }
+      // block comment
+      if(c === '/' && c2 === '*'){
+        i += 2;
+        while(i < n && !(src[i] === '*' && src[i+1] === '/')) i++;
+        i += 2;
+        continue;
+      }
+      // string / template literal — copy verbatim
+      if(c === '"' || c === "'" || c === '`'){
+        const quote = c;
+        out += c; i++;
+        while(i < n){
+          const ch = src[i];
+          if(ch === '\\'){ out += ch + (src[i+1] || ''); i += 2; continue; }
+          out += ch; i++;
+          if(ch === quote) break;
+        }
+        continue;
+      }
+      // whitespace run — collapse or drop
+      if(c === ' ' || c === '\t' || c === '\n' || c === '\r' || c === '\f' || c === '\v'){
+        let j = i;
+        while(j < n && /\s/.test(src[j])) j++;
+        const prev = out[out.length-1] || '';
+        const next = src[j] || '';
+        // drop entirely at the edges or next to a safe delimiter; else keep one space
+        if(prev === '' || next === '' || isSafe(prev) || isSafe(next)){
+          /* drop */
+        } else {
+          out += ' ';
+        }
+        i = j;
+        continue;
+      }
+      out += c;
+      i++;
+    }
+    return out.trim();
+  }
+
+  function guessMode(src){
+    const s = String(src);
+    if(!s.trim()) return 'css';
+    let js = 0, css = 0;
+    if(/\b(function|return|typeof|instanceof|new|await|yield)\b/.test(s)) js += 2;
+    if(/=>|===|!==|\+\+|--|&&|\|\||\?\./.test(s)) js += 2;
+    if(/\b(var|let|const|class|import|export)\b/.test(s)) js += 2;
+    if(/\b(console|document|window|Math|JSON)\./.test(s)) js += 2;
+    if(/@media|@keyframes|@import|@font-face|@supports/.test(s)) css += 3;
+    if(/[.#][a-z][\w-]*\s*\{/i.test(s)) css += 2;                 // .class { / #id {
+    if(/[-a-z]+\s*:\s*[^;{}()]+;/i.test(s)) css += 1;             // prop: value;
+    if(/:\s*(hover|focus|active|before|after|root|nth-child)/.test(s)) css += 1;
+    return js >= css ? 'js' : 'css';
+  }
+
+  // ---- stats ----
+  function bytes(str){ try{ return new Blob([str]).size; }catch(_){ return (str||'').length; } }
+  function fmtBytes(n){ return n < 1024 ? n + ' B' : (n/1024).toFixed(1) + ' KB'; }
+  function updateStats(orig, min){
+    const o = bytes(orig), m = bytes(min);
+    el('origSize').textContent = fmtBytes(o);
+    el('minSize').textContent = fmtBytes(m);
+    const pct = o > 0 ? Math.max(0, Math.round((1 - m/o) * 100)) : 0;
+    el('savedPct').textContent = pct + '%';
+  }
+
+  function setHint(mode){
+    if(currentMode !== 'auto'){ el('modeHint').innerHTML = ''; return; }
+    el('modeHint').innerHTML = t.detected + ': <b>' + (mode === 'js' ? 'JavaScript' : 'CSS') + '</b>';
+  }
+
+  // ---- run ----
+  function runMinify(){
+    const src = el('input').value;
+    if(!src.trim()){
+      el('output').value = '';
+      updateStats('', '');
+      el('modeHint').innerHTML = '';
+      toast(t.emptyMsg);
+      return;
+    }
+    let mode = currentMode;
+    if(mode === 'auto') mode = guessMode(src);
+    lastMode = mode;
+    let out;
+    try{ out = mode === 'js' ? minifyJs(src) : minifyCss(src); }
+    catch(_){ out = src; }
+    el('output').value = out;
+    updateStats(src, out);
+    setHint(mode);
+  }
+
+  function loadSample(){
+    let mode = currentMode === 'auto' ? 'css' : currentMode;
+    el('input').value = mode === 'js' ? SAMPLE_JS : SAMPLE_CSS;
+    el('origSize').textContent = fmtBytes(bytes(el('input').value));
+    runMinify();
+  }
+
+  function clearAll(){
+    el('input').value = '';
+    el('output').value = '';
+    updateStats('', '');
+    el('modeHint').innerHTML = '';
+    el('input').focus();
+  }
+
+  function download(){
+    const text = el('output').value;
+    if(!text){ toast(t.emptyMsg); return; }
+    const ext = lastMode === 'js' ? 'js' : 'css';
+    const type = ext === 'js' ? 'application/javascript' : 'text/css';
+    const blob = new Blob([text], {type:type});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'min.' + ext;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+  }
+
+  // ---- toast + copy ----
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1700); }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(fallbackCopy.bind(null,text)); }
+    else fallbackCopy(text);
+    toast(t.copiedMsg);
+  }
+  function fallbackCopy(text){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+  }
+
+  // ---- events ----
+  el('minifyBtn').addEventListener('click', runMinify);
+  el('sampleBtn').addEventListener('click', loadSample);
+  el('clearBtn').addEventListener('click', clearAll);
+  el('downloadBtn').addEventListener('click', download);
+
+  el('input').addEventListener('input', ()=>{ el('origSize').textContent = fmtBytes(bytes(el('input').value)); });
+
+  el('modeSeg').addEventListener('click', e=>{
+    const b = e.target.closest('[data-mode]'); if(!b) return;
+    currentMode = b.getAttribute('data-mode');
+    el('modeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('active', x === b));
+    if(el('input').value.trim()) runMinify();
+  });
+
+  document.querySelectorAll('.copybtn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const target = el(b.getAttribute('data-copy')); if(!target) return;
+      const isField = target.tagName === 'TEXTAREA' || target.tagName === 'INPUT';
+      const text = isField ? target.value : target.textContent;
+      if(!text){ toast(t.emptyMsg); return; }
+      copy(text);
+    });
+  });
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    if(!I18N[l]) l='en';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    el('input').placeholder = t.inputPh;
+    el('output').placeholder = t.outputPh;
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+  window.__setLang=applyLang;
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  updateStats('', '');
+})();
+</script>
+</body>
+</html>

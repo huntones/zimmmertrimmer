@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — פאנל תיקיות</title>
+<meta name="description" content="Nested folder panel with auto-generated hierarchical codes (01 · 01a · 01aa). Add, rename, delete, drag-to-reorder, drag-to-nest. RTL, all client-side.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-soft:#e6f6ec;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-soft:#132a1c;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;align-items:center;
+    gap:18px;padding:40px 16px 60px;transition:background-color .25s,color .25s;}
+
+  /* ---- theme toggle (demo chrome) ---- */
+  .demobar{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);}
+  .demobar button{font-family:var(--sans);cursor:pointer;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink-2);border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:600;transition:.15s;}
+  .demobar button:hover{border-color:var(--accent);color:var(--accent-dim);}
+
+  /* ================= FOLDER PANEL ================= */
+  .fp{width:100%;max-width:440px;background:var(--panel);border:1px solid var(--line);border-radius:20px;
+    box-shadow:var(--shadow-lg);overflow:hidden;display:flex;flex-direction:column;}
+
+  /* header */
+  .fp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 18px 14px;}
+  .fp-head h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em;color:var(--ink);}
+  .fp-add{width:38px;height:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent-dim);border-radius:11px;
+    cursor:pointer;transition:.15s;}
+  .fp-add:hover{background:var(--accent);color:#fff;transform:translateY(-1px);box-shadow:0 6px 16px var(--grad-btn-glow);}
+  .fp-add svg{width:18px;height:18px;}
+
+  /* search */
+  .fp-search{margin:0 18px 12px;display:flex;align-items:center;gap:9px;background:var(--panel-2);
+    border:1px solid var(--line);border-radius:12px;padding:0 13px;height:42px;transition:.15s;}
+  .fp-search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);background:var(--panel);}
+  .fp-search svg{width:16px;height:16px;color:var(--faint);flex-shrink:0;}
+  .fp-search input{border:none;background:none;outline:none;color:var(--ink);font-family:var(--sans);
+    font-size:14px;width:100%;}
+  .fp-search input::placeholder{color:var(--faint);}
+
+  /* section header (root breadcrumb) */
+  .fp-root{display:flex;align-items:center;gap:10px;margin:0 18px 8px;padding:8px 4px;
+    border-bottom:1px dashed var(--line);cursor:pointer;border-radius:8px;transition:background .12s;}
+  .fp-root:hover{background:var(--panel-2);}
+  .fp-root .ic{width:19px;height:19px;color:var(--accent);flex-shrink:0;}
+  .fp-root .nm{flex:1;min-width:0;font-weight:700;font-size:14.5px;color:var(--ink-2);}
+  .fp-root.drop-inside{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent);}
+
+  /* list */
+  .fp-list{list-style:none;margin:0;padding:6px 12px 12px;display:flex;flex-direction:column;gap:5px;
+    max-height:460px;overflow-y:auto;scrollbar-gutter:stable;}
+  .fp-list::-webkit-scrollbar{width:9px;}
+  .fp-list::-webkit-scrollbar-thumb{background:var(--faint);border-radius:99px;border:3px solid var(--panel);}
+  .fp-list:hover::-webkit-scrollbar-thumb{background:var(--muted);}
+
+  .fp-empty{padding:26px 10px;text-align:center;color:var(--faint);font-size:13.5px;}
+
+  /* row */
+  .fp-row{position:relative;display:flex;align-items:center;gap:7px;padding:9px 10px;border-radius:12px;cursor:pointer;
+    border:1px solid transparent;background:var(--panel);transition:background .13s,border-color .13s,box-shadow .13s;}
+  .fp-row:hover{background:var(--panel-2);}
+  .fp-row.sel{background:var(--accent-soft);border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent);}
+  .fp-row.dragging{opacity:.45;}
+  .fp-row.drop-before{box-shadow:inset 0 3px 0 -1px var(--accent);}
+  .fp-row.drop-after{box-shadow:inset 0 -3px 0 -1px var(--accent);}
+  .fp-row.drop-inside{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent);}
+
+  /* depth guide line (start side) */
+  .fp-row.sub::before{content:"";position:absolute;inset-inline-start:0;top:6px;bottom:6px;
+    width:2px;border-radius:2px;background:var(--line);}
+
+  /* grip handle (start / right in RTL) */
+  .fp-grip{flex-shrink:0;width:18px;height:24px;display:flex;align-items:center;justify-content:center;
+    color:var(--faint);cursor:grab;border-radius:6px;touch-action:none;}
+  .fp-grip:hover{color:var(--accent);background:var(--panel);}
+  .fp-grip:active{cursor:grabbing;}
+  .fp-grip svg{width:14px;height:15px;pointer-events:none;}
+
+  /* expand / collapse chevron */
+  .fp-chev{flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+    border:none;background:none;color:var(--faint);cursor:pointer;border-radius:6px;padding:0;transition:.12s;}
+  .fp-chev:hover{color:var(--accent);background:var(--accent-soft);}
+  .fp-chev.ph{visibility:hidden;cursor:default;}
+  .fp-chev svg{width:14px;height:14px;transform:rotate(180deg);transition:transform .15s;pointer-events:none;} /* RTL collapsed → point inline-start */
+  .fp-chev.open svg{transform:rotate(90deg);}                                                                 /* expanded → point down */
+
+  .fp-fic{flex-shrink:0;width:19px;height:19px;color:var(--muted);}
+  .fp-row.sel .fp-fic{color:var(--accent);}
+  .fp-fic svg{width:100%;height:100%;}
+
+  .fp-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-size:14px;color:var(--ink-2);font-weight:500;}
+  .fp-row.sel .fp-name{color:var(--accent-dim);font-weight:600;}
+  .fp-name input{width:100%;font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);
+    border:1px solid var(--accent);background:var(--panel);border-radius:7px;padding:3px 8px;outline:none;
+    box-shadow:0 0 0 3px var(--accent-soft);}
+
+  /* per-row action buttons */
+  .fp-act{display:flex;align-items:center;gap:1px;flex-shrink:0;opacity:0;transition:opacity .12s;}
+  .fp-row:hover .fp-act,.fp-row.sel .fp-act,.fp.editing .fp-act,.fp-row:has(.kebab.on) .fp-act{opacity:1;}
+  .fp-act button{position:relative;background:none;border:none;color:var(--faint);cursor:pointer;
+    padding:5px;border-radius:7px;line-height:0;transition:.12s;}
+  .fp-act button:hover{color:var(--accent);background:var(--accent-soft);}
+  .fp-act button.del:hover{color:var(--danger);background:var(--danger-soft);}
+  .fp-act svg{width:15px;height:15px;pointer-events:none;}
+  .fp-act .reorder{cursor:grab;}
+  .fp-act .kebab.on{color:var(--accent);background:var(--accent-soft);}
+
+  /* auto-generated folder code badge (end / left in RTL) */
+  .fp-code{flex-shrink:0;font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.02em;
+    color:var(--muted);background:var(--panel-2);border:1px solid var(--line);border-radius:999px;
+    padding:2px 9px;min-width:34px;text-align:center;user-select:none;}
+  .fp-code.sel{color:var(--accent-ink);background:var(--grad-btn);border-color:transparent;
+    box-shadow:0 3px 9px var(--grad-btn-glow);}
+  .fp-code.root{color:var(--accent-dim);background:var(--accent-soft);border-color:transparent;}
+
+  /* kebab pop-up menu (shared, position:fixed so the list overflow never clips it) */
+  .fp-menu{position:fixed;z-index:80;min-width:190px;background:var(--panel);border:1px solid var(--line);
+    border-radius:13px;box-shadow:var(--shadow-lg);padding:6px;display:none;flex-direction:column;gap:2px;
+    transform-origin:top;animation:fpMenuIn .12s ease;}
+  .fp-menu.open{display:flex;}
+  @keyframes fpMenuIn{from{opacity:0;transform:translateY(-4px) scale(.98);}to{opacity:1;transform:none;}}
+  .fp-mi{display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;cursor:pointer;
+    font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--ink-2);text-align:start;
+    padding:9px 11px;border-radius:9px;transition:.12s;}
+  .fp-mi:hover,.fp-mi:focus-visible{background:var(--accent-soft);color:var(--accent-dim);outline:none;}
+  .fp-mi.del:hover,.fp-mi.del:focus-visible{background:var(--danger-soft);color:var(--danger);}
+  .fp-mi .mic{flex-shrink:0;line-height:0;color:var(--faint);}
+  .fp-mi:hover .mic,.fp-mi:focus-visible .mic{color:inherit;}
+  .fp-mi svg{width:16px;height:16px;}
+  .fp-msep{height:1px;background:var(--line);margin:3px 6px;}
+
+  /* count badge (end / left in RTL) */
+  .fp-cnt{flex-shrink:0;font-family:var(--mono);font-size:11.5px;color:var(--faint);min-width:30px;
+    text-align:center;}
+  .fp-cnt b{font-weight:700;color:var(--muted);}
+  .fp-row.sel .fp-cnt{color:var(--accent-dim);}
+  .fp-row.sel .fp-cnt b{color:var(--accent-dim);}
+
+  /* tooltip */
+  [data-tip]{position:relative;}
+  [data-tip]:hover::after{content:attr(data-tip);position:absolute;top:calc(100% + 7px);left:50%;
+    transform:translateX(-50%);background:var(--ink);color:var(--panel);font-family:var(--sans);
+    font-size:11px;font-weight:600;white-space:nowrap;padding:4px 8px;border-radius:6px;z-index:20;
+    pointer-events:none;box-shadow:var(--shadow);}
+
+  /* footer */
+  .fp-foot{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--panel-2);
+    border-top:1px solid var(--line);}
+  .fp-edit{display:inline-flex;align-items:center;gap:7px;flex-shrink:0;font-family:var(--sans);
+    font-size:13px;font-weight:600;color:#fff;background:var(--ink);border:none;border-radius:999px;
+    padding:8px 16px;cursor:pointer;transition:.15s;}
+  .fp-edit:hover{filter:brightness(1.12);}
+  .fp.editing .fp-edit{background:var(--grad-btn);box-shadow:0 6px 16px var(--grad-btn-glow);}
+  .fp-edit svg{width:14px;height:14px;}
+  .fp-hint{flex:1;min-width:0;font-size:11px;color:var(--faint);line-height:1.4;text-align:start;}
+  .fp-hint code{font-family:var(--mono);font-size:10.5px;color:var(--muted);}
+  .fp-up{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    border:none;border-radius:999px;cursor:pointer;color:#fff;background:var(--grad-btn);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);transition:.15s;}
+  .fp-up:hover{filter:brightness(1.06);transform:translateY(-1px);}
+  .fp-up:active{transform:translateY(1px);}
+  .fp-up svg{width:18px;height:18px;}
+
+  /* toast */
+  #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--panel);font-size:13px;font-weight:600;padding:11px 18px;
+    border-radius:12px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.25s;z-index:99;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+  <div class="demobar">
+    <span>KOLKLI · פאנל תיקיות</span>
+    <button id="themeBtn" type="button">🌙 מצב כהה</button>
+  </div>
+
+  <!-- ============ FOLDER PANEL ============ -->
+  <section class="fp" id="fp" aria-label="תיקיות">
+    <div class="fp-head">
+      <h2>תיקיות</h2>
+      <button class="fp-add" id="addBtn" type="button" title="תיקייה ראשית חדשה" aria-label="תיקייה ראשית חדשה">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 10v6"/><path d="M9 13h6"/></svg>
+      </button>
+    </div>
+
+    <label class="fp-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="search" placeholder="חיפוש קבצים…" autocomplete="off">
+    </label>
+
+    <div class="fp-root" id="rootRow" title="חזרה לתיקייה הראשית">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg></span>
+      <span class="nm">תיקייה ראשית</span>
+      <span class="fp-code root">ALL</span>
+      <span class="fp-cnt" id="rootCnt">0/0</span>
+    </div>
+
+    <ul class="fp-list" id="list"></ul>
+
+    <div class="fp-foot">
+      <button class="fp-edit" id="editBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+        <span id="editLabel">עריכה</span>
+      </button>
+      <span class="fp-hint">הקוד <code>01 · 01a · 01aa</code> נוצר אוטומטית לפי סדר התיקיות. גררו מהידית לשינוי סדר, או אל תוך תיקייה כדי לקנן.</span>
+      <button class="fp-up" id="upBtn" type="button" title="העלאת קבצים" aria-label="העלאת קבצים">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6"/><path d="m5 12 7-7 7 7"/><path d="M5 21h14"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------- icons ---------- */
+  var ICON = {
+    folder:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>',
+    folderOpen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 1.5-3a2 2 0 0 1 1.8-1.1H21a1 1 0 0 1 .95 1.32l-2.1 6A2 2 0 0 1 17.9 19H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v1.5"/></svg>',
+    grip:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>',
+    chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+    pencil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+    trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+    addsub:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 11v4"/><path d="M10 13h4"/></svg>',
+    kebab:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg>'
+  };
+
+  /* ---------- state (a real tree) ---------- */
+  var uid = 1;
+  function mk(name, total, sel, children){
+    return { id:'f'+(uid++), name:name, total:total||0, sel:sel||0,
+             children: children||[], expanded:true };
+  }
+  var tree = [
+    mk('חתונה של דנה ואורי', 0, 0, [
+      mk('קבלת פנים', 0, 0, [ mk('משפחה'), mk('חברים') ]),
+      mk('חופה', 0, 0, [ mk('כניסה לחופה'), mk('טקס') ]),
+      mk('ריקודים')
+    ]),
+    mk('אירוע חברה 2026'),
+    mk('צילומי סטודיו', 0, 0, [ mk('פורטרטים'), mk('מוצרים') ]),
+    mk('בר מצווה — יונתן'),
+    mk('ארכיון ישן')
+  ];
+  var selectedId = tree[0].id;
+  var editing = false;
+  var query = '';
+
+  /* ---------- auto-code generation ----------
+     depth 0 (top level)  → "01", "02", "03" …  (2-digit, 1-based)
+     depth ≥ 1            → parentCode + a letter for the sibling index
+     e.g.  01 · 01a · 01b · 01aa · 01ab · 01ba …
+     Codes are DERIVED from tree order on every render — never stored, never typed. */
+  function pad2(n){ return (n < 10 ? '0' : '') + n; }
+  function letterFor(i){                 // 0→a, 1→b … 25→z, 26→aa (Excel-style overflow)
+    var s = '', k = i + 1;
+    while(k > 0){ var r = (k - 1) % 26; s = String.fromCharCode(97 + r) + s; k = Math.floor((k - 1) / 26); }
+    return s;
+  }
+  function computeCodes(nodes, parentCode){
+    nodes.forEach(function(n, i){
+      n.code = parentCode ? parentCode + letterFor(i) : pad2(i + 1);
+      if(n.children.length) computeCodes(n.children, n.code);
+    });
+  }
+
+  /* ---------- tree helpers ---------- */
+  function findCtx(id, nodes, parent){    // → { list, index, node, parent } | null
+    nodes = nodes || tree;
+    for(var i = 0; i < nodes.length; i++){
+      if(nodes[i].id === id) return { list:nodes, index:i, node:nodes[i], parent:parent||null };
+      if(nodes[i].children.length){
+        var r = findCtx(id, nodes[i].children, nodes[i]);
+        if(r) return r;
+      }
+    }
+    return null;
+  }
+  function byId(id){ var c = findCtx(id); return c ? c.node : null; }
+  function subtreeHas(node, targetId){
+    return node.children.some(function(c){ return c.id === targetId || subtreeHas(c, targetId); });
+  }
+  function countAll(nodes){ return nodes.reduce(function(a, n){ return a + 1 + countAll(n.children); }, 0); }
+  function agg(nodes){
+    var s = 0, t = 0;
+    nodes.forEach(function(n){ s += n.sel; t += n.total; var c = agg(n.children); s += c.s; t += c.t; });
+    return { s:s, t:t };
+  }
+
+  /* ---------- flatten (respects search + expanded) ---------- */
+  function subtreeMatches(n, q){
+    if(n.name.toLowerCase().indexOf(q) !== -1) return true;
+    return n.children.some(function(c){ return subtreeMatches(c, q); });
+  }
+  function buildRows(){
+    var q = query.trim().toLowerCase(), out = [];
+    (function walk(nodes, depth){
+      nodes.forEach(function(n){
+        if(q){
+          if(!subtreeMatches(n, q)) return;               // prune non-matching branches
+          out.push({ node:n, depth:depth });
+          if(n.children.length) walk(n.children, depth + 1); // searching → force-open
+        } else {
+          out.push({ node:n, depth:depth });
+          if(n.children.length && n.expanded) walk(n.children, depth + 1);
+        }
+      });
+    })(tree, 0);
+    return out;
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    computeCodes(tree, '');
+    var list = $('list');
+    $('fp').classList.toggle('editing', editing);
+
+    var a = agg(tree);
+    $('rootCnt').textContent = a.s + '/' + a.t;
+
+    var rows = buildRows();
+    if(!rows.length){
+      list.innerHTML = '<li class="fp-empty">' + (query ? 'אין תוצאות תואמות' : 'עדיין אין תיקיות — הוסיפו אחת ➕') + '</li>';
+      return;
+    }
+
+    list.innerHTML = rows.map(function(r){
+      var n = r.node, sel = n.id === selectedId, hasKids = n.children.length > 0;
+      var indent = 10 + r.depth * 20;
+      var chev = hasKids
+        ? '<button class="fp-chev' + (n.expanded ? ' open' : '') + '" data-chev title="' + (n.expanded ? 'כיווץ' : 'הרחבה') + '" aria-label="הרחבה/כיווץ">' + ICON.chev + '</button>'
+        : '<span class="fp-chev ph"></span>';
+      return ''
+        + '<li class="fp-row' + (sel ? ' sel' : '') + (r.depth > 0 ? ' sub' : '') + '" data-id="' + n.id + '" data-depth="' + r.depth + '" draggable="true" style="padding-inline-start:' + indent + 'px">'
+        +   '<span class="fp-grip" data-grip title="גרירה לשינוי מיקום / קינון">' + ICON.grip + '</span>'
+        +   chev
+        +   '<span class="fp-fic">' + (hasKids && n.expanded ? ICON.folderOpen : ICON.folder) + '</span>'
+        +   '<span class="fp-name" title="' + esc(n.name) + '">' + esc(n.name) + '</span>'
+        +   '<span class="fp-act">'
+        +     '<button class="kebab" data-menu aria-label="עוד פעולות" aria-haspopup="menu" aria-expanded="false">' + ICON.kebab + '</button>'
+        +   '</span>'
+        +   '<span class="fp-code' + (sel ? ' sel' : '') + '" title="קוד אוטומטי">' + n.code + '</span>'
+        +   '<span class="fp-cnt"><b>' + n.sel + '</b>/' + n.total + '</span>'
+        + '</li>';
+    }).join('');
+  }
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  /* ---------- toast ---------- */
+  var toastTimer;
+  function toast(msg){
+    var t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 1800);
+  }
+
+  /* ---------- kebab (⋮) pop-up menu ---------- */
+  var menuEl = null, menuBtn = null, menuTargetId = null;
+  function buildMenu(){
+    menuEl = document.createElement('div');
+    menuEl.className = 'fp-menu';
+    menuEl.id = 'fpMenu';
+    menuEl.setAttribute('role', 'menu');
+    menuEl.innerHTML =
+        '<button class="fp-mi" data-mi="addsub" role="menuitem"><span class="mic">' + ICON.addsub + '</span><span>תת־תיקייה חדשה</span></button>'
+      + '<button class="fp-mi" data-mi="edit" role="menuitem"><span class="mic">' + ICON.pencil + '</span><span>שינוי שם</span></button>'
+      + '<div class="fp-msep"></div>'
+      + '<button class="fp-mi del" data-mi="delete" role="menuitem"><span class="mic">' + ICON.trash + '</span><span>מחיקה</span></button>';
+    document.body.appendChild(menuEl);
+    menuEl.addEventListener('click', function(e){
+      var mi = e.target.closest('[data-mi]'); if(!mi) return;
+      var id = menuTargetId, act = mi.getAttribute('data-mi');
+      closeMenu();
+      if(act === 'edit') beginRename(id);
+      else if(act === 'addsub') addSubfolder(id);
+      else if(act === 'delete') deleteFolder(id);
+    });
+  }
+  function openMenu(btn, id){
+    if(!menuEl) buildMenu();
+    menuTargetId = id; menuBtn = btn;
+    menuEl.classList.add('open');
+    btn.classList.add('on'); btn.setAttribute('aria-expanded', 'true');
+    var r = btn.getBoundingClientRect(), pad = 8;
+    var mw = menuEl.offsetWidth, mh = menuEl.offsetHeight;
+    var left = r.right - mw;                                              // RTL: align right edges
+    if(left < pad) left = pad;
+    if(left + mw > window.innerWidth - pad) left = window.innerWidth - pad - mw;
+    var top = r.bottom + 6;
+    if(top + mh > window.innerHeight - pad) top = Math.max(pad, r.top - mh - 6);   // flip up if no room below
+    menuEl.style.left = left + 'px';
+    menuEl.style.top = top + 'px';
+    var first = menuEl.querySelector('.fp-mi'); if(first) first.focus();
+  }
+  function closeMenu(){
+    if(!menuEl || !menuEl.classList.contains('open')) return;
+    menuEl.classList.remove('open');
+    if(menuBtn){ menuBtn.classList.remove('on'); menuBtn.setAttribute('aria-expanded', 'false'); }
+    menuBtn = null; menuTargetId = null;
+  }
+  function toggleMenu(btn, id){
+    if(menuEl && menuEl.classList.contains('open') && menuTargetId === id){ closeMenu(); return; }
+    closeMenu();
+    openMenu(btn, id);
+  }
+
+  /* ---------- actions ---------- */
+  function addFolder(){                              // new top-level folder
+    var f = mk('תיקייה חדשה');
+    tree.push(f);
+    selectedId = f.id;
+    query = ''; $('search').value = '';
+    render();
+    beginRename(f.id, true);
+    $('list').scrollTop = $('list').scrollHeight;
+  }
+
+  function addSubfolder(parentId){                   // new child under a folder
+    var ctx = findCtx(parentId); if(!ctx) return;
+    var f = mk('תת־תיקייה חדשה');
+    ctx.node.children.push(f);
+    ctx.node.expanded = true;
+    selectedId = f.id;
+    query = ''; $('search').value = '';
+    render();
+    beginRename(f.id, true);
+  }
+
+  function deleteFolder(id){
+    var ctx = findCtx(id); if(!ctx) return;
+    var kids = ctx.node.children.length;
+    if(!confirm('למחוק את "' + ctx.node.name + '"' + (kids ? ' וכל תת־התיקיות שבתוכה?' : '?'))) return;
+    ctx.list.splice(ctx.index, 1);
+    if(!findCtx(selectedId)) selectedId = tree.length ? tree[0].id : null;   // selection fell inside the removed subtree
+    render(); toast('התיקייה נמחקה');
+  }
+
+  function toggleExpand(id){
+    var n = byId(id); if(!n || !n.children.length) return;
+    n.expanded = !n.expanded;
+    render();
+  }
+
+  function beginRename(id, isNew){
+    var row = document.querySelector('.fp-row[data-id="' + id + '"]');
+    if(!row) return;
+    var nameEl = row.querySelector('.fp-name');
+    var f = byId(id); if(!f) return;
+    var input = document.createElement('input');
+    input.type = 'text'; input.value = f.name; input.setAttribute('aria-label','שם התיקייה');
+    nameEl.innerHTML = ''; nameEl.appendChild(input);
+    input.focus(); input.select();
+    var done = function(save){
+      var v = input.value.trim();
+      if(save && v) f.name = v;               // rename only touches the NAME — the code stays auto
+      render();
+    };
+    input.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){ e.preventDefault(); done(true); }
+      else if(e.key === 'Escape'){ e.preventDefault(); done(false); }
+    });
+    input.addEventListener('blur', function(){ done(true); });
+  }
+
+  /* ---------- drag: reorder + nest (HTML5) ---------- */
+  var dragId = null;
+  function clearDropMarks(){
+    document.querySelectorAll('.fp-row,.fp-root').forEach(function(r){ r.classList.remove('drop-before','drop-after','drop-inside'); });
+  }
+  function zoneFor(row, clientY){
+    var rect = row.getBoundingClientRect(), y = clientY - rect.top, h = rect.height;
+    if(y < h * 0.28) return 'before';
+    if(y > h * 0.72) return 'after';
+    return 'inside';
+  }
+
+  // move `dragId` relative to `targetId`; zone: 'before' | 'after' | 'inside' | 'root'
+  function moveNode(dId, targetId, zone){
+    if(zone !== 'root'){
+      if(dId === targetId) return;
+      var dNode = byId(dId);
+      if(dNode && subtreeHas(dNode, targetId)){ toast('אי אפשר לקנן תיקייה בתוך עצמה'); return; }
+    }
+    var d = findCtx(dId); if(!d) return;
+    var moved = d.list.splice(d.index, 1)[0];
+
+    if(zone === 'root'){
+      tree.push(moved);
+    } else {
+      var t = findCtx(targetId);                        // re-find AFTER removal (indices shifted)
+      if(!t){ d.list.splice(d.index, 0, moved); return; }
+      if(zone === 'inside'){
+        t.node.children.push(moved); t.node.expanded = true;
+      } else {
+        t.list.splice(t.index + (zone === 'after' ? 1 : 0), 0, moved);
+      }
+    }
+    render(); toast('הסדר עודכן');
+  }
+
+  function wire(){
+    var list = $('list');
+
+    // click delegation
+    list.addEventListener('click', function(e){
+      var row = e.target.closest('.fp-row'); if(!row) return;
+      var id = row.getAttribute('data-id');
+      if(e.target.closest('[data-menu]')){ e.stopPropagation(); toggleMenu(e.target.closest('[data-menu]'), id); return; }
+      if(e.target.closest('[data-chev]')){ e.stopPropagation(); toggleExpand(id); return; }
+      if(e.target.closest('[data-grip]')) return;          // handles are for dragging, not selecting
+      selectedId = id; render();
+    });
+
+    // double-click name = rename
+    list.addEventListener('dblclick', function(e){
+      var nameEl = e.target.closest('.fp-name'); if(!nameEl) return;
+      var row = e.target.closest('.fp-row'); if(row) beginRename(row.getAttribute('data-id'));
+    });
+
+    // only start a drag when the pointer went down on a handle
+    var handleArmed = false;
+    list.addEventListener('pointerdown', function(e){ handleArmed = !!e.target.closest('[data-grip]'); });
+
+    list.addEventListener('dragstart', function(e){
+      var row = e.target.closest('.fp-row'); if(!row) return;
+      if(!handleArmed){ e.preventDefault(); return; }        // rows only drag from a handle
+      dragId = row.getAttribute('data-id');
+      row.classList.add('dragging');
+      try{ e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); }catch(_){}
+    });
+
+    list.addEventListener('dragover', function(e){
+      var row = e.target.closest('.fp-row'); if(!row || !dragId) return;
+      e.preventDefault();
+      clearDropMarks();
+      if(row.getAttribute('data-id') === dragId) return;     // no marker on the row being dragged
+      row.classList.add('drop-' + zoneFor(row, e.clientY));
+    });
+
+    list.addEventListener('drop', function(e){
+      var row = e.target.closest('.fp-row'); if(!row || !dragId) return;
+      e.preventDefault();
+      var targetId = row.getAttribute('data-id');
+      if(targetId !== dragId) moveNode(dragId, targetId, zoneFor(row, e.clientY));
+    });
+
+    list.addEventListener('dragend', function(){
+      dragId = null; handleArmed = false; clearDropMarks();
+      document.querySelectorAll('.fp-row.dragging').forEach(function(r){ r.classList.remove('dragging'); });
+    });
+
+    // root breadcrumb = drop target to promote a folder back to the top level
+    var rootRow = $('rootRow');
+    rootRow.addEventListener('dragover', function(e){ if(!dragId) return; e.preventDefault(); clearDropMarks(); rootRow.classList.add('drop-inside'); });
+    rootRow.addEventListener('dragleave', function(){ rootRow.classList.remove('drop-inside'); });
+    rootRow.addEventListener('drop', function(e){ if(!dragId) return; e.preventDefault(); moveNode(dragId, null, 'root'); });
+    rootRow.addEventListener('click', function(){ selectedId = null; render(); });
+
+    $('addBtn').addEventListener('click', addFolder);
+    $('search').addEventListener('input', function(e){ query = e.target.value; render(); });
+    $('editBtn').addEventListener('click', function(){
+      editing = !editing;
+      $('editLabel').textContent = editing ? 'סיום' : 'עריכה';
+      render();
+    });
+    $('upBtn').addEventListener('click', function(){
+      var f = byId(selectedId);
+      toast(f ? 'העלאה אל "' + f.name + '" (' + f.code + ')…' : 'בחרו תיקייה תחילה');
+    });
+
+    // dismiss the kebab menu on outside click / Escape / scroll / resize
+    document.addEventListener('pointerdown', function(e){
+      if(!menuEl || !menuEl.classList.contains('open')) return;
+      if(e.target.closest('.fp-menu') || e.target.closest('[data-menu]')) return;
+      closeMenu();
+    });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeMenu(); });
+    window.addEventListener('resize', closeMenu);
+    window.addEventListener('scroll', closeMenu, true);   // capture: also catches the list's own scroll
+
+    // theme toggle
+    $('themeBtn').addEventListener('click', function(){
+      var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+      this.textContent = dark ? '🌙 מצב כהה' : '☀️ מצב בהיר';
+    });
+  }
+
+  render();
+  wire();
+})();
+</script>
+</body>
+</html>

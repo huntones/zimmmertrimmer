@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — Meta Tags Generator</title>
+<meta name="description" content="Free meta tag generator — build SEO title, description, keywords, Open Graph and Twitter card tags with a live Google & social preview. Copy ready-to-paste HTML. Fast, private, right in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 22px;}
+  .pagehead h1{font-size:clamp(23px,3vw,32px);font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:12px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  .tool{display:grid;grid-template-columns:380px 1fr;gap:18px;align-items:start;}
+  @media (max-width:760px){ .tool{grid-template-columns:1fr;} }
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);}
+
+  /* ---- form (left) ---- */
+  .formcard{padding:18px;}
+  .grouphead{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--accent);margin:22px 0 13px;padding-bottom:8px;border-bottom:1px solid var(--line);}
+  .grouphead:first-child{margin-top:0;}
+  .grouphead svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .field{margin-bottom:13px;}
+  .field:last-child{margin-bottom:0;}
+  .field > label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;letter-spacing:.01em;}
+  .field input, .field textarea, .field select{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:11px;
+    font-family:var(--sans);font-size:13.5px;font-weight:500;padding:10px 12px;outline:none;
+    transition:border-color .12s,box-shadow .12s;}
+  .field input:focus, .field textarea:focus, .field select:focus{
+    border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .field textarea{resize:vertical;min-height:66px;line-height:1.5;}
+  .field input.ltr{direction:ltr;unicode-bidi:isolate;text-align:start;font-family:var(--mono);font-size:13px;}
+  .field select{cursor:pointer;-webkit-appearance:none;appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23727a8a' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+    background-repeat:no-repeat;background-position:left 12px center;padding-inline-start:12px;padding-inline-end:34px;}
+  html[dir="ltr"] .field select{background-position:right 12px center;}
+  .field input[type=color]{height:46px;padding:4px;cursor:pointer;-webkit-appearance:none;appearance:none;}
+  .field input[type=color]::-webkit-color-swatch-wrapper{padding:0;}
+  .field input[type=color]::-webkit-color-swatch{border:none;border-radius:7px;}
+  .field input[type=color]::-moz-color-swatch{border:none;border-radius:7px;}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:420px){ .frow{grid-template-columns:1fr;} }
+
+  /* ---- previews (right) ---- */
+  .rightcol{display:flex;flex-direction:column;gap:18px;}
+  .pvcard{padding:16px 17px 17px;}
+  .pvhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px;}
+  .pvhead .ttl{font-size:13px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;}
+
+  /* copy button (from color-convert) */
+  .copybtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--muted);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .copybtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .copybtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* Google SERP preview */
+  .serp{direction:ltr;unicode-bidi:isolate;text-align:start;padding:6px 2px 2px;}
+  .serp-url{display:block;color:#006621;font-size:13px;line-height:1.35;margin-bottom:3px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  html[data-theme="dark"] .serp-url{color:#4cae67;}
+  .serp-title{display:block;color:#1a0dab;font-size:19px;line-height:1.3;font-weight:500;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px;}
+  html[data-theme="dark"] .serp-title{color:#8ab4f8;}
+  .serp-desc{color:#4d5156;font-size:13px;line-height:1.5;}
+  html[data-theme="dark"] .serp-desc{color:#bdc1c6;}
+
+  /* Social share card (Open Graph) */
+  .social{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel-2);}
+  .social-img{aspect-ratio:1.91/1;background-color:var(--line-2);background-size:cover;background-position:center;
+    background-repeat:no-repeat;display:flex;align-items:center;justify-content:center;color:var(--faint);}
+  .social-img svg{width:40px;height:40px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+  .social-img.has-img svg{display:none;}
+  .social-body{padding:11px 14px 13px;border-top:1px solid var(--line);}
+  .social-domain{direction:ltr;unicode-bidi:isolate;text-align:start;font-size:11px;font-weight:600;
+    letter-spacing:.04em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .social-title{font-size:15px;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:4px;}
+  .social-desc{font-size:12.5px;color:var(--muted);line-height:1.45;}
+
+  /* generated code */
+  #codeOut{direction:ltr;unicode-bidi:isolate;text-align:start;font-family:var(--mono);font-size:12.5px;line-height:1.65;
+    color:var(--ink);background:var(--panel-2);border:1px solid var(--line-2);border-radius:12px;
+    padding:14px 16px;margin:0;overflow-x:auto;white-space:pre;min-height:44px;}
+
+  .note{display:flex;align-items:flex-start;gap:9px;margin-top:18px;padding:12px 14px;border-radius:12px;
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+    font-size:12px;color:var(--ink-2);line-height:1.55;}
+  .note svg{width:16px;height:16px;color:var(--accent-dim);flex-shrink:0;margin-top:1px;
+    stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="pageTitle"></h1>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="tool">
+    <!-- form -->
+    <div class="card formcard">
+      <!-- Basic -->
+      <div class="grouphead">
+        <svg viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+        <span data-i18n="basicGroup"></span>
+      </div>
+      <div class="field">
+        <label data-i18n="f_title"></label>
+        <input type="text" id="mTitle" value="KOLKLI — Free Online Tools" spellcheck="false">
+      </div>
+      <div class="field">
+        <label data-i18n="f_desc"></label>
+        <textarea id="mDesc" spellcheck="false">Free, private, browser-based tools for editing audio, images, PDFs and more. No signup, nothing uploaded.</textarea>
+      </div>
+      <div class="field">
+        <label data-i18n="f_keywords"></label>
+        <input type="text" id="mKeywords" value="online tools, free tools, audio editor, pdf tools, image tools" spellcheck="false">
+      </div>
+      <div class="field">
+        <label data-i18n="f_author"></label>
+        <input type="text" id="mAuthor" value="KOLKLI" spellcheck="false">
+      </div>
+      <div class="field">
+        <label data-i18n="f_canonical"></label>
+        <input type="url" id="mCanonical" class="ltr" value="https://kolkli.com/" spellcheck="false">
+      </div>
+      <div class="field">
+        <label data-i18n="f_robots"></label>
+        <select id="mRobots">
+          <option value="index, follow" selected>index, follow</option>
+          <option value="noindex, follow">noindex, follow</option>
+          <option value="index, nofollow">index, nofollow</option>
+          <option value="noindex, nofollow">noindex, nofollow</option>
+        </select>
+      </div>
+      <div class="frow">
+        <div class="field">
+          <label data-i18n="f_theme"></label>
+          <input type="color" id="mTheme" value="#7b34ff">
+        </div>
+        <div class="field">
+          <label data-i18n="f_lang"></label>
+          <input type="text" id="mLang" class="ltr" value="he" spellcheck="false">
+        </div>
+      </div>
+
+      <!-- Open Graph -->
+      <div class="grouphead">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.5-3.5a2 2 0 0 0-2.8 0L6 21"/></svg>
+        <span data-i18n="ogGroup"></span>
+      </div>
+      <div class="field">
+        <label data-i18n="f_ogtitle"></label>
+        <input type="text" id="mOgTitle" placeholder="KOLKLI — Free Online Tools" spellcheck="false">
+      </div>
+      <div class="field">
+        <label data-i18n="f_ogdesc"></label>
+        <textarea id="mOgDesc" spellcheck="false"></textarea>
+      </div>
+      <div class="field">
+        <label data-i18n="f_ogimage"></label>
+        <input type="url" id="mOgImage" class="ltr" placeholder="https://kolkli.com/share.jpg" spellcheck="false">
+      </div>
+      <div class="field">
+        <label data-i18n="f_ogurl"></label>
+        <input type="url" id="mOgUrl" class="ltr" placeholder="https://kolkli.com/" spellcheck="false">
+      </div>
+      <div class="field">
+        <label data-i18n="f_ogtype"></label>
+        <select id="mOgType">
+          <option value="website" selected>website</option>
+          <option value="article">article</option>
+          <option value="product">product</option>
+        </select>
+      </div>
+
+      <!-- Twitter -->
+      <div class="grouphead">
+        <svg viewBox="0 0 24 24"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+        <span data-i18n="twGroup"></span>
+      </div>
+      <div class="frow">
+        <div class="field">
+          <label data-i18n="f_twcard"></label>
+          <select id="mTwCard">
+            <option value="summary_large_image" selected>summary_large_image</option>
+            <option value="summary">summary</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-i18n="f_twsite"></label>
+          <input type="text" id="mTwSite" class="ltr" value="@kolkli" spellcheck="false">
+        </div>
+      </div>
+    </div>
+
+    <!-- previews -->
+    <div class="rightcol">
+      <!-- SERP -->
+      <div class="card pvcard">
+        <div class="pvhead"><span class="ttl" data-i18n="serpTitle"></span></div>
+        <div class="serp">
+          <span class="serp-url" id="serpU"></span>
+          <span class="serp-title" id="serpT"></span>
+          <span class="serp-desc" id="serpD"></span>
+        </div>
+      </div>
+
+      <!-- Social card -->
+      <div class="card pvcard">
+        <div class="pvhead"><span class="ttl" data-i18n="socialTitle"></span></div>
+        <div class="social">
+          <div class="social-img" id="socImg">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.5-3.5a2 2 0 0 0-2.8 0L6 21"/></svg>
+          </div>
+          <div class="social-body">
+            <div class="social-domain" id="socDomain"></div>
+            <div class="social-title" id="socTitle"></div>
+            <div class="social-desc" id="socDesc"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code -->
+      <div class="card pvcard">
+        <div class="pvhead">
+          <span class="ttl" data-i18n="codeTitle"></span>
+          <button class="copybtn" data-copy="codeOut" type="button">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span data-i18n="copy"></span>
+          </button>
+        </div>
+        <pre id="codeOut"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <span data-i18n="note"></span>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'מחולל Meta Tags',
+      pageTitle:'מחולל Meta Tags — Title, תיאור, Open Graph ו-Twitter',
+      pageSub:'מלאו את השדות וקבלו מייד תגי meta מוכנים להדבקה — כותרת, תיאור, מילות מפתח, Open Graph ו-Twitter Cards — עם תצוגה חיה של תוצאת Google ושל כרטיס השיתוף. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      basicGroup:'בסיסי', ogGroup:'Open Graph', twGroup:'Twitter',
+      f_title:'כותרת הדף (Title)', f_desc:'תיאור (Description)', f_keywords:'מילות מפתח (מופרדות בפסיקים)',
+      f_author:'יוצר', f_canonical:'כתובת קנונית (Canonical URL)', f_robots:'Robots',
+      f_theme:'צבע נושא (Theme color)', f_lang:'שפה',
+      f_ogtitle:'og:title', f_ogdesc:'og:description', f_ogimage:'og:image (URL)', f_ogurl:'og:url', f_ogtype:'og:type',
+      f_twcard:'twitter:card', f_twsite:'twitter:site (@handle)',
+      serpTitle:'תצוגה מקדימה ב-Google', socialTitle:'כרטיס שיתוף (רשתות חברתיות)', codeTitle:'הקוד שנוצר',
+      copy:'העתקה', copiedMsg:'הועתק ✓',
+      note:'התגים נבנים אצלכם בדפדפן — שום מידע לא מועלה לשרת. שדות ריקים לא ייכללו בקוד. אם og:title / og:description / og:url ריקים, הם יימשכו מהכותרת, התיאור והכתובת הקנונית.',
+      foot:'KOLKLI · Meta Tags Generator · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'Meta Tags Generator',
+      pageTitle:'Meta Tags Generator — Title, Description, Open Graph & Twitter',
+      pageSub:'Fill in the fields and instantly get ready-to-paste meta tags — title, description, keywords, Open Graph and Twitter cards — with a live Google result and share-card preview. Everything runs in your browser; nothing is sent to a server.',
+      basicGroup:'Basic', ogGroup:'Open Graph', twGroup:'Twitter',
+      f_title:'Page title', f_desc:'Description', f_keywords:'Keywords (comma-separated)',
+      f_author:'Author', f_canonical:'Canonical URL', f_robots:'Robots',
+      f_theme:'Theme color', f_lang:'Language',
+      f_ogtitle:'og:title', f_ogdesc:'og:description', f_ogimage:'og:image (URL)', f_ogurl:'og:url', f_ogtype:'og:type',
+      f_twcard:'twitter:card', f_twsite:'twitter:site (@handle)',
+      serpTitle:'Google preview', socialTitle:'Social share card', codeTitle:'Generated code',
+      copy:'Copy', copiedMsg:'Copied ✓',
+      note:'Tags are built in your browser — nothing is uploaded. Empty fields are left out of the code. If og:title / og:description / og:url are blank they fall back to the title, description and canonical URL.',
+      foot:'KOLKLI · Meta Tags Generator · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'Генератор Meta-тегов',
+      pageTitle:'Генератор Meta-тегов — Title, Description, Open Graph и Twitter',
+      pageSub:'Заполните поля и мгновенно получите готовые для вставки meta-теги — заголовок, описание, ключевые слова, Open Graph и Twitter Cards — с живым превью результата Google и карточки для соцсетей. Всё работает в браузере; ничего не отправляется на сервер.',
+      basicGroup:'Основное', ogGroup:'Open Graph', twGroup:'Twitter',
+      f_title:'Заголовок страницы', f_desc:'Описание', f_keywords:'Ключевые слова (через запятую)',
+      f_author:'Автор', f_canonical:'Канонический URL', f_robots:'Robots',
+      f_theme:'Цвет темы', f_lang:'Язык',
+      f_ogtitle:'og:title', f_ogdesc:'og:description', f_ogimage:'og:image (URL)', f_ogurl:'og:url', f_ogtype:'og:type',
+      f_twcard:'twitter:card', f_twsite:'twitter:site (@handle)',
+      serpTitle:'Превью Google', socialTitle:'Карточка для соцсетей', codeTitle:'Сгенерированный код',
+      copy:'Копировать', copiedMsg:'Скопировано ✓',
+      note:'Теги собираются в вашем браузере — ничего не загружается. Пустые поля в код не попадают. Если og:title / og:description / og:url пусты, они берутся из заголовка, описания и канонического URL.',
+      foot:'KOLKLI · Генератор Meta-тегов · Приватно и быстро, прямо в браузере' }
+  };
+
+  let lang='he', t=I18N.he;
+
+  // ---- helpers ----
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function cssUrl(s){ return String(s).replace(/[\\"]/g,'\\$&').replace(/[\r\n]/g,''); }
+  function val(id){ const e=el(id); return e ? e.value.trim() : ''; }
+  function trunc(s,n){ s=String(s); return s.length>n ? s.slice(0,n).replace(/\s+\S*$/,'').trimEnd()+'…' : s; }
+  function hostOf(u){ try{ return new URL(u).hostname.replace(/^www\./,''); }catch(_){ return ''; } }
+  function crumb(u){
+    if(!u) return 'example.com';
+    try{
+      const url=new URL(u);
+      const host=url.hostname.replace(/^www\./,'');
+      const segs=url.pathname.split('/').filter(Boolean);
+      return segs.length ? host+' › '+segs.join(' › ') : host;
+    }catch(_){ return u; }
+  }
+  function metaName(name,content){ return content ? '<meta name="'+name+'" content="'+esc(content)+'">' : ''; }
+  function metaProp(prop,content){ return content ? '<meta property="'+prop+'" content="'+esc(content)+'">' : ''; }
+
+  // ---- generate ----
+  function generate(){
+    const title=val('mTitle'), desc=val('mDesc'), keywords=val('mKeywords'), author=val('mAuthor');
+    const canonical=val('mCanonical'), robots=val('mRobots'), theme=val('mTheme'), mlang=val('mLang');
+    const ogTitle=val('mOgTitle')||title;
+    const ogDesc=val('mOgDesc')||desc;
+    const ogUrl=val('mOgUrl')||canonical;
+    const ogImage=val('mOgImage');
+    const ogType=val('mOgType');
+    const twCard=val('mTwCard'), twSite=val('mTwSite');
+
+    // ---- SERP preview ----
+    el('serpU').textContent = crumb(canonical);
+    el('serpT').textContent = title || 'Page title';
+    el('serpD').textContent = trunc(desc, 160) || 'Your page description will appear here…';
+
+    // ---- Social card ----
+    const dom = hostOf(ogUrl) || 'example.com';
+    el('socDomain').textContent = dom.toUpperCase();
+    el('socTitle').textContent = ogTitle || 'Open Graph title';
+    el('socDesc').textContent = trunc(ogDesc, 120) || 'Open Graph description preview…';
+    const simg = el('socImg');
+    if(ogImage){ simg.style.backgroundImage = 'url("'+cssUrl(ogImage)+'")'; simg.classList.add('has-img'); }
+    else { simg.style.backgroundImage = 'none'; simg.classList.remove('has-img'); }
+
+    // ---- code ----
+    const lines = [
+      title ? '<title>'+esc(title)+'</title>' : '',
+      metaName('description', desc),
+      metaName('keywords', keywords),
+      metaName('author', author),
+      metaName('robots', robots),
+      metaName('theme-color', theme),
+      mlang ? '<meta http-equiv="content-language" content="'+esc(mlang)+'">' : '',
+      canonical ? '<link rel="canonical" href="'+esc(canonical)+'">' : '',
+      metaProp('og:type', ogType),
+      metaProp('og:title', ogTitle),
+      metaProp('og:description', ogDesc),
+      metaProp('og:image', ogImage),
+      metaProp('og:url', ogUrl),
+      metaName('twitter:card', twCard),
+      metaName('twitter:site', twSite),
+      metaName('twitter:title', ogTitle),
+      metaName('twitter:description', ogDesc),
+      metaName('twitter:image', ogImage)
+    ].filter(Boolean);
+    el('codeOut').textContent = lines.join('\n');
+  }
+
+  // ---- toast + copy ----
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1700); }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(fallbackCopy.bind(null,text)); }
+    else fallbackCopy(text);
+    toast(t.copiedMsg);
+  }
+  function fallbackCopy(text){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+  }
+
+  // ---- events ----
+  ['mTitle','mDesc','mKeywords','mAuthor','mCanonical','mRobots','mTheme','mLang',
+   'mOgTitle','mOgDesc','mOgImage','mOgUrl','mOgType','mTwCard','mTwSite'].forEach(id=>{
+    const e=el(id); if(e){ e.addEventListener('input', generate); e.addEventListener('change', generate); }
+  });
+  document.querySelectorAll('.copybtn').forEach(b=>{
+    b.addEventListener('click',()=>{ const target=el(b.getAttribute('data-copy')); if(target) copy(target.textContent); });
+  });
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    if(!I18N[l]) l='en';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+  window.__setLang=applyLang;
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  const li=el('mLang'); if(li) li.value = lang;
+  generate();
+})();
+</script>
+</body>
+</html>

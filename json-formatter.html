@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — JSON Formatter</title>
+<meta name="description" content="Free JSON formatter, validator & minifier — paste JSON to beautify it with your choice of indentation, minify it, sort keys and catch syntax errors with the exact line and column. Fast, private, right in your browser.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 22px;}
+  .pagehead h1{font-size:clamp(23px,3vw,32px);font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:12px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  /* reused helpers (from color-convert.html / minify.html) */
+  .gbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);font-size:13px;font-weight:600;padding:10px 12px;border-radius:11px;
+    cursor:pointer;transition:all .12s;}
+  .gbtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .gbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .gbtn.hidden{display:none;}
+  .copybtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--muted);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .copybtn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .copybtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ---- json tool ---- */
+  .tool{display:flex;flex-direction:column;gap:18px;align-items:stretch;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);}
+  .panel{padding:18px;}
+
+  .toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px;}
+  .seg button{border:0;background:transparent;color:var(--muted);font-family:var(--sans);font-size:13px;font-weight:600;
+    padding:7px 15px;border-radius:9px;cursor:pointer;transition:all .12s;}
+  .seg button:hover{color:var(--ink-2);}
+  .seg button.active{background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow-sm);}
+  .seg.mini button{padding:7px 12px;font-size:12.5px;}
+  .seg.disabled{opacity:.4;pointer-events:none;}
+  .seg-cap{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);}
+
+  .toggle-wrap{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+  .tglabel{font-size:13px;font-weight:600;color:var(--muted);}
+  .switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;direction:ltr;}
+  .switch input{position:absolute;opacity:0;width:0;height:0;}
+  .switch .track{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:background .15s;cursor:pointer;}
+  .switch .track::before{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+    background:var(--panel);box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .15s;}
+  .switch input:checked + .track{background:var(--accent);}
+  .switch input:checked + .track::before{transform:translateX(20px);}
+
+  .chead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+  .ctitle{font-size:13px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;}
+  .cactions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .code{width:100%;min-height:240px;resize:vertical;display:block;background:var(--panel-2);border:1px solid var(--line);
+    color:var(--ink);border-radius:12px;font-family:var(--mono);font-size:13px;line-height:1.6;padding:13px 14px;
+    direction:ltr;text-align:left;transition:border-color .12s,box-shadow .12s;}
+  .code::placeholder{color:var(--faint);}
+  .code:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .code[readonly]{color:var(--ink-2);}
+
+  .btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px;}
+  .gbtn.primary{background:var(--grad-btn);color:#fff;border-color:transparent;box-shadow:0 2px 12px var(--grad-btn-glow);}
+  .gbtn.primary:hover{filter:brightness(1.06);color:#fff;background:var(--grad-btn);border-color:transparent;}
+
+  /* validity banner */
+  .status{display:none;align-items:center;gap:9px;margin:0 0 12px;padding:11px 14px;border-radius:12px;
+    font-size:12.5px;font-weight:600;line-height:1.5;direction:inherit;}
+  .status.show{display:flex;}
+  .status svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .status .stx{unicode-bidi:plaintext;}
+  .status.ok{background:var(--success-soft);border:1px solid color-mix(in srgb,var(--success) 30%,transparent);color:var(--success-dim);}
+  .status.err{background:var(--danger-soft);border:1px solid color-mix(in srgb,var(--danger) 34%,transparent);color:var(--danger);}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  @media (max-width:560px){ .stats{grid-template-columns:1fr;} }
+  .stat{background:var(--panel-2);border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;text-align:center;}
+  .stat .slabel{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--faint);margin-bottom:5px;}
+  .stat .sval{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ink);direction:ltr;}
+
+  .divider{height:1px;background:var(--line);margin:16px 0;border:0;}
+
+  .note{display:flex;align-items:flex-start;gap:9px;margin-top:18px;padding:12px 14px;border-radius:12px;
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);
+    font-size:12px;color:var(--ink-2);line-height:1.55;}
+  .note svg{width:16px;height:16px;color:var(--accent-dim);flex-shrink:0;margin-top:1px;
+    stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h1 data-i18n="pageTitle"></h1>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="tool">
+    <!-- options -->
+    <div class="toolbar">
+      <div class="seg" id="modeSeg" role="group" aria-label="mode">
+        <button type="button" data-mode="pretty" class="active" data-i18n="modeBeautify"></button>
+        <button type="button" data-mode="min" data-i18n="modeMinify"></button>
+      </div>
+      <span class="seg-cap" data-i18n="indentLabel"></span>
+      <div class="seg mini" id="indentSeg" role="group" aria-label="indent">
+        <button type="button" data-indent="2" class="active" data-i18n="indent2"></button>
+        <button type="button" data-indent="4" data-i18n="indent4"></button>
+        <button type="button" data-indent="tab" data-i18n="indentTab"></button>
+      </div>
+      <label class="toggle-wrap">
+        <span class="switch"><input type="checkbox" id="sortKeys"><span class="track"></span></span>
+        <span class="tglabel" data-i18n="sortKeys"></span>
+      </label>
+    </div>
+
+    <!-- input -->
+    <div class="card panel">
+      <div class="chead">
+        <span class="ctitle" data-i18n="inputTitle"></span>
+        <div class="cactions">
+          <button class="copybtn" id="sampleBtn" type="button"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span data-i18n="loadSample"></span></button>
+          <button class="copybtn" id="clearBtn" type="button"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg><span data-i18n="clear"></span></button>
+        </div>
+      </div>
+      <textarea class="code" id="input" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+      <div class="btnrow">
+        <button class="gbtn primary" id="formatBtn" type="button">
+          <svg viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg>
+          <span data-i18n="formatBtn"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- output -->
+    <div class="card panel">
+      <div class="chead">
+        <span class="ctitle" data-i18n="outputTitle"></span>
+        <div class="cactions">
+          <button class="copybtn" id="copyBtn" data-copy="output" type="button"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-i18n="copy"></span></button>
+          <button class="copybtn" id="downloadBtn" type="button"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg><span data-i18n="download"></span></button>
+        </div>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+      <textarea class="code" id="output" readonly spellcheck="false"></textarea>
+      <hr class="divider">
+      <div class="stats">
+        <div class="stat"><div class="slabel" data-i18n="statSize"></div><div class="sval" id="stSize">—</div></div>
+        <div class="stat"><div class="slabel" data-i18n="statNodes"></div><div class="sval" id="stNodes">—</div></div>
+        <div class="stat"><div class="slabel" data-i18n="statDepth"></div><div class="sval" id="stDepth">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <span data-i18n="note"></span>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{ dir:'rtl',
+      kick:'JSON Formatter',
+      pageTitle:'סידור ובדיקת JSON',
+      pageSub:'הדביקו JSON כדי לסדר אותו יפה עם רמת הזחה לבחירתכם, לכווץ אותו לשורה אחת, למיין מפתחות ולתפוס שגיאות תחביר עם השורה והעמודה המדויקות. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      modeBeautify:'סידור יפה', modeMinify:'כיווץ',
+      indentLabel:'הזחה', indent2:'2 רווחים', indent4:'4 רווחים', indentTab:'טאב',
+      sortKeys:'מיון מפתחות',
+      inputTitle:'JSON מקור', outputTitle:'פלט',
+      inputPh:'הדביקו כאן JSON…', outputPh:'התוצאה המסודרת תופיע כאן',
+      formatBtn:'סדר', clear:'ניקוי', loadSample:'טעינת דוגמה',
+      copy:'העתקה', download:'הורדה', copiedMsg:'הועתק ✓',
+      statSize:'גודל', statNodes:'ערכים', statDepth:'עומק',
+      emptyMsg:'הדביקו JSON קודם',
+      valid:'JSON תקין', invalid:'JSON לא תקין: ',
+      lineWord:'שורה', colWord:'עמודה',
+      note:'הכול רץ מקומית בדפדפן — ה-JSON שלכם לא נשלח לשום שרת. הכלי משתמש במנתח ה-JSON המובנה של הדפדפן, כך שהבדיקה זהה לזו של הקוד שלכם. תגובות (comments) וסיומות פסיק (trailing commas) אינן חוקיות ב-JSON ויסומנו כשגיאה.',
+      foot:'KOLKLI · JSON Formatter · פרטי ומהיר, ישירות בדפדפן' },
+    en:{ dir:'ltr',
+      kick:'JSON Formatter',
+      pageTitle:'JSON Formatter & Validator',
+      pageSub:'Paste JSON to beautify it with the indentation you choose, minify it to a single line, sort its keys and catch syntax errors with the exact line and column. Everything runs in your browser; nothing is sent to a server.',
+      modeBeautify:'Beautify', modeMinify:'Minify',
+      indentLabel:'Indent', indent2:'2 spaces', indent4:'4 spaces', indentTab:'Tab',
+      sortKeys:'Sort keys',
+      inputTitle:'JSON input', outputTitle:'Output',
+      inputPh:'Paste your JSON here…', outputPh:'Formatted output appears here',
+      formatBtn:'Format', clear:'Clear', loadSample:'Load sample',
+      copy:'Copy', download:'Download', copiedMsg:'Copied ✓',
+      statSize:'Size', statNodes:'Values', statDepth:'Depth',
+      emptyMsg:'Paste some JSON first',
+      valid:'Valid JSON', invalid:'Invalid JSON: ',
+      lineWord:'line', colWord:'column',
+      note:'Everything runs locally in your browser — your JSON is never sent to a server. This uses the browser’s built-in JSON parser, so validation matches what your code sees. Comments and trailing commas are not valid JSON and will be flagged as an error.',
+      foot:'KOLKLI · JSON Formatter · Private and fast, right in your browser' },
+    ru:{ dir:'ltr',
+      kick:'JSON Formatter',
+      pageTitle:'Форматирование и проверка JSON',
+      pageSub:'Вставьте JSON, чтобы красиво отформатировать его с выбранным отступом, сжать в одну строку, отсортировать ключи и находить синтаксические ошибки с точной строкой и колонкой. Всё работает в браузере; ничего не отправляется на сервер.',
+      modeBeautify:'Форматировать', modeMinify:'Сжать',
+      indentLabel:'Отступ', indent2:'2 пробела', indent4:'4 пробела', indentTab:'Таб',
+      sortKeys:'Сортировать ключи',
+      inputTitle:'Исходный JSON', outputTitle:'Результат',
+      inputPh:'Вставьте сюда JSON…', outputPh:'Здесь появится отформатированный результат',
+      formatBtn:'Форматировать', clear:'Очистить', loadSample:'Загрузить пример',
+      copy:'Копировать', download:'Скачать', copiedMsg:'Скопировано ✓',
+      statSize:'Размер', statNodes:'Значения', statDepth:'Глубина',
+      emptyMsg:'Сначала вставьте JSON',
+      valid:'Корректный JSON', invalid:'Некорректный JSON: ',
+      lineWord:'строка', colWord:'колонка',
+      note:'Всё работает локально в браузере — ваш JSON никуда не отправляется. Используется встроенный парсер JSON браузера, поэтому проверка совпадает с тем, что видит ваш код. Комментарии и висячие запятые не являются допустимым JSON и будут отмечены как ошибка.',
+      foot:'KOLKLI · JSON Formatter · Приватно и быстро, прямо в браузере' }
+  };
+
+  const SAMPLE =
+`{
+  "name": "Kolkli",
+  "type": "web app",
+  "live": true,
+  "version": 4.8,
+  "tools": ["reverse", "sort", "json"],
+  "limits": { "free": 3, "pro": null },
+  "tags": [
+    { "id": 1, "label": "fast" },
+    { "id": 2, "label": "private" }
+  ]
+}`;
+
+  let lang='he', t=I18N.he;
+  let currentMode='pretty';   // 'pretty' | 'min'
+  let indent='2';             // '2' | '4' | 'tab'
+
+  // ---- structure analysis ----
+  function countNodes(v){
+    let n = 1;
+    if(Array.isArray(v)) v.forEach(x => n += countNodes(x));
+    else if(v && typeof v === 'object') Object.keys(v).forEach(k => n += countNodes(v[k]));
+    return n;
+  }
+  function depthOf(v){
+    if(Array.isArray(v)){ let m = 0; for(const x of v){ const d = depthOf(x); if(d > m) m = d; } return m + 1; }
+    if(v && typeof v === 'object'){ let m = 0; for(const k in v){ const d = depthOf(v[k]); if(d > m) m = d; } return m + 1; }
+    return 0;
+  }
+  function sortDeep(v){
+    if(Array.isArray(v)) return v.map(sortDeep);
+    if(v && typeof v === 'object'){
+      const o = {};
+      Object.keys(v).sort().forEach(k => { o[k] = sortDeep(v[k]); });
+      return o;
+    }
+    return v;
+  }
+
+  // ---- stats ----
+  function bytes(str){ try{ return new Blob([str]).size; }catch(_){ return (str||'').length; } }
+  function fmtBytes(n){ return n < 1024 ? n + ' B' : (n/1024).toFixed(1) + ' KB'; }
+  function fmtNum(n){ try{ return n.toLocaleString(lang === 'he' ? 'he-IL' : lang === 'ru' ? 'ru-RU' : 'en-US'); }catch(_){ return String(n); } }
+  function setStats(out, data){
+    el('stSize').textContent  = out ? fmtBytes(bytes(out)) : '—';
+    el('stNodes').textContent = data === undefined ? '—' : fmtNum(countNodes(data));
+    el('stDepth').textContent = data === undefined ? '—' : fmtNum(depthOf(data));
+  }
+
+  // ---- error location ----
+  // Engines phrase JSON.parse errors inconsistently and modern V8 no longer
+  // reports a character position, so we locate the first syntax error with our
+  // own JSON scanner (grammar-accurate, identical across every browser). It runs
+  // only after JSON.parse has already rejected the input, so no false positives.
+  function lineColFromPos(src, pos){
+    const upto = src.slice(0, Math.min(pos, src.length));
+    const nl = upto.split('\n');
+    return { line: nl.length, col: nl[nl.length - 1].length + 1 };
+  }
+  function findError(src){
+    const n = src.length; let i = 0; let error = null;
+    function fail(msg, at){ if(!error) error = { pos: (at == null ? i : at), msg: msg }; return false; }
+    function ws(){ while(i < n){ const c = src[i]; if(c === ' ' || c === '\t' || c === '\n' || c === '\r') i++; else break; } }
+    function str(){
+      i++;
+      while(i < n){
+        const c = src[i];
+        if(c === '"'){ i++; return true; }
+        if(c === '\\'){
+          const e = src[i + 1];
+          if(e === undefined) return fail('Unterminated string');
+          if('"\\/bfnrt'.indexOf(e) >= 0){ i += 2; continue; }
+          if(e === 'u'){ if(/^[0-9a-fA-F]{4}$/.test(src.substr(i + 2, 4))){ i += 6; continue; } return fail('Invalid \\u escape in string', i); }
+          return fail('Invalid escape sequence in string', i);
+        }
+        if(c.charCodeAt(0) < 0x20) return fail('Unterminated string');
+        i++;
+      }
+      return fail('Unterminated string');
+    }
+    function num(){
+      const s = i;
+      if(src[i] === '-') i++;
+      if(src[i] === '0') i++;
+      else if(src[i] >= '1' && src[i] <= '9'){ while(src[i] >= '0' && src[i] <= '9') i++; }
+      else return fail('Invalid number', s);
+      if(src[i] === '.'){ i++; if(!(src[i] >= '0' && src[i] <= '9')) return fail('Invalid number', s); while(src[i] >= '0' && src[i] <= '9') i++; }
+      if(src[i] === 'e' || src[i] === 'E'){ i++; if(src[i] === '+' || src[i] === '-') i++; if(!(src[i] >= '0' && src[i] <= '9')) return fail('Invalid number', s); while(src[i] >= '0' && src[i] <= '9') i++; }
+      return true;
+    }
+    function lit(w){ if(src.substr(i, w.length) === w){ i += w.length; return true; } return fail('Unexpected token ' + JSON.stringify(src[i] || '')); }
+    function value(){
+      ws();
+      if(i >= n) return fail('Unexpected end of input');
+      const c = src[i];
+      if(c === '{') return obj();
+      if(c === '[') return arr();
+      if(c === '"') return str();
+      if(c === '-' || (c >= '0' && c <= '9')) return num();
+      if(c === 't') return lit('true');
+      if(c === 'f') return lit('false');
+      if(c === 'n') return lit('null');
+      return fail('Unexpected token ' + JSON.stringify(c));
+    }
+    function obj(){
+      i++; ws();
+      if(src[i] === '}'){ i++; return true; }
+      while(true){
+        ws();
+        if(src[i] !== '"') return fail('Expected property name in double quotes');
+        if(!str()) return false;
+        ws();
+        if(src[i] !== ':') return fail("Expected ':' after property name");
+        i++;
+        if(!value()) return false;
+        ws();
+        if(src[i] === ','){ i++; continue; }
+        if(src[i] === '}'){ i++; return true; }
+        if(i >= n) return fail('Unexpected end of input');
+        return fail("Expected ',' or '}' after property value");
+      }
+    }
+    function arr(){
+      i++; ws();
+      if(src[i] === ']'){ i++; return true; }
+      while(true){
+        if(!value()) return false;
+        ws();
+        if(src[i] === ','){ i++; continue; }
+        if(src[i] === ']'){ i++; return true; }
+        if(i >= n) return fail('Unexpected end of input');
+        return fail("Expected ',' or ']' after array element");
+      }
+    }
+    ws();
+    if(i >= n) return { pos: 0, msg: 'Unexpected end of input' };
+    value();
+    if(!error){ ws(); if(i < n) fail('Unexpected token ' + JSON.stringify(src[i])); }
+    return error;
+  }
+
+  // ---- status banner ----
+  const OKIC   = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>';
+  const ERRIC  = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><path d="M12 16.5h.01"/></svg>';
+  function setStatus(kind, html){
+    const s = el('status');
+    if(!kind){ s.className = 'status'; s.innerHTML = ''; return; }
+    s.className = 'status show ' + kind;
+    s.innerHTML = (kind === 'ok' ? OKIC : ERRIC) + '<span class="stx">' + html + '</span>';
+  }
+  function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+  // ---- run ----
+  function run(){
+    const src = el('input').value;
+    if(!src.trim()){
+      el('output').value = '';
+      setStats('', undefined);
+      setStatus(null);
+      toast(t.emptyMsg);
+      return;
+    }
+    let data;
+    try{ data = JSON.parse(src); }
+    catch(e){
+      el('output').value = '';
+      setStats('', undefined);
+      const found = findError(src);
+      const detail = found ? found.msg : (e && e.message ? String(e.message).split('\n')[0] : 'syntax error');
+      let html = esc(t.invalid + detail);
+      if(found){
+        const lc = lineColFromPos(src, found.pos);
+        html += ' <bdi>(' + t.lineWord + ' ' + lc.line + ', ' + t.colWord + ' ' + lc.col + ')</bdi>';
+        try{ el('input').focus(); el('input').setSelectionRange(found.pos, Math.min(found.pos + 1, src.length)); }catch(_){}
+      }
+      setStatus('err', html);
+      return;
+    }
+    if(el('sortKeys').checked) data = sortDeep(data);
+    let out;
+    if(currentMode === 'min') out = JSON.stringify(data);
+    else out = JSON.stringify(data, null, indent === 'tab' ? '\t' : Number(indent));
+    el('output').value = out;
+    setStats(out, data);
+    setStatus('ok', esc(t.valid));
+  }
+
+  function loadSample(){ el('input').value = SAMPLE; run(); }
+  function clearAll(){
+    el('input').value = '';
+    el('output').value = '';
+    setStats('', undefined);
+    setStatus(null);
+    el('input').focus();
+  }
+  function download(){
+    const text = el('output').value;
+    if(!text){ toast(t.emptyMsg); return; }
+    const blob = new Blob([text], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'data.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  }
+
+  // ---- toast + copy ----
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1700); }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(fallbackCopy.bind(null,text)); }
+    else fallbackCopy(text);
+    toast(t.copiedMsg);
+  }
+  function fallbackCopy(text){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(_){} document.body.removeChild(ta);
+  }
+
+  // ---- events ----
+  el('formatBtn').addEventListener('click', run);
+  el('sampleBtn').addEventListener('click', loadSample);
+  el('clearBtn').addEventListener('click', clearAll);
+  el('downloadBtn').addEventListener('click', download);
+  el('sortKeys').addEventListener('change', ()=>{ if(el('input').value.trim()) run(); });
+
+  el('modeSeg').addEventListener('click', e=>{
+    const b = e.target.closest('[data-mode]'); if(!b) return;
+    currentMode = b.getAttribute('data-mode');
+    el('modeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('active', x === b));
+    el('indentSeg').classList.toggle('disabled', currentMode === 'min');
+    if(el('input').value.trim()) run();
+  });
+  el('indentSeg').addEventListener('click', e=>{
+    const b = e.target.closest('[data-indent]'); if(!b) return;
+    indent = b.getAttribute('data-indent');
+    el('indentSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('active', x === b));
+    if(currentMode !== 'min' && el('input').value.trim()) run();
+  });
+
+  document.querySelectorAll('.copybtn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const target = el(b.getAttribute('data-copy')); if(!target) return;
+      const isField = target.tagName === 'TEXTAREA' || target.tagName === 'INPUT';
+      const text = isField ? target.value : target.textContent;
+      if(!text){ toast(t.emptyMsg); return; }
+      copy(text);
+    });
+  });
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    if(!I18N[l]) l='en';
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    el('input').placeholder = t.inputPh;
+    el('output').placeholder = t.outputPh;
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+  window.__setLang=applyLang;
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  setStats('', undefined);
+})();
+</script>
+</body>
+</html>

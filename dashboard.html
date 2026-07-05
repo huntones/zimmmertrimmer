@@ -477,6 +477,8 @@
   .ri-dhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
   .ri-dhead h3{font-size:16px;font-weight:700;margin:0 0 7px;letter-spacing:-0.01em;word-break:break-word;}
   .ri-dhead .btn{white-space:nowrap;}
+  .ri-dacts{display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .ri-dlall[disabled]{opacity:.65;cursor:progress;}
   .ri-dstats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
   .ri-stat{flex:1;min-width:74px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 11px;}
   .ri-stat .v{font-size:16px;font-weight:700;color:var(--ink);font-family:var(--mono);}
@@ -541,6 +543,7 @@
 <div class="side-scrim" id="sideScrim"></div>
 
 <script src="./request-store.js"></script>
+<script src="./vendor/jszip.min.js"></script>
 <script>
 (function(){
   var el = function(id){ return document.getElementById(id); };
@@ -647,7 +650,8 @@
         confClose:'לסגור את הבקשה? לא ניתן יהיה להעלות קבצים חדשים.', confDel:'למחוק את הבקשה ואת כל הקבצים שהתקבלו?',
         selectHint:'בחרו בקשה כדי לראות את הקבצים שהתקבלו',
         kSubs:'לקוחות', kFiles:'קבצים', kSize:'נפח',
-        openFull:'עמוד מלא', detNoFiles:'עדיין לא התקבלו קבצים', dl:'הורדה', noResults:'לא נמצאו בקשות'
+        openFull:'עמוד מלא', detNoFiles:'עדיין לא התקבלו קבצים', dl:'הורדה', noResults:'לא נמצאו בקשות',
+        dlAll:'הורד הכל (ZIP)', zipping:'מכין ZIP…', dlAllEmpty:'אין קבצים להורדה'
       },
       reviewTitle:'הערות מלקוחות', reviewSub:'פרויקטים ששלחתם ללקוח לצפייה, הערות ואישור.', reviewEmptyT:'עדיין אין פרויקטים', reviewEmptyP:'צרו פרויקט, העלו חומרים, ושתפו קישור ממותג לצפייה ואישור.', openReview:'פרויקט חדש', reviewNew:'פרויקט חדש', reviewManage:'ניהול הפרויקטים',
       footer:'KOLKLI · העריכה רצה בדפדפן שלכם · הקבצים נשארים אצלכם.'
@@ -740,7 +744,8 @@
         confClose:'Close this request? No new files can be uploaded.', confDel:'Delete this request and all received files?',
         selectHint:'Select a request to see the files clients sent',
         kSubs:'Clients', kFiles:'Files', kSize:'Size',
-        openFull:'Full page', detNoFiles:'No files received yet', dl:'Download', noResults:'No requests found'
+        openFull:'Full page', detNoFiles:'No files received yet', dl:'Download', noResults:'No requests found',
+        dlAll:'Download all (ZIP)', zipping:'Zipping…', dlAllEmpty:'No files to download'
       },
       reviewTitle:'Client comments', reviewSub:'Projects you sent to a client to view, comment on and approve.', reviewEmptyT:'No projects yet', reviewEmptyP:'Create a project, upload materials, and share a branded link to view and approve.', openReview:'New project', reviewNew:'New project', reviewManage:'Manage projects',
       footer:'KOLKLI · Editing runs in your browser · Your files stay with you.'
@@ -833,7 +838,8 @@
         confClose:'Закрыть запрос? Новые файлы загрузить будет нельзя.', confDel:'Удалить запрос и все полученные файлы?',
         selectHint:'Выберите запрос, чтобы увидеть присланные файлы',
         kSubs:'Клиенты', kFiles:'Файлы', kSize:'Объём',
-        openFull:'Вся страница', detNoFiles:'Файлы ещё не получены', dl:'Скачать', noResults:'Запросы не найдены'
+        openFull:'Вся страница', detNoFiles:'Файлы ещё не получены', dl:'Скачать', noResults:'Запросы не найдены',
+        dlAll:'Скачать всё (ZIP)', zipping:'Упаковка…', dlAllEmpty:'Нет файлов для скачивания'
       },
       reviewTitle:'Комментарии клиентов', reviewSub:'Проекты, отправленные клиенту для просмотра, комментариев и одобрения.', reviewEmptyT:'Проектов пока нет', reviewEmptyP:'Создайте проект, загрузите материалы и поделитесь брендированной ссылкой для просмотра и одобрения.', openReview:'Новый проект', reviewNew:'Новый проект', reviewManage:'Управление проектами',
       footer:'KOLKLI · Редактирование в вашем браузере · Ваши файлы остаются у вас.'
@@ -954,7 +960,8 @@
     download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
     phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
     mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
-    openext:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>'
+    openext:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
+    archive:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>'
   };
   var PLAN_ICON = { free:'zap', lite:'zap', pro:'crown', business:'shield' };
 
@@ -1837,7 +1844,10 @@
     box.innerHTML=
       '<div class="ri-dhead"><div><h3>'+esc(r.name||t.ri.untitled)+'</h3>'+
         '<span class="ri-badge '+st+'">'+esc(riStatusLabel(st))+'</span></div>'+
-        '<a class="btn ghost" href="request.html?tab=manage" style="text-decoration:none">'+s(ICON.openext)+esc(t.ri.openFull)+'</a></div>'+
+        '<div class="ri-dacts">'+
+          (files.length?'<button type="button" class="btn primary ri-dlall" data-rdlall="'+esc(r.token)+'">'+s(ICON.archive)+'<span class="lbl">'+esc(t.ri.dlAll)+'</span></button>':'')+
+          '<a class="btn ghost" href="request.html?tab=manage" style="text-decoration:none">'+s(ICON.openext)+esc(t.ri.openFull)+'</a>'+
+        '</div></div>'+
       '<div class="ri-dstats">'+stats+'</div>'+
       '<div class="ri-dlink"><span class="lk">'+esc(riUploadUrl(r.token))+'</span>'+
         '<button type="button" data-rcopy="'+esc(r.token)+'" aria-label="'+esc(t.ri.aCopy)+'">'+s(ICON.copy)+'</button></div>'+
@@ -1857,15 +1867,47 @@
     var ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select();
     try{ document.execCommand('copy'); }catch(_){ } ta.remove(); done();
   }
+  function riTrigger(blob, name){
+    var url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=name||'file'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  }
   function riDownload(id){
     if(!window.KR) return;
     KR.getBlob(id).then(function(blob){
       if(!blob) return;
       var r=KR.getRequest(reqState.sel), f=r&&(r.files||[]).filter(function(x){ return x.id===id; })[0];
-      var url=URL.createObjectURL(blob), a=document.createElement('a');
-      a.href=url; a.download=(f&&f.name)||'file'; document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+      riTrigger(blob, (f&&f.name)||'file');
     });
+  }
+  // Bundle every file in the request into a single .zip (mirrors download.html).
+  function riDownloadAll(token){
+    if(!window.KR) return;
+    var r=KR.getRequest(token); if(!r) return;
+    var files=(r.files||[]).slice();
+    if(!files.length){ riToast(t.ri.dlAllEmpty); return; }
+    var sel=window.CSS&&CSS.escape?CSS.escape(token):token;
+    var btn=document.querySelector('.ri-dlall[data-rdlall="'+sel+'"]');
+    var lbl=btn&&btn.querySelector('.lbl'), prev=lbl?lbl.textContent:null;
+    if(btn){ btn.disabled=true; if(lbl) lbl.textContent=t.ri.zipping; }
+    var restore=function(){ if(btn){ btn.disabled=false; if(lbl&&prev!=null) lbl.textContent=prev; } };
+    Promise.all(files.map(function(f){
+      return KR.getBlob(f.id).then(function(b){ return { name:f.name, blob:b }; }, function(){ return { name:f.name, blob:null }; });
+    })).then(function(items){
+      items=items.filter(function(x){ return x.blob; });
+      if(!items.length){ riToast(t.ri.dlAllEmpty); restore(); return; }
+      if(!window.JSZip){ items.forEach(function(x){ riTrigger(x.blob, x.name); }); restore(); return; }
+      var zip=new JSZip(), used={};
+      items.forEach(function(x){
+        var base=x.name||'file', n=base, i=2;
+        while(used[n]){ var dot=base.lastIndexOf('.'); n = dot>0 ? base.slice(0,dot)+' ('+i+')'+base.slice(dot) : base+' ('+i+')'; i++; }
+        used[n]=true; zip.file(n, x.blob);
+      });
+      return zip.generateAsync({type:'blob'}).then(function(blob){
+        var safe=(r.name||'kolkli-files').replace(/[^\w֐-׿ \-]+/g,'').trim()||'kolkli-files';
+        riTrigger(blob, safe+'.zip'); restore();
+      });
+    }).catch(function(){ riToast(t.ri.dlAllEmpty); restore(); });
   }
   function riDuplicate(token){
     if(!window.KR) return;
@@ -1935,6 +1977,7 @@
     });
     var detail=el('riDetail');
     if(detail) detail.addEventListener('click', function(e){
+      var dlAll=e.target.closest('[data-rdlall]'); if(dlAll){ riDownloadAll(dlAll.getAttribute('data-rdlall')); return; }
       var dl=e.target.closest('[data-rdl]'); if(dl){ riDownload(dl.getAttribute('data-rdl')); return; }
       var cp=e.target.closest('[data-rcopy]'); if(cp){ riCopy(cp.getAttribute('data-rcopy')); return; }
     });

@@ -129,7 +129,7 @@
   .statcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);}
   .statcard + .statcard{border-inline-start:1px solid var(--line);}
   .statcard:hover{background:var(--panel);box-shadow:var(--shadow);}
-  .st-top{flex-direction:row-reverse;align-items:flex-start;justify-content:center;gap:12px;min-width:0;}
+  .st-top{flex-direction:column-reverse;align-items:center;justify-content:center;gap:9px;min-width:0;}
   .st-tx{min-width:0;text-align:center;}
   .st-label{font-size:12px;font-weight:700;margin-bottom:5px;}
   .st-val{letter-spacing:0;align-items:baseline;justify-content:center;color:var(--ink);}
@@ -680,7 +680,7 @@
       filterByType:'סינון לפי סוג קובץ',
       chipYael:'יעל', chipVideo:'וידאו', chipImages:'תמונות', chipDocs:'מסמכים', chipSelected:'נבחרו',
       addFiles:'הוספת קבצים', addFilesTitle:'העלאת קבצים נוספים לגלריה',
-      dropBig:'גררו קבצים או תיקיות לכאן', choose:'בחירת קבצים', chooseFolder:'בחירת תיקייה', dropHint:'תיקיות נשמרות כאלבומים לפי המבנה המקורי',
+      dropBig:'גררו קבצים או תיקיות לכאן', choose:'הוספת קבצים', chooseFolder:'הוספת תיקייה', dropHint:'תיקיות נשמרות כאלבומים לפי המבנה המקורי',
       selectAll:'בחירת הכל', moveDefault:'העבר לתיקייה…', delSelected:'מחק נבחרים',
       albumsTitle:'אלבומים / תיקיות', searchPh:'חיפוש קבצים…', newFolderTitle:'תיקייה חדשה', newFolderPh:'שם התיקייה', add:'הוסף', showMore:'הצג עוד', showLess:'הצג פחות',
       folderAll:'כל הקבצים', folderCohen:'חתונה כהן', folderYael:'בת מצווה יעל', folderDaniel:'בר מצווה דניאל', folderFamily:'חופשה משפחתית', folderMore:'אירועים נוספים', folderStudio:'צילומי סטודיו', folderCorp:'אירוע חברה',
@@ -1311,5 +1311,6 @@
   const saved=ls('ac_lang'); applyLang(saved==='en'||saved==='ru'||saved==='he'?saved:'he');
 })();
 </script>
+<script src="./accessibility.js" defer></script>
 </body>
 </html>

@@ -53,7 +53,9 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:80%;max-width:none;margin:0 auto;padding:14px 20px 8px;}
+  @media (max-width:1560px){ .wrap{width:90%;} }
+  @media (max-width:640px){ .wrap{width:100%;padding:14px 14px 16px;} }
 
   /* header */
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
@@ -71,11 +73,11 @@
   .iconbtn{width:38px;height:38px;padding:0;justify-content:center;font-size:15px;line-height:1;}
 
   /* page intro */
-  .pagehead{margin:4px 0 20px;}
+  .pagehead{margin:2px 0 10px;}
   .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
   .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
     letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
-    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+    padding:4px 11px;border-radius:999px;margin-bottom:7px;}
   .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
 
   /* layout */
@@ -109,11 +111,23 @@
   input[type=file]{display:none;}
 
   /* file list */
+  /* the files card is a fixed-height internal window: the header (count + view toggle) and the
+     total-size row are ordinary siblings that stay put, while ONLY the middle grid scrolls. That
+     grid's max-height is what caps the whole thing — JS sets an exact inline value (sizeFilesWindow)
+     so the window ends just above the viewport bottom no matter how tall the stuff above it is; the
+     calc() below is only a no-JS fallback. Result: the card never grows with the file count and the
+     page itself never has to scroll to reveal files. Same principle on mobile/tablet. */
   .files{display:flex;flex-direction:column;}
-  .flist{display:flex;flex-direction:column;gap:8px;padding:14px;max-height:calc(100vh - 220px);overflow-y:auto;overscroll-behavior:contain;}
-  .flist::-webkit-scrollbar{width:10px;}
-  .flist::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:999px;border:3px solid var(--panel);}
-  .flist::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+  .fhead,.ftot{flex:0 0 auto;}
+  /* shared scroll region for BOTH list & gallery views: sizes to its content up to the cap, then
+     shows a draggable scrollbar (renders on the left edge in RTL) instead of pushing the page taller. */
+  .flist,.fgrid{max-height:calc(100dvh - 452px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;}
+  .flist{display:flex;flex-direction:column;gap:8px;padding:14px;}
+  .flist::-webkit-scrollbar,.fgrid::-webkit-scrollbar{width:12px;}
+  .flist::-webkit-scrollbar-button,.fgrid::-webkit-scrollbar-button{display:none;height:0;width:0;}
+  .flist::-webkit-scrollbar-track,.fgrid::-webkit-scrollbar-track{background:transparent;margin:4px 0;}
+  .flist::-webkit-scrollbar-thumb,.fgrid::-webkit-scrollbar-thumb{background:var(--faint);border-radius:999px;border:3px solid var(--panel);min-height:44px;}
+  .flist::-webkit-scrollbar-thumb:hover,.fgrid::-webkit-scrollbar-thumb:hover{background:var(--muted);}
   .frow{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line-2);border-radius:11px;background:var(--panel);}
   .frow .fico{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
   .frow .fico.image{color:var(--info);background:var(--info-soft);} .frow .fico.video{color:#e5484d;background:var(--danger-soft);}
@@ -167,10 +181,13 @@
   .fcard .rm svg{width:14px;height:14px;}
 
   /* options side */
-  .side{padding:18px;position:sticky;top:16px;}
-  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
-  .opt{margin-bottom:16px;}
-  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+  .side{padding:13px 18px;position:sticky;top:14px;}
+  .side h3{font-size:15px;margin:0 0 8px;font-weight:700;}
+  .opt{margin-bottom:8px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:5px;}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .two .opt{margin-bottom:8px;}
+  @media (max-width:560px){ .two{grid-template-columns:1fr;} }
   .seg{display:flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:4px;}
   .segbtn{flex:1;height:36px;border:none;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;
     font-size:13px;font-weight:600;transition:color .14s,background .14s,box-shadow .14s;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
@@ -179,7 +196,7 @@
   .inp,.ta{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
     font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
   .inp:focus,.ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
-  .ta{resize:vertical;min-height:64px;}
+  .ta{resize:vertical;min-height:46px;}
   .inp[dir=ltr]{text-align:start;}
   select.inp{cursor:pointer;}
   .chkline{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);cursor:pointer;margin-bottom:8px;}
@@ -250,7 +267,7 @@
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 
   /* client branding */
-  .brandsec{border-top:1px dashed var(--line);margin-top:6px;padding-top:15px;}
+  .brandsec{border-top:1px dashed var(--line);margin-top:4px;padding-top:11px;}
   .brandhead{display:block;font-size:12.5px;font-weight:700;color:var(--ink-2);margin-bottom:4px;}
   .brandsub{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:11px;}
   .tiles{display:flex;gap:9px;margin-bottom:11px;}
@@ -280,7 +297,7 @@
   .bprev-logo img{display:block;max-height:26px;max-width:120px;object-fit:contain;}
   .bprev-name{font-size:15px;font-weight:800;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.35);text-align:center;padding:0 8px;}
   .bprev-hint{font-size:11px;color:var(--faint);text-align:center;margin-top:7px;}
-  .brandlock{border:1.4px solid var(--line);border-radius:13px;background:var(--panel-2);padding:16px 15px;margin-top:4px;
+  .brandlock{border:1.4px solid var(--line);border-radius:13px;background:var(--panel-2);padding:12px 15px;margin-top:4px;
     display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;}
   .brandlock[hidden]{display:none;}
   .brandlock-badge{font-size:10px;font-weight:800;letter-spacing:.06em;color:#fff;background:var(--grad);padding:3px 10px;border-radius:999px;}
@@ -290,7 +307,7 @@
     background:var(--grad-btn);padding:9px 18px;border-radius:10px;box-shadow:0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
   .brandlock-cta:hover{filter:brightness(1.06);}
 
-  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  footer{margin-top:6px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
     background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
     box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
@@ -367,6 +384,28 @@
         <div class="opt hidden" id="emailOpt">
           <label data-i18n="toLbl"></label>
           <input class="inp" id="recipients" type="text" dir="ltr" data-i18n-ph="toPh">
+        </div>
+
+        <div class="two">
+          <div class="opt">
+            <label data-i18n="senderNameLbl"></label>
+            <input class="inp" id="senderName" type="text" autocomplete="name" data-i18n-ph="senderNamePh">
+          </div>
+          <div class="opt">
+            <label data-i18n="senderEmailLbl"></label>
+            <input class="inp" id="senderEmail" type="email" dir="ltr" autocomplete="email" data-i18n-ph="senderEmailPh">
+          </div>
+        </div>
+
+        <div class="two">
+          <div class="opt">
+            <label data-i18n="recipientNameLbl"></label>
+            <input class="inp" id="recipientName" type="text" data-i18n-ph="recipientNamePh">
+          </div>
+          <div class="opt">
+            <label data-i18n="recipientEmailLbl"></label>
+            <input class="inp" id="recipientEmail" type="email" dir="ltr" data-i18n-ph="recipientEmailPh">
+          </div>
         </div>
 
         <div class="opt">
@@ -508,12 +547,16 @@
       kick:'שליחת קבצים גדולים',
       pageTitle:'שלחו קבצים גדולים בקישור אחד',
       pageSub:'גררו קבצים, הגדירו תוקף וסיסמה, וקבלו קישור הורדה מסודר לנמען. הכול נשאר במחשב שלכם עד שתחליטו לשלוח.',
-      dropBig:'גררו קבצים או תיקיות לכאן', or2:'או', choose:'בחירת קבצים', chooseFolder:'בחירת תיקייה',
-      sizeNote:'עד 2GB בשליחה (חבילת Free)', remove:'הסרה',
+      dropBig:'גררו קבצים או תיקיות לכאן', or2:'או', choose:'הוספת קבצים', chooseFolder:'הוספת תיקייה',
+      sizeNote:'עד 3GB בשליחה (חבילת Free)', remove:'הסרה',
       viewList:'תצוגת רשימה', viewGallery:'תצוגת גלרייה', filesWord:n=>n===1?'קובץ':'קבצים',
       totalLbl:'סה״כ', optTitle:'הגדרות שליחה',
       methodLbl:'איך לשלוח', mLink:'קישור', mEmail:'אימייל',
       toLbl:'נמענים (מופרדים בפסיק)', toPh:'a@mail.com, b@mail.com',
+      senderNameLbl:'שם השולח', senderNamePh:'השם שלכם',
+      senderEmailLbl:'אימייל השולח', senderEmailPh:'you@example.com',
+      recipientNameLbl:'שם הנמען', recipientNamePh:'שם הנמען',
+      recipientEmailLbl:'אימייל הנמען', recipientEmailPh:'client@example.com',
       msgLbl:'הודעה אישית (לא חובה)', msgPh:'כמה מילים לנמען…',
       expiryLbl:'תוקף הקישור',
       exp1:'יום אחד', exp3:'3 ימים', exp7:'7 ימים', exp30:'30 יום',
@@ -547,11 +590,15 @@
       pageTitle:'Send large files with one link',
       pageSub:'Drop files, set an expiry and a password, and get a clean download link for your recipient. Nothing leaves your machine until you send.',
       dropBig:'Drag files or folders here', or2:'or', choose:'Choose files', chooseFolder:'Choose folder',
-      sizeNote:'Up to 2GB per send (Free plan)', remove:'Remove',
+      sizeNote:'Up to 3GB per send (Free plan)', remove:'Remove',
       viewList:'List view', viewGallery:'Gallery view', filesWord:n=>n===1?'file':'files',
       totalLbl:'Total', optTitle:'Send options',
       methodLbl:'How to send', mLink:'Link', mEmail:'Email',
       toLbl:'Recipients (comma separated)', toPh:'a@mail.com, b@mail.com',
+      senderNameLbl:'Sender name', senderNamePh:'Your name',
+      senderEmailLbl:'Sender email', senderEmailPh:'you@example.com',
+      recipientNameLbl:'Recipient name', recipientNamePh:'Recipient name',
+      recipientEmailLbl:'Recipient email', recipientEmailPh:'client@example.com',
       msgLbl:'Personal message (optional)', msgPh:'A few words for the recipient…',
       expiryLbl:'Link expiry',
       exp1:'1 day', exp3:'3 days', exp7:'7 days', exp30:'30 days',
@@ -585,11 +632,15 @@
       pageTitle:'Отправляйте большие файлы одной ссылкой',
       pageSub:'Перетащите файлы, задайте срок действия и пароль — и получите чистую ссылку для скачивания для получателя. Ничего не покидает ваше устройство, пока вы не отправите.',
       dropBig:'Перетащите файлы или папки сюда', or2:'или', choose:'Выбрать файлы', chooseFolder:'Выбрать папку',
-      sizeNote:'До 2 ГБ за отправку (бесплатный план)', remove:'Удалить',
+      sizeNote:'До 3 ГБ за отправку (бесплатный план)', remove:'Удалить',
       viewList:'Список', viewGallery:'Галерея', filesWord:n=>{var m=n%10,d=n%100;return (m===1&&d!==11)?'файл':((m>=2&&m<=4)&&!(d>=12&&d<=14))?'файла':'файлов';},
       totalLbl:'Всего', optTitle:'Параметры отправки',
       methodLbl:'Как отправить', mLink:'Ссылка', mEmail:'Эл. почта',
       toLbl:'Получатели (через запятую)', toPh:'a@mail.com, b@mail.com',
+      senderNameLbl:'Имя отправителя', senderNamePh:'Ваше имя',
+      senderEmailLbl:'Email отправителя', senderEmailPh:'you@example.com',
+      recipientNameLbl:'Имя получателя', recipientNamePh:'Имя получателя',
+      recipientEmailLbl:'Email получателя', recipientEmailPh:'client@example.com',
       msgLbl:'Личное сообщение (необязательно)', msgPh:'Несколько слов для получателя…',
       expiryLbl:'Срок действия ссылки',
       exp1:'1 день', exp3:'3 дня', exp7:'7 дней', exp30:'30 дней',
@@ -864,51 +915,93 @@
     }
     el('totalVal').textContent = fmtBytes(totalBytes());
     el('sendBtn').disabled = files.length===0;
+    sizeFilesWindow();
   }
+
+  // Cap the scrolling grid so the files card behaves as a fixed-height internal window: measure the
+  // grid's natural offset from the top of the document and give it just the height that fits above
+  // the viewport bottom (minus the pinned total-size row). That keeps the header + total row visible
+  // and lets ONLY the middle grid scroll — the page itself never grows with the file count. Re-run
+  // after every render and on resize/rotate; same on mobile (window.innerHeight tracks the URL bar).
+  function sizeFilesWindow(){
+    const list=el('flist'), ftot=document.querySelector('#filesCard .ftot');
+    if(!list || !files.length || !list.offsetParent) return;   // skip when hidden (e.g. result view)
+    const top=list.getBoundingClientRect().top + window.scrollY;   // stable doc offset (scroll-safe)
+    const ftotH=ftot ? ftot.offsetHeight : 46;                     // total row stays pinned below
+    const avail=window.innerHeight - top - ftotH - 22;             // 22px breathing room at the bottom
+    list.style.maxHeight=Math.max(180, avail)+'px';
+  }
+  window.addEventListener('resize', sizeFilesWindow);
+  window.addEventListener('orientationchange', sizeFilesWindow);
 
   function expiryText(days){ days=+days; return days===1 ? t.day : t.days(days); }
 
   function toast(msg){ const el2=el('toast'); el2.textContent=msg; el2.classList.add('show'); clearTimeout(el2._t); el2._t=setTimeout(()=>el2.classList.remove('show'),1800); }
+  function withUsage(tool,payload,work){
+    if(window.KolkliUsage && window.KolkliUsage.guard) return window.KolkliUsage.guard(tool,payload,work);
+    return Promise.resolve().then(work);
+  }
 
   // ---- create link ----
   async function createLink(){
     el('optErr').textContent='';
     if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
-    if(method==='email' && !el('recipients').value.trim()){ el('optErr').textContent=t.errNoEmail; return; }
+    const recipientEmail=(el('recipientEmail').value||'').trim();
+    if(method==='email' && !(recipientEmail || el('recipients').value.trim())){ el('optErr').textContent=t.errNoEmail; return; }
     const pwOn=el('pwToggle').checked, pwVal=el('password').value;
     if(pwOn && !pwVal){ el('optErr').textContent=t.errNoPw; return; }
     const notifyOn=el('notifyToggle').checked;
 
-    // fake-but-real progress while we write blobs to IndexedDB
-    el('composer').style.display='none';
-    const prog=el('progCard'); prog.classList.add('show');
-    const days=+el('expiry').value;
-    const token=randToken();
-    const record={
-      token, ownerId:currentOwnerId(), createdAt:Date.now(), expiresAt:Date.now()+days*86400000,
-      sender:'', message:el('message').value.trim(),
-      recipients:method==='email'? el('recipients').value.trim() : '',
-      password: pwOn? await hashPass(pwVal) : null,
-      notify: notifyOn,
-      downloads:0,
-      files: files.map(f=>({ name:(f.path||f.name), size:f.size, type:f.file.type||'', blob:f.file })),
-    };
-    record.brand = brandForRecord();
+    const prog=el('progCard');
+    let result=null;
+    try{
+      result = await withUsage('send-files', { files:files.length, totalBytes:totalBytes() }, async()=>{
+        // fake-but-real progress while we write blobs to IndexedDB
+        el('composer').style.display='none';
+        prog.classList.add('show');
+        const days=+el('expiry').value;
+        const token=randToken();
+        const record={
+          token, ownerId:currentOwnerId(), createdAt:Date.now(), expiresAt:Date.now()+days*86400000,
+          sender:{
+            name:(el('senderName').value||'').trim(),
+            email:(el('senderEmail').value||'').trim()
+          },
+          recipient:{
+            name:(el('recipientName').value||'').trim(),
+            email:recipientEmail
+          },
+          message:el('message').value.trim(),
+          recipients:method==='email'? (recipientEmail || el('recipients').value.trim()) : recipientEmail,
+          password: pwOn? await hashPass(pwVal) : null,
+          notify: notifyOn,
+          downloads:0,
+          files: files.map(f=>({ name:(f.path||f.name), size:f.size, type:f.file.type||'', blob:f.file })),
+        };
+        record.brand = brandForRecord();
 
-    const total=Math.max(totalBytes(),1); let done=0;
-    // animate progress proportional to file sizes (purely visual for the demo)
-    for(let i=0;i<files.length;i++){
-      await new Promise(r=>setTimeout(r, 120));
-      done+=files[i].size; setProg(Math.min(99, Math.round(done/total*100)));
+        const total=Math.max(totalBytes(),1); let done=0;
+        // animate progress proportional to file sizes (purely visual for the demo)
+        for(let i=0;i<files.length;i++){
+          await new Promise(r=>setTimeout(r, 120));
+          done+=files[i].size; setProg(Math.min(99, Math.round(done/total*100)));
+        }
+        await idbPut('t_'+token, record);
+        upsertSendIndex(record);
+        setProg(100);
+        await new Promise(r=>setTimeout(r,200));
+        return { token, days, record };
+      });
+    }catch(err){
+      prog.classList.remove('show');
+      el('composer').style.display='';
+      if(err && err.usage) return;
+      throw err;
     }
-    await idbPut('t_'+token, record);
-    upsertSendIndex(record);
-    setProg(100);
-    await new Promise(r=>setTimeout(r,200));
 
     prog.classList.remove('show');
-    showShare(token, days, pwOn, notifyOn);
-    if(method==='email' && record.recipients){ openMailto(); }
+    showShare(result.token, result.days, pwOn, notifyOn);
+    if(method==='email' && result.record.recipients){ openMailto(); }
   }
   function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
 
@@ -924,7 +1017,7 @@
       `<span class="chip">${fileSvg()} ${t.chipFiles(files.length)}</span>`+
       (pwOn? `<span class="chip">${lockSvg()} ${t.chipPw}</span>` : '');
     renderQR(url);
-    el('emailBtn').classList.toggle('hidden', !(method==='email' && el('recipients').value.trim()));
+    el('emailBtn').classList.toggle('hidden', !(method==='email' && ((el('recipientEmail').value||'').trim() || el('recipients').value.trim())));
     lastNotifiedCount=0;
     updateStat(0);
     startStatWatch(notifyOn);
@@ -950,7 +1043,7 @@
 
   // ---- email delivery (opens the sender's mail app, prefilled) ----
   function buildMailto(){
-    const to=encodeURIComponent(el('recipients').value.trim());
+    const to=encodeURIComponent((el('recipientEmail').value||'').trim() || el('recipients').value.trim());
     const msg=el('message').value.trim();
     const subject=encodeURIComponent(t.emailSubject);
     const body=encodeURIComponent((msg? msg+'\n\n':'')+t.emailBodyLead+'\n'+currentUrl+'\n\n'+t.emailBodyExpiry(expiryText(currentDays)));
@@ -999,6 +1092,8 @@
     stopStatWatch(); notifyEnabled=false; lastNotifiedCount=0;
     el('shareCard').classList.remove('show');
     el('message').value=''; el('recipients').value=''; el('password').value='';
+    el('senderName').value=''; el('senderEmail').value='';
+    el('recipientName').value=''; el('recipientEmail').value='';
     el('pwToggle').checked=false; el('password').classList.add('hidden');
     el('notifyToggle').checked=false; el('emailBtn').classList.add('hidden');
     el('composer').style.display=''; renderFiles();
