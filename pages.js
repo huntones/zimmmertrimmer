@@ -153,7 +153,7 @@
         {he:'המרה',en:'Convert',ru:'Конвертация',s:'live',href:'../convert.html'},{he:'Fade In/Out',en:'Fade In/Out',ru:'Затухание',s:'soon'},
         {he:'הסרת שקט',en:'Trim Silence',ru:'Убрать тишину',s:'soon'},{he:'רינגטון',en:'Ringtone',ru:'Рингтон',s:'soon'},
         {he:'זיהוי BPM',en:'BPM Detector',ru:'Определение BPM',s:'live',href:'../app.html'},{he:'זיהוי סולם',en:'Key Detector',ru:'Определение тональности',s:'live',href:'../app.html'},
-        {he:'הסרת ווקאל',en:'Vocal Remover',ru:'Удаление вокала',s:'soon'},
+        {he:'הסרת ווקאל',en:'Vocal Remover',ru:'Удаление вокала',s:'live',href:'../vocal-remover.html'},
         {he:'מאסטרינג AI',en:'AI Mastering',ru:'AI-мастеринг',s:'live',href:'../ai-master.html'},
         {he:'ניקוי אודיו AI',en:'AI Cleanup',ru:'AI-очистка',s:'live',href:'../ai-audio-cleanup.html'}
       ]},

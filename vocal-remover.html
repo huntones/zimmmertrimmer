@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — הסרת ווקאל</title>
+<meta name="description" content="Vocal Remover — split a stereo song into an instrumental (music only) or an acapella (vocals only), right in your browser. Compare before/after, preview, and download. Fast, simple and professional-quality.">
+<style>
+  :root {
+    color-scheme:light;
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    color-scheme:dark;
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead .kick .new{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.05em;color:#fff;
+    background:var(--grad-btn);border-radius:6px;padding:1px 6px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:66ch;}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:stretch;}
+  @media (max-width:840px){ .grid{grid-template-columns:1fr;} }
+  .col{min-width:0;display:flex;flex-direction:column;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:2.5px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:16px;padding:34px 20px;text-align:center;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1 1 auto;min-height:280px;
+    background:var(--panel-2);transition:border-color .15s,background .15s;}
+  #composer.loaded .drop{flex:0 0 auto;min-height:0;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:56px;height:56px;margin:0 auto 12px;border-radius:15px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:28px;height:28px;}
+  .drop .big{font-size:15.5px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:12px;color:var(--faint);margin:6px 0;font-family:var(--mono);}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:13.5px;padding:10px 22px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .sizenote{margin-top:12px;font-size:11.5px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  /* loaded source card */
+  .srcCard{padding:16px;}
+  .fhead{display:flex;align-items:center;gap:12px;}
+  .fhead .fico{width:44px;height:44px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
+  .fhead .fico svg{width:21px;height:21px;}
+  .fhead .fn{flex:1;min-width:0;}
+  .fhead .fn .nm{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fhead .fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .fhead .rm{width:32px;height:32px;flex-shrink:0;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .fhead .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .fhead .rm svg{width:16px;height:16px;}
+
+  /* waveform blocks */
+  .waveblock{margin-top:14px;}
+  .wavelabel{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .wavelabel .dot{width:8px;height:8px;border-radius:50%;background:var(--faint);}
+  .wavelabel.after{color:var(--accent-dim);} .wavelabel.after .dot{background:var(--accent);}
+  .wavelabel.before .dot{background:var(--faint);}
+  .wave{display:block;width:100%;height:72px;border-radius:11px;background:var(--panel-2);border:1px solid var(--line-2);}
+  audio{width:100%;height:40px;margin-top:10px;display:block;}
+
+  /* options side */
+  .side{padding:18px;position:sticky;top:16px;}
+  .side h3{font-size:15px;margin:0 0 14px;font-weight:700;}
+  .opt{margin-bottom:16px;}
+  .opt > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:7px;}
+
+  /* mode / strength tiles */
+  .fmts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+  .fmts.two{grid-template-columns:repeat(2,1fr);}
+  .fmt{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:11px 4px 9px;border-radius:11px;
+    border:1px solid var(--line);background:var(--panel-2);cursor:pointer;transition:border-color .12s,background .12s,transform .08s;}
+  .fmt:hover{border-color:var(--accent);}
+  .fmt:active{transform:scale(.97);}
+  .fmt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
+  .fmt .emo{font-size:17px;line-height:1;margin-bottom:1px;}
+  .fmt b{font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--ink);}
+  .fmt small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;text-align:center;}
+  .fmt.on b{color:var(--accent-dim);}
+
+  .convbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .convbtn:hover{filter:brightness(1.05);} .convbtn:active{transform:translateY(1px);}
+  .convbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .convbtn svg{width:17px;height:17px;}
+  .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+  .rtnote{font-size:10.5px;color:var(--faint);font-family:var(--mono);text-align:center;margin-top:6px;line-height:1.45;}
+
+  /* progress */
+  .prog{padding:18px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;}
+  .prog .lbl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;font-weight:600;color:var(--ink-2);}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .18s ease;}
+  .prog .stage{font-family:var(--mono);font-size:11px;color:var(--accent-dim);margin-top:9px;text-align:center;}
+
+  /* results */
+  .results{padding:22px;display:none;margin-top:18px;}
+  .results.show{display:block;}
+  .results .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .results .ok svg{width:28px;height:28px;}
+  .results h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .results .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 20px;}
+  .results .subt b{color:var(--success-dim);}
+
+  /* before / after compare */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+  @media (max-width:720px){ .ba{grid-template-columns:1fr;} }
+  .bacol{padding:14px;border:1px solid var(--line-2);border-radius:13px;background:var(--panel-2);}
+  .bacol.aft{border-color:var(--accent);box-shadow:var(--shadow-sm);}
+  .bacol .wave{background:var(--panel);}
+
+  .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .row2 a,.row2 button{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 a:hover,.row2 button:hover{border-color:var(--accent);} .row2 *:active{transform:translateY(1px);}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .row2 svg{width:15px;height:15px;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick">✨ <span data-i18n="kick"></span><span class="new" data-i18n="newBadge"></span></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <div class="grid" id="composer">
+    <!-- main: upload + source preview -->
+    <div class="col">
+      <div class="drop" id="drop">
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="or" data-i18n="or2"></div>
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <div class="sizenote" data-i18n="sizeNote"></div>
+      </div>
+      <input type="file" id="fileInput" accept="audio/*">
+
+      <div class="card srcCard" id="srcCard" style="display:none">
+        <div class="fhead">
+          <span class="fico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+          <span class="fn"><div class="nm" id="srcName"></div><div class="sz" id="srcMeta"></div></span>
+          <button class="rm" id="srcRemove" type="button" title="remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div>
+        <div class="waveblock">
+          <div class="wavelabel"><span class="dot"></span><span data-i18n="original"></span></div>
+          <canvas id="waveSrc" class="wave"></canvas>
+          <audio id="audioSrc" controls preload="metadata"></audio>
+        </div>
+      </div>
+    </div>
+
+    <!-- side: options -->
+    <div class="col">
+      <div class="card side">
+        <h3 data-i18n="optTitle"></h3>
+
+        <div class="opt">
+          <label data-i18n="modeLbl"></label>
+          <div class="fmts two" id="modes"></div>
+        </div>
+
+        <div class="opt">
+          <label data-i18n="lvlLbl"></label>
+          <div class="fmts" id="lvls"></div>
+        </div>
+
+        <button class="convbtn" id="runBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17l-1.9-5.6L4.5 10l5.6-1.9z"/></svg>
+          <span data-i18n="runBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+        <div class="rtnote" data-i18n="rtNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="nm" id="progName"></span><span id="progPct">0%</span></div>
+    <div class="bar"><i id="progBar"></i></div>
+    <div class="stage" id="progStage"></div>
+  </div>
+
+  <!-- results -->
+  <div class="card results" id="resultsCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" id="readySub"></p>
+
+    <div class="ba">
+      <div class="bacol">
+        <div class="wavelabel before"><span class="dot"></span><span data-i18n="before"></span></div>
+        <canvas id="waveBefore" class="wave"></canvas>
+        <audio id="audioBefore" controls preload="metadata"></audio>
+      </div>
+      <div class="bacol aft">
+        <div class="wavelabel after"><span class="dot"></span><span id="afterLbl"></span></div>
+        <canvas id="waveAfter" class="wave"></canvas>
+        <audio id="audioAfter" controls preload="metadata"></audio>
+      </div>
+    </div>
+
+    <div class="row2">
+      <button id="dlBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="dlLbl"></span>
+      </button>
+      <button id="againBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        <span data-i18n="againBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl', langIco:'EN', newBadge:'AI',
+      kick:'הסרת ווקאל',
+      pageTitle:'הפרידו את השירה מהמוזיקה',
+      pageSub:'העלו שיר בסטריאו וקבלו שתי גרסאות — פלייבק נקי בלי שירה (מוזיקה בלבד), או אקפלה עם השירה בלבד. ההפרדה רצה כולה בדפדפן שלכם, בלי העלאה לשרת. מהיר, פשוט ובאיכות מקצועית.',
+      dropBig:'גררו קובץ שיר לכאן', or2:'או', choose:'בחרו קובץ',
+      sizeNote:'MP3 · WAV · M4A · AAC · OGG · FLAC · סטריאו', remove:'הסרה',
+      original:'הקובץ המקורי',
+      optTitle:'הגדרות הפרדה',
+      modeLbl:'מה להפיק',
+      modeinstrumental:'מוזיקה', modeinstrumentalSub:'בלי שירה',
+      modeacapella:'שירה', modeacapellaSub:'בלי מוזיקה',
+      lvlLbl:'עוצמת ההפרדה',
+      lvlgentle:'עדין', lvlgentleSub:'שומר איכות',
+      lvlbalanced:'מאוזן', lvlbalancedSub:'מומלץ',
+      lvlstrong:'חזק', lvlstrongSub:'הסרה מרבית',
+      runBtn:'הפרידו עכשיו', working:'מפריד את האודיו',
+      rtNote:'עובד על שירים בסטריאו — השירה מוסרת מהמרכז. קובץ ארוך ייקח מעט יותר זמן.',
+      st_load:'מכין את הרצועה…', st_split:'מפריד ערוצים…', st_separate:'מבודד את המרכז…',
+      st_encode:'מכין את הקובץ…', st_done:'הושלם',
+      readyTitle:'ההפרדה הושלמה!',
+      readySub:(d,m)=>`הופק <b>${m}</b> · ${d} · האזינו והשוו בין <b>המקור</b> לתוצאה.`,
+      before:'מקור', outInstrumental:'מוזיקה בלבד', outAcapella:'שירה בלבד',
+      dlInstrumental:'הורדת המוזיקה', dlAcapella:'הורדת השירה',
+      againBtn:'להפריד שוב',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · הסרת ווקאל · מהיר, פשוט ובאיכות מקצועית',
+      errNoFile:'צריך להעלות קובץ אודיו', errDecode:'לא הצלחנו לפענח את הקובץ — נסו פורמט אחר',
+      errMono:'הקובץ אינו בסטריאו — להסרת ווקאל צריך שיר עם שני ערוצים (L/R) שונים',
+      errRun:'ההפרדה נכשלה — נסו קובץ אחר',
+      loaded:'הקובץ נטען ✓', dlWord:'הורדה',
+    },
+    en:{
+      dir:'ltr', langIco:'עב', newBadge:'AI',
+      kick:'Vocal Remover',
+      pageTitle:'Split the vocals from the music',
+      pageSub:'Upload a stereo song and get two versions — a clean instrumental with no vocals (music only), or an acapella with vocals only. The separation runs entirely in your browser, with no upload to a server. Fast, simple and professional-quality.',
+      dropBig:'Drag a song file here', or2:'or', choose:'Choose file',
+      sizeNote:'MP3 · WAV · M4A · AAC · OGG · FLAC · stereo', remove:'Remove',
+      original:'Original file',
+      optTitle:'Separation settings',
+      modeLbl:'What to keep',
+      modeinstrumental:'Music', modeinstrumentalSub:'No vocals',
+      modeacapella:'Vocals', modeacapellaSub:'No music',
+      lvlLbl:'Separation strength',
+      lvlgentle:'Gentle', lvlgentleSub:'Keeps quality',
+      lvlbalanced:'Balanced', lvlbalancedSub:'Recommended',
+      lvlstrong:'Strong', lvlstrongSub:'Max removal',
+      runBtn:'Separate now', working:'Separating audio',
+      rtNote:'Works on stereo songs — vocals are pulled from the center. A long file takes a little longer.',
+      st_load:'Preparing the track…', st_split:'Splitting channels…', st_separate:'Isolating the center…',
+      st_encode:'Preparing the file…', st_done:'Done',
+      readyTitle:'Separation complete!',
+      readySub:(d,m)=>`Produced <b>${m}</b> · ${d} · listen and compare the <b>original</b> vs the result.`,
+      before:'Original', outInstrumental:'Music only', outAcapella:'Vocals only',
+      dlInstrumental:'Download the music', dlAcapella:'Download the vocals',
+      againBtn:'Separate again',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Vocal Remover · Fast, simple and professional quality',
+      errNoFile:'Add an audio file first', errDecode:'We could not decode that file — try another format',
+      errMono:'This file is not stereo — vocal removal needs a song with two different channels (L/R)',
+      errRun:'Separation failed — try another file',
+      loaded:'File loaded ✓', dlWord:'Download',
+    },
+    ru:{
+      dir:'ltr',
+      newBadge:'AI',
+      kick:'Удаление вокала',
+      pageTitle:'Отделите вокал от музыки',
+      pageSub:'Загрузите стереопесню и получите две версии — чистую минусовку без вокала (только музыка) или акапеллу только с вокалом. Разделение выполняется полностью в вашем браузере, без загрузки на сервер. Быстро, просто и профессионального качества.',
+      dropBig:'Перетащите файл песни сюда', or2:'или', choose:'Выбрать файл',
+      sizeNote:'MP3 · WAV · M4A · AAC · OGG · FLAC · стерео', remove:'Удалить',
+      original:'Исходный файл',
+      optTitle:'Настройки разделения',
+      modeLbl:'Что оставить',
+      modeinstrumental:'Музыка', modeinstrumentalSub:'Без вокала',
+      modeacapella:'Вокал', modeacapellaSub:'Без музыки',
+      lvlLbl:'Сила разделения',
+      lvlgentle:'Мягко', lvlgentleSub:'Бережно',
+      lvlbalanced:'Сбалансированно', lvlbalancedSub:'Рекомендуется',
+      lvlstrong:'Сильно', lvlstrongSub:'Максимум',
+      runBtn:'Разделить', working:'Разделение аудио',
+      rtNote:'Работает со стереопеснями — вокал берётся из центра. Длинный файл занимает чуть больше времени.',
+      st_load:'Подготовка дорожки…', st_split:'Разделение каналов…', st_separate:'Выделение центра…',
+      st_encode:'Подготовка файла…', st_done:'Готово',
+      readyTitle:'Разделение завершено!',
+      readySub:(d,m)=>`Получено: <b>${m}</b> · ${d} · послушайте и сравните <b>оригинал</b> и результат.`,
+      before:'Оригинал', outInstrumental:'Только музыка', outAcapella:'Только вокал',
+      dlInstrumental:'Скачать музыку', dlAcapella:'Скачать вокал',
+      againBtn:'Разделить снова',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Удаление вокала · Быстро, просто и профессионального качества',
+      errNoFile:'Сначала добавьте аудиофайл', errDecode:'Не удалось декодировать этот файл — попробуйте другой формат',
+      errMono:'Этот файл не стерео — для удаления вокала нужна песня с двумя разными каналами (L/R)',
+      errRun:'Разделение не удалось — попробуйте другой файл',
+      loaded:'Файл загружен ✓', dlWord:'Скачать',
+    },
+  };
+
+  // Output modes. instrumental = music without vocals; acapella = vocals without music.
+  const MODES = [
+    { id:'instrumental', emo:'🎸' },
+    { id:'acapella',     emo:'🎤' },
+  ];
+
+  // Separation strength presets — the vocal band pulled from the center.
+  // Wider band = more of the mix treated as vocal (stronger removal / fuller acapella).
+  const LEVELS = [
+    { id:'gentle',   hpf:220, lpf:5500  },
+    { id:'balanced', hpf:150, lpf:8500  },
+    { id:'strong',   hpf:100, lpf:12000 },
+  ];
+
+  let lang='he', t=I18N.he;
+  let mode='instrumental';
+  let level='balanced';
+  let ac=null;
+  const state={ file:null, name:'', size:0, buffer:null, out:null, outUrl:null, srcUrl:null, outMode:'instrumental' };
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+  function lvlOf(id){ return LEVELS.find(l=>l.id===id)||LEVELS[1]; }
+  function baseName(name){ return String(name||'audio').replace(/\.[^.\/\\]+$/,''); }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function mmss(s){ if(!s||!isFinite(s)) return '—'; s=Math.round(s); const m=Math.floor(s/60); return m+':'+String(s%60).padStart(2,'0'); }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1800); }
+  function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function outWord(m){ return m==='acapella' ? t.outAcapella : t.outInstrumental; }
+
+  // ---- pickers ----
+  function renderModes(){
+    el('modes').innerHTML = MODES.map(m=>`
+      <button type="button" class="fmt ${m.id===mode?'on':''}" data-mode="${m.id}">
+        <span class="emo">${m.emo}</span>
+        <b>${t['mode'+m.id]}</b><small>${t['mode'+m.id+'Sub']}</small>
+      </button>`).join('');
+  }
+  function renderLvls(){
+    el('lvls').innerHTML = LEVELS.map(l=>`
+      <button type="button" class="fmt ${l.id===level?'on':''}" data-lvl="${l.id}">
+        <b>${t['lvl'+l.id]}</b><small>${t['lvl'+l.id+'Sub']}</small>
+      </button>`).join('');
+  }
+
+  // ---- intake ----
+  const AUDIO_RE = /\.(mp3|wav|aac|m4a|ogg|oga|opus|flac|weba|webm|aif|aiff|wma|3gp|amr|mka|caf)$/i;
+  async function loadFile(file){
+    if(!file) return;
+    if(file.type && file.type.indexOf('audio')!==0 && !AUDIO_RE.test(file.name)){ el('optErr').textContent=t.errDecode; return; }
+    clearFile();
+    state.file=file; state.name=file.name; state.size=file.size;
+    el('optErr').textContent='';
+    el('srcName').textContent=file.name;
+    el('srcMeta').textContent=fmtBytes(file.size);
+    state.srcUrl=URL.createObjectURL(file);
+    el('audioSrc').src=state.srcUrl;
+    el('srcCard').style.display='';
+    el('composer').classList.add('loaded');
+    try{
+      const arr=await file.arrayBuffer();
+      if(!ac) ac=new (window.AudioContext||window.webkitAudioContext)();
+      state.buffer=await ac.decodeAudioData(arr.slice(0));
+      const b=state.buffer;
+      const chLbl = b.numberOfChannels>=2 ? 'stereo' : 'mono';
+      el('srcMeta').textContent = [fmtBytes(file.size), mmss(b.duration), chLbl, Math.round(b.sampleRate/1000)+'kHz'].join(' · ');
+      el('runBtn').disabled=false;
+      // warn early if the track can't be separated (mono / dual-mono)
+      if(!isStereo(b)) el('optErr').textContent=t.errMono;
+      requestAnimationFrame(()=>drawWave(el('waveSrc'), b.getChannelData(0), cssVar('--faint')));
+      toast(t.loaded);
+    }catch(err){
+      el('optErr').textContent=t.errDecode;
+      clearFile();
+    }
+  }
+  function clearFile(){
+    if(state.srcUrl) URL.revokeObjectURL(state.srcUrl);
+    if(state.outUrl) URL.revokeObjectURL(state.outUrl);
+    state.file=null; state.buffer=null; state.out=null; state.outUrl=null; state.srcUrl=null;
+    el('srcCard').style.display='none';
+    el('composer').classList.remove('loaded');
+    el('runBtn').disabled=true;
+    el('audioSrc').removeAttribute('src');
+  }
+
+  // true stereo = 2+ channels AND the two channels actually differ (a real stereo image)
+  function isStereo(buffer){
+    if(!buffer || buffer.numberOfChannels<2) return false;
+    const L=buffer.getChannelData(0), R=buffer.getChannelData(1);
+    const n=L.length; if(!n) return false;
+    const step=Math.max(1, Math.floor(n/4000));
+    let diff=0, energy=0;
+    for(let i=0;i<n;i+=step){ const d=L[i]-R[i]; diff+=d*d; energy+=L[i]*L[i]+R[i]*R[i]; }
+    return energy>0 && (diff/energy)>1e-4;
+  }
+
+  // ---- waveform drawing ----
+  function drawWave(canvas, data, color){
+    if(!canvas || !data) return;
+    const dpr=window.devicePixelRatio||1;
+    const W=canvas.clientWidth||600, H=canvas.clientHeight||72;
+    if(!W) return;
+    canvas.width=W*dpr; canvas.height=H*dpr;
+    const ctx=canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,W,H);
+    const mid=H/2, step=Math.max(1,Math.floor(data.length/W));
+    ctx.strokeStyle=color||'#888'; ctx.lineWidth=1;
+    ctx.beginPath();
+    for(let x=0;x<W;x++){
+      let min=1,max=-1; const start=x*step, end=Math.min(data.length,start+step);
+      for(let i=start;i<end;i++){ const v=data[i]; if(v<min)min=v; if(v>max)max=v; }
+      if(min>max){ min=0; max=0; }
+      ctx.moveTo(x+0.5, mid + min*mid*0.92);
+      ctx.lineTo(x+0.5, mid + max*mid*0.92);
+    }
+    ctx.stroke();
+  }
+  function redraw(){
+    if(state.buffer && el('srcCard').style.display!=='none')
+      drawWave(el('waveSrc'), state.buffer.getChannelData(0), cssVar('--faint'));
+    if(state.out && el('resultsCard').classList.contains('show')){
+      drawWave(el('waveBefore'), state.buffer.getChannelData(0), cssVar('--faint'));
+      drawWave(el('waveAfter'), state.out.channels[0], cssVar('--accent'));
+    }
+  }
+
+  // ---- the separation engine (real in-browser center-channel / mid-side split) ----
+  // Vocals in most mixes sit dead-center: equal in L and R. The center signal
+  // C = (L+R)/2 carries them (band-limited to the voice range). For an instrumental we
+  // subtract that band from both channels; for an acapella we keep it and subtract the
+  // stereo "sides" S = (L-R)/2 that hold the panned instruments. Whole graph is
+  // sample-accurate, so cancellation is phase-correct.
+  async function separate(buffer, m, lvl, onProg){
+    const sr=buffer.sampleRate, len=buffer.length;
+    const Off = window.OfflineAudioContext||window.webkitOfflineAudioContext;
+    const off = new Off(2, len, sr);
+
+    const src = off.createBufferSource(); src.buffer=buffer;
+    const split = off.createChannelSplitter(2);
+    src.connect(split);
+
+    // center C = 0.5*L + 0.5*R
+    const gL=off.createGain(); gL.gain.value=0.5;
+    const gR=off.createGain(); gR.gain.value=0.5;
+    split.connect(gL,0); split.connect(gR,1);
+    const center=off.createGain(); center.gain.value=1;
+    gL.connect(center); gR.connect(center);
+
+    // band-limit the center to the vocal range
+    const hp=off.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=lvl.hpf; hp.Q.value=0.707;
+    const lp=off.createBiquadFilter(); lp.type='lowpass';  lp.frequency.value=lvl.lpf; lp.Q.value=0.707;
+    center.connect(hp); hp.connect(lp);   // lp = centerBand (vocal estimate)
+
+    const merger=off.createChannelMerger(2);
+
+    if(m==='instrumental'){
+      // out = original − centerBand, on both channels (stereo preserved, bass/air kept)
+      const neg=off.createGain(); neg.gain.value=-1; lp.connect(neg);
+      split.connect(merger,0,0);   // L  -> out L
+      split.connect(merger,1,1);   // R  -> out R
+      neg.connect(merger,0,0);     // -centerBand -> out L
+      neg.connect(merger,0,1);     // -centerBand -> out R
+    } else {
+      // acapella: the center C=(L+R)/2 already drops pure stereo (panned) instruments —
+      // they live only in the sides. Band-limited to the voice range, C is the vocal
+      // estimate. Duplicated to both output channels.
+      lp.connect(merger,0,0); lp.connect(merger,0,1);   // centerBand on both channels
+    }
+    merger.connect(off.destination);
+
+    // run: rendering is one async op — animate progress while it works
+    onProg(0.06,'st_split');
+    src.start();
+    let done=false;
+    const renderP = off.startRendering().then(b=>{ done=true; return b; });
+    let pc=0.1;
+    while(!done && pc<0.86){ await sleep(90); pc+=0.06; onProg(pc, pc<0.45?'st_split':'st_separate'); }
+    const rendered = await renderP;
+
+    onProg(0.9,'st_encode'); await sleep(20);
+    const chans=[];
+    for(let c=0;c<rendered.numberOfChannels;c++) chans.push(rendered.getChannelData(c));
+
+    // acapella is often quiet — lift it (capped, so near-silence doesn't blow up noise);
+    // music only gets pulled down if it went hot. Then a hard clip guard on both.
+    let peak=0;
+    for(let c=0;c<chans.length;c++){ const d=chans[c]; for(let i=0;i<len;i++){ const a=Math.abs(d[i]); if(a>peak)peak=a; } }
+    if(peak>0){
+      const gain = m==='acapella' ? Math.min(8, 0.97/peak) : Math.min(1, 0.99/peak);
+      if(gain!==1){ for(let c=0;c<chans.length;c++){ const d=chans[c]; for(let i=0;i<len;i++) d[i]*=gain; } }
+    }
+    // hard clip guard
+    for(let c=0;c<chans.length;c++){ const d=chans[c]; for(let i=0;i<len;i++){ if(d[i]>1)d[i]=1; else if(d[i]<-1)d[i]=-1; } }
+
+    const wav=encodeWav(chans, sr);
+    onProg(1,'st_done');
+    return { blob:new Blob([wav],{type:'audio/wav'}), channels:chans, sampleRate:sr, length:len, duration:len/sr };
+  }
+
+  // 16-bit PCM WAV from Float32 channels
+  function encodeWav(chans, sr){
+    const ch=chans.length, len=chans[0].length, bytesPerSample=2, blockAlign=ch*bytesPerSample;
+    const dataLen=len*blockAlign, buf=new ArrayBuffer(44+dataLen), view=new DataView(buf);
+    let p=0;
+    const ws=s=>{ for(let i=0;i<s.length;i++) view.setUint8(p++, s.charCodeAt(i)); };
+    const u32=v=>{ view.setUint32(p,v,true); p+=4; };
+    const u16=v=>{ view.setUint16(p,v,true); p+=2; };
+    ws('RIFF'); u32(36+dataLen); ws('WAVE'); ws('fmt '); u32(16); u16(1); u16(ch); u32(sr); u32(sr*blockAlign); u16(blockAlign); u16(16); ws('data'); u32(dataLen);
+    for(let i=0;i<len;i++){ for(let c=0;c<ch;c++){ let s=chans[c][i]; s=s<-1?-1:s>1?1:s; view.setInt16(p, s<0?s*0x8000:s*0x7FFF, true); p+=2; } }
+    return buf;
+  }
+
+  // ---- run ----
+  async function runSeparate(){
+    el('optErr').textContent='';
+    if(!state.file || !state.buffer){ el('optErr').textContent=t.errNoFile; return; }
+    if(!isStereo(state.buffer)){ el('optErr').textContent=t.errMono; return; }
+
+    el('composer').style.display='none';
+    el('resultsCard').classList.remove('show');
+    if(state.outUrl){ URL.revokeObjectURL(state.outUrl); state.outUrl=null; }
+    const prog=el('progCard'); prog.classList.add('show');
+    el('progName').textContent=t.working+' · '+state.name;
+    setProg(0,'st_load');
+    prog.scrollIntoView({behavior:'smooth',block:'center'});
+    await sleep(60);
+
+    try{
+      const m=mode;
+      const res=await separate(state.buffer, m, lvlOf(level), (p,st)=>setProg(Math.round(p*100), st));
+      state.out=res; state.outMode=m;
+      await sleep(150);
+      prog.classList.remove('show');
+      showResults();
+    }catch(err){
+      prog.classList.remove('show');
+      el('composer').style.display='';
+      el('optErr').textContent=t.errRun;
+    }
+  }
+  function setProg(p,stKey){
+    el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%';
+    if(stKey && t[stKey]) el('progStage').textContent=t[stKey];
+  }
+
+  function showResults(){
+    state.outUrl=URL.createObjectURL(state.out.blob);
+    el('audioBefore').src=state.srcUrl;
+    el('audioAfter').src=state.outUrl;
+    el('afterLbl').textContent=outWord(state.outMode);
+    el('dlLbl').textContent = state.outMode==='acapella' ? t.dlAcapella : t.dlInstrumental;
+    el('readySub').innerHTML=t.readySub(mmss(state.out.duration), outWord(state.outMode));
+    el('resultsCard').classList.add('show');
+    requestAnimationFrame(()=>{
+      drawWave(el('waveBefore'), state.buffer.getChannelData(0), cssVar('--faint'));
+      drawWave(el('waveAfter'), state.out.channels[0], cssVar('--accent'));
+      el('resultsCard').scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  }
+
+  function download(){
+    if(!state.out || !state.outUrl) return;
+    const suffix = state.outMode==='acapella' ? '-vocals' : '-instrumental';
+    const a=document.createElement('a'); a.href=state.outUrl; a.download=baseName(state.name)+suffix+'.wav';
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+  // back to settings, keeping the loaded file so mode/strength can be tweaked and re-run
+  function backToEdit(){
+    el('resultsCard').classList.remove('show');
+    el('composer').style.display='';
+    window.scrollTo({top:0,behavior:'smooth'});
+    requestAnimationFrame(redraw);
+  }
+  function resetAll(){
+    clearFile();
+    el('resultsCard').classList.remove('show');
+    el('composer').style.display='';
+    el('optErr').textContent='';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- i18n + theme (mirrors the other pages; header stays in sync via its observer) ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderModes(); renderLvls();
+    if(state.file) el('srcName').textContent=state.name;
+    if(state.out && el('resultsCard').classList.contains('show')){
+      el('afterLbl').textContent=outWord(state.outMode);
+      el('dlLbl').textContent = state.outMode==='acapella' ? t.dlAcapella : t.dlInstrumental;
+      el('readySub').innerHTML=t.readySub(mmss(state.out.duration), outWord(state.outMode));
+    }
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+    requestAnimationFrame(redraw);
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ if(input.files && input.files[0]) loadFile(input.files[0]); input.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer && e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('srcRemove').addEventListener('click', resetAll);
+  el('modes').addEventListener('click',e=>{ const b=e.target.closest('[data-mode]'); if(b){ mode=b.getAttribute('data-mode'); renderModes(); } });
+  el('lvls').addEventListener('click',e=>{ const b=e.target.closest('[data-lvl]'); if(b){ level=b.getAttribute('data-lvl'); renderLvls(); } });
+
+  el('runBtn').addEventListener('click',runSeparate);
+  el('dlBtn').addEventListener('click',download);
+  el('againBtn').addEventListener('click',backToEdit);
+
+  window.__setLang=applyLang;
+  el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+  let rz; window.addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(redraw,150); });
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  renderModes(); renderLvls();
+})();
+</script>
+</body>
+</html>
