@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — הסרת רקע AI</title>
-<meta name="description" content="Remove the background from any image automatically with AI — right in your browser. Download a transparent PNG or WEBP, or drop in a new background: white, a solid color, a gradient, or your own image. Private and fast, nothing leaves your machine.">
+<meta name="description" content="Remove the background from any image automatically with AI. Download a transparent PNG or WEBP, or drop in a new background: white, a solid color, a gradient, or your own image. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -55,7 +55,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -352,7 +352,7 @@
       dir:'rtl', langIco:'EN',
       kick:'AI · הסרת רקע',
       pageTitle:'הסירו את הרקע מכל תמונה — אוטומטית',
-      pageSub:'גררו תמונה, וה־AI יזהה את הנושא ויסיר את הרקע בשנייה. הורידו PNG או WEBP שקוף, או החליפו לרקע חדש — לבן, צבע אחיד, גרדיאנט או תמונה משלכם. הכול רץ בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      pageSub:'גררו תמונה, וה־AI יזהה את הנושא ויסיר את הרקע בשנייה. הורידו PNG או WEBP שקוף, או החליפו לרקע חדש — לבן, צבע אחיד, גרדיאנט או תמונה משלכם. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו תמונות לכאן', or2:'או', choose:'בחרו תמונות',
       sizeNote:'PNG · JPG · WEBP', remove:'הסרה',
       totalLbl:'סה״כ', optTitle:'הגדרות',
@@ -370,15 +370,15 @@
       before:'לפני', after:'אחרי',
       failed:'העיבוד נכשל', errNoFiles:'צריך לצרף לפחות תמונה אחת',
       errEngine:'לא הצלחנו לטעון את מנוע הסרת הרקע. בדקו את החיבור לאינטרנט ונסו שוב.',
-      seam:'בהרצה הראשונה מורד לדפדפן מודל AI (פעם אחת, נשמר במטמון). מרגע זה הכול רץ מקומית — התמונות שלכם אף פעם לא נשלחות לשרת.',
-      foot:'KOLKLI · הסרת רקע AI · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · הסרת רקע AI · מהיר, פשוט ובאיכות מקצועית',
       copied:'הקישור הועתק ✓',
     },
     en:{
       dir:'ltr', langIco:'עב',
       kick:'AI · Remove background',
       pageTitle:'Remove the background from any image — automatically',
-      pageSub:'Drop an image and the AI finds the subject and cuts the background in a second. Download a transparent PNG or WEBP, or swap in a new background — white, a solid color, a gradient, or your own image. Everything runs in your browser — nothing leaves your machine.',
+      pageSub:'Drop an image and the AI finds the subject and cuts the background in a second. Download a transparent PNG or WEBP, or swap in a new background — white, a solid color, a gradient, or your own image. Fast, simple and professional-quality.',
       dropBig:'Drag images here', or2:'or', choose:'Choose images',
       sizeNote:'PNG · JPG · WEBP', remove:'Remove',
       totalLbl:'Total', optTitle:'Options',
@@ -396,15 +396,15 @@
       before:'before', after:'after',
       failed:'Processing failed', errNoFiles:'Add at least one image',
       errEngine:'Could not load the background-removal engine. Check your connection and try again.',
-      seam:'On the first run a small AI model is downloaded to your browser (once, then cached). From then on everything runs locally — your images are never sent to a server.',
-      foot:'KOLKLI · AI Remove background · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · AI Remove background · Fast, simple and professional quality',
       copied:'Link copied ✓',
     },
     ru:{
       dir:'ltr',
       kick:'AI · Удаление фона',
       pageTitle:'Удаляйте фон с любого изображения — автоматически',
-      pageSub:'Перетащите изображение, и AI найдёт объект и вырежет фон за секунду. Скачайте прозрачный PNG или WEBP либо замените фон — белый, сплошной цвет, градиент или своё изображение. Всё работает в вашем браузере — ничего не покидает устройство.',
+      pageSub:'Перетащите изображение, и AI найдёт объект и вырежет фон за секунду. Скачайте прозрачный PNG или WEBP либо замените фон — белый, сплошной цвет, градиент или своё изображение. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите изображения сюда', or2:'или', choose:'Выбрать изображения',
       sizeNote:'PNG · JPG · WEBP', remove:'Удалить',
       totalLbl:'Всего', optTitle:'Параметры',
@@ -422,8 +422,8 @@
       before:'до', after:'после',
       failed:'Обработка не удалась', errNoFiles:'Добавьте хотя бы одно изображение',
       errEngine:'Не удалось загрузить движок удаления фона. Проверьте соединение и попробуйте снова.',
-      seam:'При первом запуске небольшая AI-модель загружается в ваш браузер (один раз, затем кэшируется). Далее всё работает локально — ваши изображения никогда не отправляются на сервер.',
-      foot:'KOLKLI · AI-удаление фона · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · AI-удаление фона · Быстро, просто и профессионального качества',
       copied:'Ссылка скопирована ✓',
     },
   };

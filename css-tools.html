@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — כלי CSS ועיצוב</title>
+<meta name="description" content="Free visual CSS tools — gradient, box-shadow, text-shadow, border-radius and glassmorphism generators, plus a color converter, palette generator and WCAG contrast checker. Live preview, copy-ready CSS. Fast, simple and professional-quality.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:70ch;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* layout: tool list + workspace */
+  .tt-grid{display:grid;grid-template-columns:250px 1fr;gap:18px;align-items:start;}
+  @media (max-width:900px){ .tt-grid{grid-template-columns:1fr;} }
+
+  /* sidebar */
+  .tt-side{padding:10px;position:sticky;top:88px;max-height:calc(100vh - 104px);overflow:auto;}
+  @media (max-width:900px){ .tt-side{position:static;max-height:none;} }
+  .tt-grp{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);
+    padding:12px 10px 6px;}
+  .tt-grp:first-child{padding-top:4px;}
+  .tt-nav{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-radius:11px;
+    background:none;cursor:pointer;text-align:start;color:var(--ink-2);font-family:var(--sans);font-size:13.5px;
+    font-weight:600;transition:background .12s,color .12s;}
+  .tt-nav:hover{background:var(--panel-2);color:var(--ink);}
+  .tt-nav.on{background:var(--accent-soft);color:var(--accent-dim);}
+  .tt-nav .nvi{width:30px;height:30px;flex-shrink:0;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    background:var(--panel-2);color:var(--muted);transition:background .12s,color .12s;}
+  .tt-nav:hover .nvi{color:var(--ink);}
+  .tt-nav.on .nvi{background:var(--panel);color:var(--accent);}
+  .tt-nav .nvi svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .tt-nav span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* workspace */
+  .tt-work{min-width:0;}
+  .tt-toolhead{display:flex;align-items:center;gap:13px;margin-bottom:14px;}
+  .tt-toolhead .thi{width:46px;height:46px;flex-shrink:0;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .tt-toolhead .thi svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .tt-toolhead h3{font-size:19px;font-weight:700;margin:0 0 2px;}
+  .tt-toolhead p{font-size:13px;color:var(--muted);margin:0;}
+
+  /* options / controls bar */
+  .tt-opts{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:flex-end;padding:16px 18px;margin-bottom:16px;}
+  .tt-opts:empty{display:none;}
+  .tt-opt{display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .tt-opt > label{font-size:11.5px;font-weight:700;color:var(--ink-2);display:flex;align-items:center;gap:8px;}
+  .tt-opt > label .rv{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent-dim);
+    background:var(--accent-soft);padding:1px 7px;border-radius:999px;}
+  .tt-opt select,.tt-opt input[type=text],.tt-opt input[type=number]{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:9px;
+    font-family:var(--sans);font-size:13px;padding:8px 11px;transition:border-color .12s,box-shadow .12s;}
+  .tt-opt input[type=number]{width:92px;}
+  .tt-opt select{cursor:pointer;}
+  .tt-opt select:focus,.tt-opt input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .tt-checks{display:flex;flex-wrap:wrap;gap:8px;align-self:flex-end;}
+  .tt-check{display:inline-flex;align-items:center;gap:7px;cursor:pointer;user-select:none;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:7px 13px;
+    font-size:12.5px;font-weight:600;color:var(--ink-2);transition:border-color .12s,background .12s,color .12s;}
+  .tt-check:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));}
+  .tt-check input{accent-color:var(--accent);width:15px;height:15px;margin:0;cursor:pointer;}
+  .tt-check.on{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));color:var(--accent-dim);}
+
+  /* range slider control */
+  .tt-opt-rng{min-width:200px;flex:1 1 200px;max-width:280px;}
+  input[type=range].tt-rng{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;
+    background:var(--line);outline:none;cursor:pointer;margin:6px 0 2px;}
+  input[type=range].tt-rng::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;
+    background:var(--accent);border:3px solid var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.28);cursor:pointer;}
+  input[type=range].tt-rng::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--accent);
+    border:3px solid var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.28);cursor:pointer;}
+  input[type=range].tt-rng:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px var(--accent-soft);}
+
+  /* color control */
+  .colrow{display:flex;align-items:center;gap:8px;}
+  .colrow input[type=color]{-webkit-appearance:none;appearance:none;width:40px;height:38px;padding:0;border:1px solid var(--line);
+    border-radius:9px;background:none;cursor:pointer;flex-shrink:0;}
+  .colrow input[type=color]::-webkit-color-swatch-wrapper{padding:3px;}
+  .colrow input[type=color]::-webkit-color-swatch{border:none;border-radius:6px;}
+  .colrow input[type=color]::-moz-color-swatch{border:none;border-radius:6px;}
+  .colrow .colhex{width:104px;text-transform:uppercase;font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;}
+
+  /* preview + code panes */
+  .tt-io{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+  @media (max-width:820px){ .tt-io{grid-template-columns:1fr;} }
+  .tt-pane{display:flex;flex-direction:column;min-width:0;}
+  .tt-pane-h{display:flex;align-items:center;gap:10px;margin-bottom:8px;min-height:32px;}
+  .tt-pane-h .ttl{font-size:13px;font-weight:700;color:var(--ink-2);}
+  .tt-pane-h .sp{flex:1;}
+  .tt-mini{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 11px;border-radius:9px;
+    border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;
+    font-size:12px;font-weight:600;font-family:var(--sans);transition:border-color .12s,color .12s,background .12s;}
+  .tt-mini:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .tt-mini svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .tt-mini.primary{color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px var(--grad-btn-glow);}
+  .tt-mini.primary:hover{filter:brightness(1.06);color:#fff;}
+
+  /* live preview stage */
+  .tt-prev{position:relative;min-height:360px;border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;padding:26px;text-align:center;
+    background-color:var(--panel-2);box-shadow:var(--shadow-sm);
+    background-image:
+      linear-gradient(45deg,var(--line-2) 25%,transparent 25%),
+      linear-gradient(-45deg,var(--line-2) 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,var(--line-2) 75%),
+      linear-gradient(-45deg,transparent 75%,var(--line-2) 75%);
+    background-size:22px 22px;background-position:0 0,0 11px,11px -11px,-11px 0;}
+
+  /* generic demo pieces used inside the stage */
+  .demo-box{width:180px;height:130px;border-radius:16px;background:var(--grad);}
+  .demo-card{width:210px;height:150px;border-radius:16px;background:var(--panel);}
+  .demo-text{font-size:46px;font-weight:800;letter-spacing:-.01em;color:var(--ink);}
+  .cv-chip{display:flex;flex-direction:column;gap:6px;align-items:center;}
+  .cv-chip .cv-hex{font-family:var(--mono);font-size:30px;font-weight:700;letter-spacing:.02em;}
+  .cv-chip .cv-sub{font-family:var(--mono);font-size:12.5px;opacity:.82;}
+  .pal-row{position:absolute;inset:0;display:flex;}
+  .pal-cell{flex:1;display:flex;align-items:flex-end;justify-content:center;padding-bottom:16px;}
+  .pal-cell b{font-family:var(--mono);font-size:11.5px;font-weight:600;background:rgba(0,0,0,.32);color:#fff;
+    padding:3px 8px;border-radius:999px;backdrop-filter:blur(3px);}
+  .cc-sample{max-width:340px;text-align:start;}
+  .cc-sample .cc-big{font-size:30px;font-weight:800;line-height:1.15;margin-bottom:10px;}
+  .cc-sample .cc-small{font-size:14px;line-height:1.55;}
+  .glass-card{width:220px;padding:26px 20px;border-radius:18px;color:#fff;font-weight:700;font-size:15px;
+    letter-spacing:.01em;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 6px rgba(0,0,0,.3);}
+
+  textarea.tt-code{width:100%;min-height:360px;resize:vertical;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--ink);padding:14px 15px;font-family:var(--mono);font-size:13px;line-height:1.7;
+    box-shadow:var(--shadow-sm);transition:border-color .12s,box-shadow .12s;}
+  textarea.tt-code:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  textarea.tt-code[readonly]{background:var(--panel-2);}
+
+  /* note under the panes (browser hints, contrast verdict) */
+  .tt-note{margin-top:14px;font-size:12.5px;min-height:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .tt-note.ok{color:var(--success-dim);}
+  .tt-note.err{color:var(--danger);}
+  .tt-note.muted{color:var(--muted);}
+  .tt-note svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .cc-ratio{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--ink);}
+  .cc-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:4px 11px;border-radius:999px;}
+  .cc-badge.ok{background:var(--success-soft);color:var(--success-dim);}
+  .cc-badge.no{background:var(--danger-soft);color:var(--danger);}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" id="kick"></span>
+    <h2 id="pageTitle"></h2>
+    <p id="pageSub"></p>
+  </div>
+
+  <div class="tt-grid">
+    <aside class="tt-side card" id="ttSide"></aside>
+
+    <div class="tt-work">
+      <div class="tt-toolhead">
+        <span class="thi" id="thIcon"></span>
+        <div>
+          <h3 id="thName"></h3>
+          <p id="thDesc"></p>
+        </div>
+      </div>
+
+      <div class="tt-opts card" id="ttOpts"></div>
+
+      <div class="tt-io">
+        <div class="tt-pane">
+          <div class="tt-pane-h">
+            <span class="ttl" id="prevLabel"></span>
+            <span class="sp"></span>
+            <button class="tt-mini" id="shufBtn" type="button" style="display:none"></button>
+          </div>
+          <div class="tt-prev" id="cssPrev"></div>
+        </div>
+
+        <div class="tt-pane">
+          <div class="tt-pane-h">
+            <span class="ttl" id="codeLabel"></span>
+            <span class="sp"></span>
+            <button class="tt-mini" id="copyBtn" type="button"></button>
+            <button class="tt-mini primary" id="dlBtn" type="button"></button>
+          </div>
+          <textarea class="tt-code" id="cssOut" dir="ltr" spellcheck="false" readonly></textarea>
+        </div>
+      </div>
+
+      <div class="tt-note" id="ttNote"></div>
+    </div>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  /* ---------- icons (Feather-style, inherit currentColor) ---------- */
+  const IC = {
+    gradient:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m21 5-16 16"/><path d="m21 11-10 10"/><path d="m21 17-4 4"/>',
+    shadow:'<rect x="3" y="3" width="13" height="13" rx="2"/><path d="M21 8v11a2 2 0 0 1-2 2H8"/>',
+    text:'<path d="M4 7V5h16v2"/><path d="M9 19h6"/><path d="M12 5v14"/>',
+    radius:'<path d="M21 21v-6a8 8 0 0 0-8-8H7"/><path d="M3 3v3"/><path d="M3 3h3"/>',
+    layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+    swatch:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+    palette:'<circle cx="13.5" cy="6.5" r="1.2"/><circle cx="17" cy="10" r="1.2"/><circle cx="8" cy="6" r="1.2"/><circle cx="6" cy="11" r="1.2"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10a2 2 0 0 0 2-2c0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2a1.5 1.5 0 0 1 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4.5-8-10-8z"/>',
+    contrast:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z"/>',
+    copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+    dl:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+    dice:'<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/>',
+    ok:'<path d="M20 6 9 17l-5-5"/>',
+    warn:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+    info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>'
+  };
+  const svg = n => '<svg viewBox="0 0 24 24" aria-hidden="true">'+(IC[n]||'')+'</svg>';
+
+  /* ---------- color helpers ---------- */
+  function normHex(v){ v=String(v||'').trim().replace(/^#/,''); if(/^[0-9a-fA-F]{3}$/.test(v)) v=v.split('').map(c=>c+c).join('');
+    return /^[0-9a-fA-F]{6}$/.test(v) ? '#'+v.toLowerCase() : null; }
+  const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+  function hexToRgb(h){ h=(normHex(h)||'#000000').slice(1); const n=parseInt(h,16); return {r:(n>>16)&255,g:(n>>8)&255,b:n&255}; }
+  function rgbToHex(r,g,b){ return '#'+[r,g,b].map(x=>clamp(Math.round(x),0,255).toString(16).padStart(2,'0')).join(''); }
+  function rgbToHsl(r,g,b){ r/=255;g/=255;b/=255; const mx=Math.max(r,g,b),mn=Math.min(r,g,b); let h,s,l=(mx+mn)/2;
+    if(mx===mn){ h=s=0; } else { const d=mx-mn; s=l>.5?d/(2-mx-mn):d/(mx+mn);
+      switch(mx){ case r:h=(g-b)/d+(g<b?6:0);break; case g:h=(b-r)/d+2;break; default:h=(r-g)/d+4; } h/=6; }
+    return {h:Math.round(h*360), s:Math.round(s*100), l:Math.round(l*100)}; }
+  function hslToRgb(h,s,l){ h=((h%360)+360)%360/360; s=clamp(s,0,100)/100; l=clamp(l,0,100)/100; let r,g,b;
+    if(s===0){ r=g=b=l; } else { const q=l<.5?l*(1+s):l+s-l*s, p=2*l-q;
+      const f=(p,q,t)=>{ if(t<0)t+=1; if(t>1)t-=1; if(t<1/6)return p+(q-p)*6*t; if(t<1/2)return q; if(t<2/3)return p+(q-p)*(2/3-t)*6; return p; };
+      r=f(p,q,h+1/3); g=f(p,q,h); b=f(p,q,h-1/3); }
+    return {r:r*255,g:g*255,b:b*255}; }
+  const hslToHex = (h,s,l)=>{ const c=hslToRgb(h,s,l); return rgbToHex(c.r,c.g,c.b); };
+  function relLum({r,g,b}){ const a=[r,g,b].map(v=>{ v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4); });
+    return 0.2126*a[0]+0.7152*a[1]+0.0722*a[2]; }
+  function contrastRatio(h1,h2){ const L1=relLum(hexToRgb(h1)), L2=relLum(hexToRgb(h2)); const hi=Math.max(L1,L2), lo=Math.min(L1,L2); return (hi+0.05)/(lo+0.05); }
+  function rgba(hex, a){ const {r,g,b}=hexToRgb(hex); return 'rgba('+r+', '+g+', '+b+', '+(+a).toFixed(2).replace(/\.?0+$/,'')+')'; }
+  const idealInk = hex => relLum(hexToRgb(hex))>0.42 ? '#141414' : '#ffffff';
+  const randHex = () => '#'+Math.floor(Math.random()*0x1000000).toString(16).padStart(6,'0');
+  const num = (v,d) => { const n=parseFloat(v); return isNaN(n)?d:n; };
+
+  /* ---------- tool registry ----------
+     Each tool: id, grp, ic, names{}, desc{}, opts[], rand?,
+     build(o) -> { code, ext?, render(host), note? }.
+     render() paints the live-preview stage; code is the copyable CSS. */
+  function sel(k, def, label, options){ return {k,type:'select',def,label,options}; }
+  function chk(k, def, label){ return {k,type:'check',def,label}; }
+  function rng(k, def, label, min, max, step, unit){ return {k,type:'range',def,label,min,max,step:step||1,unit:unit||''}; }
+  function col(k, def, label){ return {k,type:'color',def,label}; }
+  function o3(he,en,ru){ return {he,en,ru}; }
+
+  const TOOLS = [
+    /* ===== group: bg ===== */
+    { id:'gradient', grp:'bg', ic:'gradient', rand:true,
+      names:o3('מחולל גרדיאנט','Gradient Generator','Генератор градиентов'),
+      desc:o3('גרדיאנט לינארי, רדיאלי או קוני — עם זווית, צבעים ונקודות עצירה.','Linear, radial or conic gradients — angle, colors and stops.','Линейный, радиальный или конический градиент — угол, цвета и стопы.'),
+      opts:[
+        sel('type','linear', o3('סוג','Type','Тип'), [
+          {v:'linear', ...o3('לינארי','Linear','Линейный')}, {v:'radial', ...o3('רדיאלי','Radial','Радиальный')}, {v:'conic', ...o3('קוני','Conic','Конический')} ]),
+        rng('angle',90, o3('זווית','Angle','Угол'),0,360,1,'deg'),
+        col('c1','#7b34ff', o3('צבע ראשון','First color','Первый цвет')),
+        rng('s1',0, o3('עצירה 1','Stop 1','Стоп 1'),0,100,1,'%'),
+        col('c2','#3f85ff', o3('צבע שני','Second color','Второй цвет')),
+        rng('s2',100, o3('עצירה 2','Stop 2','Стоп 2'),0,100,1,'%') ],
+      build(o){ const stops=o.c1+' '+num(o.s1,0)+'%, '+o.c2+' '+num(o.s2,100)+'%';
+        let val;
+        if(o.type==='radial') val='radial-gradient(circle, '+stops+')';
+        else if(o.type==='conic') val='conic-gradient(from '+num(o.angle,90)+'deg, '+stops+')';
+        else val='linear-gradient('+num(o.angle,90)+'deg, '+stops+')';
+        return { code:'background: '+val+';', ext:'css',
+          render(host){ host.style.background=val; },
+          note:{cls:'muted', ic:'info', text: o.type==='conic' ? T.noteConic : T.noteGrad } }; } },
+
+    /* ===== group: fx ===== */
+    { id:'shadow', grp:'fx', ic:'shadow',
+      names:o3('מחולל Box Shadow','Box Shadow','Генератор Box Shadow'),
+      desc:o3('צל תיבה בתצוגה חיה — היסט, טשטוש, פרישה, צבע ושקיפות.','A live box-shadow — offset, blur, spread, color and opacity.','Тень блока вживую — смещение, размытие, разброс, цвет и прозрачность.'),
+      opts:[
+        rng('x',0, o3('היסט אופקי','Offset X','Смещение X'),-60,60,1,'px'),
+        rng('y',14, o3('היסט אנכי','Offset Y','Смещение Y'),-60,60,1,'px'),
+        rng('blur',30, o3('טשטוש','Blur','Размытие'),0,120,1,'px'),
+        rng('spread',-6, o3('פרישה','Spread','Разброс'),-40,60,1,'px'),
+        col('color','#2b3140', o3('צבע צל','Shadow color','Цвет тени')),
+        rng('op',22, o3('שקיפות','Opacity','Прозрачность'),0,100,1,'%'),
+        chk('inset',false, o3('פנימי (inset)','Inset','Внутренняя')) ],
+      build(o){ const val=(o.inset?'inset ':'')+num(o.x,0)+'px '+num(o.y,0)+'px '+num(o.blur,0)+'px '+num(o.spread,0)+'px '+rgba(o.color, num(o.op,20)/100);
+        return { code:'box-shadow: '+val+';', ext:'css',
+          render(host){ host.style.background='var(--panel-2)';
+            host.innerHTML='<div class="demo-card" style="box-shadow:'+val+'"></div>'; } }; } },
+
+    { id:'text-shadow', grp:'fx', ic:'text',
+      names:o3('מחולל Text Shadow','Text Shadow','Генератор Text Shadow'),
+      desc:o3('צל לטקסט — היסט, טשטוש, צבע ושקיפות, עם תצוגה חיה.','A shadow for text — offset, blur, color and opacity, live.','Тень для текста — смещение, размытие, цвет и прозрачность.'),
+      opts:[
+        rng('x',2, o3('היסט אופקי','Offset X','Смещение X'),-30,30,1,'px'),
+        rng('y',3, o3('היסט אנכי','Offset Y','Смещение Y'),-30,30,1,'px'),
+        rng('blur',6, o3('טשטוש','Blur','Размытие'),0,50,1,'px'),
+        col('color','#7b34ff', o3('צבע צל','Shadow color','Цвет тени')),
+        rng('op',45, o3('שקיפות','Opacity','Прозрачность'),0,100,1,'%') ],
+      build(o){ const val=num(o.x,0)+'px '+num(o.y,0)+'px '+num(o.blur,0)+'px '+rgba(o.color, num(o.op,45)/100);
+        return { code:'text-shadow: '+val+';', ext:'css',
+          render(host){ host.style.background='var(--panel-2)';
+            host.innerHTML='<div class="demo-text" style="text-shadow:'+val+'">עיצוב Aa 123</div>'; } }; } },
+
+    { id:'radius', grp:'fx', ic:'radius',
+      names:o3('מחולל Border Radius','Border Radius','Генератор Border Radius'),
+      desc:o3('עיגול פינות — כל פינה בנפרד, ביחידת px או %.','Round corners — each one independently, in px or %.','Скругление углов — каждый угол отдельно, в px или %.'),
+      opts:[
+        sel('unit','px', o3('יחידה','Unit','Единица'), [ {v:'px', ...o3('px','px','px')}, {v:'%', ...o3('%','%','%')} ]),
+        rng('tl',24, o3('שמאל־עליון','Top-left','Верх-лево'),0,100,1,''),
+        rng('tr',24, o3('ימין־עליון','Top-right','Верх-право'),0,100,1,''),
+        rng('br',24, o3('ימין־תחתון','Bottom-right','Низ-право'),0,100,1,''),
+        rng('bl',24, o3('שמאל־תחתון','Bottom-left','Низ-лево'),0,100,1,'') ],
+      build(o){ const u=o.unit==='%'?'%':'px';
+        const val=num(o.tl,0)+u+' '+num(o.tr,0)+u+' '+num(o.br,0)+u+' '+num(o.bl,0)+u;
+        return { code:'border-radius: '+val+';', ext:'css',
+          render(host){ host.style.background='var(--panel-2)';
+            host.innerHTML='<div class="demo-box" style="width:190px;height:150px;border-radius:'+val+'"></div>'; } }; } },
+
+    { id:'glass', grp:'fx', ic:'layers',
+      names:o3('אפקט זכוכית (Glass)','Glassmorphism','Стеклянный эффект'),
+      desc:o3('כרטיס זכוכית מטושטש — backdrop-filter, שקיפות ומסגרת.','A frosted-glass card — backdrop-filter, transparency and border.','Матовое стекло — backdrop-filter, прозрачность и рамка.'),
+      opts:[
+        rng('blur',12, o3('טשטוש רקע','Backdrop blur','Размытие фона'),0,30,1,'px'),
+        rng('alpha',18, o3('שקיפות מילוי','Fill opacity','Прозрачность'),0,100,1,'%'),
+        rng('sat',140, o3('רוויה','Saturation','Насыщенность'),100,220,1,'%'),
+        rng('rad',18, o3('עיגול פינות','Corner radius','Скругление'),0,44,1,'px'),
+        chk('border',true, o3('מסגרת עדינה','Subtle border','Тонкая рамка')) ],
+      build(o){ const blur=num(o.blur,12), sat=num(o.sat,140), rad=num(o.rad,18), a=(num(o.alpha,18)/100).toFixed(2).replace(/\.?0+$/,'');
+        const filter='blur('+blur+'px) saturate('+sat+'%)';
+        const border=o.border?'1px solid rgba(255, 255, 255, 0.28)':'none';
+        const code='background: rgba(255, 255, 255, '+a+');\nbackdrop-filter: '+filter+';\n-webkit-backdrop-filter: '+filter+';\nborder: '+border+';\nborder-radius: '+rad+'px;';
+        const style='background:rgba(255,255,255,'+a+');backdrop-filter:'+filter+';-webkit-backdrop-filter:'+filter+';border:'+border+';border-radius:'+rad+'px;';
+        return { code, ext:'css',
+          render(host){ host.style.background='radial-gradient(120% 120% at 15% 20%, #ff5f9e 0%, transparent 45%), radial-gradient(120% 120% at 85% 30%, #7b34ff 0%, transparent 45%), linear-gradient(135deg, #3f85ff, #22d3a0)';
+            host.innerHTML='<div class="glass-card" style="'+style+'">Glassmorphism</div>'; } }; } },
+
+    /* ===== group: color ===== */
+    { id:'convert', grp:'color', ic:'swatch',
+      names:o3('ממיר צבעים','Color Converter','Конвертер цвета'),
+      desc:o3('צבע אחד — כל הפורמטים: HEX, RGB ו־HSL.','One color, every format — HEX, RGB and HSL.','Один цвет во всех форматах — HEX, RGB и HSL.'),
+      opts:[ col('color','#7b34ff', o3('צבע','Color','Цвет')) ],
+      build(o){ const hex=(normHex(o.color)||'#000000'); const {r,g,b}=hexToRgb(hex); const {h,s,l}=rgbToHsl(r,g,b);
+        const HEX=hex.toUpperCase(), RGB='rgb('+r+', '+g+', '+b+')', HSL='hsl('+h+', '+s+'%, '+l+'%)';
+        const code='/* '+HEX+' */\ncolor: '+hex+';\n/* rgb */ '+RGB+';\n/* hsl */ '+HSL+';';
+        return { code, ext:'txt',
+          render(host){ const ink=idealInk(hex); host.style.background=hex;
+            host.innerHTML='<div class="cv-chip" style="color:'+ink+'"><div class="cv-hex">'+HEX+'</div><div class="cv-sub">'+RGB+' · '+HSL+'</div></div>'; } }; } },
+
+    { id:'palette', grp:'color', ic:'palette', rand:true,
+      names:o3('מחולל פלטת צבעים','Palette Generator','Генератор палитр'),
+      desc:o3('חמישה צבעים תואמים מצבע בסיס — משתני CSS מוכנים.','Five matching colors from a base — ready CSS variables.','Пять сочетающихся цветов из базового — готовые CSS-переменные.'),
+      opts:[
+        col('base','#7b34ff', o3('צבע בסיס','Base color','Базовый цвет')),
+        sel('mode','tints', o3('שיטה','Scheme','Схема'), [
+          {v:'tints', ...o3('גוונים (בהיר→כהה)','Tints & shades','Оттенки')},
+          {v:'analogous', ...o3('אנלוגי','Analogous','Аналоговая')},
+          {v:'complementary', ...o3('משלים','Complementary','Комплементарная')},
+          {v:'triadic', ...o3('טריאדי','Triadic','Триадная')} ]) ],
+      build(o){ const base=normHex(o.base)||'#7b34ff'; const {r,g,b}=hexToRgb(base); const {h,s,l}=rgbToHsl(r,g,b);
+        let cols;
+        if(o.mode==='analogous') cols=[-40,-20,0,20,40].map(d=>hslToHex(h+d,s,l));
+        else if(o.mode==='complementary') cols=[hslToHex(h,s,clamp(l+16,8,92)),hslToHex(h,s,l),hslToHex(h,clamp(s-25,5,100),clamp(l-14,6,94)),hslToHex(h+180,s,l),hslToHex(h+180,s,clamp(l+16,8,92))];
+        else if(o.mode==='triadic') cols=[hslToHex(h,s,l),hslToHex(h,clamp(s-30,5,100),clamp(l+18,8,94)),hslToHex(h+120,s,l),hslToHex(h+240,s,l),hslToHex(h+120,clamp(s-25,5,100),clamp(l+14,8,94))];
+        else cols=[92,74,l,Math.max(l-18,14),24].map(ll=>hslToHex(h,s,ll));
+        const code=':root {\n'+cols.map((c,i)=>'  --color-'+(i+1)+': '+c+';').join('\n')+'\n}';
+        return { code, ext:'css',
+          render(host){ host.style.background='none'; host.style.backgroundImage='none';
+            host.innerHTML='<div class="pal-row">'+cols.map(c=>'<div class="pal-cell" style="background:'+c+'"><b>'+c.toUpperCase()+'</b></div>').join('')+'</div>'; } }; } },
+
+    { id:'contrast', grp:'color', ic:'contrast',
+      names:o3('בודק ניגודיות','Contrast Checker','Проверка контраста'),
+      desc:o3('יחס ניגודיות בין טקסט לרקע — מול תקני WCAG AA / AAA.','Text-to-background contrast ratio against WCAG AA / AAA.','Контраст текста и фона по стандартам WCAG AA / AAA.'),
+      opts:[
+        col('fg','#ffffff', o3('צבע טקסט','Text color','Цвет текста')),
+        col('bg','#7b34ff', o3('צבע רקע','Background','Цвет фона')) ],
+      build(o){ const fg=normHex(o.fg)||'#000000', bg=normHex(o.bg)||'#ffffff'; const ratio=contrastRatio(fg,bg); const r=ratio.toFixed(2);
+        const pass={ na:ratio>=4.5, naa:ratio>=7, la:ratio>=3, laa:ratio>=4.5 };
+        const code='color: '+fg+';\nbackground-color: '+bg+';\n/* contrast ratio: '+r+':1 */';
+        const badge=(ok,lab)=>'<span class="cc-badge '+(ok?'ok':'no')+'">'+lab+' '+(ok?T.pass:T.fail)+'</span>';
+        const noteHtml='<span class="cc-ratio">'+r+':1</span>'+badge(pass.na,'AA')+badge(pass.naa,'AAA')+badge(pass.la,'AA '+T.large);
+        return { code, ext:'css',
+          render(host){ host.style.background=bg;
+            host.innerHTML='<div class="cc-sample" style="color:'+fg+'"><div class="cc-big">'+T.ccBig+'</div><div class="cc-small">'+T.ccSmall+'</div></div>'; },
+          note:{cls:'', html:noteHtml} }; } }
+  ];
+  const TOOL_BY_ID = {}; TOOLS.forEach(t=>TOOL_BY_ID[t.id]=t);
+
+  /* ---------- UI strings ---------- */
+  const UI = {
+    he:{ dir:'rtl',
+      kick:'כלים · כלי CSS', title:'כלי CSS ועיצוב',
+      sub:'אוסף מחוללי CSS חזותיים — גרדיאנט, צללים, פינות, זכוכית, צבעים, פלטות וניגודיות. תצוגה חיה וקוד מוכן להעתקה',
+      grp:{bg:'רקע', fx:'אפקטים', color:'צבע'},
+      preview:'תצוגה מקדימה', code:'קוד CSS', copy:'העתקה', copied:'הועתק ✓', download:'הורדה', shuffle:'אקראי',
+      pass:'עובר', fail:'נכשל', large:'גדול',
+      ccBig:'הקוד רץ בדפדפן', ccSmall:'טקסט לדוגמה לבדיקת קריאוּת — משפט קצר שממחיש איך הצבעים נראים יחד על המסך.',
+      noteGrad:'עובד בכל דפדפן מודרני. אפשר להוסיף עוד נקודות עצירה ידנית בקוד.',
+      noteConic:'גרדיאנט קוני (conic-gradient) נתמך בדפדפנים עדכניים; בישנים מאוד ייתכן שלא יוצג.',
+      foot:'KOLKLI · כלי CSS ועיצוב · מהיר, פשוט ובאיכות מקצועית' },
+    en:{ dir:'ltr',
+      kick:'Tools · CSS Tools', title:'CSS & Design Tools',
+      sub:'A toolbox of visual CSS generators — gradient, shadows, corners, glass, colors, palettes and contrast. Live preview and copy-ready CSS',
+      grp:{bg:'Background', fx:'Effects', color:'Color'},
+      preview:'Preview', code:'CSS Code', copy:'Copy', copied:'Copied ✓', download:'Download', shuffle:'Random',
+      pass:'Pass', fail:'Fail', large:'Large',
+      ccBig:'The code runs in the browser', ccSmall:'A short sample sentence for a readability check — it shows how the colors look together on screen.',
+      noteGrad:'Works in every modern browser. Add more color stops by hand in the code.',
+      noteConic:'conic-gradient is supported in current browsers; very old ones may not render it.',
+      foot:'KOLKLI · CSS & Design Tools · Fast, simple and professional quality' },
+    ru:{ dir:'ltr',
+      kick:'Инструменты · CSS', title:'CSS и дизайн',
+      sub:'Набор визуальных CSS-генераторов — градиент, тени, углы, стекло, цвета, палитры и контраст. Живой предпросмотр и готовый CSS',
+      grp:{bg:'Фон', fx:'Эффекты', color:'Цвет'},
+      preview:'Предпросмотр', code:'CSS-код', copy:'Копировать', copied:'Скопировано ✓', download:'Скачать', shuffle:'Случайно',
+      pass:'ОК', fail:'Нет', large:'крупный',
+      ccBig:'Код работает в браузере', ccSmall:'Короткий пример текста для проверки читаемости — видно, как цвета смотрятся вместе на экране.',
+      noteGrad:'Работает во всех современных браузерах. Дополнительные стопы можно добавить в коде вручную.',
+      noteConic:'conic-gradient поддерживается в современных браузерах; в очень старых может не отображаться.',
+      foot:'KOLKLI · CSS и дизайн · Быстро, просто и профессионально' }
+  };
+
+  /* ---------- state ---------- */
+  let lang='he', T=UI.he;
+  let curId='gradient';
+  let vals={};
+
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1600); }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  const fmtRV = (v,u) => v+(u||'');
+
+  /* ---------- sidebar ---------- */
+  function renderSide(){
+    const groups=['bg','fx','color']; let html='';
+    groups.forEach(g=>{
+      html+='<div class="tt-grp">'+T.grp[g]+'</div>';
+      TOOLS.filter(x=>x.grp===g).forEach(tool=>{
+        html+='<button type="button" class="tt-nav'+(tool.id===curId?' on':'')+'" data-id="'+tool.id+'">'+
+          '<span class="nvi">'+svg(tool.ic)+'</span><span>'+tool.names[lang]+'</span></button>';
+      });
+    });
+    el('ttSide').innerHTML=html;
+  }
+
+  /* ---------- controls ---------- */
+  function renderOpts(tool, preset){
+    vals={}; const checks=[], blocks=[];
+    tool.opts.forEach(op=>{
+      const v = (preset && preset[op.k]!=null) ? preset[op.k] : op.def;
+      vals[op.k]=v;
+      if(op.type==='check'){
+        checks.push('<label class="tt-check'+(v?' on':'')+'"><input type="checkbox" data-k="'+op.k+'"'+(v?' checked':'')+'><span>'+op.label[lang]+'</span></label>');
+      } else if(op.type==='select'){
+        const options=op.options.map(o=>'<option value="'+o.v+'"'+(o.v===v?' selected':'')+'>'+o[lang]+'</option>').join('');
+        blocks.push('<div class="tt-opt"><label>'+op.label[lang]+'</label><select data-k="'+op.k+'">'+options+'</select></div>');
+      } else if(op.type==='range'){
+        blocks.push('<div class="tt-opt tt-opt-rng"><label>'+op.label[lang]+' <b class="rv" data-rv="'+op.k+'">'+fmtRV(v,op.unit)+'</b></label>'+
+          '<input type="range" class="tt-rng" data-k="'+op.k+'" data-unit="'+op.unit+'" min="'+op.min+'" max="'+op.max+'" step="'+op.step+'" value="'+v+'"></div>');
+      } else if(op.type==='color'){
+        blocks.push('<div class="tt-opt tt-opt-col"><label>'+op.label[lang]+'</label><div class="colrow">'+
+          '<input type="color" data-k="'+op.k+'" value="'+v+'">'+
+          '<input type="text" class="colhex" data-hex="'+op.k+'" value="'+v+'" spellcheck="false" maxlength="7"></div></div>');
+      }
+    });
+    if(checks.length) blocks.push('<div class="tt-checks">'+checks.join('')+'</div>');
+    el('ttOpts').innerHTML=blocks.join('');
+  }
+  function readOpts(){
+    el('ttOpts').querySelectorAll('[data-k]').forEach(n=>{
+      const k=n.getAttribute('data-k');
+      vals[k] = (n.type==='checkbox') ? n.checked : n.value;
+    });
+  }
+
+  /* ---------- run + render ---------- */
+  function selectTool(id, fromHash){
+    const tool=TOOL_BY_ID[id]||TOOLS[0]; curId=tool.id;
+    if(!fromHash){ try{ history.replaceState(null,'','#'+tool.id); }catch(_){ location.hash=tool.id; } }
+    renderSide();
+    el('thIcon').innerHTML=svg(tool.ic);
+    el('thName').textContent=tool.names[lang];
+    el('thDesc').textContent=tool.desc[lang];
+    renderOpts(tool);
+    el('shufBtn').style.display = tool.rand ? '' : 'none';
+    run();
+  }
+  function run(){
+    readOpts();
+    const tool=TOOL_BY_ID[curId];
+    const host=el('cssPrev'); host.removeAttribute('style'); host.innerHTML='';
+    const note=el('ttNote'); note.className='tt-note'; note.innerHTML='';
+    let out;
+    try{ out=tool.build(vals); }
+    catch(e){ el('cssOut').value=''; note.className='tt-note err'; note.innerHTML=svg('warn')+'<span>'+String(e&&e.message||e)+'</span>'; return; }
+    el('cssOut').value=out.code;
+    try{ out.render(host); }catch(_){}
+    if(out.note){
+      note.className='tt-note '+(out.note.cls||'');
+      if(out.note.html) note.innerHTML=out.note.html;
+      else note.innerHTML=svg(out.note.ic||'info')+'<span>'+out.note.text+'</span>';
+    }
+  }
+
+  /* ---------- actions ---------- */
+  function shuffleTool(){
+    const tool=TOOL_BY_ID[curId]; if(!tool.rand) return; readOpts();
+    const preset={};
+    tool.opts.forEach(op=>{
+      if(op.type==='color') preset[op.k]=randHex();
+      else if(op.type==='range' && op.k==='angle') preset[op.k]=Math.floor(Math.random()*361);
+      else preset[op.k]=vals[op.k];
+    });
+    renderOpts(tool, preset); run();
+  }
+  function copyCode(){
+    const text=el('cssOut').value; const done=()=>toast(T.copied);
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done)); }
+    else fallbackCopy(text,done);
+  }
+  function fallbackCopy(text,done){ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(_){} ta.remove(); }
+  function downloadCode(){
+    const tool=TOOL_BY_ID[curId]; const text=el('cssOut').value; if(!text) return;
+    const ext=tool.buildExt||'css'; const mime=ext==='css'?'text/css':'text/plain';
+    const blob=new Blob([text],{type:mime+';charset=utf-8'}); const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download='kolkli-'+tool.id+'.'+ext; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+
+  /* ---------- language + theme ---------- */
+  function applyChrome(){
+    el('kick').textContent=T.kick;
+    el('pageTitle').textContent=T.title;
+    el('pageSub').textContent=T.sub;
+    el('prevLabel').textContent=T.preview;
+    el('codeLabel').textContent=T.code;
+    el('shufBtn').innerHTML=svg('dice')+'<span>'+T.shuffle+'</span>';
+    el('copyBtn').innerHTML=svg('copy')+'<span>'+T.copy+'</span>';
+    el('dlBtn').innerHTML=svg('dl')+'<span>'+T.download+'</span>';
+    el('foot').textContent=T.foot;
+    document.title='KOLKLI — '+T.title;
+  }
+  function applyLang(l){
+    lang=l; T=UI[l]||UI.he;
+    document.documentElement.lang=l; document.documentElement.dir=T.dir;
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    applyChrome(); selectTool(curId, true);
+  }
+  window.__setLang=applyLang;
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  /* ---------- events ---------- */
+  el('ttSide').addEventListener('click', e=>{ const b=e.target.closest('[data-id]'); if(b) selectTool(b.getAttribute('data-id')); });
+  el('ttOpts').addEventListener('input', e=>{
+    const t=e.target;
+    if(t.type==='range'){ const rv=el('ttOpts').querySelector('[data-rv="'+t.getAttribute('data-k')+'"]'); if(rv) rv.textContent=fmtRV(t.value, t.getAttribute('data-unit')); }
+    else if(t.type==='color'){ const hx=el('ttOpts').querySelector('.colhex[data-hex="'+t.getAttribute('data-k')+'"]'); if(hx) hx.value=t.value; }
+    else if(t.classList.contains('colhex')){ const k=t.getAttribute('data-hex'); const v=normHex(t.value); const c=el('ttOpts').querySelector('input[type=color][data-k="'+k+'"]'); if(v && c) c.value=v; }
+    const chk=t.closest('.tt-check'); if(chk) chk.classList.toggle('on', t.checked);
+    run();
+  });
+  el('ttOpts').addEventListener('change', run);
+  el('shufBtn').addEventListener('click', shuffleTool);
+  el('copyBtn').addEventListener('click', copyCode);
+  el('dlBtn').addEventListener('click', downloadCode);
+  window.addEventListener('hashchange', ()=>{ const id=location.hash.replace(/^#/,''); if(id && TOOL_BY_ID[id] && id!==curId) selectTool(id, true); });
+  const tb=el('themeToggle'); if(tb) tb.addEventListener('click', ()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  /* download uses the built tool's ext; stash it on run */
+  const _run=run; run=function(){ _run(); const t=TOOL_BY_ID[curId]; try{ t.buildExt=(t.build(vals)||{}).ext||'css'; }catch(_){ t.buildExt='css'; } };
+
+  /* ---------- init ---------- */
+  applyTheme(ls('theme')||'light');
+  const startId=location.hash.replace(/^#/,''); if(startId && TOOL_BY_ID[startId]) curId=startId;
+  applyLang(detectLang());
+})();
+</script>
+</body>
+</html>

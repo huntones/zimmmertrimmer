@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — סימן מים לתמונות</title>
-<meta name="description" content="Add a text or logo watermark to your images right in your browser — position, tile, rotate and set the opacity, then download. Fast, private, nothing leaves your machine.">
+<meta name="description" content="position, tile, rotate and set the opacity, then download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -448,8 +448,8 @@
     he:{
       dir:'rtl',
       kick:'סימן מים לתמונות',
-      pageTitle:'הוסיפו סימן מים לתמונות — בלי להעלות לשרת',
-      pageSub:'גררו תמונות, הוסיפו טקסט או לוגו כסימן מים, קבעו מיקום, שקיפות, גודל, סיבוב ופריסה חוזרת — ותורידו. הכול מתבצע בדפדפן שלכם, ושום קובץ לא עוזב את המחשב.',
+      pageTitle:'הוסיפו סימן מים לתמונות',
+      pageSub:'גררו תמונות, הוסיפו טקסט או לוגו כסימן מים, קבעו מיקום, שקיפות, גודל, סיבוב ופריסה חוזרת — ותורידו. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו תמונות לכאן', or2:'או', choose:'בחרו תמונות',
       sizeNote:'JPG · PNG · WEBP · GIF · BMP', remove:'הסרה',
       previewLbl:'תצוגה מקדימה', totalLbl:'סה״כ', optTitle:'הגדרות סימן המים',
@@ -466,16 +466,16 @@
       dlAll:'הורדת הכול', againBtn:'תמונה נוספת',
       wmSuffix:'סימן-מים', origLbl:'מקור',
       failed:'העיבוד נכשל — פורמט לא נתמך בדפדפן',
-      seam:'הכול קורה מקומית: התמונות מעובדות ישירות בדפדפן שלכם דרך canvas — שום קובץ לא נשלח לשרת, וכלום לא עוזב את המחשב.',
-      foot:'KOLKLI · סימן מים לתמונות · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · סימן מים לתמונות · מהיר, פשוט ובאיכות מקצועית',
       errNoFiles:'צריך לצרף לפחות תמונה אחת', errNoText:'הזינו טקסט לסימן המים', errNoLogo:'בחרו קובץ לוגו', errDecode:'לא הצלחנו לפענח אף תמונה',
       copied:'הקישור הועתק ✓', dl:'הורדה',
     },
     en:{
       dir:'ltr',
       kick:'Image watermark',
-      pageTitle:'Add a watermark to images — without uploading',
-      pageSub:'Drop images, add a text or logo watermark, set the position, opacity, size, rotation and tiling, then download. Everything runs in your browser — nothing leaves your machine.',
+      pageTitle:'Add a watermark to images',
+      pageSub:'Drop images, add a text or logo watermark, set the position, opacity, size, rotation and tiling, then download. Fast, simple and professional-quality.',
       dropBig:'Drag images here', or2:'or', choose:'Choose images',
       sizeNote:'JPG · PNG · WEBP · GIF · BMP', remove:'Remove',
       previewLbl:'Live preview', totalLbl:'Total', optTitle:'Watermark options',
@@ -492,16 +492,16 @@
       dlAll:'Download all', againBtn:'Watermark more',
       wmSuffix:'watermarked', origLbl:'source',
       failed:'Processing failed — format not supported by this browser',
-      seam:'Everything is local: images are processed right in your browser via canvas — no file is sent to a server, and nothing leaves your machine.',
-      foot:'KOLKLI · Image watermark · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Image watermark · Fast, simple and professional quality',
       errNoFiles:'Add at least one image', errNoText:'Enter the watermark text', errNoLogo:'Choose a logo file', errDecode:'We could not decode any image',
       copied:'Link copied ✓', dl:'Download',
     },
     ru:{
       dir:'ltr',
       kick:'Водяной знак на фото',
-      pageTitle:'Добавьте водяной знак на изображения — без загрузки на сервер',
-      pageSub:'Перетащите изображения, добавьте текст или логотип как водяной знак, задайте положение, прозрачность, размер, поворот и замостить, затем скачайте. Всё работает в вашем браузере — ничего не покидает устройство.',
+      pageTitle:'Добавьте водяной знак на изображения',
+      pageSub:'Перетащите изображения, добавьте текст или логотип как водяной знак, задайте положение, прозрачность, размер, поворот и замостить, затем скачайте. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите изображения сюда', or2:'или', choose:'Выбрать изображения',
       sizeNote:'JPG · PNG · WEBP · GIF · BMP', remove:'Удалить',
       previewLbl:'Предпросмотр', totalLbl:'Всего', optTitle:'Параметры водяного знака',
@@ -518,8 +518,8 @@
       dlAll:'Скачать всё', againBtn:'Ещё',
       wmSuffix:'znak', origLbl:'оригинал',
       failed:'Обработка не удалась — формат не поддерживается этим браузером',
-      seam:'Всё локально: изображения обрабатываются прямо в вашем браузере через canvas — ни один файл не отправляется на сервер, ничего не покидает устройство.',
-      foot:'KOLKLI · Водяной знак · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Водяной знак · Быстро, просто и профессионального качества',
       errNoFiles:'Добавьте хотя бы одно изображение', errNoText:'Введите текст водяного знака', errNoLogo:'Выберите файл логотипа', errDecode:'Не удалось декодировать ни одно изображение',
       copied:'Ссылка скопирована ✓', dl:'Скачать',
     },

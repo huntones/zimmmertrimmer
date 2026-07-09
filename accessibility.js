@@ -83,6 +83,7 @@
       lineSpace: 'ריווח שורות', letterSpace: 'ריווח אותיות', readable: 'פונט קריא',
       links: 'הדגשת קישורים', headings: 'הדגשת כותרות', stopAnim: 'עצירת אנימציות',
       bigCursor: 'סמן גדול', guide: 'סרגל קריאה', mask: 'מסכת קריאה', tts: 'הקראת טקסט',
+      sound: 'צלילי חיווי',
       reset: 'איפוס הגדרות', statement: 'הצהרת נגישות',
       note: 'ללא צד שלישי · נשמר במכשיר שלכם בלבד',
       stmtClose: 'סגירת הצהרת הנגישות'
@@ -94,6 +95,7 @@
       lineSpace: 'Line spacing', letterSpace: 'Letter spacing', readable: 'Readable font',
       links: 'Highlight links', headings: 'Highlight titles', stopAnim: 'Stop animations',
       bigCursor: 'Big cursor', guide: 'Reading guide', mask: 'Reading mask', tts: 'Read aloud',
+      sound: 'Notification sounds',
       reset: 'Reset settings', statement: 'Accessibility statement',
       note: 'No third parties · stored on your device only',
       stmtClose: 'Close accessibility statement'
@@ -105,6 +107,7 @@
       lineSpace: 'Межстрочный интервал', letterSpace: 'Межбуквенный интервал', readable: 'Читаемый шрифт',
       links: 'Выделить ссылки', headings: 'Выделить заголовки', stopAnim: 'Остановить анимацию',
       bigCursor: 'Большой курсор', guide: 'Линейка чтения', mask: 'Маска чтения', tts: 'Озвучивание',
+      sound: 'Звуки уведомлений',
       reset: 'Сбросить настройки', statement: 'Заявление о доступности',
       note: 'Без третьих лиц · хранится только на вашем устройстве',
       stmtClose: 'Закрыть заявление о доступности'
@@ -138,6 +141,7 @@
     guide: '<path d="M3 12h18"/><path d="M7 8l-4 4 4 4"/><path d="M17 8l4 4-4 4"/>',
     mask: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
     tts: '<path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.4 5.6a9 9 0 0 1 0 12.8"/>',
+    sound: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
     reset: '<path d="M3 12a9 9 0 1 0 2.6-6.3"/><path d="M3 4v4h4"/>',
     close: '<path d="M18 6 6 18M6 6l12 12"/>'
   };
@@ -166,7 +170,7 @@
   #a11y-root *{ box-sizing:border-box; }
 
   /* Floating access button */
-  #a11y-fab{ position:fixed; bottom:18px; inset-inline-start:18px; z-index:2147483000;
+  #a11y-fab{ position:fixed; bottom:18px; right:18px; left:auto; z-index:2147483000;
     width:54px; height:54px; border:none; border-radius:50%; cursor:pointer;
     background:linear-gradient(135deg,#7b34ff 0%,#3f85ff 100%); color:#fff;
     box-shadow:0 10px 26px rgba(82,94,244,.45); display:flex; align-items:center; justify-content:center;
@@ -175,15 +179,17 @@
   #a11y-fab:active{ transform:scale(.96); }
   #a11y-fab:focus-visible{ outline:3px solid #fff; outline-offset:3px; }
   #a11y-fab svg{ width:30px; height:30px; }
+  html[dir="rtl"] #a11y-fab{ left:18px; right:auto; }
 
   /* Panel */
-  #a11y-panel{ position:fixed; bottom:84px; inset-inline-start:18px; z-index:2147483000;
+  #a11y-panel{ position:fixed; bottom:84px; right:18px; left:auto; z-index:2147483000;
     width:min(360px, calc(100vw - 24px)); max-height:min(80vh,660px); overflow:auto;
     border-radius:20px; background:#fff; color:#1b2138; border:1px solid #e8ebfb;
     box-shadow:0 30px 72px rgba(30,37,80,.28); direction:inherit;
     opacity:0; visibility:hidden; transform:translateY(12px) scale(.98); transform-origin:bottom;
     transition:opacity .18s ease, transform .18s ease, visibility .18s; }
   #a11y-panel.open{ opacity:1; visibility:visible; transform:none; }
+  html[dir="rtl"] #a11y-panel{ left:18px; right:auto; }
   #a11y-panel::-webkit-scrollbar{ width:10px; }
   #a11y-panel::-webkit-scrollbar-thumb{ background:#d8ddf3; border-radius:8px; border:3px solid #fff; }
 
@@ -374,6 +380,12 @@
       return '<button class="a11y-tile" type="button" role="switch" aria-checked="false" data-act="toggle" data-key="' + x.key + '">' +
         svg(x.ic) + '<span>' + esc(d[x.key]) + '</span></button>';
     }).join('');
+    // Notification-sound mute toggle. Its on/off state lives in the
+    // notify-sound.js module (window.KolkliSound), not in `state`, so it's a
+    // remote control rather than an a11y effect; paint()/the click handler
+    // special-case data-act="sound".
+    tilesHtml += '<button class="a11y-tile" type="button" role="switch" aria-checked="false" data-act="sound">' +
+      svg('sound') + '<span>' + esc(d.sound) + '</span></button>';
     var contrastHtml = CONTRASTS.map(function (c) {
       return '<button class="a11y-cbtn" type="button" role="radio" aria-checked="false" data-act="contrast" data-val="' + c.v + '">' +
         '<span class="sw" aria-hidden="true"></span><span>' + esc(d[c.k]) + '</span></button>';
@@ -421,6 +433,10 @@
     panel.querySelectorAll('[data-act="toggle"]').forEach(function (b) {
       b.setAttribute('aria-checked', state[b.getAttribute('data-key')] ? 'true' : 'false');
     });
+    // Sound tile: checked = notification sounds are ON. State is owned by the
+    // notify-sound module; default to on if it hasn't loaded yet.
+    var sb = panel.querySelector('[data-act="sound"]');
+    if (sb) sb.setAttribute('aria-checked', (!window.KolkliSound || window.KolkliSound.enabled()) ? 'true' : 'false');
   }
 
   // ============================================================
@@ -483,7 +499,8 @@
     else if (act === 'inc') { if (state.fontScale < ZOOMS.length - 1) state.fontScale++; }
     else if (act === 'toggle') { var k = el.getAttribute('data-key'); state[k] = !state[k]; }
     else if (act === 'contrast') { var v = el.getAttribute('data-val'); state.contrast = (state.contrast === v ? '' : v); }
-    else if (act === 'reset') { state = defaults(); }
+    else if (act === 'sound') { if (window.KolkliSound) { window.KolkliSound.toggle(); window.KolkliSound.success(); } paint(); return; }
+    else if (act === 'reset') { state = defaults(); if (window.KolkliSound) window.KolkliSound.setEnabled(true); }
     else if (act === 'statement') { openStatement(); return; }
     save(); apply(); paint();
   });

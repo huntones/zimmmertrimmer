@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — ממיר ארכיונים</title>
-<meta name="description" content="Bundle and convert any files into ZIP or GZIP archives right in your browser. Drop your files, pick a target format, and download. Private and fast — nothing leaves your machine.">
+<meta name="description" content="Drop your files, pick a target format, and download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -339,7 +339,7 @@
       dir:'rtl', langIco:'EN',
       kick:'ממירים · ממיר ארכיונים',
       pageTitle:'ארזו והמירו קבצים לארכיון',
-      pageSub:'גררו כל קובץ שתרצו, בחרו פורמט יעד — ZIP או GZIP — וקבלו ארכיון מוכן להורדה. ZIP מאגד את כל הקבצים לקובץ אחד, GZIP דוחס כל קובץ בנפרד. הכול מתבצע בדפדפן שלכם, שום קובץ לא עוזב את המחשב.',
+      pageSub:'גררו כל קובץ שתרצו, בחרו פורמט יעד — ZIP או GZIP — וקבלו ארכיון מוכן להורדה. ZIP מאגד את כל הקבצים לקובץ אחד, GZIP דוחס כל קובץ בנפרד. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קבצים או תיקיות לכאן', or2:'או', choose:'הוספת קבצים', chooseFolder:'הוספת תיקייה',
       remove:'הסרה', totalLbl:'סה״כ', optTitle:'הגדרות ארכיון',
       fmtLbl:'פורמט יעד',
@@ -350,8 +350,8 @@
       download:'הורדה', dlAll:'הורדת הכול', againBtn:'ארכיון נוסף',
       combinedFile:'archive',
       failed:'הארכוב נכשל עבור קובץ זה',
-      seam:'ZIP ו-GZIP נבנים במלואם כאן בדפדפן, ממש עכשיו. TAR‏, 7Z ו-RAR מתחברים עם מנוע השרת — הקבצים תמיד נשארים אצלכם.',
-      foot:'KOLKLI · ממיר ארכיונים · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · ממיר ארכיונים · מהיר, פשוט ובאיכות מקצועית',
       errNone:'הוסיפו לפחות קובץ אחד לארכוב',
       errLibs:'ספריית הארכוב לא נטענה. בדקו את החיבור לאינטרנט ורעננו את העמוד.',
       errFail:'הארכוב נכשל. נסו שוב.',
@@ -361,7 +361,7 @@
       dir:'ltr', langIco:'עב',
       kick:'Converters · Archive Converter',
       pageTitle:'Bundle and convert files into archives',
-      pageSub:'Drop any files, pick a target format — ZIP or GZIP — and get a ready-to-download archive. ZIP bundles everything into one file; GZIP compresses each file separately. Everything runs in your browser; nothing leaves your machine.',
+      pageSub:'Drop any files, pick a target format — ZIP or GZIP — and get a ready-to-download archive. ZIP bundles everything into one file; GZIP compresses each file separately. Fast, simple and professional-quality.',
       dropBig:'Drag files or folders here', or2:'or', choose:'Choose files', chooseFolder:'Choose folder',
       remove:'Remove', totalLbl:'Total', optTitle:'Archive options',
       fmtLbl:'Target format',
@@ -372,8 +372,8 @@
       download:'Download', dlAll:'Download all', againBtn:'Archive more',
       combinedFile:'archive',
       failed:'Archiving failed for this file',
-      seam:'ZIP and GZIP are built entirely here in your browser, right now. TAR, 7Z and RAR connect with the server engine — your files always stay with you.',
-      foot:'KOLKLI · Archive converter · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Archive converter · Fast, simple and professional quality',
       errNone:'Add at least one file to archive',
       errLibs:'The archiving library failed to load. Check your connection and refresh.',
       errFail:'Archiving failed. Try again.',
@@ -383,7 +383,7 @@
       dir:'ltr',
       kick:'Конвертеры · Конвертер архивов',
       pageTitle:'Упакуйте и конвертируйте файлы в архивы',
-      pageSub:'Перетащите любые файлы, выберите целевой формат — ZIP или GZIP — и получите готовый к скачиванию архив. ZIP объединяет всё в один файл; GZIP сжимает каждый файл отдельно. Всё работает в вашем браузере; ничего не покидает устройство.',
+      pageSub:'Перетащите любые файлы, выберите целевой формат — ZIP или GZIP — и получите готовый к скачиванию архив. ZIP объединяет всё в один файл; GZIP сжимает каждый файл отдельно. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите файлы или папки сюда', or2:'или', choose:'Выбрать файлы', chooseFolder:'Выбрать папку',
       remove:'Удалить', totalLbl:'Всего', optTitle:'Параметры архива',
       fmtLbl:'Целевой формат',
@@ -394,8 +394,8 @@
       download:'Скачать', dlAll:'Скачать всё', againBtn:'Ещё архив',
       combinedFile:'archive',
       failed:'Не удалось заархивировать этот файл',
-      seam:'ZIP и GZIP создаются полностью здесь, в вашем браузере, прямо сейчас. TAR, 7Z и RAR подключаются к серверному движку — ваши файлы всегда остаются у вас.',
-      foot:'KOLKLI · Конвертер архивов · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Конвертер архивов · Быстро, просто и профессионального качества',
       errNone:'Добавьте хотя бы один файл для архивации',
       errLibs:'Не удалось загрузить библиотеку архивации. Проверьте соединение и обновите страницу.',
       errFail:'Архивация не удалась. Попробуйте ещё раз.',

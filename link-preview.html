@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — תצוגה מקדימה לקישור</title>
-<meta name="description" content="Compose and preview how your link looks when shared on Facebook, X/Twitter, LinkedIn, WhatsApp and Google. Generate copy-ready Open Graph and Twitter Card meta tags — all in your browser.">
+<meta name="description" content="Compose and preview how your link looks when shared on Facebook, X/Twitter, LinkedIn, WhatsApp and Google. Generate copy-ready Open Graph and Twitter Card meta tags. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -393,7 +393,7 @@
       dir:'rtl', langIco:'EN',
       kick:'שיווק · תצוגה מקדימה לקישור',
       pageTitle:'תצוגה מקדימה לקישור ותגי OG',
-      pageSub:'הרכיבו איך הקישור שלכם ייראה כשמשתפים אותו ברשתות — פייסבוק, X, לינקדאין, וואטסאפ וגוגל — וקבלו תגי Open Graph מוכנים להעתקה. הכול רץ בדפדפן שלכם, בלי לשלוח דבר לשרת.',
+      pageSub:'הרכיבו איך הקישור שלכם ייראה כשמשתפים אותו ברשתות — פייסבוק, X, לינקדאין, וואטסאפ וגוגל — וקבלו תגי Open Graph מוכנים להעתקה. מהיר, פשוט ובאיכות מקצועית.',
       formTitle:'פרטי הקישור',
       formSub:'מלאו את השדות והתצוגות מתעדכנות בזמן אמת.',
       urlLbl:'כתובת הקישור (URL)',
@@ -411,21 +411,21 @@
       waLbl:'וואטסאפ / טלגרם',
       ggLbl:'תוצאת חיפוש בגוגל',
       seam:'אי אפשר למשוך תגי מטא מכתובת חיצונית מדפדפן (חסימת CORS), ולכן זהו מרכיב תצוגה — אתם מזינים את הערכים ורואים תצוגה נאמנה. הפלטפורמות עשויות לחתוך טקסט או להשתמש בממטמון, אז ראו בזה קירוב.',
-      foot:'KOLKLI · תצוגה מקדימה לקישור · מרכיב תגי OG, ישירות בדפדפן',
+      foot:'KOLKLI · תצוגה מקדימה לקישור. מהיר, פשוט ובאיכות מקצועית.',
       copied:'התגים הועתקו ✓',
       copiedEmpty:'אין מה להעתיק עדיין',
       noTitle:'הכותרת שלכם תופיע כאן',
       noDesc:'התיאור שלכם יופיע כאן — כמה מילים שמסבירות על מה הדף.',
       hintG:'לגוגל', hintS:'לרשתות',
-      s_title:'שירותי הקבצים של KOLKLI — הכול בדפדפן',
-      s_desc:'המירו, כווצו וחתכו קבצים ישירות בדפדפן. פרטי, מהיר, בלי העלאות לשרת.',
+      s_title:'שירותי הקבצים של KOLKLI — מהיר ופשוט',
+      s_desc:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
       s_site:'KOLKLI',
     },
     en:{
       dir:'ltr', langIco:'עב',
       kick:'Marketing · Link Preview',
       pageTitle:'Link Preview & OG Tags',
-      pageSub:'Compose how your link looks when shared across Facebook, X, LinkedIn, WhatsApp and Google — and get copy-ready Open Graph tags. Everything runs in your browser, nothing is sent to a server.',
+      pageSub:'Compose how your link looks when shared across Facebook, X, LinkedIn, WhatsApp and Google — and get copy-ready Open Graph tags. Fast, simple and professional-quality.',
       formTitle:'Link details',
       formSub:'Fill in the fields and the previews update live.',
       urlLbl:'Link URL',
@@ -443,21 +443,21 @@
       waLbl:'WhatsApp / Telegram',
       ggLbl:'Google search result',
       seam:'A browser cannot fetch meta tags from a remote URL (CORS blocks it), so this is a composer — you type the values and see a faithful preview. Real platforms may truncate text or use a cache, so treat this as a close approximation.',
-      foot:'KOLKLI · Link Preview · OG tag composer, right in your browser',
+      foot:'KOLKLI · Link Preview. Fast, simple and professional-quality.',
       copied:'Tags copied ✓',
       copiedEmpty:'Nothing to copy yet',
       noTitle:'Your title appears here',
       noDesc:'Your description appears here — a line that explains what the page is about.',
       hintG:'Google', hintS:'Social',
-      s_title:'KOLKLI file tools — all in your browser',
-      s_desc:'Convert, compress and cut files right in your browser. Private, fast, no uploads.',
+      s_title:'KOLKLI file tools — fast & simple',
+      s_desc:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
       s_site:'KOLKLI',
     },
     ru:{
       dir:'ltr',
       kick:'Маркетинг · Превью ссылки',
       pageTitle:'Превью ссылки и OG-теги',
-      pageSub:'Соберите, как ваша ссылка выглядит при публикации в Facebook, X, LinkedIn, WhatsApp и Google, и получите готовые к копированию теги Open Graph. Всё работает в браузере, ничего не отправляется на сервер.',
+      pageSub:'Соберите, как ваша ссылка выглядит при публикации в Facebook, X, LinkedIn, WhatsApp и Google, и получите готовые к копированию теги Open Graph. Быстро, просто и профессионального качества.',
       formTitle:'Данные ссылки',
       formSub:'Заполните поля — превью обновляются в реальном времени.',
       urlLbl:'URL ссылки',
@@ -475,14 +475,14 @@
       waLbl:'WhatsApp / Telegram',
       ggLbl:'Результат поиска Google',
       seam:'Браузер не может получить мета-теги с внешнего URL (блокирует CORS), поэтому это конструктор — вы вводите значения и видите точное превью. Реальные платформы могут обрезать текст или использовать кэш, так что это приближение.',
-      foot:'KOLKLI · Превью ссылки · Конструктор OG-тегов, прямо в браузере',
+      foot:'KOLKLI · Превью ссылки. Быстро, просто и профессионального качества.',
       copied:'Теги скопированы ✓',
       copiedEmpty:'Пока нечего копировать',
       noTitle:'Здесь появится ваш заголовок',
       noDesc:'Здесь появится ваше описание — строка о том, чему посвящена страница.',
       hintG:'Google', hintS:'Соцсети',
-      s_title:'Файловые инструменты KOLKLI — всё в браузере',
-      s_desc:'Конвертируйте, сжимайте и обрезайте файлы прямо в браузере. Приватно, быстро, без загрузок.',
+      s_title:'Файловые инструменты KOLKLI — быстро и просто',
+      s_desc:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
       s_site:'KOLKLI',
     },
   };

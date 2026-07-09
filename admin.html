@@ -57,7 +57,7 @@
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
 
-  .admin-wrap{max-width:1100px;margin:0 auto;padding:22px 22px 60px;}
+  .admin-wrap{width:100%;max-width:none;margin:0 auto;padding:22px 22px 60px;}
 
   /* ---------- header row ---------- */
   .ahead{display:flex;align-items:center;gap:16px;margin:2px 0 22px;flex-wrap:wrap;}
@@ -204,7 +204,7 @@
       title:'ניהול מערכת', tag:'אדמין',
       sub:'ניהול משתמשים, חבילות והרשאות — פאנל האדמין של KOLKLI.',
       back:'חזרה לדשבורד',
-      statTotal:'סה״כ משתמשים', statFree:'חינם (Free)', statLite:'Lite', statPro:'Pro', statBusiness:'Business', statAdmins:'אדמינים',
+      statTotal:'סה״כ משתמשים', statFree:'חינם (Free)', statCreator:'Creator', statStudio:'Studio', statAdmins:'אדמינים',
       usersTitle:'משתמשים', usersSub:'כל המשתמשים הרשומים. החבילה מוצגת לקריאה בלבד; אפשר להעניק/לשלול הרשאת אדמין או למחוק.',
       searchPh:'חיפוש לפי שם או אימייל…',
       thUser:'משתמש', thJoined:'הצטרפ/ה', thPlan:'חבילה', thRole:'הרשאה', thActions:'פעולות',
@@ -221,7 +221,7 @@
       title:'Admin panel', tag:'Admin',
       sub:'Manage users, plans and permissions — the KOLKLI admin panel.',
       back:'Back to dashboard',
-      statTotal:'Total users', statFree:'Free', statLite:'Lite', statPro:'Pro', statBusiness:'Business', statAdmins:'Admins',
+      statTotal:'Total users', statFree:'Free', statCreator:'Creator', statStudio:'Studio', statAdmins:'Admins',
       usersTitle:'Users', usersSub:'Everyone registered. Plans are read-only here; grant or revoke admin, or remove a user.',
       searchPh:'Search by name or email…',
       thUser:'User', thJoined:'Joined', thPlan:'Plan', thRole:'Role', thActions:'Actions',
@@ -238,7 +238,7 @@
       title:'Админ-панель', tag:'Админ',
       sub:'Управление пользователями, планами и правами — админ-панель KOLKLI.',
       back:'Назад в кабинет',
-      statTotal:'Всего пользователей', statFree:'Free', statLite:'Lite', statPro:'Pro', statBusiness:'Business', statAdmins:'Админы',
+      statTotal:'Всего пользователей', statFree:'Free', statCreator:'Creator', statStudio:'Studio', statAdmins:'Админы',
       usersTitle:'Пользователи', usersSub:'Все зарегистрированные. Планы здесь только для чтения; выдавайте или отзывайте админ-права, удаляйте.',
       searchPh:'Поиск по имени или почте…',
       thUser:'Пользователь', thJoined:'Регистрация', thPlan:'План', thRole:'Роль', thActions:'Действия',
@@ -282,13 +282,13 @@
   function loadUsers(){ try{ return JSON.parse(lsGet(USERS_KEY))||[]; }catch(e){ return []; } }
   function saveUsers(u){ lsSet(USERS_KEY, JSON.stringify(u)); }
 
-  var PLAN_ORDER=['free','lite','pro','business'];
-  var PLAN_NAME={ free:'Free', lite:'Lite', pro:'Pro', business:'Business' };
+  var PLAN_ORDER=['free','creator','studio'];
+  var PLAN_NAME={ free:'Free', creator:'Creator', studio:'Studio' };
 
   function sessionEmail(){ return (lsGet(SESSION_KEY)||'').toLowerCase(); }
   function isBootstrap(email){ return ADMIN_EMAILS.indexOf((email||'').toLowerCase())>-1; }
   function isAdminUser(u){ return !!u && (isBootstrap(u.email) || u.role==='admin'); }
-  function userPlan(u){ var p=u&&u.plan; return (p==='lite'||p==='pro'||p==='business')?p:'free'; }
+  function userPlan(u){ var p=(u&&u.plan||'').toLowerCase(); if(p==='lite')return 'creator'; if(p==='pro'||p==='business')return 'studio'; return PLAN_NAME[p]?p:'free'; }
   function currentIsAdmin(){
     var e=sessionEmail();
     if(!e) return false;
@@ -367,14 +367,13 @@
   }
   function renderStats(){
     var users=loadUsers();
-    var c={ free:0, lite:0, pro:0, business:0, admins:0 };
+    var c={ free:0, creator:0, studio:0, admins:0 };
     users.forEach(function(u){ c[userPlan(u)]++; if(isAdminUser(u)) c.admins++; });
     el('astats').innerHTML =
       statCard('users', t.statTotal, users.length, true)+
-      statCard('zap',   t.statFree,  c.free)+
-      statCard('star',  t.statLite,  c.lite)+
-      statCard('crown', t.statPro,   c.pro)+
-      statCard('users', t.statBusiness, c.business)+
+      statCard('zap',   t.statFree,    c.free)+
+      statCard('star',  t.statCreator, c.creator)+
+      statCard('crown', t.statStudio,  c.studio)+
       statCard('shield',t.statAdmins,c.admins);
   }
 

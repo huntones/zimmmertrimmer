@@ -50,7 +50,7 @@
   body{zoom:1.25;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
     -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
-  .wrap{max-width:75%;margin:0 auto;padding:26px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 60px;}
   button{font-family:var(--sans);}
 
   /* ---------- header ---------- */
@@ -142,6 +142,24 @@
   .viewtoggle .vbtn svg{width:16px;height:16px;}
   .viewtoggle .vbtn:hover{color:var(--muted);}
   .viewtoggle .vbtn.on{background:var(--panel);color:var(--accent);box-shadow:var(--shadow-sm);}
+
+  /* ---------- internal-scroll window (step 1 file list + step 3 progress list) ---------- */
+  /* The list/grid/table scrolls inside a fixed-height window so the page itself
+     doesn't grow with hundreds of files; heads + foots stay pinned. */
+  .filescroll{max-height:min(58vh,600px);overflow-y:auto;overflow-x:auto;
+    scrollbar-gutter:stable;margin:0 -6px;padding:0 6px 4px;overscroll-behavior:contain;}
+  /* The window itself owns both scroll axes so the sticky header below can pin to
+     it; the inner .tblwrap must NOT be its own scroll box or it steals the sticky. */
+  .filescroll .tblwrap{overflow:visible;}
+  .filescroll::-webkit-scrollbar{width:11px;}
+  .filescroll::-webkit-scrollbar-track{background:transparent;}
+  .filescroll::-webkit-scrollbar-thumb{background-color:var(--line);border-radius:8px;
+    border:3px solid transparent;background-clip:content-box;}
+  .filescroll:hover::-webkit-scrollbar-thumb{background-color:var(--faint);}
+  /* Pin the column headers while the rows scroll inside the window. border-collapse
+     drops a sticky th's own border, so the divider is drawn with a box-shadow. */
+  .filescroll thead th{position:sticky;top:0;z-index:3;background:var(--panel);
+    box-shadow:inset 0 -1px 0 var(--line);}
 
   /* ---------- file grid (Dropbox-style) ---------- */
   .filegrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-top:4px;}
@@ -364,15 +382,171 @@
     .cardhead{margin-bottom:14px;}
   }
   @media (min-width:1500px){
-    .wrap{max-width:75%;}
+    .wrap{width:100%;max-width:none;}
   }
   #site-header{zoom:0.8;}
+
+  /* ===================== KOLKLI app-shell sidebar (right side, RTL) ===================== */
+  /* This page sets body{zoom:1.25}; the shared header cancels it with zoom:.8 to render 1:1.
+     The sidebar does the same, so its 260px column = 260 real px and lines up with the header.
+     Outer positioning uses PHYSICAL props (the page is always RTL) to avoid start/end confusion;
+     inner rows use flex + logical props so icons/text mirror correctly. */
+  .kside{position:fixed;top:0;right:0;bottom:0;width:260px;zoom:.8;
+    display:flex;flex-direction:column;background:var(--panel);
+    border-left:1px solid var(--line);            /* the edge facing the content */
+    padding:18px 16px;z-index:65;}
+
+  /* content clearance: reserve the right 260 real px for the sidebar.
+     #site-header is net-zoom 1.0 -> 260px; .wrap sits in body zoom 1.25 -> 260/1.25 = 208px.
+     .wrap ships as width:100% + margin:0 auto; we switch it to width:auto so the added
+     right margin actually shrinks the box (otherwise it over-constrains and jumps left in RTL). */
+  #site-header{margin-right:260px;}
+  .wrap{width:auto;margin-left:0;margin-right:208px;}
+
+  /* brand */
+  .kbrand{display:flex;align-items:center;padding:4px 6px 2px;margin-bottom:16px;}
+  .kbrand-logo{height:30px;width:auto;display:block;}
+
+  /* nav */
+  .knav{display:flex;flex-direction:column;gap:3px;}
+  .knav-item{display:flex;align-items:center;gap:13px;width:100%;padding:11px 12px;border:none;background:none;
+    cursor:pointer;border-radius:12px;font-family:var(--sans);font-size:14.5px;font-weight:650;
+    color:var(--ink-2);text-align:start;transition:background .13s,color .13s;}
+  .knav-item svg{width:21px;height:21px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.9;
+    stroke-linecap:round;stroke-linejoin:round;color:var(--muted);transition:color .13s;}
+  .knav-item:hover{background:var(--panel-2);color:var(--ink);}
+  .knav-item:hover svg{color:var(--ink-2);}
+  .knav-item.active{background:var(--accent-soft);color:var(--accent-dim);font-weight:750;}
+  .knav-item.active svg{color:var(--accent-dim);}
+  .knav-sep{height:1px;background:var(--line);margin:12px 6px;border:none;}
+
+  /* spacer pushes storage + user to the bottom */
+  .kspace{flex:1 1 auto;min-height:14px;}
+
+  /* storage card */
+  .kstore{display:flex;align-items:center;gap:13px;padding:13px;margin-bottom:12px;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:16px;}
+  .kstore-ring{width:52px;height:52px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;position:relative;
+    background:conic-gradient(var(--accent) calc(var(--p,0)*1%), var(--line) 0);}
+  .kstore-ring::before{content:'';position:absolute;inset:6px;border-radius:50%;background:var(--panel-2);}
+  .kstore-ring span{position:relative;font-family:var(--mono);font-size:12px;font-weight:800;color:var(--ink);}
+  .kstore-tx{min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .kstore-lbl{font-size:12px;font-weight:600;color:var(--muted);}
+  .kstore-val{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+  .kstore-val b{color:var(--accent-dim);}
+
+  /* upgrade button */
+  .kupg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-bottom:14px;padding:11px 14px;
+    border:none;cursor:pointer;color:#fff;font-family:var(--sans);font-weight:700;font-size:14px;border-radius:12px;
+    text-shadow:0 1px 2px rgba(0,0,0,.18);
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .kupg:hover{filter:brightness(1.05);} .kupg:active{transform:translateY(1px);}
+  .kupg svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* user card */
+  .kuser{display:flex;align-items:center;gap:11px;width:100%;padding:9px 8px;border:1px solid var(--line);
+    background:var(--panel);cursor:pointer;border-radius:14px;box-shadow:var(--shadow-sm);
+    transition:border-color .13s,background .13s;}
+  .kuser:hover{border-color:var(--accent);background:var(--panel-2);}
+  .kuser-av{width:38px;height:38px;flex-shrink:0;border-radius:50%;overflow:hidden;display:grid;place-items:center;
+    background:var(--grad);color:#fff;font-size:14px;font-weight:800;box-shadow:0 3px 9px var(--grad-shadow);}
+  .kuser-av img{width:100%;height:100%;object-fit:cover;}
+  .kuser-tx{min-width:0;flex:1;display:flex;flex-direction:column;text-align:start;}
+  .kuser-name{font-size:13.5px;font-weight:750;color:var(--ink);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .kuser-mail{font-size:11.5px;font-weight:550;color:var(--muted);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .kuser-chev{width:18px;height:18px;flex-shrink:0;color:var(--faint);stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* on narrower screens drop the rail and fall back to the shared header nav */
+  @media (max-width:1000px){
+    .kside{display:none;}
+    #site-header{margin-right:0;}
+    .wrap{margin-right:0;}
+  }
 </style>
 <link rel="stylesheet" href="./header.css">
 </head>
 <body>
 <div id="site-header"></div>
 <script src="./header.js"></script>
+
+<!-- ===================== KOLKLI sidebar (right side, RTL) ===================== -->
+<aside class="kside" aria-label="ניווט ראשי">
+
+  <div class="kbrand">
+    <img class="kbrand-logo" src="./assets/logo.png" alt="KOLKLI" width="139" height="34" decoding="async">
+  </div>
+
+  <nav class="knav">
+    <button class="knav-item" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+      <span>דשבורד</span>
+    </button>
+
+    <button class="knav-item" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg>
+      <span>שליחת קבצים</span>
+    </button>
+
+    <button class="knav-item active" type="button" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M4 13 6 5a1 1 0 0 1 1-.8h10a1 1 0 0 1 1 .8l2 8v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/></svg>
+      <span>בקשת קבצים</span>
+    </button>
+
+    <button class="knav-item" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-4 3.5V17H5a1 1 0 0 1-1-1Z"/><path d="m9.5 10 1.8 1.8L15 8"/></svg>
+      <span>משוב קבצים</span>
+    </button>
+
+    <button class="knav-item" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7a1 1 0 0 1 1-1h4l2 2h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/></svg>
+      <span>ארגון קבצים</span>
+    </button>
+
+    <button class="knav-item" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><circle cx="9" cy="7" r="2" fill="var(--panel)"/><circle cx="15" cy="12" r="2" fill="var(--panel)"/><circle cx="8" cy="17" r="2" fill="var(--panel)"/></svg>
+      <span>כלי מדיה</span>
+    </button>
+
+    <hr class="knav-sep">
+
+    <button class="knav-item" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16"/><path d="M9 9v11"/></svg>
+      <span>תבניות</span>
+    </button>
+
+    <button class="knav-item" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.5M12 18.5V21M4.2 7l2.2 1.3M17.6 15.7 19.8 17M4.2 17l2.2-1.3M17.6 8.3 19.8 7"/></svg>
+      <span>הגדרות</span>
+    </button>
+  </nav>
+
+  <div class="kspace"></div>
+
+  <div class="kstore">
+    <div class="kstore-ring" style="--p:41"><span>41%</span></div>
+    <div class="kstore-tx">
+      <span class="kstore-lbl">אחסון</span>
+      <span class="kstore-val">829 GB <b>/ 2 TB</b></span>
+    </div>
+  </div>
+
+  <button class="kupg" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
+    <span>שדרג חבילה</span>
+  </button>
+
+  <button class="kuser" type="button">
+    <span class="kuser-av">TZ</span>
+    <span class="kuser-tx">
+      <span class="kuser-name">Tal Zimmer</span>
+      <span class="kuser-mail">tal.zimmer@gmail.com</span>
+    </span>
+    <svg class="kuser-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+  </button>
+
+</aside>
+
 <div class="wrap">
 
   <!-- ============ intro ============ -->
@@ -387,7 +561,7 @@
   <div class="topbar">
     <h1 class="brand-h">AudioCut — Cut. Normalize. Perfect.</h1>
     <div class="toolbtns">
-      <a class="pillbtn" href="./files.html" title="ארגון קבצים">
+      <a class="pillbtn" href="./files.html" title="בחירת קבצים">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
         <span data-i18n="organize"></span>
       </a>
@@ -428,13 +602,15 @@
         </button>
         </div>
       </div>
-      <div class="tblwrap" id="listWrap"><table class="tbl">
-        <thead><tr>
-          <th data-i18n="colName"></th><th data-i18n="colDur"></th><th data-i18n="colSize"></th><th data-i18n="colFmt"></th><th data-i18n="colBpm"></th><th data-i18n="colKey"></th><th></th>
-        </tr></thead>
-        <tbody id="fileRows"></tbody>
-      </table></div>
-      <div class="filegrid hidden" id="fileGrid"></div>
+      <div class="filescroll" id="listScroll">
+        <div class="tblwrap" id="listWrap"><table class="tbl">
+          <thead><tr>
+            <th data-i18n="colName"></th><th data-i18n="colDur"></th><th data-i18n="colSize"></th><th data-i18n="colFmt"></th><th data-i18n="colBpm"></th><th data-i18n="colKey"></th><th></th>
+          </tr></thead>
+          <tbody id="fileRows"></tbody>
+        </table></div>
+        <div class="filegrid hidden" id="fileGrid"></div>
+      </div>
       <div class="listfoot" id="listFoot"></div>
     </div>
   </section>
@@ -575,12 +751,14 @@
       <div class="top" style="margin-top:8px;margin-bottom:0;"><span id="doneLabel"></span><span></span></div>
     </div>
 
-    <div class="tblwrap"><table class="prtbl hidden" id="prTable">
-      <thead><tr>
-        <th data-i18n="colName"></th><th data-i18n="colStatus"></th><th data-i18n="colProg"></th><th data-i18n="colOut"></th><th></th>
-      </tr></thead>
-      <tbody id="prRows"></tbody>
-    </table></div>
+    <div class="filescroll" id="prScroll">
+      <div class="tblwrap"><table class="prtbl hidden" id="prTable">
+        <thead><tr>
+          <th data-i18n="colName"></th><th data-i18n="colStatus"></th><th data-i18n="colProg"></th><th data-i18n="colOut"></th><th></th>
+        </tr></thead>
+        <tbody id="prRows"></tbody>
+      </table></div>
+    </div>
     <div id="emptyProg" class="listfoot" style="justify-content:center;"><span data-i18n="noRun"></span></div>
 
     <div class="prfoot">
@@ -638,7 +816,7 @@
 
   const I18N = {
     he: {
-      dir:'rtl', langIco:'EN', help:'עזרה', organize:'ארגון קבצים',
+      dir:'rtl', langIco:'EN', help:'עזרה', organize:'בחירת קבצים',
       introTitle:'חותך אודיו',
       introP1:'העלו שיר אחד או כמה קבצי אודיו, והכינו אותם במהירות לשימוש אחיד ומקצועי.',
       introP2:'הכלי מזהה באופן אוטומטי את ה־BPM ואת הסולם המוזיקלי של כל שיר, מאפשר לחתוך אותו לאורך הרצוי - 15, 20, 30, 45, 60 או 90 שניות ולהחיל עוצמת שמע אחידה על כל הקבצים.',
@@ -668,7 +846,7 @@
       doneLabel:(d,n)=>`הושלמו ${d} מתוך ${n}`, noRun:'עדיין לא הופעל עיבוד',
       restart:'נקה הכל והתחל מחדש', dlAll:'הורד הכל (ZIP)',
       stQueued:'בתור', stProcessing:'מעבד', stDone:'הושלם', stSkip:'דולג', stError:'שגיאה',
-      footer:'כל העיבוד מתבצע במחשב שלך · שום קובץ לא עולה לאינטרנט',
+      footer:'כל העיבוד מתבצע במחשב שלך. מהיר, פשוט ובאיכות מקצועית.',
       engineLoading:'טוען מנוע…', engineReady:'המנוע מוכן', engineWorking:'עובד…', engineFailed:'טעינת המנוע נכשלה',
       errNoEngine:'שגיאה: לא ניתן לטעון את מנוע האודיו. ודאו שתיקיית vendor/ קיימת.',
       errFileProto:'נפתח כקובץ מקומי — הדפדפן חוסם את המנוע. הריצו דרך start.bat או שרת מקומי.',
@@ -677,7 +855,7 @@
       confirmClearBody:'כל הקבצים שהעלית יימחקו מהרשימה. לא ניתן לבטל פעולה זו.',
       confirmYes:'כן, מחק', confirmNo:'לא',
       helpBody1:'גררו קבצי אודיו, בחרו אורך קטע ורמת עוצמה (LUFS), ולחצו "התחל לעבד". הכלי חותך קטע בכל שיר ומאזן את כולם לאותה עוצמה — בדיוק כמו MP3Gain.',
-      helpBody2:'הכול רץ מקומית בדפדפן דרך ffmpeg. שום קובץ לא עולה לאינטרנט. בסוף אפשר להוריד כל קובץ בנפרד או את כולם כ‑ZIP אחד.',
+      helpBody2:'בסוף אפשר להוריד כל קובץ בנפרד או את כולם כ‑ZIP אחד. מהיר, פשוט ובאיכות מקצועית.',
     },
     en: {
       dir:'ltr', langIco:'עב', help:'Help', organize:'Organize',
@@ -710,7 +888,7 @@
       doneLabel:(d,n)=>`${d} of ${n} done`, noRun:'No run yet',
       restart:'Clear all & restart', dlAll:'Download all (ZIP)',
       stQueued:'Queued', stProcessing:'Processing', stDone:'Done', stSkip:'Skipped', stError:'Error',
-      footer:'All processing happens on your machine · nothing is uploaded',
+      footer:'Fast, simple and professional-quality.',
       engineLoading:'Loading engine…', engineReady:'Engine ready', engineWorking:'Working…', engineFailed:'Engine failed to load',
       errNoEngine:'ERROR: could not load the audio engine. Make sure the vendor/ folder exists.',
       errFileProto:'Opened as a local file — the browser blocks the engine. Run via start.bat or a local server.',
@@ -719,7 +897,7 @@
       confirmClearBody:'All uploaded files will be removed from the list. This can’t be undone.',
       confirmYes:'Yes, delete', confirmNo:'No',
       helpBody1:'Drop audio files, pick a clip length and loudness (LUFS), then click "Start processing". It cuts a clip from each song and balances them all to the same loudness — just like MP3Gain.',
-      helpBody2:'Everything runs locally in your browser via ffmpeg. No file is ever uploaded. When done, download each file or all of them as one ZIP.',
+      helpBody2:'When done, download each file or all of them as one ZIP. Fast, simple and professional-quality.',
     },
     ru:{
       dir:'ltr',
@@ -753,7 +931,7 @@
       doneLabel:(d,n)=>`${d} из ${n} готово`, noRun:'Ещё не запускалось',
       restart:'Очистить и начать заново', dlAll:'Скачать всё (ZIP)',
       stQueued:'В очереди', stProcessing:'Обработка', stDone:'Готово', stSkip:'Пропущено', stError:'Ошибка',
-      footer:'Вся обработка идёт на вашем устройстве · ничего не загружается',
+      footer:'Вся обработка идёт на вашем устройстве. Быстро, просто и профессионального качества.',
       engineLoading:'Загрузка движка…', engineReady:'Движок готов', engineWorking:'Работа…', engineFailed:'Не удалось загрузить движок',
       errNoEngine:'ОШИБКА: не удалось загрузить аудиодвижок. Убедитесь, что папка vendor/ существует.',
       errFileProto:'Открыто как локальный файл — браузер блокирует движок. Запустите через start.bat или локальный сервер.',
@@ -762,7 +940,7 @@
       confirmClearBody:'Все загруженные файлы будут удалены из списка. Это нельзя отменить.',
       confirmYes:'Да, удалить', confirmNo:'Нет',
       helpBody1:'Перетащите аудиофайлы, выберите длину фрагмента и громкость (LUFS), затем нажмите «Начать обработку». Он вырезает фрагмент из каждой песни и выравнивает их все к одной громкости — как MP3Gain.',
-      helpBody2:'Всё работает локально в вашем браузере через ffmpeg. Ни один файл не загружается. По завершении скачайте каждый файл или все сразу в одном ZIP.',
+      helpBody2:'По завершении скачайте каждый файл или все сразу в одном ZIP. Быстро, просто и профессионального качества.',
     },
   };
 
@@ -789,7 +967,7 @@
   const $ = (sel,root=document) => root.querySelector(sel);
 
   // ---- state ----
-  let ffmpeg=null, ready=false, busy=false, encoding=false, currentItem=null;
+  let ffmpeg=null, ready=false, busy=false, encoding=false, zipBusy=false, currentItem=null;
   let lang='he', t=I18N.he;
   let items=[]; // {file,name,ext,size,dur,status,prog,out}
   let settings={ clip:60, start:'random', lufs:'-14', preset:'none', fmt:'mp3', br:'320', nameMode:'prefix', suffix:'60s_normal_' };
@@ -803,6 +981,7 @@
 
   // ---- i18n ----
   function applyLang(l){
+    if(!I18N[l]) l='en';
     lang=l; t=I18N[l];
     document.documentElement.lang=l; document.documentElement.dir=t.dir;
     document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
@@ -812,6 +991,14 @@
     else el('engineText').textContent = t.engineLoading;
     startBtn_updateLabel();
     renderList(); renderProgress(); updateTotals(); renderPreviewFiles();
+  }
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(I18N[chosen]) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
   }
 
   // ---- file list ----
@@ -1053,6 +1240,13 @@
 
   // analysis (BPM + key) is still pending if any file hasn't settled to done/error
   function analysisPending(){ return items.some(it=> it.astatus!=='done' && it.astatus!=='error'); }
+  function activeProcessPending(){ return busy || encoding || zipBusy || aBusy || aQueue.length>0 || analysisPending(); }
+  window.addEventListener('beforeunload',e=>{
+    if(!activeProcessPending()) return;
+    e.preventDefault();
+    e.returnValue='';
+    return '';
+  });
   function startBtn_updateLabel(){
     const span=$('#startBtn span'); if(!span) return;
     if(busy) span.textContent=t.processing;
@@ -1263,17 +1457,25 @@
   // ---- downloads ----
   function triggerDownload(url,name){ const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); }
   async function downloadZip(){
+    if(zipBusy) return;
     const outs=items.filter(it=>it.out);
     if(!outs.length) return;
     if(typeof JSZip==='undefined'){ outs.forEach((o,i)=>setTimeout(()=>triggerDownload(o.out.url,o.out.name),i*300)); return; }
     const btn=el('dlAll'); const prev=btn.innerHTML; btn.disabled=true;
-    const zip=new JSZip();
-    outs.forEach(it=>zip.file(it.out.name,it.out.blob));
-    const blob=await zip.generateAsync({type:'blob'});
-    const url=URL.createObjectURL(blob);
-    triggerDownload(url,`AudioCut_${outs.length}_files.zip`);
-    setTimeout(()=>URL.revokeObjectURL(url),4000);
-    btn.innerHTML=prev; btn.disabled=false;
+    zipBusy=true;
+    try{
+      const zip=new JSZip();
+      outs.forEach(it=>zip.file(it.out.name,it.out.blob));
+      const blob=await zip.generateAsync({type:'blob'});
+      const url=URL.createObjectURL(blob);
+      triggerDownload(url,`AudioCut_${outs.length}_files.zip`);
+      setTimeout(()=>URL.revokeObjectURL(url),4000);
+    }catch(err){
+      console.error(err);
+    }finally{
+      zipBusy=false;
+      btn.innerHTML=prev; btn.disabled=false;
+    }
   }
 
   function clearAll(){
@@ -1537,9 +1739,23 @@
   buildWave();
   let savedView='list'; try{ savedView=localStorage.getItem('ac_view')||'list'; }catch(_){}
   setView(savedView);
-  applyLang('he');
+  applyLang(detectLang());
   loadEngine();
 })();
+</script>
+
+<!-- sidebar: click a nav item to move the active state (wire real hrefs later) -->
+<script>
+  document.querySelectorAll('.kside .knav-item').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.kside .knav-item.active').forEach(function (a) {
+        a.classList.remove('active');
+        a.removeAttribute('aria-current');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-current', 'page');
+    });
+  });
 </script>
 </body>
 </html>

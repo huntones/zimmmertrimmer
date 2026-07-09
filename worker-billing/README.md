@@ -25,6 +25,10 @@ paid plan (Lite / Pro / Business). Copy each Price id (`price_…`) into
 PLAN_PRICES = '{"lite":"price_XXX","pro":"price_YYY","business":"price_ZZZ"}'
 ```
 
+The Worker also keeps the built-in promotion code `Kolkli2026` active in
+Stripe Checkout: 100% off the first subscription invoice for Lite, Pro and
+Business, redeemable through August 31, 2026 (Israel time).
+
 ## 2. Secrets
 ```bash
 npx wrangler secret put STRIPE_SECRET_KEY          # sk_live_… / sk_test_…
@@ -62,7 +66,7 @@ Checkout / the Billing Portal. Until it's set, they fall back to the
 ## Endpoints
 | Route | Auth | Body | Returns |
 |---|---|---|---|
-| `POST /checkout` | JWT + owner/admin | `{orgId, plan, seats}` | `{ url }` (redirect to Stripe) |
+| `POST /checkout` | JWT + owner/admin | `{orgId, plan, seats, promoCode?}` | `{ url }` (redirect to Stripe) |
 | `POST /portal`   | JWT + owner/admin | `{orgId}` | `{ url }` (manage/cancel) |
 | `POST /webhook`  | Stripe signature | (Stripe event) | `ok` |
 | `GET  /health`   | — | — | `{ ok: true }` |

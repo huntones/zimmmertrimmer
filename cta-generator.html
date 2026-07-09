@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחולל CTA</title>
-<meta name="description" content="Generate high-converting call-to-action button text for any goal — purchase, leads, downloads, sign-ups and more. Curated phrase banks in Hebrew, English and Russian, with a live button preview and copyable HTML. 100% in your browser.">
+<meta name="description" content="Generate high-converting call-to-action button text for any goal — purchase, leads, downloads, sign-ups and more. Curated phrase banks in Hebrew, English and Russian, with a live button preview and copyable HTML. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -145,7 +145,7 @@
 
   .swatch{display:flex;gap:8px;align-items:center;}
   .swatch input[type=color]{width:38px;height:34px;padding:0;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);cursor:pointer;}
-  .swatch .inp{flex:1;font-family:var(--mono);text-transform:uppercase;}
+  .swatch .inp{flex:1;font-family:var(--mono);text-transform:uppercase;direction:ltr;}
 
   .copyhtml{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
@@ -275,7 +275,7 @@
       dir:'rtl', langIco:'EN',
       kick:'שיווק · מחולל CTA',
       pageTitle:'מחוללו קריאות לפעולה שממירות',
-      pageSub:'בחרו את מטרת הכפתור, קבלו בנק ביטויים מוכנים בשלוש שפות, טענו כל אחד לתצוגה חיה ועצבו כפתור מוכן — עם קוד HTML מוכן להעתקה. הכול רץ אצלכם בדפדפן.',
+      pageSub:'בחרו את מטרת הכפתור, קבלו בנק ביטויים מוכנים בשלוש שפות, טענו כל אחד לתצוגה חיה ועצבו כפתור מוכן — עם קוד HTML מוכן להעתקה. מהיר, פשוט ובאיכות מקצועית.',
       goalTitle:'מה מטרת הכפתור?',
       offerLbl:'מילת מוצר / הצעה (רשות)',
       offerPh:'לדוגמה: קורס, מנוי, ספר…',
@@ -297,15 +297,15 @@
       charsLbl:n=>`${n} תווים`,
       tplBadge:'מותאם',
       chosen:'נטען לתצוגה ✓',
-      seam:'כל הביטויים והקוד נוצרים אצלכם בדפדפן — שום דבר לא נשלח לשרת. העתיקו את הביטוי או את קוד ה-HTML והדביקו באתר, בדף הנחיתה או בקמפיין.',
-      foot:'KOLKLI · מחולל CTA · טקסטים שממירים, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · מחולל CTA. מהיר, פשוט ובאיכות מקצועית.',
       copied:'הועתק ✓',
     },
     en:{
       dir:'ltr', langIco:'עב',
       kick:'Marketing · CTA Generator',
       pageTitle:'Generate calls to action that convert',
-      pageSub:'Pick your button goal, get a ready-made bank of phrases in three languages, load any one into a live preview and style a button — with copy-ready HTML. Everything runs in your browser.',
+      pageSub:'Pick your button goal, get a ready-made bank of phrases in three languages, load any one into a live preview and style a button — with copy-ready HTML. Fast, simple and professional-quality.',
       goalTitle:'What is the button for?',
       offerLbl:'Product / offer word (optional)',
       offerPh:'e.g. course, plan, ebook…',
@@ -327,15 +327,15 @@
       charsLbl:n=>`${n} chars`,
       tplBadge:'custom',
       chosen:'Loaded into preview ✓',
-      seam:'Every phrase and code snippet is built in your browser — nothing is sent to a server. Copy the phrase or the HTML and paste it into your site, landing page or campaign.',
-      foot:'KOLKLI · CTA Generator · Copy that converts, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · CTA Generator. Fast, simple and professional-quality.',
       copied:'Copied ✓',
     },
     ru:{
       dir:'ltr',
       kick:'Маркетинг · Генератор CTA',
       pageTitle:'Создавайте призывы к действию, которые конвертируют',
-      pageSub:'Выберите цель кнопки, получите готовый банк фраз на трёх языках, загрузите любую в живой превью и оформите кнопку — с готовым HTML-кодом. Всё работает в вашем браузере.',
+      pageSub:'Выберите цель кнопки, получите готовый банк фраз на трёх языках, загрузите любую в живой превью и оформите кнопку — с готовым HTML-кодом. Быстро, просто и профессионального качества.',
       goalTitle:'Для чего кнопка?',
       offerLbl:'Слово продукта / предложения (необязательно)',
       offerPh:'напр.: курс, подписка, книга…',
@@ -357,8 +357,8 @@
       charsLbl:n=>`${n} симв.`,
       tplBadge:'своё',
       chosen:'Загружено в превью ✓',
-      seam:'Каждая фраза и фрагмент кода создаются в вашем браузере — ничего не отправляется на сервер. Скопируйте фразу или HTML и вставьте на сайт, лендинг или в кампанию.',
-      foot:'KOLKLI · Генератор CTA · Тексты, которые конвертируют, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Генератор CTA. Быстро, просто и профессионального качества.',
       copied:'Скопировано ✓',
     },
   };

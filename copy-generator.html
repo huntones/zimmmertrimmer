@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחולל קופי קצר</title>
-<meta name="description" content="Generate short marketing copy — headlines, ads, social posts and landing heroes — in Hebrew, English and Russian. Pick a tone and type, and get ready-to-use variations. 100% in your browser, nothing leaves your machine.">
+<meta name="description" content="Generate short marketing copy — headlines, ads, social posts and landing heroes — in Hebrew, English and Russian. Pick a tone and type, and get ready-to-use variations. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -256,7 +256,7 @@
       dir:'rtl', langIco:'EN',
       kick:'שיווק · מחולל קופי קצר',
       pageTitle:'מחולל קופי קצר',
-      pageSub:'הזינו שם מוצר, קהל ותועלת — ובחרו טון וסוג. המחולל מרכיב עבורכם כמה גרסאות קופי קצרות ומוכנות לשימוש: כותרות, מודעות, פוסטים ותיאורי דף נחיתה. הכול נבנה מקומית בדפדפן, בלי שום שליחה לשרת.',
+      pageSub:'הזינו שם מוצר, קהל ותועלת — ובחרו טון וסוג. המחולל מרכיב עבורכם כמה גרסאות קופי קצרות ומוכנות לשימוש: כותרות, מודעות, פוסטים ותיאורי דף נחיתה. מהיר, פשוט ובאיכות מקצועית.',
       formTitle:'הגדרות הקופי',
       productLbl:'שם המוצר או השירות',
       productPh:'לדוגמה: אפליקציית כושר, בית קפה שכונתי, קורס דיגיטלי',
@@ -272,8 +272,8 @@
       emptyBody:'מלאו את שם המוצר בצד ולחצו “הפקת קופי” כדי לקבל כמה גרסאות מוכנות.',
       copyOne:'העתקה', copiedOne:'הועתק', charsLbl:'תווים',
       errNoProduct:'צריך להזין שם מוצר או שירות כדי להתחיל',
-      seam:'המחולל עובד מהתבניות המובנות בעמוד בלבד — הטקסט מורכב מקומית בדפדפן, שום נתון לא נשלח לשרת ואין כאן שום קריאה לבינה מלאכותית חיצונית.',
-      foot:'KOLKLI · מחולל קופי קצר · טקסטים שיווקיים ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · מחולל קופי קצר. מהיר, פשוט ובאיכות מקצועית.',
       copied:'הועתק ✓', copiedAll:'כל הגרסאות הועתקו ✓',
       tones:{ professional:'מקצועי', friendly:'ידידותי', bold:'נועז', luxury:'יוקרתי', playful:'שובב' },
       types:{ headline:'כותרת', ad:'מודעה', social:'פוסט לרשת', hero:'דף נחיתה' },
@@ -284,7 +284,7 @@
       dir:'ltr', langIco:'עב',
       kick:'Marketing · Short Copy Generator',
       pageTitle:'Short Copy Generator',
-      pageSub:'Enter a product name, an audience and a benefit, then pick a tone and type. The generator assembles several short, ready-to-use copy variations — headlines, ads, social posts and landing heroes. Everything is built locally in your browser, with nothing sent to a server.',
+      pageSub:'Enter a product name, an audience and a benefit, then pick a tone and type. The generator assembles several short, ready-to-use copy variations — headlines, ads, social posts and landing heroes. Fast, simple and professional-quality.',
       formTitle:'Copy settings',
       productLbl:'Product or service name',
       productPh:'e.g. a fitness app, a neighborhood café, an online course',
@@ -300,8 +300,8 @@
       emptyBody:'Fill in the product name on the side and press “Generate copy” to get a set of ready-to-use variations.',
       copyOne:'Copy', copiedOne:'Copied', charsLbl:'chars',
       errNoProduct:'Enter a product or service name to get started',
-      seam:'The generator works only from the templates built into this page — copy is assembled locally in your browser, no data is sent to a server, and there is no external AI call involved.',
-      foot:'KOLKLI · Short Copy Generator · Marketing copy right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Short Copy Generator. Fast, simple and professional-quality.',
       copied:'Copied ✓', copiedAll:'All variations copied ✓',
       tones:{ professional:'Professional', friendly:'Friendly', bold:'Bold', luxury:'Luxury', playful:'Playful' },
       types:{ headline:'Headline', ad:'Ad', social:'Social post', hero:'Landing hero' },
@@ -311,7 +311,7 @@
       dir:'ltr',
       kick:'Маркетинг · Генератор коротких текстов',
       pageTitle:'Генератор коротких текстов',
-      pageSub:'Введите название продукта, аудиторию и выгоду, затем выберите тон и тип. Генератор соберёт несколько коротких готовых вариантов — заголовки, объявления, посты и тексты для лендинга. Всё создаётся локально в браузере, ничего не отправляется на сервер.',
+      pageSub:'Введите название продукта, аудиторию и выгоду, затем выберите тон и тип. Генератор соберёт несколько коротких готовых вариантов — заголовки, объявления, посты и тексты для лендинга. Быстро, просто и профессионального качества.',
       formTitle:'Настройки текста',
       productLbl:'Название продукта или услуги',
       productPh:'напр.: фитнес-приложение, районное кафе, онлайн-курс',
@@ -327,8 +327,8 @@
       emptyBody:'Заполните название продукта слева и нажмите «Создать текст», чтобы получить набор готовых вариантов.',
       copyOne:'Копировать', copiedOne:'Скопировано', charsLbl:'симв.',
       errNoProduct:'Введите название продукта или услуги, чтобы начать',
-      seam:'Генератор работает только на встроенных в страницу шаблонах — текст собирается локально в браузере, данные не отправляются на сервер и никакой внешний ИИ не вызывается.',
-      foot:'KOLKLI · Генератор коротких текстов · Маркетинговые тексты прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Генератор коротких текстов. Быстро, просто и профессионального качества.',
       copied:'Скопировано ✓', copiedAll:'Все варианты скопированы ✓',
       tones:{ professional:'Деловой', friendly:'Дружелюбный', bold:'Смелый', luxury:'Премиум', playful:'Игривый' },
       types:{ headline:'Заголовок', ad:'Объявление', social:'Пост', hero:'Лендинг' },

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — HEIC ל-JPG</title>
-<meta name="description" content="Convert iPhone HEIC / HEIF photos to JPG, PNG or WEBP right in your browser. Batch convert, pick quality, and download. Fast, private, nothing leaves your machine.">
+<meta name="description" content="Batch convert, pick quality, and download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -318,7 +318,7 @@
       dir:'rtl', langIco:'EN',
       kick:'תמונות · HEIC ל-JPG',
       pageTitle:'המירו תמונות HEIC של האייפון ל-JPG',
-      pageSub:'גררו קובצי HEIC / HEIF, בחרו פורמט ואיכות, וקבלו תמונות מוכנות להורדה. הכול מתבצע בדפדפן שלכם — שום תמונה לא עוזבת את המחשב.',
+      pageSub:'גררו קובצי HEIC / HEIF, בחרו פורמט ואיכות, וקבלו תמונות מוכנות להורדה. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובצי HEIC לכאן', or2:'או', choose:'בחרו קבצים',
       remove:'הסרה', totalLbl:'סה״כ', optTitle:'הגדרות המרה',
       fmtLbl:'פורמט יעד', qualityLbl:'איכות', qualityHint:'איכות גבוהה יותר = קובץ גדול יותר',
@@ -329,8 +329,8 @@
       download:'הורדה', origLbl:'מקור',
       unsupported:'פורמט לא נתמך', unsupHint:'צריך קובץ HEIC / HEIF',
       failed:'ההמרה נכשלה — ייתכן שהקובץ פגום',
-      seam:'הכול רץ מקומית בדפדפן — התמונות אף פעם לא נשלחות לשרת. פענוח ה-HEIC נעשה על ידי libheif המהודר ל-WebAssembly, ישירות אצלכם.',
-      foot:'KOLKLI · HEIC ל-JPG · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · HEIC ל-JPG · מהיר, פשוט ובאיכות מקצועית',
       errNoFiles:'צריך לצרף לפחות קובץ HEIC אחד', errDecode:'לא הצלחנו לפענח אף קובץ',
       errLib:'ספריית ההמרה לא נטענה. בדקו את החיבור ורעננו את העמוד.',
       copied:'הקישור הועתק ✓',
@@ -339,7 +339,7 @@
       dir:'ltr', langIco:'עב',
       kick:'Images · HEIC to JPG',
       pageTitle:'Convert iPhone HEIC photos to JPG',
-      pageSub:'Drop HEIC / HEIF files, pick a format and quality, and get ready-to-download images. Everything runs in your browser — no photo ever leaves your machine.',
+      pageSub:'Drop HEIC / HEIF files, pick a format and quality, and get ready-to-download images. Fast, simple and professional-quality.',
       dropBig:'Drag HEIC files here', or2:'or', choose:'Choose files',
       remove:'Remove', totalLbl:'Total', optTitle:'Convert options',
       fmtLbl:'Target format', qualityLbl:'Quality', qualityHint:'Higher quality = larger file',
@@ -350,8 +350,8 @@
       download:'Download', origLbl:'source',
       unsupported:'Unsupported format', unsupHint:'Needs a HEIC / HEIF file',
       failed:'Conversion failed — the file may be corrupt',
-      seam:'Everything runs locally in your browser — photos are never uploaded. HEIC decoding is handled by libheif compiled to WebAssembly, right on your machine.',
-      foot:'KOLKLI · HEIC to JPG · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · HEIC to JPG · Fast, simple and professional quality',
       errNoFiles:'Add at least one HEIC file', errDecode:'We could not decode any file',
       errLib:'The conversion library failed to load. Check your connection and refresh.',
       copied:'Link copied ✓',
@@ -360,7 +360,7 @@
       dir:'ltr',
       kick:'Изображения · HEIC в JPG',
       pageTitle:'Конвертируйте фото iPhone HEIC в JPG',
-      pageSub:'Перетащите файлы HEIC / HEIF, выберите формат и качество — и получите готовые к скачиванию изображения. Всё работает в вашем браузере — ни одно фото не покидает устройство.',
+      pageSub:'Перетащите файлы HEIC / HEIF, выберите формат и качество — и получите готовые к скачиванию изображения. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите файлы HEIC сюда', or2:'или', choose:'Выбрать файлы',
       remove:'Удалить', totalLbl:'Всего', optTitle:'Параметры конвертации',
       fmtLbl:'Целевой формат', qualityLbl:'Качество', qualityHint:'Выше качество = больше файл',
@@ -371,9 +371,9 @@
       download:'Скачать', origLbl:'оригинал',
       unsupported:'Неподдерживаемый формат', unsupHint:'Нужен файл HEIC / HEIF',
       failed:'Конвертация не удалась — файл может быть повреждён',
-      seam:'Всё работает локально в вашем браузере — фото никогда не загружаются. Декодирование HEIC выполняет libheif, скомпилированный в WebAssembly, прямо на вашем устройстве.',
-      foot:'KOLKLI · HEIC в JPG · Приватно и быстро, прямо в браузере',
-      errNoFiles:'Добавьте хотя бы один файл HEIC', errDecode:'Не удалось декодировать ни один файл',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · HEIC в JPG · Быстро, просто и профессионального качества',
+      errNoFiles:'Быстро, просто и профессионального качества.',
       errLib:'Не удалось загрузить библиотеку конвертации. Проверьте соединение и обновите страницу.',
       copied:'Ссылка скопирована ✓',
     },

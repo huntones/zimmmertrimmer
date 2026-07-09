@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — נורמליזציית עוצמה (LUFS)</title>
+<meta name="description" content="Batch loudness normalization — bring every track to the same perceived loudness (LUFS) with a true-peak limiter. EBU R128, two-pass. Fast, simple and professional-quality.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:66ch;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:2.5px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:16px;padding:52px 28px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:72px;height:72px;margin:0 auto 15px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:36px;height:36px;}
+  .drop .big{font-size:20px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:14px;color:var(--faint);margin:8px 0;font-family:var(--mono);}
+  .drop .picks{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:12px 26px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .choose.ghost{background:var(--panel);color:var(--ink-2);border:1px solid var(--line);text-shadow:none;
+    box-shadow:var(--shadow-sm);}
+  .drop .choose.ghost:hover{border-color:var(--accent);filter:none;}
+  .drop .choose svg{width:17px;height:17px;}
+  .drop .sizenote{margin-top:15px;font-size:13px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  .stack{display:none;}
+  .stack.show{display:block;}
+  .sect{margin-top:16px;padding:18px;}
+  .sect h3{font-size:15px;margin:0 0 4px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .sect h3 svg{width:17px;height:17px;color:var(--accent);}
+  .sect .hint{font-size:12.5px;color:var(--muted);margin:0 0 14px;}
+
+  /* settings */
+  .fld{margin-top:16px;}
+  .fld:first-of-type{margin-top:4px;}
+  .fld > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:8px;}
+  .fld .sub{font-weight:400;color:var(--faint);font-family:var(--mono);font-size:10.5px;}
+  .seg{display:flex;gap:9px;flex-wrap:wrap;}
+  .seg button{flex:1;min-width:120px;text-align:start;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+    background:var(--panel-2);cursor:pointer;transition:border-color .12s,background .12s,transform .08s;}
+  .seg button:hover{border-color:var(--accent);} .seg button:active{transform:scale(.99);}
+  .seg button.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
+  .seg button b{display:block;font-size:13.5px;color:var(--ink);}
+  .seg button small{font-size:10.5px;color:var(--faint);font-family:var(--mono);}
+  .seg button.on b{color:var(--accent-dim);}
+
+  .lufsrow{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-top:12px;}
+  .lufsrow .num{display:flex;flex-direction:column;gap:6px;}
+  .lufsrow .num span{font-size:11px;color:var(--muted);font-family:var(--mono);}
+  .lufsrow input[type=number]{width:110px;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    border-radius:10px;font-family:var(--mono);font-size:15px;font-weight:600;padding:9px 11px;}
+  .lufsrow input[type=number]:focus{outline:none;border-color:var(--accent);}
+
+  .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;
+    padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);}
+  .toggle .tg-txt b{font-size:13px;display:block;} .toggle .tg-txt small{font-size:10.5px;color:var(--faint);font-family:var(--mono);}
+  .sw{position:relative;width:42px;height:24px;flex-shrink:0;direction:ltr;}
+  .sw input{opacity:0;width:0;height:0;position:absolute;}
+  .sw .track{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:background .15s;cursor:pointer;}
+  .sw .track::before{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;
+    transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+  .sw input:checked + .track{background:var(--accent);}
+  .sw input:checked + .track::before{transform:translateX(18px);}
+
+  .qrow2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;}
+  @media (max-width:560px){ .qrow2{grid-template-columns:1fr;} .seg button{min-width:0;} }
+  .sel{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--mono);font-size:13px;padding:10px 11px;cursor:pointer;}
+  .sel:focus{outline:none;border-color:var(--accent);}
+  .sel:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* queue */
+  .qhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
+  .qhead .qcount{font-family:var(--mono);font-size:12px;color:var(--muted);}
+  .qhead .qclear{font-size:11.5px;color:var(--faint);background:none;border:none;cursor:pointer;font-family:var(--mono);}
+  .qhead .qclear:hover{color:var(--danger);}
+  .qlist{display:flex;flex-direction:column;gap:9px;}
+  .qi{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel-2);
+    position:relative;overflow:hidden;}
+  .qi .qbar{position:absolute;inset:0 auto 0 0;width:0;background:var(--grad-soft);opacity:.55;transition:width .2s ease;z-index:0;}
+  .qi > *{position:relative;z-index:1;}
+  .qi .qico{width:42px;height:42px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--grad-soft);color:var(--accent);}
+  .qi .qico svg{width:20px;height:20px;}
+  .qi .qn{flex:1;min-width:0;}
+  .qi .qn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .qi .qn .meta{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:3px;}
+  .qi .qn .meta em{font-style:normal;color:var(--ink-2);}
+  .qi .qn .lufs{font-family:var(--mono);font-size:11px;margin-top:4px;color:var(--muted);display:none;}
+  .qi.done .qn .lufs,.qi.skip .qn .lufs{display:block;}
+  .qi .qn .lufs b{color:var(--ink);font-weight:700;}
+  .gchip{display:inline-block;padding:1px 7px;border-radius:999px;font-weight:700;font-size:10.5px;margin-inline-start:4px;}
+  .gchip.up{background:var(--success-soft);color:var(--success-dim);}
+  .gchip.down{background:var(--info-soft);color:var(--info-dim);}
+  .gchip.flat{background:var(--line-2);color:var(--muted);}
+  .pill{flex-shrink:0;font-family:var(--mono);font-size:10.5px;font-weight:600;padding:4px 10px;border-radius:999px;
+    background:var(--line-2);color:var(--muted);white-space:nowrap;}
+  .pill.run{background:var(--accent-soft);color:var(--accent-dim);}
+  .pill.done{background:var(--success-soft);color:var(--success-dim);}
+  .pill.skip{background:var(--warm-soft);color:var(--warn);}
+  .pill.err{background:var(--danger-soft);color:var(--danger);}
+  .qdel{flex-shrink:0;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    color:var(--faint);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .12s,border-color .12s;}
+  .qdel:hover{color:var(--danger);border-color:var(--danger);}
+  .qdel svg{width:14px;height:14px;}
+
+  .gobtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:15px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:18px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .gobtn:hover{filter:brightness(1.05);} .gobtn:active{transform:translateY(1px);}
+  .gobtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .gobtn svg{width:18px;height:18px;}
+  .opterr{font-size:12px;color:var(--danger);margin-top:10px;min-height:15px;text-align:center;}
+  .rtnote{font-size:10.5px;color:var(--faint);font-family:var(--mono);text-align:center;margin-top:8px;line-height:1.5;}
+
+  /* progress */
+  .prog{padding:16px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;gap:10px;}
+  .prog .lbl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+  .bar.indet i{width:35%;animation:slide 1.1s ease-in-out infinite;}
+  @keyframes slide{0%{margin-left:-35%}100%{margin-left:100%}}
+  .prog .phase{margin-top:8px;font-family:var(--mono);font-size:10.5px;color:var(--faint);text-align:center;}
+
+  /* results */
+  .results{padding:22px;display:none;margin-top:18px;}
+  .results.show{display:block;}
+  .results .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .results .ok svg{width:28px;height:28px;}
+  .results h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .results .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+  .rlist{display:flex;flex-direction:column;gap:9px;margin-bottom:16px;}
+  .rrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel-2);}
+  .rrow.err{border-color:color-mix(in srgb,var(--danger) 40%,var(--line-2));}
+  .rrow .rico{width:46px;height:46px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .rrow.err .rico{background:var(--danger-soft);color:var(--danger);}
+  .rrow .rico svg{width:20px;height:20px;}
+  .rrow .rn{flex:1;min-width:0;}
+  .rrow .rn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rrow .rn .meta{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .rrow .meta em{font-style:normal;color:var(--success-dim);}
+  .dlbtn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);font-size:12px;font-weight:600;cursor:pointer;box-shadow:var(--shadow-sm);transition:border-color .12s;}
+  .dlbtn:hover{border-color:var(--accent);}
+  .dlbtn svg{width:14px;height:14px;}
+  .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .row2 button{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 button:hover{border-color:var(--accent);} .row2 button:active{transform:translateY(1px);}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .row2 svg{width:15px;height:15px;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="icon" type="image/png" href="./assets/logo.png">
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <!-- upload -->
+  <div id="composer">
+    <div class="drop" id="drop">
+      <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+      <div class="big" data-i18n="dropBig"></div>
+      <div class="or" data-i18n="or2"></div>
+      <div class="picks">
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <button class="choose ghost" type="button" id="chooseFolderBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span data-i18n="chooseFolder"></span>
+        </button>
+      </div>
+      <div class="sizenote" data-i18n="sizeNote"></div>
+    </div>
+    <input type="file" id="fileInput" multiple accept="audio/*,.mp3,.wav,.flac,.aac,.m4a,.ogg,.oga,.opus,.wma,.aiff,.aif">
+    <input type="file" id="folderInput" webkitdirectory directory multiple>
+
+    <!-- everything below appears once files are added -->
+    <div class="stack" id="stack">
+
+      <!-- queue -->
+      <div class="card sect" id="queueCard">
+        <div class="qhead">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span data-i18n="queueTitle"></span></h3>
+          <button class="qclear" id="qClear" type="button" data-i18n="qClear"></button>
+        </div>
+        <div class="qcount" id="qCount"></div>
+        <div class="qlist" id="qList"></div>
+      </div>
+
+      <!-- settings -->
+      <div class="card sect">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg><span data-i18n="setTitle"></span></h3>
+        <p class="hint" data-i18n="setHint"></p>
+
+        <div class="fld">
+          <label data-i18n="tgtLbl"></label>
+          <div class="seg" id="tgtSeg">
+            <button type="button" data-tgt="-14" class="on"><b>−14 LUFS</b><small data-i18n="tgtStream"></small></button>
+            <button type="button" data-tgt="-16"><b>−16 LUFS</b><small data-i18n="tgtPod"></small></button>
+            <button type="button" data-tgt="-23"><b>−23 LUFS</b><small data-i18n="tgtBroad"></small></button>
+          </div>
+          <div class="lufsrow">
+            <label class="num"><span data-i18n="tgtCustom"></span><input type="number" id="tgtNum" value="-14" min="-36" max="-5" step="0.5"></label>
+            <label class="num"><span data-i18n="tpLbl"></span>
+              <select class="sel" id="tpSel" style="width:130px">
+                <option value="-1">−1 dBTP</option>
+                <option value="-2">−2 dBTP</option>
+                <option value="-1.5">−1.5 dBTP</option>
+                <option value="-0.5">−0.5 dBTP</option>
+                <option value="0">0 dBTP</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="fld">
+          <label data-i18n="modeLbl"></label>
+          <div class="seg" id="modeSeg">
+            <button type="button" data-mode="two" class="on"><b data-i18n="modeTwo"></b><small data-i18n="modeTwoSub"></small></button>
+            <button type="button" data-mode="one"><b data-i18n="modeOne"></b><small data-i18n="modeOneSub"></small></button>
+          </div>
+        </div>
+
+        <div class="toggle">
+          <div class="tg-txt"><b data-i18n="upLbl"></b><small data-i18n="upSub"></small></div>
+          <label class="sw"><input type="checkbox" id="upOnly"><span class="track"></span></label>
+        </div>
+
+        <div class="fld">
+          <label data-i18n="qualLbl"></label>
+          <div class="qrow2">
+            <select class="sel" id="fmtSel">
+              <option value="mp3">MP3</option>
+              <option value="m4a">M4A (AAC)</option>
+              <option value="wav">WAV</option>
+              <option value="flac">FLAC</option>
+            </select>
+            <select class="sel" id="brSel">
+              <option value="320">320 kbps</option>
+              <option value="256">256 kbps</option>
+              <option value="192">192 kbps</option>
+              <option value="128">128 kbps</option>
+            </select>
+            <select class="sel" id="keepName">
+              <option value="suffix" data-i18n="nameSuffix"></option>
+              <option value="same" data-i18n="nameSame"></option>
+            </select>
+          </div>
+        </div>
+
+        <button class="gobtn" id="goBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+          <span id="goTxt" data-i18n="goBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+        <div class="rtnote" data-i18n="rtNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="nm" id="progName" data-i18n="working"></span><span id="progPct"></span></div>
+    <div class="bar" id="progWrap"><i id="progBar"></i></div>
+    <div class="phase" id="progPhase"></div>
+  </div>
+
+  <!-- results -->
+  <div class="card results" id="resultsCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" id="readySub"></p>
+    <div class="rlist" id="rlist"></div>
+    <div class="row2">
+      <button id="dlAllBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+        <span id="dlAllTxt" data-i18n="dlAll"></span>
+      </button>
+      <button id="newBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="newBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- Local engine (in ./vendor). No external network needed at runtime. -->
+<script src="./vendor/ffmpeg.js"></script>
+<script src="./vendor/util.js"></script>
+<script src="./vendor/jszip.min.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl',
+      kick:'נורמליזציית עוצמה · LUFS',
+      pageTitle:'יישרו את העוצמה של כל השירים — לרמה אחת',
+      pageSub:'העלו כמה שירים ביחד, ו-KOLKLI יביא כל אחד לאותה עוצמה נתפסת (LUFS) לפי תקן EBU R128 — שיר חלש יוגבר, שיר חזק ירוכך, עם מגביל שיא (True-Peak) שמונע עיוותים. שני מעברים לדיוק מקסימלי. מהיר, פשוט ובאיכות מקצועית.',
+      dropBig:'גררו קבצי אודיו לכאן', or2:'או', choose:'בחרו קבצים', chooseFolder:'בחרו תיקייה',
+      sizeNote:'MP3 · WAV · FLAC · AAC · M4A · OGG — כמה שרוצים',
+      sizeFree:(cap,per)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · עד ${cap} לקובץ · עד ${per} קבצים ביום · אורך מלא`,
+      sizePaid:(cap)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · עד ${cap} לקובץ · אורך מלא · ללא הגבלת כמות`,
+      errTooBig:(cap)=>`קובץ גדול מדי — מותר עד ${cap} לקובץ בחבילה שלכם`,
+      errDaily:(n)=>`הגעתם למכסת ${n} הקבצים היומית של חבילת Free. שדרגו כדי להמשיך.`,
+      errDailyLeft:(n)=> n===1?`נותר עוד קובץ אחד להיום (חבילת Free)`:`נותרו עוד ${n} קבצים להיום (חבילת Free)`,
+      queueTitle:'רשימת השירים', qClear:'נקה הכול',
+      setTitle:'הגדרות נורמליזציה',
+      setHint:'בחרו את עוצמת היעד וכיצד לעבד. −14 LUFS הוא הסטנדרט של Spotify ו-YouTube.',
+      tgtLbl:'עוצמת יעד (Integrated LUFS)',
+      tgtStream:'סטרימינג · Spotify/YouTube', tgtPod:'פודקאסט · Apple', tgtBroad:'שידור · EBU R128',
+      tgtCustom:'ערך מותאם', tpLbl:'תקרת שיא',
+      modeLbl:'איכות עיבוד',
+      modeTwo:'שני מעברים · מדויק', modeTwoSub:'מדידה ואז תיקון ליניארי — הכי נאמן',
+      modeOne:'מעבר אחד · מהיר', modeOneSub:'מהיר פי 2, מעט פחות מדויק',
+      upLbl:'הגברה בלבד (לא להחליש)', upSub:'שיר שכבר חזק מהיעד יישאר כמו שהוא',
+      qualLbl:'פורמט ואיכות ייצוא',
+      nameSuffix:'הוסף _normalized לשם', nameSame:'שמור על אותו שם',
+      goBtn:'נרמלו את השירים', goBtnBusy:'מעבד…',
+      working:'מעבד…', engineLoading:'טוען מנוע אודיו…',
+      phaseMeasure:'מודד עוצמה (מעבר 1/2)…', phaseApply:'מיישר לעוצמת היעד (מעבר 2/2)…', phaseSingle:'מנרמל…',
+      readyTitle:'הכול מוכן!',
+      readySub:n=> n===1 ? 'שיר אחד עבר נורמליזציה ומוכן להורדה.' : `${n} שירים עברו נורמליזציה ומוכנים להורדה.`,
+      dlAll:'הורדת הכול (ZIP)', dlOne:'הורדה', newBtn:'אצווה חדשה',
+      origLbl:'מקור', gainLbl:'הגברה',
+      measured:'נמדד', target:'יעד', skipped:'דילוג — כבר בעוצמה',
+      failed:'העיבוד נכשל',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · נורמליזציית עוצמה · מהיר, פשוט ובאיכות מקצועית',
+      rtNote:'העיבוד מתבצע מקומית במנוע ffmpeg המובנה. הפלט מקודד מחדש בפורמט שבחרתם.',
+      errNoFiles:'הוסיפו לפחות קובץ אודיו אחד',
+      errEngine:'שגיאה: לא ניתן לטעון את מנוע האודיו. ודאו שתיקיית vendor/ קיימת.',
+      errFileProto:'הקובץ נפתח כקובץ מקומי — הדפדפן חוסם את המנוע. הריצו דרך start.bat או שרת מקומי.',
+      errAll:'אף שיר לא עובד — נסו פורמט אחר או קבצים אחרים',
+      zipName:'KOLKLI-normalized',
+    },
+    en:{
+      dir:'ltr',
+      kick:'Loudness normalize · LUFS',
+      pageTitle:'Level every track to the same loudness',
+      pageSub:'Drop in a batch of songs and KOLKLI brings each one to the same perceived loudness (LUFS) per the EBU R128 standard — quiet tracks are lifted, loud ones eased down, with a True-Peak limiter that prevents clipping. Two-pass for maximum accuracy. Fast, simple and professional-quality.',
+      dropBig:'Drop audio files here', or2:'or', choose:'Choose files', chooseFolder:'Choose folder',
+      sizeNote:'MP3 · WAV · FLAC · AAC · M4A · OGG — as many as you like',
+      sizeFree:(cap,per)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · up to ${cap} per file · ${per} files/day · full length`,
+      sizePaid:(cap)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · up to ${cap} per file · full length · unlimited`,
+      errTooBig:(cap)=>`File too large — up to ${cap} per file on your plan`,
+      errDaily:(n)=>`You've reached the Free plan's ${n} files/day limit. Upgrade to keep going.`,
+      errDailyLeft:(n)=> n===1?`1 file left for today (Free plan)`:`${n} files left for today (Free plan)`,
+      queueTitle:'Track queue', qClear:'Clear all',
+      setTitle:'Normalization settings',
+      setHint:'Pick your target loudness and how to process. −14 LUFS is the Spotify & YouTube standard.',
+      tgtLbl:'Target loudness (Integrated LUFS)',
+      tgtStream:'Streaming · Spotify/YouTube', tgtPod:'Podcast · Apple', tgtBroad:'Broadcast · EBU R128',
+      tgtCustom:'Custom value', tpLbl:'True-peak ceiling',
+      modeLbl:'Processing quality',
+      modeTwo:'Two-pass · accurate', modeTwoSub:'Measure then linear correction — most faithful',
+      modeOne:'One-pass · fast', modeOneSub:'2× faster, slightly less precise',
+      upLbl:'Boost only (never reduce)', upSub:'A track already louder than target is left untouched',
+      qualLbl:'Export format & quality',
+      nameSuffix:'Add _normalized to name', nameSame:'Keep the same name',
+      goBtn:'Normalize tracks', goBtnBusy:'Processing…',
+      working:'Processing…', engineLoading:'Loading audio engine…',
+      phaseMeasure:'Measuring loudness (pass 1/2)…', phaseApply:'Leveling to target (pass 2/2)…', phaseSingle:'Normalizing…',
+      readyTitle:'All done!',
+      readySub:n=> n===1 ? 'One track normalized and ready to download.' : `${n} tracks normalized and ready to download.`,
+      dlAll:'Download all (ZIP)', dlOne:'Download', newBtn:'New batch',
+      origLbl:'source', gainLbl:'gain',
+      measured:'measured', target:'target', skipped:'skipped — already loud enough',
+      failed:'Processing failed',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Loudness normalize · Fast, simple and professional quality',
+      rtNote:'Processing runs locally in the built-in ffmpeg engine. Output is re-encoded in the format you pick.',
+      errNoFiles:'Add at least one audio file',
+      errEngine:'ERROR: could not load the audio engine. Make sure the vendor/ folder exists.',
+      errFileProto:'Opened as a local file — the browser blocks the engine. Run via start.bat or a local server.',
+      errAll:'No track could be processed — try another format or different files',
+      zipName:'KOLKLI-normalized',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Нормализация громкости · LUFS',
+      pageTitle:'Выровняйте громкость всех треков до одного уровня',
+      pageSub:'Загрузите сразу несколько песен, и KOLKLI приведёт каждую к одной воспринимаемой громкости (LUFS) по стандарту EBU R128 — тихие треки усилятся, громкие смягчатся, а лимитер True-Peak предотвратит искажения. Два прохода для максимальной точности. Быстро, просто и профессионального качества.',
+      dropBig:'Перетащите аудиофайлы сюда', or2:'или', choose:'Выбрать файлы', chooseFolder:'Выбрать папку',
+      sizeNote:'MP3 · WAV · FLAC · AAC · M4A · OGG — сколько угодно',
+      sizeFree:(cap,per)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · до ${cap} на файл · ${per} файлов/день · полная длина`,
+      sizePaid:(cap)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · до ${cap} на файл · полная длина · без лимита`,
+      errTooBig:(cap)=>`Файл слишком большой — до ${cap} на файл на вашем плане`,
+      errDaily:(n)=>`Достигнут лимит ${n} файлов/день на бесплатном плане. Оформите подписку, чтобы продолжить.`,
+      errDailyLeft:(n)=> n===1?`Остался 1 файл на сегодня (Free)`:`Осталось ${n} файлов на сегодня (Free)`,
+      queueTitle:'Очередь треков', qClear:'Очистить всё',
+      setTitle:'Настройки нормализации',
+      setHint:'Выберите целевую громкость и способ обработки. −14 LUFS — стандарт Spotify и YouTube.',
+      tgtLbl:'Целевая громкость (Integrated LUFS)',
+      tgtStream:'Стриминг · Spotify/YouTube', tgtPod:'Подкаст · Apple', tgtBroad:'Вещание · EBU R128',
+      tgtCustom:'Своё значение', tpLbl:'Потолок пика',
+      modeLbl:'Качество обработки',
+      modeTwo:'Два прохода · точно', modeTwoSub:'Измерение и линейная коррекция — точнее всего',
+      modeOne:'Один проход · быстро', modeOneSub:'В 2× быстрее, чуть менее точно',
+      upLbl:'Только усиление (не уменьшать)', upSub:'Трек громче цели останется без изменений',
+      qualLbl:'Формат и качество экспорта',
+      nameSuffix:'Добавить _normalized к имени', nameSame:'Сохранить то же имя',
+      goBtn:'Нормализовать треки', goBtnBusy:'Обработка…',
+      working:'Обработка…', engineLoading:'Загрузка аудиодвижка…',
+      phaseMeasure:'Измерение громкости (проход 1/2)…', phaseApply:'Выравнивание к цели (проход 2/2)…', phaseSingle:'Нормализация…',
+      readyTitle:'Готово!',
+      readySub:n=> n===1 ? 'Один трек нормализован и готов к скачиванию.' : `${n} треков нормализовано и готово к скачиванию.`,
+      dlAll:'Скачать всё (ZIP)', dlOne:'Скачать', newBtn:'Новая партия',
+      origLbl:'оригинал', gainLbl:'усиление',
+      measured:'измерено', target:'цель', skipped:'пропущено — уже достаточно громко',
+      failed:'Обработка не удалась',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Нормализация громкости · Быстро, просто и профессионального качества',
+      rtNote:'Обработка выполняется локально во встроенном движке ffmpeg. Результат перекодируется в выбранный формат.',
+      errNoFiles:'Добавьте хотя бы один аудиофайл',
+      errEngine:'ОШИБКА: не удалось загрузить аудиодвижок. Убедитесь, что папка vendor/ существует.',
+      errFileProto:'Открыто как локальный файл — браузер блокирует движок. Запустите через start.bat или локальный сервер.',
+      errAll:'Ни один трек не обработан — попробуйте другой формат или другие файлы',
+      zipName:'KOLKLI-normalized',
+    },
+  };
+
+  const AUDIO_EXTS = ['mp3','wav','flac','aac','m4a','ogg','oga','opus','wma','aiff','aif','m4b','opus'];
+  const MIME = { mp3:'audio/mpeg', m4a:'audio/mp4', wav:'audio/wav', flac:'audio/flac' };
+  const LRA = 11;   // loudness range target for the loudnorm filter
+
+  const FFmpeg    = (window.FFmpegWASM && window.FFmpegWASM.FFmpeg);
+  const fetchFile = (window.FFmpegUtil  && window.FFmpegUtil.fetchFile);
+  const engineAvailable = !!(FFmpeg && fetchFile);
+
+  let lang='he', t=I18N.he;
+  let files=[];        // {id,file,name,size,url,dur, meas, gain, status}
+  let results=[];      // {name, blob, url, size, srcSize, ok, gain, measured, target, skipped}
+  let uid=1, busy=false;
+  let target=-14, tp=-1;
+  let ffmpeg=null, ffLoading=null;
+
+  // ---- helpers ----
+  function baseName(name){ return String(name||'audio').replace(/\.[^.\/\\]+$/,''); }
+  function extOf(name){ const m=/\.([^.\/\\]+)$/.exec(name||''); const e=m?m[1].toLowerCase():''; return AUDIO_EXTS.includes(e)?e:'mp3'; }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function mmss(s){ if(!s||!isFinite(s)) return null; s=Math.round(s); const m=Math.floor(s/60); return m+':'+String(s%60).padStart(2,'0'); }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function num(v){ const n=parseFloat(v); return isFinite(n)?n:null; }
+  function fmtDb(v){ if(v==null||!isFinite(v)) return '—'; const s=v>=0?'+':'−'; return s+Math.abs(v).toFixed(1)+' dB'; }
+  function fmtLufs(v){ if(v==null||!isFinite(v)) return '—'; return (v<0?'−':'')+Math.abs(v).toFixed(1); }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1900); }
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function finiteDuration(v){ const n=parseFloat(v); return isFinite(n) && n>0 ? n : null; }
+
+  // ---- plan-aware limits (free-tier friction; server enforces once a Worker is live) ----
+  // Paid (creator/studio) → 500MB per file, unlimited files/day.
+  // Free / anonymous       → 50MB per file, 3 files/day. Every export is full length.
+  const MB = 1048576;
+  const FREE_DAILY_FILES = 3;
+  function planPaid(){
+    try{ if(window.KolkliUsage && window.KolkliUsage.isExempt) return !!window.KolkliUsage.isExempt(); }catch(_){}
+    // fallback to the same localStorage signals the rest of the site uses
+    let plan='';
+    try{
+      const email=(ls('ac_session')||'').toLowerCase();
+      if(email){ const users=JSON.parse(ls('ac_users')||'[]')||[]; const u=users.find(x=>(x.email||'').toLowerCase()===email); if(u&&u.plan) plan=u.plan; }
+    }catch(_){}
+    if(!plan) plan=ls('ac_plan')||'';
+    plan=(plan||'free').toLowerCase();
+    return plan==='lite'||plan==='creator'||plan==='pro'||plan==='business'||plan==='studio';
+  }
+  function fileCap(){
+    try{ if(window.KolkliUsage && window.KolkliUsage.fileByteCap) return window.KolkliUsage.fileByteCap(); }catch(_){}
+    return planPaid() ? 500*MB : 50*MB;
+  }
+  function capTxt(){ const c=fileCap(); return c>=1073741824 ? Math.round(c/1073741824)+'GB' : Math.round(c/MB)+'MB'; }
+  function dayStamp(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+  function ledgerKey(){ return 'kolkli_norm_files_'+dayStamp(); }
+  function filesUsedToday(){ if(planPaid()) return 0; const n=parseInt(ls(ledgerKey())||'0',10); return isFinite(n)&&n>0?n:0; }
+  function addFilesToday(n){ if(planPaid()||!n) return; try{ localStorage.setItem(ledgerKey(), String(filesUsedToday()+n)); }catch(_){} }
+  function dailyRemaining(){ return planPaid() ? Infinity : Math.max(0, FREE_DAILY_FILES - filesUsedToday()); }
+  function showUpgrade(){ try{ if(window.KolkliUsage && window.KolkliUsage.showBlocked) window.KolkliUsage.showBlocked({code:'daily_files'}); }catch(_){}}
+  function updateLimitsUI(){
+    const note=document.querySelector('.sizenote');
+    if(note && t.sizeFree) note.textContent = planPaid() ? t.sizePaid(capTxt()) : t.sizeFree(capTxt(), FREE_DAILY_FILES);
+  }
+
+  // ---- engine (single-thread wasm core; rebuilt when an encoder "spends" it) ----
+  function loadFF(){
+    if(ffmpeg) return Promise.resolve(ffmpeg);
+    if(!ffLoading){
+      ffLoading = (async()=>{
+        if(!engineAvailable) throw new Error('engine');
+        const f=new FFmpeg();
+        const dir=location.href.replace(/[^/]*$/,'')+'vendor/';
+        await f.load({ coreURL:dir+'ffmpeg-core.js', wasmURL:dir+'ffmpeg-core.wasm' });
+        ffmpeg=f; return f;
+      })().catch(e=>{ ffLoading=null; throw e; });
+    }
+    return ffLoading;
+  }
+  function disposeFF(){ try{ ffmpeg && ffmpeg.terminate && ffmpeg.terminate(); }catch(_){} ffmpeg=null; ffLoading=null; }
+
+  async function probeOriginalDuration(f, inName){
+    let dur=null;
+    const onLog=e=>{
+      const msg=(e && typeof e.message==='string') ? e.message : '';
+      const m=msg.match(/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/);
+      if(m) dur=(+m[1])*3600+(+m[2])*60+parseFloat(m[3]);
+    };
+    f.on('log', onLog);
+    try{ await f.exec(['-hide_banner','-i',inName]); }
+    catch(_){ /* ffmpeg exits after printing metadata because no output is requested */ }
+    finally{ try{ f.off('log', onLog); }catch(_){}}
+    return finiteDuration(dur);
+  }
+
+  function encodeArgs(fmt){
+    const br=el('brSel').value;
+    switch(fmt){
+      case 'wav':  return ['-c:a','pcm_s16le'];
+      case 'flac': return ['-c:a','flac'];
+      case 'm4a':  return ['-c:a','aac','-b:a',br+'k'];
+      case 'mp3':
+      default:     return ['-c:a','libmp3lame','-b:a',br+'k'];
+    }
+  }
+
+  // Pass 1 — analyse the file and read loudnorm's JSON measurement off the log.
+  async function measure(f, inName){
+    let buf='';
+    const onLog=e=>{ if(e && typeof e.message==='string') buf += e.message + '\n'; };
+    f.on('log', onLog);
+    try{
+      const af=`loudnorm=I=${target}:TP=${tp}:LRA=${LRA}:print_format=json`;
+      await f.exec(['-hide_banner','-nostats','-i',inName,'-af',af,'-f','null','-']);
+    }catch(_){ /* measurement failed — caller falls back to single-pass */ }
+    finally{ try{ f.off('log', onLog); }catch(_){}}
+    const m = buf.match(/\{[\s\S]*?"input_i"[\s\S]*?"target_offset"[\s\S]*?\}/) || buf.match(/\{[\s\S]*?"input_i"[\s\S]*?\}/);
+    if(!m) return null;
+    try{ return JSON.parse(m[0]); }catch(_){ return null; }
+  }
+
+  function buildAf(meas, twoPass){
+    const base=`loudnorm=I=${target}:TP=${tp}:LRA=${LRA}`;
+    if(twoPass && meas){
+      return base+`:measured_I=${meas.input_i}:measured_TP=${meas.input_tp}:measured_LRA=${meas.input_lra}`+
+                  `:measured_thresh=${meas.input_thresh}:offset=${meas.target_offset}:linear=true`;
+    }
+    return base;
+  }
+
+  // Normalize one file end-to-end. onProg(0..1) covers both passes.
+  async function processOne(item, cfg, onProg){
+    const f=await loadFF();
+    const inName='in_'+(uid++)+'.'+extOf(item.name);
+    const outName='out_'+(uid++)+'.'+cfg.fmt;
+    let spent = cfg.fmt==='flac';   // the flac encoder aborts the core after writing
+    let phase=0;
+    const onp=e=>{
+      if(onProg && e && isFinite(e.progress)){
+        const p=Math.max(0,Math.min(1,e.progress));
+        onProg(cfg.twoPass ? (phase===0 ? p*0.45 : 0.45+p*0.55) : p);
+      }
+    };
+    try{
+      await f.writeFile(inName, await fetchFile(item.file));
+      const originalDuration = await probeOriginalDuration(f, inName) || finiteDuration(item.dur);
+      if(originalDuration && (!finiteDuration(item.dur) || Math.abs(item.dur-originalDuration)>0.05)){
+        item.dur = originalDuration;
+        renderQueue();
+      }
+      f.on('progress', onp);
+
+      let meas=null, gain=null, measured=null, skipped=false;
+      if(cfg.twoPass){
+        if(cfg.onPhase) cfg.onPhase('measure');
+        meas = await measure(f, inName);
+        measured = meas ? num(meas.input_i) : null;
+      }
+      phase=1;
+      if(cfg.onPhase) cfg.onPhase(cfg.twoPass ? 'apply' : 'single');
+
+      // "boost only": a track already at/above target is passed through unchanged.
+      let af = buildAf(meas, cfg.twoPass);
+      if(cfg.upOnly && measured!=null && measured >= target){ af=null; skipped=true; }
+      if(measured!=null) gain = skipped ? 0 : (target - measured);
+
+      const args=['-hide_banner','-i',inName];
+      const filters=[];
+      if(af) filters.push(af);
+      if(originalDuration){
+        const d=originalDuration.toFixed(3);
+        filters.push('asetpts=N/SR/TB', 'apad', `atrim=0:${d}`);
+        args.push('-t', d);
+      }
+      if(filters.length) args.push('-af', filters.join(','));
+      args.push(...encodeArgs(cfg.fmt), outName);
+
+      await f.exec(args);
+      const data=await f.readFile(outName);
+      if(onProg) onProg(1);
+      const blob=new Blob([data.buffer||data], { type: MIME[cfg.fmt]||'application/octet-stream' });
+      if(!blob.size) throw new Error('empty output');
+      return { blob, gain, measured, skipped };
+    }catch(err){
+      spent=true;   // never reuse an instance that threw
+      throw err;
+    }finally{
+      try{ f.off('progress', onp); }catch(_){}
+      if(!spent){ try{ await f.deleteFile(inName); }catch(_){} try{ await f.deleteFile(outName); }catch(_){} }
+      if(spent) disposeFF();
+    }
+  }
+
+  // ---- intake ----
+  function addFiles(list){
+    let added=0, tooBig=0, overQuota=0;
+    const cap=fileCap(), paid=planPaid();
+    Array.from(list||[]).forEach(file=>{
+      const okType = file.type && file.type.indexOf('audio')===0;
+      const okExt  = new RegExp('\\.('+AUDIO_EXTS.join('|')+')$','i').test(file.name);
+      if(!okType && !okExt) return;
+      if(file.size > cap){ tooBig++; return; }
+      // free tier: at most FREE_DAILY_FILES files/day, counting today's usage + current queue
+      if(!paid && (filesUsedToday() + files.length + 1) > FREE_DAILY_FILES){ overQuota++; return; }
+      const it={ id:'f'+(uid++), file, name:file.name, size:file.size, url:URL.createObjectURL(file), dur:0, status:'wait', gain:null, measured:null, skipped:false };
+      files.push(it);
+      probeDuration(it);
+      added++;
+    });
+    if(added){ el('stack').classList.add('show'); renderQueue(); el('resultsCard').classList.remove('show'); el('optErr').textContent=''; }
+    if(tooBig){ const m=t.errTooBig(capTxt()); el('optErr').textContent=m; toast(m); }
+    else if(overQuota){ el('optErr').textContent=t.errDaily(FREE_DAILY_FILES); showUpgrade(); }
+  }
+  function probeDuration(it){
+    try{
+      const a=new Audio(); a.preload='metadata';
+      a.onloadedmetadata=()=>{ if(isFinite(a.duration)&&a.duration>0){ it.dur=a.duration; renderQueue(); } a.src=''; };
+      a.onerror=()=>{ a.src=''; };
+      a.src=it.url;
+    }catch(_){}
+  }
+  function removeFile(id){
+    const f=files.find(x=>x.id===id); if(f&&f.url) URL.revokeObjectURL(f.url);
+    files=files.filter(x=>x.id!==id);
+    renderQueue();
+    if(!files.length){ el('stack').classList.remove('show'); el('drop').style.display=''; }
+  }
+  function clearFiles(){
+    files.forEach(f=>{ if(f.url) URL.revokeObjectURL(f.url); });
+    files=[];
+    el('stack').classList.remove('show'); el('drop').style.display=''; el('optErr').textContent='';
+    renderQueue();
+  }
+
+  // ---- queue render ----
+  const PILL={ wait:'', run:'run', done:'done', skip:'skip', err:'err' };
+  function statusText(it){
+    if(it.status==='run') return t.working;
+    if(it.status==='done') return 'LUFS';
+    if(it.status==='skip') return '↔';
+    if(it.status==='err') return t.failed;
+    return mmss(it.dur) || '';
+  }
+  function renderQueue(){
+    const n=files.length;
+    el('qCount').textContent = n ? `${n} · ${fmtBytes(files.reduce((a,f)=>a+f.size,0))}` : '';
+    el('qList').innerHTML = files.map(it=>{
+      const sub = [extOf(it.name).toUpperCase(), mmss(it.dur), fmtBytes(it.size)].filter(Boolean).join(' · ');
+      let lufs='';
+      if(it.status==='done' && it.measured!=null){
+        const dir = it.gain>0.1?'up':(it.gain<-0.1?'down':'flat');
+        lufs = `<div class="lufs">${t.measured} <b>${fmtLufs(it.measured)}</b> → ${t.target} <b>${fmtLufs(target)}</b> LUFS<span class="gchip ${dir}">${fmtDb(it.gain)}</span></div>`;
+      } else if(it.status==='skip'){
+        lufs = `<div class="lufs">${t.skipped}${it.measured!=null?` · <b>${fmtLufs(it.measured)}</b> LUFS`:''}</div>`;
+      }
+      const pillCls = PILL[it.status]||'';
+      const pillTx = it.status==='done' ? '✓' : (it.status==='skip' ? '↔' : (it.status==='err' ? '!' : (it.status==='run' ? '···' : (mmss(it.dur)||'—'))));
+      return `<div class="qi ${it.status==='done'?'done':''} ${it.status==='skip'?'skip':''}" data-id="${it.id}">
+        <div class="qbar" data-bar="${it.id}"></div>
+        <div class="qico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+        <div class="qn">
+          <div class="nm" title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</div>
+          <div class="meta">${sub}</div>
+          ${lufs}
+        </div>
+        <span class="pill ${pillCls}">${pillTx}</span>
+        ${busy?'':`<button class="qdel" data-del="${it.id}" type="button" aria-label="remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>`}
+      </div>`;
+    }).join('');
+  }
+  function setBar(id,p){ const b=el('qList').querySelector(`[data-bar="${id}"]`); if(b) b.style.width=Math.round(p*100)+'%'; }
+  function setStatus(it,s){ it.status=s; renderQueue(); }
+
+  // ---- run ----
+  async function run(){
+    if(busy) return;
+    el('optErr').textContent='';
+    if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
+    if(location.protocol==='file:'){ el('optErr').textContent=t.errFileProto; return; }
+
+    // free-tier daily file allowance (paid plans are unlimited)
+    if(!planPaid()){
+      const remaining=dailyRemaining();
+      if(remaining<=0){ el('optErr').textContent=t.errDaily(FREE_DAILY_FILES); showUpgrade(); return; }
+      if(files.length>remaining){ el('optErr').textContent=t.errDailyLeft(remaining); showUpgrade(); return; }
+    }
+
+    target = clampTarget(num(el('tgtNum').value));
+    tp     = num(el('tpSel').value); if(tp==null) tp=-1;
+    const cfg={
+      fmt: el('fmtSel').value,
+      twoPass: el('modeSeg').querySelector('.on').getAttribute('data-mode')==='two',
+      upOnly: el('upOnly').checked,
+      suffix: el('keepName').value==='suffix',
+    };
+
+    busy=true; el('goBtn').disabled=true; el('goTxt').textContent=t.goBtnBusy;
+    files.forEach(it=>{ it.status='wait'; it.gain=null; it.measured=null; it.skipped=false; });
+    renderQueue();
+    clearResults();
+    const prog=el('progCard'); prog.classList.add('show');
+    el('progName').textContent=t.engineLoading; el('progPct').textContent=''; el('progPhase').textContent='';
+    el('progWrap').classList.add('indet');
+    prog.scrollIntoView({behavior:'smooth',block:'center'});
+
+    try{ await loadFF(); }
+    catch(_){ prog.classList.remove('show'); el('progWrap').classList.remove('indet'); el('optErr').textContent=t.errEngine; finishBusy(); return; }
+    el('progWrap').classList.remove('indet');
+
+    const n=files.length;
+    for(let i=0;i<n;i++){
+      const it=files[i];
+      setStatus(it,'run');
+      el('progName').textContent=`${it.name}  ·  ${i+1}/${n}`;
+      setProg(Math.round(i/n*100));
+      await sleep(20);
+      try{
+        const r=await processOne(it, {
+          ...cfg,
+          onPhase:ph=>{ el('progPhase').textContent = ph==='measure'?t.phaseMeasure:(ph==='apply'?t.phaseApply:t.phaseSingle); },
+        }, p=>{ setBar(it.id,p); setProg(Math.round((i+p)/n*100)); });
+        it.measured=r.measured; it.gain=r.gain; it.skipped=r.skipped;
+        setStatus(it, r.skipped ? 'skip' : 'done');
+        const outName=(cfg.suffix?baseName(it.name)+'_normalized':baseName(it.name))+'.'+cfg.fmt;
+        results.push({ name:outName, blob:r.blob, url:URL.createObjectURL(r.blob), size:r.blob.size, srcSize:it.size,
+                       ok:true, gain:r.gain, measured:r.measured, skipped:r.skipped });
+      }catch(err){
+        console.error(err);
+        setStatus(it,'err');
+        results.push({ name:baseName(it.name)+'.'+cfg.fmt, blob:null, url:null, size:0, srcSize:it.size, ok:false });
+      }
+      setProg(Math.round((i+1)/n*100));
+    }
+
+    await sleep(200);
+    prog.classList.remove('show'); el('progPhase').textContent='';
+    finishBusy();
+    addFilesToday(results.filter(r=>r.ok).length);   // count successfully exported files toward the daily free quota
+    updateLimitsUI();
+    if(!results.some(r=>r.ok)){ el('optErr').textContent=t.errAll; return; }
+    showResults();
+  }
+  function finishBusy(){ busy=false; el('goBtn').disabled=false; el('goTxt').textContent=t.goBtn; renderQueue(); }
+  function clampTarget(v){ if(v==null) return -14; return Math.max(-36, Math.min(-5, v)); }
+  function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+
+  function showResults(){
+    const ok=results.filter(r=>r.ok).length;
+    el('readySub').textContent=t.readySub(ok);
+    el('rlist').innerHTML = results.map((r,i)=>{
+      if(!r.ok){
+        return `<div class="rrow err"><span class="rico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></span>
+          <span class="rn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta">${escapeHtml(t.failed)}</div></span></div>`;
+      }
+      let meta;
+      if(r.skipped){ meta = `${t.skipped} · ${fmtBytes(r.size)}`; }
+      else {
+        const g = r.gain!=null ? `${t.gainLbl} ${fmtDb(r.gain)} · ` : '';
+        meta = `${g}${fmtLufs(target)} LUFS · ${t.origLbl} ${fmtBytes(r.srcSize)} → <em>${fmtBytes(r.size)}</em>`;
+      }
+      return `<div class="rrow"><span class="rico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+        <span class="rn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta">${meta}</div></span>
+        <button class="dlbtn" data-dl="${i}" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>${t.dlOne}</span></button></div>`;
+    }).join('');
+    const okCount=results.filter(r=>r.ok).length;
+    el('dlAllTxt').textContent = okCount>1 ? t.dlAll : t.dlOne;
+    el('resultsCard').classList.add('show');
+    el('resultsCard').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  function download(r){
+    if(!r||!r.url) return;
+    const a=document.createElement('a'); a.href=r.url; a.download=r.name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  async function downloadAll(){
+    const ok=results.filter(r=>r.ok && r.blob);
+    if(!ok.length) return;
+    if(ok.length===1){ download(ok[0]); return; }
+    if(window.JSZip){
+      try{
+        const zip=new window.JSZip();
+        ok.forEach(r=>zip.file(r.name, r.blob));
+        const blob=await zip.generateAsync({type:'blob'});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a'); a.href=url; a.download=t.zipName+'.zip'; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),6000);
+        toast('ZIP ✓');
+        return;
+      }catch(_){ /* fall through to sequential downloads */ }
+    }
+    for(const r of ok){ download(r); await sleep(300); }
+  }
+
+  function clearResults(){ results.forEach(r=>{ if(r.url) URL.revokeObjectURL(r.url); }); results=[]; }
+  function reset(){
+    clearResults();
+    clearFiles();
+    el('resultsCard').classList.remove('show');
+    el('optErr').textContent='';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- target segmented + custom sync ----
+  function selectTarget(v){
+    target=clampTarget(v);
+    el('tgtNum').value = target;
+    el('tgtSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on', parseFloat(b.getAttribute('data-tgt'))===target));
+  }
+  function syncQual(){
+    const fmt=el('fmtSel').value;
+    el('brSel').disabled = (fmt==='wav' || fmt==='flac');
+  }
+
+  // ---- i18n + theme (mirrors the other pages; header stays in sync via its observer) ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    // options with data-i18n also need their text applied (handled above), keep button label fresh:
+    el('goTxt').textContent = busy ? t.goBtnBusy : t.goBtn;
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderQueue();
+    updateLimitsUI();
+    if(results.length && el('resultsCard').classList.contains('show')) showResults();
+  }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput'), folder=el('folderInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  el('chooseFolderBtn').addEventListener('click',e=>{ e.stopPropagation(); folder.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  folder.addEventListener('change',()=>{ addFiles(folder.files); folder.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('qList').addEventListener('click',e=>{ const b=e.target.closest('[data-del]'); if(b && !busy) removeFile(b.getAttribute('data-del')); });
+  el('qClear').addEventListener('click',()=>{ if(!busy) clearFiles(); });
+
+  el('tgtSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-tgt]'); if(b) selectTarget(parseFloat(b.getAttribute('data-tgt'))); });
+  el('tgtNum').addEventListener('input',()=>{ selectTarget(num(el('tgtNum').value)); });
+  el('tgtNum').addEventListener('blur',()=>{ el('tgtNum').value=clampTarget(num(el('tgtNum').value)); selectTarget(num(el('tgtNum').value)); });
+  el('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-mode]'); if(b){ el('modeSeg').querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); } });
+  el('fmtSel').addEventListener('change',syncQual);
+
+  el('goBtn').addEventListener('click',run);
+  el('newBtn').addEventListener('click',reset);
+  el('dlAllBtn').addEventListener('click',downloadAll);
+  el('rlist').addEventListener('click',e=>{ const b=e.target.closest('[data-dl]'); if(b) download(results[+b.getAttribute('data-dl')]); });
+
+  window.__setLang=applyLang;
+  const tt=el('themeToggle'); if(tt) tt.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  selectTarget(-14);
+  syncQual();
+  // warm up the engine in the background so the first batch feels instant
+  setTimeout(()=>{ if(engineAvailable && location.protocol!=='file:') loadFF().catch(()=>{}); }, 600);
+})();
+</script>
+</body>
+</html>

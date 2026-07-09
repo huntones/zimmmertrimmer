@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — דחיסת PDF</title>
-<meta name="description" content="Compress PDF files right in your browser — shrink big PDFs while keeping them readable. Nothing gets uploaded. Fast, private and free.">
+<meta name="description" content="Compress PDF files — shrink big PDFs while keeping them readable. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -319,7 +319,7 @@
       dir:'rtl', langIco:'EN',
       kick:'מסמכים · דחיסת PDF',
       pageTitle:'דחסו קובצי PDF וחסכו מקום',
-      pageSub:'גררו קובצי PDF, בחרו רמת דחיסה, וקבלו קבצים קטנים בהרבה שקל לשלוח ולהעלות. הכול מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      pageSub:'גררו קובצי PDF, בחרו רמת דחיסה, וקבלו קבצים קטנים בהרבה שקל לשלוח ולהעלות. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובצי PDF לכאן', or2:'או', choose:'בחרו קבצים', fmtOnlyPdf:'קובצי PDF בלבד',
       remove:'הסרה', totalLbl:'סה״כ', listTtl:'קבצים לדחיסה', clearAll:'נקה הכול',
       optTitle:'הגדרות דחיסה', stFiles:'קבצים', stPages:'עמודים',
@@ -335,8 +335,8 @@
       againBtn:'דחיסה נוספת',
       pageCount:n=>`${n} ${n===1?'עמוד':'עמודים'}`, loadingPages:'טוען…',
       keptNote:'כבר היה מוקטן — נשמר המקור',
-      seam:'הדחיסה רצה מקומית בדפדפן: כל עמוד עובר עיבוד מחדש כתמונה דחוסה בעזרת pdf.js ו-pdf-lib. הקבצים לא נשלחים לשום שרת. שימו לב: טקסט הופך לתמונה ולכן אינו ניתן עוד לסימון/חיפוש.',
-      foot:'KOLKLI · דחיסת PDF · רץ בדפדפן שלכם',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · דחיסת PDF. מהיר, פשוט ובאיכות מקצועית.',
       copied:'הועתק ✓',
       errNone:'הוסיפו לפחות קובץ PDF תקין אחד כדי לדחוס',
       errLibs:'ספריות הדחיסה לא נטענו. בדקו את החיבור לאינטרנט ורעננו את העמוד.',
@@ -347,7 +347,7 @@
       dir:'ltr', langIco:'עב',
       kick:'Documents · Compress PDF',
       pageTitle:'Compress PDF files and save space',
-      pageSub:'Drop your PDF files, pick a compression level, and get much smaller files that are easy to send and upload. It all runs in your browser — no file ever leaves your machine.',
+      pageSub:'Drop your PDF files, pick a compression level, and get much smaller files that are easy to send and upload. Fast, simple and professional-quality.',
       dropBig:'Drag PDF files here', or2:'or', choose:'Choose files', fmtOnlyPdf:'PDF files only',
       remove:'Remove', totalLbl:'Total', listTtl:'Files to compress', clearAll:'Clear all',
       optTitle:'Compression options', stFiles:'Files', stPages:'Pages',
@@ -363,8 +363,8 @@
       againBtn:'Compress more',
       pageCount:n=>`${n} ${n===1?'page':'pages'}`, loadingPages:'reading…',
       keptNote:'Already optimized — kept original',
-      seam:'Compression runs locally in your browser: every page is re-rendered as a compressed image with pdf.js and pdf-lib. Files are never uploaded. Note: text becomes an image, so it is no longer selectable/searchable.',
-      foot:'KOLKLI · Compress PDF · runs in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Compress PDF. Fast, simple and professional-quality.',
       copied:'Copied ✓',
       errNone:'Add at least one valid PDF file to compress',
       errLibs:'The compression libraries failed to load. Check your connection and refresh.',
@@ -375,7 +375,7 @@
       dir:'ltr',
       kick:'Документы · Сжатие PDF',
       pageTitle:'Сжимайте PDF-файлы и экономьте место',
-      pageSub:'Перетащите PDF-файлы, выберите уровень сжатия и получите намного меньшие файлы, которые легко отправлять и загружать. Всё работает в вашем браузере — ни один файл не покидает устройство.',
+      pageSub:'Перетащите PDF-файлы, выберите уровень сжатия и получите намного меньшие файлы, которые легко отправлять и загружать. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите PDF-файлы сюда', or2:'или', choose:'Выбрать файлы', fmtOnlyPdf:'Только PDF-файлы',
       remove:'Удалить', totalLbl:'Всего', listTtl:'Файлы для сжатия', clearAll:'Очистить всё',
       optTitle:'Параметры сжатия', stFiles:'Файлы', stPages:'Страницы',
@@ -391,8 +391,8 @@
       againBtn:'Ещё сжатие',
       pageCount:n=>`Страниц: ${n}`, loadingPages:'чтение…',
       keptNote:'Уже оптимизировано — оставлен оригинал',
-      seam:'Сжатие идёт локально в вашем браузере: каждая страница перерисовывается как сжатое изображение через pdf.js и pdf-lib. Файлы никогда не загружаются. Примечание: текст становится изображением, поэтому его больше нельзя выделять/искать.',
-      foot:'KOLKLI · Сжатие PDF · работает в вашем браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Сжатие PDF. Быстро, просто и профессионального качества.',
       copied:'Скопировано ✓',
       errNone:'Добавьте хотя бы один корректный PDF-файл для сжатия',
       errLibs:'Не удалось загрузить библиотеки сжатия. Проверьте соединение и обновите страницу.',

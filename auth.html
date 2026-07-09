@@ -62,7 +62,7 @@
 
   /* ---------- top bar ---------- */
   .top{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;
-    max-width:75%;width:100%;margin:0 auto;padding:18px 22px;}
+    width:100%;max-width:none;margin:0 auto;padding:18px 22px;}
   .brand{display:flex;align-items:center;gap:11px;}
   .brand .logo{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
     background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);flex-shrink:0;}
@@ -288,7 +288,7 @@
       or:'או', guest:'המשך כאורח, בלי חשבון',
       switchToSignupText:'אין לכם חשבון עדיין?', switchToSignupLink:'הרשמה',
       switchToLoginText:'כבר יש לכם חשבון?', switchToLoginLink:'התחברות',
-      privacy:'ההרשמה נועדה רק לשמירת קבצים וקישורים. עריכת האודיו עצמה תמיד נשארת במחשב שלכם ולא עולה לשרת.',
+      privacy:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
       dashboard:'לדשבורד', goFiles:'לאזור הקבצים שלי', logout:'התנתקות',
       signedHi:name=>`שלום, ${name}!`, welcomeBack:'התחברת בהצלחה 👋', accountCreated:'החשבון נוצר בהצלחה 🎉',
       errRequired:'שדה חובה', errEmail:'כתובת אימייל לא תקינה', errPassShort:'הסיסמה חייבת לפחות 6 תווים',
@@ -298,7 +298,7 @@
       checkEmail:'שלחנו לכם מייל אימות — אשרו אותו ואז התחברו.',
       resetSent:'שלחנו קישור לאיפוס סיסמה למייל שלכם.',
       resetNeedEmail:'הזינו קודם את כתובת האימייל.',
-      foot:'KOLKLI · ההרשמה מקומית להדגמה · העריכה תמיד רצה בדפדפן שלכם',
+      foot:'KOLKLI · ההרשמה מקומית להדגמה. מהיר, פשוט ובאיכות מקצועית.',
     },
     en:{
       dir:'ltr', langIco:'עב',
@@ -314,7 +314,7 @@
       or:'or', guest:'Continue as guest, no account',
       switchToSignupText:"Don't have an account?", switchToSignupLink:'Sign up',
       switchToLoginText:'Already have an account?', switchToLoginLink:'Sign in',
-      privacy:'Accounts are only for saving files and links. Audio editing itself always stays on your machine and is never uploaded.',
+      privacy:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
       dashboard:'Go to dashboard', goFiles:'Go to my files', logout:'Log out',
       signedHi:name=>`Hi, ${name}!`, welcomeBack:'Signed in 👋', accountCreated:'Account created 🎉',
       errRequired:'Required field', errEmail:'Invalid email address', errPassShort:'Password must be at least 6 characters',
@@ -324,7 +324,7 @@
       checkEmail:'We sent you a confirmation email — confirm it, then sign in.',
       resetSent:'We emailed you a password-reset link.',
       resetNeedEmail:'Enter your email address first.',
-      foot:'KOLKLI · Accounts are local (demo) · Editing always runs in your browser',
+      foot:'KOLKLI · Accounts are local (demo). Fast, simple and professional-quality.',
     },
     ru:{
       dir:'ltr',
@@ -340,7 +340,7 @@
       or:'или', guest:'Продолжить как гость, без аккаунта',
       switchToSignupText:'Нет аккаунта?', switchToSignupLink:'Зарегистрироваться',
       switchToLoginText:'Уже есть аккаунт?', switchToLoginLink:'Войти',
-      privacy:'Аккаунты нужны только для сохранения файлов и ссылок. Само редактирование аудио всегда остаётся на вашем устройстве и никогда не загружается.',
+      privacy:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
       dashboard:'В личный кабинет', goFiles:'К моим файлам', logout:'Выйти',
       signedHi:name=>`Привет, ${name}!`, welcomeBack:'Вы вошли 👋', accountCreated:'Аккаунт создан 🎉',
       errRequired:'Обязательное поле', errEmail:'Неверный адрес почты', errPassShort:'Пароль должен быть не менее 6 символов',
@@ -350,7 +350,7 @@
       checkEmail:'Мы отправили письмо для подтверждения — подтвердите и войдите.',
       resetSent:'Мы отправили ссылку для сброса пароля на вашу почту.',
       resetNeedEmail:'Сначала введите адрес электронной почты.',
-      foot:'KOLKLI · Аккаунты локальные (демо) · Редактирование всегда идёт в вашем браузере',
+      foot:'KOLKLI · Аккаунты локальные (демо). Быстро, просто и профессионального качества.',
     },
   };
 
@@ -369,6 +369,11 @@
   function saveUsers(u){ try{ localStorage.setItem(USERS_KEY, JSON.stringify(u)); }catch(_){} }
   function findUser(email){ return loadUsers().find(u=>u.email===email.toLowerCase()); }
   function setSession(email){ try{ localStorage.setItem(SESSION_KEY, email.toLowerCase()); }catch(_){} }
+  // 7-day free trial for freshly-registered users (fingerprint-gated in trial.js).
+  function grantTrial(email){
+    try{ return (window.KolkliTrial && KolkliTrial.grantOnSignup) ? KolkliTrial.grantOnSignup(email) : Promise.resolve(); }
+    catch(_){ return Promise.resolve(); }
+  }
   function clearSession(){ try{ localStorage.removeItem(SESSION_KEY); }catch(_){} }
   function currentSession(){ try{ return localStorage.getItem(SESSION_KEY); }catch(_){ return null; } }
 
@@ -431,7 +436,7 @@
       if(window.KolkliAuth && window.KolkliAuth.configured()){
         if(mode==='signup'){
           const r=await window.KolkliAuth.signUp({ name, email, password:pass });
-          if(r.ok){ if(r.code==='confirm'){ showMsg(t.checkEmail,'info'); } else { showSigned(name, email, t.accountCreated); } }
+          if(r.ok){ if(r.code==='confirm'){ showMsg(t.checkEmail,'info'); } else { await grantTrial(email); showSigned(name, email, t.accountCreated); } }
           else if(r.code==='taken'){ setErr('emailField','emailErr',t.errTaken); }
           else if(r.code==='weak'){ setErr('passField','passErr',t.errPassShort); }
           else { showMsg(r.message||t.errRequired,'err'); }
@@ -448,6 +453,7 @@
         users.push({ name, email, pass:await hashPass(pass), role:'user', plan:'free', created:Date.now() });
         saveUsers(users);
         setSession(email);
+        await grantTrial(email);
         showSigned(name, email, t.accountCreated);
       } else {
         const u=findUser(email);

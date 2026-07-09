@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — שינוי גודל תמונה</title>
-<meta name="description" content="Resize images right in your browser — set exact dimensions or scale by percent, keep the aspect ratio, pick a format and download. Fast, private, nothing leaves your machine.">
+<meta name="description" content="set exact dimensions or scale by percent, keep the aspect ratio, pick a format and download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -48,12 +48,15 @@
   }
   *{box-sizing:border-box;}
   html,body{margin:0;min-height:100%;}
-  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;overflow-x:clip;
     -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
+  @media (max-width:840px){
+    .wrap{width:100vw;max-width:100vw;margin:0;padding:20px 16px 48px;}
+  }
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -346,8 +349,8 @@
     he:{
       dir:'rtl', langIco:'EN',
       kick:'שינוי גודל תמונה',
-      pageTitle:'שנו גודל של תמונות — בלי להעלות לשרת',
-      pageSub:'גררו תמונות, קבעו מידות מדויקות או הקטינו באחוזים, שמרו על יחס הממדים, בחרו פורמט וקבלו קובץ מוכן להורדה. הכול מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      pageTitle:'שנו גודל של תמונות',
+      pageSub:'גררו תמונות, קבעו מידות מדויקות או הקטינו באחוזים, שמרו על יחס הממדים, בחרו פורמט וקבלו קובץ מוכן להורדה. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו תמונות לכאן', or2:'או', choose:'בחרו תמונות',
       sizeNote:'JPG · PNG · WEBP · GIF · BMP', remove:'הסרה',
       totalLbl:'סה״כ', optTitle:'הגדרות שינוי גודל',
@@ -364,8 +367,8 @@
       dlAll:'הורדת הכול', againBtn:'תמונה נוספת',
       converted:'שונה', origLbl:'מקור',
       failed:'העיבוד נכשל — פורמט לא נתמך בדפדפן',
-      seam:'הכול קורה מקומית: התמונות מעובדות ישירות בדפדפן שלכם דרך canvas — שום קובץ לא נשלח לשרת, וכלום לא עוזב את המחשב.',
-      foot:'KOLKLI · שינוי גודל תמונה · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · שינוי גודל תמונה · מהיר, פשוט ובאיכות מקצועית',
       errNoFiles:'צריך לצרף לפחות תמונה אחת', errDims:'הזינו רוחב או גובה', errDecode:'לא הצלחנו לפענח אף תמונה',
       copied:'הקישור הועתק ✓',
       dl:'הורדה',
@@ -373,8 +376,8 @@
     en:{
       dir:'ltr', langIco:'עב',
       kick:'Resize image',
-      pageTitle:'Resize images — without uploading',
-      pageSub:'Drop images, set exact dimensions or scale by percent, keep the aspect ratio, pick a format and get a ready-to-download file. Everything runs in your browser — nothing leaves your machine.',
+      pageTitle:'Resize images',
+      pageSub:'Drop images, set exact dimensions or scale by percent, keep the aspect ratio, pick a format and get a ready-to-download file. Fast, simple and professional-quality.',
       dropBig:'Drag images here', or2:'or', choose:'Choose images',
       sizeNote:'JPG · PNG · WEBP · GIF · BMP', remove:'Remove',
       totalLbl:'Total', optTitle:'Resize options',
@@ -391,8 +394,8 @@
       dlAll:'Download all', againBtn:'Resize more',
       converted:'resized', origLbl:'source',
       failed:'Processing failed — format not supported by this browser',
-      seam:'Everything is local: images are processed right in your browser via canvas — no file is sent to a server, and nothing leaves your machine.',
-      foot:'KOLKLI · Image resize · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Image resize · Fast, simple and professional quality',
       errNoFiles:'Add at least one image', errDims:'Enter a width or a height', errDecode:'We could not decode any image',
       copied:'Link copied ✓',
       dl:'Download',
@@ -400,8 +403,8 @@
     ru:{
       dir:'ltr',
       kick:'Изменение размера изображения',
-      pageTitle:'Изменяйте размер изображений — без загрузки на сервер',
-      pageSub:'Перетащите изображения, задайте точные размеры или масштаб в процентах, сохраните соотношение сторон, выберите формат и получите готовый к скачиванию файл. Всё работает в вашем браузере — ничего не покидает устройство.',
+      pageTitle:'Изменяйте размер изображений',
+      pageSub:'Перетащите изображения, задайте точные размеры или масштаб в процентах, сохраните соотношение сторон, выберите формат и получите готовый к скачиванию файл. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите изображения сюда', or2:'или', choose:'Выбрать изображения',
       sizeNote:'JPG · PNG · WEBP · GIF · BMP', remove:'Удалить',
       totalLbl:'Всего', optTitle:'Параметры изменения размера',
@@ -418,8 +421,8 @@
       dlAll:'Скачать всё', againBtn:'Ещё',
       converted:'изменено', origLbl:'оригинал',
       failed:'Обработка не удалась — формат не поддерживается этим браузером',
-      seam:'Всё локально: изображения обрабатываются прямо в вашем браузере через canvas — ни один файл не отправляется на сервер, ничего не покидает устройство.',
-      foot:'KOLKLI · Изменение размера · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Изменение размера · Быстро, просто и профессионального качества',
       errNoFiles:'Добавьте хотя бы одно изображение', errDims:'Введите ширину или высоту', errDecode:'Не удалось декодировать ни одно изображение',
       copied:'Ссылка скопирована ✓',
       dl:'Скачать',

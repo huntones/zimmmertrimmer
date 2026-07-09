@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מאסטרינג AI</title>
-<meta name="description" content="AI Mastering — upload a track, pick a sound style (Warm, Balanced, Powerful, Clean, Dynamic) and get a balanced, clear, loudness-consistent master ready to play. Compare before/after, choose the processing strength, see the audio stats and download. Runs entirely in your browser — nothing leaves your machine.">
+<meta name="description" content="AI Mastering — upload a track, pick a sound style (Warm, Balanced, Powerful, Clean, Dynamic) and get a balanced, clear, loudness-consistent master ready to play. Compare before/after, choose the processing strength, see the audio stats and download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -371,7 +371,7 @@
       dir:'rtl', langIco:'EN',
       kick:'מאסטרינג AI', nb:'חדש',
       pageTitle:'מאסטרינג אוטומטי לאודיו עם AI',
-      pageSub:'העלו שיר או הקלטה, בחרו סגנון סאונד ועוצמת עיבוד — וקבלו גרסה מאוזנת, ברורה ובעוצמה אחידה, מוכנה להשמעה, תוך שמירה על אופי הסאונד המקורי. העיבוד רץ בדפדפן שלכם; שום קובץ לא עוזב את המחשב.',
+      pageSub:'העלו שיר או הקלטה, בחרו סגנון סאונד ועוצמת עיבוד — וקבלו גרסה מאוזנת, ברורה ובעוצמה אחידה, מוכנה להשמעה, תוך שמירה על אופי הסאונד המקורי. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובץ אודיו לכאן', or2:'או', choose:'בחרו קובץ',
       sizeNote:'MP3 · WAV · M4A · AAC · OGG · FLAC', remove:'הסרה',
       optTitle:'הגדרות מאסטרינג', styleLbl:'סגנון סאונד',
@@ -385,15 +385,15 @@
       procBalance:'איזון עוצמות', procFreq:'התאמת תדרים', procClarity:'שיפור בהירות',
       procDyn:'שליטה בדינמיקה', procLoud:'עוצמה אחידה',
       masterBtn:'בצעו מאסטרינג', working:'מבצע מאסטרינג…',
-      rtNote:'העיבוד רץ מקומית בדפדפן — קובץ ארוך ייקח מספר שניות.',
+      rtNote:'העיבוד מהיר — קובץ ארוך ייקח מספר שניות.',
       stLoud:'עוצמה (RMS)', stPeak:'שיא (Peak)', stDur:'משך', stSr:'קצב דגימה', stCh:'ערוצים',
       colBefore:'לפני', colAfter:'אחרי', chMono:'מונו', chStereo:'סטריאו',
       readyTitle:'המאסטרינג מוכן!', readySub:'הקובץ עובד ומוכן להאזנה ולהורדה.',
       prevTitle:'האזנה: לפני / אחרי', prevOrig:'מקורי', prevMaster:'ממוסטר',
       labelOrig:'מנגן: מקורי', labelMaster:'מנגן: ממוסטר',
       statsTitle:'נתוני אודיו', dl:'הורדת הקובץ', again:'מאסטרינג נוסף',
-      seam:'המאסטרינג רץ מקומית: הקובץ מפוענח ועובר איזון תדרים, שיפור בהירות, שליטה בדינמיקה ונרמול עוצמה — הכול בדפדפן דרך מנוע ה-Web Audio. הקבצים תמיד נשארים אצלכם.',
-      foot:'KOLKLI · מאסטרינג AI · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · מאסטרינג AI · מהיר, פשוט ובאיכות מקצועית',
       errNoFile:'צריך לצרף קובץ אודיו', errDecode:'לא הצלחנו לפענח את הקובץ — נסו פורמט אחר',
       dlWord:'הורדה', copied:'הקישור הועתק ✓',
     },
@@ -401,7 +401,7 @@
       dir:'ltr', langIco:'עב',
       kick:'AI Mastering', nb:'New',
       pageTitle:'Automatic AI audio mastering',
-      pageSub:'Upload a track or recording, pick a sound style and processing strength — and get a balanced, clear, loudness-consistent version ready to play, while keeping the original character of the sound. Processing runs in your browser; nothing leaves your machine.',
+      pageSub:'Upload a track or recording, pick a sound style and processing strength — and get a balanced, clear, loudness-consistent version ready to play, while keeping the original character of the sound. Fast, simple and professional-quality.',
       dropBig:'Drag an audio file here', or2:'or', choose:'Choose file',
       sizeNote:'MP3 · WAV · M4A · AAC · OGG · FLAC', remove:'Remove',
       optTitle:'Mastering options', styleLbl:'Sound style',
@@ -415,15 +415,15 @@
       procBalance:'Level balancing', procFreq:'Frequency shaping', procClarity:'Clarity boost',
       procDyn:'Dynamics control', procLoud:'Consistent loudness',
       masterBtn:'Master now', working:'Mastering…',
-      rtNote:'Processing runs locally in your browser — a long file takes a few seconds.',
+      rtNote:'Processing is fast — a long file takes a few seconds.',
       stLoud:'Loudness (RMS)', stPeak:'Peak', stDur:'Duration', stSr:'Sample rate', stCh:'Channels',
       colBefore:'Before', colAfter:'After', chMono:'Mono', chStereo:'Stereo',
       readyTitle:'Your master is ready!', readySub:'The file is processed and ready to play and download.',
       prevTitle:'Listen: before / after', prevOrig:'Original', prevMaster:'Mastered',
       labelOrig:'Playing: Original', labelMaster:'Playing: Mastered',
       statsTitle:'Audio stats', dl:'Download file', again:'Master another',
-      seam:'Mastering runs locally: the file is decoded and goes through frequency shaping, clarity, dynamics control and loudness normalization — all in your browser via the Web Audio engine. Your files always stay with you.',
-      foot:'KOLKLI · AI Mastering · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · AI Mastering · Fast, simple and professional quality',
       errNoFile:'Add an audio file', errDecode:'We could not decode the file — try another format',
       dlWord:'Download', copied:'Link copied ✓',
     },
@@ -432,7 +432,7 @@
 
       kick:'AI-мастеринг', nb:'Новое',
       pageTitle:'Автоматический AI-мастеринг аудио',
-      pageSub:'Загрузите трек или запись, выберите звуковой стиль и силу обработки — и получите сбалансированную, чистую версию с ровной громкостью, готовую к воспроизведению, сохраняя оригинальный характер звука. Обработка идёт в вашем браузере; ничего не покидает устройство.',
+      pageSub:'Загрузите трек или запись, выберите звуковой стиль и силу обработки — и получите сбалансированную, чистую версию с ровной громкостью, готовую к воспроизведению, сохраняя оригинальный характер звука. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите аудиофайл сюда', or2:'или', choose:'Выбрать файл',
       sizeNote:'MP3 · WAV · M4A · AAC · OGG · FLAC', remove:'Удалить',
       optTitle:'Параметры мастеринга', styleLbl:'Звуковой стиль',
@@ -446,15 +446,15 @@
       procBalance:'Баланс уровней', procFreq:'Частотная коррекция', procClarity:'Усиление чёткости',
       procDyn:'Контроль динамики', procLoud:'Ровная громкость',
       masterBtn:'Мастеринг', working:'Мастеринг…',
-      rtNote:'Обработка выполняется локально в вашем браузере — длинный файл занимает несколько секунд.',
+      rtNote:'Обработка быстрая — длинный файл занимает несколько секунд.',
       stLoud:'Громкость (RMS)', stPeak:'Пик', stDur:'Длительность', stSr:'Частота дискретизации', stCh:'Каналы',
       colBefore:'До', colAfter:'После', chMono:'Моно', chStereo:'Стерео',
       readyTitle:'Ваш мастер готов!', readySub:'Файл обработан и готов к прослушиванию и скачиванию.',
       prevTitle:'Послушайте: до / после', prevOrig:'Оригинал', prevMaster:'После мастеринга',
       labelOrig:'Играет: Оригинал', labelMaster:'Играет: После мастеринга',
       statsTitle:'Параметры аудио', dl:'Скачать файл', again:'Мастеринг другого',
-      seam:'Мастеринг идёт локально: файл декодируется и проходит частотную коррекцию, чёткость, контроль динамики и нормализацию громкости — всё в вашем браузере через движок Web Audio. Ваши файлы всегда остаются у вас.',
-      foot:'KOLKLI · AI-мастеринг · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · AI-мастеринг · Быстро, просто и профессионального качества',
       errNoFile:'Добавьте аудиофайл', errDecode:'Не удалось декодировать файл — попробуйте другой формат',
       dlWord:'Скачать', copied:'Ссылка скопирована ✓',
     },

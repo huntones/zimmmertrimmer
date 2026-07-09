@@ -10,12 +10,19 @@
   if (window.KolkliUsage) return;
 
   var GB = 1024 * 1024 * 1024;
+  var MB = 1024 * 1024;
   var LIMITS = {
     'send-files': { daily: 2, maxBytes: 3 * GB },
-    'organize-files': { daily: 2, maxFiles: 5, maxFolders: 3 },
+    'organize-files': { daily: 2, maxFiles: 10, maxFolders: 3 },
     'review-files': { daily: 2, maxFiles: 1 },
     'request-files': { daily: 2, maxFiles: 5 }
   };
+
+  // Per-file export/upload ceiling by plan. Paid tiers (creator/studio) get a
+  // large single-file allowance; free is intentionally small. This is a size
+  // cap layered on top of any per-tool daily/file quotas, applied client-side
+  // at intake by the tools that meter file size (e.g. normalize-audio).
+  var FILE_BYTE_CAP = { free: 50 * MB, paid: 500 * MB };
 
   var TXT = {
     he: {
@@ -67,6 +74,41 @@
     var depth = location.pathname.replace(/[^/]*$/, '').split('/').filter(Boolean).length;
     return depth ? new Array(depth + 1).join('../') : './';
   }
+
+  // Daily quotas and per-use file/folder caps are free-tier friction only.
+  // Any paid plan (Creator/Studio) is unlimited on projects and files, so the
+  // whole usage-limit flow is skipped for them. Plan is read from the same
+  // localStorage signals the rest of the site uses (mirrors send.html), which
+  // KolkliAuth keeps in sync with the Supabase profile.
+  // Legacy plans (lite/pro/business) map onto the new tiers so older stored
+  // accounts keep resolving.
+  function normalizePlan(plan) {
+    plan = String(plan || '').toLowerCase();
+    if (plan === 'lite') return 'creator';
+    if (plan === 'pro' || plan === 'business') return 'studio';
+    return plan || 'free';
+  }
+  function currentPlan() {
+    var plan = '';
+    try {
+      var email = (localStorage.getItem('ac_session') || '').toLowerCase();
+      if (email) {
+        var users = JSON.parse(localStorage.getItem('ac_users') || '[]') || [];
+        var u = users.filter(function (x) { return (x.email || '').toLowerCase() === email; })[0];
+        if (u && u.plan) plan = u.plan;
+      }
+    } catch (_) {}
+    if (!plan) { try { plan = localStorage.getItem('ac_plan') || ''; } catch (_) {} }
+    return normalizePlan(plan);
+  }
+
+  function isExempt() {
+    var p = currentPlan();
+    return p === 'creator' || p === 'studio';
+  }
+
+  // Largest single file the current plan may export/upload (paid 500MB, free 50MB).
+  function fileByteCap() { return isExempt() ? FILE_BYTE_CAP.paid : FILE_BYTE_CAP.free; }
 
   function toolLimit(tool) {
     tool = String(tool || '').toLowerCase();
@@ -227,6 +269,7 @@
   }
 
   async function authorize(tool, payload) {
+    if (isExempt()) return { ok: true, exempt: true };
     var local = localPayloadLimit(tool, payload);
     if (local) return local;
     return call('authorize', await clientPayload(tool, payload));
@@ -264,6 +307,14 @@
 
   async function consume(tool, payload) {
     return guard(tool, payload || {}, function () { return Promise.resolve(true); });
+  }
+
+  // One-shot 7-day-trial claim, gated server-side by fingerprint + anon id + IP
+  // (mirrors authorize()). Returns { ok, granted } from the Worker, or
+  // { ok:true, skipped:true } when no Worker is configured (caller then falls
+  // back to the local fingerprint ledger). Used by trial.js.
+  async function claimTrial(payload) {
+    return call('trial-claim', await clientPayload('trial', payload || {}));
   }
 
   function usageError(info) {
@@ -641,6 +692,10 @@
   window.KolkliUsage = {
     limits: LIMITS,
     configured: function () { return !!workerBase(); },
+    currentPlan: currentPlan,
+    isExempt: isExempt,
+    fileByteCap: fileByteCap,
+    fileByteCaps: FILE_BYTE_CAP,
     anonymousId: anonymousId,
     fingerprint: fingerprint,
     authorize: authorize,
@@ -648,6 +703,7 @@
     cancel: cancel,
     guard: guard,
     consume: consume,
+    claimTrial: claimTrial,
     showBlocked: showBlocked,
     formatBytes: fmtBytes,
     currentTool: currentAutoTool,

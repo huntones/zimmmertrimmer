@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — ממיר ספרים</title>
-<meta name="description" content="Convert ebooks (EPUB) to PDF, HTML or plain text right in your browser. Pick a target format, set page options, and download. Private and fast — nothing leaves your machine.">
+<meta name="description" content="Pick a target format, set page options, and download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -356,7 +356,7 @@
       dir:'rtl', langIco:'EN',
       kick:'ממירים · ממיר ספרים',
       pageTitle:'המירו ספרים אלקטרוניים בין פורמטים',
-      pageSub:'גררו קובצי EPUB, HTML או טקסט, בחרו פורמט יעד — PDF, HTML או טקסט — וקבלו קובץ מוכן להורדה. הכול מתבצע בדפדפן שלכם, שום קובץ לא עוזב את המחשב.',
+      pageSub:'גררו קובצי EPUB, HTML או טקסט, בחרו פורמט יעד — PDF, HTML או טקסט — וקבלו קובץ מוכן להורדה. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו ספרים לכאן', or2:'או', choose:'בחרו קבצים',
       remove:'הסרה', totalLbl:'סה״כ', optTitle:'הגדרות המרה',
       fmtLbl:'פורמט יעד',
@@ -370,8 +370,8 @@
       combinedFile:'ספרים-מאוחדים',
       unsupported:'פורמט לא נתמך', unsupHint:'נתמכים: EPUB · HTML · TXT',
       failed:'ההמרה נכשלה עבור קובץ זה',
-      seam:'המרת EPUB ל-PDF, ל-HTML ולטקסט מתבצעת במלואה כאן בדפדפן. ייצוא ל-EPUB‏, MOBI ו-AZW3 מתחבר עם מנוע השרת — הקבצים תמיד נשארים אצלכם.',
-      foot:'KOLKLI · ממיר ספרים · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · ממיר ספרים · מהיר, פשוט ובאיכות מקצועית',
       errNone:'הוסיפו לפחות ספר נתמך אחד (EPUB / HTML / TXT)',
       errLibs:'ספריות ההמרה לא נטענו. בדקו את החיבור לאינטרנט ורעננו את העמוד.',
       errFail:'ההמרה נכשלה. נסו קובץ אחר.',
@@ -381,7 +381,7 @@
       dir:'ltr', langIco:'עב',
       kick:'Converters · Ebook Converter',
       pageTitle:'Convert ebooks between formats',
-      pageSub:'Drop EPUB, HTML or text files, pick a target format — PDF, HTML or plain text — and get a ready-to-download file. Everything runs in your browser; nothing leaves your machine.',
+      pageSub:'Drop EPUB, HTML or text files, pick a target format — PDF, HTML or plain text — and get a ready-to-download file. Fast, simple and professional-quality.',
       dropBig:'Drag ebooks here', or2:'or', choose:'Choose files',
       remove:'Remove', totalLbl:'Total', optTitle:'Convert options',
       fmtLbl:'Target format',
@@ -395,8 +395,8 @@
       combinedFile:'merged-ebooks',
       unsupported:'Format not supported', unsupHint:'Supported: EPUB · HTML · TXT',
       failed:'Conversion failed for this file',
-      seam:'EPUB to PDF, HTML and plain text is produced entirely here in your browser. EPUB, MOBI and AZW3 export connects with the server engine — your files always stay with you.',
-      foot:'KOLKLI · Ebook converter · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Ebook converter · Fast, simple and professional quality',
       errNone:'Add at least one supported ebook (EPUB / HTML / TXT)',
       errLibs:'Conversion libraries failed to load. Check your connection and refresh.',
       errFail:'Conversion failed. Try a different file.',
@@ -406,7 +406,7 @@
       dir:'ltr',
       kick:'Конвертеры · Конвертер эл. книг',
       pageTitle:'Конвертируйте электронные книги между форматами',
-      pageSub:'Перетащите файлы EPUB, HTML или текст, выберите целевой формат — PDF, HTML или обычный текст — и получите готовый к скачиванию файл. Всё работает в вашем браузере; ничего не покидает устройство.',
+      pageSub:'Перетащите файлы EPUB, HTML или текст, выберите целевой формат — PDF, HTML или обычный текст — и получите готовый к скачиванию файл. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите книги сюда', or2:'или', choose:'Выбрать файлы',
       remove:'Удалить', totalLbl:'Всего', optTitle:'Параметры конвертации',
       fmtLbl:'Целевой формат',
@@ -420,8 +420,8 @@
       combinedFile:'merged-ebooks',
       unsupported:'Формат не поддерживается', unsupHint:'Поддерживаются: EPUB · HTML · TXT',
       failed:'Не удалось конвертировать этот файл',
-      seam:'Конвертация EPUB в PDF, HTML и обычный текст выполняется полностью здесь, в вашем браузере. Экспорт в EPUB, MOBI и AZW3 подключается к серверному движку — ваши файлы всегда остаются у вас.',
-      foot:'KOLKLI · Конвертер эл. книг · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Конвертер эл. книг · Быстро, просто и профессионального качества',
       errNone:'Добавьте хотя бы одну поддерживаемую книгу (EPUB / HTML / TXT)',
       errLibs:'Не удалось загрузить библиотеки конвертации. Проверьте соединение и обновите страницу.',
       errFail:'Конвертация не удалась. Попробуйте другой файл.',

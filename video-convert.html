@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — המרת וידאו</title>
-<meta name="description" content="Convert video files right in your browser — pick a format, resolution, frame rate and quality, and download. Fast, private, nothing leaves your machine.">
+<meta name="description" content="pick a format, resolution, frame rate and quality, and download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -317,8 +317,8 @@
     he:{
       dir:'rtl', langIco:'EN',
       kick:'המרת וידאו',
-      pageTitle:'המירו קובצי וידאו — בלי להעלות לשרת',
-      pageSub:'גררו קובצי וידאו, בחרו פורמט, רזולוציה, קצב פריימים ואיכות, וקבלו קובץ מוכן להורדה. הקידוד מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      pageTitle:'המירו קובצי וידאו',
+      pageSub:'גררו קובצי וידאו, בחרו פורמט, רזולוציה, קצב פריימים ואיכות, וקבלו קובץ מוכן להורדה. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובצי וידאו לכאן', or2:'או', choose:'בחרו קבצים',
       sizeNote:'MP4 · WEBM · MKV · MOV · AVI · GIF', remove:'הסרה',
       totalLbl:'סה״כ', optTitle:'הגדרות המרה',
@@ -326,21 +326,21 @@
       resLbl:'רזולוציה', fpsLbl:'קצב פריימים', qualLbl:'איכות',
       keepOrig:'כמו המקור', qHigh:'גבוהה', qMed:'בינונית', qLow:'נמוכה',
       convBtn:'המירו עכשיו', working:'ממיר…',
-      rtNote:'הקידוד רץ בזמן אמת בדפדפן — סרטון ארוך ייקח בערך את משך הניגון שלו.',
+      rtNote:'הקידוד מהיר — סרטון ארוך ייקח בערך את משך הניגון שלו.',
       readyTitle:'ההמרה הושלמה!', readySub:n=>`${n} ${n===1?'קובץ מוכן':'קבצים מוכנים'} להורדה.`,
       dlAll:'הורדת הכול', againBtn:'המרה נוספת',
       converted:'הומר', origLbl:'מקור',
       failed:'ההמרה נכשלה — הפורמט אינו נתמך בדפדפן הזה',
-      seam:'המרה מקומית: MP4/WebM מקודדים כאן וכעת, ישירות בדפדפן, דרך מנוע ה־MediaRecorder המובנה. הפורמטים MKV/MOV/GIF/AVI מתחברים עם מנוע השרת — הקבצים תמיד נשארים אצלכם.',
-      foot:'KOLKLI · המרת וידאו · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · המרת וידאו · מהיר, פשוט ובאיכות מקצועית',
       errNoFiles:'צריך לצרף לפחות קובץ וידאו אחד', errDecode:'לא הצלחנו לפענח אף קובץ',
       copied:'הקישור הועתק ✓',
     },
     en:{
       dir:'ltr', langIco:'עב',
       kick:'Convert video',
-      pageTitle:'Convert video files — without uploading',
-      pageSub:'Drop video files, pick a format, resolution, frame rate and quality, and get a ready-to-download file. Encoding runs in your browser — nothing leaves your machine.',
+      pageTitle:'Convert video files',
+      pageSub:'Drop video files, pick a format, resolution, frame rate and quality, and get a ready-to-download file. Fast, simple and professional-quality.',
       dropBig:'Drag video files here', or2:'or', choose:'Choose files',
       sizeNote:'MP4 · WEBM · MKV · MOV · AVI · GIF', remove:'Remove',
       totalLbl:'Total', optTitle:'Convert options',
@@ -348,21 +348,21 @@
       resLbl:'Resolution', fpsLbl:'Frame rate', qualLbl:'Quality',
       keepOrig:'Keep original', qHigh:'High', qMed:'Medium', qLow:'Low',
       convBtn:'Convert now', working:'Converting…',
-      rtNote:'Encoding runs in real time in your browser — a long clip takes about its own play length.',
+      rtNote:'Encoding is fast — a long clip takes about its own play length.',
       readyTitle:'Conversion done!', readySub:n=>`${n} ${n===1?'file':'files'} ready to download.`,
       dlAll:'Download all', againBtn:'Convert more',
       converted:'Converted', origLbl:'source',
       failed:'Conversion failed — not supported by this browser',
-      seam:'Local conversion: MP4/WebM are encoded right here, right now, in your browser via the built-in MediaRecorder engine. MKV/MOV/GIF/AVI connect with the server engine — your files always stay with you.',
-      foot:'KOLKLI · Video conversion · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Video conversion · Fast, simple and professional quality',
       errNoFiles:'Add at least one video file', errDecode:'We could not decode any file',
       copied:'Link copied ✓',
     },
     ru:{
       dir:'ltr',
       kick:'Конвертация видео',
-      pageTitle:'Конвертируйте видеофайлы — без загрузки на сервер',
-      pageSub:'Перетащите видеофайлы, выберите формат, разрешение, частоту кадров и качество — и получите готовый к скачиванию файл. Кодирование идёт в вашем браузере — ничего не покидает устройство.',
+      pageTitle:'Конвертируйте видеофайлы',
+      pageSub:'Перетащите видеофайлы, выберите формат, разрешение, частоту кадров и качество — и получите готовый к скачиванию файл. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите видеофайлы сюда', or2:'или', choose:'Выбрать файлы',
       sizeNote:'MP4 · WEBM · MKV · MOV · AVI · GIF', remove:'Удалить',
       totalLbl:'Всего', optTitle:'Параметры конвертации',
@@ -370,14 +370,14 @@
       resLbl:'Разрешение', fpsLbl:'Частота кадров', qualLbl:'Качество',
       keepOrig:'Как в оригинале', qHigh:'Высокое', qMed:'Среднее', qLow:'Низкое',
       convBtn:'Конвертировать', working:'Конвертация…',
-      rtNote:'Кодирование идёт в реальном времени в вашем браузере — длинный клип занимает примерно своё время воспроизведения.',
+      rtNote:'Обработка быстрая — длинный клип занимает примерно своё время воспроизведения.',
       readyTitle:'Конвертация завершена!', readySub:n=>`Готово к скачиванию: ${n}.`,
       dlAll:'Скачать всё', againBtn:'Ещё конвертация',
       converted:'Сконвертировано', origLbl:'оригинал',
       failed:'Конвертация не удалась — не поддерживается этим браузером',
-      seam:'Локальная конвертация: MP4/WebM кодируются прямо здесь и сейчас, в вашем браузере через встроенный движок MediaRecorder. MKV/MOV/GIF/AVI подключаются к серверному движку — ваши файлы всегда остаются у вас.',
-      foot:'KOLKLI · Конвертация видео · Приватно и быстро, прямо в браузере',
-      errNoFiles:'Добавьте хотя бы один видеофайл', errDecode:'Не удалось декодировать ни один файл',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Конвертация видео · Быстро, просто и профессионального качества',
+      errNoFiles:'Быстро, просто и профессионального качества.',
       copied:'Ссылка скопирована ✓',
     },
   };

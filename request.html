@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{width:min(96vw,1760px);max-width:96vw;margin:0 auto;padding:16px 0 18px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:16px 0 18px;}
   @media (max-width:840px){ .wrap{width:100%;max-width:none;padding:18px 14px 48px;} }
 
   /* page intro */
@@ -244,7 +244,7 @@
   .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
 
   /* manage view */
-  .mgbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .mgbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;padding:0 14px;flex-wrap:wrap;}
   .mgbar h3{font-size:17px;margin:0;font-weight:700;}
   .btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);
     background:var(--panel);color:var(--ink-2);cursor:pointer;font-size:13.5px;font-weight:600;box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s;}
@@ -252,25 +252,38 @@
   .btn.grad{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
 
-  .reqlist{display:flex;flex-direction:column;gap:12px;}
-  .rcard{display:flex;align-items:center;gap:16px;padding:16px 18px;background:var(--panel);border:1px solid var(--line);
-    border-radius:14px;box-shadow:var(--shadow-sm);flex-wrap:wrap;}
+  .reqlist{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:0 14px;}
+  .rcard{display:flex;flex-direction:column;align-items:stretch;gap:18px;min-height:244px;padding:18px;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow-sm);}
   .rcard.unseen{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
-  .rc-main{flex:1;min-width:200px;}
+  .rc-main{flex:1;min-width:0;}
   .rc-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px;}
-  .rc-name{font-size:15.5px;font-weight:700;color:var(--ink);}
+  .rc-name{font-size:17px;font-weight:800;color:var(--ink);line-height:1.25;word-break:break-word;}
   .badge{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:999px;}
   .badge.b-active{background:var(--success-soft);color:var(--success-dim);}
   .badge.b-expired{background:var(--warm-soft);color:var(--warn);}
   .badge.b-closed{background:var(--panel-2);color:var(--faint);border:1px solid var(--line);}
   .newbadge{font-family:var(--mono);font-size:10px;font-weight:700;background:var(--grad);color:#fff;padding:3px 9px;border-radius:999px;}
   .rc-meta{display:flex;flex-wrap:wrap;gap:7px;align-items:center;}
-  .rc-actions{display:flex;gap:7px;flex-wrap:wrap;}
-  .minibtn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:9px;border:1px solid var(--line);
+  .rc-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:auto;}
+  .minibtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--line);
     background:var(--panel-2);color:var(--ink-2);cursor:pointer;font-size:12.5px;font-weight:600;transition:all .12s;}
+  .minibtn.go{grid-column:1/-1;}
   .minibtn:hover{border-color:var(--accent);color:var(--accent-dim);} .minibtn svg{width:14px;height:14px;}
   .minibtn.danger:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
   .minibtn.go{color:var(--accent-dim);border-color:var(--accent);background:var(--accent-soft);}
+
+  @media (max-width:1020px){
+    .reqlist{grid-template-columns:repeat(2,minmax(0,1fr));}
+  }
+  @media (max-width:640px){
+    .reqlist{grid-template-columns:1fr;}
+    .rcard{min-height:0;}
+    .rc-actions{grid-template-columns:1fr;}
+  }
+  @media (max-width:840px){
+    .mgbar,.reqlist{padding-inline:0;}
+  }
 
   .empty{text-align:center;padding:48px 20px;color:var(--muted);}
   .empty .ei{width:66px;height:66px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
@@ -358,6 +371,119 @@
     background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
     box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ===== received: summary card ===== */
+  .rvhead{margin-bottom:14px;}
+  .rvsum{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,300px);overflow:hidden;margin-bottom:14px;}
+  @media(max-width:720px){ .rvsum{grid-template-columns:1fr;} }
+  .rvsum .sum-l{padding:18px 20px;min-width:0;}
+  .rvsum .sum-r{padding:18px 20px;background:var(--panel-2);border-inline-start:1px solid var(--line-2);}
+  @media(max-width:720px){ .rvsum .sum-r{border-inline-start:none;border-top:1px solid var(--line-2);} }
+  .sum-title{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:13px;}
+  .sum-title svg{width:14px;height:14px;color:var(--accent);}
+  .sum-row{display:flex;align-items:center;gap:12px;font-size:13px;padding:5px 0;}
+  .sum-row .k{display:inline-flex;align-items:center;gap:7px;color:var(--muted);flex-shrink:0;min-width:104px;}
+  .sum-row .k svg{width:14px;height:14px;color:var(--accent);flex-shrink:0;}
+  .sum-row .v{color:var(--ink);font-weight:600;word-break:break-word;min-width:0;}
+  .sum-more{font-weight:600;font-size:11px;color:var(--accent-dim);background:var(--accent-soft);padding:2px 8px;border-radius:999px;margin-inline-start:4px;white-space:nowrap;}
+  .sum-badge{margin-bottom:9px;}
+
+  /* ===== received: panel ===== */
+  .rvpanel{padding:16px 18px 18px;}
+  .rvp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px;}
+  .rvp-name{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.01em;word-break:break-word;}
+  .rvp-id{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:3px;}
+  .rvp-ico{width:40px;height:40px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
+  .rvp-ico svg{width:19px;height:19px;}
+  .rvpanel .rvtools{display:flex;align-items:center;gap:10px 12px;flex-wrap:wrap;margin-bottom:14px;}
+  .rvtools-r{display:flex;align-items:center;gap:8px;margin-inline-start:auto;flex-wrap:wrap;}
+  .rvsearch{display:flex;align-items:center;gap:7px;height:34px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:var(--panel);min-width:170px;flex:1;}
+  .rvsearch svg{width:15px;height:15px;color:var(--faint);flex-shrink:0;}
+  .rvsearch input{border:none;background:transparent;outline:none;font-family:var(--sans);font-size:13px;color:var(--ink);width:100%;min-width:0;}
+  .viewtoggle{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px;flex-shrink:0;}
+  .viewtoggle button{width:34px;height:28px;border:none;background:transparent;border-radius:7px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s,box-shadow .12s;}
+  .viewtoggle button svg{width:16px;height:16px;}
+  .viewtoggle button.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  .viewtoggle button:hover:not(.on){color:var(--ink-2);}
+
+  /* ===== received: list / table ===== */
+  .ftbl-wrap{overflow-x:auto;}
+  .ftbl{width:100%;border-collapse:collapse;font-size:13px;}
+  .ftbl col.cg-name{width:44%;} .ftbl col.cg-act{width:1%;}
+  .ftbl th{text-align:start;font-size:11px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  .ftbl td{padding:9px 12px;border-bottom:1px solid var(--line-2);vertical-align:middle;}
+  .ftbl tbody tr:last-child td{border-bottom:none;}
+  .ftbl tr.frw:hover td{background:var(--panel-2);}
+  .ftbl tr.frw.hide{display:none;}
+  .ftbl .c-mono{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap;}
+  .ftbl .c-act{width:1%;white-space:nowrap;}
+  .ftbl tr.grp td{background:var(--panel-2);cursor:pointer;padding:8px 12px;border-bottom:1px solid var(--line-2);}
+  .ftbl tr.grp:hover td{background:var(--line-2);}
+  .grp-c{display:flex;align-items:center;gap:10px;}
+  .grp-chev{display:inline-flex;color:var(--muted);transition:transform .15s;}
+  .grp-chev svg{width:16px;height:16px;}
+  .grp.collapsed .grp-chev{transform:rotate(-90deg);}
+  .grp-fico{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--grad);color:#fff;}
+  .grp-fico svg{width:15px;height:15px;}
+  .grp-nm{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .grp-count{margin-inline-start:auto;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dim);white-space:nowrap;}
+  .ft-file{display:flex;align-items:center;gap:11px;min-width:0;}
+  .ft-ico{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);overflow:hidden;cursor:pointer;}
+  .ft-ico.image{color:var(--info);background:var(--info-soft);}
+  .ft-ico.video{color:var(--danger);background:var(--danger-soft);}
+  .ft-ico.doc{color:var(--info-dim);background:var(--info-soft);}
+  .ft-ico img{width:100%;height:100%;object-fit:cover;}
+  .ft-ico svg{width:17px;height:17px;}
+  .ft-nm{min-width:0;display:flex;align-items:center;flex-wrap:wrap;}
+  .ft-nm .t{font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;}
+  .new-tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--grad);color:#fff;padding:2px 7px;border-radius:999px;margin-inline-start:8px;}
+  .kbadge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);white-space:nowrap;}
+  .kbadge.image{color:var(--info);background:var(--info-soft);border-color:transparent;}
+  .kbadge.video{color:var(--danger);background:var(--danger-soft);border-color:transparent;}
+  .kbadge.audio{color:var(--accent-dim);background:var(--accent-soft);border-color:transparent;}
+  .kbadge.doc{color:var(--info-dim);background:var(--info-soft);border-color:transparent;}
+  .kbadge.other{color:var(--muted);background:var(--panel-2);border-color:var(--line);}
+  .upbadge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--success-soft);color:var(--success-dim);white-space:nowrap;}
+  .upbadge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+  .ft-act{display:flex;gap:6px;}
+  .ft-act button{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .12s,color .12s,background .12s;}
+  .ft-act button:hover{border-color:var(--accent);color:var(--accent);}
+  .ft-act button.del:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .ft-act svg{width:15px;height:15px;}
+
+  /* ===== received: grid (thumbnails) ===== */
+  .fgrid-group{margin-bottom:20px;}
+  .fgrid-group:last-child{margin-bottom:0;}
+  .fg-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--line-2);}
+  .fg-ava{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--grad);color:#fff;font-weight:700;font-size:13px;}
+  .fg-nm{font-weight:700;font-size:14px;color:var(--ink);}
+  .fg-count{margin-inline-start:auto;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dim);}
+  .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+  .gcard{position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel);cursor:pointer;transition:border-color .12s,box-shadow .12s,transform .08s;}
+  .gcard:hover{border-color:var(--accent);box-shadow:var(--shadow-sm);}
+  .gcard:active{transform:translateY(1px);}
+  .gcard.isnew{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft);}
+  .gc-thumb{position:relative;aspect-ratio:4/3;background:var(--panel-2);display:flex;align-items:center;justify-content:center;color:var(--faint);overflow:hidden;}
+  .gc-thumb.image{color:var(--info);} .gc-thumb.video{color:var(--danger);} .gc-thumb.audio{color:var(--accent);}
+  .gc-thumb img,.gc-thumb video{width:100%;height:100%;object-fit:cover;display:block;}
+  .gc-thumb .ph{display:flex;}
+  .gc-thumb .ph svg{width:38px;height:38px;}
+  .gc-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+  .gc-play svg{width:34px;height:34px;color:#fff;filter:drop-shadow(0 2px 6px rgba(0,0,0,.55));}
+  .gc-body{padding:9px 11px;}
+  .gc-nm{font-size:12.5px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .gc-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:6px;}
+  .gc-act{position:absolute;top:7px;inset-inline-end:7px;display:flex;gap:5px;opacity:0;transition:opacity .12s;}
+  .gcard:hover .gc-act,.gcard:focus-within .gc-act{opacity:1;}
+  .gc-act button{width:28px;height:28px;border-radius:7px;border:none;background:rgba(15,18,32,.62);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+  .gc-act button:hover{background:rgba(15,18,32,.85);}
+  .gc-act button.del:hover{background:var(--danger);}
+  .gc-act svg{width:14px;height:14px;}
+
+  /* ===== received: no results ===== */
+  .nores{text-align:center;padding:40px 20px;color:var(--muted);}
+  .nores svg{width:30px;height:30px;color:var(--faint);margin-bottom:10px;}
+  .nores p{margin:0;font-size:14px;}
 </style>
 <link rel="stylesheet" href="./header.css">
 <style>
@@ -376,14 +502,14 @@
   </div>
 
   <div class="tabs" id="tabs">
-    <button class="tab on" id="tabCreate" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-      <span data-i18n="tabCreate"></span>
-    </button>
     <button class="tab" id="tabManage" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
       <span data-i18n="tabManage"></span>
       <span class="count" id="mgCount">0</span>
+    </button>
+    <button class="tab on" id="tabCreate" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+      <span data-i18n="tabCreate"></span>
     </button>
   </div>
 
@@ -570,18 +696,39 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         <span data-i18n="back"></span>
       </button>
-      <h3 id="rvName"></h3>
-      <span id="rvStatus"></span>
     </div>
-    <div class="rvtools" id="rvTools">
-      <div class="filterchips" id="rvFilter"></div>
-      <select class="sortsel" id="rvSort">
-        <option value="new" data-i18n="sortNew"></option>
-        <option value="old" data-i18n="sortOld"></option>
-        <option value="name" data-i18n="sortName"></option>
-      </select>
+
+    <div class="card rvsum hidden" id="rvSummary"></div>
+
+    <div class="card rvpanel hidden" id="rvPanel">
+      <div class="rvp-head">
+        <div class="rvp-title">
+          <div class="rvp-name" id="rvpName"></div>
+          <div class="rvp-id" id="rvpId"></div>
+        </div>
+        <div class="rvp-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+      </div>
+      <div class="rvtools" id="rvTools">
+        <div class="filterchips" id="rvFilter"></div>
+        <div class="rvtools-r">
+          <div class="rvsearch">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="rvSearchInp" type="text" data-i18n-ph="searchPh" autocomplete="off">
+          </div>
+          <select class="sortsel" id="rvSort">
+            <option value="new" data-i18n="sortNew"></option>
+            <option value="old" data-i18n="sortOld"></option>
+            <option value="name" data-i18n="sortName"></option>
+          </select>
+          <div class="viewtoggle" id="rvViewToggle">
+            <button type="button" id="vwList" data-view="list" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
+            <button type="button" id="vwGrid" data-view="grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div id="subList"></div>
     </div>
-    <div id="subList"></div>
+
     <div class="empty hidden" id="rvEmpty">
       <div class="ei"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
       <h3 data-i18n="rvEmptyTitle"></h3>
@@ -609,6 +756,7 @@
   </div>
 </div>
 
+<script src="./project-numbering.js"></script>
 <script src="./request-store.js"></script>
 <script src="./vendor/qrcode.min.js"></script>
 <script>
@@ -640,7 +788,7 @@
       copy:'העתקה', copied:'הקישור הועתק ✓',
       openClient:'תצוגת הלקוח', shareEmail:'שליחה במייל', shareWa:'וואטסאפ', toManage:'לניהול הבקשות',
       qrDl:'הורדת קוד QR',
-      seam:'הדגמה מקומית: הבקשות והקבצים נשמרים בדפדפן הזה. עם חיבור השרת הקישור יעבוד לכל לקוח מכל מכשיר.',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
       foot:'KOLKLI · Kolkli Request · הדגמה מקומית עד לחיבור השרת',
       mgTitle:'הזמנות שהתקבלו', newReq:'בקשה חדשה',
       mgEmptyTitle:'עדיין אין בקשות', mgEmptyBody:'צרו בקשה ראשונה כדי לקבל קבצים מלקוחות בקישור אחד.',
@@ -655,6 +803,11 @@
       dupSuffix:' (עותק)', copiedShort:'הקישור הועתק ✓', closedToast:'הבקשה נסגרה', delToast:'הבקשה נמחקה',
       back:'חזרה', sortNew:'החדשים ביותר', sortOld:'הישנים ביותר', sortName:'לפי שם לקוח',
       fAll:'הכל', anonymous:'לקוח ללא שם',
+      searchPh:'חיפוש קובץ…', viewList:'תצוגת רשימה', viewGrid:'תמונות ממוזערות', noResults:'לא נמצאו קבצים תואמים', newTag:'חדש',
+      thName:'שם הקובץ', thType:'סוג', thSize:'גודל', thDate:'תאריך העלאה', thStatus:'סטטוס', thActions:'פעולות', fStatusUp:'הועלה',
+      kImage:'תמונה', kVideo:'וידאו', kAudio:'אודיו', kDoc:'מסמך', kOther:'אחר',
+      sumSender:'פרטי השולח', sumName:'שם', sumEmail:'אימייל', sumPhone:'טלפון', sumSubject:'נושא הבקשה', sumCreated:'תאריך יצירה',
+      sumStatus:'סטטוס הבקשה', sumFiles:'קבצים שהועלו', sumSize:'גודל כולל', sumUpdated:'עדכון אחרון', sendersMore:n=>`+${n} שולחים`,
       rvEmptyTitle:'עדיין לא התקבלו קבצים', rvEmptyBody:'ברגע שלקוח יעלה קבצים דרך הקישור, הם יופיעו כאן.',
       filePreview:'תצוגה', fileDownload:'הורדה', fileDelete:'מחיקה', close:'סגור',
       confTitleFileDel:'מחיקת הקובץ', confFileDel:'למחוק את הקובץ? לא ניתן יהיה לשחזר אותו.',
@@ -704,6 +857,11 @@
       dupSuffix:' (copy)', copiedShort:'Link copied ✓', closedToast:'Request closed', delToast:'Request deleted',
       back:'Back', sortNew:'Newest first', sortOld:'Oldest first', sortName:'By client name',
       fAll:'All', anonymous:'Unnamed client',
+      searchPh:'Search files…', viewList:'List view', viewGrid:'Thumbnails', noResults:'No matching files', newTag:'New',
+      thName:'File name', thType:'Type', thSize:'Size', thDate:'Uploaded', thStatus:'Status', thActions:'Actions', fStatusUp:'Uploaded',
+      kImage:'Image', kVideo:'Video', kAudio:'Audio', kDoc:'Document', kOther:'Other',
+      sumSender:'Sender details', sumName:'Name', sumEmail:'Email', sumPhone:'Phone', sumSubject:'Subject', sumCreated:'Created',
+      sumStatus:'Request status', sumFiles:'Files uploaded', sumSize:'Total size', sumUpdated:'Last update', sendersMore:n=>`+${n} more`,
       rvEmptyTitle:'No files received yet', rvEmptyBody:'As soon as a client uploads through the link, their files appear here.',
       filePreview:'Preview', fileDownload:'Download', fileDelete:'Delete', close:'Close',
       confTitleFileDel:'Delete file', confFileDel:'Delete this file? It cannot be recovered.',
@@ -753,6 +911,11 @@
       dupSuffix:' (копия)', copiedShort:'Ссылка скопирована ✓', closedToast:'Запрос закрыт', delToast:'Запрос удалён',
       back:'Назад', sortNew:'Сначала новые', sortOld:'Сначала старые', sortName:'По имени клиента',
       fAll:'Все', anonymous:'Клиент без имени',
+      searchPh:'Поиск файлов…', viewList:'Список', viewGrid:'Эскизы', noResults:'Совпадений не найдено', newTag:'Новый',
+      thName:'Имя файла', thType:'Тип', thSize:'Размер', thDate:'Загружен', thStatus:'Статус', thActions:'Действия', fStatusUp:'Загружен',
+      kImage:'Изображение', kVideo:'Видео', kAudio:'Аудио', kDoc:'Документ', kOther:'Другое',
+      sumSender:'Данные отправителя', sumName:'Имя', sumEmail:'Эл. почта', sumPhone:'Телефон', sumSubject:'Тема', sumCreated:'Создано',
+      sumStatus:'Статус запроса', sumFiles:'Загружено файлов', sumSize:'Общий размер', sumUpdated:'Обновлено', sendersMore:n=>`+${n} ещё`,
       rvEmptyTitle:'Файлы пока не получены', rvEmptyBody:'Как только клиент загрузит файлы по ссылке, они появятся здесь.',
       filePreview:'Просмотр', fileDownload:'Скачать', fileDelete:'Удалить', close:'Закрыть',
       confTitleFileDel:'Удалить файл', confFileDel:'Удалить этот файл? Восстановить его будет невозможно.',
@@ -773,7 +936,9 @@
   let createTypes = {};           // {image:true,...}
   let lastToken=null;             // request just created (for share panel)
   let rvToken=null;               // request open in received view
-  let rvSort='new', rvFilter='all';
+  let rvSort='new', rvFilter='all', rvView='list', rvSearch='';
+  let rvCollapsed=new Set(), rvNewIds=new Set(), gridUrls=[];
+  const ARCHIVE=['zip','rar','7z','gz','tar','bz2','xz'];
   let notifyEnabled=false;
 
   // ---------- helpers ----------
@@ -828,6 +993,7 @@
 
   // ---------- tabs / views ----------
   function setView(v){
+    if(view==='received' && v!=='received') revokeGridUrls();
     view=v;
     el('createView').classList.toggle('hidden', v!=='create');
     el('manageView').classList.toggle('hidden', v!=='manage');
@@ -897,11 +1063,16 @@
           notify: el('fNotify').checked,
           status:'active', submissions:[], files:[]
         };
+        if(window.KolkliProjectNumbers) await KolkliProjectNumbers.assign('receive', next);
         KR.upsertRequest(next);
         return next;
       });
     }catch(err){
       if(err && err.usage) return;
+      if(err && err.message==='project_number_allocation_failed'){
+        el('createErr').textContent = lang==='he' ? 'לא ניתן להקצות מספר פרויקט כרגע. נסו שוב.' : 'Could not allocate a project number. Please try again.';
+        return;
+      }
       throw err;
     }
     lastToken=req.token;
@@ -915,6 +1086,8 @@
     el('openClientBtn').href=url;
     el('waShareBtn').href='https://wa.me/?text='+encodeURIComponent(t.waText(req.name,url));
     const chips=[];
+    const num=projectNumberText(req);
+    if(num) chips.push(`<span class="chip">${KR.escapeHtml(num)}</span>`);
     chips.push(`<span class="chip">${clockSvg()} ${req.expiresAt? t.chipExpSoon(daysWord(Math.ceil((req.expiresAt-Date.now())/86400000))) : t.chipNoExpiry}</span>`);
     chips.push(`<span class="chip">${folderSvg()} ${KR.escapeHtml(req.folder)}</span>`);
     if(req.types.length) chips.push(`<span class="chip">${req.types.map(k=>lblForType(k)).join(' · ')}</span>`);
@@ -957,12 +1130,17 @@
   // ---------- manage ----------
   function updateCount(){ el('mgCount').textContent = KR.loadRequests().length; }
   function statusLabel(s){ return s==='active'? t.stActive : s==='expired'? t.stExpired : t.stClosed; }
+  function projectNumberText(req){
+    return window.KolkliProjectNumbers ? KolkliProjectNumbers.display('receive', req, lang) : '';
+  }
 
   function reqCardHtml(req){
     const st=KR.statusOf(req);
     const unseen=KR.reqUnseen(req);
     const bytes=KR.reqBytes(req);
     const chips=[];
+    const num=projectNumberText(req);
+    if(num) chips.push(`<span class="chip">${KR.escapeHtml(num)}</span>`);
     chips.push(`<span class="chip">${folderSvg()} ${KR.escapeHtml(req.folder)}</span>`);
     chips.push(`<span class="chip">${fileSvg()} ${t.chipFiles(req.files.length)}</span>`);
     if(bytes) chips.push(`<span class="chip">${KR.fmtBytes(bytes)}</span>`);
@@ -995,7 +1173,8 @@
 
   function renderManage(){
     updateCount();
-    const reqs=KR.loadRequests().slice().sort((a,b)=>b.createdAt-a.createdAt);
+    const reqs=window.KolkliProjectNumbers ? KolkliProjectNumbers.ensureAll('receive', KR.loadRequests(), KR.saveRequests) : KR.loadRequests();
+    reqs.sort((a,b)=>b.createdAt-a.createdAt);
     el('reqList').innerHTML = reqs.map(reqCardHtml).join('');
     el('mgEmpty').classList.toggle('hidden', reqs.length>0);
     el('reqList').classList.toggle('hidden', reqs.length===0);
@@ -1012,12 +1191,14 @@
     if(!ok) return;
     const req=KR.getRequest(token); if(!req) return; req.status='closed'; KR.upsertRequest(req); renderManage(); toast(t.closedToast);
   }
-  function duplicateRequest(token){
+  async function duplicateRequest(token){
     const src=KR.getRequest(token); if(!src) return;
     const copy=JSON.parse(JSON.stringify(src));
     copy.token=KR.randToken(); copy.name=src.name+t.dupSuffix; copy.createdAt=Date.now();
     copy.status='active'; copy.submissions=[]; copy.files=[];
     if(src.expiresAt){ const span=src.expiresAt-src.createdAt; copy.expiresAt=Date.now()+Math.max(span,86400000); }
+    delete copy.projectNumber; delete copy.project_number; delete copy.projectNumberLabel; delete copy.projectNumberSource;
+    if(window.KolkliProjectNumbers) await KolkliProjectNumbers.assign('receive', copy);
     KR.upsertRequest(copy); renderManage(); updateCount();
   }
   async function deleteRequest(token){
@@ -1028,18 +1209,161 @@
 
   // ---------- received files ----------
   function openReceived(token){
-    rvToken=token; rvSort='new'; rvFilter='all'; el('rvSort').value='new';
+    rvToken=token; rvSort='new'; rvFilter='all'; rvSearch=''; rvView='list'; rvCollapsed=new Set();
+    el('rvSort').value='new';
+    const si=el('rvSearchInp'); if(si) si.value='';
+    el('vwList').classList.add('on'); el('vwGrid').classList.remove('on');
     renderReceived(true);
     setView('received');
     // mark everything seen (after capturing which were new for the dots)
     const req=KR.getRequest(token);
     if(req){ let changed=false; req.files.forEach(f=>{ if(!f.seen){ f.seen=true; changed=true; } }); if(changed){ KR.upsertRequest(req); } }
   }
+
+  // ---- shared helpers for the received views ----
+  function reqShortId(req){ const s=(req.token||'').replace(/[^a-z0-9]/gi,'').toUpperCase(); return '#REQ-'+(s.slice(-4)||'0000'); }
+  function kindClass(f){ return (f.kind==='doc' && ARCHIVE.indexOf((f.ext||'').toLowerCase())>=0)? 'other' : f.kind; }
+  function kindLabel(f){ const c=kindClass(f); return t['k'+c.charAt(0).toUpperCase()+c.slice(1)] || t.kDoc; }
+  function sortCmp(a,b){ return rvSort==='old'? a.at-b.at : rvSort==='name'? (a.name||'').localeCompare(b.name||'') : b.at-a.at; }
+  function visibleFiles(req){
+    let files=req.files.slice();
+    if(rvFilter!=='all') files=files.filter(f=>f.kind===rvFilter);
+    const q=rvSearch.trim().toLowerCase();
+    if(q) files=files.filter(f=>(f.name||'').toLowerCase().indexOf(q)>=0);
+    return files;
+  }
+  function groupFiles(req){
+    const fv=visibleFiles(req);
+    let subs=req.submissions.slice();
+    subs.sort((a,b)=> rvSort==='old'? a.at-b.at : rvSort==='name'? (a.name||'').localeCompare(b.name||'') : b.at-a.at);
+    const groups=subs.map(sub=>({sub, files:fv.filter(f=>f.subId===sub.id).sort(sortCmp)})).filter(g=>g.files.length);
+    const claimed=new Set(); groups.forEach(g=>g.files.forEach(f=>claimed.add(f.id)));
+    const orphans=fv.filter(f=>!claimed.has(f.id));
+    if(orphans.length) groups.push({sub:{id:'__none',name:'',at:0}, files:orphans.sort(sortCmp)});
+    return groups;
+  }
+  function revokeGridUrls(){ gridUrls.forEach(u=>{ try{URL.revokeObjectURL(u);}catch(_){}}); gridUrls=[]; }
+
+  function summaryHtml(req, st){
+    const subs=req.submissions.slice().sort((a,b)=>a.at-b.at);
+    const primary=subs.filter(s=>s.name||s.email||s.phone)[0]||subs[0]||null;
+    const nm=primary&&primary.name?KR.escapeHtml(primary.name):t.anonymous;
+    const em=primary&&primary.email?KR.escapeHtml(primary.email):'—';
+    const ph=primary&&primary.phone?KR.escapeHtml(primary.phone):'—';
+    const lastAt=req.files.reduce((m,f)=>Math.max(m,f.at||0),0);
+    const more=subs.length>1?` <span class="sum-more">${KR.escapeHtml(t.sendersMore(subs.length-1))}</span>`:'';
+    const left=`<div class="sum-title">${userSvg()}<span>${t.sumSender}</span></div>
+      <div class="sum-row"><span class="k">${userSvg()}<span>${t.sumName}</span></span><span class="v">${nm}${more}</span></div>
+      <div class="sum-row"><span class="k">${mailSvg()}<span>${t.sumEmail}</span></span><span class="v" dir="ltr">${em}</span></div>
+      <div class="sum-row"><span class="k">${phoneSvg()}<span>${t.sumPhone}</span></span><span class="v" dir="ltr">${ph}</span></div>
+      <div class="sum-row"><span class="k">${tagSvg()}<span>${t.sumSubject}</span></span><span class="v">${KR.escapeHtml(req.name)}</span></div>
+      <div class="sum-row"><span class="k">${calSvg()}<span>${t.sumCreated}</span></span><span class="v">${fmtDateTime(req.createdAt)}</span></div>`;
+    const right=`<div class="sum-title">${clockSvg()}<span>${t.sumStatus}</span></div>
+      <div class="sum-badge"><span class="badge b-${st}">${statusLabel(st)}</span></div>
+      <div class="sum-row"><span class="k">${fileSvg()}<span>${t.sumFiles}</span></span><span class="v">${req.files.length}</span></div>
+      <div class="sum-row"><span class="k">${folderSvg()}<span>${t.sumSize}</span></span><span class="v">${KR.fmtBytes(KR.reqBytes(req))}</span></div>
+      <div class="sum-row"><span class="k">${clockSvg()}<span>${t.sumUpdated}</span></span><span class="v">${lastAt?fmtDateTime(lastAt):'—'}</span></div>`;
+    return `<div class="sum-l">${left}</div><div class="sum-r">${right}</div>`;
+  }
+
+  // ---- list (table) view ----
+  function fileRowHtml(f, subId, collapsed){
+    const previewable=f.kind==='image'||f.kind==='video'||f.kind==='audio'||f.ext==='pdf';
+    const isNew=rvNewIds.has(f.id);
+    return `<tr class="frw${collapsed?' hide':''}" data-sub="${subId}" data-fid="${f.id}">
+      <td class="c-name"><div class="ft-file">
+        <span class="ft-ico ${f.kind}" ${previewable?`data-pv="${f.id}"`:''}>${KR.FICON[f.kind]}</span>
+        <div class="ft-nm"><span class="t" title="${KR.escapeHtml(f.name)}">${KR.escapeHtml(f.name)}</span>${isNew?`<span class="new-tag">${t.newTag}</span>`:''}</div>
+      </div></td>
+      <td><span class="kbadge ${kindClass(f)}">${kindLabel(f)}</span></td>
+      <td class="c-mono">${KR.fmtBytes(f.size)}</td>
+      <td class="c-mono">${fmtDateTime(f.at)}</td>
+      <td><span class="upbadge">${t.fStatusUp}</span></td>
+      <td class="c-act"><div class="ft-act">
+        ${previewable?`<button data-pv="${f.id}" title="${KR.escapeHtml(t.filePreview)}">${eyeSvg()}</button>`:''}
+        <button data-dl="${f.id}" title="${KR.escapeHtml(t.fileDownload)}">${dlSvg()}</button>
+        <button class="del" data-del="${f.id}" title="${KR.escapeHtml(t.fileDelete)}">${trashSvg()}</button>
+      </div></td>
+    </tr>`;
+  }
+  function tableHtml(groups){
+    const head=`<thead><tr>
+      <th class="c-name">${t.thName}</th><th>${t.thType}</th><th>${t.thSize}</th><th>${t.thDate}</th><th>${t.thStatus}</th><th class="c-act">${t.thActions}</th>
+    </tr></thead>`;
+    const body=groups.map(g=>{
+      const collapsed=rvCollapsed.has(g.sub.id);
+      const nm=g.sub.name?KR.escapeHtml(g.sub.name):t.anonymous;
+      const grp=`<tr class="grp${collapsed?' collapsed':''}" data-sub="${g.sub.id}">
+        <td colspan="6"><div class="grp-c">
+          <span class="grp-chev">${chevSvg()}</span>
+          <span class="grp-fico">${folderSvg()}</span>
+          <span class="grp-nm">${nm}</span>
+          <span class="grp-count">${t.chipFiles(g.files.length)}</span>
+        </div></td></tr>`;
+      return grp + g.files.map(f=>fileRowHtml(f, g.sub.id, collapsed)).join('');
+    }).join('');
+    return `<div class="ftbl-wrap"><table class="ftbl"><colgroup><col class="cg-name"><col><col><col><col><col class="cg-act"></colgroup>${head}<tbody>${body}</tbody></table></div>`;
+  }
+
+  // ---- grid (thumbnails) view ----
+  function gcardHtml(f){
+    const previewable=f.kind==='image'||f.kind==='video'||f.kind==='audio'||f.ext==='pdf';
+    const isThumb=(f.kind==='image'||f.kind==='video');
+    const isNew=rvNewIds.has(f.id);
+    const thumb=isThumb
+      ? `<div class="gc-thumb ${f.kind}" data-thumb="${f.id}" data-kind="${f.kind}"><span class="ph">${KR.FICON[f.kind]}</span>${f.kind==='video'?`<span class="gc-play">${playSvg()}</span>`:''}</div>`
+      : `<div class="gc-thumb ${f.kind}"><span class="ph">${KR.FICON[f.kind]}</span></div>`;
+    return `<div class="gcard${isNew?' isnew':''}" ${previewable?`data-pv="${f.id}"`:''} data-fid="${f.id}">
+      ${thumb}
+      <div class="gc-act">
+        <button data-dl="${f.id}" title="${KR.escapeHtml(t.fileDownload)}">${dlSvg()}</button>
+        <button class="del" data-del="${f.id}" title="${KR.escapeHtml(t.fileDelete)}">${trashSvg()}</button>
+      </div>
+      <div class="gc-body">
+        <div class="gc-nm" title="${KR.escapeHtml(f.name)}">${KR.escapeHtml(f.name)}</div>
+        <div class="gc-meta"><span class="kbadge ${kindClass(f)}">${kindLabel(f)}</span><span class="c-mono">${KR.fmtBytes(f.size)}</span></div>
+      </div>
+    </div>`;
+  }
+  function gridHtml(groups){
+    return groups.map(g=>{
+      const nm=g.sub.name?KR.escapeHtml(g.sub.name):t.anonymous;
+      const initial=(g.sub.name||'?').trim().charAt(0).toUpperCase()||'?';
+      return `<div class="fgrid-group">
+        <div class="fg-head">
+          <span class="fg-ava">${KR.escapeHtml(initial)}</span>
+          <span class="fg-nm">${nm}</span>
+          <span class="fg-count">${t.chipFiles(g.files.length)}</span>
+        </div>
+        <div class="fgrid">${g.files.map(gcardHtml).join('')}</div>
+      </div>`;
+    }).join('');
+  }
+  function fillThumbs(){
+    el('subList').querySelectorAll('.gc-thumb[data-thumb]').forEach(node=>{
+      const id=node.getAttribute('data-thumb'), kind=node.getAttribute('data-kind');
+      KR.getBlob(id).then(blob=>{
+        if(!blob) return;
+        const url=URL.createObjectURL(blob); gridUrls.push(url);
+        if(kind==='image'){
+          const img=new Image(); img.alt='';
+          img.onload=()=>{ const ph=node.querySelector('.ph'); if(ph) ph.remove(); node.insertBefore(img,node.firstChild); };
+          img.onerror=()=>{ try{URL.revokeObjectURL(url);}catch(_){} };
+          img.src=url;
+        } else if(kind==='video'){
+          const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='metadata';
+          v.onloadeddata=()=>{ const ph=node.querySelector('.ph'); if(ph) ph.remove(); };
+          v.src=url+'#t=0.1'; node.insertBefore(v,node.firstChild);
+        }
+      }).catch(()=>{});
+    });
+  }
+
   function renderReceived(freshOpen){
     const req=KR.getRequest(rvToken); if(!req){ setView('manage'); return; }
+    revokeGridUrls();
     const st=KR.statusOf(req);
-    el('rvName').textContent=req.name;
-    el('rvStatus').innerHTML=`<span class="badge b-${st}">${statusLabel(st)}</span>`;
+    rvNewIds = new Set(freshOpen ? req.files.filter(f=>!f.seen).map(f=>f.id) : []);
 
     // filter chips
     el('rvFilter').innerHTML = ['all'].concat(TYPE_KEYS).map(k=>{
@@ -1048,55 +1372,20 @@
     }).join('');
 
     const hasFiles=req.files.length>0;
-    el('subList').classList.toggle('hidden', !hasFiles);
-    el('rvTools').classList.toggle('hidden', !hasFiles);
+    el('rvSummary').classList.toggle('hidden', !hasFiles);
+    el('rvPanel').classList.toggle('hidden', !hasFiles);
     el('rvEmpty').classList.toggle('hidden', hasFiles);
     if(!hasFiles){ el('subList').innerHTML=''; return; }
 
-    // group files by submission
-    let subs=req.submissions.slice();
-    subs.sort((a,b)=> rvSort==='old'? a.at-b.at : rvSort==='name'? (a.name||'').localeCompare(b.name||'') : b.at-a.at);
+    el('rvSummary').innerHTML = summaryHtml(req, st);
+    el('rvpName').textContent = req.name;
+    el('rvpId').textContent = reqShortId(req);
 
-    const rows=subs.map(sub=>{
-      let files=req.files.filter(f=>f.subId===sub.id);
-      if(rvFilter!=='all') files=files.filter(f=>f.kind===rvFilter);
-      if(!files.length) return '';
-      const bytes=files.reduce((a,f)=>a+(f.size||0),0);
-      const contact=[];
-      if(sub.phone) contact.push(`<span class="chip">${phoneSvg()} ${KR.escapeHtml(sub.phone)}</span>`);
-      if(sub.email) contact.push(`<span class="chip">${mailSvg()} ${KR.escapeHtml(sub.email)}</span>`);
-      contact.push(`<span class="chip">${fileSvg()} ${t.chipFiles(files.length)} · ${KR.fmtBytes(bytes)}</span>`);
-      const name=sub.name? KR.escapeHtml(sub.name) : t.anonymous;
-      const initial=(sub.name||'?').trim().charAt(0).toUpperCase()||'?';
-      const fileRows=files.map(f=>{
-        const isNew=freshOpen && !f.seen;
-        const previewable = f.kind==='image'||f.kind==='video'||f.kind==='audio'||f.ext==='pdf';
-        return `<div class="frow" data-fid="${f.id}">
-          <span class="newdot${isNew?'':' ph'}"></span>
-          <span class="fico ${f.kind}" ${previewable?`data-pv="${f.id}"`:''}>${KR.FICON[f.kind]}</span>
-          <span class="fn"><div class="nm" title="${KR.escapeHtml(f.name)}">${KR.escapeHtml(f.name)}</div><div class="sz">${KR.fmtBytes(f.size)} · ${fmtDateTime(f.at)}</div></span>
-          <span class="act">
-            ${previewable?`<button data-pv="${f.id}" title="${KR.escapeHtml(t.filePreview)}">${eyeSvg()}</button>`:''}
-            <button data-dl="${f.id}" title="${KR.escapeHtml(t.fileDownload)}">${dlSvg()}</button>
-            <button class="del" data-del="${f.id}" title="${KR.escapeHtml(t.fileDelete)}">${trashSvg()}</button>
-          </span>
-        </div>`;
-      }).join('');
-      return `<div class="subgroup">
-        <div class="sg-head">
-          <span class="sg-ava">${KR.escapeHtml(initial)}</span>
-          <div class="sg-id">
-            <div class="sg-name">${name}</div>
-            <div class="sg-when">${fmtDateTime(sub.at)}</div>
-            <div class="sg-contact">${contact.join('')}</div>
-            ${sub.note?`<div class="sg-note">${KR.escapeHtml(sub.note)}</div>`:''}
-          </div>
-        </div>
-        <div class="sg-files">${fileRows}</div>
-      </div>`;
-    }).filter(Boolean).join('');
+    const groups=groupFiles(req);
+    if(!groups.length){ el('subList').innerHTML=`<div class="nores">${searchSvg()}<p>${KR.escapeHtml(t.noResults)}</p></div>`; return; }
 
-    el('subList').innerHTML = rows || `<div class="empty"><p>${KR.escapeHtml(t.rvEmptyBody)}</p></div>`;
+    if(rvView==='grid'){ el('subList').innerHTML=gridHtml(groups); fillThumbs(); }
+    else { el('subList').innerHTML=tableHtml(groups); }
   }
 
   function fileById(id){
@@ -1153,6 +1442,7 @@
     lang=l; t=I18N[l];
     document.documentElement.lang=l; document.documentElement.dir=t.dir;
     applyStatic();
+    { const vl=el('vwList'), vg=el('vwGrid'); if(vl) vl.title=t.viewList; if(vg) vg.title=t.viewGrid; }
     KR.lsSet('ac_lang', l);
     renderTypeChips(); fillFolders(el('fFolder').value && el('fFolder').value!=='__new'? el('fFolder').value : undefined);
     renderPreview();
@@ -1173,6 +1463,12 @@
   function dlSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>'; }
   function phoneSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>'; }
   function mailSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>'; }
+  function chevSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>'; }
+  function playSvg(){ return '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'; }
+  function userSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'; }
+  function calSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>'; }
+  function tagSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12 22l-9-9V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></svg>'; }
+  function searchSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>'; }
 
   // ---------- events ----------
   el('tabCreate').addEventListener('click',()=>setView('create'));
@@ -1210,10 +1506,20 @@
 
   el('rvFilter').addEventListener('click',e=>{ const c=e.target.closest('[data-filter]'); if(!c) return; rvFilter=c.getAttribute('data-filter'); renderReceived(false); });
   el('rvSort').addEventListener('change',e=>{ rvSort=e.target.value; renderReceived(false); });
+  el('rvSearchInp').addEventListener('input',e=>{ rvSearch=e.target.value; renderReceived(false); });
+  el('rvViewToggle').addEventListener('click',e=>{
+    const b=e.target.closest('[data-view]'); if(!b) return;
+    const v=b.getAttribute('data-view'); if(v===rvView) return;
+    rvView=v;
+    el('vwList').classList.toggle('on', v==='list');
+    el('vwGrid').classList.toggle('on', v==='grid');
+    renderReceived(false);
+  });
   el('subList').addEventListener('click',e=>{
-    const pv=e.target.closest('[data-pv]'); if(pv){ previewFile(pv.getAttribute('data-pv')); return; }
+    const del=e.target.closest('[data-del]'); if(del){ deleteFile(del.getAttribute('data-del')); return; }
     const dl=e.target.closest('[data-dl]'); if(dl){ downloadFile(dl.getAttribute('data-dl')); return; }
-    const del=e.target.closest('[data-del]'); if(del){ deleteFile(del.getAttribute('data-del')); }
+    const pv=e.target.closest('[data-pv]'); if(pv){ previewFile(pv.getAttribute('data-pv')); return; }
+    const grp=e.target.closest('.grp'); if(grp){ const id=grp.getAttribute('data-sub'); if(rvCollapsed.has(id)) rvCollapsed.delete(id); else rvCollapsed.add(id); renderReceived(false); }
   });
   el('pvClose').addEventListener('click',closePreview);
   el('pv').addEventListener('click',e=>{ if(e.target===el('pv')) closePreview(); });
@@ -1236,7 +1542,10 @@
   applyLang(KR.detectLang());
   fillFolders(); renderTypeChips(); renderPreview(); updateCount();
   requestNotifyPerm();
-  if(/[?&]tab=manage/.test(location.search)) setView('manage');
+  const initParams=new URLSearchParams(location.search);
+  const initFilesToken=initParams.get('files');
+  if(initFilesToken && KR.getRequest(initFilesToken)) openReceived(initFilesToken);
+  else if(initParams.get('tab')==='manage') setView('manage');
 })();
 </script>
 </body>

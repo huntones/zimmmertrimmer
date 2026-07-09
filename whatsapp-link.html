@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחולל קישור וואטסאפ</title>
-<meta name="description" content="Create a wa.me WhatsApp click-to-chat link with a country code, phone number and a pre-filled message. Copy the link or an HTML snippet, or open the chat instantly. Fast, private, all in your browser.">
+<meta name="description" content="Create a wa.me WhatsApp click-to-chat link with a country code, phone number and a pre-filled message. Copy the link or an HTML snippet, or open the chat instantly. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -298,7 +298,7 @@
       dir:'rtl',
       kick:'שיווק · מחולל קישור וואטסאפ',
       pageTitle:'מחוללל קישור וואטסאפ לצ׳אט מיידי',
-      pageSub:'בנו קישור wa.me עם קידומת מדינה, מספר טלפון והודעה מוכנה מראש. העתיקו את הקישור, קבלו קטע HTML מוכן להטמעה, או פִּתחו את הצ׳אט מיד — הכול רץ בדפדפן שלכם.',
+      pageSub:'בנו קישור wa.me עם קידומת מדינה, מספר טלפון והודעה מוכנה מראש. העתיקו את הקישור, קבלו קטע HTML מוכן להטמעה, או פִּתחו את הצ׳אט מיד. מהיר, פשוט ובאיכות מקצועית.',
       formTitle:'פרטי הקישור',
       phoneLbl:'מספר טלפון', phonePh:'50 123 4567',
       msgLbl:'הודעה מוכנה מראש', msgPh:'שלום! ראיתי את הפרסום שלכם ורציתי לשאול…',
@@ -312,15 +312,15 @@
       hintShort:'המספר קצר מדי — בדקו שוב.',
       hintOk:n=>`מספר תקין · ${n} ספרות`,
       chips:['שלום! 👋','אשמח לפרטים נוספים','מתעניין/ת במחיר','אפשר לקבוע פגישה?'],
-      seam:'הכול נבנה מקומית בדפדפן — שום מספר או הודעה לא נשלחים לשרת. הקישור עצמו נפתח באפליקציית וואטסאפ של הנמען.',
-      foot:'KOLKLI · מחולל קישור וואטסאפ · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · מחולל קישור וואטסאפ · מהיר, פשוט ובאיכות מקצועית',
       copied:'הקישור הועתק ✓', copiedHtml:'ה-HTML הועתק ✓',
     },
     en:{
       dir:'ltr',
       kick:'Marketing · WhatsApp Link Generator',
       pageTitle:'Generate a WhatsApp click-to-chat link',
-      pageSub:'Build a wa.me link with a country code, phone number and a pre-filled message. Copy the link, grab a ready-to-embed HTML snippet, or open the chat instantly — everything runs in your browser.',
+      pageSub:'Build a wa.me link with a country code, phone number and a pre-filled message. Copy the link, grab a ready-to-embed HTML snippet, or open the chat instantly. Fast, simple and professional-quality.',
       formTitle:'Link details',
       phoneLbl:'Phone number', phonePh:'50 123 4567',
       msgLbl:'Pre-filled message', msgPh:'Hi! I saw your ad and wanted to ask…',
@@ -334,15 +334,15 @@
       hintShort:'That number looks too short — double-check it.',
       hintOk:n=>`Valid number · ${n} digits`,
       chips:['Hi there! 👋','I’d love more details','Interested in the price','Can we set up a call?'],
-      seam:'Everything is built locally in your browser — no number or message is ever sent to a server. The link itself opens in the recipient’s WhatsApp app.',
-      foot:'KOLKLI · WhatsApp Link Generator · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · WhatsApp Link Generator · Fast, simple and professional quality',
       copied:'Link copied ✓', copiedHtml:'HTML copied ✓',
     },
     ru:{
       dir:'ltr',
       kick:'Маркетинг · Генератор ссылки WhatsApp',
       pageTitle:'Создайте ссылку WhatsApp для мгновенного чата',
-      pageSub:'Соберите ссылку wa.me с кодом страны, номером телефона и заранее заготовленным сообщением. Скопируйте ссылку, получите готовый HTML-фрагмент или откройте чат сразу — всё работает в вашем браузере.',
+      pageSub:'Соберите ссылку wa.me с кодом страны, номером телефона и заранее заготовленным сообщением. Скопируйте ссылку, получите готовый HTML-фрагмент или откройте чат сразу. Быстро, просто и профессионального качества.',
       formTitle:'Данные ссылки',
       phoneLbl:'Номер телефона', phonePh:'50 123 4567',
       msgLbl:'Готовое сообщение', msgPh:'Здравствуйте! Увидел вашу рекламу и хотел спросить…',
@@ -356,8 +356,8 @@
       hintShort:'Номер выглядит слишком коротким — проверьте его.',
       hintOk:n=>`Верный номер · ${n} цифр`,
       chips:['Здравствуйте! 👋','Хочу больше деталей','Интересует цена','Можем созвониться?'],
-      seam:'Всё собирается локально в вашем браузере — ни номер, ни сообщение не отправляются на сервер. Сама ссылка открывается в приложении WhatsApp получателя.',
-      foot:'KOLKLI · Генератор ссылки WhatsApp · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Генератор ссылки WhatsApp · Быстро, просто и профессионального качества',
       copied:'Ссылка скопирована ✓', copiedHtml:'HTML скопирован ✓',
     },
   };

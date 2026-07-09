@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — כיווץ CSS / JS</title>
-<meta name="description" content="Free CSS & JavaScript minifier — paste your code and get a compact, minified version with comments and whitespace stripped, ready to copy or download. String- and comment-aware. Fast, private, right in your browser.">
+<meta name="description" content="Free CSS & JavaScript minifier — paste your code and get a compact, minified version with comments and whitespace stripped, ready to copy or download. String- and comment-aware. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -209,7 +209,7 @@
     he:{ dir:'rtl',
       kick:'כיווץ CSS / JS',
       pageTitle:'כיווץ CSS ו-JavaScript',
-      pageSub:'הדביקו קוד CSS או JavaScript, וקבלו גרסה מכווצת — בלי הערות ורווחים מיותרים — מוכנה להעתקה או הורדה. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'הדביקו קוד CSS או JavaScript, וקבלו גרסה מכווצת — בלי הערות ורווחים מיותרים — מוכנה להעתקה או הורדה. מהיר, פשוט ובאיכות מקצועית.',
       modeAuto:'זיהוי אוטומטי', modeCss:'CSS', modeJs:'JavaScript',
       inputTitle:'קוד מקור', outputTitle:'פלט מכווץ',
       inputPh:'הדביקו כאן קוד CSS או JavaScript…', outputPh:'התוצאה המכווצת תופיע כאן',
@@ -217,12 +217,12 @@
       copy:'העתקה', download:'הורדה', copiedMsg:'הועתק ✓',
       statOriginal:'מקורי', statMinified:'מוקטן', statSaved:'נחסך',
       emptyMsg:'הדביקו קוד קודם', detected:'זוהה',
-      note:'זהו מכווץ קל־משקל שרץ בדפדפן ומתאים לקוד רגיל. הוא מודע למחרוזות ולהערות, אך אינו מנתח את השפה לעומק — ביטויים רגולריים (regex) ומקרי קצה של הוספת נקודה-פסיק אוטומטית (ASI) עשויים לדרוש כלי בנייה (bundler/minifier) אמיתי.',
-      foot:'KOLKLI · כיווץ CSS / JS · פרטי ומהיר, ישירות בדפדפן' },
+      note:'הוא מודע למחרוזות ולהערות, אך אינו מנתח את השפה לעומק — ביטויים רגולריים (regex) ומקרי קצה של הוספת נקודה-פסיק אוטומטית (ASI) עשויים לדרוש כלי בנייה (bundler/minifier) אמיתי. מהיר, פשוט ובאיכות מקצועית.',
+      foot:'KOLKLI · כיווץ CSS / JS · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Minify CSS / JS',
       pageTitle:'CSS & JavaScript Minifier',
-      pageSub:'Paste CSS or JavaScript and get a minified version — comments and extra whitespace stripped — ready to copy or download. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Paste CSS or JavaScript and get a minified version — comments and extra whitespace stripped — ready to copy or download. Fast, simple and professional-quality.',
       modeAuto:'Auto-detect', modeCss:'CSS', modeJs:'JavaScript',
       inputTitle:'Source code', outputTitle:'Minified output',
       inputPh:'Paste your CSS or JavaScript here…', outputPh:'Minified output appears here',
@@ -230,12 +230,12 @@
       copy:'Copy', download:'Download', copiedMsg:'Copied ✓',
       statOriginal:'Original', statMinified:'Minified', statSaved:'Saved',
       emptyMsg:'Paste some code first', detected:'Detected',
-      note:'This is a lightweight in-browser minifier, best for straightforward code. It is string- and comment-aware but does not fully parse the language — regex literals and automatic semicolon insertion (ASI) edge cases may need a real bundler/minifier.',
-      foot:'KOLKLI · Minify CSS / JS · Private and fast, right in your browser' },
+      note:'It is string- and comment-aware but does not fully parse the language — regex literals and automatic semicolon insertion (ASI) edge cases may need a real bundler/minifier. Fast, simple and professional-quality.',
+      foot:'KOLKLI · Minify CSS / JS · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Сжатие CSS / JS',
       pageTitle:'Минификатор CSS и JavaScript',
-      pageSub:'Вставьте CSS или JavaScript и получите сжатую версию — без комментариев и лишних пробелов — готовую для копирования или загрузки. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Вставьте CSS или JavaScript и получите сжатую версию — без комментариев и лишних пробелов — готовую для копирования или загрузки. Быстро, просто и профессионального качества.',
       modeAuto:'Автоопределение', modeCss:'CSS', modeJs:'JavaScript',
       inputTitle:'Исходный код', outputTitle:'Сжатый результат',
       inputPh:'Вставьте сюда CSS или JavaScript…', outputPh:'Здесь появится сжатый результат',
@@ -243,8 +243,8 @@
       copy:'Копировать', download:'Скачать', copiedMsg:'Скопировано ✓',
       statOriginal:'Исходный', statMinified:'Сжатый', statSaved:'Сэкономлено',
       emptyMsg:'Сначала вставьте код', detected:'Определено',
-      note:'Это лёгкий минификатор в браузере, подходит для несложного кода. Он учитывает строки и комментарии, но не разбирает язык полностью — регулярные выражения и краевые случаи автоматической вставки точки с запятой (ASI) могут потребовать настоящего сборщика/минификатора.',
-      foot:'KOLKLI · Сжатие CSS / JS · Приватно и быстро, прямо в браузере' }
+      note:'Он учитывает строки и комментарии, но не разбирает язык полностью — регулярные выражения и краевые случаи автоматической вставки точки с запятой (ASI) могут потребовать настоящего сборщика/минификатора. Быстро, просто и профессионального качества.',
+      foot:'KOLKLI · Сжатие CSS / JS · Быстро, просто и профессионального качества' }
   };
 
   const SAMPLE_CSS =

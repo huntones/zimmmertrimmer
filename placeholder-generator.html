@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחולל Placeholder</title>
-<meta name="description" content="Free placeholder image generator — create custom placeholder images right in your browser. Set any width and height, pick background and text colors, choose a pattern (grid, diagonal, cross, checkerboard) and add text, then download as PNG, JPG or WEBP or copy the data URI. 100% client-side, private, no uploads and no third-party placeholder services.">
+<meta name="description" content="Free placeholder image generator. Set any width and height, pick background and text colors, choose a pattern (grid, diagonal, cross, checkerboard) and add text, then download as PNG, JPG or WEBP or copy the data URI. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -290,7 +290,7 @@
     he:{ dir:'rtl',
       kick:'מחולל תמונות Placeholder',
       pageTitle:'מחולל תמונות Placeholder — בכל מידה, צבע ותבנית',
-      pageSub:'בחרו רוחב וגובה, צבע רקע וטקסט, תבנית ופורמט — וקבלו תמונת פלייסהולדר מוכנה להורדה כ-PNG, JPG או WEBP, או העתיקו את ה-data URI. הכול נוצר מקומית בדפדפן, בלי העלאות ובלי שירותי פלייסהולדר חיצוניים.',
+      pageSub:'בחרו רוחב וגובה, צבע רקע וטקסט, תבנית ופורמט — וקבלו תמונת פלייסהולדר מוכנה להורדה כ-PNG, JPG או WEBP, או העתיקו את ה-data URI. מהיר, פשוט ובאיכות מקצועית.',
       settingsTitle:'הגדרות', previewTitle:'תצוגה מקדימה',
       sizeLabel:'מידות (רוחב × גובה)', presetLabel:'מידות מוכנות',
       bgLabel:'צבע רקע', fgLabel:'צבע טקסט', textLabel:'טקסט מותאם (רשות)', textPh:'ריק = הצגת המידות',
@@ -298,12 +298,12 @@
       patSolid:'מלא', patGrid:'רשת', patDiagonal:'קווים אלכסוניים', patCross:'צלב אלכסוני', patChecker:'לוח שחמט',
       download:'הורדת התמונה', copyUri:'העתקת data URI', copyImg:'העתקת תגית <img>',
       copy:'העתקה', copiedMsg:'הועתק ✓', downloadedMsg:'התמונה הורדה ✓', clampedMsg:'המידה הוגבלה ל-5000px',
-      note:'כל התמונות נוצרות מקומית בדפדפן שלכם באמצעות canvas — שום קובץ לא נשלח לשרת ולא נעשה שימוש בשירות פלייסהולדר חיצוני.',
-      foot:'KOLKLI · מחולל תמונות Placeholder · פרטי ומהיר, ישירות בדפדפן' },
+      note:'מהיר, פשוט ובאיכות מקצועית.',
+      foot:'KOLKLI · מחולל תמונות Placeholder · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Placeholder Image Generator',
       pageTitle:'Placeholder Image Generator — any size, color & pattern',
-      pageSub:'Pick a width and height, background and text colors, a pattern and a format — and get a ready placeholder image to download as PNG, JPG or WEBP, or copy its data URI. Everything is generated locally in your browser, with no uploads and no third-party placeholder services.',
+      pageSub:'Pick a width and height, background and text colors, a pattern and a format — and get a ready placeholder image to download as PNG, JPG or WEBP, or copy its data URI. Fast, simple and professional-quality.',
       settingsTitle:'Settings', previewTitle:'Preview',
       sizeLabel:'Size (width × height)', presetLabel:'Preset sizes',
       bgLabel:'Background color', fgLabel:'Text color', textLabel:'Custom text (optional)', textPh:'Empty = show dimensions',
@@ -311,12 +311,12 @@
       patSolid:'Solid', patGrid:'Grid', patDiagonal:'Diagonal lines', patCross:'Cross', patChecker:'Checkerboard',
       download:'Download image', copyUri:'Copy data URI', copyImg:'Copy <img> tag',
       copy:'Copy', copiedMsg:'Copied ✓', downloadedMsg:'Image downloaded ✓', clampedMsg:'Size capped at 5000px',
-      note:'Every image is generated locally in your browser with canvas — nothing is uploaded to a server and no external placeholder service is used.',
-      foot:'KOLKLI · Placeholder Image Generator · Private and fast, right in your browser' },
+      note:'Fast, simple and professional-quality.',
+      foot:'KOLKLI · Placeholder Image Generator · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Генератор изображений-заглушек',
       pageTitle:'Генератор заглушек — любой размер, цвет и узор',
-      pageSub:'Выберите ширину и высоту, цвета фона и текста, узор и формат — и получите готовое изображение-заглушку для скачивания в PNG, JPG или WEBP, либо скопируйте data URI. Всё создаётся локально в браузере, без загрузок и без сторонних сервисов заглушек.',
+      pageSub:'Выберите ширину и высоту, цвета фона и текста, узор и формат — и получите готовое изображение-заглушку для скачивания в PNG, JPG или WEBP, либо скопируйте data URI. Быстро, просто и профессионального качества.',
       settingsTitle:'Настройки', previewTitle:'Предпросмотр',
       sizeLabel:'Размер (ширина × высота)', presetLabel:'Готовые размеры',
       bgLabel:'Цвет фона', fgLabel:'Цвет текста', textLabel:'Свой текст (необязательно)', textPh:'Пусто = показать размеры',
@@ -324,8 +324,8 @@
       patSolid:'Сплошной', patGrid:'Сетка', patDiagonal:'Диагональные линии', patCross:'Крест', patChecker:'Шахматный',
       download:'Скачать изображение', copyUri:'Копировать data URI', copyImg:'Копировать тег <img>',
       copy:'Копировать', copiedMsg:'Скопировано ✓', downloadedMsg:'Изображение скачано ✓', clampedMsg:'Размер ограничен 5000px',
-      note:'Каждое изображение создаётся локально в вашем браузере с помощью canvas — ничего не загружается на сервер и не используется внешний сервис заглушек.',
-      foot:'KOLKLI · Генератор изображений-заглушек · Приватно и быстро, прямо в браузере' }
+      note:'Быстро, просто и профессионального качества.',
+      foot:'KOLKLI · Генератор изображений-заглушек · Быстро, просто и профессионального качества' }
   };
 
   // ---- tool constants ----

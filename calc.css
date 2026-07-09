@@ -62,7 +62,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1
 body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
 a{color:inherit;text-decoration:none;}
 button{font-family:var(--sans);}
-.wrap{max-width:1040px;margin:0 auto;padding:26px 20px 70px;}
+.wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 70px;}
 
 /* ---------- page intro ---------- */
 .pagehead{margin:6px 0 22px;text-align:center;}

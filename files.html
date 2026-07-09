@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AudioCut — בחירת קבצים</title>
-<meta name="description" content="Organize, sort and tag your media files. Images, video, audio and documents — all in your browser. Nothing gets uploaded.">
+<meta name="description" content="Organize, sort and tag your media files. Images, video, audio and documents. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -56,8 +56,8 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{width:90%;max-width:none;margin:0 auto;padding:26px 0 60px;}
-  @media (max-width:1560px){ .wrap{width:96%;} }
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 0 60px;}
+  @media (max-width:1560px){ .wrap{width:100%;} }
   @media (max-width:640px){ .wrap{width:100%;padding:18px 14px 52px;} }
 
   /* ---------- header ---------- */
@@ -317,6 +317,9 @@
     color:var(--st-c);background:color-mix(in srgb,var(--st-c) 14%,transparent);
     border:1px solid color-mix(in srgb,var(--st-c) 30%,transparent);}
   .statusbadge .dot{width:8px;height:8px;border-radius:50%;background:var(--st-c);flex-shrink:0;}
+  /* "live" pulse for the in-progress state — matches the dashboard's active status pill */
+  .statusbadge.live .dot{box-shadow:0 0 0 3px color-mix(in srgb,var(--st-c) 24%,transparent);animation:stpulse 1.8s ease-in-out infinite;}
+  @keyframes stpulse{0%,100%{opacity:1;}50%{opacity:.4;}}
   .st-sub{margin-top:11px;font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .st-sub b{color:var(--ink);font-weight:800;}
   .statusmenu{position:absolute;inset-inline:12px;top:calc(100% + 8px);display:none;gap:4px;padding:6px;
@@ -328,7 +331,8 @@
   .statusmenu button.on{color:var(--item-c);background:color-mix(in srgb,var(--item-c) 12%,transparent);}
   .statusmenu .dot{width:8px;height:8px;border-radius:50%;background:var(--item-c);flex-shrink:0;}
   /* compact quota strip */
-  .statrow{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;background:transparent;border:0;
+  /* auto-fit so the five tiles (incl. the selection-status card) wrap cleanly at any width */
+  .statrow{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;background:transparent;border:0;
     border-radius:0;box-shadow:none;overflow:visible;}
   html[data-theme="dark"] .statrow{box-shadow:none;}
   .statrow .statcard,.statrow .statcard.total{position:relative;min-width:0;min-height:78px;padding:17px 24px 15px;
@@ -362,7 +366,6 @@
   .statrow .st-bar.i span{background:linear-gradient(90deg,var(--success),var(--success-dim));}
   .statrow .st-bar.near span{background:linear-gradient(90deg,var(--warn),#f0b429);}
   .statrow .st-bar.full span{background:linear-gradient(90deg,var(--danger),#ff8a8a);}
-  .statrow .statcard.status{display:none;}
   @media (max-width:760px){
     .statrow{grid-template-columns:repeat(2,minmax(0,1fr));}
     .statrow .statcard{min-height:86px;padding:16px 18px;}
@@ -419,14 +422,14 @@
     text-shadow:0 1px 3px rgba(0,0,0,.7);opacity:0;transform:translateY(5px);transition:opacity .16s,transform .16s;}
   .fthumb:hover .fname-ov{opacity:1;transform:none;}
   /* ---------- order number + drag-to-reorder ---------- */
-  .fnum{position:absolute;top:9px;right:9px;z-index:4;height:28px;min-width:42px;padding:0 10px;
+  .fnum{position:absolute;top:9px;left:9px;z-index:4;height:28px;min-width:42px;padding:0 10px;
     display:flex;align-items:center;justify-content:center;border-radius:8px;font-family:var(--mono);
-    font-size:12px;font-weight:800;letter-spacing:.04em;color:#fff;cursor:grab;
+    font-size:12px;font-weight:800;letter-spacing:.04em;color:#fff;cursor:grab;direction:ltr;unicode-bidi:isolate;
     background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,0) 62%),var(--grad-btn);
     box-shadow:0 4px 12px rgba(80,54,210,.28),inset 0 1px 0 rgba(255,255,255,.45);}
-  .fcard.locked .fnum{right:9px;cursor:default;filter:saturate(.55) brightness(.9);}
-  /* small black × delete affordance, top-left corner of the thumbnail (opposite the order badge) */
-  .fdel-x{position:absolute;top:8px;inset-inline-end:8px;z-index:5;width:22px;height:22px;padding:0;border:none;
+  .fcard.locked .fnum{left:9px;cursor:default;filter:saturate(.55) brightness(.9);}
+  /* small black × delete affordance, pinned to the top-right corner of the thumbnail */
+  .fdel-x{position:absolute;top:8px;right:8px;z-index:5;width:22px;height:22px;padding:0;border:none;
     border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;
     background:rgba(255,255,255,.85);color:#11141c;box-shadow:0 1px 5px rgba(0,0,0,.35);
     opacity:.9;transition:background .12s,color .12s,transform .12s,opacity .12s;}
@@ -809,6 +812,7 @@
 <body>
 <div id="site-header"></div>
 <script src="./header.js"></script>
+<script src="./project-numbering.js"></script>
 <div class="wrap">
 
   <!-- ============ header ============ -->
@@ -1761,7 +1765,7 @@
       toEditor:'לעורך', help:'עזרה', signin:'התחברות', send:'שליחת קבצים',
       kick:'מסך העבודה המרכזי',
       pageTitle:'בחירת קבצים',
-      pageSub:'ארגנו, מיינו ותייגו את קבצי המדיה שלכם — תמונות, וידאו, אודיו ומסמכים. הכול רץ בדפדפן, שום קובץ לא עולה לשרת.',
+      pageSub:'ארגנו, מיינו ותייגו את קבצי המדיה שלכם — תמונות, וידאו, אודיו ומסמכים. מהיר, פשוט ובאיכות מקצועית.',
       searchPh:'חיפוש קבצים…', gridSize:'גודל תצוגה',
       showMovedInMain:'הצג קבצים שהועברו בתיקייה הראשית',
       selCount:(n,tot)=>`<b>${n}</b>/${tot} נבחרו`, selectHint:'סמן / בטל בחירה', selectAll:'בחר הכל', deselectAll:'נקה בחירה',
@@ -1788,10 +1792,10 @@
       fmts:'תמונות · וידאו · אודיו · מסמכים',
       sizeNote:'ניתן להעלות עד 2GB בכל פעם',
       emptyTitle:'אין כאן קבצים עדיין', emptySub:'גררו קבצים לכאן כדי להתחיל לארגן',
-      addNote:'כיתוב לתמונה…', preview:'תצוגה מקדימה', del:'מחק', moveTo:'תיקייה', close:'סגור', orderTitle:'מיקום בסדר — גררו לשינוי',
+      addNote:'כיתוב לתמונה…', preview:'תצוגה מקדימה', del:'מחק', moveTo:'העבר ל...', close:'סגור', orderTitle:'מיקום בסדר — גררו לשינוי',
       lockedTag:'הועבר לתיקייה', lockedHint:name=>`הקובץ שויך לתיקייה "${name}" וזמין לשימוש רק מתוכה`,
       countFiles:n=>`${n}`,
-      footer:'כל הקבצים נשארים במחשב שלך · שום דבר לא עולה לאינטרנט',
+      footer:'כל הקבצים נשארים במחשב שלך. מהיר, פשוט ובאיכות מקצועית.',
       newFolderTitle:'תיקייה חדשה', renameFolderTitle:'שינוי שם תיקייה', folderNamePh:'שם התיקייה', newSubfolder:'תיקיית משנה',
       create:'צור', save:'שמור', cancel:'ביטול', gotIt:'הבנתי',
       blockedTitle:'קובץ לא נתמך',
@@ -1815,7 +1819,7 @@
       noPreviewTitle:'אין תצוגה מקדימה', noPreviewBody:'לקובץ הזה אין תצוגה מקדימה בדפדפן.',
       helpTitle:'איך זה עובד', helpClose:'הבנתי',
       helpBody1:'גררו קבצים (תמונות, וידאו, אודיו, מסמכים) לאזור ההעלאה, צרו תיקיות ראשיות ומיינו אליהן, והשתמשו בחיפוש ובזום כדי לנווט. כל תיקייה חדשה נוצרת כתיקייה ראשית בלבד, גם אם אתם נמצאים בתוך תיקייה אחרת. אפשר לבחור כמה קבצים ולמחוק אותם ביחד או לגרור את כולם יחד לתוך תיקייה. כל קובץ ממוספר אוטומטית (001, 002, 003…) לפי סדר התצוגה — גררו קובץ למקום אחר בגלריה כדי לשנות את הסדר, והמספור יתעדכן מיד. הסדר קובע את רצף הייצוא.',
-      helpBody2:'הוסיפו כיתוב מתחת לכל תמונה — הוא הופך לשם הקובץ בהורדה. לחצו על "הורדת הכל (ZIP)" כדי לשמור את כל הקבצים כארכיון אחד; כל קובץ ממוספר לפי סדר הגלריה, ואם הוזן כיתוב הוא מצורף לשם (למשל "001 - כך הכל התחיל.jpg", וללא כיתוב פשוט "002.jpg"). הכול רץ מקומית: שום קובץ לא עולה לאינטרנט.',
+      helpBody2:'הוסיפו כיתוב מתחת לכל תמונה — הוא הופך לשם הקובץ בהורדה. לחצו על "הורדת הכל (ZIP)" כדי לשמור את כל הקבצים כארכיון אחד; כל קובץ ממוספר לפי סדר הגלריה, ואם הוזן כיתוב הוא מצורף לשם (למשל "001 - כך הכל התחיל.jpg", וללא כיתוב פשוט "002.jpg"). מהיר, פשוט ובאיכות מקצועית.',
       clientBtn:'הגדרות לקוח', clientTitle:'הגדרות הלקוח',
       clientSub:'נהלו את פרטי הלקוח ואת ההרשאות שלו בגלריה. ההגדרות נשמרות במכשיר זה בלבד.',
       clientDetails:'פרטי הלקוח', clientPerms:'הרשאות לקוח',
@@ -1922,7 +1926,7 @@
       toEditor:'Editor', help:'Help', signin:'Sign in', send:'Send files',
       kick:'The main workspace',
       pageTitle:'Organize files',
-      pageSub:'Organize, sort and tag your media — images, video, audio and documents. Everything runs in your browser, nothing is uploaded.',
+      pageSub:'Organize, sort and tag your media — images, video, audio and documents. Fast, simple and professional-quality.',
       searchPh:'Search files…', gridSize:'Grid size',
       showMovedInMain:'Show moved files in main folder',
       selCount:(n,tot)=>`<b>${n}</b>/${tot} selected`, selectHint:'Select / deselect', selectAll:'Select all', deselectAll:'Clear selection',
@@ -1949,10 +1953,10 @@
       fmts:'Images · Video · Audio · Documents',
       sizeNote:'Up to 2GB per upload',
       emptyTitle:'No files here yet', emptySub:'Drag files here to start organizing',
-      addNote:'Add a caption…', preview:'Preview', del:'Delete', moveTo:'Folder', close:'Close', orderTitle:'Order — drag to change',
+      addNote:'Add a caption…', preview:'Preview', del:'Delete', moveTo:'Move to...', close:'Close', orderTitle:'Order — drag to change',
       lockedTag:'Unavailable', lockedHint:name=>`Assigned to "${name}" — available only inside that folder`,
       countFiles:n=>`${n}`,
-      footer:'All files stay on your machine · nothing is uploaded',
+      footer:'Fast, simple and professional-quality.',
       newFolderTitle:'New folder', renameFolderTitle:'Rename folder', folderNamePh:'Folder name', newSubfolder:'New subfolder',
       create:'Create', save:'Save', cancel:'Cancel', gotIt:'Got it',
       blockedTitle:'Unsupported file',
@@ -1976,7 +1980,7 @@
       noPreviewTitle:'No preview', noPreviewBody:'This file can’t be previewed in the browser.',
       helpTitle:'How it works', helpClose:'Got it',
       helpBody1:'Drop files (images, video, audio, documents) onto the upload area, create top-level folders and sort into them, and use search + zoom to navigate. Every new folder is created as a main folder, even when another folder is currently selected. Select multiple files to delete them together or drag them all into a folder at once. Every file is auto-numbered (001, 002, 003…) by display order — drag a file to a new spot to reorder, and the numbers update instantly. The order sets the export sequence.',
-      helpBody2:'Add a caption under each image — it becomes the file name on download. Click "Download all (ZIP)" to save every file as one archive; each file is numbered by gallery order, and if a caption was entered it is appended (e.g. "001 - The beginning.jpg", or just "002.jpg" without one). Everything runs locally: no file is uploaded.',
+      helpBody2:'Add a caption under each image — it becomes the file name on download. Click "Download all (ZIP)" to save every file as one archive; each file is numbered by gallery order, and if a caption was entered it is appended (e.g. "001 - The beginning.jpg", or just "002.jpg" without one): no file is uploaded. Fast, simple and professional-quality.',
       clientBtn:'Client', clientTitle:'Client settings',
       clientSub:'Manage this client’s details and what they can do in the gallery. Settings are stored on this device only.',
       clientDetails:'Client details', clientPerms:'Client permissions',
@@ -2083,7 +2087,7 @@
       toEditor:'Редактор', help:'Помощь', signin:'Вход', send:'Отправить файлы',
       kick:'Основное рабочее пространство',
       pageTitle:'Упорядочить файлы',
-      pageSub:'Упорядочивайте, сортируйте и помечайте медиа — изображения, видео, аудио и документы. Всё работает в вашем браузере, ничего не загружается.',
+      pageSub:'Упорядочивайте, сортируйте и помечайте медиа — изображения, видео, аудио и документы. Быстро, просто и профессионального качества.',
       searchPh:'Поиск файлов…', gridSize:'Размер сетки',
       showMovedInMain:'Показывать перемещённые файлы в основной папке',
       selCount:(n,tot)=>`Выбрано: <b>${n}</b>/${tot}`, selectHint:'Выбрать / снять', selectAll:'Выбрать всё', deselectAll:'Снять выделение',
@@ -2110,10 +2114,10 @@
       fmts:'Изображения · Видео · Аудио · Документы',
       sizeNote:'До 2 ГБ за загрузку',
       emptyTitle:'Здесь пока нет файлов', emptySub:'Перетащите файлы сюда, чтобы начать',
-      addNote:'Добавьте подпись…', preview:'Просмотр', del:'Удалить', moveTo:'Папка', close:'Закрыть', orderTitle:'Порядок — перетащите, чтобы изменить',
+      addNote:'Добавьте подпись…', preview:'Просмотр', del:'Удалить', moveTo:'Переместить...', close:'Закрыть', orderTitle:'Порядок — перетащите, чтобы изменить',
       lockedTag:'Недоступно', lockedHint:name=>`Привязан к «${name}» — доступен только внутри этой папки`,
       countFiles:n=>`${n}`,
-      footer:'Все файлы остаются на вашем устройстве · ничего не загружается',
+      footer:'Все файлы остаются на вашем устройстве. Быстро, просто и профессионального качества.',
       newFolderTitle:'Новая папка', renameFolderTitle:'Переименовать папку', folderNamePh:'Имя папки', newSubfolder:'Новая подпапка',
       create:'Создать', save:'Сохранить', cancel:'Отмена', gotIt:'Понятно',
       blockedTitle:'Неподдерживаемый файл',
@@ -2134,10 +2138,10 @@
       moveCurrentOnly:name=>`Переместить только этот файл в «${name}»`,
       moveToUnsortedAll:'Убрать все выбранные файлы из папки',
       moveToUnsortedOne:'Убрать только этот файл из папки',
-      noPreviewTitle:'Нет предпросмотра', noPreviewBody:'Этот файл нельзя предпросмотреть в браузере.',
+      noPreviewTitle:'Быстро, просто и профессионального качества.',
       helpTitle:'Как это работает', helpClose:'Понятно',
       helpBody1:'Перетащите файлы (изображения, видео, аудио, документы) в область загрузки, создавайте папки и сортируйте по ним, используйте поиск и масштаб для навигации. Выберите несколько файлов, чтобы удалить их вместе или перетащить сразу в папку. Каждый файл авто-нумеруется (001, 002, 003…) по порядку отображения — перетащите файл на новое место для изменения порядка, и номера обновятся мгновенно. Порядок задаёт последовательность экспорта. Также можно вкладывать папки в папки (любой глубины) и перетаскивать целую папку в другую — все её файлы и подпапки перемещаются вместе.',
-      helpBody2:'Добавьте подпись под каждым изображением — она станет именем файла при загрузке. Нажмите «Скачать всё (ZIP)», чтобы сохранить все файлы одним архивом; каждый файл нумеруется по порядку галереи, и если введена подпись, она добавляется к имени (например «001 - Начало.jpg», или просто «002.jpg» без неё). Всё работает локально: ни один файл не загружается.',
+      helpBody2:'Добавьте подпись под каждым изображением — она станет именем файла при загрузке. Нажмите «Скачать всё (ZIP)», чтобы сохранить все файлы одним архивом; каждый файл нумеруется по порядку галереи, и если введена подпись, она добавляется к имени (например «001 - Начало.jpg», или просто «002.jpg» без неё). Быстро, просто и профессионального качества.',
       clientBtn:'Клиент', clientTitle:'Настройки клиента',
       clientSub:'Управляйте данными клиента и его правами в галерее. Настройки хранятся только на этом устройстве.',
       clientDetails:'Данные клиента', clientPerms:'Права клиента',
@@ -2269,6 +2273,7 @@
   let selConfirmed=false;         // client has locked in their album pick — green selection frozen
   let selPromptShown=false;       // the "are you finished?" dialog was already offered for the current full-cap state
   let organizerUsageStarted=false;
+  let settingsIsNewProject=false;
 
   // ---- helpers ----
   function organizerPayloadError(payload){
@@ -2280,9 +2285,13 @@
     if(window.KolkliUsage && window.KolkliUsage.showBlocked) window.KolkliUsage.showBlocked(info,'organize-files');
     else showToast(info && info.field==='folders' ? 'Folder limit reached' : 'File limit reached');
   }
+  function usageExempt(){ return !!(window.KolkliUsage && window.KolkliUsage.isExempt && window.KolkliUsage.isExempt()); }
   async function withOrganizerUsage(payload, work){
-    const localErr=organizerPayloadError(payload);
-    if(localErr){ showOrganizerUsageLimit(localErr); return false; }
+    // Paid plans (Lite/Pro/Business) are unlimited on files & folders — only free users hit the cap.
+    if(!usageExempt()){
+      const localErr=organizerPayloadError(payload);
+      if(localErr){ showOrganizerUsageLimit(localErr); return false; }
+    }
     if(window.KolkliUsage && window.KolkliUsage.guard && !organizerUsageStarted){
       try{
         await window.KolkliUsage.guard('organize-files', payload, async()=>{
@@ -2331,6 +2340,40 @@
     }catch(_){ return safeOwnerId(email); }
   }
   function scopedKey(base){ return base+'::'+currentOwnerId(); }
+  function loadSelectionProjects(){
+    try{ const a=JSON.parse(localStorage.getItem(scopedKey('ac_projects'))||'[]'); return Array.isArray(a)?a:[]; }catch(_){ return []; }
+  }
+  function saveSelectionProjects(list){
+    try{ localStorage.setItem(scopedKey('ac_projects'), JSON.stringify((list||[]).slice(0,100))); }catch(_){}
+  }
+  async function createSelectionProjectRecord(client, album){
+    const now=Date.now();
+    const bytes=files.reduce((sum,f)=>sum+(Number(f.size)||0),0);
+    const selected=files.filter(f=>f.selected).length;
+    const share=shareState();
+    const project={
+      id:'sel_'+now.toString(36)+'_'+Math.random().toString(36).slice(2,8),
+      name:album.alTitle || client.event || client.name || 'Selection gallery',
+      client:client.name || '',
+      email:client.email || '',
+      phone:client.phone || '',
+      desc:album.alDesc || '',
+      status:client.status || 'draft',
+      files:files.length,
+      selected:selected,
+      sizeMB:Math.round((bytes/1048576)*10)/10,
+      createdAt:now,
+      updated:now,
+      link:shareLinkFor(share.id),
+      projectService:'select',
+      serviceType:'select'
+    };
+    if(window.KolkliProjectNumbers) await KolkliProjectNumbers.assign('select', project);
+    const list=loadSelectionProjects().filter(p=>p && p.id!==project.id);
+    list.unshift(project);
+    saveSelectionProjects(list);
+    return project;
+  }
   function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
   function stripExt(name){ return name.replace(/\.[^.\/\\]+$/,''); }
   function fmtBytes(n){ if(n==null) return '—'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
@@ -2698,7 +2741,8 @@
       return { photos:photoCap, videos:null, total:photoCap };
     }
     if(m.separate) return { photos:m.maxPhotos, videos:m.maxVideos, total:m.maxPhotos + m.maxVideos };
-    return { photos:m.maxTotal, videos:m.maxTotal, total:m.maxTotal };
+    // one combined pool (no separate video quota) -> no dedicated video number to show (em dash)
+    return { photos:m.maxTotal, videos:null, total:m.maxTotal };
   }
   function setStatBar(id, cur, max){
     const span=el(id); if(!span) return;
@@ -2713,15 +2757,20 @@
     const nf=n=>{ try{ return Number(n).toLocaleString('en-US'); }catch(_){ return ''+n; } };
     const c=selCounts();
     const q=statQuota();
+    const m=albumMgr && albumMgr.limitOn ? albumMgr : null;
+    // videos truly disallowed (photo-only package: album/prints/maxVideos=0) -> the total counts photos only.
+    // a combined pool still ALLOWS videos, so they keep counting toward the total there.
+    const vidBlocked=m ? !videosEnabled(m) : false;
     el('stGalleryTotal').textContent = nf(files.length);
     el('stImagesCur').textContent = nf(c.photos);
     el('stImagesMax').textContent = nf(q.photos);
+    // no dedicated video quota (photo-only package OR one combined pool) -> show an em dash, not a count
     const noVideos = q.videos == null;
     const videoCard = el('stVideosCur').closest('.statcard');
     if(videoCard) videoCard.classList.toggle('no-videos', noVideos);
     el('stVideosCur').textContent = noVideos ? '—' : nf(c.videos);
     el('stVideosMax').textContent = noVideos ? '' : nf(q.videos);
-    el('stSelectedCur').textContent = nf(noVideos ? c.photos : c.total);
+    el('stSelectedCur').textContent = nf(vidBlocked ? c.photos : c.total);
     el('stSelectedMax').textContent = nf(q.total);
     setStatBar('stImagesBar', c.photos, q.photos);
     setStatBar('stVideosBar', noVideos ? 0 : c.videos, noVideos ? 0 : q.videos);
@@ -2730,11 +2779,14 @@
 
   // ---- selection-status card: direct four-state selector ----
   const STATUS_ORDER=['draft','awaiting','selecting','completed'];
+  // Colors reference the theme-aware CSS vars (same palette as the dashboard status
+  // pills) so they shift correctly between light and dark instead of staying on the
+  // light-mode hex. Setting a custom property to "var(--x)" resolves at use time.
   const STATUS_META={
-    draft:    {c:'#9aa1b1'},
-    awaiting: {c:'#0ea5b7'},
-    selecting:{c:'#7c3aed'},
-    completed:{c:'#22b04b'},
+    draft:    {c:'var(--faint)'},
+    awaiting: {c:'var(--info)'},
+    selecting:{c:'var(--accent)'},
+    completed:{c:'var(--success)'},
   };
   const STATUS_LEGACY={
     active:'selecting',
@@ -2754,6 +2806,7 @@
     const card=el('statStatusCard'); if(!card) return;
     const s=normStatus(loadClient().status);
     card.style.setProperty('--st-c', STATUS_META[s].c);
+    const badge=el('stStatusBadge'); if(badge) badge.classList.toggle('live', s==='selecting');
     el('stStatusText').textContent = statusText(s);
     el('stStatusCounter').innerHTML = t.statSelLine(selCounts().total, files.length);
     renderStatusMenu(s);
@@ -3166,6 +3219,7 @@
   // album without touching stored data — nothing persists until Save.
   function openSettings(isNew){
     isNew = isNew===true; // guard: clientBtn passes a click Event, not a flag
+    settingsIsNewProject = isNew;
     const c = isNew ? JSON.parse(JSON.stringify(CLIENT_DEFAULT)) : loadClient();
     const a = isNew ? (function(){ const d={}; ALBUM_FIELDS.forEach(([id,,def])=>d[id]=def); return d; })() : loadAlbum();
     el('cName').value=c.name||''; el('cEmail').value=c.email||''; el('cPhone').value=c.phone||'';
@@ -3242,13 +3296,24 @@
       renderAll();
     });
   }
-  function saveSettings(){
+  async function saveSettings(){
     const perms={}; PERM_KEYS.forEach(k=>{ const box=el('perm_'+k); perms[k]=!!(box&&box.checked); });
     const c={ name:el('cName').value.trim(), email:el('cEmail').value.trim(), phone:el('cPhone').value.trim(),
       event:el('cEvent').value, deadline:el('cDeadline').value, status:normStatus(el('cStatus').value), perms };
     try{ localStorage.setItem(scopedKey('ac_client'), JSON.stringify(c)); }catch(_){}
     const a={}; ALBUM_FIELDS.forEach(([id,kind])=>a[id]=getField(id,kind));
     try{ localStorage.setItem(scopedKey('ac_album'), JSON.stringify(a)); }catch(_){}
+    if(settingsIsNewProject){
+      try{ await createSelectionProjectRecord(c,a); }
+      catch(err){
+        if(err && err.message==='project_number_allocation_failed'){
+          showToast(lang==='he' ? 'לא ניתן להקצות מספר פרויקט כרגע. נסו שוב.' : 'Could not allocate a project number. Please try again.');
+          return;
+        }
+        throw err;
+      }
+      settingsIsNewProject=false;
+    }
     el('settingsOverlay').classList.remove('show');
     renderStatusCard(); // reflect the new status on the strip immediately
     renderGrid();       // repaint thumbnails so watermark / brand changes show at once

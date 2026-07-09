@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — Fade In / Fade Out</title>
+<meta name="description" content="Add smooth fade-in and fade-out to your audio — batch, in the browser. Pick the fade length and curve, export to MP3, M4A, WAV or FLAC. Fast, simple and private.">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
+
+  /* page intro */
+  .pagehead{margin:4px 0 20px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:66ch;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* dropzone */
+  .drop{border:2.5px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:16px;padding:52px 28px;text-align:center;cursor:pointer;
+    background:var(--panel-2);transition:border-color .15s,background .15s;}
+  .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
+  .drop .cloud{width:72px;height:72px;margin:0 auto 15px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);}
+  .drop .cloud svg{width:36px;height:36px;}
+  .drop .big{font-size:20px;font-weight:600;color:var(--ink);}
+  .drop .or{font-size:14px;color:var(--faint);margin:8px 0;font-family:var(--mono);}
+  .drop .picks{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .drop .choose{display:inline-flex;align-items:center;gap:8px;color:#fff;border:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:12px 26px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
+  .drop .choose.ghost{background:var(--panel);color:var(--ink-2);border:1px solid var(--line);text-shadow:none;
+    box-shadow:var(--shadow-sm);}
+  .drop .choose.ghost:hover{border-color:var(--accent);filter:none;}
+  .drop .choose svg{width:17px;height:17px;}
+  .drop .sizenote{margin-top:15px;font-size:13px;color:var(--faint);font-family:var(--mono);}
+  input[type=file]{display:none;}
+
+  .stack{display:none;}
+  .stack.show{display:block;}
+  .sect{margin-top:16px;padding:18px;}
+  .sect h3{font-size:15px;margin:0 0 4px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .sect h3 svg{width:17px;height:17px;color:var(--accent);}
+  .sect .hint{font-size:12.5px;color:var(--muted);margin:0 0 14px;}
+
+  /* settings */
+  .fld{margin-top:16px;}
+  .fld:first-of-type{margin-top:4px;}
+  .fld > label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:8px;}
+  .fld .sub{font-weight:400;color:var(--faint);font-family:var(--mono);font-size:10.5px;}
+  .seg{display:flex;gap:9px;flex-wrap:wrap;}
+  .seg button{flex:1;min-width:120px;text-align:start;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+    background:var(--panel-2);cursor:pointer;transition:border-color .12s,background .12s,transform .08s;}
+  .seg button:hover{border-color:var(--accent);} .seg button:active{transform:scale(.99);}
+  .seg button.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
+  .seg button b{display:block;font-size:13.5px;color:var(--ink);}
+  .seg button small{font-size:10.5px;color:var(--faint);font-family:var(--mono);}
+  .seg button.on b{color:var(--accent-dim);}
+
+  .fadegrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;}
+  @media (max-width:560px){ .fadegrid{grid-template-columns:1fr;} .seg button{min-width:0;} }
+  .rng{display:flex;flex-direction:column;gap:9px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);}
+  .rng .top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .rng .top b{font-size:13px;display:flex;align-items:center;gap:7px;}
+  .rng .top b svg{width:15px;height:15px;color:var(--accent);}
+  .rng .val{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent-dim);
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:3px 10px;min-width:62px;text-align:center;}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;
+    background:linear-gradient(90deg,var(--accent) var(--p,50%),var(--line) var(--p,50%));cursor:pointer;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;
+    border:2px solid var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer;}
+  input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--accent);cursor:pointer;}
+
+  .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;
+    padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);}
+  .toggle .tg-txt b{font-size:13px;display:block;} .toggle .tg-txt small{font-size:10.5px;color:var(--faint);font-family:var(--mono);}
+  .sw{position:relative;width:42px;height:24px;flex-shrink:0;direction:ltr;}
+  .sw input{opacity:0;width:0;height:0;position:absolute;}
+  .sw .track{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:background .15s;cursor:pointer;}
+  .sw .track::before{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;
+    transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+  .sw input:checked + .track{background:var(--accent);}
+  .sw input:checked + .track::before{transform:translateX(18px);}
+
+  .qrow2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;}
+  @media (max-width:560px){ .qrow2{grid-template-columns:1fr;} }
+  .sel{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    font-family:var(--mono);font-size:13px;padding:10px 11px;cursor:pointer;}
+  .sel:focus{outline:none;border-color:var(--accent);}
+  .sel:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* queue */
+  .qhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
+  .qhead .qcount{font-family:var(--mono);font-size:12px;color:var(--muted);}
+  .qhead .qclear{font-size:11.5px;color:var(--faint);background:none;border:none;cursor:pointer;font-family:var(--mono);}
+  .qhead .qclear:hover{color:var(--danger);}
+  .qlist{display:flex;flex-direction:column;gap:9px;}
+  .qi{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel-2);
+    position:relative;overflow:hidden;}
+  .qi .qbar{position:absolute;inset:0 auto 0 0;width:0;background:var(--grad-soft);opacity:.55;transition:width .2s ease;z-index:0;}
+  .qi > *{position:relative;z-index:1;}
+  .qi .qico{width:42px;height:42px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--grad-soft);color:var(--accent);}
+  .qi .qico svg{width:20px;height:20px;}
+  .qi .qn{flex:1;min-width:0;}
+  .qi .qn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .qi .qn .meta{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:3px;}
+  .qi .qn .meta em{font-style:normal;color:var(--ink-2);}
+  .pill{flex-shrink:0;font-family:var(--mono);font-size:10.5px;font-weight:600;padding:4px 10px;border-radius:999px;
+    background:var(--line-2);color:var(--muted);white-space:nowrap;}
+  .pill.run{background:var(--accent-soft);color:var(--accent-dim);}
+  .pill.done{background:var(--success-soft);color:var(--success-dim);}
+  .pill.err{background:var(--danger-soft);color:var(--danger);}
+  .qdel{flex-shrink:0;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    color:var(--faint);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .12s,border-color .12s;}
+  .qdel:hover{color:var(--danger);border-color:var(--danger);}
+  .qdel svg{width:14px;height:14px;}
+
+  .gobtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:15px;padding:15px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:18px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;}
+  .gobtn:hover{filter:brightness(1.05);} .gobtn:active{transform:translateY(1px);}
+  .gobtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+  .gobtn svg{width:18px;height:18px;}
+  .opterr{font-size:12px;color:var(--danger);margin-top:10px;min-height:15px;text-align:center;}
+  .rtnote{font-size:10.5px;color:var(--faint);font-family:var(--mono);text-align:center;margin-top:8px;line-height:1.5;}
+
+  /* progress */
+  .prog{padding:16px;display:none;margin-top:18px;}
+  .prog.show{display:block;}
+  .prog .lbl{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;gap:10px;}
+  .prog .lbl .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;}
+  .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
+  .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
+  .bar.indet i{width:35%;animation:slide 1.1s ease-in-out infinite;}
+  @keyframes slide{0%{margin-left:-35%}100%{margin-left:100%}}
+  .prog .phase{margin-top:8px;font-family:var(--mono);font-size:10.5px;color:var(--faint);text-align:center;}
+
+  /* results */
+  .results{padding:22px;display:none;margin-top:18px;}
+  .results.show{display:block;}
+  .results .ok{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .results .ok svg{width:28px;height:28px;}
+  .results h3{text-align:center;font-size:19px;margin:0 0 4px;}
+  .results .subt{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;}
+  .rlist{display:flex;flex-direction:column;gap:9px;margin-bottom:16px;}
+  .rrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel-2);}
+  .rrow.err{border-color:color-mix(in srgb,var(--danger) 40%,var(--line-2));}
+  .rrow .rico{width:46px;height:46px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--success-soft);color:var(--success-dim);}
+  .rrow.err .rico{background:var(--danger-soft);color:var(--danger);}
+  .rrow .rico svg{width:20px;height:20px;}
+  .rrow .rn{flex:1;min-width:0;}
+  .rrow .rn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rrow .rn .meta{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .rrow .meta em{font-style:normal;color:var(--success-dim);}
+  .dlbtn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);font-size:12px;font-weight:600;cursor:pointer;box-shadow:var(--shadow-sm);transition:border-color .12s;}
+  .dlbtn:hover{border-color:var(--accent);}
+  .dlbtn svg{width:14px;height:14px;}
+  .row2{display:flex;gap:10px;flex-wrap:wrap;}
+  .row2 button{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);transition:border-color .12s,transform .08s;box-shadow:var(--shadow-sm);}
+  .row2 button:hover{border-color:var(--accent);} .row2 button:active{transform:translateY(1px);}
+  .row2 .primary{color:#fff;border:none;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .row2 svg{width:15px;height:15px;}
+  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="icon" type="image/png" href="./assets/logo.png">
+<link rel="stylesheet" href="./header.css">
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <!-- upload -->
+  <div id="composer">
+    <div class="drop" id="drop">
+      <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-8 4 16 3-10 2 4h6"/></svg></div>
+      <div class="big" data-i18n="dropBig"></div>
+      <div class="or" data-i18n="or2"></div>
+      <div class="picks">
+        <button class="choose" type="button" id="chooseBtn" data-i18n="choose"></button>
+        <button class="choose ghost" type="button" id="chooseFolderBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span data-i18n="chooseFolder"></span>
+        </button>
+      </div>
+      <div class="sizenote" data-i18n="sizeNote"></div>
+    </div>
+    <input type="file" id="fileInput" multiple accept="audio/*,.mp3,.wav,.flac,.aac,.m4a,.ogg,.oga,.opus,.wma,.aiff,.aif">
+    <input type="file" id="folderInput" webkitdirectory directory multiple>
+
+    <!-- everything below appears once files are added -->
+    <div class="stack" id="stack">
+
+      <!-- queue -->
+      <div class="card sect" id="queueCard">
+        <div class="qhead">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span data-i18n="queueTitle"></span></h3>
+          <button class="qclear" id="qClear" type="button" data-i18n="qClear"></button>
+        </div>
+        <div class="qcount" id="qCount"></div>
+        <div class="qlist" id="qList"></div>
+      </div>
+
+      <!-- settings -->
+      <div class="card sect">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-8 4 16 3-10 2 4h6"/></svg><span data-i18n="setTitle"></span></h3>
+        <p class="hint" data-i18n="setHint"></p>
+
+        <div class="fadegrid">
+          <div class="rng">
+            <div class="top">
+              <b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 20 4"/><path d="M4 20h16"/></svg><span data-i18n="fadeInLbl"></span></b>
+              <span class="val" id="finVal"></span>
+            </div>
+            <input type="range" id="finRng" min="0" max="15" step="0.5" value="3">
+          </div>
+          <div class="rng">
+            <div class="top">
+              <b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4 20 20"/><path d="M4 20h16"/></svg><span data-i18n="fadeOutLbl"></span></b>
+              <span class="val" id="foutVal"></span>
+            </div>
+            <input type="range" id="foutRng" min="0" max="15" step="0.5" value="3">
+          </div>
+        </div>
+
+        <div class="fld">
+          <label data-i18n="curveLbl"></label>
+          <div class="seg" id="curveSeg">
+            <button type="button" data-curve="tri" class="on"><b data-i18n="curveLin"></b><small data-i18n="curveLinSub"></small></button>
+            <button type="button" data-curve="qsin"><b data-i18n="curveSmooth"></b><small data-i18n="curveSmoothSub"></small></button>
+            <button type="button" data-curve="exp"><b data-i18n="curveExp"></b><small data-i18n="curveExpSub"></small></button>
+            <button type="button" data-curve="log"><b data-i18n="curveLog"></b><small data-i18n="curveLogSub"></small></button>
+          </div>
+        </div>
+
+        <div class="fld">
+          <label data-i18n="qualLbl"></label>
+          <div class="qrow2">
+            <select class="sel" id="fmtSel">
+              <option value="mp3">MP3</option>
+              <option value="m4a">M4A (AAC)</option>
+              <option value="wav">WAV</option>
+              <option value="flac">FLAC</option>
+            </select>
+            <select class="sel" id="brSel">
+              <option value="320">320 kbps</option>
+              <option value="256">256 kbps</option>
+              <option value="192">192 kbps</option>
+              <option value="128">128 kbps</option>
+            </select>
+            <select class="sel" id="keepName">
+              <option value="suffix" data-i18n="nameSuffix"></option>
+              <option value="same" data-i18n="nameSame"></option>
+            </select>
+          </div>
+        </div>
+
+        <button class="gobtn" id="goBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-8 4 16 3-10 2 4h6"/></svg>
+          <span id="goTxt" data-i18n="goBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+        <div class="rtnote" data-i18n="rtNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="card prog" id="progCard">
+    <div class="lbl"><span class="nm" id="progName" data-i18n="working"></span><span id="progPct"></span></div>
+    <div class="bar" id="progWrap"><i id="progBar"></i></div>
+    <div class="phase" id="progPhase"></div>
+  </div>
+
+  <!-- results -->
+  <div class="card results" id="resultsCard">
+    <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3 data-i18n="readyTitle"></h3>
+    <p class="subt" id="readySub"></p>
+    <div class="rlist" id="rlist"></div>
+    <div class="row2">
+      <button id="dlAllBtn" class="primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+        <span id="dlAllTxt" data-i18n="dlAll"></span>
+      </button>
+      <button id="newBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <span data-i18n="newBtn"></span>
+      </button>
+    </div>
+    <div class="seam">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span data-i18n="seam"></span>
+    </div>
+  </div>
+
+  <footer data-i18n="foot"></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- Local engine (in ./vendor). No external network needed at runtime. -->
+<script src="./vendor/ffmpeg.js"></script>
+<script src="./vendor/util.js"></script>
+<script src="./vendor/jszip.min.js"></script>
+<script>
+(function(){
+  const el = id => document.getElementById(id);
+
+  const I18N = {
+    he:{
+      dir:'rtl',
+      kick:'Fade In / Fade Out',
+      pageTitle:'הוסיפו כניסה ויציאה חלקה לאודיו',
+      pageSub:'העלו כמה קבצים ביחד, ו-KOLKLI יוסיף Fade In בהתחלה ו-Fade Out בסוף — במעבר חלק שנשמע מקצועי. בחרו את אורך ה-Fade ואת סוג העקומה, וייצאו ל-MP3, M4A, WAV או FLAC. הכול רץ בדפדפן, בלי העלאה לשרת.',
+      dropBig:'גררו קבצי אודיו לכאן', or2:'או', choose:'בחרו קבצים', chooseFolder:'בחרו תיקייה',
+      sizeNote:'MP3 · WAV · FLAC · AAC · M4A · OGG — כמה שרוצים',
+      sizeFree:(cap,per)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · עד ${cap} לקובץ · עד ${per} קבצים ביום · אורך מלא`,
+      sizePaid:(cap)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · עד ${cap} לקובץ · אורך מלא · ללא הגבלת כמות`,
+      errTooBig:(cap)=>`קובץ גדול מדי — מותר עד ${cap} לקובץ בחבילה שלכם`,
+      errDaily:(n)=>`הגעתם למכסת ${n} הקבצים היומית של חבילת Free. שדרגו כדי להמשיך.`,
+      errDailyLeft:(n)=> n===1?`נותר עוד קובץ אחד להיום (חבילת Free)`:`נותרו עוד ${n} קבצים להיום (חבילת Free)`,
+      queueTitle:'רשימת הקבצים', qClear:'נקה הכול',
+      setTitle:'הגדרות Fade',
+      setHint:'בחרו כמה שניות יימשך ה-Fade בכניסה וביציאה, ואיזו עקומה. אפס שניות = בלי Fade בצד הזה.',
+      fadeInLbl:'Fade In (כניסה)', fadeOutLbl:'Fade Out (יציאה)',
+      curveLbl:'עקומת ה-Fade',
+      curveLin:'ליניארי', curveLinSub:'עלייה קבועה', curveSmooth:'חלק', curveSmoothSub:'סינוס רך',
+      curveExp:'אקספוננציאלי', curveExpSub:'התחלה איטית', curveLog:'לוגריתמי', curveLogSub:'התחלה מהירה',
+      qualLbl:'פורמט ואיכות ייצוא',
+      nameSuffix:'הוסף _fade לשם', nameSame:'שמור על אותו שם',
+      goBtn:'הוסיפו Fade', goBtnBusy:'מעבד…',
+      working:'מעבד…', engineLoading:'טוען מנוע אודיו…',
+      phaseFade:'מוסיף Fade…',
+      readyTitle:'הכול מוכן!',
+      readySub:n=> n===1 ? 'קובץ אחד עם Fade ומוכן להורדה.' : `${n} קבצים עם Fade ומוכנים להורדה.`,
+      dlAll:'הורדת הכול (ZIP)', dlOne:'הורדה', newBtn:'אצווה חדשה',
+      origLbl:'מקור', fadeMeta:(i,o)=>`Fade In ${i}s · Fade Out ${o}s`,
+      failed:'העיבוד נכשל',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · Fade In / Fade Out · מהיר, פשוט ובאיכות מקצועית',
+      rtNote:'העיבוד מתבצע מקומית במנוע ffmpeg המובנה. הפלט מקודד מחדש בפורמט שבחרתם.',
+      errNoFiles:'הוסיפו לפחות קובץ אודיו אחד',
+      errNoFade:'בחרו לפחות Fade אחד גדול מאפס',
+      errEngine:'שגיאה: לא ניתן לטעון את מנוע האודיו. ודאו שתיקיית vendor/ קיימת.',
+      errFileProto:'הקובץ נפתח כקובץ מקומי — הדפדפן חוסם את המנוע. הריצו דרך start.bat או שרת מקומי.',
+      errAll:'אף קובץ לא עובד — נסו פורמט אחר או קבצים אחרים',
+      zipName:'KOLKLI-fade',
+    },
+    en:{
+      dir:'ltr',
+      kick:'Fade In / Fade Out',
+      pageTitle:'Add a smooth fade-in and fade-out',
+      pageSub:'Drop in a batch of files and KOLKLI eases each one in at the start and out at the end — a smooth, professional transition. Pick the fade length and curve, then export to MP3, M4A, WAV or FLAC. Everything runs in your browser, nothing is uploaded.',
+      dropBig:'Drop audio files here', or2:'or', choose:'Choose files', chooseFolder:'Choose folder',
+      sizeNote:'MP3 · WAV · FLAC · AAC · M4A · OGG — as many as you like',
+      sizeFree:(cap,per)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · up to ${cap} per file · ${per} files/day · full length`,
+      sizePaid:(cap)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · up to ${cap} per file · full length · unlimited`,
+      errTooBig:(cap)=>`File too large — up to ${cap} per file on your plan`,
+      errDaily:(n)=>`You've reached the Free plan's ${n} files/day limit. Upgrade to keep going.`,
+      errDailyLeft:(n)=> n===1?`1 file left for today (Free plan)`:`${n} files left for today (Free plan)`,
+      queueTitle:'File queue', qClear:'Clear all',
+      setTitle:'Fade settings',
+      setHint:'Choose how many seconds the fade lasts on the way in and out, and which curve. Zero seconds = no fade on that side.',
+      fadeInLbl:'Fade In', fadeOutLbl:'Fade Out',
+      curveLbl:'Fade curve',
+      curveLin:'Linear', curveLinSub:'steady ramp', curveSmooth:'Smooth', curveSmoothSub:'soft sine',
+      curveExp:'Exponential', curveExpSub:'slow start', curveLog:'Logarithmic', curveLogSub:'fast start',
+      qualLbl:'Export format & quality',
+      nameSuffix:'Add _fade to name', nameSame:'Keep the same name',
+      goBtn:'Add fade', goBtnBusy:'Processing…',
+      working:'Processing…', engineLoading:'Loading audio engine…',
+      phaseFade:'Adding fade…',
+      readyTitle:'All done!',
+      readySub:n=> n===1 ? 'One track faded and ready to download.' : `${n} tracks faded and ready to download.`,
+      dlAll:'Download all (ZIP)', dlOne:'Download', newBtn:'New batch',
+      origLbl:'source', fadeMeta:(i,o)=>`Fade in ${i}s · Fade out ${o}s`,
+      failed:'Processing failed',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Fade In / Fade Out · Fast, simple and professional quality',
+      rtNote:'Processing runs locally in the built-in ffmpeg engine. Output is re-encoded in the format you pick.',
+      errNoFiles:'Add at least one audio file',
+      errNoFade:'Set at least one fade above zero',
+      errEngine:'ERROR: could not load the audio engine. Make sure the vendor/ folder exists.',
+      errFileProto:'Opened as a local file — the browser blocks the engine. Run via start.bat or a local server.',
+      errAll:'No track could be processed — try another format or different files',
+      zipName:'KOLKLI-fade',
+    },
+    ru:{
+      dir:'ltr',
+      kick:'Fade In / Fade Out',
+      pageTitle:'Добавьте плавное появление и затухание',
+      pageSub:'Загрузите сразу несколько файлов, и KOLKLI плавно введёт каждый в начале и выведет в конце — аккуратный профессиональный переход. Выберите длину и форму затухания и экспортируйте в MP3, M4A, WAV или FLAC. Всё работает в браузере, ничего не загружается на сервер.',
+      dropBig:'Перетащите аудиофайлы сюда', or2:'или', choose:'Выбрать файлы', chooseFolder:'Выбрать папку',
+      sizeNote:'MP3 · WAV · FLAC · AAC · M4A · OGG — сколько угодно',
+      sizeFree:(cap,per)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · до ${cap} на файл · ${per} файлов/день · полная длина`,
+      sizePaid:(cap)=>`MP3 · WAV · FLAC · AAC · M4A · OGG · до ${cap} на файл · полная длина · без лимита`,
+      errTooBig:(cap)=>`Файл слишком большой — до ${cap} на файл на вашем плане`,
+      errDaily:(n)=>`Достигнут лимит ${n} файлов/день на бесплатном плане. Оформите подписку, чтобы продолжить.`,
+      errDailyLeft:(n)=> n===1?`Остался 1 файл на сегодня (Free)`:`Осталось ${n} файлов на сегодня (Free)`,
+      queueTitle:'Очередь файлов', qClear:'Очистить всё',
+      setTitle:'Настройки затухания',
+      setHint:'Выберите, сколько секунд длится плавность на входе и выходе, и какую форму. Ноль секунд = без затухания с этой стороны.',
+      fadeInLbl:'Fade In', fadeOutLbl:'Fade Out',
+      curveLbl:'Форма затухания',
+      curveLin:'Линейно', curveLinSub:'ровный подъём', curveSmooth:'Плавно', curveSmoothSub:'мягкий синус',
+      curveExp:'Экспонента', curveExpSub:'медленный старт', curveLog:'Логарифм', curveLogSub:'быстрый старт',
+      qualLbl:'Формат и качество экспорта',
+      nameSuffix:'Добавить _fade к имени', nameSame:'Сохранить то же имя',
+      goBtn:'Добавить затухание', goBtnBusy:'Обработка…',
+      working:'Обработка…', engineLoading:'Загрузка аудиодвижка…',
+      phaseFade:'Добавление затухания…',
+      readyTitle:'Готово!',
+      readySub:n=> n===1 ? 'Один трек обработан и готов к скачиванию.' : `${n} треков обработано и готово к скачиванию.`,
+      dlAll:'Скачать всё (ZIP)', dlOne:'Скачать', newBtn:'Новая партия',
+      origLbl:'оригинал', fadeMeta:(i,o)=>`Fade in ${i}s · Fade out ${o}s`,
+      failed:'Обработка не удалась',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Fade In / Fade Out · Быстро, просто и профессионального качества',
+      rtNote:'Обработка выполняется локально во встроенном движке ffmpeg. Результат перекодируется в выбранный формат.',
+      errNoFiles:'Добавьте хотя бы один аудиофайл',
+      errNoFade:'Задайте хотя бы одно затухание больше нуля',
+      errEngine:'ОШИБКА: не удалось загрузить аудиодвижок. Убедитесь, что папка vendor/ существует.',
+      errFileProto:'Открыто как локальный файл — браузер блокирует движок. Запустите через start.bat или локальный сервер.',
+      errAll:'Ни один трек не обработан — попробуйте другой формат или другие файлы',
+      zipName:'KOLKLI-fade',
+    },
+  };
+
+  const AUDIO_EXTS = ['mp3','wav','flac','aac','m4a','ogg','oga','opus','wma','aiff','aif','m4b'];
+  const MIME = { mp3:'audio/mpeg', m4a:'audio/mp4', wav:'audio/wav', flac:'audio/flac' };
+
+  const FFmpeg    = (window.FFmpegWASM && window.FFmpegWASM.FFmpeg);
+  const fetchFile = (window.FFmpegUtil  && window.FFmpegUtil.fetchFile);
+  const engineAvailable = !!(FFmpeg && fetchFile);
+
+  let lang='he', t=I18N.he;
+  let files=[];        // {id,file,name,size,url,dur,status}
+  let results=[];      // {name, blob, url, size, srcSize, ok, fin, fout}
+  let uid=1, busy=false;
+  let curve='tri';
+  let ffmpeg=null, ffLoading=null;
+
+  // ---- helpers ----
+  function baseName(name){ return String(name||'audio').replace(/\.[^.\/\\]+$/,''); }
+  function extOf(name){ const m=/\.([^.\/\\]+)$/.exec(name||''); const e=m?m[1].toLowerCase():''; return AUDIO_EXTS.includes(e)?e:'mp3'; }
+  function fmtBytes(n){ if(n==null) return '—'; if(n>=1073741824) return (n/1073741824).toFixed(2)+' GB'; if(n>=1048576) return (n/1048576).toFixed(1)+' MB'; if(n>=1024) return (n/1024).toFixed(0)+' KB'; return n+' B'; }
+  function mmss(s){ if(!s||!isFinite(s)) return null; s=Math.round(s); const m=Math.floor(s/60); return m+':'+String(s%60).padStart(2,'0'); }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function num(v){ const n=parseFloat(v); return isFinite(n)?n:null; }
+  function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1900); }
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+  function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
+  function finiteDuration(v){ const n=parseFloat(v); return isFinite(n) && n>0 ? n : null; }
+
+  // ---- plan-aware limits (free-tier friction; server enforces once a Worker is live) ----
+  const MB = 1048576;
+  const FREE_DAILY_FILES = 3;
+  function planPaid(){
+    try{ if(window.KolkliUsage && window.KolkliUsage.isExempt) return !!window.KolkliUsage.isExempt(); }catch(_){}
+    let plan='';
+    try{
+      const email=(ls('ac_session')||'').toLowerCase();
+      if(email){ const users=JSON.parse(ls('ac_users')||'[]')||[]; const u=users.find(x=>(x.email||'').toLowerCase()===email); if(u&&u.plan) plan=u.plan; }
+    }catch(_){}
+    if(!plan) plan=ls('ac_plan')||'';
+    plan=(plan||'free').toLowerCase();
+    return plan==='lite'||plan==='creator'||plan==='pro'||plan==='business'||plan==='studio';
+  }
+  function fileCap(){
+    try{ if(window.KolkliUsage && window.KolkliUsage.fileByteCap) return window.KolkliUsage.fileByteCap(); }catch(_){}
+    return planPaid() ? 500*MB : 50*MB;
+  }
+  function capTxt(){ const c=fileCap(); return c>=1073741824 ? Math.round(c/1073741824)+'GB' : Math.round(c/MB)+'MB'; }
+  function dayStamp(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+  function ledgerKey(){ return 'kolkli_fade_files_'+dayStamp(); }
+  function filesUsedToday(){ if(planPaid()) return 0; const n=parseInt(ls(ledgerKey())||'0',10); return isFinite(n)&&n>0?n:0; }
+  function addFilesToday(n){ if(planPaid()||!n) return; try{ localStorage.setItem(ledgerKey(), String(filesUsedToday()+n)); }catch(_){} }
+  function dailyRemaining(){ return planPaid() ? Infinity : Math.max(0, FREE_DAILY_FILES - filesUsedToday()); }
+  function showUpgrade(){ try{ if(window.KolkliUsage && window.KolkliUsage.showBlocked) window.KolkliUsage.showBlocked({code:'daily_files'}); }catch(_){}}
+  function updateLimitsUI(){
+    const note=document.querySelector('.sizenote');
+    if(note && t.sizeFree) note.textContent = planPaid() ? t.sizePaid(capTxt()) : t.sizeFree(capTxt(), FREE_DAILY_FILES);
+  }
+
+  // ---- engine ----
+  function loadFF(){
+    if(ffmpeg) return Promise.resolve(ffmpeg);
+    if(!ffLoading){
+      ffLoading = (async()=>{
+        if(!engineAvailable) throw new Error('engine');
+        const f=new FFmpeg();
+        const dir=location.href.replace(/[^/]*$/,'')+'vendor/';
+        await f.load({ coreURL:dir+'ffmpeg-core.js', wasmURL:dir+'ffmpeg-core.wasm' });
+        ffmpeg=f; return f;
+      })().catch(e=>{ ffLoading=null; throw e; });
+    }
+    return ffLoading;
+  }
+  function disposeFF(){ try{ ffmpeg && ffmpeg.terminate && ffmpeg.terminate(); }catch(_){} ffmpeg=null; ffLoading=null; }
+
+  async function probeOriginalDuration(f, inName){
+    let dur=null;
+    const onLog=e=>{
+      const msg=(e && typeof e.message==='string') ? e.message : '';
+      const m=msg.match(/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/);
+      if(m) dur=(+m[1])*3600+(+m[2])*60+parseFloat(m[3]);
+    };
+    f.on('log', onLog);
+    try{ await f.exec(['-hide_banner','-i',inName]); }
+    catch(_){ /* ffmpeg exits after printing metadata because no output is requested */ }
+    finally{ try{ f.off('log', onLog); }catch(_){}}
+    return finiteDuration(dur);
+  }
+
+  function encodeArgs(fmt){
+    const br=el('brSel').value;
+    switch(fmt){
+      case 'wav':  return ['-c:a','pcm_s16le'];
+      case 'flac': return ['-c:a','flac'];
+      case 'm4a':  return ['-c:a','aac','-b:a',br+'k'];
+      case 'mp3':
+      default:     return ['-c:a','libmp3lame','-b:a',br+'k'];
+    }
+  }
+
+  // Build the afade chain for one file, clamped to its real duration.
+  function buildFade(dur, fin, fout){
+    let inN=fin, outN=fout;
+    if(dur){
+      // never let the two fades overlap or exceed the track
+      if(inN+outN > dur){ const k=dur/(inN+outN); inN=+(inN*k).toFixed(3); outN=+(outN*k).toFixed(3); }
+    }
+    const parts=[];
+    if(inN>0)  parts.push(`afade=t=in:st=0:d=${inN}:curve=${curve}`);
+    if(outN>0 && dur){ const st=Math.max(0,(dur-outN)).toFixed(3); parts.push(`afade=t=out:st=${st}:d=${outN}:curve=${curve}`); }
+    return { af: parts.join(','), inN, outN };
+  }
+
+  // Process one file end-to-end. onProg(0..1).
+  async function processOne(item, cfg, onProg){
+    const f=await loadFF();
+    const inName='in_'+(uid++)+'.'+extOf(item.name);
+    const outName='out_'+(uid++)+'.'+cfg.fmt;
+    let spent = cfg.fmt==='flac';   // the flac encoder aborts the core after writing
+    const onp=e=>{ if(onProg && e && isFinite(e.progress)) onProg(Math.max(0,Math.min(1,e.progress))); };
+    try{
+      await f.writeFile(inName, await fetchFile(item.file));
+      const dur = await probeOriginalDuration(f, inName) || finiteDuration(item.dur);
+      if(dur && (!finiteDuration(item.dur) || Math.abs(item.dur-dur)>0.05)){ item.dur=dur; renderQueue(); }
+      f.on('progress', onp);
+
+      const fade=buildFade(dur, cfg.fin, cfg.fout);
+      const args=['-hide_banner','-i',inName];
+      if(fade.af) args.push('-af', fade.af);
+      args.push(...encodeArgs(cfg.fmt), outName);
+
+      await f.exec(args);
+      const data=await f.readFile(outName);
+      if(onProg) onProg(1);
+      const blob=new Blob([data.buffer||data], { type: MIME[cfg.fmt]||'application/octet-stream' });
+      if(!blob.size) throw new Error('empty output');
+      return { blob, fin:fade.inN, fout:fade.outN };
+    }catch(err){
+      spent=true;
+      throw err;
+    }finally{
+      try{ f.off('progress', onp); }catch(_){}
+      if(!spent){ try{ await f.deleteFile(inName); }catch(_){} try{ await f.deleteFile(outName); }catch(_){} }
+      if(spent) disposeFF();
+    }
+  }
+
+  // ---- intake ----
+  function addFiles(list){
+    let added=0, tooBig=0, overQuota=0;
+    const cap=fileCap(), paid=planPaid();
+    Array.from(list||[]).forEach(file=>{
+      const okType = file.type && file.type.indexOf('audio')===0;
+      const okExt  = new RegExp('\\.('+AUDIO_EXTS.join('|')+')$','i').test(file.name);
+      if(!okType && !okExt) return;
+      if(file.size > cap){ tooBig++; return; }
+      if(!paid && (filesUsedToday() + files.length + 1) > FREE_DAILY_FILES){ overQuota++; return; }
+      const it={ id:'f'+(uid++), file, name:file.name, size:file.size, url:URL.createObjectURL(file), dur:0, status:'wait' };
+      files.push(it);
+      probeDuration(it);
+      added++;
+    });
+    if(added){ el('stack').classList.add('show'); renderQueue(); el('resultsCard').classList.remove('show'); el('optErr').textContent=''; }
+    if(tooBig){ const m=t.errTooBig(capTxt()); el('optErr').textContent=m; toast(m); }
+    else if(overQuota){ el('optErr').textContent=t.errDaily(FREE_DAILY_FILES); showUpgrade(); }
+  }
+  function probeDuration(it){
+    try{
+      const a=new Audio(); a.preload='metadata';
+      a.onloadedmetadata=()=>{ if(isFinite(a.duration)&&a.duration>0){ it.dur=a.duration; renderQueue(); } a.src=''; };
+      a.onerror=()=>{ a.src=''; };
+      a.src=it.url;
+    }catch(_){}
+  }
+  function removeFile(id){
+    const f=files.find(x=>x.id===id); if(f&&f.url) URL.revokeObjectURL(f.url);
+    files=files.filter(x=>x.id!==id);
+    renderQueue();
+    if(!files.length){ el('stack').classList.remove('show'); el('drop').style.display=''; }
+  }
+  function clearFiles(){
+    files.forEach(f=>{ if(f.url) URL.revokeObjectURL(f.url); });
+    files=[];
+    el('stack').classList.remove('show'); el('drop').style.display=''; el('optErr').textContent='';
+    renderQueue();
+  }
+
+  // ---- queue render ----
+  const PILL={ wait:'', run:'run', done:'done', err:'err' };
+  function renderQueue(){
+    const n=files.length;
+    el('qCount').textContent = n ? `${n} · ${fmtBytes(files.reduce((a,f)=>a+f.size,0))}` : '';
+    el('qList').innerHTML = files.map(it=>{
+      const sub = [extOf(it.name).toUpperCase(), mmss(it.dur), fmtBytes(it.size)].filter(Boolean).join(' · ');
+      const pillCls = PILL[it.status]||'';
+      const pillTx = it.status==='done' ? '✓' : (it.status==='err' ? '!' : (it.status==='run' ? '···' : (mmss(it.dur)||'—')));
+      return `<div class="qi ${it.status==='done'?'done':''}" data-id="${it.id}">
+        <div class="qbar" data-bar="${it.id}"></div>
+        <div class="qico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-8 4 16 3-10 2 4h6"/></svg></div>
+        <div class="qn">
+          <div class="nm" title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</div>
+          <div class="meta">${sub}</div>
+        </div>
+        <span class="pill ${pillCls}">${pillTx}</span>
+        ${busy?'':`<button class="qdel" data-del="${it.id}" type="button" aria-label="remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>`}
+      </div>`;
+    }).join('');
+  }
+  function setBar(id,p){ const b=el('qList').querySelector(`[data-bar="${id}"]`); if(b) b.style.width=Math.round(p*100)+'%'; }
+  function setStatus(it,s){ it.status=s; renderQueue(); }
+
+  // ---- run ----
+  async function run(){
+    if(busy) return;
+    el('optErr').textContent='';
+    if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
+    if(location.protocol==='file:'){ el('optErr').textContent=t.errFileProto; return; }
+
+    const fin=Math.max(0,num(el('finRng').value)||0);
+    const fout=Math.max(0,num(el('foutRng').value)||0);
+    if(fin<=0 && fout<=0){ el('optErr').textContent=t.errNoFade; return; }
+
+    if(!planPaid()){
+      const remaining=dailyRemaining();
+      if(remaining<=0){ el('optErr').textContent=t.errDaily(FREE_DAILY_FILES); showUpgrade(); return; }
+      if(files.length>remaining){ el('optErr').textContent=t.errDailyLeft(remaining); showUpgrade(); return; }
+    }
+
+    const cfg={ fmt: el('fmtSel').value, fin, fout, suffix: el('keepName').value==='suffix' };
+
+    busy=true; el('goBtn').disabled=true; el('goTxt').textContent=t.goBtnBusy;
+    files.forEach(it=>{ it.status='wait'; });
+    renderQueue();
+    clearResults();
+    const prog=el('progCard'); prog.classList.add('show');
+    el('progName').textContent=t.engineLoading; el('progPct').textContent=''; el('progPhase').textContent='';
+    el('progWrap').classList.add('indet');
+    prog.scrollIntoView({behavior:'smooth',block:'center'});
+
+    try{ await loadFF(); }
+    catch(_){ prog.classList.remove('show'); el('progWrap').classList.remove('indet'); el('optErr').textContent=t.errEngine; finishBusy(); return; }
+    el('progWrap').classList.remove('indet');
+
+    const n=files.length;
+    for(let i=0;i<n;i++){
+      const it=files[i];
+      setStatus(it,'run');
+      el('progName').textContent=`${it.name}  ·  ${i+1}/${n}`;
+      el('progPhase').textContent=t.phaseFade;
+      setProg(Math.round(i/n*100));
+      await sleep(20);
+      try{
+        const r=await processOne(it, cfg, p=>{ setBar(it.id,p); setProg(Math.round((i+p)/n*100)); });
+        setStatus(it,'done');
+        const outName=(cfg.suffix?baseName(it.name)+'_fade':baseName(it.name))+'.'+cfg.fmt;
+        results.push({ name:outName, blob:r.blob, url:URL.createObjectURL(r.blob), size:r.blob.size, srcSize:it.size, ok:true, fin:r.fin, fout:r.fout });
+      }catch(err){
+        console.error(err);
+        setStatus(it,'err');
+        results.push({ name:baseName(it.name)+'.'+cfg.fmt, blob:null, url:null, size:0, srcSize:it.size, ok:false });
+      }
+      setProg(Math.round((i+1)/n*100));
+    }
+
+    await sleep(200);
+    prog.classList.remove('show'); el('progPhase').textContent='';
+    finishBusy();
+    addFilesToday(results.filter(r=>r.ok).length);
+    updateLimitsUI();
+    if(!results.some(r=>r.ok)){ el('optErr').textContent=t.errAll; return; }
+    showResults();
+  }
+  function finishBusy(){ busy=false; el('goBtn').disabled=false; el('goTxt').textContent=t.goBtn; renderQueue(); }
+  function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+
+  function showResults(){
+    const ok=results.filter(r=>r.ok).length;
+    el('readySub').textContent=t.readySub(ok);
+    el('rlist').innerHTML = results.map((r,i)=>{
+      if(!r.ok){
+        return `<div class="rrow err"><span class="rico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></span>
+          <span class="rn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta">${escapeHtml(t.failed)}</div></span></div>`;
+      }
+      const meta = `${t.fadeMeta(r.fin,r.fout)} · ${t.origLbl} ${fmtBytes(r.srcSize)} → <em>${fmtBytes(r.size)}</em>`;
+      return `<div class="rrow"><span class="rico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-8 4 16 3-10 2 4h6"/></svg></span>
+        <span class="rn"><div class="nm" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div><div class="meta">${meta}</div></span>
+        <button class="dlbtn" data-dl="${i}" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>${t.dlOne}</span></button></div>`;
+    }).join('');
+    const okCount=results.filter(r=>r.ok).length;
+    el('dlAllTxt').textContent = okCount>1 ? t.dlAll : t.dlOne;
+    el('resultsCard').classList.add('show');
+    el('resultsCard').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  function download(r){
+    if(!r||!r.url) return;
+    const a=document.createElement('a'); a.href=r.url; a.download=r.name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  async function downloadAll(){
+    const ok=results.filter(r=>r.ok && r.blob);
+    if(!ok.length) return;
+    if(ok.length===1){ download(ok[0]); return; }
+    if(window.JSZip){
+      try{
+        const zip=new window.JSZip();
+        ok.forEach(r=>zip.file(r.name, r.blob));
+        const blob=await zip.generateAsync({type:'blob'});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a'); a.href=url; a.download=t.zipName+'.zip'; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),6000);
+        toast('ZIP ✓');
+        return;
+      }catch(_){ /* fall through to sequential downloads */ }
+    }
+    for(const r of ok){ download(r); await sleep(300); }
+  }
+
+  function clearResults(){ results.forEach(r=>{ if(r.url) URL.revokeObjectURL(r.url); }); results=[]; }
+  function reset(){
+    clearResults();
+    clearFiles();
+    el('resultsCard').classList.remove('show');
+    el('optErr').textContent='';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---- sliders ----
+  function syncRange(input, valEl){
+    const v=num(input.value)||0;
+    valEl.textContent = v+'s';
+    const pct = (v-input.min)/((input.max-input.min)||1)*100;
+    input.style.setProperty('--p', pct+'%');
+  }
+  function syncQual(){
+    const fmt=el('fmtSel').value;
+    el('brSel').disabled = (fmt==='wav' || fmt==='flac');
+  }
+
+  // ---- i18n + theme ----
+  function applyLang(l){
+    lang=l; t=I18N[l];
+    document.documentElement.lang=l; document.documentElement.dir=t.dir;
+    document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
+    el('goTxt').textContent = busy ? t.goBtnBusy : t.goBtn;
+    try{ localStorage.setItem('ac_lang', l); }catch(_){}
+    renderQueue();
+    updateLimitsUI();
+    if(results.length && el('resultsCard').classList.contains('show')) showResults();
+  }
+  function detectLang(){
+    const chosen=ls('ac_lang'); if(chosen) return chosen;
+    const cc=ls('ac_country'); if(cc) return cc==='IL'?'he':'en';
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(_){}
+    const navHe=(navigator.language||'').toLowerCase().indexOf('he')===0;
+    return (tz==='Asia/Jerusalem'||navHe)?'he':'en';
+  }
+  function applyTheme(th){
+    const dark=(th==='dark');
+    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+    const ti=el('themeIco'); if(ti) ti.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+
+  // ---- events ----
+  const drop=el('drop'), input=el('fileInput'), folder=el('folderInput');
+  el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
+  el('chooseFolderBtn').addEventListener('click',e=>{ e.stopPropagation(); folder.click(); });
+  drop.addEventListener('click',()=>input.click());
+  input.addEventListener('change',()=>{ addFiles(input.files); input.value=''; });
+  folder.addEventListener('change',()=>{ addFiles(folder.files); folder.value=''; });
+  ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFiles(e.dataTransfer.files); });
+  document.addEventListener('dragover',e=>{ if(e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+  document.addEventListener('drop',e=>{ if(e.target!==drop && e.dataTransfer && Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault(); });
+
+  el('qList').addEventListener('click',e=>{ const b=e.target.closest('[data-del]'); if(b && !busy) removeFile(b.getAttribute('data-del')); });
+  el('qClear').addEventListener('click',()=>{ if(!busy) clearFiles(); });
+
+  el('finRng').addEventListener('input',()=>syncRange(el('finRng'),el('finVal')));
+  el('foutRng').addEventListener('input',()=>syncRange(el('foutRng'),el('foutVal')));
+  el('curveSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-curve]'); if(b){ el('curveSeg').querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); curve=b.getAttribute('data-curve'); } });
+  el('fmtSel').addEventListener('change',syncQual);
+
+  el('goBtn').addEventListener('click',run);
+  el('newBtn').addEventListener('click',reset);
+  el('dlAllBtn').addEventListener('click',downloadAll);
+  el('rlist').addEventListener('click',e=>{ const b=e.target.closest('[data-dl]'); if(b) download(results[+b.getAttribute('data-dl')]); });
+
+  window.__setLang=applyLang;
+  const tt=el('themeToggle'); if(tt) tt.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+  // ---- init ----
+  applyTheme(ls('theme')||'light');
+  applyLang(detectLang());
+  syncRange(el('finRng'),el('finVal'));
+  syncRange(el('foutRng'),el('foutVal'));
+  syncQual();
+  setTimeout(()=>{ if(engineAvailable && location.protocol!=='file:') loadFF().catch(()=>{}); }, 600);
+})();
+</script>
+</body>
+</html>

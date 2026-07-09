@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — JSON Formatter</title>
-<meta name="description" content="Free JSON formatter, validator & minifier — paste JSON to beautify it with your choice of indentation, minify it, sort keys and catch syntax errors with the exact line and column. Fast, private, right in your browser.">
+<meta name="description" content="Free JSON formatter, validator & minifier — paste JSON to beautify it with your choice of indentation, minify it, sort keys and catch syntax errors with the exact line and column. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -226,7 +226,7 @@
     he:{ dir:'rtl',
       kick:'JSON Formatter',
       pageTitle:'סידור ובדיקת JSON',
-      pageSub:'הדביקו JSON כדי לסדר אותו יפה עם רמת הזחה לבחירתכם, לכווץ אותו לשורה אחת, למיין מפתחות ולתפוס שגיאות תחביר עם השורה והעמודה המדויקות. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'הדביקו JSON כדי לסדר אותו יפה עם רמת הזחה לבחירתכם, לכווץ אותו לשורה אחת, למיין מפתחות ולתפוס שגיאות תחביר עם השורה והעמודה המדויקות. מהיר, פשוט ובאיכות מקצועית.',
       modeBeautify:'סידור יפה', modeMinify:'כיווץ',
       indentLabel:'הזחה', indent2:'2 רווחים', indent4:'4 רווחים', indentTab:'טאב',
       sortKeys:'מיון מפתחות',
@@ -238,12 +238,12 @@
       emptyMsg:'הדביקו JSON קודם',
       valid:'JSON תקין', invalid:'JSON לא תקין: ',
       lineWord:'שורה', colWord:'עמודה',
-      note:'הכול רץ מקומית בדפדפן — ה-JSON שלכם לא נשלח לשום שרת. הכלי משתמש במנתח ה-JSON המובנה של הדפדפן, כך שהבדיקה זהה לזו של הקוד שלכם. תגובות (comments) וסיומות פסיק (trailing commas) אינן חוקיות ב-JSON ויסומנו כשגיאה.',
-      foot:'KOLKLI · JSON Formatter · פרטי ומהיר, ישירות בדפדפן' },
+      note:'הכלי משתמש במנתח ה-JSON המובנה של הדפדפן, כך שהבדיקה זהה לזו של הקוד שלכם. תגובות (comments) וסיומות פסיק (trailing commas) אינן חוקיות ב-JSON ויסומנו כשגיאה. מהיר, פשוט ובאיכות מקצועית.',
+      foot:'KOLKLI · JSON Formatter · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'JSON Formatter',
       pageTitle:'JSON Formatter & Validator',
-      pageSub:'Paste JSON to beautify it with the indentation you choose, minify it to a single line, sort its keys and catch syntax errors with the exact line and column. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Paste JSON to beautify it with the indentation you choose, minify it to a single line, sort its keys and catch syntax errors with the exact line and column. Fast, simple and professional-quality.',
       modeBeautify:'Beautify', modeMinify:'Minify',
       indentLabel:'Indent', indent2:'2 spaces', indent4:'4 spaces', indentTab:'Tab',
       sortKeys:'Sort keys',
@@ -255,12 +255,12 @@
       emptyMsg:'Paste some JSON first',
       valid:'Valid JSON', invalid:'Invalid JSON: ',
       lineWord:'line', colWord:'column',
-      note:'Everything runs locally in your browser — your JSON is never sent to a server. This uses the browser’s built-in JSON parser, so validation matches what your code sees. Comments and trailing commas are not valid JSON and will be flagged as an error.',
-      foot:'KOLKLI · JSON Formatter · Private and fast, right in your browser' },
+      note:'This uses the browser’s built-in JSON parser, so validation matches what your code sees. Comments and trailing commas are not valid JSON and will be flagged as an error. Fast, simple and professional-quality.',
+      foot:'KOLKLI · JSON Formatter · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'JSON Formatter',
       pageTitle:'Форматирование и проверка JSON',
-      pageSub:'Вставьте JSON, чтобы красиво отформатировать его с выбранным отступом, сжать в одну строку, отсортировать ключи и находить синтаксические ошибки с точной строкой и колонкой. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Вставьте JSON, чтобы красиво отформатировать его с выбранным отступом, сжать в одну строку, отсортировать ключи и находить синтаксические ошибки с точной строкой и колонкой. Быстро, просто и профессионального качества.',
       modeBeautify:'Форматировать', modeMinify:'Сжать',
       indentLabel:'Отступ', indent2:'2 пробела', indent4:'4 пробела', indentTab:'Таб',
       sortKeys:'Сортировать ключи',
@@ -272,8 +272,8 @@
       emptyMsg:'Сначала вставьте JSON',
       valid:'Корректный JSON', invalid:'Некорректный JSON: ',
       lineWord:'строка', colWord:'колонка',
-      note:'Всё работает локально в браузере — ваш JSON никуда не отправляется. Используется встроенный парсер JSON браузера, поэтому проверка совпадает с тем, что видит ваш код. Комментарии и висячие запятые не являются допустимым JSON и будут отмечены как ошибка.',
-      foot:'KOLKLI · JSON Formatter · Приватно и быстро, прямо в браузере' }
+      note:'Используется встроенный парсер JSON браузера, поэтому проверка совпадает с тем, что видит ваш код. Комментарии и висячие запятые не являются допустимым JSON и будут отмечены как ошибка. Быстро, просто и профессионального качества.',
+      foot:'KOLKLI · JSON Formatter · Быстро, просто и профессионального качества' }
   };
 
   const SAMPLE =

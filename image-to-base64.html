@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — תמונה ל-Base64</title>
-<meta name="description" content="Free image to Base64 encoder — drag in a PNG, JPG, SVG or GIF and instantly get a copy-ready data URI, CSS background-image and HTML img tag. 100% client-side, nothing is uploaded.">
+<meta name="description" content="Free image to Base64 encoder — drag in a PNG, JPG, SVG or GIF and instantly get a copy-ready data URI, CSS background-image and HTML img tag. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -255,39 +255,39 @@
     he:{ dir:'rtl',
       kick:'תמונה ל-Base64',
       pageTitle:'ממיר תמונה ל-Base64',
-      pageSub:'גררו תמונה או בחרו קובץ, וקבלו מייד data URI מוכן להעתקה — כולל גרסת CSS ו-HTML. הכול רץ בדפדפן, שום קובץ לא נשלח לשרת.',
+      pageSub:'גררו תמונה או בחרו קובץ, וקבלו מייד data URI מוכן להעתקה — כולל גרסת CSS ו-HTML. מהיר, פשוט ובאיכות מקצועית.',
       copy:'העתקה', copiedMsg:'הועתק ✓',
       emptyTitle:'גררו לכאן תמונה', emptySub:'PNG · JPG · SVG · GIF · WebP — או בחרו קובץ מהמחשב',
       choose:'בחירת קובץ', clear:'ניקוי',
       rawTitle:'Data URI', wrapLabel:'גלישת שורות',
       fName:'שם קובץ', fType:'סוג', fDims:'מידות', fOrig:'מקורי', fEnc:'מקודד', fOver:'תוספת',
       errType:'נא לבחור קובץ תמונה', errRead:'קריאת הקובץ נכשלה',
-      note:'קידוד Base64 גדול בכ-33% מהקובץ המקורי. הוא מתאים בעיקר לאייקונים קטנים ול-SVG מוטבע — כדי לחסוך בקשת רשת ולהטמיע את התמונה ישירות בקוד. הכול מתבצע מקומית בדפדפן.',
-      foot:'KOLKLI · תמונה ל-Base64 · פרטי ומהיר, ישירות בדפדפן' },
+      note:'קידוד Base64 גדול בכ-33% מהקובץ המקורי. הוא מתאים בעיקר לאייקונים קטנים ול-SVG מוטבע — כדי לחסוך בקשת רשת ולהטמיע את התמונה ישירות בקוד. מהיר, פשוט ובאיכות מקצועית.',
+      foot:'KOLKLI · תמונה ל-Base64 · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Image to Base64',
       pageTitle:'Image to Base64 Encoder',
-      pageSub:'Drag in an image or choose a file and instantly get a copy-ready data URI — plus CSS and HTML variants. Everything runs in your browser; no file is sent to a server.',
+      pageSub:'Drag in an image or choose a file and instantly get a copy-ready data URI — plus CSS and HTML variants. Fast, simple and professional-quality.',
       copy:'Copy', copiedMsg:'Copied ✓',
       emptyTitle:'Drop an image here', emptySub:'PNG · JPG · SVG · GIF · WebP — or choose a file from your computer',
       choose:'Choose file', clear:'Clear',
       rawTitle:'Data URI', wrapLabel:'Wrap long lines',
       fName:'File name', fType:'Type', fDims:'Dimensions', fOrig:'Original', fEnc:'Encoded', fOver:'Overhead',
       errType:'Please choose an image file', errRead:'Could not read the file',
-      note:'Base64 encoding is about 33% larger than the original file. It is best for tiny icons and inline SVGs — to save an HTTP request and embed the image right in your code. Everything runs locally in your browser.',
-      foot:'KOLKLI · Image to Base64 · Private and fast, right in your browser' },
+      note:'Base64 encoding is about 33% larger than the original file. It is best for tiny icons and inline SVGs — to save an HTTP request and embed the image right in your code. Fast, simple and professional-quality.',
+      foot:'KOLKLI · Image to Base64 · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Изображение в Base64',
       pageTitle:'Кодировщик изображения в Base64',
-      pageSub:'Перетащите изображение или выберите файл и мгновенно получите готовый data URI для копирования — вместе с вариантами для CSS и HTML. Всё работает в браузере; ни один файл не отправляется на сервер.',
+      pageSub:'Перетащите изображение или выберите файл и мгновенно получите готовый data URI для копирования — вместе с вариантами для CSS и HTML. Быстро, просто и профессионального качества.',
       copy:'Копировать', copiedMsg:'Скопировано ✓',
       emptyTitle:'Перетащите изображение сюда', emptySub:'PNG · JPG · SVG · GIF · WebP — или выберите файл на компьютере',
       choose:'Выбрать файл', clear:'Очистить',
       rawTitle:'Data URI', wrapLabel:'Перенос строк',
       fName:'Имя файла', fType:'Тип', fDims:'Размеры', fOrig:'Оригинал', fEnc:'В Base64', fOver:'Прирост',
       errType:'Выберите файл изображения', errRead:'Не удалось прочитать файл',
-      note:'Кодирование в Base64 примерно на 33% больше исходного файла. Оно лучше всего подходит для маленьких иконок и встроенных SVG — чтобы сэкономить сетевой запрос и встроить изображение прямо в код. Всё выполняется локально в браузере.',
-      foot:'KOLKLI · Изображение в Base64 · Приватно и быстро, прямо в браузере' }
+      note:'Кодирование в Base64 примерно на 33% больше исходного файла. Оно лучше всего подходит для маленьких иконок и встроенных SVG — чтобы сэкономить сетевой запрос и встроить изображение прямо в код. Быстро, просто и профессионального качества.',
+      foot:'KOLKLI · Изображение в Base64 · Быстро, просто и профессионального качества' }
   };
 
   let lang='he', t=I18N.he;

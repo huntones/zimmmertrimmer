@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — DOC ל-PDF</title>
-<meta name="description" content="Convert Word DOCX, TXT and RTF documents to clean PDF files — right in your browser. Choose page size, orientation and margins. Private and fast.">
+<meta name="description" content="Convert Word DOCX, TXT and RTF documents to clean PDF files. Choose page size, orientation and margins. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -324,7 +324,7 @@
       dir:'rtl', langIco:'EN',
       kick:'מסמכים · DOC ל-PDF',
       pageTitle:'המירו מסמכי Word ל-PDF',
-      pageSub:'גררו קובצי DOCX, TXT או RTF וקבלו PDF נקי ומוכן להורדה. בחרו גודל עמוד, כיוון ושוליים. ההמרה מתבצעת כולה בדפדפן — שום קובץ לא עוזב את המחשב שלכם.',
+      pageSub:'גררו קובצי DOCX, TXT או RTF וקבלו PDF נקי ומוכן להורדה. בחרו גודל עמוד, כיוון ושוליים. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו מסמכים לכאן', or2:'או', choose:'בחרו קבצים',
       remove:'הסרה', totalLbl:'סה״כ', optTitle:'הגדרות PDF',
       sizeLbl:'גודל עמוד', orientLbl:'כיוון', portrait:'לאורך', landscape:'לרוחב',
@@ -336,8 +336,8 @@
       download:'הורדה', dlAll:'הורדת הכול', againBtn:'המרה נוספת',
       combinedFile:'מסמכים-מאוחדים',
       unsupported:'פורמט לא נתמך בדפדפן', unsupHint:'קובצי DOC ישנים דורשים המרה בשרת',
-      seam:'הכול רץ מקומית בדפדפן — הקבצים לא נשלחים לשום שרת. קובצי DOCX ממופים לעיצוב ה-PDF; DOC בפורמט הישן עדיין דורש המרה בצד השרת.',
-      foot:'KOLKLI · DOC ל-PDF · רץ בדפדפן שלכם',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · DOC ל-PDF. מהיר, פשוט ובאיכות מקצועית.',
       copied:'הועתק ✓',
       errNone:'הוסיפו לפחות מסמך אחד נתמך (DOCX / TXT / RTF)',
       errLibs:'ספריות ההמרה לא נטענו. בדקו את החיבור לאינטרנט ורעננו את העמוד.',
@@ -347,7 +347,7 @@
       dir:'ltr', langIco:'עב',
       kick:'Documents · DOC to PDF',
       pageTitle:'Convert Word documents to PDF',
-      pageSub:'Drop DOCX, TXT or RTF files and get a clean, ready-to-download PDF. Pick page size, orientation and margins. It all runs in your browser — no file ever leaves your machine.',
+      pageSub:'Drop DOCX, TXT or RTF files and get a clean, ready-to-download PDF. Pick page size, orientation and margins. Fast, simple and professional-quality.',
       dropBig:'Drag documents here', or2:'or', choose:'Choose files',
       remove:'Remove', totalLbl:'Total', optTitle:'PDF options',
       sizeLbl:'Page size', orientLbl:'Orientation', portrait:'Portrait', landscape:'Landscape',
@@ -359,8 +359,8 @@
       download:'Download', dlAll:'Download all', againBtn:'Convert more',
       combinedFile:'merged-documents',
       unsupported:'Format not supported in browser', unsupHint:'Legacy DOC files need server-side conversion',
-      seam:'Everything runs locally in your browser — files are never uploaded. DOCX is mapped into the PDF layout; the legacy DOC format still needs server-side conversion.',
-      foot:'KOLKLI · DOC to PDF · runs in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · DOC to PDF. Fast, simple and professional-quality.',
       copied:'Copied ✓',
       errNone:'Add at least one supported document (DOCX / TXT / RTF)',
       errLibs:'Conversion libraries failed to load. Check your connection and refresh.',
@@ -370,7 +370,7 @@
       dir:'ltr',
       kick:'Документы · DOC в PDF',
       pageTitle:'Конвертируйте документы Word в PDF',
-      pageSub:'Перетащите файлы DOCX, TXT или RTF и получите чистый, готовый к скачиванию PDF. Выберите размер страницы, ориентацию и поля. Всё работает в вашем браузере — ни один файл не покидает устройство.',
+      pageSub:'Перетащите файлы DOCX, TXT или RTF и получите чистый, готовый к скачиванию PDF. Выберите размер страницы, ориентацию и поля. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите документы сюда', or2:'или', choose:'Выбрать файлы',
       remove:'Удалить', totalLbl:'Всего', optTitle:'Параметры PDF',
       sizeLbl:'Размер страницы', orientLbl:'Ориентация', portrait:'Книжная', landscape:'Альбомная',
@@ -381,9 +381,9 @@
       readyTitle:'Ваш PDF готов!', readySub:'Нажмите «Скачать», чтобы сохранить файлы.',
       download:'Скачать', dlAll:'Скачать всё', againBtn:'Ещё конвертация',
       combinedFile:'merged-documents',
-      unsupported:'Формат не поддерживается в браузере', unsupHint:'Старые файлы DOC требуют конвертации на сервере',
-      seam:'Всё работает локально в вашем браузере — файлы никогда не загружаются. DOCX раскладывается в макет PDF; старый формат DOC по-прежнему требует конвертации на сервере.',
-      foot:'KOLKLI · DOC в PDF · работает в вашем браузере',
+      unsupported:'Быстро, просто и профессионального качества.',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · DOC в PDF. Быстро, просто и профессионального качества.',
       copied:'Скопировано ✓',
       errNone:'Добавьте хотя бы один поддерживаемый документ (DOCX / TXT / RTF)',
       errLibs:'Не удалось загрузить библиотеки конвертации. Проверьте соединение и обновите страницу.',

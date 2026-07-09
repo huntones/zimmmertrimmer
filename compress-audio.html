@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — דחיסת אודיו</title>
-<meta name="description" content="Compress audio files right in your browser — shrink MP3, WAV, AAC, M4A and more. Pick a compression level and export bitrate, see the size before and after, and download. Nothing leaves your machine.">
+<meta name="description" content="shrink MP3, WAV, AAC, M4A and more. Pick a compression level and export bitrate, see the size before and after, and download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -317,8 +317,8 @@
     he:{
       dir:'rtl', langIco:'EN',
       kick:'דחיסת אודיו',
-      pageTitle:'דחסו קובצי אודיו — בלי להעלות לשרת',
-      pageSub:'גררו קובץ שמע כבד, בחרו רמת דחיסה וקצב סיביות לייצוא — וקבלו קובץ קטן בהרבה תוך שמירה על צליל נקי ככל האפשר. הדחיסה מתבצעת בדפדפן שלכם, שום קובץ לא עוזב את המחשב.',
+      pageTitle:'דחסו קובצי אודיו',
+      pageSub:'גררו קובץ שמע כבד, בחרו רמת דחיסה וקצב סיביות לייצוא — וקבלו קובץ קטן בהרבה תוך שמירה על צליל נקי ככל האפשר. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובצי אודיו לכאן', or2:'או', choose:'בחרו קבצים',
       sizeNote:'MP3 · WAV · AAC · M4A · OGG · FLAC', remove:'הסרה',
       totalLbl:'סה״כ', optTitle:'הגדרות דחיסה',
@@ -328,23 +328,23 @@
       fmtLbl:'פורמט פלט', brLbl:'איכות (קצב סיביות)',
       estLbl:'גודל משוער אחרי דחיסה',
       convBtn:'דחסו עכשיו', working:'דוחס…',
-      rtNote:'הדחיסה רצה בזמן אמת בדפדפן — קובץ ארוך ייקח בערך את משך הניגון שלו.',
+      rtNote:'הדחיסה מהירה — קובץ ארוך ייקח בערך את משך הניגון שלו.',
       readyTitle:'הדחיסה הושלמה!',
       readySub:n=>`${n} ${n===1?'קובץ מוכן':'קבצים מוכנים'} להורדה.`,
       savedOverall:(pct,from,to)=>`נחסכו <b>${pct}%</b> — מ־${from} ל־${to}`,
       dlAll:'הורדת הכול', againBtn:'דחיסה נוספת',
       origLbl:'מקור', savedTxt:p=>`↓ ${p}% קטן יותר`, grewTxt:p=>`↑ ${p}% גדול יותר`,
       failed:'הדחיסה נכשלה — הפורמט אינו נתמך בדפדפן הזה',
-      seam:'דחיסה מקומית: האודיו מפוענח ומקודד מחדש כאן ועכשיו, ישירות בדפדפן, דרך מנוע ה־MediaRecorder המובנה (Opus/AAC). MP3 יתחבר עם מנוע השרת — הקבצים תמיד נשארים אצלכם.',
-      foot:'KOLKLI · דחיסת אודיו · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · דחיסת אודיו · מהיר, פשוט ובאיכות מקצועית',
       errNoFiles:'צריך לצרף לפחות קובץ אודיו אחד', errDecode:'לא הצלחנו לדחוס אף קובץ',
       copied:'הקישור הועתק ✓', dlWord:'הורדה',
     },
     en:{
       dir:'ltr', langIco:'עב',
       kick:'Compress audio',
-      pageTitle:'Compress audio files — without uploading',
-      pageSub:'Drop a heavy sound file, pick a compression level and export bitrate — and get a much smaller file that keeps the audio as clean as possible. Compression runs in your browser; nothing leaves your machine.',
+      pageTitle:'Compress audio files',
+      pageSub:'Drop a heavy sound file, pick a compression level and export bitrate — and get a much smaller file that keeps the audio as clean as possible. Fast, simple and professional-quality.',
       dropBig:'Drag audio files here', or2:'or', choose:'Choose files',
       sizeNote:'MP3 · WAV · AAC · M4A · OGG · FLAC', remove:'Remove',
       totalLbl:'Total', optTitle:'Compress options',
@@ -354,23 +354,23 @@
       fmtLbl:'Output format', brLbl:'Quality (bitrate)',
       estLbl:'Estimated size after',
       convBtn:'Compress now', working:'Compressing…',
-      rtNote:'Compression runs in real time in your browser — a long file takes about its own play length.',
+      rtNote:'Compression runs in real time — a long file takes about its own play length.',
       readyTitle:'Compression done!',
       readySub:n=>`${n} ${n===1?'file':'files'} ready to download.`,
       savedOverall:(pct,from,to)=>`Saved <b>${pct}%</b> — ${from} → ${to}`,
       dlAll:'Download all', againBtn:'Compress more',
       origLbl:'source', savedTxt:p=>`↓ ${p}% smaller`, grewTxt:p=>`↑ ${p}% larger`,
       failed:'Compression failed — not supported by this browser',
-      seam:'Local compression: audio is decoded and re-encoded right here, right now, in your browser via the built-in MediaRecorder engine (Opus/AAC). MP3 connects with the server engine — your files always stay with you.',
-      foot:'KOLKLI · Audio compression · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Audio compression · Fast, simple and professional quality',
       errNoFiles:'Add at least one audio file', errDecode:'We could not compress any file',
       copied:'Link copied ✓', dlWord:'Download',
     },
     ru:{
       dir:'ltr',
       kick:'Сжатие аудио',
-      pageTitle:'Сжимайте аудиофайлы — без загрузки на сервер',
-      pageSub:'Перетащите тяжёлый звуковой файл, выберите уровень сжатия и битрейт экспорта — и получите намного меньший файл, сохранив звук максимально чистым. Сжатие идёт в вашем браузере; ничего не покидает устройство.',
+      pageTitle:'Сжимайте аудиофайлы',
+      pageSub:'Перетащите тяжёлый звуковой файл, выберите уровень сжатия и битрейт экспорта — и получите намного меньший файл, сохранив звук максимально чистым. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите аудиофайлы сюда', or2:'или', choose:'Выбрать файлы',
       sizeNote:'MP3 · WAV · AAC · M4A · OGG · FLAC', remove:'Удалить',
       totalLbl:'Всего', optTitle:'Параметры сжатия',
@@ -380,16 +380,16 @@
       fmtLbl:'Формат вывода', brLbl:'Качество (битрейт)',
       estLbl:'Примерный размер после',
       convBtn:'Сжать', working:'Сжатие…',
-      rtNote:'Сжатие идёт в реальном времени в вашем браузере — длинный файл занимает примерно своё время воспроизведения.',
+      rtNote:'Обработка быстрая — длинный файл занимает примерно своё время воспроизведения.',
       readyTitle:'Сжатие завершено!',
       readySub:n=>`Готово к скачиванию: ${n}.`,
       savedOverall:(pct,from,to)=>`Экономия <b>${pct}%</b> — ${from} → ${to}`,
       dlAll:'Скачать всё', againBtn:'Ещё сжатие',
       origLbl:'оригинал', savedTxt:p=>`↓ на ${p}% меньше`, grewTxt:p=>`↑ на ${p}% больше`,
       failed:'Сжатие не удалось — не поддерживается этим браузером',
-      seam:'Локальное сжатие: аудио декодируется и перекодируется прямо здесь и сейчас, в вашем браузере через встроенный движок MediaRecorder (Opus/AAC). MP3 подключается к серверному движку — ваши файлы всегда остаются у вас.',
-      foot:'KOLKLI · Сжатие аудио · Приватно и быстро, прямо в браузере',
-      errNoFiles:'Добавьте хотя бы один аудиофайл', errDecode:'Не удалось сжать ни один файл',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Сжатие аудио · Быстро, просто и профессионального качества',
+      errNoFiles:'Быстро, просто и профессионального качества.',
       copied:'Ссылка скопирована ✓', dlWord:'Скачать',
     },
   };

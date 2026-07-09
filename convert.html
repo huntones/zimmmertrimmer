@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — המרת אודיו</title>
-<meta name="description" content="Convert audio files right in your browser — pick a format, sample rate, channels and bit depth, and download. Fast, private, nothing leaves your machine.">
+<meta name="description" content="pick a format, sample rate, channels and bit depth, and download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,13 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1;}
-
-  /* cover banner */
-  .cover{width:100%;height:clamp(140px,22vw,250px);border-radius:16px;
-    background:url('./assets/converter-cover.jpg') center/cover no-repeat;
-    box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:20px;}
-  @media (max-width:640px){ .cover{height:clamp(120px,38vw,190px);border-radius:12px;} }
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -123,7 +117,7 @@
   .fmt:active{transform:scale(.97);}
   .fmt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
   .fmt b{font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--ink);}
-  .fmt small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;}
+  .fmt small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;direction:ltr;}
   .fmt.on b{color:var(--accent-dim);}
   .fmt.soon{cursor:not-allowed;opacity:.62;}
   .fmt.soon:hover{border-color:var(--line);}
@@ -145,6 +139,7 @@
   .convbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
   .convbtn svg{width:17px;height:17px;}
   .opterr{font-size:11.5px;color:var(--danger);margin-top:8px;min-height:14px;text-align:center;}
+  .rtnote{font-size:10.5px;color:var(--faint);font-family:var(--mono);text-align:center;margin-top:6px;line-height:1.45;}
 
   /* progress */
   .prog{padding:16px;display:none;margin-top:18px;}
@@ -201,10 +196,9 @@
 <body>
 <div id="site-header"></div>
 <script src="./header.js"></script>
+<script src="./vendor/ffmpeg.js"></script>
+<script src="./vendor/util.js"></script>
 <div class="wrap">
-
-  <!-- ============ cover ============ -->
-  <div class="cover" role="img" aria-label="Audio Converter"></div>
 
   <div class="pagehead">
     <span class="kick" data-i18n="kick"></span>
@@ -276,6 +270,7 @@
           <span data-i18n="convBtn"></span>
         </button>
         <div class="opterr" id="optErr"></div>
+        <div class="rtnote" data-i18n="rtNote"></div>
       </div>
     </div>
   </div>
@@ -320,8 +315,8 @@
     he:{
       dir:'rtl', langIco:'EN',
       kick:'המרת אודיו',
-      pageTitle:'המירו קבצי אודיו — בלי להעלות לשרת',
-      pageSub:'גררו קבצי אודיו, בחרו פורמט, קצב דגימה, ערוצים ועומק סיביות, וקבלו קובץ מוכן להורדה. הכול מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      pageTitle:'המירו קבצי אודיו',
+      pageSub:'גררו קבצי אודיו, בחרו פורמט, קצב דגימה, ערוצים ועומק סיביות, וקבלו קובץ מוכן להורדה. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קבצי אודיו לכאן', or2:'או', choose:'בחרו קבצים',
       sizeNote:'MP3 · WAV · M4A · AAC · FLAC · OGG · OPUS', remove:'הסרה',
       totalLbl:'סה״כ', optTitle:'הגדרות המרה',
@@ -329,20 +324,22 @@
       rateLbl:'קצב דגימה', chLbl:'ערוצים', depthLbl:'עומק סיביות (WAV)',
       keepOrig:'כמו המקור', stereo:'סטריאו', mono:'מונו', float32:'32-bit Float',
       convBtn:'המירו עכשיו', working:'ממיר…',
+      rtNote:'WAV נוצר מיידית. שאר הפורמטים (MP3 · M4A · AAC · OGG · FLAC) מקודדים מקומית במנוע ffmpeg שמוטמע בדף — הפעם הראשונה טוענת את המנוע (כּ־30MB) ואז הוא נשמר במטמון.',
       readyTitle:'ההמרה הושלמה!', readySub:n=>`${n} ${n===1?'קובץ מוכן':'קבצים מוכנים'} להורדה.`,
       dlAll:'הורדת הכול', againBtn:'המרה נוספת',
       convGo:s=>`ל־${s}`, converted:'הומר', origLbl:'מקור',
-      failed:'ההמרה נכשלה — פורמט לא נתמך בדפדפן',
-      seam:'הדגמה מקומית: המרה מלאה ל־WAV עובדת כאן וכעת, ישירות בדפדפן. מנועי הקידוד ל־MP3/AAC/FLAC/OGG מתחברים עם השרת — הקבצים תמיד נשארים אצלכם.',
-      foot:'KOLKLI · המרת אודיו · פרטי ומהיר, ישירות בדפדפן',
+      failed:'ההמרה נכשלה — לא הצלחנו לפענח את הקובץ',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · המרת אודיו · מהיר, פשוט ובאיכות מקצועית',
       errNoFiles:'צריך לצרף לפחות קובץ אודיו אחד', errDecode:'לא הצלחנו לפענח אף קובץ',
       copied:'הקישור הועתק ✓',
+      engineLoad:'טוען מנוע המרה…', errEngine:'טעינת מנוע ההמרה נכשלה — רעננו את הדף ונסו שוב, או בחרו בפורמט WAV.',
     },
     en:{
       dir:'ltr', langIco:'עב',
       kick:'Convert audio',
-      pageTitle:'Convert audio files — without uploading',
-      pageSub:'Drop audio files, pick a format, sample rate, channels and bit depth, and get a ready-to-download file. Everything runs in your browser — nothing leaves your machine.',
+      pageTitle:'Convert audio files',
+      pageSub:'Drop audio files, pick a format, sample rate, channels and bit depth, and get a ready-to-download file. Fast, simple and professional-quality.',
       dropBig:'Drag audio files here', or2:'or', choose:'Choose files',
       sizeNote:'MP3 · WAV · M4A · AAC · FLAC · OGG · OPUS', remove:'Remove',
       totalLbl:'Total', optTitle:'Convert options',
@@ -350,20 +347,22 @@
       rateLbl:'Sample rate', chLbl:'Channels', depthLbl:'Bit depth (WAV)',
       keepOrig:'Keep original', stereo:'Stereo', mono:'Mono', float32:'32-bit Float',
       convBtn:'Convert now', working:'Converting…',
+      rtNote:'WAV is instant. Every other format (MP3 · M4A · AAC · OGG · FLAC) is encoded locally by the built-in ffmpeg engine — the first run loads the engine (~30 MB), then it is cached.',
       readyTitle:'Conversion done!', readySub:n=>`${n} ${n===1?'file':'files'} ready to download.`,
       dlAll:'Download all', againBtn:'Convert more',
       convGo:s=>`to ${s}`, converted:'Converted', origLbl:'source',
-      failed:'Conversion failed — format not supported by this browser',
-      seam:'Local demo: full conversion to WAV works right here, right now, in your browser. The MP3/AAC/FLAC/OGG encoders connect with the server — your files always stay with you.',
-      foot:'KOLKLI · Audio conversion · Private and fast, right in your browser',
+      failed:'Conversion failed — we could not decode this file',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Audio conversion · Fast, simple and professional quality',
       errNoFiles:'Add at least one audio file', errDecode:'We could not decode any file',
       copied:'Link copied ✓',
+      engineLoad:'Loading conversion engine…', errEngine:'The conversion engine failed to load — refresh and try again, or pick the WAV format.',
     },
     ru:{
       dir:'ltr',
       kick:'Конвертация аудио',
-      pageTitle:'Конвертируйте аудиофайлы — без загрузки на сервер',
-      pageSub:'Перетащите аудиофайлы, выберите формат, частоту дискретизации, каналы и разрядность — и получите готовый к скачиванию файл. Всё работает в вашем браузере — ничего не покидает устройство.',
+      pageTitle:'Конвертируйте аудиофайлы',
+      pageSub:'Перетащите аудиофайлы, выберите формат, частоту дискретизации, каналы и разрядность — и получите готовый к скачиванию файл. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите аудиофайлы сюда', or2:'или', choose:'Выбрать файлы',
       sizeNote:'MP3 · WAV · M4A · AAC · FLAC · OGG · OPUS', remove:'Удалить',
       totalLbl:'Всего', optTitle:'Параметры конвертации',
@@ -371,25 +370,30 @@
       rateLbl:'Частота дискретизации', chLbl:'Каналы', depthLbl:'Разрядность (WAV)',
       keepOrig:'Как в оригинале', stereo:'Стерео', mono:'Моно', float32:'32-бит Float',
       convBtn:'Конвертировать', working:'Конвертация…',
+      rtNote:'Обработка быстрая — WAV — мгновенно. Все остальные форматы (MP3 · M4A · AAC · OGG  — первый запуск загружает движок (~30 МБ), затем он кэшируется.',
       readyTitle:'Конвертация завершена!', readySub:n=>`Готово к скачиванию: ${n}.`,
       dlAll:'Скачать всё', againBtn:'Ещё конвертация',
       convGo:s=>`в ${s}`, converted:'Сконвертировано', origLbl:'оригинал',
-      failed:'Конвертация не удалась — формат не поддерживается этим браузером',
-      seam:'Локальная демонстрация: полная конвертация в WAV работает прямо здесь и сейчас, в вашем браузере. Кодировщики MP3/AAC/FLAC/OGG подключаются к серверу — ваши файлы всегда остаются у вас.',
-      foot:'KOLKLI · Конвертация аудио · Приватно и быстро, прямо в браузере',
-      errNoFiles:'Добавьте хотя бы один аудиофайл', errDecode:'Не удалось декодировать ни один файл',
+      failed:'Конвертация не удалась — не удалось декодировать этот файл',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Конвертация аудио · Быстро, просто и профессионального качества',
+      errNoFiles:'Быстро, просто и профессионального качества.',
       copied:'Ссылка скопирована ✓',
+      engineLoad:'Загрузка движка конвертации…', errEngine:'Не удалось загрузить движок конвертации — обновите страницу и повторите, или выберите формат WAV.',
     },
   };
 
-  // target formats — WAV is fully implemented client-side; the rest arrive with the server engine.
+  // target formats — WAV is a fast offline decode + PCM encode, right in the page.
+  // Every compressed format is produced locally by the vendored ffmpeg engine
+  // (loaded on first use) — no server, and no browser-codec dependency. The bitrate
+  // baked into each args() matches the `sub` label; FLAC/WAV are lossless.
   const FORMATS = [
-    { id:'wav',  label:'WAV',  ext:'wav',  sub:'lossless', ready:true  },
-    { id:'mp3',  label:'MP3',  ext:'mp3',  sub:'320 kbps', ready:false },
-    { id:'m4a',  label:'M4A',  ext:'m4a',  sub:'AAC',      ready:false },
-    { id:'flac', label:'FLAC', ext:'flac', sub:'lossless', ready:false },
-    { id:'ogg',  label:'OGG',  ext:'ogg',  sub:'vorbis',   ready:false },
-    { id:'aac',  label:'AAC',  ext:'aac',  sub:'256 kbps', ready:false },
+    { id:'wav',  label:'WAV',  ext:'wav',  sub:'lossless', engine:'wav', ready:true, mime:'audio/wav',  lossy:false },
+    { id:'mp3',  label:'MP3',  ext:'mp3',  sub:'320 kbps', engine:'ff',  ready:true, mime:'audio/mpeg', lossy:true,  args:()=>['-c:a','libmp3lame','-b:a','320k'] },
+    { id:'m4a',  label:'M4A',  ext:'m4a',  sub:'AAC',      engine:'ff',  ready:true, mime:'audio/mp4',  lossy:true,  args:()=>['-c:a','aac','-b:a','256k','-f','ipod'] },
+    { id:'flac', label:'FLAC', ext:'flac', sub:'lossless', engine:'ff',  ready:true, mime:'audio/flac', lossy:false, abortsCore:true, args:()=>['-c:a','flac'] },
+    { id:'ogg',  label:'OGG',  ext:'ogg',  sub:'Vorbis',   engine:'ff',  ready:true, mime:'audio/ogg',  lossy:true,  abortsCore:true, args:()=>['-c:a','libvorbis','-b:a','256k','-f','ogg'] },
+    { id:'aac',  label:'AAC',  ext:'aac',  sub:'256 kbps', engine:'ff',  ready:true, mime:'audio/aac',  lossy:true,  args:()=>['-c:a','aac','-b:a','256k','-f','adts'] },
   ];
 
   const ICON = {
@@ -399,6 +403,32 @@
     warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>',
     dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
   };
+
+  // ---- ffmpeg engine (lazy) ----
+  // The vendored single-thread wasm core needs no COOP/COEP headers, so it runs
+  // straight off the static server — same wiring as extract-audio.html. Loaded on
+  // first use. It never reclaims heap between runs and a couple of encoders (flac,
+  // libvorbis) call abort() right after writing a valid file, so a "spent" instance
+  // is torn down and the next file rebuilds one — the wasm binary stays HTTP-cached.
+  const FFmpeg    = (window.FFmpegWASM && window.FFmpegWASM.FFmpeg);
+  const fetchFile = (window.FFmpegUtil  && window.FFmpegUtil.fetchFile);
+  const engineAvailable = !!(FFmpeg && fetchFile);
+  let ffmpeg=null, ffLoading=null;
+  function loadFF(){
+    if(ffmpeg) return Promise.resolve(ffmpeg);
+    if(!ffLoading){
+      ffLoading = (async()=>{
+        if(!engineAvailable) throw new Error('engine');
+        const f=new FFmpeg();
+        const dir=location.href.replace(/[^/]*$/,'')+'vendor/';
+        await f.load({ coreURL:dir+'ffmpeg-core.js', wasmURL:dir+'ffmpeg-core.wasm' });
+        ffmpeg=f; return f;
+      })().catch(e=>{ ffLoading=null; throw e; });
+    }
+    return ffLoading;
+  }
+  function disposeFF(){ try{ ffmpeg && ffmpeg.terminate && ffmpeg.terminate(); }catch(_){} ffmpeg=null; ffLoading=null; }
+  function specOf(id){ return FORMATS.find(f=>f.id===id); }
 
   let lang='he', t=I18N.he;
   let files=[];        // {id,file,name,size}
@@ -488,20 +518,59 @@
     return await oc.startRendering();
   }
 
-  async function convertOne(item, opts){
+  // WAV path: decode the source, optionally resample/remix, then encode PCM — all offline.
+  async function convertWav(item, opts){
     const arr = await item.file.arrayBuffer();
     if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
     const decoded = await audioCtx.decodeAudioData(arr.slice(0));
     const shaped = await reshape(decoded, opts.rate, opts.channels);
-    const blob = encodeWav(shaped, opts.depth);          // WAV path (the only live encoder)
-    return { blob, seconds: shaped.duration };
+    const blob = encodeWav(shaped, opts.depth);
+    return { blob };
+  }
+
+  // Compressed path: hand the source to the local ffmpeg engine and re-encode the
+  // audio (-vn drops any embedded cover art). Works in every browser, no server.
+  async function convertFF(item, spec, opts, onProg){
+    const f=await loadFF();
+    let spent=!!spec.abortsCore;   // these encoders abort the core once they finish
+    try{
+      const inExt=((item.name.match(/\.([^.]+)$/)||[])[1]||'audio').toLowerCase().replace(/[^a-z0-9]/g,'')||'audio';
+      const inName='src_'+(uid++)+'.'+inExt;
+      const outName='out_'+(uid++)+'.'+spec.ext;
+      await f.writeFile(inName, await fetchFile(item.file));
+
+      const args=['-i',inName,'-vn'];
+      if(opts.rate)     args.push('-ar',String(opts.rate));
+      if(opts.channels) args.push('-ac',String(opts.channels));
+      args.push(...spec.args(), outName);
+
+      const onp=e=>{ if(onProg && e && isFinite(e.progress)) onProg(Math.max(0,Math.min(0.99,e.progress))); };
+      f.on('progress',onp);
+      let data;
+      try{
+        await f.exec(args);
+        data=await f.readFile(outName);   // valid even when the core aborts right after
+      } finally {
+        try{ f.off('progress',onp); }catch(_){}
+        if(!spent){ await f.deleteFile(inName).catch(()=>{}); await f.deleteFile(outName).catch(()=>{}); }
+      }
+      if(onProg) onProg(1);
+      const blob=new Blob([data],{type:spec.mime||'application/octet-stream'});
+      if(!blob.size) throw new Error('empty');
+      return { blob };
+    }catch(err){
+      spent=true;                    // never reuse an instance that threw
+      throw err;
+    }finally{
+      if(spent) disposeFF();
+    }
   }
 
   // ---- run ----
   async function runConvert(){
     el('optErr').textContent='';
     if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
-    const spec = FORMATS.find(f=>f.id===fmt);
+    const spec = specOf(fmt);
     const opts = {
       rate:+el('rate').value || 0,
       channels:+el('channels').value || 0,
@@ -513,6 +582,14 @@
     clearResults();
     const prog=el('progCard'); prog.classList.add('show');
 
+    // Compressed formats need the local ffmpeg engine — load it once (a ~30 MB
+    // core, then browser-cached) and surface the wait instead of a frozen button.
+    if(spec.engine!=='wav' && !ffmpeg){
+      el('progName').textContent=t.engineLoad; setProg(0);
+      try{ await loadFF(); }
+      catch(err){ prog.classList.remove('show'); el('optErr').textContent=t.errEngine; el('composer').style.display=''; return; }
+    }
+
     results=[];
     for(let i=0;i<files.length;i++){
       const it=files[i];
@@ -520,8 +597,10 @@
       setProg(Math.round(i/files.length*100));
       await sleep(30);
       try{
-        const { blob } = await convertOne(it, opts);
-        results.push({ name: baseName(it.name)+'.'+spec.ext, blob, url:URL.createObjectURL(blob), size:blob.size, srcSize:it.size, ok:true });
+        const r = spec.engine==='wav'
+          ? await convertWav(it, opts)
+          : await convertFF(it, spec, opts, p=>setProg(Math.round((i+p)/files.length*100)));
+        results.push({ name: baseName(it.name)+'.'+spec.ext, blob:r.blob, url:URL.createObjectURL(r.blob), size:r.blob.size, srcSize:it.size, ok:true });
       }catch(err){
         results.push({ name: baseName(it.name)+'.'+spec.ext, blob:null, url:null, size:0, srcSize:it.size, ok:false });
       }

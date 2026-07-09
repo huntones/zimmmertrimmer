@@ -84,14 +84,20 @@ async function verifyUser(request, env) {
 async function userPlan(user, env) {
   if (!user) return 'anonymous';
   try {
-    const q = `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=plan`;
+    const q = `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=plan,trial_ends_at`;
     const r = await fetch(q, {
       headers: { authorization: `Bearer ${user.token}`, apikey: env.SUPABASE_ANON_KEY }
     });
     if (!r.ok) return 'free';
     const rows = await r.json().catch(() => []);
-    const plan = String((rows && rows[0] && rows[0].plan) || 'free').toLowerCase();
-    return /^(free|lite|pro|business)$/.test(plan) ? plan : 'free';
+    const row = (rows && rows[0]) || {};
+    let plan = String(row.plan || 'free').toLowerCase();
+    if (plan === 'lite') plan = 'creator';
+    else if (plan === 'pro' || plan === 'business') plan = 'studio';
+    // A finished Creator trial reverts to Free until the column is reset (paid
+    // conversions must null out trial_ends_at — see supabase-schema.sql).
+    if (plan === 'creator' && row.trial_ends_at && Date.parse(row.trial_ends_at) < Date.now()) plan = 'free';
+    return /^(free|creator|studio)$/.test(plan) ? plan : 'free';
   } catch (_) {
     return 'free';
   }
@@ -230,6 +236,7 @@ export class UsageLimiter {
       if (action === 'commit') return this.commit(body);
       if (action === 'cancel') return this.cancel(body);
       if (action === 'status') return this.status(body);
+      if (action === 'trial-claim') return this.trialClaim(body);
       return this.out({ ok: false, error: 'not found' }, 404);
     } catch (e) {
       return this.out({ ok: false, error: String((e && e.message) || e) }, 500);
@@ -333,6 +340,29 @@ export class UsageLimiter {
     return this.out(quota.ok ? { ok: true, ...quota } : quota, quota.ok ? 200 : 429);
   }
 
+  // One-shot 7-day-trial claim. The trial is stamped against every identity
+  // dimension (user id, anonymous browser id, device fingerprint) plus the IP,
+  // so clearing the session, deleting the account, or registering a fresh email
+  // from the same browser/device can't farm a second trial.
+  async trialClaim(body) {
+    if (isPaidPlan(body.plan)) return this.out({ ok: true, granted: false, reason: 'already_paid' });
+    const dims = await dimensions(body);
+    const ipHash = body.ip ? await sha256Hex('ip:' + body.ip) : '';
+    const keys = dims.map(d => 'trial:' + d.kind + ':' + d.value);
+    if (ipHash) keys.push('trial:ip:' + ipHash);
+    if (!keys.length) return this.out({ ok: false, code: 'missing_identity' }, 400);
+
+    const result = await this.state.storage.transaction(async txn => {
+      for (const k of keys) {
+        if (await txn.get(k)) return { granted: false, reason: 'already_claimed' };
+      }
+      const rec = { claimedAt: Date.now(), day: israelDay() };
+      for (const k of keys) await txn.put(k, rec);
+      return { granted: true, endsAt: Date.now() + 7 * 24 * 60 * 60 * 1000 };
+    });
+    return this.out({ ok: true, ...result });
+  }
+
   async bumpIpRate(day, limit, ipHash) {
     if (!ipHash) return { ok: true };
     const burstMax = +(this.env.USAGE_IP_BURST || 40);
@@ -376,7 +406,9 @@ export class UsageLimiter {
 
 function isPaidPlan(plan) {
   plan = String(plan || '').toLowerCase();
-  return plan === 'lite' || plan === 'pro' || plan === 'business';
+  // Current tiers plus legacy slugs (lite/pro/business) for back-compat.
+  return plan === 'creator' || plan === 'studio' ||
+    plan === 'lite' || plan === 'pro' || plan === 'business';
 }
 
 function validatePayload(limit, payload) {

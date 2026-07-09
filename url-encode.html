@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — URL Encoder / Decoder</title>
-<meta name="description" content="Free URL encoder & decoder — percent-encode or decode URLs and query strings instantly, with component vs full-URL modes and a live query-parameter breakdown. Fast, private, right in your browser.">
+<meta name="description" content="Free URL encoder & decoder — percent-encode or decode URLs and query strings instantly, with component vs full-URL modes and a live query-parameter breakdown. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -225,7 +225,7 @@
     he:{ dir:'rtl',
       kick:'קידוד ופענוח כתובות',
       pageTitle:'URL Encoder / Decoder — קידוד ופענוח כתובות',
-      pageSub:'קודדו או פענחו כתובות URL באופן מיידי. במצב "רכיב" כל התווים המיוחדים מקודדים (מתאים לערכי פרמטרים בשאילתה), ובמצב "כתובת מלאה" נשמרים התווים המבניים של הקישור. הכול רץ בדפדפן — שום דבר לא נשלח לשרת.',
+      pageSub:'קודדו או פענחו כתובות URL באופן מיידי. במצב "רכיב" כל התווים המיוחדים מקודדים (מתאים לערכי פרמטרים בשאילתה), ובמצב "כתובת מלאה" נשמרים התווים המבניים של הקישור. מהיר, פשוט ובאיכות מקצועית.',
       dirLabel:'פעולה', modeLabel:'סוג הקידוד',
       encode:'קידוד', decode:'פענוח', componentMode:'רכיב', fullUrlMode:'כתובת מלאה',
       inputLabel:'קלט', outputLabel:'פלט',
@@ -233,11 +233,11 @@
       paramsTitle:'פרמטרים בשאילתה', keyCol:'מפתח', valueCol:'ערך',
       errDecode:'לא ניתן לפענח — הקלט מכיל רצף אחוזים לא תקין (למשל % בודד או ‎%ZZ‎).',
       note:'טיפ: "רכיב" משתמש ב-encodeURIComponent ומקודד גם תווים שמורים כמו ? & = / , בעוד "כתובת מלאה" משתמש ב-encodeURI ושומר על מבנה הקישור. הפענוח תמיד משתמש ב-decodeURIComponent.',
-      foot:'KOLKLI · URL Encoder / Decoder · פרטי ומהיר, ישירות בדפדפן' },
+      foot:'KOLKLI · URL Encoder / Decoder · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'URL Encoder / Decoder',
       pageTitle:'URL Encoder / Decoder — encode & decode URLs',
-      pageSub:'Encode or decode URLs instantly. “Component” mode escapes every reserved character (great for query values), while “Full URL” mode keeps the structural characters of a link intact. Everything runs in your browser — nothing is sent to a server.',
+      pageSub:'Encode or decode URLs instantly. “Component” mode escapes every reserved character (great for query values), while “Full URL” mode keeps the structural characters of a link intact. Fast, simple and professional-quality.',
       dirLabel:'Action', modeLabel:'Encoding type',
       encode:'Encode', decode:'Decode', componentMode:'Component', fullUrlMode:'Full URL',
       inputLabel:'Input', outputLabel:'Output',
@@ -245,11 +245,11 @@
       paramsTitle:'Query parameters', keyCol:'Key', valueCol:'Value',
       errDecode:'Can’t decode — the input contains an invalid percent sequence (e.g. a lone % or %ZZ).',
       note:'Tip: “Component” uses encodeURIComponent and escapes reserved characters like ? & = / , too, while “Full URL” uses encodeURI and preserves a link’s structure. Decoding always uses decodeURIComponent.',
-      foot:'KOLKLI · URL Encoder / Decoder · Private and fast, right in your browser' },
+      foot:'KOLKLI · URL Encoder / Decoder · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'URL-кодировщик',
       pageTitle:'URL Encoder / Decoder — кодирование и декодирование ссылок',
-      pageSub:'Мгновенно кодируйте или декодируйте URL-адреса. Режим «Компонент» экранирует все зарезервированные символы (удобно для значений параметров), а режим «Полный URL» сохраняет структурные символы ссылки. Всё работает в браузере — ничего не отправляется на сервер.',
+      pageSub:'Мгновенно кодируйте или декодируйте URL-адреса. Режим «Компонент» экранирует все зарезервированные символы (удобно для значений параметров), а режим «Полный URL» сохраняет структурные символы ссылки. Быстро, просто и профессионального качества.',
       dirLabel:'Действие', modeLabel:'Тип кодирования',
       encode:'Кодировать', decode:'Декодировать', componentMode:'Компонент', fullUrlMode:'Полный URL',
       inputLabel:'Ввод', outputLabel:'Результат',
@@ -257,7 +257,7 @@
       paramsTitle:'Параметры запроса', keyCol:'Ключ', valueCol:'Значение',
       errDecode:'Не удаётся декодировать — во вводе недопустимая процентная последовательность (например, одиночный % или %ZZ).',
       note:'Совет: «Компонент» использует encodeURIComponent и экранирует зарезервированные символы (? & = / , и др.), а «Полный URL» использует encodeURI и сохраняет структуру ссылки. Декодирование всегда использует decodeURIComponent.',
-      foot:'KOLKLI · URL Encoder / Decoder · Приватно и быстро, прямо в браузере' }
+      foot:'KOLKLI · URL Encoder / Decoder · Быстро, просто и профессионального качества' }
   };
 
   const SAMPLES = {

@@ -51,7 +51,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:900px;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;}
   .brand{display:flex;align-items:center;gap:11px;}
@@ -257,7 +257,7 @@
       day:'יום', days:d=>`${d} ימים`, today:'היום',
       preview:'תצוגה מקדימה', download:'הורדה', close:'סגור',
       copied:'הועתק ✓',
-      seam:'הדגמה מקומית: הקבצים נטענים מהדפדפן הזה (IndexedDB). עם חיבור השרת הקישור יעבוד מכל מכשיר.',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
       foot:'הורדת קבצים · הדגמה מקומית', poweredBy:'מופעל על ידי',
     },
     en:{ dir:'ltr', langIco:'עב',
@@ -485,6 +485,7 @@
   init();
 })();
 </script>
+<script src="./notify-sound.js" defer></script>
 <script src="./accessibility.js" defer></script>
 </body>
 </html>

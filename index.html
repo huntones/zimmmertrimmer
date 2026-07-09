@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — Everything you need to work with files</title>
-<meta name="description" content="Upload once — then edit, convert, compress, organize and send your files. Fast, private, and right in your browser. Audio, images, video, documents, converters and AI tools in one place.">
+<meta name="description" content="Upload once — then edit, convert, compress, organize and send your files. Audio, images, video, documents, converters and AI tools in one place. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -70,7 +70,7 @@
       radial-gradient(60% 50% at 50% 100%,var(--mesh-3),transparent 62%);}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:0 22px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:0 22px;}
   .gtext{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
 
   /* ---------- top bar ---------- */
@@ -97,7 +97,7 @@
   .menuBtn{display:none;}
   .navpanel{display:none;border-top:1px solid var(--line);background:var(--panel);}
   .navpanel.open{display:block;}
-  .navpanel .inner{display:flex;flex-direction:column;max-width:75%;margin:0 auto;padding:6px 22px 14px;}
+  .navpanel .inner{display:flex;flex-direction:column;width:100%;max-width:none;margin:0 auto;padding:6px 22px 14px;}
   .navpanel a{padding:12px 8px;font-size:15px;color:var(--ink-2);border-bottom:1px solid var(--line-2);}
   .navpanel a:last-child{border-bottom:none;}
 
@@ -208,7 +208,7 @@
   .step p{font-size:13.7px;color:var(--muted);margin:0;}
 
   /* ---------- pricing ---------- */
-  .plans{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;align-items:start;}
+  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start;}
   .plan{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px 24px;box-shadow:var(--shadow);}
   .plan.pop{border-color:var(--accent);box-shadow:var(--shadow-lg);}
   .plan .ribbon{position:absolute;top:-11px;inset-inline-start:24px;background:var(--grad);color:#fff;font-size:11px;font-weight:700;
@@ -221,6 +221,8 @@
   .plan li{display:flex;align-items:flex-start;gap:9px;font-size:13.7px;color:var(--ink-2);}
   .plan li svg{width:16px;height:16px;color:var(--success);flex-shrink:0;margin-top:2px;}
   .plan .cta,.plan .ghost{width:100%;}
+  .plan-trial{display:block;text-align:center;margin-top:10px;font-size:12px;font-weight:600;color:var(--accent-dim,var(--accent));text-decoration:none;}
+  .plan-trial:hover{text-decoration:underline;}
 
   /* ---------- faq ---------- */
   .faq{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px;}
@@ -257,10 +259,11 @@
     .navlinks{display:none;}
     .menuBtn{display:inline-flex;}
   }
-  @media (max-width:1080px){ .hero3d{display:none;} .plans{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:1080px){ .hero3d{display:none;} }
   @media (max-width:860px){
     .g4{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:repeat(2,1fr);}
     .aigrid{grid-template-columns:repeat(2,1fr);}
+    .plans{grid-template-columns:1fr;max-width:460px;margin-inline:auto;}
     .fcols{grid-template-columns:1fr 1fr;}
   }
   @media (max-width:560px){
@@ -364,7 +367,7 @@
     radial-gradient(46% 34% at 16% 40%,rgba(105,102,255,.18),transparent 70%),
     radial-gradient(40% 35% at 87% 30%,rgba(105,102,255,.15),transparent 72%),
     radial-gradient(42% 30% at 77% 80%,rgba(93,104,255,.14),transparent 70%);}
-  .wrap{max-width:75%;}
+  .wrap{width:100%;max-width:none;}
   .orb{display:none;}
   .hero{min-height:454px;padding:120px 0 6px;overflow:visible;isolation:isolate;direction:ltr;}
   .hero::before{content:"";position:absolute;inset:-72px 0 -120px;z-index:0;pointer-events:none;opacity:.78;
@@ -382,7 +385,7 @@
       radial-gradient(circle at 96% 32%,#b99aff 0 7px,transparent 8px),
       radial-gradient(circle at 27% 87%,#6aa2ff 0 7px,transparent 8px);
     filter:blur(.4px);}
-  .hero .wrap{max-width:860px;}
+  .hero .wrap{max-width:none;}
   /* headline sits on ONE line (Hebrew/English); wider wrap + smaller size keep it
      inside the clear band between the baked-in 3D icons. Longer copy (RU) wraps. */
   h1.big{max-width:820px;font-size:clamp(34px,3.6vw,46px);line-height:1.06;letter-spacing:0;margin:0 auto 18px;
@@ -425,7 +428,7 @@
   .ficon.i-pdf{width:135px;height:135px;top:94%;right:8.3%;border-radius:29px;background:linear-gradient(145deg,#5f6bff 0%,#38a2ff 100%);transform:rotate(10deg);}
 
   #popular{padding:34px 0 34px;position:relative;z-index:3;direction:ltr;}
-  #popular .wrap{max-width:760px;}
+  #popular .wrap{max-width:none;}
   #popular .reveal{opacity:1;transform:none;}
   .tsec-h{font-size:18px;line-height:1.25;margin:0 0 8px;color:#131936;font-weight:800;letter-spacing:0;}
   .tsec-underline{width:56px;height:4px;margin:0 auto 11px;background:linear-gradient(90deg,#7842ff,#3194ff);}
@@ -494,15 +497,6 @@
   /* on phones, zoom the art via bg-size (not element width, which would
      overflow the page) so the clear centre sits behind the headline */
   @media (max-width:720px){ .topbg{height:auto;aspect-ratio:1983/793;background:url('./assets/hero-bg.jpg') center top/cover no-repeat;} }
-
-  /* ---------- enlarge central hero + tools block uniformly ---------- */
-  /* single uniform zoom keeps every ratio, gap, padding and font size in
-     proportion; scoped to the desktop layout so the wider column can't
-     overflow narrow viewports (mobile keeps its own tuned sizes). */
-  @media (min-width:1081px){
-    .hero .wrap{zoom:1.16;}
-    #popular .wrap{zoom:1.16;}
-  }
 
   /* ---------- all-tools grid (iLoveIMG-style, filterable) ---------- */
   .tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 auto 32px;}
@@ -717,11 +711,11 @@
     he:{
       navHome:'בית', navSend:'שליחת קבצים', navAI:'כלי AI', navAudio:'אודיו', navImages:'תמונות', navVideo:'וידאו',
       navDocs:'מסמכים', navConvert:'ממירים', navCompress:'דחיסה', navPricing:'מסלולים ומחירים', navSignin:'התחברות', navStart:'התחילו',
-      heroBadge:'100+ כלים · הכול בדפדפן',
+      heroBadge:'100+ כלים · מהיר ופשוט',
       heroT1:'כל הכלים החכמים לקבצים שלכם', heroT2:'במקום אחד.',
       heroSub:'העלאה, עריכה, המרה, ארגון ושליחה של קבצים — במהירות ובפשטות.',
-      trust1:'בלי התקנה', trust2:'עריכה פרטית בדפדפן', trust3:'עובד בכל מכשיר',
-      hb1t:'בלי להתקין תוכנה', hb2t:'100% מאובטח ופרטי', hb3t:'מהיר במיוחד, מבוסס ענן', hb4t:'עובד בכל מכשיר ובכל מקום',
+      trust1:'בלי התקנה', trust2:'עריכה מהירה ופשוטה', trust3:'עובד בכל מכשיר',
+      hb1t:'בלי להתקין תוכנה', hb2t:'100% מקצועי ואיכותי', hb3t:'מהיר במיוחד, מבוסס ענן', hb4t:'עובד בכל מכשיר ובכל מקום',
       heroCta1:'התחילו עכשיו בחינם', heroCta2:'צפו איך זה עובד',
       toolsH:'כל מה שצריך לעבוד עם קבצים',
       tc1t:'שליחת קבצים', tc1p:'שלחו עד 100GB בקלות', tc2t:'כלי AI', tc2p:'עריכה חכמה בכוח AI',
@@ -734,25 +728,25 @@
       tabAll:'הכול', tabAudio:'אודיו', tabImages:'תמונות', tabVideo:'וידאו', tabDocs:'מסמכים', tabConvert:'המרה', tabCompress:'דחיסה', tabMarketing:'שיווק', tabCalc:'מחשבונים',
       kCats:'קטגוריות', catsH:'בית לכל סוג קובץ', catsP:'קפצו לכלים לאודיו, תמונות, וידאו, מסמכים ועוד.',
       kSend:'שליחת קבצים גדולים', sendH:'שתפו קבצים גדולים, בפשטות', sendP:'מעלים פעם אחת ושולחים לינק — עם סיסמה, תפוגה והתראות הורדה.',
-      kWhy:'למה KOLKLI', whyH:'מהיר, פרטי, הכול במקום אחד', whyP:'הבסיס נעשה נכון — בלי לקפוץ בין עשרה אתרים שונים.',
+      kWhy:'למה KOLKLI', whyH:'מהיר, פשוט, הכול במקום אחד', whyP:'הבסיס נעשה נכון — בלי לקפוץ בין עשרה אתרים שונים.',
       kHow:'איך זה עובד', howH:'שלושה שלבים, זהו', howP:'בלי התקנה, בלי כאב ראש. מעלים ומתחילים.',
-      kPricing:'מסלולים ומחירים', pricingH:'תמחור פשוט ושקוף', pricingP:'מתחילים בחינם. משדרגים כשצריך יותר.',
+      kPricing:'מסלולים ומחירים', pricingH:'תמחור פשוט ושקוף', pricingP:'מתחילים בחינם — או 7 ימי ניסיון חינם ל-Creator, ללא כרטיס אשראי.',
       perMonth:'/לחודש', mostPopular:'הכי פופולרי',
       kFaq:'שאלות נפוצות', faqH:'שאלות נפוצות', aiMore:'לכל כלי ה-AI', pricingMore:'צפו בכל החבילות', faqMore:'לכל השאלות הנפוצות',
       finalH:'מוכנים לעבוד עם הקבצים שלכם?', finalP:'העלו את הקובץ הראשון — זה לוקח כמה שניות בלבד.', finalCta:'בואו נתחיל',
       ctaEditor:'פתחו את העורך', ctaOrganize:'לסידור הקבצים', ctaCut:'פתחו את חותך הווידאו',
       liveLbl:'זמין', soonLbl:'בקרוב',
-      footTagline:'הפלטפורמה שבה מעלים קובץ פעם אחת — ואז שולחים, עורכים, ממירים, דוחסים ומסדרים. הכול בדפדפן.',
-      footNote:'KOLKLI · העריכה רצה בדפדפן שלכם · הקבצים נשארים אצלכם.'
+      footTagline:'הפלטפורמה שבה מעלים קובץ פעם אחת — ואז שולחים, עורכים, ממירים, דוחסים ומסדרים. מהיר, פשוט ובאיכות מקצועית.',
+      footNote:'KOLKLI. מהיר, פשוט ובאיכות מקצועית.'
     },
     en:{
       navHome:'Home', navSend:'Send Files', navAI:'AI Tools', navAudio:'Audio', navImages:'Images', navVideo:'Video',
       navDocs:'Documents', navConvert:'Converters', navCompress:'Compress', navPricing:'Pricing', navSignin:'Sign In', navStart:'Get started',
-      heroBadge:'100+ tools · all in your browser',
+      heroBadge:'100+ tools · fast & simple',
       heroT1:'All your smart file tools,', heroT2:'in one place.',
       heroSub:'Upload, edit, convert, organize and send your files — fast and simple.',
-      trust1:'No install', trust2:'Private in-browser editing', trust3:'Works on any device',
-      hb1t:'No software required', hb2t:'100% Secure and private', hb3t:'Blazing fast cloud powered', hb4t:'Works everywhere any device',
+      trust1:'No install', trust2:'Fast, simple editing', trust3:'Works on any device',
+      hb1t:'No software required', hb2t:'100% Professional quality', hb3t:'Blazing fast cloud powered', hb4t:'Works everywhere any device',
       heroCta1:'Get started free', heroCta2:'See how it works',
       toolsH:'Everything you need to work with files',
       tc1t:'Send Files', tc1p:'Send up to 100GB', tc2t:'AI Tools', tc2p:'Smart editing with AI',
@@ -765,26 +759,26 @@
       tabAll:'All', tabAudio:'Audio', tabImages:'Images', tabVideo:'Video', tabDocs:'Documents', tabConvert:'Convert', tabCompress:'Compress', tabMarketing:'Marketing', tabCalc:'Calculators',
       kCats:'Categories', catsH:'A hub for every kind of file', catsP:'Jump into the tools for audio, images, video, documents and more.',
       kSend:'Send large files', sendH:'Share big files, simply', sendP:'Upload once and send a link — with passwords, expiry and download alerts.',
-      kWhy:'Why KOLKLI', whyH:'Fast, private, all in one place', whyP:'The essentials done right — without juggling ten different sites.',
+      kWhy:'Why KOLKLI', whyH:'Fast, simple, all in one place', whyP:'The essentials done right — without juggling ten different sites.',
       kHow:'How it works', howH:'Three steps, that’s it', howP:'No install, no hassle. Upload and go.',
-      kPricing:'Pricing', pricingH:'Simple, transparent pricing', pricingP:'Start free. Upgrade when you need more.',
+      kPricing:'Pricing', pricingH:'Simple, transparent pricing', pricingP:'Start free — or try Creator free for 7 days, no credit card.',
       perMonth:'/mo', mostPopular:'Most Popular',
       kFaq:'FAQ', faqH:'Frequently asked questions', aiMore:'Explore AI tools', pricingMore:'See all plans', faqMore:'Read all FAQs',
       finalH:'Ready to work with your files?', finalP:'Upload your first file — it takes just a few seconds.', finalCta:'Get started',
       ctaEditor:'Open the Editor', ctaOrganize:'Organize Files', ctaCut:'Open Video Cutter',
       liveLbl:'Live', soonLbl:'Soon',
-      footTagline:'The platform where you upload a file once — then send, edit, convert, compress and organize it. All in your browser.',
-      footNote:'KOLKLI · Editing runs in your browser · Your files stay with you.'
+      footTagline:'The platform where you upload a file once — then send, edit, convert, compress and organize it. Fast, simple and professional-quality.',
+      footNote:'KOLKLI. Fast, simple and professional-quality.'
     },
     ru:{
       dir:'ltr',
       navHome:'Главная', navSend:'Отправка файлов', navAI:'AI-инструменты', navAudio:'Аудио', navImages:'Изображения', navVideo:'Видео',
       navDocs:'Документы', navConvert:'Конвертеры', navCompress:'Сжатие', navPricing:'Цены', navSignin:'Вход', navStart:'Начать',
-      heroBadge:'100+ инструментов · всё в браузере',
+      heroBadge:'100+ инструментов · быстро и просто',
       heroT1:'Все умные инструменты для файлов', heroT2:'в одном месте.',
       heroSub:'Загрузка, редактирование, конвертация, упорядочивание и отправка файлов — быстро и просто.',
-      trust1:'Без установки', trust2:'Приватное редактирование в браузере', trust3:'Работает на любом устройстве',
-      hb1t:'Без установки ПО', hb2t:'100% безопасно и приватно', hb3t:'Молниеносно, на базе облака', hb4t:'Работает везде и на любом устройстве',
+      trust1:'Быстро, просто и профессионального качества.',
+      hb1t:'Без установки ПО', hb2t:'100% профессиональное качество', hb3t:'Молниеносно, на базе облака', hb4t:'Работает везде и на любом устройстве',
       heroCta1:'Начать бесплатно', heroCta2:'Посмотреть, как это работает',
       toolsH:'Всё, что нужно для работы с файлами',
       tc1t:'Отправка файлов', tc1p:'Отправляйте до 100 ГБ', tc2t:'AI-инструменты', tc2p:'Умное редактирование с AI',
@@ -797,16 +791,16 @@
       tabAll:'Все', tabAudio:'Аудио', tabImages:'Изображения', tabVideo:'Видео', tabDocs:'Документы', tabConvert:'Конвертация', tabCompress:'Сжатие', tabMarketing:'Маркетинг', tabCalc:'Калькуляторы',
       kCats:'Категории', catsH:'Дом для любого типа файлов', catsP:'Переходите к инструментам для аудио, изображений, видео, документов и не только.',
       kSend:'Отправка больших файлов', sendH:'Делитесь большими файлами — просто', sendP:'Загрузите один раз и отправьте ссылку — с паролем, сроком действия и уведомлениями о скачивании.',
-      kWhy:'Почему KOLKLI', whyH:'Быстро, приватно, всё в одном месте', whyP:'Всё основное сделано правильно — без прыжков между десятком сайтов.',
+      kWhy:'Почему KOLKLI', whyH:'Быстро, просто, всё в одном месте', whyP:'Всё основное сделано правильно — без прыжков между десятком сайтов.',
       kHow:'Как это работает', howH:'Три шага, и всё', howP:'Без установки, без хлопот. Загрузите и начните.',
-      kPricing:'Цены', pricingH:'Простые и прозрачные цены', pricingP:'Начните бесплатно. Обновляйтесь, когда нужно больше.',
+      kPricing:'Цены', pricingH:'Простые и прозрачные цены', pricingP:'Начните бесплатно — или 7 дней Creator бесплатно, без карты.',
       perMonth:'/мес', mostPopular:'Самый популярный',
       kFaq:'FAQ', faqH:'Частые вопросы', aiMore:'Все AI-инструменты', pricingMore:'Все тарифы', faqMore:'Все частые вопросы',
       finalH:'Готовы работать со своими файлами?', finalP:'Загрузите первый файл — это займёт всего несколько секунд.', finalCta:'Начать',
       ctaEditor:'Открыть редактор', ctaOrganize:'Упорядочить файлы', ctaCut:'Открыть видеорезак',
       liveLbl:'Доступно', soonLbl:'Скоро',
-      footTagline:'Платформа, где вы загружаете файл один раз — а затем отправляете, редактируете, конвертируете, сжимаете и упорядочиваете. Всё в браузере.',
-      footNote:'KOLKLI · Редактирование в вашем браузере · Ваши файлы остаются у вас.'
+      footTagline:'Платформа, где вы загружаете файл один раз — а затем отправляете, редактируете, конвертируете, сжимаете и упорядочиваете. Быстро, просто и профессионального качества.',
+      footNote:'KOLKLI · Ваши файлы остаются у вас. Быстро, просто и профессионального качества.'
     }
   };
 
@@ -849,6 +843,7 @@
       {i:'🔗', c:'b', cat:['audio'], href:'./merge-audio.html', he:['מיזוג אודיו','אחדו כמה קבצי שמע לאחד.'], en:['Merge Audio','Combine audio files into one.'], ru:['Объединение аудио','Объединяйте аудиофайлы в один.']},
       {i:'🎵', c:'g', cat:['audio','convert'], href:'./mp4-to-mp3.html', he:['MP4 ל-MP3','חלצו שמע מסרטון וידאו.'], en:['MP4 to MP3','Extract audio from video.'], ru:['MP4 в MP3','Извлекайте звук из видео.']},
       {i:'🎧', c:'t', cat:['audio','video'], href:'./extract-audio.html', new:true, he:['חילוץ אודיו','שמרו את פס הקול מכל וידאו.'], en:['Extract Audio','Save the soundtrack from any video.'], ru:['Извлечение аудио','Сохраняйте звуковую дорожку из любого видео.']},
+      {i:'🎚️', c:'g', cat:['audio'], href:'./normalize-audio.html', new:true, he:['נורמליזציית עוצמה','יישרו כמה שירים לאותה עוצמה (LUFS).'], en:['Loudness Normalize','Level a batch of tracks to one loudness (LUFS).'], ru:['Нормализация громкости','Выровняйте партию треков до одной громкости (LUFS).']},
       {i:'✨', c:'v', cat:['audio'], href:'./ai-audio-cleanup.html', new:true, he:['ניקוי אודיו AI','הסירו רעש ושפרו את הקול עם AI.'], en:['AI Audio Cleanup','Remove noise & enhance voice with AI.'], ru:['AI-очистка аудио','Убирайте шум и улучшайте голос с AI.']},
       {i:'🖼️', c:'b', cat:['images','convert'], href:'./heic-to-jpg.html', he:['HEIC ל-JPG','המירו תמונות אייפון ל-JPG.'], en:['HEIC to JPG','Convert iPhone photos to JPG.'], ru:['HEIC в JPG','Конвертируйте фото iPhone в JPG.']},
       {i:'📐', c:'g', cat:['images'], href:'./resize-image.html', he:['שינוי גודל תמונה','שנו מידות לפי פיקסל או אחוז.'], en:['Resize Image','Resize by pixels or percentage.'], ru:['Изменение размера','Меняйте размер по пикселям или процентам.']},
@@ -882,7 +877,7 @@
       {i:'🟪', c:'p', cat:[], href:'./box-shadow.html', new:true, he:['מחולל Box Shadow','עיצוב צל עם תצוגה חיה וקוד CSS.'], en:['Box Shadow','Design shadows with live preview & CSS.'], ru:['Box Shadow','Тени с превью и готовым CSS.']},
       {i:'⬜', c:'b', cat:[], href:'./border-radius.html', new:true, he:['מחולל Border Radius','פינות מעוגלות עם תצוגה חיה וקוד CSS.'], en:['Border Radius','Rounded corners with live preview & CSS.'], ru:['Border Radius','Скругление углов с превью и CSS.']},
       {i:'☁️', c:'b', cat:[], href:'./send.html', he:['שליחת קבצים','שלחו קבצים גדולים בלינק אחד.'], en:['Send Files','Share big files with one link.'], ru:['Отправка файлов','Делитесь большими файлами одной ссылкой.']},
-      {i:'✅', c:'p', cat:[], href:'./review.html', new:true, he:['משוב ואישור קבצים','שלחו עבודה ללקוח לצפייה, הערות ואישור.'], en:['Client Review','Send work to a client for sign-off.'], ru:['Одобрение клиента','Отправьте работу клиенту на просмотр и одобрение.']},
+      {i:'✅', c:'p', cat:[], href:'./review.html', new:true, he:['אישור קבצים','שלחו עבודה ללקוח לצפייה, הערות ואישור.'], en:['Approve Files','Send work to a client for sign-off.'], ru:['Утверждение файлов','Отправьте работу клиенту на просмотр и одобрение.']},
       {i:'🔗', c:'b', cat:['marketing'], href:'./utm-builder.html', new:true, he:['בונה קישורי UTM','בנו קישורים מסודרים למעקב קמפיינים.'], en:['UTM Link Builder','Build tidy links to track campaigns.'], ru:['UTM-конструктор','Создавайте аккуратные ссылки для отслеживания кампаний.']},
       {i:'🔳', c:'v', cat:['marketing'], href:'./qr-generator.html', new:true, he:['מחולל QR Code','QR לקישור, וואטסאפ, תפריט או קובץ.'], en:['QR Code Generator','QR for a link, WhatsApp, menu or file.'], ru:['Генератор QR-кодов','QR для ссылки, WhatsApp, меню или файла.']},
       {i:'💬', c:'g', cat:['marketing'], href:'./whatsapp-link.html', new:true, he:['קישור וואטסאפ','קישור עם הודעה מוכנה מראש.'], en:['WhatsApp Link','A link with a ready-to-send message.'], ru:['Ссылка WhatsApp','Ссылка с готовым сообщением.']},
@@ -917,9 +912,9 @@
     ],
     hubs:[
       {id:'audio', i:'🎵', cta:{href:'./app.html', k:'ctaEditor'},
-       he:['אודיו','חתכו, נרמלו, המירו ועשו מאסטרינג — הכול בדפדפן.'],
-       en:['Audio','Cut, normalize, convert & master — all in your browser.'],
-       ru:['Аудио','Обрезка, нормализация, конвертация и мастеринг — всё в браузере.'],
+       he:['אודיו','חתכו, נרמלו, המירו ועשו מאסטרינג — מהר ופשוט.'],
+       en:['Audio','Cut, normalize, convert & master — fast and simple.'],
+       ru:['Аудио','Обрезка, нормализация, конвертация и мастеринг — быстро и просто.'],
        tools:[{he:'חותך',en:'Cutter',ru:'Обрезка',s:'live'},{he:'מיזוג',en:'Merge',ru:'Объединение',s:'live'},{he:'נרמול',en:'Normalize',ru:'Нормализация',s:'live'},{he:'ווליום',en:'Volume',ru:'Громкость',s:'live'},{he:'המרה',en:'Convert',ru:'Конвертация',s:'live'},{he:'Fade In/Out',en:'Fade In/Out',ru:'Затухание',s:'soon'},{he:'הסרת שקט',en:'Trim Silence',ru:'Убрать тишину',s:'soon'},{he:'רינגטון',en:'Ringtone',ru:'Рингтон',s:'soon'},{he:'זיהוי BPM',en:'BPM Detector',ru:'Определение BPM',s:'live'},{he:'זיהוי סולם',en:'Key Detector',ru:'Определение тональности',s:'live'},{he:'מאסטרינג AI',en:'AI Mastering',ru:'AI-мастеринг',s:'live'},{he:'הסרת ווקאל',en:'Vocal Remover',ru:'Удаление вокала',s:'live'}]},
       {id:'images', i:'🖼️',
        he:['תמונות','שנו גודל, חתכו, המירו ודחסו תמונות.'],
@@ -953,8 +948,8 @@
       {he:'סטטיסטיקת הורדות',en:'Download Stats',ru:'Статистика скачиваний'}
     ],
     why:[
-      {i:'🔒', he:['פרטי כברירת מחדל','העריכה רצה בדפדפן — קבצים עולים רק כשאתם בוחרים לשלוח.'], en:['Private by default','Editing runs in your browser — files only upload when you choose to send.'], ru:['Приватно по умолчанию','Редактирование идёт в браузере — файлы загружаются, только когда вы решаете отправить.']},
-      {i:'⚡', he:['מהיר במיוחד','עיבוד מיידי בדפדפן לעריכות ולהמרות, בלי המתנה לשרת.'], en:['Lightning fast','Instant in-browser processing for edits & conversions — no server wait.'], ru:['Молниеносно','Мгновенная обработка в браузере для правок и конвертаций — без ожидания сервера.']},
+      {i:'💎', he:['איכות מקצועית','תוצאות ברמת סטודיו תוך שניות — בלי להתפשר על האיכות.'], en:['Professional quality','Studio-grade results in seconds — no compromise on quality.'], ru:['Профессиональное качество','Студийный результат за секунды — без компромиссов по качеству.']},
+      {i:'⚡', he:['מהיר במיוחד','עיבוד מיידי לעריכות ולהמרות — בלי המתנה.'], en:['Lightning fast','Instant processing for edits & conversions — no waiting around.'], ru:['Молниеносно','Мгновенная обработка правок и конвертаций — без ожидания.']},
       {i:'🌍', he:['עובד בכל מקום','כל מכשיר, כל דפדפן מודרני — בלי להתקין כלום.'], en:['Works everywhere','Any device, any modern browser — nothing to install.'], ru:['Работает везде','Любое устройство, любой современный браузер — ничего не нужно устанавливать.']},
       {i:'🤖', he:['מבוסס AI','כלים חכמים להסרת רקע, ניקוי אודיו וסיכום מסמכים (בקרוב).'], en:['AI powered','Smart tools to remove backgrounds, clean audio and summarize docs (soon).'], ru:['На базе AI','Умные инструменты для удаления фона, очистки звука и конспектов документов (скоро).']},
       {i:'📦', he:['הכול במקום אחד','שליחה, עריכה, המרה, דחיסה וסידור — בלי לקפוץ בין אתרים.'], en:['All in one place','Send, edit, convert, compress & organize — without juggling ten sites.'], ru:['Всё в одном месте','Отправка, правка, конвертация, сжатие и упорядочивание — без прыжков между десятком сайтов.']},
@@ -966,54 +961,48 @@
       {i:'⬇️', he:['הורדה או שיתוף','מקבלים את הקובץ בחזרה או שולחים לינק.'], en:['Download or share','Get your file back, or send a link.'], ru:['Скачайте или поделитесь','Получите файл обратно или отправьте ссылку.']}
     ],
     plans:[
-      {price:'$0', he:['חינם','להתחלה מהירה'], en:['Free','To get started'], ru:['Бесплатно','Для быстрого старта'], cta:{he:'התחילו',en:'Get Started',ru:'Начать'}, feats:[
-        {he:'עד 3GB לשליחה',en:'Up to 3GB per transfer',ru:'До 3 ГБ за передачу'},
-        {he:'כלים בסיסיים',en:'Basic tools',ru:'Базовые инструменты'},
-        {he:'קבצים נשמרים 3 ימים',en:'Files kept for 3 days',ru:'Файлы хранятся 3 дня'},
-        {he:'עריכה מקומית בדפדפן',en:'Local in-browser editing',ru:'Локальное редактирование в браузере'}]},
-      {price:'$6.99', pop:true, he:['Lite','לעבודה יומיומית'], en:['Lite','For everyday work'], ru:['Lite','Для повседневной работы'], cta:{he:'קחו Lite',en:'Get Lite',ru:'Выбрать Lite'}, feats:[
-        {he:'שליחה עד 20GB בכל פעם',en:'Up to 20GB per transfer',ru:'До 20 ГБ за передачу'},
-        {he:'100GB אחסון בענן',en:'100GB cloud storage',ru:'100 ГБ в облаке'},
-        {he:'קבצים נשמרים 14 יום',en:'Files kept for 14 days',ru:'Файлы хранятся 14 дней'},
-        {he:'כל כלי העריכה',en:'All editing tools',ru:'Все инструменты редактирования'},
-        {he:'הגנה בסיסמה',en:'Password protection',ru:'Защита паролем'},
-        {he:'בלי פרסומות',en:'No ads',ru:'Без рекламы'}]},
-      {price:'$14.99', he:['Pro','לעבודה מקצועית'], en:['Pro','For professional work'], ru:['Pro','Для профессионалов'], cta:{he:'קחו Pro',en:'Get Pro',ru:'Выбрать Pro'}, feats:[
-        {he:'שליחה עד 100GB בכל פעם',en:'Up to 100GB per transfer',ru:'До 100 ГБ за передачу'},
-        {he:'1TB אחסון בענן',en:'1TB cloud storage',ru:'1 ТБ в облаке'},
-        {he:'קבצים נשמרים 30 יום',en:'Files kept for 30 days',ru:'Файлы хранятся 30 дней'},
-        {he:'כל הכלים + כלי AI',en:'All tools + AI tools',ru:'Все инструменты + AI'},
-        {he:'התראות הורדה',en:'Download notifications',ru:'Уведомления о скачивании'},
-        {he:'תמיכה מהירה בעדיפות',en:'Priority support',ru:'Приоритетная поддержка'}]},
-      {price:'$39.99', he:['Business','לצוותים וארגונים'], en:['Business','For teams & orgs'], ru:['Business','Для команд и организаций'], cta:{he:'קחו Business',en:'Get Business',ru:'Выбрать Business'}, feats:[
-        {he:'5 מושבים כלולים (+$9 למושב)',en:'5 seats included (+$9/seat)',ru:'5 мест включено (+$9/место)'},
-        {he:'5TB אחסון משותף',en:'5TB shared storage',ru:'5 ТБ общего хранилища'},
-        {he:'שליחה עד 200GB בכל פעם',en:'Up to 200GB per transfer',ru:'До 200 ГБ за передачу'},
-        {he:'White-label ומיתוג מלא',en:'Full white-label branding',ru:'Полный white-label брендинг'},
-        {he:'ניהול צוות והרשאות',en:'Team management & roles',ru:'Управление командой и роли'},
-        {he:'חיוב מרוכז',en:'Centralized billing',ru:'Единый счёт'},
-        {he:'כל הכלים + כלי AI',en:'All tools + AI tools',ru:'Все инструменты + AI'},
-        {he:'תמיכה בעדיפות',en:'Priority support',ru:'Приоритетная поддержка'}]}
+      {price:{he:'₪0',en:'$0',ru:'$0'}, he:['חינם','להתחלה מהירה'], en:['Free','To get started'], ru:['Бесплатно','Для быстрого старта'], cta:{he:'התחילו',en:'Get Started',ru:'Начать'}, feats:[
+        {he:'עד 3 פרויקטים פעילים',en:'Up to 3 active projects',ru:'До 3 активных проектов'},
+        {he:'עד 3GB אחסון והעברה',en:'Up to 3GB storage & transfer',ru:'До 3 ГБ хранилища и передачи'},
+        {he:'קבצים נשמרים 7 ימים',en:'Files kept for 7 days',ru:'Файлы хранятся 7 дней'},
+        {he:'ארגון · בקשה · משוב — 2 ביום',en:'Organize · request · review — 2/day',ru:'Организация · запрос · ревью — 2/день'},
+        {he:'כלי PDF בסיסיים',en:'Basic PDF tools',ru:'Базовые PDF-инструменты'}]},
+      {price:{he:'₪89',en:'$24',ru:'$24'}, pop:true, he:['Creator','ליוצרים ופרילנסרים'], en:['Creator','For creators & freelancers'], ru:['Creator','Для авторов и фрилансеров'], cta:{he:'בחרו Creator',en:'Get Creator',ru:'Выбрать Creator'}, feats:[
+        {he:'100 פרויקטים · 500 קבצים לכל אחד',en:'100 projects · 500 files each',ru:'100 проектов · 500 файлов в каждом'},
+        {he:'250GB אחסון · עד 25GB בהעברה',en:'250GB storage · up to 25GB/transfer',ru:'250 ГБ · до 25 ГБ за передачу'},
+        {he:'קבצים נשמרים 90 יום',en:'Files kept for 90 days',ru:'Файлы хранятся 90 дней'},
+        {he:'כל הכלים + Review Studio',en:'All tools + Review Studio',ru:'Все инструменты + Review Studio'},
+        {he:'מיתוג אישי וקישורים ממותגים',en:'Custom branding & branded links',ru:'Свой брендинг и фирменные ссылки'},
+        {he:'עד 10 פעולות AI ביום',en:'Up to 10 AI actions/day',ru:'До 10 AI-операций в день'},
+        {he:'עד 2 חברי צוות',en:'Up to 2 team members',ru:'До 2 участников'}]},
+      {price:{he:'₪249',en:'$69',ru:'$69'}, he:['Studio','לסטודיו וצוותים'], en:['Studio','For studios & teams'], ru:['Studio','Для студий и команд'], cta:{he:'בחרו Studio',en:'Get Studio',ru:'Выбрать Studio'}, feats:[
+        {he:'500 פרויקטים · 2,000 קבצים לכל אחד',en:'500 projects · 2,000 files each',ru:'500 проектов · 2 000 файлов в каждом'},
+        {he:'1TB אחסון · עד 100GB בהעברה',en:'1TB storage · up to 100GB/transfer',ru:'1 ТБ · до 100 ГБ за передачу'},
+        {he:'שמירת קבצים עד שנה',en:'Files kept up to 1 year',ru:'Файлы хранятся до года'},
+        {he:'White-label מלא + דומיין אישי',en:'Full white-label + custom domain',ru:'Полный white-label + свой домен'},
+        {he:'עד 10 משתמשי צוות והרשאות',en:'Up to 10 team members & roles',ru:'До 10 участников и роли'},
+        {he:'אוטומציות מייל ודוחות שימוש',en:'Email automations & usage reports',ru:'Email-автоматизация и отчёты'},
+        {he:'אבטחה: 2FA ויומן פעילות',en:'Security: 2FA & activity log',ru:'Безопасность: 2FA и журнал'}]}
     ],
     faq:[
-      {he:['זה בחינם?','כן — כלי הליבה חינמיים ורצים בדפדפן שלכם. חבילות בתשלום מוסיפות שליחה גדולה יותר, אחסון ושיתוף.'],
-       en:['Is it free?','Yes — the core tools are free and run in your browser. Paid plans add bigger transfers, storage and sharing.'],
-       ru:['Это бесплатно?','Да — основные инструменты бесплатны и работают в вашем браузере. Платные планы добавляют большие передачи, хранилище и общий доступ.']},
-      {he:['הקבצים שלי מועלים לשרת?','העריכה וההמרה רצות מקומית. קבצים עוזבים את המכשיר רק כשאתם בוחרים לשלוח או לאחסן אותם.'],
-       en:['Do my files get uploaded?','Editing and converting run locally. Files only leave your device when you choose to send or store them.'],
-       ru:['Мои файлы загружаются на сервер?','Редактирование и конвертация выполняются локально. Файлы покидают устройство, только когда вы решаете отправить или сохранить их.']},
-      {he:['צריך להתקין משהו?','לא. הכול רץ בדפדפן מודרני, בלי התקנות ובלי תוספים.'],
-       en:['Do I need to install anything?','No. Everything runs in a modern browser — no installs, no plugins.'],
-       ru:['Нужно что-то устанавливать?','Нет. Всё работает в современном браузере — без установок и плагинов.']},
+      {he:['זה בחינם?','כן — כלי הליבה חינמיים ומהירים. חבילות בתשלום מוסיפות שליחה גדולה יותר, אחסון ושיתוף.'],
+       en:['Is it free?','Yes — the core tools are free and fast. Paid plans add bigger transfers, storage and sharing.'],
+       ru:['Это бесплатно?','Да — основные инструменты бесплатны и быстры. Платные планы добавляют большие передачи, хранилище и общий доступ.']},
+      {he:['כמה זה מהיר?','רוב העריכות וההמרות מסתיימות תוך שניות — מעלים, מבצעים ומורידים.'],
+       en:['How fast is it?','Most edits and conversions finish in seconds — upload, do it, download.'],
+       ru:['Насколько это быстро?','Большинство правок и конвертаций завершаются за секунды — загрузите, сделайте, скачайте.']},
+      {he:['צריך להתקין משהו?','לא — נכנסים ומתחילים מיד, בלי התקנות ובלי תוספים.'],
+       en:['Do I need to install anything?','No — jump right in, no installs and no plugins.'],
+       ru:['Нужно что-то устанавливать?','Нет — начните сразу, без установок и плагинов.']},
       {he:['אילו כלים עובדים כבר עכשיו?','עורך האודיו וסידור הקבצים המקומי כבר פעילים. שאר הכלים נחשפים בהדרגה.'],
        en:['Which tools work right now?','The audio editor and local file organizer are live today. The rest of the tools are rolling out.'],
        ru:['Какие инструменты работают уже сейчас?','Аудиоредактор и локальное упорядочивание файлов уже доступны. Остальные инструменты выходят постепенно.']},
       {he:['צריך חשבון?','לא כדי להתחיל. חשבון מוסיף היסטוריה, לינקים שמורים ושיתוף.'],
        en:['Do I need an account?','Not to start. An account adds history, saved links and sharing.'],
        ru:['Нужен ли аккаунт?','Не для начала работы. Аккаунт добавляет историю, сохранённые ссылки и общий доступ.']},
-      {he:['יש מגבלת גודל?','בחינם עד 3GB לשליחה; חבילות Lite, Pro ו-Business מעלות את המגבלה.'],
-       en:['Is there a size limit?','Free is up to 3GB per transfer; Lite, Pro and Business raise the limit.'],
-       ru:['Есть ли ограничение по размеру?','Бесплатно — до 3 ГБ за передачу; Lite, Pro и Business увеличивают лимит.']}
+      {he:['יש מגבלת גודל?','בחינם עד 3GB לשליחה; מסלולי Creator ו-Studio מעלים את המגבלה.'],
+       en:['Is there a size limit?','Free is up to 3GB per transfer; Creator and Studio raise the limit.'],
+       ru:['Есть ли ограничение по размеру?','Бесплатно — до 3 ГБ за передачу; Creator и Studio увеличивают лимит.']}
     ],
     footerCols:[
       {t:{he:'כלים',en:'Tools',ru:'Инструменты'}, links:[
@@ -1062,15 +1051,18 @@
     const [name,tagline] = p[L];
     const ribbon = p.pop ? `<span class="ribbon">${S.mostPopular}</span>` : '';
     const feats = p.feats.map(f=>`<li>${check}${f[L]}</li>`).join('');
-    // Free → sign-up; paid plans (Lite/Pro) → the checkout flow.
+    // Free → sign-up; paid plans (Creator/Studio) → the checkout flow.
     const slug = (p.en[0]||'').toLowerCase();
     const href = slug==='free' ? './auth.html?mode=signup' : `./checkout.html?plan=${slug}`;
     const btn = p.pop
       ? `<a class="cta" href="${href}">${p.cta[L]}</a>`
       : `<a class="ghost" href="${href}">${p.cta[L]}</a>`;
+    // Creator is the trialed tier → offer the no-card 7-day trial via sign-up.
+    const trialTxt = { he:'או 7 ימי ניסיון חינם — ללא כרטיס אשראי', en:'or start 7 days free — no credit card', ru:'или 7 дней бесплатно — без карты' };
+    const trial = slug==='creator' ? `<a class="plan-trial" href="./auth.html?mode=signup">${trialTxt[L]}</a>` : '';
     return `<div class="plan ${p.pop?'pop':''}">${ribbon}<h3>${name}</h3>
-      <div class="price">${p.price}<span>${S.perMonth}</span></div><p class="tagline">${tagline}</p>
-      <ul>${feats}</ul>${btn}</div>`;
+      <div class="price">${p.price[L]}<span>${S.perMonth}</span></div><p class="tagline">${tagline}</p>
+      <ul>${feats}</ul>${btn}${trial}</div>`;
   }
 
   function render(){

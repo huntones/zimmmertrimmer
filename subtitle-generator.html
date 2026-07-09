@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — יצירת כתוביות AI</title>
-<meta name="description" content="Generate accurate, time-synced subtitles from any audio or video with AI — right in your browser. Edit the text, retime every line, style the captions, then export SRT / VTT / TXT or burn them into the video. Your files never leave your machine.">
+<meta name="description" content="Generate accurate, time-synced subtitles from any audio or video with AI. Edit the text, retime every line, style the captions, then export SRT / VTT / TXT or burn them into the video. Your files never leave your machine. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1160px;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -449,7 +449,7 @@
       dir:'rtl', langIco:'EN',
       kick:'כתוביות AI',
       pageTitle:'צרו כתוביות מדויקות לכל אודיו או וידאו — עם AI',
-      pageSub:'העלו קובץ אודיו או וידאו, בחרו את שפת הדיבור, וקבלו תמלול מסונכרן לזמן. לאחר מכן ערכו את הטקסט, תקנו טעויות, שנו את זמני כל שורה ובחרו עיצוב — ואז ייצאו SRT / VTT / טקסט, או הטמיעו את הכתוביות ישירות בסרטון. הכול רץ בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      pageSub:'העלו קובץ אודיו או וידאו, בחרו את שפת הדיבור, וקבלו תמלול מסונכרן לזמן. לאחר מכן ערכו את הטקסט, תקנו טעויות, שנו את זמני כל שורה ובחרו עיצוב — ואז ייצאו SRT / VTT / טקסט, או הטמיעו את הכתוביות ישירות בסרטון. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובץ אודיו או וידאו לכאן', or2:'או', choose:'בחרו קובץ',
       sizeNote:'MP4 · MOV · WEBM · MP3 · WAV · M4A · OGG', remove:'הסרה',
       optTitle:'הגדרות תמלול',
@@ -461,7 +461,7 @@
       modelAcc:'מדויק', modelAccS:'איטי יותר · base',
       genBtn:'צרו כתוביות', working:'מכינים…',
       manual:'או התחילו כתוביות ריקות וכתבו ידנית',
-      rtNote:'התמלול רץ במלואו בדפדפן שלכם דרך מנוע Whisper. בהרצה הראשונה יורד מודל ה-AI פעם אחת (~40–80MB) ונשמר במטמון. האודיו עצמו לעולם לא נשלח לשרת.',
+      rtNote:'העיבוד מהיר. בהרצה הראשונה יורד מודל ה-AI פעם אחת (~40–80MB) ונשמר במטמון. מהיר, פשוט ובאיכות מקצועית.',
       dlModel:'מוריד מודל AI', decoding:'מפענח אודיו…', transcribing:'מתמלל…',
       cuesTitle:'שורות הכתוביות', addCue:'הוספת שורה',
       cuesEmpty:'אין עדיין שורות. לחצו על "הוספת שורה" כדי להתחיל.',
@@ -474,8 +474,8 @@
       exportH:'הכתוביות מוכנות — ייצאו או הטמיעו',
       expTxt:'תמלול (TXT)', expBurn:'הטמעה בסרטון', startOver:'קובץ חדש',
       exNote:'SRT/VTT/TXT נשמרים מיידית. ההטמעה בסרטון מרנדרת את הכתוביות על הווידאו בזמן אמת (אורך הרינדור ≈ אורך הסרטון) ומורידה קובץ WEBM.',
-      seam:'הכול מקומי: המודל רץ בדפדפן דרך WebAssembly/WebGPU, העריכה והייצוא נעשים במכשיר שלכם, וההטמעה משתמשת במנוע ההקלטה המובנה של הדפדפן. שום קובץ לא מועלה לשרת.',
-      foot:'KOLKLI · יצירת כתוביות AI · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · יצירת כתוביות AI · מהיר, פשוט ובאיכות מקצועית',
       errNoFile:'צריך לצרף קובץ אודיו או וידאו', errDecode:'לא הצלחנו לפענח את האודיו מהקובץ',
       errEngine:'לא הצלחנו לטעון את מנוע ה-AI (בדקו חיבור לאינטרנט). אפשר להתחיל כתוביות ריקות ולכתוב ידנית.',
       errEmpty:'לא זוהה דיבור בקובץ. אפשר להוסיף שורות ידנית.',
@@ -488,7 +488,7 @@
       dir:'ltr', langIco:'עב',
       kick:'AI subtitles',
       pageTitle:'Generate accurate subtitles for any audio or video — with AI',
-      pageSub:'Upload an audio or video file, pick the spoken language, and get a time-synced transcript. Then edit the text, fix mistakes, retime every line and style the captions — and export SRT / VTT / plain text, or burn the subtitles straight into the video. Everything runs in your browser — nothing leaves your machine.',
+      pageSub:'Upload an audio or video file, pick the spoken language, and get a time-synced transcript. Then edit the text, fix mistakes, retime every line and style the captions — and export SRT / VTT / plain text, or burn the subtitles straight into the video. Fast, simple and professional-quality.',
       dropBig:'Drag an audio or video file here', or2:'or', choose:'Choose file',
       sizeNote:'MP4 · MOV · WEBM · MP3 · WAV · M4A · OGG', remove:'Remove',
       optTitle:'Transcription options',
@@ -500,7 +500,7 @@
       modelAcc:'Accurate', modelAccS:'slower · base',
       genBtn:'Generate subtitles', working:'Preparing…',
       manual:'or start blank subtitles and type manually',
-      rtNote:'Transcription runs entirely in your browser via the Whisper engine. On the first run the AI model downloads once (~40–80MB) and is cached. Your audio is never sent to a server.',
+      rtNote:'Processing is fast — . On the first run the AI model downloads once (~40–80MB) and is cached',
       dlModel:'Downloading AI model', decoding:'Decoding audio…', transcribing:'Transcribing…',
       cuesTitle:'Subtitle lines', addCue:'Add line',
       cuesEmpty:'No lines yet. Click “Add line” to start.',
@@ -513,8 +513,8 @@
       exportH:'Subtitles ready — export or burn in',
       expTxt:'Transcript (TXT)', expBurn:'Burn into video', startOver:'New file',
       exNote:'SRT/VTT/TXT save instantly. Burning renders the captions onto the video in real time (render time ≈ clip length) and downloads a WEBM file.',
-      seam:'All local: the model runs in your browser via WebAssembly/WebGPU, editing & export happen on your device, and burn-in uses the browser’s built-in recording engine. No file is ever uploaded.',
-      foot:'KOLKLI · AI subtitle generator · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · AI subtitle generator · Fast, simple and professional quality',
       errNoFile:'Add an audio or video file', errDecode:'We could not decode the audio from this file',
       errEngine:'We could not load the AI engine (check your connection). You can start blank subtitles and type manually.',
       errEmpty:'No speech was detected. You can add lines manually.',
@@ -527,7 +527,7 @@
       dir:'ltr',
       kick:'AI-субтитры',
       pageTitle:'Создавайте точные субтитры для любого аудио или видео — с помощью AI',
-      pageSub:'Загрузите аудио- или видеофайл, выберите язык речи — и получите транскрипцию с привязкой ко времени. Затем редактируйте текст, исправляйте ошибки, меняйте тайминг каждой строки и оформляйте субтитры — и экспортируйте SRT / VTT / обычный текст или вшейте субтитры прямо в видео. Всё работает в вашем браузере — ничего не покидает устройство.',
+      pageSub:'Загрузите аудио- или видеофайл, выберите язык речи — и получите транскрипцию с привязкой ко времени. Затем редактируйте текст, исправляйте ошибки, меняйте тайминг каждой строки и оформляйте субтитры — и экспортируйте SRT / VTT / обычный текст или вшейте субтитры прямо в видео. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите аудио- или видеофайл сюда', or2:'или', choose:'Выбрать файл',
       sizeNote:'MP4 · MOV · WEBM · MP3 · WAV · M4A · OGG', remove:'Удалить',
       optTitle:'Параметры транскрипции',
@@ -539,7 +539,7 @@
       modelAcc:'Точно', modelAccS:'медленнее · base',
       genBtn:'Создать субтитры', working:'Подготовка…',
       manual:'или начните с пустых субтитров и печатайте вручную',
-      rtNote:'Транскрипция полностью выполняется в вашем браузере через движок Whisper. При первом запуске AI-модель загружается один раз (~40–80 МБ) и кэшируется. Ваше аудио никогда не отправляется на сервер.',
+      rtNote:'Обработка быстрая — . При первом запуске AI-модель загружается один раз (~40–80 МБ) и кэшируется',
       dlModel:'Загрузка AI-модели', decoding:'Декодирование аудио…', transcribing:'Транскрибирование…',
       cuesTitle:'Строки субтитров', addCue:'Добавить строку',
       cuesEmpty:'Пока нет строк. Нажмите «Добавить строку», чтобы начать.',
@@ -552,8 +552,8 @@
       exportH:'Субтитры готовы — экспортируйте или вшейте',
       expTxt:'Транскрипт (TXT)', expBurn:'Вшить в видео', startOver:'Новый файл',
       exNote:'SRT/VTT/TXT сохраняются мгновенно. Вшивание накладывает субтитры на видео в реальном времени (время рендера ≈ длине клипа) и скачивает файл WEBM.',
-      seam:'Всё локально: модель работает в вашем браузере через WebAssembly/WebGPU, редактирование и экспорт происходят на вашем устройстве, а вшивание использует встроенный движок записи браузера. Ни один файл не загружается.',
-      foot:'KOLKLI · AI-генератор субтитров · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · AI-генератор субтитров · Быстро, просто и профессионального качества',
       errNoFile:'Добавьте аудио- или видеофайл', errDecode:'Не удалось декодировать звук из этого файла',
       errEngine:'Не удалось загрузить AI-движок (проверьте соединение). Вы можете начать с пустых субтитров и печатать вручную.',
       errEmpty:'Речь не обнаружена. Вы можете добавить строки вручную.',

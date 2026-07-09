@@ -53,8 +53,8 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{width:80%;max-width:none;margin:0 auto;padding:14px 20px 8px;}
-  @media (max-width:1560px){ .wrap{width:90%;} }
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:14px 20px 8px;}
+  @media (max-width:1560px){ .wrap{width:100%;} }
   @media (max-width:640px){ .wrap{width:100%;padding:14px 14px 16px;} }
 
   /* header */
@@ -318,6 +318,7 @@
 <body>
 <div id="site-header"></div>
 <script src="./header.js"></script>
+<script src="./project-numbering.js"></script>
 <div class="wrap">
 
   <div class="pagehead">
@@ -388,19 +389,8 @@
 
         <div class="two">
           <div class="opt">
-            <label data-i18n="senderNameLbl"></label>
-            <input class="inp" id="senderName" type="text" autocomplete="name" data-i18n-ph="senderNamePh">
-          </div>
-          <div class="opt">
             <label data-i18n="senderEmailLbl"></label>
             <input class="inp" id="senderEmail" type="email" dir="ltr" autocomplete="email" data-i18n-ph="senderEmailPh">
-          </div>
-        </div>
-
-        <div class="two">
-          <div class="opt">
-            <label data-i18n="recipientNameLbl"></label>
-            <input class="inp" id="recipientName" type="text" data-i18n-ph="recipientNamePh">
           </div>
           <div class="opt">
             <label data-i18n="recipientEmailLbl"></label>
@@ -435,7 +425,7 @@
         <div class="opt brandsec" id="brandSec">
           <label class="brandhead" data-i18n="brandLbl"></label>
           <div class="brandlock" id="brandLock" hidden>
-            <span class="brandlock-badge">PRO</span>
+            <span class="brandlock-badge">CREATOR</span>
             <svg class="brandlock-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <div class="brandlock-txt" data-i18n="brandLockTxt"></div>
             <a class="brandlock-cta" id="brandUpgrade" href="pricing/" data-i18n="brandLockCta"></a>
@@ -546,16 +536,14 @@
       toFiles:'הקבצים שלי', signin:'התחברות',
       kick:'שליחת קבצים גדולים',
       pageTitle:'שלחו קבצים גדולים בקישור אחד',
-      pageSub:'גררו קבצים, הגדירו תוקף וסיסמה, וקבלו קישור הורדה מסודר לנמען. הכול נשאר במחשב שלכם עד שתחליטו לשלוח.',
+      pageSub:'גררו קבצים, הגדירו תוקף וסיסמה, וקבלו קישור הורדה מסודר לנמען. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קבצים או תיקיות לכאן', or2:'או', choose:'הוספת קבצים', chooseFolder:'הוספת תיקייה',
       sizeNote:'עד 3GB בשליחה (חבילת Free)', remove:'הסרה',
       viewList:'תצוגת רשימה', viewGallery:'תצוגת גלרייה', filesWord:n=>n===1?'קובץ':'קבצים',
       totalLbl:'סה״כ', optTitle:'הגדרות שליחה',
       methodLbl:'איך לשלוח', mLink:'קישור', mEmail:'אימייל',
       toLbl:'נמענים (מופרדים בפסיק)', toPh:'a@mail.com, b@mail.com',
-      senderNameLbl:'שם השולח', senderNamePh:'השם שלכם',
       senderEmailLbl:'אימייל השולח', senderEmailPh:'you@example.com',
-      recipientNameLbl:'שם הנמען', recipientNamePh:'שם הנמען',
       recipientEmailLbl:'אימייל הנמען', recipientEmailPh:'client@example.com',
       msgLbl:'הודעה אישית (לא חובה)', msgPh:'כמה מילים לנמען…',
       expiryLbl:'תוקף הקישור',
@@ -574,30 +562,28 @@
       emailSubject:'שיתפתי איתך קבצים', emailBodyLead:'שלום, שיתפתי איתך קבצים דרך KOLKLI. אפשר להוריד כאן:', emailBodyExpiry:d=>`הקישור פג בעוד ${d}.`,
       chipExpiry:d=>`פג תוקף בעוד ${d}`, chipFiles:n=>`${n} קבצים`, chipPw:'מוגן בסיסמה',
       day:'יום', days:d=>`${d} ימים`,
-      seam:'זו הדגמה מקומית: הקבצים נשמרים בדפדפן הזה (IndexedDB) והקישור עובד באותו מחשב. עם חיבור השרת הקישור יעבוד לכל אחד, בכל מקום.',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
       foot:'KOLKLI · שליחת קבצים · הדגמה מקומית עד לחיבור השרת',
       errNoFiles:'צריך לצרף לפחות קובץ אחד', errNoEmail:'הזינו לפחות נמען אחד', errNoPw:'הזינו סיסמה או בטלו את ההגנה',
       brandLbl:'מיתוג ללקוח (לא חובה)', brandSub:'הוסיפו לוגו, רקע וצבע — והנמען יקבל עמוד הורדה ממותג בעיצוב שלכם.',
       brandNamePh:'שם העסק שלכם', brandTagPh:'שורת תיאור קצרה (לא חובה)',
       brandLogo:'לוגו', brandBg:'רקע', brandColor:'צבע המותג',
       brandPreviewHint:'כך ייראה עמוד ההורדה של הנמען', brandYou:'העסק שלכם', brandImgErr:'לא הצלחנו לטעון את התמונה',
-      brandLockTxt:'מיתוג אישי — לוגו, רקע וצבע — זמין בתוכניות Pro ו‑Business. בתוכניות Free ו‑Lite אין אפשרות למיתוג.', brandLockCta:'שדרגו לתוכנית Pro',
+      brandLockTxt:'מיתוג אישי — לוגו, רקע וצבע — זמין במסלולי Creator ו‑Studio. במסלול Free אין אפשרות למיתוג.', brandLockCta:'שדרגו למסלול Creator',
     },
     en:{
       dir:'ltr', langIco:'עב',
       toFiles:'My files', signin:'Sign in',
       kick:'Send large files',
       pageTitle:'Send large files with one link',
-      pageSub:'Drop files, set an expiry and a password, and get a clean download link for your recipient. Nothing leaves your machine until you send.',
+      pageSub:'Drop files, set an expiry and a password, and get a clean download link for your recipient. Fast, simple and professional-quality.',
       dropBig:'Drag files or folders here', or2:'or', choose:'Choose files', chooseFolder:'Choose folder',
       sizeNote:'Up to 3GB per send (Free plan)', remove:'Remove',
       viewList:'List view', viewGallery:'Gallery view', filesWord:n=>n===1?'file':'files',
       totalLbl:'Total', optTitle:'Send options',
       methodLbl:'How to send', mLink:'Link', mEmail:'Email',
       toLbl:'Recipients (comma separated)', toPh:'a@mail.com, b@mail.com',
-      senderNameLbl:'Sender name', senderNamePh:'Your name',
       senderEmailLbl:'Sender email', senderEmailPh:'you@example.com',
-      recipientNameLbl:'Recipient name', recipientNamePh:'Recipient name',
       recipientEmailLbl:'Recipient email', recipientEmailPh:'client@example.com',
       msgLbl:'Personal message (optional)', msgPh:'A few words for the recipient…',
       expiryLbl:'Link expiry',
@@ -623,23 +609,21 @@
       brandNamePh:'Your business name', brandTagPh:'Short tagline (optional)',
       brandLogo:'Logo', brandBg:'Background', brandColor:'Brand color',
       brandPreviewHint:'This is how your recipient’s download page will look', brandYou:'Your business', brandImgErr:'We couldn’t load that image',
-      brandLockTxt:'Personal branding — logo, background & color — is available on the Pro and Business plans. Free and Lite plans don’t include branding.', brandLockCta:'Upgrade to Pro',
+      brandLockTxt:'Personal branding — logo, background & color — is available on the Creator and Studio plans. The Free plan doesn’t include branding.', brandLockCta:'Upgrade to Creator',
     },
     ru:{
       dir:'ltr',
       toFiles:'Мои файлы', signin:'Вход',
       kick:'Отправка больших файлов',
       pageTitle:'Отправляйте большие файлы одной ссылкой',
-      pageSub:'Перетащите файлы, задайте срок действия и пароль — и получите чистую ссылку для скачивания для получателя. Ничего не покидает ваше устройство, пока вы не отправите.',
+      pageSub:'Перетащите файлы, задайте срок действия и пароль — и получите чистую ссылку для скачивания для получателя. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите файлы или папки сюда', or2:'или', choose:'Выбрать файлы', chooseFolder:'Выбрать папку',
       sizeNote:'До 3 ГБ за отправку (бесплатный план)', remove:'Удалить',
       viewList:'Список', viewGallery:'Галерея', filesWord:n=>{var m=n%10,d=n%100;return (m===1&&d!==11)?'файл':((m>=2&&m<=4)&&!(d>=12&&d<=14))?'файла':'файлов';},
       totalLbl:'Всего', optTitle:'Параметры отправки',
       methodLbl:'Как отправить', mLink:'Ссылка', mEmail:'Эл. почта',
       toLbl:'Получатели (через запятую)', toPh:'a@mail.com, b@mail.com',
-      senderNameLbl:'Имя отправителя', senderNamePh:'Ваше имя',
       senderEmailLbl:'Email отправителя', senderEmailPh:'you@example.com',
-      recipientNameLbl:'Имя получателя', recipientNamePh:'Имя получателя',
       recipientEmailLbl:'Email получателя', recipientEmailPh:'client@example.com',
       msgLbl:'Личное сообщение (необязательно)', msgPh:'Несколько слов для получателя…',
       expiryLbl:'Срок действия ссылки',
@@ -665,7 +649,7 @@
       brandNamePh:'Название вашей компании', brandTagPh:'Короткий слоган (необязательно)',
       brandLogo:'Логотип', brandBg:'Фон', brandColor:'Цвет бренда',
       brandPreviewHint:'Так будет выглядеть страница скачивания получателя', brandYou:'Ваш бренд', brandImgErr:'Не удалось загрузить изображение',
-      brandLockTxt:'Персональный брендинг — логотип, фон и цвет — доступен в тарифах Pro и Business. В тарифах Free и Lite брендинг недоступен.', brandLockCta:'Перейти на Pro',
+      brandLockTxt:'Персональный брендинг — логотип, фон и цвет — доступен в тарифах Creator и Studio. В тарифе Free брендинг недоступен.', brandLockCta:'Перейти на Creator',
     },
   };
 
@@ -709,8 +693,11 @@
   function upsertSendIndex(rec){
     const a=sendIndex().filter(x=>x.token!==rec.token);
     const bytes=(rec.files||[]).reduce((s,f)=>s+(f.size||0),0);
+    const fileNames=(rec.files||[]).map(f=>f.name||'').filter(Boolean).slice(0,60);
     a.unshift({ token:rec.token, ownerId:rec.ownerId, createdAt:rec.createdAt, expiresAt:rec.expiresAt,
-      files:(rec.files||[]).length, bytes, downloads:rec.downloads||0 });
+      sender:rec.sender||'', recipient:rec.recipient||'', recipients:rec.recipients||'', message:rec.message||'',
+      files:(rec.files||[]).length, bytes, downloads:rec.downloads||0, fileNames,
+      projectNumber:rec.projectNumber, project_number:rec.project_number, projectService:rec.projectService, serviceType:rec.serviceType });
     saveSendIndex(a);
   }
   function deleteSendIndex(token){ saveSendIndex(sendIndex().filter(x=>x.token!==token)); }
@@ -724,7 +711,8 @@
     try{ return Object.assign(d, JSON.parse(localStorage.getItem(scopedKey('kolkli_brand'))||'{}')); }catch(_){ return d; }
   }
   function saveBrand(){ try{ localStorage.setItem(scopedKey('kolkli_brand'), JSON.stringify(brand)); }catch(_){} }
-  // branding is a paid feature: Pro + Business only (Free/Lite are locked out)
+  // branding is a paid feature: Creator + Studio only (Free is locked out).
+  // Legacy slugs (lite/pro/business) map onto the new tiers.
   function currentPlan(){
     let plan='';
     try{
@@ -736,9 +724,12 @@
       }
     }catch(_){}
     if(!plan){ try{ plan=localStorage.getItem('ac_plan')||''; }catch(_){} }
-    return (plan||'free').toLowerCase();
+    plan=(plan||'free').toLowerCase();
+    if(plan==='lite') return 'creator';
+    if(plan==='pro'||plan==='business') return 'studio';
+    return plan;
   }
-  function canBrand(){ const p=currentPlan(); return p==='pro'||p==='business'; }
+  function canBrand(){ const p=currentPlan(); return p==='creator'||p==='studio'; }
   function applyBrandGate(){
     const ok=canBrand(), body=el('brandBody'), lock=el('brandLock');
     if(body) body.hidden=!ok;
@@ -946,6 +937,7 @@
   async function createLink(){
     el('optErr').textContent='';
     if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
+    const senderEmail=(el('senderEmail').value||'').trim();
     const recipientEmail=(el('recipientEmail').value||'').trim();
     if(method==='email' && !(recipientEmail || el('recipients').value.trim())){ el('optErr').textContent=t.errNoEmail; return; }
     const pwOn=el('pwToggle').checked, pwVal=el('password').value;
@@ -963,14 +955,8 @@
         const token=randToken();
         const record={
           token, ownerId:currentOwnerId(), createdAt:Date.now(), expiresAt:Date.now()+days*86400000,
-          sender:{
-            name:(el('senderName').value||'').trim(),
-            email:(el('senderEmail').value||'').trim()
-          },
-          recipient:{
-            name:(el('recipientName').value||'').trim(),
-            email:recipientEmail
-          },
+          sender:senderEmail,
+          recipient:recipientEmail,
           message:el('message').value.trim(),
           recipients:method==='email'? (recipientEmail || el('recipients').value.trim()) : recipientEmail,
           password: pwOn? await hashPass(pwVal) : null,
@@ -979,6 +965,7 @@
           files: files.map(f=>({ name:(f.path||f.name), size:f.size, type:f.file.type||'', blob:f.file })),
         };
         record.brand = brandForRecord();
+        if(window.KolkliProjectNumbers) await KolkliProjectNumbers.assign('send', record);
 
         const total=Math.max(totalBytes(),1); let done=0;
         // animate progress proportional to file sizes (purely visual for the demo)
@@ -996,23 +983,29 @@
       prog.classList.remove('show');
       el('composer').style.display='';
       if(err && err.usage) return;
+      if(err && err.message==='project_number_allocation_failed'){
+        el('optErr').textContent = lang==='he' ? 'לא ניתן להקצות מספר פרויקט כרגע. נסו שוב.' : 'Could not allocate a project number. Please try again.';
+        return;
+      }
       throw err;
     }
 
     prog.classList.remove('show');
-    showShare(result.token, result.days, pwOn, notifyOn);
+    showShare(result.token, result.days, pwOn, notifyOn, result.record);
     if(method==='email' && result.record.recipients){ openMailto(); }
   }
   function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
 
   let currentToken=null, currentUrl='', currentDays=7, statTimer=null, notifyEnabled=false, lastNotifiedCount=0, bc=null;
-  function showShare(token, days, pwOn, notifyOn){
+  function showShare(token, days, pwOn, notifyOn, record){
     currentToken=token; currentDays=days;
     const url=new URL('download.html?t='+token, location.href).href;
     currentUrl=url;
     el('shareLink').textContent=url;
     el('previewLink').href=url;
+    const num=(window.KolkliProjectNumbers && record) ? KolkliProjectNumbers.display('send', record, lang) : '';
     el('shareChips').innerHTML =
+      (num ? `<span class="chip">${escapeHtml(num)}</span>` : '')+
       `<span class="chip">${clockSvg()} ${t.chipExpiry(expiryText(days))}</span>`+
       `<span class="chip">${fileSvg()} ${t.chipFiles(files.length)}</span>`+
       (pwOn? `<span class="chip">${lockSvg()} ${t.chipPw}</span>` : '');
@@ -1092,8 +1085,7 @@
     stopStatWatch(); notifyEnabled=false; lastNotifiedCount=0;
     el('shareCard').classList.remove('show');
     el('message').value=''; el('recipients').value=''; el('password').value='';
-    el('senderName').value=''; el('senderEmail').value='';
-    el('recipientName').value=''; el('recipientEmail').value='';
+    el('senderEmail').value=''; el('recipientEmail').value='';
     el('pwToggle').checked=false; el('password').classList.add('hidden');
     el('notifyToggle').checked=false; el('emailBtn').classList.add('hidden');
     el('composer').style.display=''; renderFiles();

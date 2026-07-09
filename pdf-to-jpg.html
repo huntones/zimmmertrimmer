@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — PDF ל-JPG</title>
-<meta name="description" content="Convert PDF pages to JPG, PNG or WEBP images right in your browser. Pick resolution and quality, and download every page as an image or a ZIP. Fast, private, nothing leaves your machine.">
+<meta name="description" content="Pick resolution and quality, and download every page as an image or a ZIP. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -345,7 +345,7 @@
       dir:'rtl', langIco:'EN',
       kick:'מסמכים · PDF ל-JPG',
       pageTitle:'המירו עמודי PDF לתמונות',
-      pageSub:'גררו קובצי PDF, בחרו פורמט, איכות ורזולוציה, וקבלו כל עמוד כתמונה מוכנה להורדה. הכול מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      pageSub:'גררו קובצי PDF, בחרו פורמט, איכות ורזולוציה, וקבלו כל עמוד כתמונה מוכנה להורדה. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובצי PDF לכאן', or2:'או', choose:'בחרו קבצים', fmtOnlyPdf:'קובצי PDF בלבד',
       remove:'הסרה', totalLbl:'סה״כ', listTtl:'קבצים להמרה', clearAll:'נקה הכול',
       optTitle:'הגדרות המרה', stFiles:'קבצים', stPages:'עמודים',
@@ -357,8 +357,8 @@
       download:'הורדה', downloadAll:'הורדת הכול (ZIP)',
       againBtn:'המרה נוספת',
       pageCount:n=>`${n} ${n===1?'עמוד':'עמודים'}`, loadingPages:'טוען…',
-      seam:'ההמרה רצה מקומית בדפדפן: כל עמוד עובר רינדור לתמונה בעזרת pdf.js. הקבצים לא נשלחים לשום שרת.',
-      foot:'KOLKLI · PDF ל-JPG · רץ בדפדפן שלכם',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · PDF ל-JPG. מהיר, פשוט ובאיכות מקצועית.',
       copied:'הועתק ✓',
       errNone:'הוסיפו לפחות קובץ PDF תקין אחד כדי להמיר',
       errLibs:'ספריית ההמרה לא נטענה. בדקו את החיבור לאינטרנט ורעננו את העמוד.',
@@ -369,7 +369,7 @@
       dir:'ltr', langIco:'עב',
       kick:'Documents · PDF to JPG',
       pageTitle:'Convert PDF pages to images',
-      pageSub:'Drop your PDF files, pick a format, quality and resolution, and get every page as a ready-to-download image. It all runs in your browser — no file ever leaves your machine.',
+      pageSub:'Drop your PDF files, pick a format, quality and resolution, and get every page as a ready-to-download image. Fast, simple and professional-quality.',
       dropBig:'Drag PDF files here', or2:'or', choose:'Choose files', fmtOnlyPdf:'PDF files only',
       remove:'Remove', totalLbl:'Total', listTtl:'Files to convert', clearAll:'Clear all',
       optTitle:'Convert options', stFiles:'Files', stPages:'Pages',
@@ -381,8 +381,8 @@
       download:'Download', downloadAll:'Download all (ZIP)',
       againBtn:'Convert more',
       pageCount:n=>`${n} ${n===1?'page':'pages'}`, loadingPages:'reading…',
-      seam:'Conversion runs locally in your browser: every page is rendered to an image with pdf.js. Files are never uploaded.',
-      foot:'KOLKLI · PDF to JPG · runs in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · PDF to JPG. Fast, simple and professional-quality.',
       copied:'Copied ✓',
       errNone:'Add at least one valid PDF file to convert',
       errLibs:'The conversion library failed to load. Check your connection and refresh.',
@@ -393,7 +393,7 @@
       dir:'ltr',
       kick:'Документы · PDF в JPG',
       pageTitle:'Конвертируйте страницы PDF в изображения',
-      pageSub:'Перетащите PDF-файлы, выберите формат, качество и разрешение — и получите каждую страницу как готовое к скачиванию изображение. Всё работает в вашем браузере — ни один файл не покидает устройство.',
+      pageSub:'Перетащите PDF-файлы, выберите формат, качество и разрешение — и получите каждую страницу как готовое к скачиванию изображение. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите PDF-файлы сюда', or2:'или', choose:'Выбрать файлы', fmtOnlyPdf:'Только PDF-файлы',
       remove:'Удалить', totalLbl:'Всего', listTtl:'Файлы для конвертации', clearAll:'Очистить всё',
       optTitle:'Параметры конвертации', stFiles:'Файлы', stPages:'Страницы',
@@ -405,8 +405,8 @@
       download:'Скачать', downloadAll:'Скачать всё (ZIP)',
       againBtn:'Ещё конвертация',
       pageCount:n=>`Страниц: ${n}`, loadingPages:'чтение…',
-      seam:'Конвертация идёт локально в вашем браузере: каждая страница отрисовывается в изображение через pdf.js. Файлы никогда не загружаются.',
-      foot:'KOLKLI · PDF в JPG · работает в вашем браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · PDF в JPG. Быстро, просто и профессионального качества.',
       copied:'Скопировано ✓',
       errNone:'Добавьте хотя бы один корректный PDF-файл для конвертации',
       errLibs:'Не удалось загрузить библиотеку конвертации. Проверьте соединение и обновите страницу.',

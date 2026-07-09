@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מיזוג PDF</title>
-<meta name="description" content="Merge several PDF files into one — right in your browser. Reorder pages by drag, nothing gets uploaded. Fast, private and free.">
+<meta name="description" content="Merge several PDF files into one. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -312,7 +312,7 @@
       dir:'rtl', langIco:'EN',
       kick:'מסמכים · מיזוג PDF',
       pageTitle:'מזגו כמה קובצי PDF לקובץ אחד',
-      pageSub:'גררו כמה קובצי PDF, סדרו אותם בסדר הרצוי, ומזגו אותם ל-PDF אחד מסודר. הכול מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      pageSub:'גררו כמה קובצי PDF, סדרו אותם בסדר הרצוי, ומזגו אותם ל-PDF אחד מסודר. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובצי PDF לכאן', or2:'או', choose:'בחרו קבצים', fmtOnlyPdf:'קובצי PDF בלבד',
       remove:'הסרה', totalLbl:'סה״כ', orderTtl:'סדר המיזוג', reverse:'הפוך סדר',
       moveUp:'הזז למעלה', moveDown:'הזז למטה',
@@ -322,8 +322,8 @@
       readyTitle:'ה-PDF המאוחד מוכן!', readySub:(f,p)=>`${f} קבצים מוזגו ל-PDF אחד עם ${p} עמודים.`,
       download:'הורדת ה-PDF', againBtn:'מיזוג נוסף',
       pageCount:n=>`${n} ${n===1?'עמוד':'עמודים'}`, loadingPages:'טוען…',
-      seam:'הכול רץ מקומית בדפדפן בעזרת pdf-lib — הקבצים לא נשלחים לשום שרת. גררו את הקבצים או השתמשו בחצים כדי לשנות את סדר המיזוג.',
-      foot:'KOLKLI · מיזוג PDF · רץ בדפדפן שלכם',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · מיזוג PDF. מהיר, פשוט ובאיכות מקצועית.',
       copied:'הועתק ✓',
       errNone:'הוסיפו לפחות שני קובצי PDF תקינים כדי למזג',
       errLibs:'ספריית המיזוג לא נטענה. בדקו את החיבור לאינטרנט ורעננו את העמוד.',
@@ -334,7 +334,7 @@
       dir:'ltr', langIco:'עב',
       kick:'Documents · Merge PDF',
       pageTitle:'Merge several PDF files into one',
-      pageSub:'Drop your PDF files, arrange them in the order you want, and merge them into one tidy PDF. It all runs in your browser — no file ever leaves your machine.',
+      pageSub:'Drop your PDF files, arrange them in the order you want, and merge them into one tidy PDF. Fast, simple and professional-quality.',
       dropBig:'Drag PDF files here', or2:'or', choose:'Choose files', fmtOnlyPdf:'PDF files only',
       remove:'Remove', totalLbl:'Total', orderTtl:'Merge order', reverse:'Reverse',
       moveUp:'Move up', moveDown:'Move down',
@@ -344,8 +344,8 @@
       readyTitle:'Your merged PDF is ready!', readySub:(f,p)=>`${f} files merged into one PDF with ${p} pages.`,
       download:'Download PDF', againBtn:'Merge more',
       pageCount:n=>`${n} ${n===1?'page':'pages'}`, loadingPages:'reading…',
-      seam:'Everything runs locally in your browser with pdf-lib — files are never uploaded. Drag the rows or use the arrows to change the merge order.',
-      foot:'KOLKLI · Merge PDF · runs in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Merge PDF. Fast, simple and professional-quality.',
       copied:'Copied ✓',
       errNone:'Add at least two valid PDF files to merge',
       errLibs:'The merge library failed to load. Check your connection and refresh.',
@@ -356,7 +356,7 @@
       dir:'ltr',
       kick:'Документы · Объединение PDF',
       pageTitle:'Объедините несколько PDF-файлов в один',
-      pageSub:'Перетащите PDF-файлы, расставьте их в нужном порядке и объедините в один аккуратный PDF. Всё работает в вашем браузере — ни один файл не покидает устройство.',
+      pageSub:'Перетащите PDF-файлы, расставьте их в нужном порядке и объедините в один аккуратный PDF. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите PDF-файлы сюда', or2:'или', choose:'Выбрать файлы', fmtOnlyPdf:'Только PDF-файлы',
       remove:'Удалить', totalLbl:'Всего', orderTtl:'Порядок объединения', reverse:'Обратить',
       moveUp:'Вверх', moveDown:'Вниз',
@@ -366,8 +366,8 @@
       readyTitle:'Ваш объединённый PDF готов!', readySub:(f,p)=>`Объединено файлов: ${f} · страниц: ${p}.`,
       download:'Скачать PDF', againBtn:'Ещё объединение',
       pageCount:n=>`Страниц: ${n}`, loadingPages:'чтение…',
-      seam:'Всё работает локально в вашем браузере через pdf-lib — файлы никогда не загружаются. Перетаскивайте строки или используйте стрелки, чтобы изменить порядок объединения.',
-      foot:'KOLKLI · Объединение PDF · работает в вашем браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Объединение PDF. Быстро, просто и профессионального качества.',
       copied:'Скопировано ✓',
       errNone:'Добавьте хотя бы два корректных PDF-файла для объединения',
       errLibs:'Не удалось загрузить библиотеку объединения. Проверьте соединение и обновите страницу.',

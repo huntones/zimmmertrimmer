@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI - הגדרות חשבון</title>
+<meta name="description" content="ניהול הגדרות החשבון, פרטים אישיים, תשלומים, אבטחה, התראות וצוות ב-KOLKLI.">
+<link rel="stylesheet" href="header.css">
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --success:#22b04b; --success-soft:#e6f6ec; --danger:#e5484d; --danger-soft:#fdecec;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#8f52ff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-soft:#132a1c; --danger:#ff6b6b; --danger-soft:#2a1719;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+    radial-gradient(58% 40% at 15% 4%,rgba(124,58,237,0.10),transparent 60%),
+    radial-gradient(52% 40% at 88% 2%,rgba(34,211,160,0.08),transparent 60%);}
+  a{color:inherit;text-decoration:none;}
+  button,input,select{font-family:var(--sans);}
+  .wrap{width:100%;padding:34px 22px 70px;}
+  .hero{max-width:980px;margin:0 auto 28px;text-align:center;padding:34px 12px 18px;}
+  .kicker{display:inline-flex;align-items:center;gap:8px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dim);
+    font-family:var(--mono);font-size:11px;font-weight:850;letter-spacing:.05em;text-transform:uppercase;padding:6px 13px;margin-bottom:14px;}
+  .hero h1{margin:0 0 10px;font-size:clamp(30px,4vw,46px);line-height:1.08;font-weight:900;letter-spacing:0;}
+  .hero p{margin:0 auto;color:var(--muted);font-size:16px;max-width:68ch;}
+  .settings-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:22px;align-items:start;max-width:1280px;margin:0 auto;}
+  .settings-nav{position:sticky;top:92px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:var(--shadow);}
+  .nav-title{font-size:12px;font-weight:900;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin:4px 10px 10px;}
+  .settings-nav a{display:flex;align-items:center;gap:11px;min-height:42px;border-radius:12px;padding:9px 11px;color:var(--ink-2);font-size:13.5px;font-weight:800;transition:background .12s,color .12s;}
+  .settings-nav a:hover,.settings-nav a.active{background:var(--accent-soft);color:var(--accent-dim);}
+  .settings-nav svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .settings-main{display:flex;flex-direction:column;gap:18px;}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px;}
+  .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;border-bottom:1px solid var(--line-2);padding-bottom:16px;}
+  .panel h2{margin:0;font-size:23px;font-weight:900;letter-spacing:0;}
+  .panel p{margin:5px 0 0;color:var(--muted);font-size:13.7px;}
+  .tag{display:inline-flex;align-items:center;height:28px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dim);padding:0 11px;font-size:12px;font-weight:850;white-space:nowrap;}
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-size:12.5px;font-weight:800;color:var(--ink-2);}
+  .field input,.field select{height:44px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);color:var(--ink);padding:0 13px;font-size:14px;outline:none;}
+  .field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .profile-row{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+  .avatar{width:70px;height:70px;border-radius:18px;display:grid;place-items:center;overflow:hidden;background:var(--grad);color:#fff;font-size:27px;font-weight:900;box-shadow:0 8px 18px rgba(93,79,240,.22);}
+  .avatar img{width:100%;height:100%;object-fit:cover;}
+  .avatar-actions{display:flex;gap:9px;flex-wrap:wrap;}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;border-radius:11px;border:1px solid var(--line);padding:0 18px;background:var(--panel);color:var(--ink-2);font-size:13.5px;font-weight:850;cursor:pointer;box-shadow:var(--shadow-sm);}
+  .btn.primary{border:none;color:#fff;background:var(--grad);}
+  .btn.danger{border-color:rgba(229,72,77,.35);color:#fff;background:var(--danger);}
+  .btn.ghost-danger{border-color:rgba(229,72,77,.28);color:var(--danger);background:var(--danger-soft);}
+  .option-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  .option{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--line);border-radius:14px;background:var(--panel-2);padding:14px;}
+  .option b{display:block;font-size:14px;color:var(--ink);}
+  .option span{display:block;font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .toggle{width:48px;height:28px;border-radius:999px;border:1px solid var(--line);background:var(--line);position:relative;cursor:pointer;flex-shrink:0;}
+  .toggle::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .16s;}
+  .toggle.on{background:var(--accent);border-color:var(--accent);}
+  .toggle.on::after{transform:translateX(-20px);}
+  html[dir="ltr"] .toggle.on::after{transform:translateX(20px);}
+  .billing-card{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;}
+  .mini-card{border:1px solid var(--line);border-radius:14px;background:var(--panel-2);padding:16px;}
+  .mini-card h3{margin:0 0 6px;font-size:16px;}
+  .mini-card strong{font-size:24px;}
+  .table{width:100%;border-collapse:collapse;margin-top:10px;}
+  .table th,.table td{text-align:start;border-bottom:1px solid var(--line-2);padding:10px 8px;font-size:13px;}
+  .table th{font-size:11px;color:var(--faint);letter-spacing:.05em;text-transform:uppercase;}
+  .security-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;}
+  .activity{display:flex;flex-direction:column;gap:9px;}
+  .activity-row{display:flex;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--panel-2);font-size:13px;}
+  .danger-panel{border-color:rgba(229,72,77,.35);background:linear-gradient(180deg,var(--panel),var(--danger-soft));}
+  .danger-panel .panel-head{border-bottom-color:rgba(229,72,77,.20);}
+  .warn{border:1px solid rgba(229,72,77,.35);background:var(--danger-soft);color:var(--danger);border-radius:13px;padding:12px 14px;font-size:13.5px;font-weight:750;margin-bottom:14px;}
+  .saved{display:none;color:var(--success);font-size:13px;font-weight:850;margin-inline-start:8px;}
+  .saved.show{display:inline;}
+  @media (max-width:900px){
+    .settings-layout{grid-template-columns:1fr;}
+    .settings-nav{position:relative;top:auto;display:flex;overflow:auto;gap:6px;}
+    .settings-nav .nav-title{display:none;}
+    .settings-nav a{white-space:nowrap;min-width:max-content;}
+    .grid2,.option-list,.billing-card,.security-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="header.js"></script>
+
+<main class="wrap">
+  <section class="hero">
+    <span class="kicker" data-i="kick">KOLKLI SETTINGS</span>
+    <h1 data-i="title">הגדרות חשבון</h1>
+    <p data-i="sub">אזור נפרד לניהול החשבון, החבילה, האבטחה, ההתראות והצוות שלכם.</p>
+  </section>
+
+  <div class="settings-layout">
+    <nav class="settings-nav" aria-label="ניווט הגדרות">
+      <div class="nav-title" data-i="navTitle">הגדרות</div>
+      <a href="#overview" class="active" data-nav><svg viewBox="0 0 24 24"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/></svg><span data-i="navOverview">החשבון שלי</span></a>
+      <a href="#details" data-nav><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span data-i="navDetails">פרטי חשבון</span></a>
+      <a href="#preferences" data-nav><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33"/></svg><span data-i="navPrefs">הגדרות חשבון</span></a>
+      <a href="#billing" data-nav><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span data-i="navBilling">תשלומים וחבילה</span></a>
+      <a href="#security" data-nav><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg><span data-i="navSecurity">אבטחה וסיסמה</span></a>
+      <a href="#notifications" data-nav><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span data-i="navNotifications">התראות</span></a>
+      <a href="#team" data-nav><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><span data-i="navTeam">צוות והרשאות</span></a>
+      <a href="#delete" data-nav><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg><span data-i="navDelete">מחיקת חשבון</span></a>
+    </nav>
+
+    <div class="settings-main">
+      <section class="panel" id="overview">
+        <div class="panel-head"><div><h2 data-i="overviewTitle">החשבון שלי</h2><p data-i="overviewSub">סיכום כללי של החשבון והפעילות שלכם.</p></div><span class="tag" id="planTag">Free</span></div>
+        <div class="billing-card">
+          <div class="mini-card"><h3 data-i="helloTitle">שלום</h3><strong id="helloName">Guest</strong><p id="helloEmail"></p></div>
+          <div class="mini-card"><h3 data-i="workspaceTitle">אזור עבודה</h3><p data-i="workspaceSub">כאן מנהלים הגדרות כלליות בלבד, בנפרד מהקבצים והפרויקטים.</p></div>
+        </div>
+      </section>
+
+      <section class="panel" id="details">
+        <div class="panel-head"><div><h2 data-i="detailsTitle">פרטי חשבון</h2><p data-i="detailsSub">שם, תמונת פרופיל, אימייל, טלפון ופרטים אישיים.</p></div></div>
+        <div class="profile-row">
+          <div class="avatar" id="avatarBox">?</div>
+          <div class="avatar-actions">
+            <button class="btn" type="button" id="avatarPick" data-i="changePhoto">החלפת תמונה</button>
+            <button class="btn" type="button" id="avatarRemove" data-i="removePhoto">הסרת תמונה</button>
+            <input type="file" id="avatarFile" accept="image/*" hidden>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label for="name" data-i="fullName">שם מלא</label><input id="name" type="text"></div>
+          <div class="field"><label for="email" data-i="email">אימייל</label><input id="email" type="email" dir="ltr" disabled></div>
+          <div class="field"><label for="phone" data-i="phone">טלפון</label><input id="phone" type="tel" dir="ltr"></div>
+          <div class="field"><label for="role" data-i="role">תפקיד / עסק</label><input id="role" type="text"></div>
+        </div>
+        <div class="actions"><button class="btn primary" type="button" id="saveDetails" data-i="save">שמירת שינויים</button><span class="saved" id="savedDetails" data-i="saved">נשמר</span></div>
+      </section>
+
+      <section class="panel" id="preferences">
+        <div class="panel-head"><div><h2 data-i="prefsTitle">הגדרות חשבון</h2><p data-i="prefsSub">שפה, אזור זמן, העדפות מערכת והתראות בסיס.</p></div></div>
+        <div class="grid2">
+          <div class="field"><label for="langSelect" data-i="language">שפת ממשק</label><select id="langSelect"><option value="he">עברית</option><option value="en">English</option><option value="ru">Русский</option></select></div>
+          <div class="field"><label for="timezone" data-i="timezone">אזור זמן</label><select id="timezone"><option value="Asia/Jerusalem">Asia/Jerusalem</option><option value="UTC">UTC</option><option value="Europe/London">Europe/London</option><option value="America/New_York">America/New_York</option></select></div>
+          <div class="field"><label for="themeSelect" data-i="theme">ערכת נושא</label><select id="themeSelect"><option value="light" data-i="light">בהיר</option><option value="dark" data-i="dark">כהה</option></select></div>
+          <div class="field"><label for="density" data-i="density">צפיפות ממשק</label><select id="density"><option value="comfortable" data-i="comfortable">נוחה</option><option value="compact" data-i="compact">קומפקטית</option></select></div>
+        </div>
+        <div class="actions"><button class="btn primary" type="button" id="savePrefs" data-i="save">שמירת שינויים</button><span class="saved" id="savedPrefs" data-i="saved">נשמר</span></div>
+      </section>
+
+      <section class="panel" id="billing">
+        <div class="panel-head"><div><h2 data-i="billingTitle">תשלומים וחבילה</h2><p data-i="billingSub">החבילה הפעילה, אמצעי תשלום, חשבוניות והיסטוריית חיובים.</p></div></div>
+        <div class="billing-card">
+          <div class="mini-card"><h3 data-i="activePlan">החבילה הפעילה</h3><strong id="activePlanName">Free</strong><p data-i="billingNote">ניתן לשדרג או לשנות חבילה בכל רגע.</p><div class="actions"><a class="btn primary" href="pricing/" data-i="upgrade">שדרוג או שינוי חבילה</a></div></div>
+          <div class="mini-card"><h3 data-i="paymentMethod">אמצעי תשלום</h3><p data-i="paymentNone">לא הוגדר אמצעי תשלום.</p><button class="btn" type="button" data-i="addPayment">הוספת אמצעי תשלום</button></div>
+        </div>
+        <table class="table"><thead><tr><th data-i="date">תאריך</th><th data-i="desc">תיאור</th><th data-i="amount">סכום</th><th data-i="invoice">חשבונית</th></tr></thead><tbody><tr><td>-</td><td data-i="noBilling">אין עדיין חיובים להצגה</td><td>-</td><td>-</td></tr></tbody></table>
+      </section>
+
+      <section class="panel" id="security">
+        <div class="panel-head"><div><h2 data-i="securityTitle">אבטחה וסיסמה</h2><p data-i="securitySub">החלפת סיסמה, אימות דו-שלבי, מכשירים מחוברים ופעילות אחרונה.</p></div></div>
+        <div class="security-grid">
+          <div class="mini-card">
+            <h3 data-i="passwordTitle">החלפת סיסמה</h3>
+            <div class="field"><label for="oldPass" data-i="oldPass">סיסמה נוכחית</label><input id="oldPass" type="password"></div>
+            <div class="field"><label for="newPass" data-i="newPass">סיסמה חדשה</label><input id="newPass" type="password"></div>
+            <div class="actions"><button class="btn primary" type="button" data-i="savePass">עדכון סיסמה</button></div>
+          </div>
+          <div class="mini-card">
+            <h3 data-i="securityChecks">בקרות אבטחה</h3>
+            <div class="option"><div><b data-i="twofa">אימות דו-שלבי</b><span data-i="twofaSub">הוספת שכבת הגנה לחשבון.</span></div><button class="toggle" type="button" data-toggle="twofa"></button></div>
+            <div class="activity">
+              <div class="activity-row"><span data-i="device">מכשיר מחובר</span><b>Chrome / Windows</b></div>
+              <div class="activity-row"><span data-i="lastActivity">פעילות אחרונה</span><b id="lastActivity">Today</b></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="notifications">
+        <div class="panel-head"><div><h2 data-i="notificationsTitle">התראות</h2><p data-i="notificationsSub">הגדירו אילו עדכונים לקבל במייל ובהתראות מערכת.</p></div></div>
+        <div class="option-list">
+          <div class="option"><div><b data-i="downloadAlert">התראת הורדה</b><span data-i="downloadAlertSub">מייל כאשר מישהו מוריד קובץ ששלחתם.</span></div><button class="toggle" type="button" data-toggle="download"></button></div>
+          <div class="option"><div><b data-i="productUpdates">עדכוני מוצר</b><span data-i="productUpdatesSub">חדשות, טיפים וכלים חדשים.</span></div><button class="toggle" type="button" data-toggle="updates"></button></div>
+          <div class="option"><div><b data-i="billingAlerts">התראות חיוב</b><span data-i="billingAlertsSub">חשבוניות, תשלומים ושינויים בחבילה.</span></div><button class="toggle" type="button" data-toggle="billing"></button></div>
+          <div class="option"><div><b data-i="securityAlerts">התראות אבטחה</b><span data-i="securityAlertsSub">כניסות חדשות ושינויי סיסמה.</span></div><button class="toggle" type="button" data-toggle="security"></button></div>
+        </div>
+      </section>
+
+      <section class="panel" id="team">
+        <div class="panel-head"><div><h2 data-i="teamTitle">צוות והרשאות</h2><p data-i="teamSub">זמין למשתמשים בעלי חבילה הכוללת ניהול צוות.</p></div><span class="tag" data-i="teamBadge">Studio</span></div>
+        <div class="mini-card"><h3 data-i="teamManage">ניהול צוות</h3><p data-i="teamText">הזמינו חברי צוות, הגדירו תפקידים והרשאות, ועקבו אחרי מושבים זמינים.</p><div class="actions"><a class="btn" href="dashboard.html#team" data-i="openTeam">פתיחת ניהול צוות</a></div></div>
+      </section>
+
+      <section class="panel danger-panel" id="delete">
+        <div class="panel-head"><div><h2 data-i="deleteTitle">מחיקת חשבון</h2><p data-i="deleteSub">אזור נפרד ומובחן לפעולות בלתי הפיכות.</p></div></div>
+        <div class="warn" data-i="deleteWarn">מחיקת החשבון תסיר לצמיתות פרטים אישיים, פרויקטים, קבצים, צוותים והיסטוריית חיובים. לא ניתן לשחזר פעולה זו לאחר מכן.</div>
+        <button class="btn ghost-danger" type="button" id="deleteAccount" data-i="deleteBtn">מחיקת חשבון</button>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+  var USERS_KEY='ac_users', SESSION_KEY='ac_session', NOTIF_KEY='ac_notif', PREF_KEY='ac_settings';
+  function el(id){ return document.getElementById(id); }
+  function lsGet(k){ try{return localStorage.getItem(k);}catch(e){return null;} }
+  function lsSet(k,v){ try{localStorage.setItem(k,v);}catch(e){} }
+  function lsDel(k){ try{localStorage.removeItem(k);}catch(e){} }
+  function loadUsers(){ try{return JSON.parse(lsGet(USERS_KEY)||'[]')||[];}catch(e){return [];} }
+  function saveUsers(u){ lsSet(USERS_KEY, JSON.stringify(u)); }
+  function safeOwnerId(v){ return String(v||'guest').toLowerCase().replace(/[^a-z0-9_.@-]+/g,'_') || 'guest'; }
+  function ownerId(){
+    var email=(lsGet(SESSION_KEY)||'').toLowerCase();
+    if(!email) return 'guest';
+    var u=loadUsers().find(function(x){ return (x.email||'').toLowerCase()===email; });
+    return safeOwnerId((u&&(u.id||u.userId))||email);
+  }
+  function scoped(k){ return k+'::'+ownerId(); }
+  function readJson(k, fallback){ try{ var v=JSON.parse(lsGet(k)||'null'); return v || fallback; }catch(e){ return fallback; } }
+  function writeJson(k,v){ lsSet(k, JSON.stringify(v)); }
+  function currentUser(){
+    var email=(lsGet(SESSION_KEY)||'').toLowerCase();
+    var u=email ? loadUsers().find(function(x){ return (x.email||'').toLowerCase()===email; }) : null;
+    return u || { name:'Guest', email:'', created:Date.now(), plan:'free' };
+  }
+  var user=currentUser();
+  var prefs=readJson(scoped(PREF_KEY), { timezone:'Asia/Jerusalem', density:'comfortable' });
+  var notif=readJson(scoped(NOTIF_KEY), { download:true, updates:false, billing:true, security:true, twofa:false });
+  var T={
+    he:{kick:'KOLKLI SETTINGS',title:'הגדרות חשבון',sub:'אזור נפרד לניהול החשבון, החבילה, האבטחה, ההתראות והצוות שלכם.',navTitle:'הגדרות',navOverview:'החשבון שלי',navDetails:'פרטי חשבון',navPrefs:'הגדרות חשבון',navBilling:'תשלומים וחבילה',navSecurity:'אבטחה וסיסמה',navNotifications:'התראות',navTeam:'צוות והרשאות',navDelete:'מחיקת חשבון',overviewTitle:'החשבון שלי',overviewSub:'סיכום כללי של החשבון והפעילות שלכם.',helloTitle:'שלום',workspaceTitle:'אזור הגדרות',workspaceSub:'כאן מנהלים הגדרות כלליות בלבד, בנפרד מהקבצים והפרויקטים.',detailsTitle:'פרטי חשבון',detailsSub:'שם, תמונת פרופיל, אימייל, טלפון ופרטים אישיים.',changePhoto:'החלפת תמונה',removePhoto:'הסרת תמונה',fullName:'שם מלא',email:'אימייל',phone:'טלפון',role:'תפקיד / עסק',save:'שמירת שינויים',saved:'נשמר בהצלחה',prefsTitle:'הגדרות חשבון',prefsSub:'שפה, אזור זמן, העדפות מערכת והתראות בסיס.',language:'שפת ממשק',timezone:'אזור זמן',theme:'ערכת נושא',light:'בהיר',dark:'כהה',density:'צפיפות ממשק',comfortable:'נוחה',compact:'קומפקטית',billingTitle:'תשלומים וחבילה',billingSub:'החבילה הפעילה, אמצעי תשלום, חשבוניות והיסטוריית חיובים.',activePlan:'החבילה הפעילה',billingNote:'ניתן לשדרג או לשנות חבילה בכל רגע.',upgrade:'שדרוג או שינוי חבילה',paymentMethod:'אמצעי תשלום',paymentNone:'לא הוגדר אמצעי תשלום.',addPayment:'הוספת אמצעי תשלום',date:'תאריך',desc:'תיאור',amount:'סכום',invoice:'חשבונית',noBilling:'אין עדיין חיובים להצגה',securityTitle:'אבטחה וסיסמה',securitySub:'החלפת סיסמה, אימות דו-שלבי, מכשירים מחוברים ופעילות אחרונה.',passwordTitle:'החלפת סיסמה',oldPass:'סיסמה נוכחית',newPass:'סיסמה חדשה',savePass:'עדכון סיסמה',securityChecks:'בקרות אבטחה',twofa:'אימות דו-שלבי',twofaSub:'הוספת שכבת הגנה לחשבון.',device:'מכשיר מחובר',lastActivity:'פעילות אחרונה',notificationsTitle:'התראות',notificationsSub:'הגדירו אילו עדכונים לקבל במייל ובהתראות מערכת.',downloadAlert:'התראת הורדה',downloadAlertSub:'מייל כאשר מישהו מוריד קובץ ששלחתם.',productUpdates:'עדכוני מוצר',productUpdatesSub:'חדשות, טיפים וכלים חדשים.',billingAlerts:'התראות חיוב',billingAlertsSub:'חשבוניות, תשלומים ושינויים בחבילה.',securityAlerts:'התראות אבטחה',securityAlertsSub:'כניסות חדשות ושינויי סיסמה.',teamTitle:'צוות והרשאות',teamSub:'זמין למשתמשים בעלי חבילה הכוללת ניהול צוות.',teamBadge:'Studio',teamManage:'ניהול צוות',teamText:'הזמינו חברי צוות, הגדירו תפקידים והרשאות, ועקבו אחרי מושבים זמינים.',openTeam:'פתיחת ניהול צוות',deleteTitle:'מחיקת חשבון',deleteSub:'אזור נפרד ומובחן לפעולות בלתי הפיכות.',deleteWarn:'מחיקת החשבון תסיר לצמיתות פרטים אישיים, פרויקטים, קבצים, צוותים והיסטוריית חיובים. לא ניתן לשחזר פעולה זו לאחר מכן.',deleteBtn:'מחיקת חשבון',deleteConfirm:'למחוק את החשבון לצמיתות? לא ניתן לבטל פעולה זו.'},
+    en:{kick:'KOLKLI SETTINGS',title:'Account Settings',sub:'A separate area for your account, plan, security, notifications and team.',navTitle:'Settings',navOverview:'My Account',navDetails:'Account Details',navPrefs:'Account Settings',navBilling:'Billing & Plan',navSecurity:'Security & Password',navNotifications:'Notifications',navTeam:'Team & Permissions',navDelete:'Delete Account',overviewTitle:'My Account',overviewSub:'A clear summary of your account and activity.',helloTitle:'Hello',workspaceTitle:'Settings Area',workspaceSub:'General account settings only, separate from files and projects.',detailsTitle:'Account Details',detailsSub:'Name, profile photo, email, phone and personal details.',changePhoto:'Change Photo',removePhoto:'Remove Photo',fullName:'Full Name',email:'Email',phone:'Phone',role:'Role / Business',save:'Save Changes',saved:'Saved',prefsTitle:'Account Settings',prefsSub:'Language, timezone, system preferences and defaults.',language:'Interface Language',timezone:'Timezone',theme:'Theme',light:'Light',dark:'Dark',density:'Interface Density',comfortable:'Comfortable',compact:'Compact',billingTitle:'Billing & Plan',billingSub:'Active plan, payment method, invoices and billing history.',activePlan:'Active Plan',billingNote:'You can upgrade or change plan at any time.',upgrade:'Upgrade or Change Plan',paymentMethod:'Payment Method',paymentNone:'No payment method is configured.',addPayment:'Add Payment Method',date:'Date',desc:'Description',amount:'Amount',invoice:'Invoice',noBilling:'No billing history yet',securityTitle:'Security & Password',securitySub:'Password, 2FA, connected devices and recent activity.',passwordTitle:'Change Password',oldPass:'Current Password',newPass:'New Password',savePass:'Update Password',securityChecks:'Security Controls',twofa:'Two-factor authentication',twofaSub:'Add another protection layer.',device:'Connected Device',lastActivity:'Recent Activity',notificationsTitle:'Notifications',notificationsSub:'Choose which email and system updates to receive.',downloadAlert:'Download Alert',downloadAlertSub:'Email when someone downloads a file you sent.',productUpdates:'Product Updates',productUpdatesSub:'News, tips and new tools.',billingAlerts:'Billing Alerts',billingAlertsSub:'Invoices, payments and plan changes.',securityAlerts:'Security Alerts',securityAlertsSub:'New logins and password changes.',teamTitle:'Team & Permissions',teamSub:'Available for plans that include team management.',teamBadge:'Studio',teamManage:'Team Management',teamText:'Invite teammates, set roles and manage seats.',openTeam:'Open Team Management',deleteTitle:'Delete Account',deleteSub:'A separate area for irreversible actions.',deleteWarn:'Deleting the account permanently removes personal details, projects, files, teams and billing history. This cannot be undone.',deleteBtn:'Delete Account',deleteConfirm:'Delete this account permanently? This cannot be undone.'}
+  };
+  function lang(){ return lsGet('ac_lang') || document.documentElement.lang || 'he'; }
+  function applyText(){
+    var l=T[lang()]?lang():'he', d=T[l];
+    document.documentElement.lang=l; document.documentElement.dir=l==='he'?'rtl':'ltr';
+    document.querySelectorAll('[data-i]').forEach(function(n){ var k=n.getAttribute('data-i'); if(d[k]) n.textContent=d[k]; });
+    document.title='KOLKLI - '+d.title;
+  }
+  window.__setLang=function(l){ lsSet('ac_lang', l); applyText(); var sel=el('langSelect'); if(sel) sel.value=l; };
+  function planName(){ var p=String(user.plan||'free').toLowerCase(); return p.charAt(0).toUpperCase()+p.slice(1); }
+  function avatarHtml(){
+    if(user.avatar) return '<img src="'+user.avatar+'" alt="">';
+    var n=(user.name||user.email||'?').trim();
+    return (n.charAt(0)||'?').toUpperCase();
+  }
+  function renderUser(){
+    el('helloName').textContent=(user.name||user.email||'Guest');
+    el('helloEmail').textContent=user.email||'';
+    el('planTag').textContent=planName();
+    el('activePlanName').textContent=planName();
+    el('avatarBox').innerHTML=avatarHtml();
+    el('name').value=user.name||'';
+    el('email').value=user.email||'';
+    el('phone').value=user.phone||'';
+    el('role').value=user.roleTitle||'';
+    el('langSelect').value=lang();
+    el('timezone').value=prefs.timezone||'Asia/Jerusalem';
+    el('themeSelect').value=localStorage.getItem('theme')||'light';
+    el('density').value=prefs.density||'comfortable';
+    el('lastActivity').textContent=new Date().toLocaleDateString(lang()==='he'?'he-IL':'en-US');
+    document.querySelectorAll('[data-toggle]').forEach(function(b){ b.classList.toggle('on', !!notif[b.getAttribute('data-toggle')]); });
+  }
+  function persistUser(){
+    var users=loadUsers(), email=(user.email||'').toLowerCase();
+    var i=users.findIndex(function(x){ return (x.email||'').toLowerCase()===email; });
+    if(i>-1){ users[i]=user; saveUsers(users); }
+    try{ window.dispatchEvent(new CustomEvent('kolkli:auth')); }catch(e){}
+  }
+  function flash(id){ var n=el(id); if(!n) return; n.classList.add('show'); setTimeout(function(){ n.classList.remove('show'); },1800); }
+  el('saveDetails').addEventListener('click', function(){ user.name=el('name').value.trim(); user.phone=el('phone').value.trim(); user.roleTitle=el('role').value.trim(); persistUser(); renderUser(); flash('savedDetails'); });
+  el('savePrefs').addEventListener('click', function(){ prefs.timezone=el('timezone').value; prefs.density=el('density').value; writeJson(scoped(PREF_KEY), prefs); localStorage.setItem('theme', el('themeSelect').value); document.documentElement.setAttribute('data-theme', el('themeSelect').value); window.__setLang(el('langSelect').value); flash('savedPrefs'); });
+  document.querySelectorAll('[data-toggle]').forEach(function(b){ b.addEventListener('click', function(){ var k=b.getAttribute('data-toggle'); notif[k]=!notif[k]; writeJson(scoped(NOTIF_KEY), notif); b.classList.toggle('on', !!notif[k]); }); });
+  el('avatarPick').addEventListener('click', function(){ el('avatarFile').click(); });
+  el('avatarRemove').addEventListener('click', function(){ delete user.avatar; persistUser(); renderUser(); });
+  el('avatarFile').addEventListener('change', function(){
+    var file=el('avatarFile').files&&el('avatarFile').files[0]; if(!file) return;
+    var reader=new FileReader();
+    reader.onload=function(){ user.avatar=reader.result; persistUser(); renderUser(); };
+    reader.readAsDataURL(file);
+  });
+  el('deleteAccount').addEventListener('click', function(){ if(confirm((T[lang()]||T.he).deleteConfirm)){ var users=loadUsers().filter(function(x){ return (x.email||'').toLowerCase()!==(user.email||'').toLowerCase(); }); saveUsers(users); lsDel(SESSION_KEY); location.href='index.html'; } });
+  document.querySelectorAll('[data-nav]').forEach(function(a){ a.addEventListener('click', function(){ document.querySelectorAll('[data-nav]').forEach(function(x){ x.classList.remove('active'); }); a.classList.add('active'); }); });
+  applyText(); renderUser();
+})();
+</script>
+</body>
+</html>

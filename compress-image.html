@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — דחיסת תמונה</title>
-<meta name="description" content="Compress images right in your browser — shrink JPG, PNG and WEBP files while keeping them sharp, with a before/after comparison. Nothing is uploaded. Fast, private and free.">
+<meta name="description" content="shrink JPG, PNG and WEBP files while keeping them sharp, with a before/after comparison. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -384,7 +384,7 @@
       dir:'rtl', langIco:'EN',
       kick:'תמונות · דחיסת תמונה',
       pageTitle:'דחסו תמונות — בלי לאבד איכות',
-      pageSub:'העלו תמונה, בחרו רמת דחיסה, וקבלו קובץ קטן בהרבה — עם תצוגת השוואה של "לפני / אחרי". הכול מתבצע בדפדפן שלכם, ושום תמונה לא עוזבת את המחשב.',
+      pageSub:'העלו תמונה, בחרו רמת דחיסה, וקבלו קובץ קטן בהרבה — עם תצוגת השוואה של "לפני / אחרי". מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו תמונה לכאן', or2:'או', choose:'בחרו תמונה',
       remove:'הסרה',
       optTitle:'הגדרות דחיסה',
@@ -405,8 +405,8 @@
       stOrigK:'לפני', stNewK:'אחרי', stSaveK:'חיסכון',
       dimsMeta:(ow,oh,nw,nh,fmt)=> (ow===nw&&oh===nh) ? `<b>${ow}×${oh}</b> px · ${fmt}` : `<b>${ow}×${oh}</b> <span class="arr">→</span> <b>${nw}×${nh}</b> px · ${fmt}`,
       dl:'הורדת התמונה', againBtn:'תמונה נוספת',
-      seam:'הכול קורה מקומית: התמונה מעובדת ונדחסת ישירות בדפדפן שלכם דרך canvas — שום קובץ לא נשלח לשרת, וכלום לא עוזב את המחשב.',
-      foot:'KOLKLI · דחיסת תמונה · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · דחיסת תמונה · מהיר, פשוט ובאיכות מקצועית',
       copied:'הועתק ✓',
       errNoFile:'קודם בחרו תמונה לדחיסה',
       errDecode:'לא הצלחנו לפענח את התמונה — נסו קובץ אחר',
@@ -416,7 +416,7 @@
       dir:'ltr', langIco:'עב',
       kick:'Images · Compress image',
       pageTitle:'Compress images — without losing quality',
-      pageSub:'Drop an image, pick a compression level, and get a much smaller file — with a before / after comparison view. It all runs in your browser, and no image ever leaves your machine.',
+      pageSub:'Drop an image, pick a compression level, and get a much smaller file — with a before / after comparison view. Fast, simple and professional-quality.',
       dropBig:'Drag an image here', or2:'or', choose:'Choose an image',
       remove:'Remove',
       optTitle:'Compression options',
@@ -437,8 +437,8 @@
       stOrigK:'Before', stNewK:'After', stSaveK:'Saved',
       dimsMeta:(ow,oh,nw,nh,fmt)=> (ow===nw&&oh===nh) ? `<b>${ow}×${oh}</b> px · ${fmt}` : `<b>${ow}×${oh}</b> <span class="arr">→</span> <b>${nw}×${nh}</b> px · ${fmt}`,
       dl:'Download image', againBtn:'Compress another',
-      seam:'Everything is local: the image is processed and compressed right in your browser via canvas — no file is sent to a server, and nothing leaves your machine.',
-      foot:'KOLKLI · Compress image · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Compress image · Fast, simple and professional quality',
       copied:'Copied ✓',
       errNoFile:'Choose an image to compress first',
       errDecode:'We could not decode the image — try another file',
@@ -448,7 +448,7 @@
       dir:'ltr',
       kick:'Изображения · Сжатие изображения',
       pageTitle:'Сжимайте изображения — без потери качества',
-      pageSub:'Перетащите изображение, выберите уровень сжатия и получите намного меньший файл — с режимом сравнения до / после. Всё работает в вашем браузере, и ни одно изображение не покидает устройство.',
+      pageSub:'Перетащите изображение, выберите уровень сжатия и получите намного меньший файл — с режимом сравнения до / после. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите изображение сюда', or2:'или', choose:'Выбрать изображение',
       remove:'Удалить',
       optTitle:'Параметры сжатия',
@@ -469,8 +469,8 @@
       stOrigK:'До', stNewK:'После', stSaveK:'Экономия',
       dimsMeta:(ow,oh,nw,nh,fmt)=> (ow===nw&&oh===nh) ? `<b>${ow}×${oh}</b> px · ${fmt}` : `<b>${ow}×${oh}</b> <span class="arr">→</span> <b>${nw}×${nh}</b> px · ${fmt}`,
       dl:'Скачать изображение', againBtn:'Сжать другое',
-      seam:'Всё локально: изображение обрабатывается и сжимается прямо в вашем браузере через canvas — ни один файл не отправляется на сервер, ничего не покидает устройство.',
-      foot:'KOLKLI · Сжатие изображения · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Сжатие изображения · Быстро, просто и профессионального качества',
       copied:'Скопировано ✓',
       errNoFile:'Сначала выберите изображение для сжатия',
       errDecode:'Не удалось декодировать изображение — попробуйте другой файл',

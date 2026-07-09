@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחולל פלטת צבעים</title>
-<meta name="description" content="Free color palette generator — pick a base color and a harmony mode (complementary, analogous, triadic and more) to get a balanced 5-color palette with ready-to-copy CSS custom properties. Fast, private, right in your browser.">
+<meta name="description" content="Free color palette generator — pick a base color and a harmony mode (complementary, analogous, triadic and more) to get a balanced 5-color palette with ready-to-copy CSS custom properties. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -77,7 +77,7 @@
     border-radius:12px;background:var(--panel-2);cursor:pointer;flex-shrink:0;}
   input[type=color]::-webkit-color-swatch-wrapper{padding:4px;}
   input[type=color]::-webkit-color-swatch{border:none;border-radius:8px;}
-  .hexfield{flex:1;display:flex;align-items:center;gap:2px;background:var(--panel-2);border:1px solid var(--line);
+  .hexfield{flex:1;display:flex;direction:ltr;align-items:center;gap:2px;background:var(--panel-2);border:1px solid var(--line);
     border-radius:12px;padding:0 12px;transition:border-color .12s,box-shadow .12s;}
   .hexfield:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
   .hexfield .hash{color:var(--faint);font-family:var(--mono);font-size:16px;}
@@ -228,33 +228,33 @@
     he:{ dir:'rtl',
       kick:'מחולל פלטת צבעים',
       pageTitle:'מחולל פלטת צבעים — הרמוניות צבע ל-CSS',
-      pageSub:'בחרו צבע בסיס ובחרו סוג הרמוניה — קומפלמנטרי, אנלוגי, טריאדי ועוד — וקבלו מייד פלטה הרמונית של 5 צבעים עם קוד CSS מוכן להעתקה. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'בחרו צבע בסיס ובחרו סוג הרמוניה — קומפלמנטרי, אנלוגי, טריאדי ועוד — וקבלו מייד פלטה הרמונית של 5 צבעים עם קוד CSS מוכן להעתקה. מהיר, פשוט ובאיכות מקצועית.',
       baseLabel:'צבע בסיס', harmonyLabel:'סוג הרמוניה', paletteLabel:'פלטה',
       randomBtn:'צבע אקראי', eyedropBtn:'טפטפת', copy:'העתקה', copyAll:'העתקת הכול', copiedMsg:'הועתק ✓',
       mComplementary:'קומפלמנטרי', mAnalogous:'אנלוגי', mTriadic:'טריאדי', mTetradic:'טטראדי',
       mMono:'מונוכרומטי', mSplit:'קומפלמנטרי מפוצל',
       note:'הפלטות מחושבות במרחב HSL והן נקודת פתיחה בלבד — כווננו את הצבעים לפי הטעם והצורך שלכם.',
-      foot:'KOLKLI · מחולל פלטת צבעים · פרטי ומהיר, ישירות בדפדפן' },
+      foot:'KOLKLI · מחולל פלטת צבעים · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Palette Generator',
       pageTitle:'Color Palette Generator — Color Harmonies for CSS',
-      pageSub:'Pick a base color and a harmony mode — complementary, analogous, triadic and more — and instantly get a balanced 5-color palette with ready-to-copy CSS custom properties. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Pick a base color and a harmony mode — complementary, analogous, triadic and more — and instantly get a balanced 5-color palette with ready-to-copy CSS custom properties. Fast, simple and professional-quality.',
       baseLabel:'Base color', harmonyLabel:'Harmony mode', paletteLabel:'Palette',
       randomBtn:'Random', eyedropBtn:'Eyedropper', copy:'Copy', copyAll:'Copy all', copiedMsg:'Copied ✓',
       mComplementary:'Complementary', mAnalogous:'Analogous', mTriadic:'Triadic', mTetradic:'Tetradic',
       mMono:'Monochromatic', mSplit:'Split-Complementary',
       note:'Palettes are generated in HSL space and are just a starting point — tweak the colors to taste.',
-      foot:'KOLKLI · Palette Generator · Private and fast, right in your browser' },
+      foot:'KOLKLI · Palette Generator · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Генератор палитры',
       pageTitle:'Генератор цветовой палитры — гармонии цвета для CSS',
-      pageSub:'Выберите базовый цвет и тип гармонии — комплементарная, аналоговая, триада и другие — и мгновенно получите сбалансированную палитру из 5 цветов с готовыми CSS-переменными. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Выберите базовый цвет и тип гармонии — комплементарная, аналоговая, триада и другие — и мгновенно получите сбалансированную палитру из 5 цветов с готовыми CSS-переменными. Быстро, просто и профессионального качества.',
       baseLabel:'Базовый цвет', harmonyLabel:'Тип гармонии', paletteLabel:'Палитра',
       randomBtn:'Случайный', eyedropBtn:'Пипетка', copy:'Копировать', copyAll:'Копировать всё', copiedMsg:'Скопировано ✓',
       mComplementary:'Комплементарная', mAnalogous:'Аналоговая', mTriadic:'Триада', mTetradic:'Тетрада',
       mMono:'Монохромная', mSplit:'Раздельно-комплементарная',
       note:'Палитры рассчитываются в пространстве HSL и являются лишь отправной точкой — настройте цвета по вкусу.',
-      foot:'KOLKLI · Генератор палитры · Приватно и быстро, прямо в браузере' }
+      foot:'KOLKLI · Генератор палитры · Быстро, просто и профессионального качества' }
   };
 
   const MODES = [

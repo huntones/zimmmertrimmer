@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחולל קוד הטמעה</title>
-<meta name="description" content="Generate responsive embed code for any website, YouTube or Vimeo video, Google Map, form, document or downloadable file — right in your browser. Live preview, copy in one click, no API key needed.">
+<meta name="description" content="Generate responsive embed code for any website, YouTube or Vimeo video, Google Map, form, document or downloadable file. Live preview, copy in one click, no API key needed. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -302,7 +302,7 @@
       dir:'rtl',
       kick:'שיווק · מחולל קוד הטמעה',
       pageTitle:'מחולל קוד הטמעה',
-      pageSub:'צרו קוד הטמעה רספונסיבי לכל אתר, סרטון יוטיוב או וימאו, מפת גוגל, טופס, מסמך או קובץ להורדה — עם תצוגה מקדימה חיה והעתקה בלחיצה. הכול רץ בדפדפן, בלי מפתח API ובלי שרת.',
+      pageSub:'צרו קוד הטמעה רספונסיבי לכל אתר, סרטון יוטיוב או וימאו, מפת גוגל, טופס, מסמך או קובץ להורדה — עם תצוגה מקדימה חיה והעתקה בלחיצה. מהיר, פשוט ובאיכות מקצועית.',
       tabs:{ site:'אתר', video:'סרטון', map:'מפה', form:'טופס / מסמך', file:'קובץ' },
       forms:{
         site:{ title:'הטמעת אתר', desc:'הדביקו כתובת של דף כלשהו וקבלו iframe רספונסיבי.' },
@@ -334,15 +334,15 @@
       badVideo:'לא זוהה מזהה סרטון תקין מהקישור הזה',
       badUrl:'כתובת לא תקינה — צריך להתחיל ב-http:// או https://',
       defText:'הורדת הקובץ',
-      seamTxt:'הקוד נוצר כולו בדפדפן שלכם — שום כתובת או תוכן לא נשלחים לשרת. פשוט מעתיקים ומדביקים ב-HTML של האתר.',
-      foot:'KOLKLI · מחולל קוד הטמעה · פרטי ומהיר, ישירות בדפדפן',
+      seamTxt:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · מחולל קוד הטמעה · מהיר, פשוט ובאיכות מקצועית',
       copied:'הקוד הועתק ✓',
     },
     en:{
       dir:'ltr',
       kick:'Marketing · Embed Code Generator',
       pageTitle:'Embed Code Generator',
-      pageSub:'Generate responsive embed code for any website, YouTube or Vimeo video, Google Map, form, document or downloadable file — with a live preview and one-click copy. It all runs in your browser, no API key and no server.',
+      pageSub:'Generate responsive embed code for any website, YouTube or Vimeo video, Google Map, form, document or downloadable file — with a live preview and one-click copy. Fast, simple and professional-quality.',
       tabs:{ site:'Website', video:'Video', map:'Map', form:'Form / Doc', file:'File' },
       forms:{
         site:{ title:'Embed a website', desc:'Paste any page URL and get a responsive iframe.' },
@@ -374,15 +374,15 @@
       badVideo:'No valid video id detected in this link',
       badUrl:'Invalid URL — it should start with http:// or https://',
       defText:'Download file',
-      seamTxt:'The code is generated entirely in your browser — no URL or content is sent to a server. Just copy it and paste into your site’s HTML.',
-      foot:'KOLKLI · Embed Code Generator · Private and fast, right in your browser',
+      seamTxt:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Embed Code Generator · Fast, simple and professional quality',
       copied:'Code copied ✓',
     },
     ru:{
       dir:'ltr',
       kick:'Маркетинг · Генератор кода вставки',
       pageTitle:'Генератор кода вставки',
-      pageSub:'Создавайте адаптивный код вставки для любого сайта, видео YouTube или Vimeo, карты Google, формы, документа или файла для скачивания — с живым предпросмотром и копированием в один клик. Всё работает в браузере, без ключа API и без сервера.',
+      pageSub:'Создавайте адаптивный код вставки для любого сайта, видео YouTube или Vimeo, карты Google, формы, документа или файла для скачивания — с живым предпросмотром и копированием в один клик. Быстро, просто и профессионального качества.',
       tabs:{ site:'Сайт', video:'Видео', map:'Карта', form:'Форма / документ', file:'Файл' },
       forms:{
         site:{ title:'Вставка сайта', desc:'Вставьте адрес любой страницы и получите адаптивный iframe.' },
@@ -414,8 +414,8 @@
       badVideo:'В этой ссылке не найден корректный id видео',
       badUrl:'Неверный адрес — он должен начинаться с http:// или https://',
       defText:'Скачать файл',
-      seamTxt:'Код полностью создаётся в вашем браузере — ни один адрес или содержимое не отправляются на сервер. Просто скопируйте и вставьте в HTML вашего сайта.',
-      foot:'KOLKLI · Генератор кода вставки · Приватно и быстро, прямо в браузере',
+      seamTxt:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Генератор кода вставки · Быстро, просто и профессионального качества',
       copied:'Код скопирован ✓',
     },
   };

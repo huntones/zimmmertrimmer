@@ -20,7 +20,7 @@
 #site-header .sh-nav.scrolled{border-bottom-color:#e7eafd;background:rgba(247,248,255,.9);}
 
 #site-header .sh-bar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;
-  height:72px;max-width:90%;margin:0 auto;padding:0;}
+  height:72px;width:100%;max-width:none;margin:0 auto;padding:0 22px;}
 
 #site-header .sh-brand{display:flex;align-items:center;color:var(--ink);text-decoration:none;}
 #site-header .sh-logo-img{height:34px;width:auto;display:block;flex-shrink:0;}
@@ -192,6 +192,12 @@
 #site-header .sh-langopt.active .sh-langopt-c{opacity:1;}
 #site-header.sh-signed-in .sh-tools > .sh-langwrap{display:none;}
 
+/* Signed-in users get a crisp, clean, solid-white header — no lavender tint,
+   no blur — just a hairline bottom border for definition. */
+#site-header.sh-signed-in .sh-nav{background:#fff;backdrop-filter:none;
+  border-bottom-color:#edeff8;}
+#site-header.sh-signed-in .sh-nav.scrolled{background:#fff;border-bottom-color:#e2e6f5;}
+
 #site-header .sh-cta{display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;
   border:none;cursor:pointer;font-weight:800;font-size:14px;padding:0 22px;height:42px;border-radius:15px;
   font-family:var(--sans);text-decoration:none;text-shadow:0 1px 2px rgba(0,0,0,.18);
@@ -284,7 +290,7 @@
 #site-header .sh-menu{display:none;}
 #site-header .sh-panel{display:none;border-top:1px solid var(--line);background:var(--panel);}
 #site-header .sh-panel.open{display:block;}
-#site-header .sh-panel .sh-inner{display:flex;flex-direction:column;max-width:90%;margin:0 auto;padding:6px 22px 14px;}
+#site-header .sh-panel .sh-inner{display:flex;flex-direction:column;width:100%;max-width:none;margin:0 auto;padding:6px 22px 14px;}
 #site-header .sh-panel a{padding:12px 8px;font-size:15px;color:var(--ink-2);text-decoration:none;
   border-bottom:1px solid var(--line-2);}
 #site-header .sh-panel a:last-child{border-bottom:none;}
@@ -303,7 +309,7 @@
    Playwright overlap measurements; the ☰ only appears on phones / small tablets
    (collapse query below). */
 @media (max-width:1560px){
-  #site-header .sh-bar{max-width:96%;}
+  #site-header .sh-bar{width:100%;max-width:none;}
   #site-header .sh-links{gap:7px;}
   #site-header .sh-links a,
   #site-header .sh-tlink{font-size:12.5px;gap:4px;}
@@ -337,7 +343,7 @@
 }
 
 @media (max-width:640px){
-  #site-header .sh-bar{height:64px;max-width:100%;padding:0 14px;}
+  #site-header .sh-bar{height:64px;width:100%;max-width:none;padding:0 14px;}
   #site-header .sh-panel .sh-inner{max-width:100%;padding:6px 14px 14px;}
   #site-header .sh-logo-img{height:28px;}
   #site-header .sh-pill[href="./auth.html"]{display:none;}

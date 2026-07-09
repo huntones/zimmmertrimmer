@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — חותך וידאו</title>
-<meta name="description" content="Trim and cut video clips right in your browser — set start and end on a visual timeline and download. Fast, private, nothing leaves your machine.">
+<meta name="description" content="set start and end on a visual timeline and download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:960px;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -340,8 +340,8 @@
     he:{
       dir:'rtl', langIco:'EN',
       kick:'חותך וידאו',
-      pageTitle:'חתכו קטע מתוך וידאו — בלי להעלות לשרת',
-      pageSub:'העלו סרטון, סמנו התחלה וסיום על ציר הזמן, וקבלו את הקטע החתוך מוכן להורדה. הכול רץ בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      pageTitle:'חתכו קטע מתוך וידאו',
+      pageSub:'העלו סרטון, סמנו התחלה וסיום על ציר הזמן, וקבלו את הקטע החתוך מוכן להורדה. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו סרטון לכאן', or2:'או', choose:'בחרו קובץ',
       sizeNote:'MP4 · WEBM · MKV · MOV · AVI', remove:'הסרה',
       trimTitle:'בחרו את הקטע', trimHint:'גררו את הידיות הסגולות כדי לסמן איפה הקטע מתחיל ואיפה נגמר. אפשר גם ללחוץ על הציר כדי לדלג, ולסמן לפי מיקום הנגן.',
@@ -352,13 +352,13 @@
       modePrecise:'מדויק', modePreciseSub:'קידוד מחדש · חיתוך מדויק',
       muteLbl:'הסרת אודיו', muteSub:'הקטע ייחתך ללא פס קול',
       cutBtn:'חתכו עכשיו', working:'חותך…', engineLoading:'טוען מנוע…',
-      rtNote:'החיתוך רץ מקומית בדפדפן. מצב "מהיר" כמעט מיידי; מצב "מדויק" מקודד מחדש ולכן איטי יותר בקטעים ארוכים.',
+      rtNote:'העיבוד מהיר — . מצב "מהיר" כמעט מיידי; מצב "מדויק" מקודד מחדש ולכן איטי יותר בקטעים ארוכים.',
       readyTitle:'הקטע מוכן!', readySub:'הקטע החתוך מוכן להורדה.',
       dlBtn:'הורדה', againBtn:'חתכו קטע נוסף', newBtn:'סרטון חדש',
       origLbl:'מקור', clipLbl:'קטע',
       failed:'החיתוך נכשל — נסו את מצב "מדויק" או קובץ אחר',
-      seam:'חיתוך מקומי: הסרטון נחתך כאן ועכשיו, ישירות בדפדפן דרך מנוע ffmpeg מקומי. שום קובץ לא עולה לאינטרנט — הוא תמיד נשאר אצלכם.',
-      foot:'KOLKLI · חותך וידאו · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · חותך וידאו · מהיר, פשוט ובאיכות מקצועית',
       errNoFile:'צריך להעלות קובץ וידאו', errRange:'בחרו קטע באורך של לפחות רבע שנייה',
       errEngine:'שגיאה: לא ניתן לטעון את מנוע הווידאו. ודאו שתיקיית vendor/ קיימת.',
       errFileProto:'נפתח כקובץ מקומי — הדפדפן חוסם את המנוע. הריצו דרך start.bat או שרת מקומי.',
@@ -367,8 +367,8 @@
     en:{
       dir:'ltr', langIco:'עב',
       kick:'Video cutter',
-      pageTitle:'Cut a clip from your video — without uploading',
-      pageSub:'Load a video, mark the start and end on the timeline, and get the trimmed clip ready to download. Everything runs in your browser — nothing leaves your machine.',
+      pageTitle:'Cut a clip from your video',
+      pageSub:'Load a video, mark the start and end on the timeline, and get the trimmed clip ready to download. Fast, simple and professional-quality.',
       dropBig:'Drop a video here', or2:'or', choose:'Choose file',
       sizeNote:'MP4 · WEBM · MKV · MOV · AVI', remove:'Remove',
       trimTitle:'Select the clip', trimHint:'Drag the purple handles to mark where the clip starts and ends. You can also click the timeline to seek and mark from the playhead position.',
@@ -379,13 +379,13 @@
       modePrecise:'Precise', modePreciseSub:'re-encode · frame-accurate',
       muteLbl:'Remove audio', muteSub:'Cut the clip without its soundtrack',
       cutBtn:'Cut now', working:'Cutting…', engineLoading:'Loading engine…',
-      rtNote:'Cutting runs locally in your browser. "Fast" is near-instant; "Precise" re-encodes and is slower on long clips.',
+      rtNote:'Processing is fast — . "Fast" is near-instant; "Precise" re-encodes and is slower on long clips.',
       readyTitle:'Clip ready!', readySub:'Your trimmed clip is ready to download.',
       dlBtn:'Download', againBtn:'Cut another clip', newBtn:'New video',
       origLbl:'source', clipLbl:'clip',
       failed:'Cut failed — try "Precise" mode or a different file',
-      seam:'Local cutting: your video is trimmed right here, right now, in your browser via a local ffmpeg engine. Nothing is uploaded — it always stays with you.',
-      foot:'KOLKLI · Video cutter · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Video cutter · Fast, simple and professional quality',
       errNoFile:'Add a video file', errRange:'Pick a clip of at least a quarter second',
       errEngine:'ERROR: could not load the video engine. Make sure the vendor/ folder exists.',
       errFileProto:'Opened as a local file — the browser blocks the engine. Run via start.bat or a local server.',
@@ -394,8 +394,8 @@
     ru:{
       dir:'ltr',
       kick:'Обрезка видео',
-      pageTitle:'Вырежьте фрагмент из видео — без загрузки на сервер',
-      pageSub:'Загрузите видео, отметьте начало и конец на таймлайне — и получите обрезанный клип, готовый к скачиванию. Всё работает в вашем браузере — ничего не покидает устройство.',
+      pageTitle:'Вырежьте фрагмент из видео',
+      pageSub:'Загрузите видео, отметьте начало и конец на таймлайне — и получите обрезанный клип, готовый к скачиванию. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите видео сюда', or2:'или', choose:'Выбрать файл',
       sizeNote:'MP4 · WEBM · MKV · MOV · AVI', remove:'Удалить',
       trimTitle:'Выделите клип', trimHint:'Перетаскивайте фиолетовые маркеры, чтобы отметить начало и конец клипа. Также можно кликнуть по таймлайну, чтобы перейти и отметить от позиции воспроизведения.',
@@ -406,13 +406,13 @@
       modePrecise:'Точный', modePreciseSub:'перекодирование · с точностью до кадра',
       muteLbl:'Убрать звук', muteSub:'Вырезать клип без звуковой дорожки',
       cutBtn:'Вырезать', working:'Нарезка…', engineLoading:'Загрузка движка…',
-      rtNote:'Нарезка идёт локально в вашем браузере. «Быстрый» — почти мгновенно; «Точный» перекодирует и медленнее на длинных клипах.',
+      rtNote:'Обработка быстрая — . «Быстрый» — почти мгновенно; «Точный» перекодирует и медленнее на длинных клипах.',
       readyTitle:'Клип готов!', readySub:'Ваш обрезанный клип готов к скачиванию.',
       dlBtn:'Скачать', againBtn:'Вырезать ещё', newBtn:'Новое видео',
       origLbl:'оригинал', clipLbl:'клип',
       failed:'Нарезка не удалась — попробуйте режим «Точный» или другой файл',
-      seam:'Локальная нарезка: ваше видео обрезается прямо здесь и сейчас, в вашем браузере через локальный движок ffmpeg. Ничего не загружается — файл всегда остаётся у вас.',
-      foot:'KOLKLI · Обрезка видео · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Обрезка видео · Быстро, просто и профессионального качества',
       errNoFile:'Добавьте видеофайл', errRange:'Выберите клип не короче четверти секунды',
       errEngine:'ОШИБКА: не удалось загрузить видеодвижок. Убедитесь, что папка vendor/ существует.',
       errFileProto:'Открыто как локальный файл — браузер блокирует движок. Запустите через start.bat или локальный сервер.',

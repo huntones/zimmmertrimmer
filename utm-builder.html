@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — בונה קישורי UTM</title>
-<meta name="description" content="Build tagged campaign URLs with UTM parameters right in your browser. Add utm_source, medium, campaign and more, copy the link or Markdown, and track every click. Fully client-side, nothing leaves your machine.">
+<meta name="description" content="Add utm_source, medium, campaign and more, copy the link or Markdown, and track every click. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -261,7 +261,7 @@
       dir:'rtl',
       kick:'שיווק · בונה קישורי UTM',
       pageTitle:'בנו קישורי UTM למעקב קמפיינים',
-      pageSub:'הרכיבו כתובת מתויגת עם פרמטרים של UTM — מקור, מדיום, קמפיין ועוד. הקישור נבנה בזמן אמת בזמן ההקלדה, מוכן להעתקה. הכול מתבצע בדפדפן שלכם — שום נתון לא נשלח לשרת.',
+      pageSub:'הרכיבו כתובת מתויגת עם פרמטרים של UTM — מקור, מדיום, קמפיין ועוד. הקישור נבנה בזמן אמת בזמן ההקלדה, מוכן להעתקה. מהיר, פשוט ובאיכות מקצועית.',
       formTitle:'פרטי הקמפיין',
       formSub:'מלאו את השדות והקישור מתעדכן מיד. שדות עם ✱ מומלצים לכל תיוג.',
       baseLbl:'כתובת בסיס', baseHint:'הכתובת שאליה מפנים. אם חסר http, נוסיף https:// אוטומטית.',
@@ -278,8 +278,8 @@
       thParam:'פרמטר', thValue:'ערך',
       brkEmpty:'אין עדיין פרמטרים — התחילו למלא את השדות.',
       needBase:'הזינו קודם כתובת בסיס',
-      seam:'הכול רץ מקומית בדפדפן — הכתובות שלכם אף פעם לא נשלחות לשרת. הקלט האחרון נשמר רק אצלכם, ב-localStorage של הדפדפן.',
-      foot:'KOLKLI · בונה קישורי UTM · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · בונה קישורי UTM · מהיר, פשוט ובאיכות מקצועית',
       copied:'הקישור הועתק ✓', copiedMd:'ה-Markdown הועתק ✓',
       cleared:'נוקה ✓', nothing:'אין מה להעתיק',
     },
@@ -287,7 +287,7 @@
       dir:'ltr',
       kick:'Marketing · UTM Link Builder',
       pageTitle:'Build UTM links to track your campaigns',
-      pageSub:'Assemble a tagged URL with UTM parameters — source, medium, campaign and more. The link builds live as you type and is ready to copy. Everything runs in your browser — no data ever leaves your machine.',
+      pageSub:'Assemble a tagged URL with UTM parameters — source, medium, campaign and more. The link builds live as you type and is ready to copy. Fast, simple and professional-quality.',
       formTitle:'Campaign details',
       formSub:'Fill the fields and the link updates instantly. Fields with ✱ are recommended for every tag.',
       baseLbl:'Base URL', baseHint:'The destination you are linking to. Missing http? We add https:// automatically.',
@@ -304,8 +304,8 @@
       thParam:'Parameter', thValue:'Value',
       brkEmpty:'No parameters yet — start filling the fields.',
       needBase:'Enter a base URL first',
-      seam:'Everything runs locally in your browser — your URLs are never uploaded. Your last input is saved only on your device, in the browser localStorage.',
-      foot:'KOLKLI · UTM Link Builder · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · UTM Link Builder · Fast, simple and professional quality',
       copied:'Link copied ✓', copiedMd:'Markdown copied ✓',
       cleared:'Cleared ✓', nothing:'Nothing to copy',
     },
@@ -313,7 +313,7 @@
       dir:'ltr',
       kick:'Маркетинг · UTM-конструктор',
       pageTitle:'Создавайте UTM-ссылки для отслеживания кампаний',
-      pageSub:'Соберите размеченную ссылку с UTM-параметрами — источник, канал, кампания и другие. Ссылка строится в реальном времени по мере ввода и готова к копированию. Всё работает в вашем браузере — никакие данные не покидают устройство.',
+      pageSub:'Соберите размеченную ссылку с UTM-параметрами — источник, канал, кампания и другие. Ссылка строится в реальном времени по мере ввода и готова к копированию — никакие данные не покидают устройство. Быстро, просто и профессионального качества.',
       formTitle:'Данные кампании',
       formSub:'Заполните поля — ссылка обновится сразу. Поля с ✱ рекомендуются для каждой метки.',
       baseLbl:'Базовый URL', baseHint:'Адрес назначения. Нет http? Мы добавим https:// автоматически.',
@@ -330,8 +330,8 @@
       thParam:'Параметр', thValue:'Значение',
       brkEmpty:'Параметров пока нет — начните заполнять поля.',
       needBase:'Сначала введите базовый URL',
-      seam:'Всё работает локально в вашем браузере — ваши ссылки никогда не загружаются. Последний ввод сохраняется только на вашем устройстве, в localStorage браузера.',
-      foot:'KOLKLI · UTM-конструктор · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · UTM-конструктор · Быстро, просто и профессионального качества',
       copied:'Ссылка скопирована ✓', copiedMd:'Markdown скопирован ✓',
       cleared:'Очищено ✓', nothing:'Нечего копировать',
     },

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — Meta Length Checker</title>
-<meta name="description" content="Free meta length checker — see if your SEO title and meta description are the right length, with character counts, approximate Google pixel width and a live search-result preview. Fast, private, right in your browser.">
+<meta name="description" content="Free meta length checker — see if your SEO title and meta description are the right length, with character counts, approximate Google pixel width and a live search-result preview. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -186,7 +186,7 @@
     he:{ dir:'rtl',
       kick:'בודק אורך Meta',
       pageTitle:'בודק אורך Meta — Title ו-Description',
-      pageSub:'בדקו אם כותרת ה-SEO ותיאור המטא באורך הנכון — עם ספירת תווים, רוחב משוער בפיקסלים בגוגל ותצוגה מקדימה חיה של תוצאת החיפוש. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'בדקו אם כותרת ה-SEO ותיאור המטא באורך הנכון — עם ספירת תווים, רוחב משוער בפיקסלים בגוגל ותצוגה מקדימה חיה של תוצאת החיפוש. מהיר, פשוט ובאיכות מקצועית.',
       titleField:'כותרת (Title)',
       descField:'תיאור מטא (Meta Description)',
       stTooShort:'קצר מדי', stGood:'אורך מצוין', stTooLong:'ארוך מדי',
@@ -202,11 +202,11 @@
       phTitle:'כותרת הדף שלכם תופיע כאן',
       phDesc:'תיאור המטא של הדף יופיע כאן.',
       copiedMsg:'הועתק ✓',
-      foot:'KOLKLI · בודק אורך Meta · פרטי ומהיר, ישירות בדפדפן' },
+      foot:'KOLKLI · בודק אורך Meta · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Meta Length Checker',
       pageTitle:'Meta Length Checker — Title & Meta Description',
-      pageSub:'Check whether your SEO title and meta description are the right length — with character counts, an approximate Google pixel width and a live search-result preview. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Check whether your SEO title and meta description are the right length — with character counts, an approximate Google pixel width and a live search-result preview. Fast, simple and professional-quality.',
       titleField:'Title',
       descField:'Meta Description',
       stTooShort:'Too short', stGood:'Good', stTooLong:'Too long',
@@ -222,11 +222,11 @@
       phTitle:'Your page title will appear here',
       phDesc:'Your meta description preview will appear here.',
       copiedMsg:'Copied ✓',
-      foot:'KOLKLI · Meta Length Checker · Private and fast, right in your browser' },
+      foot:'KOLKLI · Meta Length Checker · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Длина Meta',
       pageTitle:'Проверка длины Meta — Title и Description',
-      pageSub:'Проверьте, подходящей ли длины ваш SEO-заголовок и meta-описание — с подсчётом символов, приблизительной шириной в пикселях в Google и живым превью результата поиска. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Проверьте, подходящей ли длины ваш SEO-заголовок и meta-описание — с подсчётом символов, приблизительной шириной в пикселях в Google и живым превью результата поиска. Быстро, просто и профессионального качества.',
       titleField:'Заголовок (Title)',
       descField:'Meta-описание',
       stTooShort:'Слишком коротко', stGood:'Хорошо', stTooLong:'Слишком длинно',
@@ -242,7 +242,7 @@
       phTitle:'Здесь появится заголовок страницы',
       phDesc:'Здесь появится превью meta-описания.',
       copiedMsg:'Скопировано ✓',
-      foot:'KOLKLI · Проверка длины Meta · Приватно и быстро, прямо в браузере' }
+      foot:'KOLKLI · Проверка длины Meta · Быстро, просто и профессионального качества' }
   };
 
   let lang='he', t=I18N.he;

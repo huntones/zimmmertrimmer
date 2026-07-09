@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{width:min(96vw,1760px);max-width:96vw;margin:0 auto;padding:16px 0 18px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:16px 0 18px;}
   @media (max-width:840px){ .wrap{width:100%;max-width:none;padding:18px 14px 48px;} }
 
   /* page intro */
@@ -72,6 +72,8 @@
   .tab svg{width:16px;height:16px;}
   .tab .count{font-family:var(--mono);font-size:12.5px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--muted);}
   .tab.on .count{background:var(--panel);color:var(--accent-dim);}
+  #tabManage{order:0;}
+  #tabCreate{order:1;}
 
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
   .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,280px);gap:16px;align-items:start;}
@@ -480,14 +482,14 @@
   </div>
 
   <div class="tabs" id="tabs">
-    <button class="tab on" id="tabCreate" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-      <span data-i18n="tabCreate"></span>
-    </button>
     <button class="tab" id="tabManage" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
       <span data-i18n="tabManage"></span>
       <span class="count" id="mgCount">0</span>
+    </button>
+    <button class="tab on" id="tabCreate" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+      <span data-i18n="tabCreate"></span>
     </button>
   </div>
 
@@ -741,6 +743,7 @@
   </div>
 </div>
 
+<script src="./project-numbering.js"></script>
 <script src="./review-store.js"></script>
 <script src="./vendor/qrcode.min.js"></script>
 <script>
@@ -776,7 +779,7 @@
       copy:'העתקה', copied:'הקישור הועתק ✓',
       openClient:'תצוגת הלקוח', shareEmail:'שליחה במייל', shareWa:'וואטסאפ', toManage:'לניהול הפרויקטים',
       qrDl:'הורדת קוד QR',
-      seam:'הדגמה מקומית: הפרויקטים והחומרים נשמרים בדפדפן הזה. עם חיבור השרת הקישור יעבוד לכל לקוח מכל מכשיר.',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
       foot:'KOLKLI · Client Review · הדגמה מקומית עד לחיבור השרת',
       mgTitle:'הפרויקטים שלי', newReq:'פרויקט חדש',
       mgEmptyTitle:'עדיין אין פרויקטים', mgEmptyBody:'צרו פרויקט ראשון כדי לשלוח חומרים ללקוח ולקבל אישור בקישור אחד.',
@@ -1017,7 +1020,9 @@
   function pathItems(list){ return Array.from(list||[]).map(f=>({file:f, path:f.webkitRelativePath||f.name})); }
   function addFiles(items){
     const incoming=(items||[]).filter(it=>it && (it.file||it));
-    if(newItems.length + incoming.length > 1){
+    // Paid plans (Lite/Pro/Business) are unlimited — the 1-file cap is free-tier only.
+    const usageExempt=!!(window.KolkliUsage && window.KolkliUsage.isExempt && window.KolkliUsage.isExempt());
+    if(!usageExempt && newItems.length + incoming.length > 1){
       showUsageLimit({ code:'payload_limit', field:'files', max:1, actual:newItems.length + incoming.length });
       return;
     }
@@ -1127,6 +1132,7 @@
           status:'draft', activeVersion:1, maxVersion:1,
           items, comments:[], events:[], decision:null
         };
+        if(window.KolkliProjectNumbers) await KolkliProjectNumbers.assign('review', next);
         // persist blobs
         try{ for(const f of newItems){ await RV.putBlob(f.id, f.file); } }
         catch(_){ el('createErr').textContent=t.errNoFiles; throw new Error('blob_write_failed'); }
@@ -1136,6 +1142,10 @@
     }catch(err){
       if(err && err.usage) return;
       if(err && err.message==='blob_write_failed') return;
+      if(err && err.message==='project_number_allocation_failed'){
+        el('createErr').textContent = lang==='he' ? 'לא ניתן להקצות מספר פרויקט כרגע. נסו שוב.' : 'Could not allocate a project number. Please try again.';
+        return;
+      }
       throw err;
     }
     lastToken=proj.token;
@@ -1149,6 +1159,8 @@
     el('openClientBtn').href=url;
     el('waShareBtn').href='https://wa.me/?text='+encodeURIComponent(t.waText(proj.name,url));
     const chips=[];
+    const num=projectNumberText(proj);
+    if(num) chips.push(`<span class="chip">${RV.escapeHtml(num)}</span>`);
     chips.push(`<span class="chip">${clockSvg()} ${proj.expiresAt? t.chipExpSoon(daysWord(Math.ceil((proj.expiresAt-Date.now())/86400000))) : t.chipNoExpiry}</span>`);
     chips.push(`<span class="chip">${fileSvg()} ${t.chipItems(proj.items.length)}</span>`);
     chips.push(`<span class="chip">${eyeSvg()} ${t.pcView}</span>`);
@@ -1195,12 +1207,17 @@
   // ---------- manage ----------
   function updateCount(){ el('mgCount').textContent = RV.loadProjects().length; }
   function statusLabel(s){ return t['st'+s.charAt(0).toUpperCase()+s.slice(1)] || s; }
+  function projectNumberText(proj){
+    return window.KolkliProjectNumbers ? KolkliProjectNumbers.display('review', proj, lang) : '';
+  }
 
   function projCardHtml(proj){
     const st=RV.statusOf(proj);
     const openC=RV.openComments(proj);
     const kind=RV.mainKind(proj);
     const chips=[];
+    const num=projectNumberText(proj);
+    if(num) chips.push(`<span class="chip">${RV.escapeHtml(num)}</span>`);
     if(proj.client) chips.push(`<span class="chip">${userSvg()} ${RV.escapeHtml(t.chipClient(proj.client))}</span>`);
     chips.push(`<span class="chip">${kind?RV.FICON[kind]:fileSvg()} ${t.chipItems(proj.items.length)}</span>`);
     if(proj.maxVersion>1) chips.push(`<span class="chip">${layersSvg()} ${t.chipVersion(proj.maxVersion)}</span>`);
@@ -1229,7 +1246,8 @@
   }
   function renderManage(){
     updateCount();
-    const list=RV.loadProjects().slice().sort((a,b)=>RV.lastActivity(b)-RV.lastActivity(a));
+    const list=(window.KolkliProjectNumbers ? KolkliProjectNumbers.ensureAll('review', RV.loadProjects(), RV.saveProjects) : RV.loadProjects());
+    list.sort((a,b)=>RV.lastActivity(b)-RV.lastActivity(a));
     el('reqList').innerHTML = list.map(projCardHtml).join('');
     el('mgEmpty').classList.toggle('hidden', list.length>0);
     el('reqList').classList.toggle('hidden', list.length===0);
@@ -1276,6 +1294,8 @@
     el('dStatus').innerHTML=`<span class="badge b-${st}">${statusLabel(st)}</span>`;
 
     const meta=[];
+    const num=projectNumberText(p);
+    if(num) meta.push(`<span class="chip">${RV.escapeHtml(num)}</span>`);
     if(p.client) meta.push(`<span class="chip">${userSvg()} ${RV.escapeHtml(t.chipClient(p.client))}</span>`);
     meta.push(`<span class="chip">${clockSvg()} ${t.chipCreated(fmtDate(p.createdAt))}</span>`);
     if(p.expiresAt) meta.push(`<span class="chip">${clockSvg()} ${t.chipExpires(fmtDate(p.expiresAt))}</span>`);

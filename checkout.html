@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — תשלום</title>
-<meta name="description" content="Secure KOLKLI checkout — upgrade to Lite, Pro or Business. Encrypted payment, cancel anytime, 14-day money-back guarantee.">
+<meta name="description" content="Secure KOLKLI checkout — upgrade to Creator or Studio. Encrypted payment, cancel anytime, 14-day money-back guarantee.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -62,7 +62,7 @@
   .orb.b{width:480px;height:480px;background:radial-gradient(circle,#3f85ff,transparent 66%);bottom:-200px;inset-inline-end:-160px;opacity:.3;}
 
   /* ---------- layout ---------- */
-  .co-wrap{position:relative;z-index:2;flex:1;width:100%;max-width:1140px;margin:0 auto;padding:24px 22px 72px;}
+  .co-wrap{position:relative;z-index:2;flex:1;width:100%;max-width:none;margin:0 auto;padding:24px 22px 72px;}
   .back{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--muted);
     margin-bottom:16px;transition:color .12s;}
   .back:hover{color:var(--accent-dim);}
@@ -512,32 +512,39 @@
    =================================================================== */
 (function(){
   const el = id => document.getElementById(id);
-  const money = n => '$' + n.toFixed(2);
+  // Currency follows the UI language: ₪ for Hebrew, $ for English & Russian.
+  // Each plan carries a shekel and a dollar price; the active one is picked by
+  // cur() below. ₪ shows whole units, $ shows cents.
+  const CUR = { he:{ sym:'₪', field:'ils', dec:0 }, en:{ sym:'$', field:'usd', dec:2 }, ru:{ sym:'$', field:'usd', dec:2 } };
+  function cur(){ return CUR[lang] || CUR.en; }
+  const money = n => { const c = cur(); return c.sym + (+n || 0).toFixed(c.dec); };
+  const planBase = p => p.base[cur().field];
 
   /* ---------- plans (mirror PLANS in pages.js / index.html) ---------- */
   const PLANS = {
-    lite: { key:'lite', base:6.99, pop:true,
-      he:['Lite','לעבודה יומיומית'], en:['Lite','For everyday work'], ru:['Lite','Для повседневной работы'],
+    creator: { key:'creator', base:{ ils:89, usd:24 }, pop:true,
+      he:['Creator','ליוצרים ופרילנסרים'], en:['Creator','For creators & freelancers'], ru:['Creator','Для авторов и фрилансеров'],
       feats:{
-        he:['שליחה עד 20GB בכל פעם','100GB אחסון בענן','כל כלי העריכה','הגנה בסיסמה · בלי פרסומות'],
-        en:['Up to 20GB per transfer','100GB cloud storage','All editing tools','Password protection · no ads'],
-        ru:['До 20 ГБ за передачу','100 ГБ в облаке','Все инструменты','Защита паролем · без рекламы']
+        he:['100 פרויקטים · 500 קבצים לכל אחד','250GB אחסון · עד 25GB בהעברה','כל הכלים + Review Studio','מיתוג אישי · עד 10 פעולות AI ביום'],
+        en:['100 projects · 500 files each','250GB storage · up to 25GB/transfer','All tools + Review Studio','Custom branding · 10 AI actions/day'],
+        ru:['100 проектов · 500 файлов','250 ГБ · до 25 ГБ за передачу','Все инструменты + Review Studio','Свой брендинг · 10 AI-операций/день']
       } },
-    pro: { key:'pro', base:14.99,
-      he:['Pro','לעבודה מקצועית'], en:['Pro','For professional work'], ru:['Pro','Для профессионалов'],
+    studio: { key:'studio', base:{ ils:249, usd:69 },
+      he:['Studio','לסטודיו וצוותים'], en:['Studio','For studios & teams'], ru:['Studio','Для студий и команд'],
       feats:{
-        he:['שליחה עד 100GB בכל פעם','1TB אחסון בענן','כל הכלים + כלי AI','התראות הורדה · תמיכה בעדיפות'],
-        en:['Up to 100GB per transfer','1TB cloud storage','All tools + AI tools','Download alerts · priority support'],
-        ru:['До 100 ГБ за передачу','1 ТБ в облаке','Все инструменты + AI','Уведомления · приоритетная поддержка']
-      } },
-    business: { key:'business', base:39.99,
-      he:['Business','לצוותים ועסקים'], en:['Business','For teams & orgs'], ru:['Business','For teams & orgs'],
-      feats:{
-        he:['5 מושבים כלולים','5TB אחסון משותף','שליחה עד 200GB בכל פעם','ניהול צוות והרשאות'],
-        en:['5 seats included','5TB shared storage','Up to 200GB per transfer','Team management & roles'],
-        ru:['5 seats included','5TB shared storage','Up to 200GB per transfer','Team management & roles']
+        he:['500 פרויקטים · 2,000 קבצים לכל אחד','1TB אחסון · עד 100GB בהעברה','White-label מלא + דומיין אישי','עד 10 משתמשי צוות · 2FA · אוטומציות'],
+        en:['500 projects · 2,000 files each','1TB storage · up to 100GB/transfer','Full white-label + custom domain','Up to 10 team seats · 2FA · automations'],
+        ru:['500 проектов · 2 000 файлов','1 ТБ · до 100 ГБ за передачу','Полный white-label + свой домен','До 10 участников · 2FA · автоматизации']
       } }
   };
+  // Legacy plan slugs (lite/pro/business) map onto the new tiers so old
+  // deep-links and stored accounts still resolve.
+  function normalizePlan(p){
+    p = String(p || '').toLowerCase();
+    if(p === 'lite') return 'creator';
+    if(p === 'pro' || p === 'business') return 'studio';
+    return PLANS[p] ? p : 'creator';
+  }
   const YEAR_MONTHS = 10;                 // yearly = 10 months (2 free) → ~17% off
   const SAVE_PCT = Math.round((1 - YEAR_MONTHS/12) * 100);
 
@@ -547,9 +554,10 @@
     WELCOME15: { rate:0.15 },
     SAVE20: { rate:0.20 },
     KOLKLI2026: {
+      code:'Kolkli2026',
       rate:1,
       expiresAt:'2026-08-31T23:59:59+03:00',
-      plans:['lite','pro','business']
+      plans:['creator','studio']
     }
   };
   function promoIsActive(def, planKey){
@@ -596,7 +604,7 @@
       promoPh:'קוד קופון', promoOk:'הקופון הופעל — {p}% הנחה 🎉', promoNo:'קוד קופון לא תקין',
       subtotal:'סכום ביניים', discount:'הנחה', vat:'מע״מ ({p}%)',
       totalToday:'לתשלום היום', renewM:'מתחדש ב־{v} בחודש', renewY:'מתחדש ב־{v} בשנה',
-      fine:'בלחיצה על ״תשלום״ אתם מאשרים את תנאי השימוש ומדיניות הפרטיות. המחירים בדולר ($) וכוללים מע״מ במקום שנדרש.',
+      fine:'בלחיצה על ״תשלום״ אתם מאשרים את תנאי השימוש ומדיניות הפרטיות. המחירים בשקלים (₪) וכוללים מע״מ במקום שנדרש.',
       g1t:'החזר כספי 14 יום', g1d:'לא מרוצים? מקבלים את הכסף בחזרה.',
       g2t:'ביטול בכל רגע', g2d:'בלי התחייבות ובלי קנסות.',
       g3t:'תשלום מוצפן', g3d:'הצפנת SSL 256־ביט בכל תשלום.',
@@ -670,7 +678,7 @@
 
   /* ---------- state ---------- */
   let lang='he', t=I18N.he;
-  let plan='lite', cycle='monthly', promo=null, country='IL';
+  let plan='creator', cycle='monthly', promo=null, country='IL';
 
   const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const CARD_BRANDS = {
@@ -699,14 +707,15 @@
   /* ---------- price maths ---------- */
   function calc(){
     const p=PLANS[plan];
+    const base=planBase(p);
     const months = cycle==='yearly' ? YEAR_MONTHS : 1;
-    const subtotal = p.base * months;
+    const subtotal = base * months;
     const discount = Math.min(subtotal, promo ? subtotal * promo.rate : 0);
     const taxable = Math.max(0, subtotal - discount);
     const rate = VAT[country] || 0;
     const vat = taxable * rate;
     const total = taxable + vat;
-    const renewFull = cycle==='yearly' ? p.base*YEAR_MONTHS : p.base;   // sticker price at renewal
+    const renewFull = cycle==='yearly' ? base*YEAR_MONTHS : base;   // sticker price at renewal
     return { subtotal, discount, vat, vatRate:rate, total, renewFull, months };
   }
 
@@ -717,7 +726,7 @@
     const host=el('planPick');
     host.innerHTML = Object.keys(PLANS).map(function(k){
       const p=PLANS[k], on=k===plan;
-      const price = cycle==='yearly' ? money(p.base*YEAR_MONTHS) : money(p.base);
+      const price = cycle==='yearly' ? money(planBase(p)*YEAR_MONTHS) : money(planBase(p));
       const per = cycle==='yearly' ? t.perYear : t.perMonth;
       const pop = p.pop ? '<span class="po-pop">★ '+ (lang==='he'?'הכי פופולרי':lang==='ru'?'Популярный':'Popular') +'</span>' : '';
       return '<button type="button" class="plan-opt'+(on?' on':'')+'" data-plan="'+k+'">'+
@@ -742,7 +751,7 @@
   }
 
   function renderSummary(){
-    if(promo && !promoIsActive(PROMOS[promo.code], plan)){
+    if(promo && !promoIsActive(PROMOS[promo.key || promo.code], plan)){
       promo=null;
       const promoMsg=el('promoMsg');
       if(promoMsg){ promoMsg.textContent=''; promoMsg.className='promo-msg'; }
@@ -882,6 +891,7 @@
       const users=loadUsers(), u=currentUser();
       if(u){
         u.plan=plan; u.planCycle=cycle;
+        if(u.trial){ u.trial.active=false; } u.trialUsed=true;   // paid → trial ends (sweep won't downgrade)
         const i=users.findIndex(x=>(x.email||'').toLowerCase()===(u.email||'').toLowerCase());
         if(i>-1){ users[i]=u; lsSet(USERS_KEY, JSON.stringify(users)); }
       }
@@ -943,7 +953,7 @@
     if(!code){ promo=null; msg.textContent=''; msg.className='promo-msg'; renderSummary(); return; }
     const def=PROMOS[code];
     if(promoIsActive(def, plan)){
-      promo={ code:code, rate:def.rate };
+      promo={ key:code, code:def.code || code, rate:def.rate };
       msg.textContent=fmtStr(t.promoOk,{p:promoPercent(def)}); msg.className='promo-msg ok';
     } else {
       promo=null;
@@ -963,7 +973,7 @@
     document.title='KOLKLI — '+t.secure;
     renderCountry();
     renderAll();
-    if(promo){ el('promoMsg').textContent=fmtStr(t.promoOk,{p:promoPercent(PROMOS[promo.code])}); }
+    if(promo){ el('promoMsg').textContent=fmtStr(t.promoOk,{p:promoPercent(PROMOS[promo.key || promo.code])}); }
   }
   window.__setLang=applyLang;
 
@@ -1025,10 +1035,10 @@
 
   (function init(){
     applyTheme(ls('theme')||'light');
-    // deep-link: ?plan=lite|pro|business & ?cycle=monthly|yearly
-    const qp=(location.search.match(/[?&]plan=(lite|pro|business)/)||[])[1];
+    // deep-link: ?plan=creator|studio (legacy lite/pro/business accepted) & ?cycle=monthly|yearly
+    const qp=(location.search.match(/[?&]plan=(creator|studio|lite|pro|business)/)||[])[1];
     const qc=(location.search.match(/[?&]cycle=(monthly|yearly)/)||[])[1];
-    if(qp) plan=qp;
+    if(qp) plan=normalizePlan(qp);
     if(qc) cycle=qc;
     const cc=ls('ac_country'); if(cc && COUNTRIES.some(x=>x.c===cc)) country=cc;
     applyLang(detectLang());

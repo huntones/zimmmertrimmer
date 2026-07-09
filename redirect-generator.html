@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחולל Redirect</title>
-<meta name="description" content="Generate a complete, standalone HTML redirect page in your browser. Set a target URL, delay, canonical tag and a branded holding card — copy or download ready-to-host redirect.html. Fully client-side, nothing leaves your machine.">
+<meta name="description" content="Generate a complete, standalone HTML redirect page. Set a target URL, delay, canonical tag and a branded holding card — copy or download ready-to-host redirect.html. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -248,7 +248,7 @@
       dir:'rtl',
       kick:'שיווק · מחולל Redirect',
       pageTitle:'מחולל דף Redirect',
-      pageSub:'צרו דף HTML עצמאי שמפנה אוטומטית לכתובת יעד — עם השהיה, תגית canonical וכרטיס המתנה ממותג. העתיקו או הורידו redirect.html מוכן לאירוח. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'צרו דף HTML עצמאי שמפנה אוטומטית לכתובת יעד — עם השהיה, תגית canonical וכרטיס המתנה ממותג. העתיקו או הורידו redirect.html מוכן לאירוח. מהיר, פשוט ובאיכות מקצועית.',
       formTitle:'הגדרות ההפניה',
       targetLbl:'כתובת יעד',
       targetHint:'הכתובת המלאה שאליה יופנה המבקר, כולל https://',
@@ -268,8 +268,8 @@
       dlBtn:'הורדת HTML',
       previewTitle:'תצוגה מקדימה חיה',
       pvNote:'תצוגה — ההפניה מנוטרלת',
-      seam:'הכול נוצר מקומית בדפדפן שלכם. הדף שנוצר הוא HTML סטטי טהור — אפשר לארח אותו בכל מקום, ללא שרת וללא תלות ב-KOLKLI.',
-      foot:'KOLKLI · מחולל Redirect · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · מחולל Redirect · מהיר, פשוט ובאיכות מקצועית',
       copied:'הקוד הועתק ✓',
       genTitle:'מפנים אתכם…',
       genDefaultMsg:'תכף מעבירים אתכם לעמוד החדש.',
@@ -280,7 +280,7 @@
       dir:'ltr',
       kick:'Marketing · Redirect Generator',
       pageTitle:'Redirect Page Generator',
-      pageSub:'Build a standalone HTML page that auto-forwards to any target URL — with a delay, a canonical tag and a branded holding card. Copy or download a ready-to-host redirect.html. Everything runs in your browser, nothing is sent to a server.',
+      pageSub:'Build a standalone HTML page that auto-forwards to any target URL — with a delay, a canonical tag and a branded holding card. Copy or download a ready-to-host redirect.html. Fast, simple and professional-quality.',
       formTitle:'Redirect settings',
       targetLbl:'Target URL',
       targetHint:'The full address the visitor is forwarded to, including https://',
@@ -300,8 +300,8 @@
       dlBtn:'Download HTML',
       previewTitle:'Live preview',
       pvNote:'preview — redirect disabled',
-      seam:'Everything is generated locally in your browser. The output is pure static HTML — host it anywhere, with no server and no dependency on KOLKLI.',
-      foot:'KOLKLI · Redirect Generator · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Redirect Generator · Fast, simple and professional quality',
       copied:'Code copied ✓',
       genTitle:'Redirecting…',
       genDefaultMsg:'Taking you to the new page.',
@@ -312,7 +312,7 @@
       dir:'ltr',
       kick:'Маркетинг · Генератор редиректа',
       pageTitle:'Генератор страницы редиректа',
-      pageSub:'Создайте автономную HTML-страницу, которая автоматически перенаправляет на нужный URL — с задержкой, тегом canonical и брендированной карточкой ожидания. Скопируйте или скачайте готовый redirect.html. Всё работает в браузере, ничего не отправляется на сервер.',
+      pageSub:'Создайте автономную HTML-страницу, которая автоматически перенаправляет на нужный URL — с задержкой, тегом canonical и брендированной карточкой ожидания. Скопируйте или скачайте готовый redirect.html. Быстро, просто и профессионального качества.',
       formTitle:'Настройки редиректа',
       targetLbl:'Целевой URL',
       targetHint:'Полный адрес, на который будет перенаправлён посетитель, включая https://',
@@ -332,8 +332,8 @@
       dlBtn:'Скачать HTML',
       previewTitle:'Живой предпросмотр',
       pvNote:'предпросмотр — редирект отключён',
-      seam:'Всё генерируется локально в вашем браузере. Результат — чистый статический HTML: разместите его где угодно, без сервера и без зависимости от KOLKLI.',
-      foot:'KOLKLI · Генератор редиректа · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Генератор редиректа · Быстро, просто и профессионального качества',
       copied:'Код скопирован ✓',
       genTitle:'Перенаправление…',
       genDefaultMsg:'Переносим вас на новую страницу.',

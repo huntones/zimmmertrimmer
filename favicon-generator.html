@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחולל Favicon</title>
-<meta name="description" content="Free favicon generator — build a website favicon from text, an emoji or an image, preview it live at 16/32/48/180px, download ready PNGs and copy the &lt;link&gt; tags. Fast, private, right in your browser.">
+<meta name="description" content="Free favicon generator — build a website favicon from text, an emoji or an image, preview it live at 16/32/48/180px, download ready PNGs and copy the &lt;link&gt; tags. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -318,7 +318,7 @@
     he:{ dir:'rtl',
       kick:'מחולל Favicon',
       pageTitle:'מחולל Favicon לאתר',
-      pageSub:'צרו אייקון favicon מטקסט, אימוג\'י או תמונה — בחרו צבע, צורה ורקע וראו תצוגה חיה בכל הגדלים. הורידו קובצי PNG מוכנים והעתיקו את תגי ה-link. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'צרו אייקון favicon מטקסט, אימוג\'י או תמונה — בחרו צבע, צורה ורקע וראו תצוגה חיה בכל הגדלים. הורידו קובצי PNG מוכנים והעתיקו את תגי ה-link. מהיר, פשוט ובאיכות מקצועית.',
       previewLabel:'תצוגה מקדימה', tabTitle:'האתר שלי — KOLKLI',
       modeLabel:'מקור', modeText:'טקסט/אימוג\'י', modeImage:'תמונה',
       textLabel:'טקסט או אימוג\'י (1–3 תווים)', fgLabel:'צבע הטקסט',
@@ -328,12 +328,12 @@
       downloadLabel:'הורדת PNG', snippetLabel:'קוד ל-head',
       copy:'העתקה', copiedMsg:'הועתק ✓', downloadedMsg:'הורד favicon-{n}.png ✓',
       badFile:'קובץ לא נתמך — בחרו תמונה',
-      note:'לא נוצר קובץ ico. מרובה-רזולוציות — דפדפנים מודרניים מקבלים favicon בפורמט PNG. הכול מעובד מקומית בדפדפן, שום תמונה לא נשלחת לשרת.',
-      foot:'KOLKLI · מחולל Favicon · פרטי ומהיר, ישירות בדפדפן' },
+      note:'לא נוצר קובץ ico. מרובה-רזולוציות — דפדפנים מודרניים מקבלים favicon בפורמט PNG. מהיר, פשוט ובאיכות מקצועית.',
+      foot:'KOLKLI · מחולל Favicon · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Favicon Generator',
       pageTitle:'Favicon Generator',
-      pageSub:'Create a website favicon from text, an emoji or an image — pick a color, shape and background and watch a live preview at every size. Download ready-made PNGs and copy the link tags. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Create a website favicon from text, an emoji or an image — pick a color, shape and background and watch a live preview at every size. Download ready-made PNGs and copy the link tags. Fast, simple and professional-quality.',
       previewLabel:'Live preview', tabTitle:'My Website — KOLKLI',
       modeLabel:'Source', modeText:'Text / Emoji', modeImage:'Image',
       textLabel:'Text or emoji (1–3 chars)', fgLabel:'Text color',
@@ -343,12 +343,12 @@
       downloadLabel:'Download PNG', snippetLabel:'Code for head',
       copy:'Copy', copiedMsg:'Copied ✓', downloadedMsg:'Downloaded favicon-{n}.png ✓',
       badFile:'Unsupported file — choose an image',
-      note:'A real multi-resolution .ico isn\'t generated — modern browsers accept PNG favicons. Everything is processed locally in your browser; no image is uploaded.',
-      foot:'KOLKLI · Favicon Generator · Private and fast, right in your browser' },
+      note:'A real multi-resolution .ico isn\'t generated — modern browsers accept PNG favicons. Fast, simple and professional-quality.',
+      foot:'KOLKLI · Favicon Generator · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Генератор Favicon',
       pageTitle:'Генератор favicon',
-      pageSub:'Создайте favicon для сайта из текста, эмодзи или изображения — выберите цвет, форму и фон и следите за живым предпросмотром во всех размерах. Скачивайте готовые PNG и копируйте теги link. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Создайте favicon для сайта из текста, эмодзи или изображения — выберите цвет, форму и фон и следите за живым предпросмотром во всех размерах. Скачивайте готовые PNG и копируйте теги link. Быстро, просто и профессионального качества.',
       previewLabel:'Живой предпросмотр', tabTitle:'Мой сайт — KOLKLI',
       modeLabel:'Источник', modeText:'Текст / Эмодзи', modeImage:'Изображение',
       textLabel:'Текст или эмодзи (1–3 симв.)', fgLabel:'Цвет текста',
@@ -358,8 +358,8 @@
       downloadLabel:'Скачать PNG', snippetLabel:'Код для head',
       copy:'Копировать', copiedMsg:'Скопировано ✓', downloadedMsg:'Скачано favicon-{n}.png ✓',
       badFile:'Неподдерживаемый файл — выберите изображение',
-      note:'Настоящий многоразмерный .ico не создаётся — современные браузеры принимают PNG-favicon. Всё обрабатывается локально в браузере; изображения не загружаются на сервер.',
-      foot:'KOLKLI · Генератор Favicon · Приватно и быстро, прямо в браузере' }
+      note:'Настоящий многоразмерный .ico не создаётся — современные браузеры принимают PNG-favicon. Быстро, просто и профессионального качества.',
+      foot:'KOLKLI · Генератор Favicon · Быстро, просто и профессионального качества' }
   };
 
   const SANS = "'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif";

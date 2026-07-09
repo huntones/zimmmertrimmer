@@ -300,6 +300,11 @@
   function notifyAuth() { try { window.dispatchEvent(new CustomEvent('kolkli:auth')); } catch (_) {} }
   function setSession(email) { try { localStorage.setItem(SESSION_KEY, email.toLowerCase()); } catch (_) {} notifyAuth(); }
   function clearSession() { try { localStorage.removeItem(SESSION_KEY); } catch (_) {} notifyAuth(); }
+  // 7-day free trial for freshly-registered users (fingerprint-gated in trial.js).
+  function grantTrial(email) {
+    try { return (window.KolkliTrial && window.KolkliTrial.grantOnSignup) ? window.KolkliTrial.grantOnSignup(email) : Promise.resolve(); }
+    catch (_) { return Promise.resolve(); }
+  }
   function currentSession() { try { return localStorage.getItem(SESSION_KEY); } catch (_) { return null; } }
 
   function hashPass(str) {
@@ -324,7 +329,7 @@
       hashPass('test1234').then(function (h) {
         if (findUser(email)) return;                 // re-check after async hash
         var users = loadUsers();
-        users.push({ name: 'Tal Zimmer', email: email, pass: h, role: 'admin', plan: 'pro', created: Date.now() });
+        users.push({ name: 'Tal Zimmer', email: email, pass: h, role: 'admin', plan: 'studio', created: Date.now() });
         saveUsers(users);
       });
     } catch (_) {}
@@ -382,7 +387,7 @@
         ? window.KolkliAuth.signUp({ name: name, email: email, password: pass }).then(function (r) {
             if (r.ok) {
               if (r.code === 'confirm') { showMsg(t.checkEmail, 'info'); return; }
-              showSigned(name, email); return;
+              return grantTrial(email).then(function () { showSigned(name, email); });
             }
             if (r.code === 'taken') { setErr('amEmailField', 'amEmailErr', t.errTaken); return; }
             if (r.code === 'weak') { setErr('amPassField', 'amPassErr', t.errPassShort); return; }
@@ -403,8 +408,8 @@
             users.push({ name: name, email: email, pass: h, role: 'user', plan: 'free', created: Date.now() });
             saveUsers(users);
             setSession(email);
-            showSigned(name, email);
-          });
+            return grantTrial(email);
+          }).then(function () { showSigned(name, email); });
         }
         var u = findUser(email);
         if (!u) { setErr('amEmailField', 'amEmailErr', t.errNoUser); return; }

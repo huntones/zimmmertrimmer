@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — ניקוי אודיו AI</title>
-<meta name="description" content="AI Audio Cleanup — remove background noise, hum, interference and breaths, boost voice clarity and balance loudness for a clean, natural sound. Compare before/after, preview, and download. Everything runs in your browser; nothing leaves your machine.">
+<meta name="description" content="AI Audio Cleanup — remove background noise, hum, interference and breaths, boost voice clarity and balance loudness for a clean, natural sound. Compare before/after, preview, and download. Fast, simple and professional-quality.">
 <style>
   :root {
     color-scheme:light;
@@ -55,7 +55,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -323,7 +323,7 @@
       dir:'rtl', langIco:'EN', newBadge:'AI',
       kick:'ניקוי אודיו AI',
       pageTitle:'נקו ושפרו את איכות האודיו — בעזרת AI',
-      pageSub:'העלו קובץ שמע ותנו לניקוי החכם להסיר רעשי רקע, זמזומים, הפרעות ונשימות — לחדד את הקול, לאזן את העוצמה ולהשאיר צליל טבעי ונקי ככל האפשר. הכול רץ בדפדפן שלכם; שום קובץ לא עוזב את המחשב.',
+      pageSub:'העלו קובץ שמע ותנו לניקוי החכם להסיר רעשי רקע, זמזומים, הפרעות ונשימות — לחדד את הקול, לאזן את העוצמה ולהשאיר צליל טבעי ונקי ככל האפשר. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובץ אודיו לכאן', or2:'או', choose:'בחרו קובץ',
       sizeNote:'MP3 · WAV · M4A · AAC · OGG · FLAC', remove:'הסרה',
       original:'הקובץ המקורי',
@@ -336,15 +336,15 @@
       fixnoise:'רעש רקע והיסס', fixhum:'זמזום והפרעות רשת', fixbreath:'נשימות ורעשים חלשים',
       fixclarity:'חידוד ובהירות הקול', fixvolume:'איזון עוצמת השמע',
       cleanBtn:'נקו עכשיו', working:'מעבד את האודיו',
-      rtNote:'העיבוד רץ במלואו בדפדפן — קובץ ארוך ייקח מעט יותר זמן.',
+      rtNote:'העיבוד מהיר — קובץ ארוך ייקח מעט יותר זמן.',
       st_filter:'מסנן תדרים והפרעות…', st_analyze:'מנתח את מפלס הרעש…', st_clean:'מנקה רעשי רקע…',
       st_normalize:'מאזן את העוצמה…', st_encode:'מכין את הקובץ…', st_done:'הושלם',
       readyTitle:'הניקוי הושלם!',
       readySub:d=>`האודיו נוקה ושופר · ${d} · האזינו והשוו בין <b>לפני</b> ל<b>אחרי</b>.`,
       before:'לפני', after:'אחרי · נקי',
       dlBtn:'הורדת הקובץ הנקי', againBtn:'לנקות שוב',
-      seam:'ניקוי מקומי: הקובץ מפוענח ומעובד כאן בדפדפן דרך Web Audio — סינון רעש והפרעות, שער רעש (Noise Gate), חידוד ואיזון עוצמה — ומיוצא כ-WAV באיכות גבוהה. שום קובץ לא נשלח לשרת.',
-      foot:'KOLKLI · ניקוי אודיו AI · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · ניקוי אודיו AI · מהיר, פשוט ובאיכות מקצועית',
       errNoFile:'צריך להעלות קובץ אודיו', errDecode:'לא הצלחנו לפענח את הקובץ — נסו פורמט אחר',
       errNoFix:'בחרו לפחות פעולת ניקוי אחת', errRun:'העיבוד נכשל — נסו קובץ אחר',
       loaded:'הקובץ נטען ✓', dlWord:'הורדה',
@@ -353,7 +353,7 @@
       dir:'ltr', langIco:'עב', newBadge:'AI',
       kick:'AI Audio Cleanup',
       pageTitle:'Clean up & enhance your audio — with AI',
-      pageSub:'Upload a sound file and let the smart cleanup strip out background noise, hum, interference and breaths — sharpen the voice, balance the loudness and keep the tone as clean and natural as possible. It all runs in your browser; nothing leaves your machine.',
+      pageSub:'Upload a sound file and let the smart cleanup strip out background noise, hum, interference and breaths — sharpen the voice, balance the loudness and keep the tone as clean and natural as possible. Fast, simple and professional-quality.',
       dropBig:'Drag an audio file here', or2:'or', choose:'Choose file',
       sizeNote:'MP3 · WAV · M4A · AAC · OGG · FLAC', remove:'Remove',
       original:'Original file',
@@ -366,15 +366,15 @@
       fixnoise:'Background noise & hiss', fixhum:'Hum & mains interference', fixbreath:'Breaths & low-level noise',
       fixclarity:'Voice clarity & sharpness', fixvolume:'Balance loudness',
       cleanBtn:'Clean now', working:'Processing audio',
-      rtNote:'Processing runs entirely in your browser — a long file takes a little longer.',
+      rtNote:'Processing is fast — a long file takes a little longer.',
       st_filter:'Filtering frequencies…', st_analyze:'Analyzing the noise floor…', st_clean:'Removing background noise…',
       st_normalize:'Balancing loudness…', st_encode:'Preparing the file…', st_done:'Done',
       readyTitle:'Cleanup complete!',
       readySub:d=>`Your audio was cleaned & enhanced · ${d} · listen and compare <b>before</b> vs <b>after</b>.`,
       before:'Before', after:'After · clean',
       dlBtn:'Download clean file', againBtn:'Clean again',
-      seam:'Local cleanup: the file is decoded and processed right here in your browser via Web Audio — noise & interference filtering, a noise gate, clarity EQ and loudness balancing — then exported as a high-quality WAV. Nothing is sent to a server.',
-      foot:'KOLKLI · AI Audio Cleanup · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · AI Audio Cleanup · Fast, simple and professional quality',
       errNoFile:'Add an audio file first', errDecode:'We could not decode that file — try another format',
       errNoFix:'Pick at least one cleanup action', errRun:'Processing failed — try another file',
       loaded:'File loaded ✓', dlWord:'Download',
@@ -385,7 +385,7 @@
       newBadge:'AI',
       kick:'AI-очистка аудио',
       pageTitle:'Очистка и улучшение аудио — с помощью AI',
-      pageSub:'Загрузите звуковой файл, и умная очистка уберёт фоновый шум, гул, помехи и придыхания — сделает голос чётче, выровняет громкость и сохранит тон максимально чистым и естественным. Всё работает в вашем браузере; ничего не покидает ваше устройство.',
+      pageSub:'Загрузите звуковой файл, и умная очистка уберёт фоновый шум, гул, помехи и придыхания — сделает голос чётче, выровняет громкость и сохранит тон максимально чистым и естественным. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите аудиофайл сюда', or2:'или', choose:'Выбрать файл',
       sizeNote:'MP3 · WAV · M4A · AAC · OGG · FLAC', remove:'Удалить',
       original:'Исходный файл',
@@ -398,15 +398,15 @@
       fixnoise:'Фоновый шум и шипение', fixhum:'Гул и помехи сети', fixbreath:'Придыхания и тихий шум',
       fixclarity:'Чёткость и разборчивость голоса', fixvolume:'Выровнять громкость',
       cleanBtn:'Очистить', working:'Обработка аудио',
-      rtNote:'Обработка полностью выполняется в вашем браузере — длинный файл занимает чуть больше времени.',
+      rtNote:'Обработка быстрая — длинный файл занимает чуть больше времени.',
       st_filter:'Фильтрация частот…', st_analyze:'Анализ уровня шума…', st_clean:'Удаление фонового шума…',
       st_normalize:'Выравнивание громкости…', st_encode:'Подготовка файла…', st_done:'Готово',
       readyTitle:'Очистка завершена!',
       readySub:d=>`Ваше аудио очищено и улучшено · ${d} · послушайте и сравните <b>до</b> и <b>после</b>.`,
       before:'До', after:'После · чисто',
       dlBtn:'Скачать чистый файл', againBtn:'Очистить снова',
-      seam:'Локальная очистка: файл декодируется и обрабатывается прямо в вашем браузере через Web Audio — фильтрация шума и помех, шумовой гейт, EQ для чёткости и выравнивание громкости — затем экспортируется в качественный WAV. Ничего не отправляется на сервер.',
-      foot:'KOLKLI · AI-очистка аудио · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · AI-очистка аудио · Быстро, просто и профессионального качества',
       errNoFile:'Сначала добавьте аудиофайл', errDecode:'Не удалось декодировать этот файл — попробуйте другой формат',
       errNoFix:'Выберите хотя бы одно действие очистки', errRun:'Обработка не удалась — попробуйте другой файл',
       loaded:'Файл загружен ✓', dlWord:'Скачать',

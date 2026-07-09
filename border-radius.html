@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחולל Border Radius</title>
-<meta name="description" content="Free CSS border-radius generator — round element corners with a live preview, control each corner or link them together, switch between px and %, and copy ready-to-use CSS. Fast, private, right in your browser.">
+<meta name="description" content="Free CSS border-radius generator — round element corners with a live preview, control each corner or link them together, switch between px and %, and copy ready-to-use CSS. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -236,33 +236,33 @@
     he:{ dir:'rtl',
       kick:'מחולל Border Radius',
       pageTitle:'מחולל Border Radius ל-CSS',
-      pageSub:'עגלו את פינות האלמנט עם תצוגה מקדימה חיה — שלטו בכל פינה בנפרד או בכולן יחד, החליפו בין px ל-%, והעתיקו את קוד ה-CSS המוכן. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'עגלו את פינות האלמנט עם תצוגה מקדימה חיה — שלטו בכל פינה בנפרד או בכולן יחד, החליפו בין px ל-%, והעתיקו את קוד ה-CSS המוכן. מהיר, פשוט ובאיכות מקצועית.',
       copy:'העתקה', copiedMsg:'הועתק ✓',
       linkAll:'קשירת כל הפינות',
       cornerTL:'למעלה משמאל', cornerTR:'למעלה מימין', cornerBR:'למטה מימין', cornerBL:'למטה משמאל',
       unitLabel:'יחידה', random:'אקראי', reset:'איפוס',
       note:'השתמשו ב-% לעיגול רספונסיבי שמשתנה עם גודל האלמנט, וב-px לפינות בגודל קבוע. ערך של 50% על ריבוע הופך אותו לעיגול מושלם.',
-      foot:'KOLKLI · מחולל Border Radius · פרטי ומהיר, ישירות בדפדפן' },
+      foot:'KOLKLI · מחולל Border Radius · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Border Radius',
       pageTitle:'CSS Border-Radius Generator',
-      pageSub:'Round the corners of any element with a live preview — control each corner on its own or all together, switch between px and %, and copy the ready-to-use CSS. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Round the corners of any element with a live preview — control each corner on its own or all together, switch between px and %, and copy the ready-to-use CSS. Fast, simple and professional-quality.',
       copy:'Copy', copiedMsg:'Copied ✓',
       linkAll:'Link all corners',
       cornerTL:'Top-left', cornerTR:'Top-right', cornerBR:'Bottom-right', cornerBL:'Bottom-left',
       unitLabel:'Unit', random:'Random', reset:'Reset',
       note:'Use % for responsive rounding that scales with the element, and px for fixed-size corners. A value of 50% on a square turns it into a perfect circle.',
-      foot:'KOLKLI · Border-Radius Generator · Private and fast, right in your browser' },
+      foot:'KOLKLI · Border-Radius Generator · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Border Radius',
       pageTitle:'Генератор CSS border-radius',
-      pageSub:'Скругляйте углы любого элемента с живым предпросмотром — управляйте каждым углом отдельно или всеми сразу, переключайтесь между px и %, и копируйте готовый CSS. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Скругляйте углы любого элемента с живым предпросмотром — управляйте каждым углом отдельно или всеми сразу, переключайтесь между px и %, и копируйте готовый CSS. Быстро, просто и профессионального качества.',
       copy:'Копировать', copiedMsg:'Скопировано ✓',
       linkAll:'Связать все углы',
       cornerTL:'Верхний левый', cornerTR:'Верхний правый', cornerBR:'Нижний правый', cornerBL:'Нижний левый',
       unitLabel:'Единица', random:'Случайно', reset:'Сброс',
       note:'Используйте % для адаптивного скругления, которое масштабируется вместе с элементом, и px для фиксированных углов. Значение 50% на квадрате превращает его в идеальный круг.',
-      foot:'KOLKLI · Генератор border-radius · Приватно и быстро, прямо в браузере' }
+      foot:'KOLKLI · Генератор border-radius · Быстро, просто и профессионального качества' }
   };
 
   let lang='he', t=I18N.he;

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מנקה HTML</title>
-<meta name="description" content="Free online HTML cleaner — strip tags, inline styles, classes, IDs and data-attributes, remove comments, scripts and empty tags, and clean messy Microsoft Word / Google Docs markup in one click. Paste, clean and copy. Fast, private, right in your browser.">
+<meta name="description" content="Free online HTML cleaner — strip tags, inline styles, classes, IDs and data-attributes, remove comments, scripts and empty tags, and clean messy Microsoft Word / Google Docs markup in one click. Paste, clean and copy. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -214,7 +214,7 @@
     he:{ dir:'rtl',
       kick:'מנקה HTML',
       pageTitle:'מנקה HTML — ניקוי קוד, סגנונות וזבל של Word',
-      pageSub:'הדביקו קוד HTML מבולגן ונקו אותו בלחיצה — הסירו תגיות, סגנונות מוטבעים, מחלקות ומזהים, מחקו הערות וסקריפטים, ונקו את הזבל של Microsoft Word ו-Google Docs. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'הדביקו קוד HTML מבולגן ונקו אותו בלחיצה — הסירו תגיות, סגנונות מוטבעים, מחלקות ומזהים, מחקו הערות וסקריפטים, ונקו את הזבל של Microsoft Word ו-Google Docs. מהיר, פשוט ובאיכות מקצועית.',
       optionsTitle:'אפשרויות ניקוי', inputTitle:'קלט', outputTitle:'פלט מנוקה',
       optStripAll:'הסרת כל התגיות → טקסט בלבד',
       optStyles:'הסרת סגנונות מוטבעים (style="...")',
@@ -230,13 +230,13 @@
       presetWord:'ניקוי Word/Docs', presetPlain:'טקסט בלבד', presetStyles:'סגנונות בלבד', presetReset:'איפוס',
       inputPh:'הדביקו כאן את קוד ה-HTML המבולגן…',
       download:'הורדה', statBefore:'לפני', statAfter:'אחרי', statSaved:'חיסכון',
-      note:'הניקוי מתבצע לגמרי בדפדפן שלכם באמצעות DOMParser — קוד מודבק לעולם אינו מורץ ושום דבר אינו נשלח לשרת. שנו את האפשרויות למעלה כדי לכוונן את התוצאה; היא מתעדכנת בזמן אמת.',
+      note:'שנו את האפשרויות למעלה כדי לכוונן את התוצאה; היא מתעדכנת בזמן אמת. מהיר, פשוט ובאיכות מקצועית.',
       copy:'העתקה', copiedMsg:'הועתק ✓', dlMsg:'הורד ✓', errMsg:'לא ניתן לנקות את הקלט',
-      foot:'KOLKLI · מנקה HTML · פרטי ומהיר, ישירות בדפדפן' },
+      foot:'KOLKLI · מנקה HTML · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'HTML Cleaner',
       pageTitle:'HTML Cleaner — strip tags, styles & Word junk',
-      pageSub:'Paste messy HTML and clean it in one click — remove tags, inline styles, classes and IDs, delete comments and scripts, and clean up Microsoft Word and Google Docs junk. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Paste messy HTML and clean it in one click — remove tags, inline styles, classes and IDs, delete comments and scripts, and clean up Microsoft Word and Google Docs junk. Fast, simple and professional-quality.',
       optionsTitle:'Cleaning options', inputTitle:'Input', outputTitle:'Cleaned output',
       optStripAll:'Strip ALL tags → plain text',
       optStyles:'Remove inline styles (style="...")',
@@ -252,13 +252,13 @@
       presetWord:'Word/Docs cleanup', presetPlain:'Plain text', presetStyles:'Strip styles only', presetReset:'Reset',
       inputPh:'Paste your messy HTML here…',
       download:'Download', statBefore:'Before', statAfter:'After', statSaved:'Saved',
-      note:'Cleaning happens entirely in your browser using DOMParser — pasted markup is never executed and nothing is sent to a server. Toggle the options above to fine-tune the result; it updates live as you type.',
+      note:'Toggle the options above to fine-tune the result; it updates live as you type. Fast, simple and professional-quality.',
       copy:'Copy', copiedMsg:'Copied ✓', dlMsg:'Downloaded ✓', errMsg:'Could not clean the input',
-      foot:'KOLKLI · HTML Cleaner · Private and fast, right in your browser' },
+      foot:'KOLKLI · HTML Cleaner · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Очистка HTML',
       pageTitle:'Очистка HTML — удаление тегов, стилей и мусора Word',
-      pageSub:'Вставьте грязный HTML и очистите его одним щелчком — уберите теги, встроенные стили, классы и идентификаторы, удалите комментарии и скрипты, а также мусор Microsoft Word и Google Docs. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Вставьте грязный HTML и очистите его одним щелчком — уберите теги, встроенные стили, классы и идентификаторы, удалите комментарии и скрипты, а также мусор Microsoft Word и Google Docs. Быстро, просто и профессионального качества.',
       optionsTitle:'Параметры очистки', inputTitle:'Ввод', outputTitle:'Очищенный вывод',
       optStripAll:'Удалить ВСЕ теги → только текст',
       optStyles:'Удалить встроенные стили (style="...")',
@@ -274,9 +274,9 @@
       presetWord:'Очистка Word/Docs', presetPlain:'Только текст', presetStyles:'Только стили', presetReset:'Сброс',
       inputPh:'Вставьте сюда грязный HTML…',
       download:'Скачать', statBefore:'До', statAfter:'После', statSaved:'Экономия',
-      note:'Очистка выполняется полностью в вашем браузере с помощью DOMParser — вставленный код никогда не выполняется, и ничего не отправляется на сервер. Меняйте параметры выше для точной настройки; результат обновляется в реальном времени.',
+      note:'Меняйте параметры выше для точной настройки; результат обновляется в реальном времени. Быстро, просто и профессионального качества.',
       copy:'Копировать', copiedMsg:'Скопировано ✓', dlMsg:'Скачано ✓', errMsg:'Не удалось очистить ввод',
-      foot:'KOLKLI · Очистка HTML · Приватно и быстро, прямо в браузере' }
+      foot:'KOLKLI · Очистка HTML · Быстро, просто и профессионального качества' }
   };
 
   const OPTIDS = { stripAll:'optStripAll', styles:'optStyles', cls:'optClass', ids:'optId', data:'optData',

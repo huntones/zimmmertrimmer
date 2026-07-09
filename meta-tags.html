@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — Meta Tags Generator</title>
-<meta name="description" content="Free meta tag generator — build SEO title, description, keywords, Open Graph and Twitter card tags with a live Google & social preview. Copy ready-to-paste HTML. Fast, private, right in your browser.">
+<meta name="description" content="Free meta tag generator — build SEO title, description, keywords, Open Graph and Twitter card tags with a live Google & social preview. Copy ready-to-paste HTML. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -169,7 +169,7 @@
       </div>
       <div class="field">
         <label data-i18n="f_desc"></label>
-        <textarea id="mDesc" spellcheck="false">Free, private, browser-based tools for editing audio, images, PDFs and more. No signup, nothing uploaded.</textarea>
+        <textarea id="mDesc" spellcheck="false">Free tools for editing audio, images, PDFs and more. No signup needed.</textarea>
       </div>
       <div class="field">
         <label data-i18n="f_keywords"></label>
@@ -311,7 +311,7 @@
     he:{ dir:'rtl',
       kick:'מחולל Meta Tags',
       pageTitle:'מחולל Meta Tags — Title, תיאור, Open Graph ו-Twitter',
-      pageSub:'מלאו את השדות וקבלו מייד תגי meta מוכנים להדבקה — כותרת, תיאור, מילות מפתח, Open Graph ו-Twitter Cards — עם תצוגה חיה של תוצאת Google ושל כרטיס השיתוף. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'מלאו את השדות וקבלו מייד תגי meta מוכנים להדבקה — כותרת, תיאור, מילות מפתח, Open Graph ו-Twitter Cards — עם תצוגה חיה של תוצאת Google ושל כרטיס השיתוף. מהיר, פשוט ובאיכות מקצועית.',
       basicGroup:'בסיסי', ogGroup:'Open Graph', twGroup:'Twitter',
       f_title:'כותרת הדף (Title)', f_desc:'תיאור (Description)', f_keywords:'מילות מפתח (מופרדות בפסיקים)',
       f_author:'יוצר', f_canonical:'כתובת קנונית (Canonical URL)', f_robots:'Robots',
@@ -320,12 +320,12 @@
       f_twcard:'twitter:card', f_twsite:'twitter:site (@handle)',
       serpTitle:'תצוגה מקדימה ב-Google', socialTitle:'כרטיס שיתוף (רשתות חברתיות)', codeTitle:'הקוד שנוצר',
       copy:'העתקה', copiedMsg:'הועתק ✓',
-      note:'התגים נבנים אצלכם בדפדפן — שום מידע לא מועלה לשרת. שדות ריקים לא ייכללו בקוד. אם og:title / og:description / og:url ריקים, הם יימשכו מהכותרת, התיאור והכתובת הקנונית.',
-      foot:'KOLKLI · Meta Tags Generator · פרטי ומהיר, ישירות בדפדפן' },
+      note:'שדות ריקים לא ייכללו בקוד. אם og:title / og:description / og:url ריקים, הם יימשכו מהכותרת, התיאור והכתובת הקנונית. מהיר, פשוט ובאיכות מקצועית.',
+      foot:'KOLKLI · Meta Tags Generator · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Meta Tags Generator',
       pageTitle:'Meta Tags Generator — Title, Description, Open Graph & Twitter',
-      pageSub:'Fill in the fields and instantly get ready-to-paste meta tags — title, description, keywords, Open Graph and Twitter cards — with a live Google result and share-card preview. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Fill in the fields and instantly get ready-to-paste meta tags — title, description, keywords, Open Graph and Twitter cards — with a live Google result and share-card preview. Fast, simple and professional-quality.',
       basicGroup:'Basic', ogGroup:'Open Graph', twGroup:'Twitter',
       f_title:'Page title', f_desc:'Description', f_keywords:'Keywords (comma-separated)',
       f_author:'Author', f_canonical:'Canonical URL', f_robots:'Robots',
@@ -334,12 +334,12 @@
       f_twcard:'twitter:card', f_twsite:'twitter:site (@handle)',
       serpTitle:'Google preview', socialTitle:'Social share card', codeTitle:'Generated code',
       copy:'Copy', copiedMsg:'Copied ✓',
-      note:'Tags are built in your browser — nothing is uploaded. Empty fields are left out of the code. If og:title / og:description / og:url are blank they fall back to the title, description and canonical URL.',
-      foot:'KOLKLI · Meta Tags Generator · Private and fast, right in your browser' },
+      note:'Empty fields are left out of the code. If og:title / og:description / og:url are blank they fall back to the title, description and canonical URL. Fast, simple and professional-quality.',
+      foot:'KOLKLI · Meta Tags Generator · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Генератор Meta-тегов',
       pageTitle:'Генератор Meta-тегов — Title, Description, Open Graph и Twitter',
-      pageSub:'Заполните поля и мгновенно получите готовые для вставки meta-теги — заголовок, описание, ключевые слова, Open Graph и Twitter Cards — с живым превью результата Google и карточки для соцсетей. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Заполните поля и мгновенно получите готовые для вставки meta-теги — заголовок, описание, ключевые слова, Open Graph и Twitter Cards — с живым превью результата Google и карточки для соцсетей. Быстро, просто и профессионального качества.',
       basicGroup:'Основное', ogGroup:'Open Graph', twGroup:'Twitter',
       f_title:'Заголовок страницы', f_desc:'Описание', f_keywords:'Ключевые слова (через запятую)',
       f_author:'Автор', f_canonical:'Канонический URL', f_robots:'Robots',
@@ -348,8 +348,8 @@
       f_twcard:'twitter:card', f_twsite:'twitter:site (@handle)',
       serpTitle:'Превью Google', socialTitle:'Карточка для соцсетей', codeTitle:'Сгенерированный код',
       copy:'Копировать', copiedMsg:'Скопировано ✓',
-      note:'Теги собираются в вашем браузере — ничего не загружается. Пустые поля в код не попадают. Если og:title / og:description / og:url пусты, они берутся из заголовка, описания и канонического URL.',
-      foot:'KOLKLI · Генератор Meta-тегов · Приватно и быстро, прямо в браузере' }
+      note:'Пустые поля в код не попадают. Если og:title / og:description / og:url пусты, они берутся из заголовка, описания и канонического URL. Быстро, просто и профессионального качества.',
+      foot:'KOLKLI · Генератор Meta-тегов · Быстро, просто и профессионального качества' }
   };
 
   let lang='he', t=I18N.he;

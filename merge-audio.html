@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מיזוג אודיו</title>
-<meta name="description" content="Merge several audio files into one track — right in your browser. Reorder by drag, add gaps between clips, nothing gets uploaded. Fast, private and free.">
+<meta name="description" content="Merge several audio files into one track. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -152,7 +152,7 @@
   .fmt:active{transform:scale(.97);}
   .fmt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
   .fmt b{font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--ink);}
-  .fmt small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;}
+  .fmt small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;direction:ltr;}
   .fmt.on b{color:var(--accent-dim);}
   .fmt.soon{cursor:not-allowed;opacity:.62;}
   .fmt.soon:hover{border-color:var(--line);}
@@ -346,7 +346,7 @@
       dir:'rtl', langIco:'EN',
       kick:'אודיו · מיזוג אודיו',
       pageTitle:'מזגו כמה קובצי אודיו לרצועה אחת',
-      pageSub:'גררו כמה קובצי אודיו, סדרו אותם בסדר הרצוי, הוסיפו מרווח שקט ביניהם ומזגו אותם לקובץ אחד רציף. הכול מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      pageSub:'גררו כמה קובצי אודיו, סדרו אותם בסדר הרצוי, הוסיפו מרווח שקט ביניהם ומזגו אותם לקובץ אחד רציף. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובצי אודיו לכאן', or2:'או', choose:'בחרו קבצים',
       sizeNote:'MP3 · WAV · M4A · AAC · FLAC · OGG · OPUS',
       remove:'הסרה', totalLbl:'סה״כ', orderTtl:'סדר המיזוג', reverse:'הפוך סדר',
@@ -359,8 +359,8 @@
       readyTitle:'האודיו המאוחד מוכן!', readySub:(f,d)=>`${f} קבצים מוזגו לרצועה אחת באורך ${d}.`,
       download:'הורדת האודיו', againBtn:'מיזוג נוסף',
       loadingDur:'קורא…',
-      seam:'הכול רץ מקומית בדפדפן דרך Web Audio — הקבצים לא נשלחים לשום שרת. המיזוג מיוצא כ־WAV באיכות מלאה; קידוד MP3/M4A מתחבר עם השרת. גררו את הרצועות או השתמשו בחצים כדי לשנות את סדר המיזוג.',
-      foot:'KOLKLI · מיזוג אודיו · רץ בדפדפן שלכם',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · מיזוג אודיו. מהיר, פשוט ובאיכות מקצועית.',
       copied:'הועתק ✓',
       errNone:'הוסיפו לפחות שני קובצי אודיו תקינים כדי למזג',
       errFail:'המיזוג נכשל. בדקו שהקבצים תקינים ובפורמט נתמך.',
@@ -370,7 +370,7 @@
       dir:'ltr', langIco:'עב',
       kick:'Audio · Merge audio',
       pageTitle:'Merge several audio files into one track',
-      pageSub:'Drop your audio files, arrange them in the order you want, add an optional silent gap between them, and merge them into one continuous track. It all runs in your browser — no file ever leaves your machine.',
+      pageSub:'Drop your audio files, arrange them in the order you want, add an optional silent gap between them, and merge them into one continuous track. Fast, simple and professional-quality.',
       dropBig:'Drag audio files here', or2:'or', choose:'Choose files',
       sizeNote:'MP3 · WAV · M4A · AAC · FLAC · OGG · OPUS',
       remove:'Remove', totalLbl:'Total', orderTtl:'Merge order', reverse:'Reverse',
@@ -383,8 +383,8 @@
       readyTitle:'Your merged audio is ready!', readySub:(f,d)=>`${f} files merged into one ${d} track.`,
       download:'Download audio', againBtn:'Merge more',
       loadingDur:'reading…',
-      seam:'Everything runs locally in your browser via Web Audio — files are never uploaded. The merge is exported as full-quality WAV; MP3/M4A encoding connects with the server. Drag the rows or use the arrows to change the merge order.',
-      foot:'KOLKLI · Merge Audio · runs in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Merge Audio. Fast, simple and professional-quality.',
       copied:'Copied ✓',
       errNone:'Add at least two valid audio files to merge',
       errFail:'Merge failed. Make sure the files are valid and in a supported format.',
@@ -394,7 +394,7 @@
       dir:'ltr',
       kick:'Аудио · Объединение аудио',
       pageTitle:'Объедините несколько аудиофайлов в один трек',
-      pageSub:'Перетащите аудиофайлы, расставьте их в нужном порядке, добавьте по желанию тихую паузу между ними и объедините в один непрерывный трек. Всё работает в вашем браузере — ни один файл не покидает устройство.',
+      pageSub:'Перетащите аудиофайлы, расставьте их в нужном порядке, добавьте по желанию тихую паузу между ними и объедините в один непрерывный трек. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите аудиофайлы сюда', or2:'или', choose:'Выбрать файлы',
       sizeNote:'MP3 · WAV · M4A · AAC · FLAC · OGG · OPUS',
       remove:'Удалить', totalLbl:'Всего', orderTtl:'Порядок объединения', reverse:'Обратить',
@@ -407,8 +407,8 @@
       readyTitle:'Ваше объединённое аудио готово!', readySub:(f,d)=>`Объединено файлов: ${f} в один трек · ${d}.`,
       download:'Скачать аудио', againBtn:'Ещё объединение',
       loadingDur:'чтение…',
-      seam:'Всё работает локально в вашем браузере через Web Audio — файлы никогда не загружаются. Объединение экспортируется как WAV полного качества; кодирование MP3/M4A подключается к серверу. Перетаскивайте строки или используйте стрелки, чтобы изменить порядок объединения.',
-      foot:'KOLKLI · Объединение аудио · работает в вашем браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Объединение аудио. Быстро, просто и профессионального качества.',
       copied:'Скопировано ✓',
       errNone:'Добавьте хотя бы два корректных аудиофайла для объединения',
       errFail:'Объединение не удалось. Убедитесь, что файлы корректны и в поддерживаемом формате.',

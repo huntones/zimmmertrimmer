@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — ממיר מידות מסך</title>
-<meta name="description" content="Free screen-units converter — convert between PX, REM, EM, VW, VH, PT and % instantly. Set your root font, element font and viewport size, type any value and copy the rest. Fast, private, right in your browser.">
+<meta name="description" content="Free screen-units converter — convert between PX, REM, EM, VW, VH, PT and % instantly. Set your root font, element font and viewport size, type any value and copy the rest. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -247,36 +247,36 @@
     he:{ dir:'rtl',
       kick:'ממיר מידות מסך',
       pageTitle:'ממיר יחידות מסך — PX, REM, EM, VW ו-VH',
-      pageSub:'הקלידו ערך באחת היחידות וכל השאר יתעדכנו מיד — PX, REM, EM, VW, VH, PT ו-%. הגדירו גודל גופן בסיס, גופן אב וגודל חלון תצוגה, והעתיקו כל ערך בלחיצה. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'הקלידו ערך באחת היחידות וכל השאר יתעדכנו מיד — PX, REM, EM, VW, VH, PT ו-%. הגדירו גודל גופן בסיס, גופן אב וגודל חלון תצוגה, והעתיקו כל ערך בלחיצה. מהיר, פשוט ובאיכות מקצועית.',
       converterTitle:'המרה', settingsTitle:'הגדרות',
       rootLabel:'גודל גופן בסיס (root)', parentLabel:'גודל גופן אב (element)',
       vpwLabel:'רוחב חלון התצוגה', vphLabel:'גובה חלון התצוגה',
       useScreen:'לפי המסך שלי', tableTitle:'טבלת ייחוס נפוצה',
       pctLabel:'%', copy:'העתקה', copiedMsg:'הועתק ✓',
       note:'REM מחושב לפי גודל גופן הבסיס; EM ו-% לפי גופן האב (האלמנט); ו-VW/VH לפי מידות חלון התצוגה. שנו את ההגדרות למעלה כדי לקבל תוצאות מדויקות למקרה שלכם. PT מחושב לפי 96dpi (1px = 0.75pt).',
-      foot:'KOLKLI · ממיר מידות מסך · פרטי ומהיר, ישירות בדפדפן' },
+      foot:'KOLKLI · ממיר מידות מסך · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Screen Units Converter',
       pageTitle:'Screen Units Converter — PX, REM, EM, VW & VH',
-      pageSub:'Type a value in any unit and all the others update instantly — PX, REM, EM, VW, VH, PT and %. Set your root font, element font and viewport size, then copy any value with one click. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Type a value in any unit and all the others update instantly — PX, REM, EM, VW, VH, PT and %. Set your root font, element font and viewport size, then copy any value with one click. Fast, simple and professional-quality.',
       converterTitle:'Convert', settingsTitle:'Settings',
       rootLabel:'Root font size', parentLabel:'Parent font size',
       vpwLabel:'Viewport width', vphLabel:'Viewport height',
       useScreen:'Use my screen', tableTitle:'Common reference table',
       pctLabel:'%', copy:'Copy', copiedMsg:'Copied ✓',
       note:'REM is based on the root font size; EM and % are based on the parent (element) font size; VW/VH are based on the viewport size. Adjust the settings above to match your case. PT assumes 96dpi (1px = 0.75pt).',
-      foot:'KOLKLI · Screen Units Converter · Private and fast, right in your browser' },
+      foot:'KOLKLI · Screen Units Converter · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Конвертер экранных единиц',
       pageTitle:'Конвертер единиц — PX, REM, EM, VW и VH',
-      pageSub:'Введите значение в любой единице, и все остальные обновятся мгновенно — PX, REM, EM, VW, VH, PT и %. Задайте базовый шрифт, шрифт элемента и размер окна, затем скопируйте любое значение одним щелчком. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Введите значение в любой единице, и все остальные обновятся мгновенно — PX, REM, EM, VW, VH, PT и %. Задайте базовый шрифт, шрифт элемента и размер окна, затем скопируйте любое значение одним щелчком. Быстро, просто и профессионального качества.',
       converterTitle:'Конвертация', settingsTitle:'Настройки',
       rootLabel:'Базовый размер шрифта', parentLabel:'Размер шрифта элемента',
       vpwLabel:'Ширина окна', vphLabel:'Высота окна',
       useScreen:'По моему экрану', tableTitle:'Таблица соответствий',
       pctLabel:'%', copy:'Копировать', copiedMsg:'Скопировано ✓',
       note:'REM рассчитывается по базовому размеру шрифта; EM и % — по шрифту родителя (элемента); VW/VH — по размеру окна. Измените настройки выше, чтобы получить точные значения. PT рассчитывается при 96dpi (1px = 0.75pt).',
-      foot:'KOLKLI · Конвертер экранных единиц · Приватно и быстро, прямо в браузере' }
+      foot:'KOLKLI · Конвертер экранных единиц · Быстро, просто и профессионального качества' }
   };
 
   const UNITS = [

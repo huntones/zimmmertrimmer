@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — חילוץ אודיו מווידאו</title>
-<meta name="description" content="Extract the audio track from any video right in your browser — pick a format, sample rate, channels and quality, and download. Fast, private, nothing leaves your machine.">
+<meta name="description" content="pick a format, sample rate, channels and quality, and download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -118,7 +118,7 @@
   .fmt:active{transform:scale(.97);}
   .fmt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-sm);}
   .fmt b{font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--ink);}
-  .fmt small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;}
+  .fmt small{font-size:9.5px;color:var(--faint);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;direction:ltr;}
   .fmt.on b{color:var(--accent-dim);}
   .fmt.soon{cursor:not-allowed;opacity:.62;}
   .fmt.soon:hover{border-color:var(--line);}
@@ -326,8 +326,8 @@
     he:{
       dir:'rtl', langIco:'EN',
       kick:'חילוץ אודיו',
-      pageTitle:'חלצו את הסאונד מכל סרטון — בלי להעלות לשרת',
-      pageSub:'גררו קובצי וידאו, בחרו פורמט אודיו, קצב דגימה, ערוצים ואיכות, וקבלו קובץ קול מוכן להורדה. החילוץ מתבצע בדפדפן שלכם — שום קובץ לא עוזב את המחשב.',
+      pageTitle:'חלצו את הסאונד מכל סרטון',
+      pageSub:'גררו קובצי וידאו, בחרו פורמט אודיו, קצב דגימה, ערוצים ואיכות, וקבלו קובץ קול מוכן להורדה. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובצי וידאו לכאן', or2:'או', choose:'בחרו קבצים',
       sizeNote:'MP4 · MOV · WEBM · M4V · OGV', remove:'הסרה',
       totalLbl:'סה״כ', optTitle:'הגדרות חילוץ',
@@ -340,8 +340,8 @@
       dlAll:'הורדת הכול', againBtn:'חילוץ נוסף',
       converted:'חולץ', origLbl:'וידאו',
       failed:'החילוץ נכשל — ייתכן שאין רצועת אודיו בקובץ',
-      seam:'חילוץ מקומי לגמרי: WAV נוצר מיידית ואופליין. MP3 · M4A · OGG · WEBM · FLAC מקודדים כאן בדפדפן דרך מנוע ffmpeg המובנה — שום קובץ לא עוזב את המחשב.',
-      foot:'KOLKLI · חילוץ אודיו מווידאו · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · חילוץ אודיו מווידאו · מהיר, פשוט ובאיכות מקצועית',
       errNoFiles:'צריך לצרף לפחות קובץ וידאו אחד', errDecode:'לא הצלחנו לחלץ אודיו מאף קובץ',
       copied:'הקישור הועתק ✓',
       engineLoad:'טוען מנוע חילוץ…', errEngine:'טעינת מנוע החילוץ נכשלה — רעננו את הדף ונסו שוב, או בחרו בפורמט WAV.',
@@ -349,8 +349,8 @@
     en:{
       dir:'ltr', langIco:'עב',
       kick:'Extract audio',
-      pageTitle:'Extract the audio from any video — without uploading',
-      pageSub:'Drop video files, pick an audio format, sample rate, channels and quality, and get a ready-to-download sound file. Extraction runs in your browser — nothing leaves your machine.',
+      pageTitle:'Extract the audio from any video',
+      pageSub:'Drop video files, pick an audio format, sample rate, channels and quality, and get a ready-to-download sound file. Fast, simple and professional-quality.',
       dropBig:'Drag video files here', or2:'or', choose:'Choose files',
       sizeNote:'MP4 · MOV · WEBM · M4V · OGV', remove:'Remove',
       totalLbl:'Total', optTitle:'Extract options',
@@ -363,8 +363,8 @@
       dlAll:'Download all', againBtn:'Extract more',
       converted:'Extracted', origLbl:'video',
       failed:'Extraction failed — the file may have no audio track',
-      seam:'Fully local extraction: WAV is created instantly and offline. MP3 · M4A · OGG · WEBM · FLAC are encoded right here in your browser by the built-in ffmpeg engine — nothing ever leaves your machine.',
-      foot:'KOLKLI · Extract audio from video · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Extract audio from video · Fast, simple and professional quality',
       errNoFiles:'Add at least one video file', errDecode:'We could not extract audio from any file',
       copied:'Link copied ✓',
       engineLoad:'Loading extraction engine…', errEngine:'The extraction engine failed to load — refresh and try again, or pick the WAV format.',
@@ -372,8 +372,8 @@
     ru:{
       dir:'ltr',
       kick:'Извлечение аудио',
-      pageTitle:'Извлекайте звук из любого видео — без загрузки на сервер',
-      pageSub:'Перетащите видеофайлы, выберите формат аудио, частоту дискретизации, каналы и качество — и получите готовый к скачиванию звуковой файл. Извлечение идёт в вашем браузере — ничего не покидает устройство.',
+      pageTitle:'Извлекайте звук из любого видео',
+      pageSub:'Перетащите видеофайлы, выберите формат аудио, частоту дискретизации, каналы и качество — и получите готовый к скачиванию звуковой файл. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите видеофайлы сюда', or2:'или', choose:'Выбрать файлы',
       sizeNote:'MP4 · MOV · WEBM · M4V · OGV', remove:'Удалить',
       totalLbl:'Всего', optTitle:'Параметры извлечения',
@@ -381,13 +381,13 @@
       rateLbl:'Частота дискретизации', chLbl:'Каналы', depthLbl:'Разрядность (WAV)', brLbl:'Качество (битрейт)',
       keepOrig:'Как в оригинале', stereo:'Стерео', mono:'Моно', float32:'32-бит Float',
       convBtn:'Извлечь', working:'Извлечение…',
-      rtNote:'WAV — мгновенно. Все остальные форматы (MP3 · M4A · OGG · WEBM · FLAC) кодируются локально встроенным движком ffmpeg — первый запуск загружает движок (~30 МБ), затем он кэшируется.',
+      rtNote:'Обработка быстрая — WAV — мгновенно. Все остальные форматы (MP3 · M4A · OGG · WEBM  — первый запуск загружает движок (~30 МБ), затем он кэшируется.',
       readyTitle:'Извлечение завершено!', readySub:n=>`Готово к скачиванию: ${n}.`,
       dlAll:'Скачать всё', againBtn:'Ещё извлечение',
       converted:'Извлечено', origLbl:'видео',
       failed:'Извлечение не удалось — возможно, в файле нет звуковой дорожки',
-      seam:'Полностью локальное извлечение: WAV создаётся мгновенно и офлайн. MP3 · M4A · OGG · WEBM · FLAC кодируются прямо в вашем браузере встроенным движком ffmpeg — ничего не покидает устройство.',
-      foot:'KOLKLI · Извлечение аудио из видео · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Извлечение аудио из видео · Быстро, просто и профессионального качества',
       errNoFiles:'Добавьте хотя бы один видеофайл', errDecode:'Не удалось извлечь звук ни из одного файла',
       copied:'Ссылка скопирована ✓',
       engineLoad:'Загрузка движка извлечения…', errEngine:'Не удалось загрузить движок извлечения — обновите страницу и повторите, или выберите формат WAV.',

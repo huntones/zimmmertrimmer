@@ -51,57 +51,104 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:900px;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:1220px;margin:0 auto;padding:10px 22px 46px;}
 
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:26px;}
-  .dhead{text-align:center;border-bottom:1px solid var(--line-2);padding-bottom:20px;margin-bottom:20px;}
-  .dhead .ava{width:58px;height:58px;margin:0 auto 12px;border-radius:16px;display:flex;align-items:center;justify-content:center;
-    background:var(--grad-soft);color:var(--accent);}
-  .dhead .ava svg{width:29px;height:29px;}
-  .dhead h1{font-size:21px;margin:0 0 6px;font-weight:700;word-break:break-word;}
-  .dhead .desc{font-size:14px;color:var(--muted);white-space:pre-wrap;word-break:break-word;max-width:52ch;margin:0 auto;}
-  .metarow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;}
-  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--muted);
-    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;}
-  .chip svg{width:13px;height:13px;color:var(--accent);}
+  /* ---------- minimal client top bar: language picker + brand ---------- */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px 18px;}
+  .topbar .brand{display:flex;align-items:center;gap:9px;}
+  .topbar .brand img{height:30px;width:auto;display:block;}
+  .lang{position:relative;}
+  .langbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 13px;border-radius:999px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;font-size:13.5px;font-weight:600;
+    box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s;}
+  .langbtn:hover{border-color:var(--accent);} .langbtn:active{transform:scale(.97);}
+  .langbtn .globe{width:17px;height:17px;color:var(--accent);}
+  .langbtn .chev{width:14px;height:14px;color:var(--faint);transition:transform .18s;}
+  .lang.open .langbtn .chev{transform:rotate(180deg);}
+  .langmenu{position:absolute;top:calc(100% + 6px);inset-inline-start:0;min-width:150px;background:var(--panel);
+    border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);padding:5px;z-index:60;
+    opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .15s,transform .15s,visibility .15s;}
+  .lang.open .langmenu{opacity:1;visibility:visible;transform:none;}
+  .langmenu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:none;background:transparent;
+    color:var(--ink-2);cursor:pointer;font-size:13.5px;font-weight:600;text-align:start;padding:9px 11px;border-radius:8px;transition:background .12s,color .12s;}
+  .langmenu button:hover{background:var(--panel-2);color:var(--accent-dim);}
+  .langmenu button.on{color:var(--accent-dim);}
+  .langmenu button .tick{width:15px;height:15px;opacity:0;color:var(--accent);}
+  .langmenu button.on .tick{opacity:1;}
+
+  /* ---------- the one big card that hosts every state ---------- */
+  .card{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:22px;
+    box-shadow:var(--shadow-lg);padding:38px 40px 30px;}
+  @media (max-width:640px){ .card{padding:26px 18px 22px;border-radius:18px;} .wrap{padding:8px 13px 34px;} }
+
+  /* decorative folder+cloud illustration, tucked into the top-left corner of the upload view */
+  #uploadView{position:relative;}
+  .illus{position:absolute;top:-14px;left:-10px;width:150px;height:auto;pointer-events:none;z-index:0;}
+  @media (max-width:1080px){ .illus{display:none;} }
+
+  /* hero */
+  .hero{position:relative;z-index:1;text-align:center;margin-bottom:22px;}
+  .hero .ic{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);box-shadow:0 6px 16px var(--grad-shadow);}
+  .hero .ic svg{width:28px;height:28px;}
+  .hero h1{font-size:clamp(22px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin:0 0 7px;word-break:break-word;}
+  .hero .sub{font-size:15px;color:var(--muted);white-space:pre-wrap;word-break:break-word;max-width:56ch;margin:0 auto;}
+
+  /* three feature cards */
+  .features{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:0 auto 26px;position:relative;z-index:1;}
+  .fcard{flex:1 1 200px;max-width:280px;min-width:0;text-align:center;padding:13px 16px;border-radius:14px;
+    background:var(--panel-2);border:1px solid var(--line);}
+  .fc-top{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--ink-2);}
+  .fc-top .fc-ic{display:flex;color:var(--accent);}
+  .fc-top .fc-ic svg{width:16px;height:16px;}
+  .fc-t{font-size:13.5px;font-weight:700;}
+  .fc-s{font-size:12px;color:var(--muted);margin-top:3px;}
+  @media (max-width:560px){ .features{flex-direction:column;} .fcard{max-width:none;} }
 
   /* client fields */
-  .fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
-  @media (max-width:520px){ .fields{grid-template-columns:1fr;} }
-  .field{display:flex;flex-direction:column;gap:6px;}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;position:relative;z-index:1;}
+  @media (max-width:560px){ .fields{grid-template-columns:1fr;} }
+  .field{display:flex;flex-direction:column;gap:7px;min-width:0;}
   .field.full{grid-column:1 / -1;}
-  .field label{font-size:12px;font-weight:600;color:var(--ink-2);}
-  .inp,.ta{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
-    font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
+  .field label{font-size:13px;font-weight:600;color:var(--ink-2);}
+  .field label .req{color:var(--danger);}
+  .inpwrap{position:relative;}
+  .inpwrap .ic{position:absolute;top:50%;inset-inline-start:13px;transform:translateY(-50%);color:var(--faint);
+    display:flex;pointer-events:none;}
+  .inpwrap .ic svg{width:17px;height:17px;}
+  .inpwrap .inp{padding-inline-start:39px;}
+  .inp,.ta{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:11px;
+    font-family:var(--sans);font-size:14px;padding:11px 13px;transition:border-color .12s,box-shadow .12s;}
   .inp:focus,.ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
-  .ta{resize:vertical;min-height:56px;}
+  .ta{resize:vertical;min-height:78px;}
 
-  /* dropzone */
-  .drop{display:flex;align-items:center;gap:14px;border:2px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:14px;
-    padding:11px 15px;cursor:pointer;background:var(--panel-2);transition:border-color .15s,background .15s;margin-bottom:16px;}
+  /* big centered dropzone */
+  .drop{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;
+    border:2px dashed color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:16px;
+    padding:30px 22px;cursor:pointer;background:color-mix(in srgb,var(--accent-soft) 45%,var(--panel));
+    transition:border-color .15s,background .15s;margin-bottom:16px;}
   .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);}
-  .drop .cloud{width:40px;height:40px;flex:0 0 auto;border-radius:12px;display:flex;align-items:center;justify-content:center;
-    background:var(--accent-soft);color:var(--accent);}
-  .drop .cloud svg{width:22px;height:22px;}
-  .drop .dinfo{flex:1;min-width:0;text-align:start;}
-  .drop .big{font-size:14.5px;font-weight:600;color:var(--ink);}
-  .drop .dhint{margin-top:2px;font-size:11.5px;color:var(--faint);font-family:var(--mono);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .drop .dbtns{display:flex;align-items:center;gap:8px;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;}
+  .drop .cloud{color:var(--accent);margin-bottom:6px;}
+  .drop .cloud svg{width:34px;height:34px;}
+  .drop .big{font-size:16px;font-weight:700;color:var(--ink);}
+  .drop .dhint{font-size:12.5px;color:var(--muted);}
+  .drop .dbtns{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
   .drop .choose{display:inline-flex;align-items:center;gap:7px;color:#fff;border:none;white-space:nowrap;
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
-    font-weight:600;font-size:13px;padding:9px 16px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    font-weight:600;font-size:13.5px;padding:10px 18px;border-radius:999px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.18);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
   .drop .choose:hover{filter:brightness(1.05);} .drop .choose:active{transform:translateY(1px);}
   .drop .choose svg{width:15px;height:15px;}
-  .drop .choose.ghost{color:var(--accent-dim,var(--accent));background:var(--panel);border:1px solid var(--accent);text-shadow:none;box-shadow:none;}
+  .drop .choose.ghost{color:var(--accent-dim);background:var(--panel);border:1px solid var(--accent);text-shadow:none;box-shadow:var(--shadow-sm);}
   html[data-theme="dark"] .drop .choose.ghost{color:var(--accent);}
   .drop .choose.ghost:hover{background:var(--accent-soft);filter:none;}
-  @media (max-width:560px){ .drop{flex-wrap:wrap;} .drop .dinfo{flex:1 1 auto;} .drop .dbtns{flex:1 1 100%;} .drop .choose{flex:1;justify-content:center;} }
+  @media (max-width:480px){ .drop .dbtns{flex-direction:column;width:100%;} .drop .choose{width:100%;justify-content:center;} }
   input[type=file]{display:none;}
 
-  /* file list */
-  .flist{display:flex;flex-direction:column;gap:9px;margin-bottom:16px;max-height:calc(100vh - 300px);overflow-y:auto;overscroll-behavior:contain;}
+  /* file list (appears once files are added) */
+  .flist{position:relative;z-index:1;display:flex;flex-direction:column;gap:9px;margin-bottom:16px;
+    max-height:calc(100vh - 300px);overflow-y:auto;overscroll-behavior:contain;}
+  .flist:empty{display:none;}
   .flist::-webkit-scrollbar{width:10px;}
   .flist::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:999px;border:3px solid var(--panel);}
   .flist::-webkit-scrollbar-thumb:hover{background:var(--muted);}
@@ -125,18 +172,25 @@
   .frow .tick{width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--success-dim);}
   .frow .tick svg{width:18px;height:18px;}
 
-  .sendbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+  /* submit */
+  .sendbtn{position:relative;z-index:1;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
-    font-weight:600;font-size:15px;padding:14px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
+    font-weight:600;font-size:15.5px;padding:15px 20px;border-radius:14px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 10px 24px var(--grad-btn-glow);
     transition:filter .14s,transform .08s;}
   .sendbtn:hover{filter:brightness(1.05);} .sendbtn:active{transform:translateY(1px);}
-  .sendbtn:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
-  .sendbtn svg{width:17px;height:17px;}
-  .uperr{font-size:12px;color:var(--danger);margin-top:10px;min-height:15px;text-align:center;}
+  .sendbtn:disabled{opacity:.6;cursor:not-allowed;filter:none;transform:none;}
+  .sendbtn svg{width:18px;height:18px;}
+  .uperr{position:relative;z-index:1;font-size:12.5px;color:var(--danger);margin-top:10px;min-height:15px;text-align:center;}
 
-  /* states */
-  .state{text-align:center;padding:20px 10px;}
+  /* yellow privacy banner */
+  .banner{position:relative;z-index:1;display:flex;align-items:center;gap:10px;justify-content:center;text-align:center;
+    margin-top:16px;padding:12px 16px;border-radius:12px;background:var(--warm-soft);border:1px solid var(--warm-line);
+    font-size:12.5px;color:var(--ink-2);line-height:1.55;}
+  .banner svg{width:16px;height:16px;color:var(--warn);flex-shrink:0;}
+
+  /* loading / notice / password / success states */
+  .state{text-align:center;padding:22px 10px;}
   .state .si{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;}
   .state .si.warn{background:var(--warm-soft);color:var(--warn);} .state .si.lock{background:var(--accent-soft);color:var(--accent);}
   .state .si.ok{background:var(--success-soft);color:var(--success-dim);}
@@ -154,24 +208,42 @@
   .again{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;
     border:1px solid var(--line);background:var(--panel);color:var(--ink-2);box-shadow:var(--shadow-sm);}
   .again:hover{border-color:var(--accent);} .again svg{width:15px;height:15px;}
-
-  .seam{display:flex;align-items:flex-start;gap:8px;margin-top:18px;padding:11px 13px;border-radius:11px;
-    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
-  .seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
   .hidden{display:none !important;}
 
-  footer{margin-top:30px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  /* footer with policy links */
+  footer{margin-top:22px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px 16px;
+    color:var(--faint);font-size:12.5px;}
+  footer .fbrand{font-family:var(--mono);font-weight:600;}
+  footer .sep{color:var(--line);}
+  footer a{color:var(--muted);transition:color .12s;}
+  footer a:hover{color:var(--accent-dim);}
+
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
     background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
     box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
-<link rel="stylesheet" href="./header.css">
 </head>
 <body>
-<div id="site-header"></div>
-<script src="./header.js"></script>
 <div class="wrap">
+
+  <!-- minimal top bar: language picker (start) + KOLKLI brand (end) -->
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="KOLKLI"><img src="./assets/logo.png" alt="KOLKLI" width="139" height="34" decoding="async"></a>
+    <div class="lang" id="langWrap">
+      <button class="langbtn" id="langBtn" type="button" aria-haspopup="true" aria-expanded="false">
+        <svg class="globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/></svg>
+        <span id="langName">עברית</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="langmenu" id="langMenu" role="menu">
+        <button type="button" role="menuitem" data-lang="he">עברית<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
+        <button type="button" role="menuitem" data-lang="en">English<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
+        <button type="button" role="menuitem" data-lang="ru">Русский<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
+      </div>
+    </div>
+  </header>
+
   <div class="card">
     <!-- loading -->
     <div class="state" id="loadingState">
@@ -200,29 +272,70 @@
 
     <!-- upload -->
     <div class="hidden" id="uploadView">
-      <div class="dhead">
-        <div class="ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+
+      <!-- decorative folder + cloud illustration -->
+      <svg class="illus" viewBox="0 0 200 172" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="ilF" x1="20" y1="70" x2="150" y2="160" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#8b5cf6"/><stop offset="1" stop-color="#6d28d9"/>
+          </linearGradient>
+          <linearGradient id="ilB" x1="20" y1="52" x2="150" y2="120" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#a78bfa"/><stop offset="1" stop-color="#7c3aed"/>
+          </linearGradient>
+        </defs>
+        <rect x="20" y="52" width="132" height="96" rx="15" fill="url(#ilB)"/>
+        <path d="M20 78c0-8 6-14 14-14h30l12 12h62c8 0 14 6 14 14v44c0 8-6 14-14 14H34c-8 0-14-6-14-14V78Z" fill="url(#ilF)"/>
+        <g opacity=".95">
+          <path d="M86 98a20 20 0 0 1 38 4h3a13 13 0 0 1 0 26H84a17 17 0 0 1-2-34l4 4Z" fill="#ffffff"/>
+          <path d="M104 96v30" stroke="#7c3aed" stroke-width="6" stroke-linecap="round"/>
+          <path d="m94 106 10-10 10 10" stroke="#7c3aed" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+        <circle cx="164" cy="40" r="4" fill="#c4b5fd"/><circle cx="176" cy="58" r="3" fill="#ddd6fe"/><circle cx="150" cy="30" r="2.5" fill="#a78bfa"/>
+      </svg>
+
+      <div class="hero">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
         <h1 id="reqName"></h1>
-        <div class="desc" id="reqDesc"></div>
+        <div class="sub" id="reqDesc"></div>
       </div>
-      <div class="metarow" id="metaRow"></div>
+
+      <div class="features" id="featRow"></div>
 
       <div class="fields">
-        <div class="field"><label data-i18n="cName"></label><input class="inp" id="cName" type="text" data-i18n-ph="cNamePh"></div>
-        <div class="field"><label data-i18n="cPhone"></label><input class="inp" id="cPhone" type="tel" dir="ltr" data-i18n-ph="cPhonePh"></div>
-        <div class="field full"><label data-i18n="cEmail"></label><input class="inp" id="cEmail" type="email" dir="ltr" data-i18n-ph="cEmailPh"></div>
-        <div class="field full"><label data-i18n="cNote"></label><textarea class="ta" id="cNote" data-i18n-ph="cNotePh"></textarea></div>
+        <div class="field">
+          <label><span data-i18n="cName"></span> <span class="req">*</span></label>
+          <div class="inpwrap">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <input class="inp" id="cName" type="text" data-i18n-ph="cNamePh">
+          </div>
+        </div>
+        <div class="field">
+          <label data-i18n="cPhone"></label>
+          <div class="inpwrap">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span>
+            <input class="inp" id="cPhone" type="tel" dir="ltr" data-i18n-ph="cPhonePh">
+          </div>
+        </div>
+        <div class="field full">
+          <label><span data-i18n="cEmail"></span> <span class="req">*</span></label>
+          <div class="inpwrap">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span>
+            <input class="inp" id="cEmail" type="email" dir="ltr" data-i18n-ph="cEmailPh">
+          </div>
+        </div>
+        <div class="field full">
+          <label data-i18n="cNote"></label>
+          <textarea class="ta" id="cNote" data-i18n-ph="cNotePh"></textarea>
+        </div>
       </div>
 
       <div class="drop" id="drop">
-        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
-        <div class="dinfo">
-          <div class="big" data-i18n="dropBig"></div>
-          <div class="dhint" id="sizeNote"></div>
-        </div>
+        <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+        <div class="big" data-i18n="dropBig"></div>
+        <div class="dhint" data-i18n="dropSub"></div>
         <div class="dbtns">
           <button class="choose" type="button" id="chooseBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
             <span data-i18n="choose"></span>
           </button>
           <button class="choose ghost" type="button" id="chooseFolderBtn">
@@ -236,13 +349,13 @@
 
       <div class="flist" id="flist"></div>
 
-      <button class="sendbtn" id="uploadBtn" type="button" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+      <button class="sendbtn" id="uploadBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
         <span id="uploadBtnLbl"></span>
       </button>
       <div class="uperr" id="upErr"></div>
 
-      <div class="seam">
+      <div class="banner">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span data-i18n="privacy"></span>
       </div>
@@ -260,7 +373,13 @@
     </div>
   </div>
 
-  <footer data-i18n="foot"></footer>
+  <footer>
+    <span class="fbrand">KOLKLI Request</span>
+    <span class="sep">·</span>
+    <a href="./privacy.html" data-i18n="footPrivacy"></a>
+    <span class="sep">·</span>
+    <a href="./terms.html" data-i18n="footTerms"></a>
+  </footer>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -278,22 +397,23 @@
       ntMissingT:'הקישור לא נמצא', ntMissingB:'הקישור שגוי או שאינו קיים במכשיר הזה. ודאו שהעתקתם את הקישור המלא.',
       pwTitle:'הבקשה מוגנת בסיסמה', pwSub:'הזינו את הסיסמה שקיבלתם כדי להעלות קבצים.',
       pwPh:'סיסמה', unlock:'כניסה', pwWrong:'סיסמה שגויה',
-      cName:'שם', cNamePh:'השם שלכם', cPhone:'טלפון', cPhonePh:'מספר טלפון',
-      cEmail:'אימייל', cEmailPh:'you@mail.com', cNote:'הערה', cNotePh:'משהו שנרצה שנדע…',
-      dropBig:'גררו קבצים או תיקיות לכאן', or2:'או', choose:'הוספת קבצים', chooseFolder:'הוספת תיקייה',
-      uploadBtn:n=> n?`העלאת ${n} קבצים`:'העלאה', uploadBtnOne:'העלאת קובץ',
-      uploading:'מעלה…',
-      chipTypes:s=>`מותר: ${s}`, chipMaxFile:s=>`עד ${s} לקובץ`, chipMaxCount:n=>`עד ${n} קבצים`,
-      chipMaxTotal:s=>`עד ${s} סה״כ`, chipExpiry:d=>`פג תוקף בעוד ${d}`, chipAllTypes:'כל סוגי הקבצים',
+      heroSub:'בקש קבצים בקלות, קבל הכל במקום אחד',
+      cName:'שם מלא', cNamePh:'השם שלך', cPhone:'מספר טלפון', cPhonePh:'050-1234567',
+      cEmail:'אימייל', cEmailPh:'you@mail.com', cNote:'הודעה (אופציונלי)', cNotePh:'מכתב/הערות עבור מקבל הקבצים…',
+      featSizeT:'גודל מקסימלי', featSize:s=>`עד ${s} לקובץ`, featSizeAny:'ללא הגבלת גודל',
+      featCountT:n=>`עד ${n} קבצים`, featCountS:'לכל בקשה', featCountAnyT:'ריבוי קבצים', featCountAnyS:'ללא הגבלת כמות',
+      featTypesAllT:'כל הסוגים נתמכים', featTypesAllS:'תמונות, וידאו, אודיו, מסמכים ועוד', featTypesSomeT:'סוגים נתמכים',
+      dropBig:'גררו קבצים לכאן או לחצו להעלאה', dropSub:'ניתן לבחור מספר קבצים יחד', choose:'הוסף קבצים', chooseFolder:'הוסף תיקייה',
+      sendBtn:'שלח בקשה', uploading:'מעלה…',
       tImage:'תמונות', tVideo:'וידאו', tAudio:'אודיו', tDoc:'מסמכים',
       sizeNoteAll:'כל סוגי הקבצים', sizeNoteTypes:s=>`סוגים מותרים: ${s}`,
-      privacy:'הקבצים נשלחים ישירות לבעל הבקשה. לקוחות אחרים לא רואים את מה שהעליתם.',
-      foot:'KOLKLI · Kolkli Request · העלאה מאובטחת ללא צורך בחשבון',
+      privacy:'הקבצים שלכם יישארו זמינים למקבל הבקשה. אנחנו לא רואים את מה שאתם שולחים.',
+      footPrivacy:'מדיניות פרטיות', footTerms:'תנאי שימוש',
       successTitle:'הקבצים הועלו!', successDefault:'תודה! הקבצים התקבלו אצל בעל הבקשה.', uploadMore:'העלאת קבצים נוספים',
       day:'יום', days:d=>`${d} ימים`, today:'היום',
       errType:n=>`"${n}" — סוג קובץ לא מותר בבקשה זו`, errSize:(n,s)=>`"${n}" גדול מדי (מקסימום ${s})`,
       errCount:n=>`אפשר להעלות עד ${n} קבצים`, errTotal:s=>`חריגה מהגודל הכולל המותר (${s})`,
-      errNone:'צריך לבחור לפחות קובץ אחד', remove:'הסרה',
+      errNone:'צריך לבחור לפחות קובץ אחד', errName:'צריך למלא שם מלא', errEmail:'צריך למלא כתובת אימייל תקינה', remove:'הסרה',
       uploadFail:'ההעלאה נכשלה, נסו שוב', added:n=>`נוספו ${n} קבצים`,
     },
     en:{ dir:'ltr',
@@ -303,22 +423,23 @@
       ntMissingT:'Link not found', ntMissingB:'The link is invalid or doesn’t exist on this device. Make sure you copied the full link.',
       pwTitle:'This request is password protected', pwSub:'Enter the password you received to upload files.',
       pwPh:'Password', unlock:'Enter', pwWrong:'Wrong password',
-      cName:'Name', cNamePh:'Your name', cPhone:'Phone', cPhonePh:'Phone number',
-      cEmail:'Email', cEmailPh:'you@mail.com', cNote:'Note', cNotePh:'Anything we should know…',
-      dropBig:'Drag files or folders here', or2:'or', choose:'Choose files', chooseFolder:'Choose folder',
-      uploadBtn:n=> n?`Upload ${n} files`:'Upload', uploadBtnOne:'Upload file',
-      uploading:'Uploading…',
-      chipTypes:s=>`Allowed: ${s}`, chipMaxFile:s=>`Up to ${s}/file`, chipMaxCount:n=>`Up to ${n} files`,
-      chipMaxTotal:s=>`Up to ${s} total`, chipExpiry:d=>`Expires in ${d}`, chipAllTypes:'All file types',
+      heroSub:'Request files with ease — get everything in one place',
+      cName:'Full name', cNamePh:'Your name', cPhone:'Phone number', cPhonePh:'+1 555 123 4567',
+      cEmail:'Email', cEmailPh:'you@mail.com', cNote:'Message (optional)', cNotePh:'A note for the request owner…',
+      featSizeT:'Max size', featSize:s=>`Up to ${s}/file`, featSizeAny:'No size limit',
+      featCountT:n=>`Up to ${n} files`, featCountS:'per request', featCountAnyT:'Multiple files', featCountAnyS:'No count limit',
+      featTypesAllT:'All types supported', featTypesAllS:'Images, video, audio, documents & more', featTypesSomeT:'Supported types',
+      dropBig:'Drag files here or click to upload', dropSub:'You can select several files at once', choose:'Add files', chooseFolder:'Add folder',
+      sendBtn:'Send request', uploading:'Uploading…',
       tImage:'Images', tVideo:'Video', tAudio:'Audio', tDoc:'Documents',
       sizeNoteAll:'All file types', sizeNoteTypes:s=>`Allowed types: ${s}`,
-      privacy:'Your files go straight to the request owner. Other clients can’t see what you upload.',
-      foot:'KOLKLI · Kolkli Request · Secure upload, no account needed',
+      privacy:'Your files stay available to the request owner. We can’t see what you send.',
+      footPrivacy:'Privacy Policy', footTerms:'Terms of Use',
       successTitle:'Files uploaded!', successDefault:'Thank you! Your files reached the request owner.', uploadMore:'Upload more files',
       day:'1 day', days:d=>`${d} days`, today:'today',
       errType:n=>`"${n}" — file type not allowed for this request`, errSize:(n,s)=>`"${n}" is too large (max ${s})`,
       errCount:n=>`You can upload up to ${n} files`, errTotal:s=>`Over the allowed total size (${s})`,
-      errNone:'Choose at least one file', remove:'Remove',
+      errNone:'Choose at least one file', errName:'Please enter your full name', errEmail:'Please enter a valid email address', remove:'Remove',
       uploadFail:'Upload failed, please try again', added:n=>`${n} files added`,
     },
     ru:{ dir:'ltr',
@@ -328,28 +449,30 @@
       ntMissingT:'Ссылка не найдена', ntMissingB:'Ссылка неверна или не существует на этом устройстве. Убедитесь, что скопировали ссылку полностью.',
       pwTitle:'Запрос защищён паролем', pwSub:'Введите полученный пароль, чтобы загрузить файлы.',
       pwPh:'Пароль', unlock:'Войти', pwWrong:'Неверный пароль',
-      cName:'Имя', cNamePh:'Ваше имя', cPhone:'Телефон', cPhonePh:'Номер телефона',
-      cEmail:'Эл. почта', cEmailPh:'you@mail.com', cNote:'Комментарий', cNotePh:'Что нам стоит знать…',
-      dropBig:'Перетащите файлы или папки сюда', or2:'или', choose:'Выбрать файлы', chooseFolder:'Выбрать папку',
-      uploadBtn:n=> n?`Загрузить ${n} файлов`:'Загрузить', uploadBtnOne:'Загрузить файл',
-      uploading:'Загрузка…',
-      chipTypes:s=>`Разрешено: ${s}`, chipMaxFile:s=>`До ${s}/файл`, chipMaxCount:n=>`До ${n} файлов`,
-      chipMaxTotal:s=>`До ${s} всего`, chipExpiry:d=>`Истекает через ${d}`, chipAllTypes:'Любые файлы',
+      heroSub:'Запрашивайте файлы легко — всё в одном месте',
+      cName:'Полное имя', cNamePh:'Ваше имя', cPhone:'Номер телефона', cPhonePh:'+7 900 123-45-67',
+      cEmail:'Эл. почта', cEmailPh:'you@mail.com', cNote:'Сообщение (необязательно)', cNotePh:'Заметка для владельца запроса…',
+      featSizeT:'Макс. размер', featSize:s=>`До ${s}/файл`, featSizeAny:'Без ограничения размера',
+      featCountT:n=>`До ${n} файлов`, featCountS:'на запрос', featCountAnyT:'Несколько файлов', featCountAnyS:'Без ограничения количества',
+      featTypesAllT:'Любые типы файлов', featTypesAllS:'Изображения, видео, аудио, документы и др.', featTypesSomeT:'Разрешённые типы',
+      dropBig:'Перетащите файлы сюда или нажмите для загрузки', dropSub:'Можно выбрать несколько файлов сразу', choose:'Добавить файлы', chooseFolder:'Добавить папку',
+      sendBtn:'Отправить запрос', uploading:'Загрузка…',
       tImage:'Изображения', tVideo:'Видео', tAudio:'Аудио', tDoc:'Документы',
       sizeNoteAll:'Любые типы файлов', sizeNoteTypes:s=>`Разрешённые типы: ${s}`,
-      privacy:'Ваши файлы попадают напрямую владельцу запроса. Другие клиенты не видят, что вы загрузили.',
-      foot:'KOLKLI · Kolkli Request · Безопасная загрузка без аккаунта',
+      privacy:'Ваши файлы остаются доступными владельцу запроса. Мы не видим, что вы отправляете.',
+      footPrivacy:'Политика конфиденциальности', footTerms:'Условия использования',
       successTitle:'Файлы загружены!', successDefault:'Спасибо! Ваши файлы получены владельцем запроса.', uploadMore:'Загрузить ещё файлы',
       day:'1 день', days:d=>`${d} дн.`, today:'сегодня',
       errType:n=>`«${n}» — тип файла не разрешён для этого запроса`, errSize:(n,s)=>`«${n}» слишком большой (макс. ${s})`,
       errCount:n=>`Можно загрузить до ${n} файлов`, errTotal:s=>`Превышен допустимый общий размер (${s})`,
-      errNone:'Выберите хотя бы один файл', remove:'Удалить',
+      errNone:'Выберите хотя бы один файл', errName:'Введите полное имя', errEmail:'Введите корректный адрес эл. почты', remove:'Удалить',
       uploadFail:'Ошибка загрузки, попробуйте снова', added:n=>`Добавлено файлов: ${n}`,
     },
   };
+  const LNAME = { he:'עברית', en:'English', ru:'Русский' };
 
   let lang='he', t=I18N.he;
-  let req=null, token=null, unlocked=false;
+  let req=null, token=null, unlocked=false, demo=false;
   let files=[];            // {id,file,name,ext,kind,size,done}
   let uid=1, uploading=false;
 
@@ -367,18 +490,17 @@
     let exts=[]; at.forEach(k=>{ exts=exts.concat((KR.TYPES[k]||[]).map(e=>'.'+e)); }); return exts.join(',');
   }
 
-  // ---------- meta / notes ----------
-  function renderMeta(){
-    const chips=[];
+  // ---------- feature cards + dropzone note ----------
+  function fcard(icon,title,sub){
+    return `<div class="fcard"><div class="fc-top"><span class="fc-ic">${icon}</span><span class="fc-t">${KR.escapeHtml(title)}</span></div><div class="fc-s">${KR.escapeHtml(sub)}</div></div>`;
+  }
+  function renderFeatures(){
     const at=allowedTypes();
-    chips.push(`<span class="chip">${tagSvg()} ${at? at.map(typeLbl).join(' · ') : t.chipAllTypes}</span>`);
-    if(req.maxFileMB) chips.push(`<span class="chip">${fileSvg()} ${t.chipMaxFile(mb(req.maxFileMB))}</span>`);
-    if(req.maxCount) chips.push(`<span class="chip">${hashSvg()} ${t.chipMaxCount(req.maxCount)}</span>`);
-    if(req.maxTotalMB) chips.push(`<span class="chip">${stackSvg()} ${t.chipMaxTotal(mb(req.maxTotalMB))}</span>`);
-    if(req.expiresAt){ const d=Math.ceil((req.expiresAt-Date.now())/86400000); if(d>0) chips.push(`<span class="chip">${clockSvg()} ${t.chipExpiry(daysWord(d))}</span>`); }
-    el('metaRow').innerHTML=chips.join('');
-    const at2=allowedTypes();
-    el('sizeNote').textContent = at2? t.sizeNoteTypes(at2.map(typeLbl).join(' · ')) : t.sizeNoteAll;
+    const cards=[];
+    cards.push(fcard(clockSvg(), t.featSizeT, req.maxFileMB? t.featSize(mb(req.maxFileMB)) : t.featSizeAny));
+    cards.push(fcard(gridSvg(), req.maxCount? t.featCountT(req.maxCount) : t.featCountAnyT, req.maxCount? t.featCountS : t.featCountAnyS));
+    cards.push(fcard(heartSvg(), at? t.featTypesSomeT : t.featTypesAllT, at? at.map(typeLbl).join(' · ') : t.featTypesAllS));
+    el('featRow').innerHTML=cards.join('');
   }
   function mb(n){ return n>=1000? (n/1000)+' GB' : n+' MB'; }
 
@@ -444,14 +566,28 @@
     updateBtn();
   }
   function updateBtn(){
-    el('uploadBtn').disabled = uploading || files.length===0;
-    el('uploadBtnLbl').textContent = uploading? t.uploading : (files.length===1? t.uploadBtnOne : t.uploadBtn(files.length));
+    el('uploadBtn').disabled = uploading;
+    el('uploadBtnLbl').textContent = uploading? t.uploading : t.sendBtn;
   }
 
   // ---------- submit ----------
   async function submit(){
     if(uploading) return;
+    const name=el('cName').value.trim(), email=el('cEmail').value.trim();
     if(!files.length){ el('upErr').textContent=t.errNone; return; }
+    if(!name){ el('upErr').textContent=t.errName; el('cName').focus(); return; }
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ el('upErr').textContent=t.errEmail; el('cEmail').focus(); return; }
+    el('upErr').textContent='';
+
+    // demo preview (opened without a real request link): simulate a successful upload
+    if(demo){
+      uploading=true; updateBtn();
+      document.querySelectorAll('#flist .rm').forEach(b=>b.style.display='none');
+      document.querySelectorAll('#flist .frow').forEach(r=>{ r.classList.add('up','done'); const bar=r.querySelector('.fbar i'); if(bar) bar.style.width='100%'; });
+      setTimeout(()=>{ uploading=false; el('successBody').textContent=req.thankYou||t.successDefault; show('successState'); window.scrollTo({top:0,behavior:'smooth'}); }, 650);
+      return;
+    }
+
     // re-fetch to respect any owner changes; re-check gate
     const fresh=KR.getRequest(token);
     if(!fresh){ notice('ntMissingT','ntMissingB'); return; }
@@ -459,7 +595,7 @@
     if(KR.statusOf(fresh)==='expired'){ notice('ntExpiredT','ntExpiredB'); return; }
     req=fresh;
 
-    uploading=true; el('upErr').textContent=''; updateBtn();
+    uploading=true; updateBtn();
     document.querySelectorAll('#flist .rm').forEach(b=>b.style.display='none');
     document.querySelectorAll('#flist .frow').forEach(r=>r.classList.add('up'));
 
@@ -481,8 +617,8 @@
       uploading=false; el('upErr').textContent=t.uploadFail; updateBtn(); return;
     }
 
-    const sub={ id:subId, name:el('cName').value.trim(), phone:el('cPhone').value.trim(),
-      email:el('cEmail').value.trim(), note:el('cNote').value.trim(), at:Date.now(), fileIds:metas.map(m=>m.id) };
+    const sub={ id:subId, name, phone:el('cPhone').value.trim(),
+      email, note:el('cNote').value.trim(), at:Date.now(), fileIds:metas.map(m=>m.id) };
     req.submissions = (req.submissions||[]).concat([sub]);
     req.files = (req.files||[]).concat(metas);
     KR.upsertRequest(req);
@@ -510,10 +646,10 @@
   }
 
   function enterUpload(){
-    el('reqName').textContent=req.name;
-    el('reqDesc').textContent=req.desc||''; el('reqDesc').style.display=req.desc? '' : 'none';
+    el('reqName').textContent=req.name || 'KOLKLI Request';
+    el('reqDesc').textContent=req.desc || t.heroSub;
     el('fileInput').setAttribute('accept', acceptAttr());
-    renderMeta(); renderFiles(); show('uploadView');
+    renderFeatures(); renderFiles(); show('uploadView');
   }
 
   // ---------- i18n + theme ----------
@@ -522,23 +658,23 @@
     document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
   }
   function applyLang(l){
+    if(!I18N[l]) l='he';
     lang=l; t=I18N[l];
     document.documentElement.lang=l; document.documentElement.dir=t.dir;
     applyStatic(); KR.lsSet('ac_lang', l);
+    const nm=el('langName'); if(nm) nm.textContent=LNAME[l]||l;
+    document.querySelectorAll('#langMenu button').forEach(b=>b.classList.toggle('on', b.getAttribute('data-lang')===l));
     if(req){
-      if(!el('uploadView').classList.contains('hidden')){ renderMeta(); renderFiles(); }
-      if(!el('noticeState').classList.contains('hidden')){ /* keep as-is; texts re-derived on next route */ }
+      if(!el('uploadView').classList.contains('hidden')){ el('reqDesc').textContent=req.desc || t.heroSub; renderFeatures(); renderFiles(); }
       if(!el('successState').classList.contains('hidden')) el('successBody').textContent = req.thankYou || t.successDefault;
     }
   }
-  function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); const ic=el('themeIco'); if(ic) ic.textContent=dark?'☀️':'🌙'; KR.lsSet('theme',dark?'dark':'light'); }
+  function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); KR.lsSet('theme',dark?'dark':'light'); }
 
   // ---------- svg atoms ----------
-  function tagSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12 22l-8-8V4h10z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>'; }
-  function fileSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>'; }
-  function hashSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>'; }
-  function stackSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>'; }
+  function gridSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>'; }
   function clockSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'; }
+  function heartSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 1 0-7.8 7.8l1.1 1L12 21l7.7-7.5 1.1-1a5.5 5.5 0 0 0 0-7.9Z"/></svg>'; }
   function xSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>'; }
   function checkSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'; }
 
@@ -558,15 +694,26 @@
   el('uploadBtn').addEventListener('click',submit);
   el('moreBtn').addEventListener('click',resetForm);
   el('pwForm').addEventListener('submit',tryUnlock);
+
+  // language picker
+  const langWrap=el('langWrap'), langBtn=el('langBtn');
+  langBtn.addEventListener('click',e=>{ e.stopPropagation(); const open=langWrap.classList.toggle('open'); langBtn.setAttribute('aria-expanded', open?'true':'false'); });
+  el('langMenu').addEventListener('click',e=>{ const b=e.target.closest('[data-lang]'); if(!b) return; applyLang(b.getAttribute('data-lang')); langWrap.classList.remove('open'); langBtn.setAttribute('aria-expanded','false'); });
+  document.addEventListener('click',e=>{ if(!langWrap.contains(e.target)){ langWrap.classList.remove('open'); langBtn.setAttribute('aria-expanded','false'); } });
   window.__setLang=applyLang;
-  const themeBtn=el('themeToggle'); if(themeBtn) themeBtn.addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
 
   // ---------- init ----------
   applyTheme(ls('theme')||'light');
   applyLang(KR.detectLang());
   token=(location.search.match(/[?&]req=([^&]+)/)||[])[1];
   token = token? decodeURIComponent(token) : null;
-  if(!token){ notice('ntMissingT','ntMissingB'); return; }
+  if(!token){
+    // no link → local design preview with a demo request (nothing is stored)
+    demo=true;
+    req={ name:'טל זימר', desc:'', types:[], maxFileMB:7000, maxCount:5, maxTotalMB:0, expiresAt:null, thankYou:'' };
+    enterUpload();
+    return;
+  }
   req=KR.getRequest(token);
   if(!req){ notice('ntMissingT','ntMissingB'); return; }
   const st=KR.statusOf(req);

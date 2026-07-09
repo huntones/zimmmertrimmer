@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — סייד־בר</title>
+<style>
+  :root {
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
+    --grad-shadow:rgba(93,79,240,0.30);
+    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad-btn-glow:rgba(59,111,246,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#a06bff; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;}
+
+  /* ===================== SIDEBAR ===================== */
+  /* the page is RTL, so the nav rail sits on the RIGHT. Positioning uses PHYSICAL props
+     (right/border-left) to stay unambiguous; inner rows use flex + logical props to mirror. */
+  .kside{
+    position:fixed;top:0;right:0;bottom:0;   /* pinned to the RIGHT edge */
+    width:260px;
+    display:flex;flex-direction:column;
+    background:var(--panel);
+    border-left:1px solid var(--line);        /* the edge facing the content */
+    padding:18px 16px;
+    z-index:40;
+  }
+
+  /* ----- brand ----- */
+  .kbrand{display:flex;align-items:center;gap:11px;padding:6px 6px 4px;margin-bottom:16px;}
+  .kbrand .kmark{width:34px;height:34px;flex-shrink:0;}
+  .kbrand .kword{font-size:22px;font-weight:800;letter-spacing:.02em;color:var(--ink);}
+
+  /* ----- nav ----- */
+  .knav{display:flex;flex-direction:column;gap:3px;}
+  .knav-item{
+    display:flex;align-items:center;gap:13px;
+    width:100%;padding:11px 12px;border:none;background:none;cursor:pointer;
+    border-radius:12px;
+    font-family:var(--sans);font-size:14.5px;font-weight:650;
+    color:var(--ink-2);text-align:start;
+    transition:background .13s,color .13s;
+  }
+  .knav-item svg{width:21px;height:21px;flex-shrink:0;stroke:currentColor;fill:none;
+    stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;color:var(--muted);transition:color .13s;}
+  .knav-item:hover{background:var(--panel-2);color:var(--ink);}
+  .knav-item:hover svg{color:var(--ink-2);}
+  .knav-item.active{background:var(--accent-soft);color:var(--accent-dim);font-weight:750;}
+  .knav-item.active svg{color:var(--accent-dim);}
+
+  .knav-sep{height:1px;background:var(--line);margin:12px 6px;border:none;}
+
+  /* ----- spacer pushes storage + user to the bottom ----- */
+  .kspace{flex:1 1 auto;min-height:14px;}
+
+  /* ----- storage card ----- */
+  .kstore{
+    display:flex;align-items:center;gap:13px;
+    padding:13px;margin-bottom:12px;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:16px;
+  }
+  .kstore-ring{
+    --p:41;                    /* percent used */
+    width:52px;height:52px;flex-shrink:0;border-radius:50%;
+    display:grid;place-items:center;position:relative;
+    background:conic-gradient(var(--accent) calc(var(--p)*1%), var(--line) 0);
+  }
+  .kstore-ring::before{content:'';position:absolute;inset:6px;border-radius:50%;background:var(--panel-2);}
+  .kstore-ring span{position:relative;font-family:var(--mono);font-size:12px;font-weight:800;color:var(--ink);}
+  .kstore-tx{min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .kstore-lbl{font-size:12px;font-weight:600;color:var(--muted);}
+  .kstore-val{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+  .kstore-val b{color:var(--accent-dim);}
+
+  /* ----- upgrade button ----- */
+  .kupg{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    width:100%;margin-bottom:14px;padding:11px 14px;border:none;cursor:pointer;
+    color:#fff;font-family:var(--sans);font-weight:700;font-size:14px;
+    border-radius:12px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);
+    transition:filter .14s,transform .08s;
+  }
+  .kupg:hover{filter:brightness(1.05);}
+  .kupg:active{transform:translateY(1px);}
+  .kupg svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;
+    stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ----- user card ----- */
+  .kuser{
+    display:flex;align-items:center;gap:11px;
+    width:100%;padding:9px 8px;border:1px solid var(--line);background:var(--panel);cursor:pointer;
+    border-radius:14px;box-shadow:var(--shadow-sm);
+    transition:border-color .13s,background .13s;
+  }
+  .kuser:hover{border-color:var(--accent);background:var(--panel-2);}
+  .kuser-av{width:38px;height:38px;flex-shrink:0;border-radius:50%;overflow:hidden;
+    display:grid;place-items:center;background:var(--grad);color:#fff;
+    font-size:14px;font-weight:800;box-shadow:0 3px 9px var(--grad-shadow);}
+  .kuser-av img{width:100%;height:100%;object-fit:cover;}
+  .kuser-tx{min-width:0;flex:1;display:flex;flex-direction:column;text-align:start;}
+  .kuser-name{font-size:13.5px;font-weight:750;color:var(--ink);line-height:1.2;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .kuser-mail{font-size:11.5px;font-weight:550;color:var(--muted);line-height:1.25;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .kuser-chev{width:18px;height:18px;flex-shrink:0;color:var(--faint);stroke:currentColor;fill:none;
+    stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ===================== DEMO PAGE FRAME (not part of the sidebar) ===================== */
+  .kmain{margin-right:260px;padding:40px;}
+  .kmain h1{font-size:26px;font-weight:800;letter-spacing:-0.02em;margin:0 0 6px;}
+  .kmain p{color:var(--muted);margin:0 0 20px;}
+  .demo-toggle{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:11px;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink-2);cursor:pointer;
+    font-family:var(--sans);font-weight:650;font-size:14px;box-shadow:var(--shadow-sm);}
+  .demo-toggle:hover{border-color:var(--accent);color:var(--accent-dim);}
+
+  /* mobile: let the sidebar collapse to a full-width block for narrow previews */
+  @media (max-width:640px){
+    .kside{position:static;width:100%;height:auto;border-left:none;border-bottom:1px solid var(--line);}
+    .kmain{margin-right:0;}
+    .kspace{min-height:20px;}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="kside" aria-label="ניווט ראשי">
+
+    <!-- brand -->
+    <div class="kbrand">
+      <svg class="kmark" viewBox="0 0 40 40" aria-hidden="true">
+        <defs>
+          <linearGradient id="kg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#7b34ff"/>
+            <stop offset="1" stop-color="#3f85ff"/>
+          </linearGradient>
+        </defs>
+        <rect x="4" y="6" width="8" height="28" rx="3" fill="url(#kg)"/>
+        <path d="M14 20 L30 6 a3 3 0 0 1 4 4 L22 20 Z" fill="url(#kg)"/>
+        <path d="M14 20 L30 34 a3 3 0 0 0 4 -4 L22 20 Z" fill="url(#kg)"/>
+      </svg>
+      <span class="kword">KOLKLI</span>
+    </div>
+
+    <!-- primary nav -->
+    <nav class="knav">
+      <button class="knav-item" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+        <span>דשבורד</span>
+      </button>
+
+      <button class="knav-item" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg>
+        <span>שליחת קבצים</span>
+      </button>
+
+      <button class="knav-item active" type="button" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M4 13 6 5a1 1 0 0 1 1-.8h10a1 1 0 0 1 1 .8l2 8v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/></svg>
+        <span>בקשת קבצים</span>
+      </button>
+
+      <button class="knav-item" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-4 3.5V17H5a1 1 0 0 1-1-1Z"/><path d="m9.5 10 1.8 1.8L15 8"/></svg>
+        <span>משוב קבצים</span>
+      </button>
+
+      <button class="knav-item" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7a1 1 0 0 1 1-1h4l2 2h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/></svg>
+        <span>ארגון קבצים</span>
+      </button>
+
+      <button class="knav-item" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><circle cx="9" cy="7" r="2" fill="var(--panel)"/><circle cx="15" cy="12" r="2" fill="var(--panel)"/><circle cx="8" cy="17" r="2" fill="var(--panel)"/></svg>
+        <span>כלי מדיה</span>
+      </button>
+
+      <hr class="knav-sep">
+
+      <button class="knav-item" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16"/><path d="M9 9v11"/></svg>
+        <span>תבניות</span>
+      </button>
+
+      <button class="knav-item" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.5M12 18.5V21M4.2 7l2.2 1.3M17.6 15.7 19.8 17M4.2 17l2.2-1.3M17.6 8.3 19.8 7"/></svg>
+        <span>הגדרות</span>
+      </button>
+    </nav>
+
+    <div class="kspace"></div>
+
+    <!-- storage -->
+    <div class="kstore">
+      <div class="kstore-ring" style="--p:41"><span>41%</span></div>
+      <div class="kstore-tx">
+        <span class="kstore-lbl">אחסון</span>
+        <span class="kstore-val">829 GB <b>/ 2 TB</b></span>
+      </div>
+    </div>
+
+    <!-- upgrade -->
+    <button class="kupg" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
+      <span>שדרג חבילה</span>
+    </button>
+
+    <!-- user -->
+    <button class="kuser" type="button">
+      <span class="kuser-av">TZ</span>
+      <span class="kuser-tx">
+        <span class="kuser-name">Tal Zimmer</span>
+        <span class="kuser-mail">tal.zimmer@gmail.com</span>
+      </span>
+      <svg class="kuser-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+
+  </aside>
+
+  <!-- ===================== DEMO PAGE (remove when integrating) ===================== -->
+  <main class="kmain">
+    <h1>סייד־בר KOLKLI</h1>
+    <p>עמודת ניווט מלאה בצד ימין, RTL מלא, מותאמת למערכת העיצוב הקיימת.</p>
+    <button class="demo-toggle" type="button" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme==='dark' ? '' : 'dark'">
+      החלף מצב כהה / בהיר
+    </button>
+  </main>
+
+  <script>
+    // simple active-state switching so you can click through the nav in the preview
+    document.querySelectorAll('.knav-item').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.knav-item.active').forEach(function (a) {
+          a.classList.remove('active');
+          a.removeAttribute('aria-current');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-current', 'page');
+      });
+    });
+  </script>
+
+</body>
+</html>

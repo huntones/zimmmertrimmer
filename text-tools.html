@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — כלי טקסט</title>
-<meta name="description" content="Free text tools that run in your browser — reverse, sort, dedupe, clean whitespace, split & join, change case, extract emails/links, count words, make hashtags, slugify, URL encode/decode, format JSON and clean CSV. Nothing leaves your machine.">
+<meta name="description" content="Free text tools — reverse, sort, dedupe, clean whitespace, split & join, change case, extract emails/links, count words, make hashtags, slugify, URL encode/decode, format JSON and clean CSV. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:80%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -650,32 +650,32 @@
   /* ---------- UI strings ---------- */
   const UI = {
     he:{ dir:'rtl',
-      kick:'כלים · כלי טקסט', title:'כלי טקסט', sub:'אוסף כלים מהירים לעיבוד טקסט — היפוך, מיון, ניקוי, פיצול, איחוד, חילוץ, ספירה ועוד. הכול רץ בדפדפן שלכם, שום טקסט לא נשלח לשרת.',
+      kick:'כלים · כלי טקסט', title:'כלי טקסט', sub:'אוסף כלים מהירים לעיבוד טקסט — היפוך, מיון, ניקוי, פיצול, איחוד, חילוץ, ספירה ועוד',
       grp:{edit:'עיבוד טקסט', list:'רשימות', dev:'חילוץ וקוד'},
       inLabel:'קלט', outLabel:'פלט', copy:'העתקה', copied:'הועתק ✓', download:'הורדה', clear:'ניקוי', sample:'דוגמה',
       ph:'הדביקו או הקלידו טקסט כאן…',
       stat:(c,w,l)=>`${c} תווים · ${w} מילים · ${l} שורות`,
       cnt:{chars:'תווים', charsNs:'תווים ללא רווחים', words:'מילים', lines:'שורות', sentences:'משפטים', paragraphs:'פסקאות', read:'זמן קריאה', min:'דק׳'},
       okJson:'JSON תקין', errJson:'JSON לא תקין: ', errUrl:'לא ניתן לפענח — הקידוד פגום',
-      foot:'KOLKLI · כלי טקסט · הכול רץ בדפדפן שלכם, פרטי ומהיר' },
+      foot:'KOLKLI · כלי טקסט · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
-      kick:'Tools · Text Tools', title:'Text Tools', sub:'A quick toolbox for working with text — reverse, sort, clean, split, join, extract, count and more. Everything runs in your browser; no text is ever sent to a server.',
+      kick:'Tools · Text Tools', title:'Text Tools', sub:'A quick toolbox for working with text — reverse, sort, clean, split, join, extract, count and more',
       grp:{edit:'Edit Text', list:'Lists', dev:'Extract & Code'},
       inLabel:'Input', outLabel:'Output', copy:'Copy', copied:'Copied ✓', download:'Download', clear:'Clear', sample:'Sample',
       ph:'Paste or type your text here…',
       stat:(c,w,l)=>`${c} chars · ${w} words · ${l} lines`,
       cnt:{chars:'Characters', charsNs:'Characters (no spaces)', words:'Words', lines:'Lines', sentences:'Sentences', paragraphs:'Paragraphs', read:'Reading time', min:'min'},
       okJson:'Valid JSON', errJson:'Invalid JSON: ', errUrl:'Cannot decode — malformed encoding',
-      foot:'KOLKLI · Text Tools · Runs entirely in your browser, private and fast' },
+      foot:'KOLKLI · Text Tools · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
-      kick:'Инструменты · Текст', title:'Текстовые инструменты', sub:'Быстрый набор инструментов для работы с текстом — переворот, сортировка, очистка, разбивка, объединение, извлечение, подсчёт и другое. Всё работает в браузере; текст не отправляется на сервер.',
+      kick:'Инструменты · Текст', title:'Текстовые инструменты', sub:'Быстрый набор инструментов для работы с текстом — переворот, сортировка, очистка, разбивка, объединение, извлечение, подсчёт и другое',
       grp:{edit:'Обработка текста', list:'Списки', dev:'Извлечение и код'},
       inLabel:'Ввод', outLabel:'Результат', copy:'Копировать', copied:'Скопировано ✓', download:'Скачать', clear:'Очистить', sample:'Пример',
       ph:'Вставьте или введите текст…',
       stat:(c,w,l)=>`${c} симв. · ${w} слов · ${l} строк`,
       cnt:{chars:'Символы', charsNs:'Символы (без пробелов)', words:'Слова', lines:'Строки', sentences:'Предложения', paragraphs:'Абзацы', read:'Время чтения', min:'мин'},
       okJson:'Корректный JSON', errJson:'Некорректный JSON: ', errUrl:'Не удалось декодировать — повреждённая кодировка',
-      foot:'KOLKLI · Текстовые инструменты · Работает в браузере, приватно и быстро' }
+      foot:'KOLKLI · Текстовые инструменты · Быстро, просто и профессионально' }
   };
 
   /* ---------- state ---------- */

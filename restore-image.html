@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — שחזור תמונות AI</title>
-<meta name="description" content="Restore and enhance old or damaged photos with AI — sharpen detail, remove scratches and noise, fix blur, revive faded colors and bring back lost detail. Before/after compare, adjustable strength, all in your browser.">
+<meta name="description" content="Restore and enhance old or damaged photos with AI — sharpen detail, remove scratches and noise, fix blur, revive faded colors and bring back lost detail. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;zoom:1.2;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -317,7 +317,7 @@
       dir:'rtl', langIco:'EN',
       kick:'שחזור תמונות AI',
       pageTitle:'שחזרו ושפרו תמונות ישנות ופגומות — עם AI',
-      pageSub:'העלו תמונה ישנה, דהויה או מטושטשת, וה־AI ישחזר אותה: חידוד פרטים, הסרת רעש ושריטות, תיקון טשטוש, החייאת צבעים ושחזור פרטים שאבדו. עם השוואת לפני/אחרי ובחירת עוצמה. הכול רץ בדפדפן שלכם — התמונה לא עוזבת את המחשב.',
+      pageSub:'העלו תמונה ישנה, דהויה או מטושטשת, וה־AI ישחזר אותה: חידוד פרטים, הסרת רעש ושריטות, תיקון טשטוש, החייאת צבעים ושחזור פרטים שאבדו. עם השוואת לפני/אחרי ובחירת עוצמה. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו תמונה לכאן', or2:'או', choose:'בחרו תמונה',
       sizeNote:'JPG · PNG · WEBP', remove:'הסרה',
       optTitle:'הגדרות שחזור',
@@ -336,15 +336,15 @@
       dlBtn:'הורדה באיכות גבוהה', againBtn:'תמונה נוספת',
       errNoFile:'צריך לבחור תמונה קודם', errLoad:'לא הצלחנו לטעון את התמונה',
       errNoOpt:'בחרו לפחות שיפור אחד', failed:'העיבוד נכשל',
-      seam:'כל העיבוד רץ מקומית בדפדפן שלכם בעזרת עיבוד תמונה חכם — התמונה לעולם לא נשלחת לשום שרת.',
-      foot:'KOLKLI · שחזור תמונות AI · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · שחזור תמונות AI · מהיר, פשוט ובאיכות מקצועית',
       copied:'הקישור הועתק ✓',
     },
     en:{
       dir:'ltr', langIco:'עב',
       kick:'AI Photo Restoration',
       pageTitle:'Restore & enhance old, damaged photos — with AI',
-      pageSub:'Drop an old, faded or blurry photo and the AI brings it back: sharpen detail, remove noise and scratches, fix blur, revive colors and restore lost detail. With a before/after compare and adjustable strength. Everything runs in your browser — your photo never leaves your machine.',
+      pageSub:'Drop an old, faded or blurry photo and the AI brings it back: sharpen detail, remove noise and scratches, fix blur, revive colors and restore lost detail. With a before/after compare and adjustable strength. Fast, simple and professional-quality.',
       dropBig:'Drag a photo here', or2:'or', choose:'Choose a photo',
       sizeNote:'JPG · PNG · WEBP', remove:'Remove',
       optTitle:'Restoration settings',
@@ -363,15 +363,15 @@
       dlBtn:'Download high quality', againBtn:'New photo',
       errNoFile:'Choose a photo first', errLoad:'Could not load the image',
       errNoOpt:'Enable at least one enhancement', failed:'Processing failed',
-      seam:'All processing runs locally in your browser with smart image processing — your photo is never sent to any server.',
-      foot:'KOLKLI · AI Photo Restoration · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · AI Photo Restoration · Fast, simple and professional quality',
       copied:'Link copied ✓',
     },
     ru:{
       dir:'ltr',
       kick:'AI-восстановление фото',
       pageTitle:'Восстанавливайте старые, повреждённые фото — с помощью AI',
-      pageSub:'Перетащите старое, выцветшее или размытое фото, и AI вернёт его к жизни: повысит резкость деталей, уберёт шум и царапины, исправит размытие, оживит цвета и восстановит утраченные детали. С сравнением до/после и регулируемой силой. Всё работает в вашем браузере — ваше фото никогда не покидает устройство.',
+      pageSub:'Перетащите старое, выцветшее или размытое фото, и AI вернёт его к жизни: повысит резкость деталей, уберёт шум и царапины, исправит размытие, оживит цвета и восстановит утраченные детали. С сравнением до/после и регулируемой силой. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите фото сюда', or2:'или', choose:'Выбрать фото',
       sizeNote:'JPG · PNG · WEBP', remove:'Удалить',
       optTitle:'Настройки восстановления',
@@ -390,8 +390,8 @@
       dlBtn:'Скачать в высоком качестве', againBtn:'Новое фото',
       errNoFile:'Сначала выберите фото', errLoad:'Не удалось загрузить изображение',
       errNoOpt:'Включите хотя бы одно улучшение', failed:'Обработка не удалась',
-      seam:'Вся обработка выполняется локально в вашем браузере с умной обработкой изображений — ваше фото никогда не отправляется на сервер.',
-      foot:'KOLKLI · AI-восстановление фото · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · AI-восстановление фото · Быстро, просто и профессионального качества',
       copied:'Ссылка скопирована ✓',
     },
   };

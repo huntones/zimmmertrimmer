@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחולל Gradient</title>
-<meta name="description" content="Free CSS gradient generator — build linear, radial and conic gradients visually. Pick colors, angle and stops, preview live and copy ready-to-use CSS. Fast, private, right in your browser.">
+<meta name="description" content="Free CSS gradient generator — build linear, radial and conic gradients visually. Pick colors, angle and stops, preview live and copy ready-to-use CSS. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -289,36 +289,36 @@
     he:{ dir:'rtl',
       kick:'מחולל Gradient',
       pageTitle:'מחולל Gradient ל-CSS',
-      pageSub:'בנו גרדיאנט לינארי, רדיאלי או קוני באופן ויזואלי — בחרו צבעים, זווית ונקודות עצירה, וקבלו מייד קוד CSS מוכן להעתקה. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'בנו גרדיאנט לינארי, רדיאלי או קוני באופן ויזואלי — בחרו צבעים, זווית ונקודות עצירה, וקבלו מייד קוד CSS מוכן להעתקה. מהיר, פשוט ובאיכות מקצועית.',
       typeLabel:'סוג הגרדיאנט', typeLinear:'לינארי', typeRadial:'רדיאלי', typeConic:'קוני',
       angleLabel:'זווית', shapeLabel:'צורה', shapeCircle:'עיגול', shapeEllipse:'אליפסה',
       stopsLabel:'נקודות צבע', addStop:'הוספת צבע', random:'אקראי', presets:'תבניות מוכנות',
       cssLabel:'קוד CSS', copy:'העתקה', copiedMsg:'הועתק ✓',
       exportLabel:'ייצוא כתמונה', savedMsg:'ההורדה החלה ✓', exportErr:'הייצוא נכשל בדפדפן זה',
       note:'הקוד עובד בכל דפדפן מודרני. גרדיאנט קוני (conic-gradient) נתמך בדפדפנים עדכניים — בדפדפנים ישנים מאוד ייתכן שיידרש קידומת או שהוא לא יוצג.',
-      foot:'KOLKLI · מחולל Gradient · פרטי ומהיר, ישירות בדפדפן' },
+      foot:'KOLKLI · מחולל Gradient · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Gradient Generator',
       pageTitle:'CSS Gradient Generator',
-      pageSub:'Build a linear, radial or conic gradient visually — pick colors, angle and stops, and instantly get ready-to-copy CSS. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Build a linear, radial or conic gradient visually — pick colors, angle and stops, and instantly get ready-to-copy CSS. Fast, simple and professional-quality.',
       typeLabel:'Gradient type', typeLinear:'Linear', typeRadial:'Radial', typeConic:'Conic',
       angleLabel:'Angle', shapeLabel:'Shape', shapeCircle:'Circle', shapeEllipse:'Ellipse',
       stopsLabel:'Color stops', addStop:'Add stop', random:'Random', presets:'Presets',
       cssLabel:'CSS code', copy:'Copy', copiedMsg:'Copied ✓',
       exportLabel:'Export as image', savedMsg:'Download started ✓', exportErr:'Export failed in this browser',
       note:'The generated code works in every modern browser. Conic gradients are supported in current browsers — very old ones may need a prefix or may not show them.',
-      foot:'KOLKLI · Gradient Generator · Private and fast, right in your browser' },
+      foot:'KOLKLI · Gradient Generator · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Генератор градиентов',
       pageTitle:'Генератор CSS-градиентов',
-      pageSub:'Создайте линейный, радиальный или конический градиент визуально — выберите цвета, угол и точки перехода и мгновенно получите готовый CSS для копирования. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Создайте линейный, радиальный или конический градиент визуально — выберите цвета, угол и точки перехода и мгновенно получите готовый CSS для копирования. Быстро, просто и профессионального качества.',
       typeLabel:'Тип градиента', typeLinear:'Линейный', typeRadial:'Радиальный', typeConic:'Конический',
       angleLabel:'Угол', shapeLabel:'Форма', shapeCircle:'Круг', shapeEllipse:'Эллипс',
       stopsLabel:'Точки цвета', addStop:'Добавить цвет', random:'Случайно', presets:'Пресеты',
       cssLabel:'CSS-код', copy:'Копировать', copiedMsg:'Скопировано ✓',
       exportLabel:'Экспорт изображения', savedMsg:'Загрузка началась ✓', exportErr:'Экспорт не удался в этом браузере',
       note:'Сгенерированный код работает во всех современных браузерах. Конические градиенты поддерживаются в актуальных браузерах — очень старым может потребоваться префикс, или они не отобразятся.',
-      foot:'KOLKLI · Генератор градиентов · Приватно и быстро, прямо в браузере' }
+      foot:'KOLKLI · Генератор градиентов · Быстро, просто и профессионального качества' }
   };
 
   const PRESETS = [

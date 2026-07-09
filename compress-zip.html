@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — דחיסת ZIP</title>
-<meta name="description" content="Bundle any files or folders into a single compressed ZIP archive right in your browser. Nothing is uploaded — everything is zipped locally. Fast, private and free.">
+<meta name="description" content="Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -326,7 +326,7 @@
       dir:'rtl',
       kick:'דחיסה · דחיסת ZIP',
       pageTitle:'דחסו קבצים לארכיון ZIP אחד',
-      pageSub:'גררו כמה קבצים או תיקיות שלמות, ואנחנו נארוז ונדחוס אותם לקובץ ZIP יחיד — נוח לשליחה ולשמירה. הכול קורה בדפדפן שלכם, ושום קובץ לא עולה לשרת.',
+      pageSub:'גררו כמה קבצים או תיקיות שלמות, ואנחנו נארוז ונדחוס אותם לקובץ ZIP יחיד — נוח לשליחה ולשמירה. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קבצים או תיקיות לכאן', or2:'או', choose:'בחרו קבצים',
       orFolder:'או', addFolder:'הוסיפו תיקייה שלמה',
       fmtAny:'כל סוג קובץ', fmtFolders:'תיקיות', fmtMany:'כמה קבצים',
@@ -345,8 +345,8 @@
       zMeta:(c,s)=>`${c} · ${s}`,
       stOrigK:'לפני', stNewK:'ZIP', stSaveK:'חיסכון',
       dl:'הורדת ה-ZIP', againBtn:'ארכיון נוסף',
-      seam:'הכול קורה מקומית: הקבצים נדחסים ונארזים ל-ZIP ישירות בדפדפן שלכם — שום קובץ לא נשלח לשרת, וכלום לא עוזב את המחשב.',
-      foot:'KOLKLI · דחיסת ZIP · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · דחיסת ZIP · מהיר, פשוט ובאיכות מקצועית',
       copied:'הועתק ✓',
       errNoFile:'קודם הוסיפו קבצים לארכיון',
       errFail:'יצירת ה-ZIP נכשלה — נסו שוב',
@@ -355,7 +355,7 @@
       dir:'ltr',
       kick:'Compress · Compress ZIP',
       pageTitle:'Bundle files into one ZIP archive',
-      pageSub:'Drop in any files or whole folders and we’ll pack and compress them into a single ZIP — easy to send and to store. It all runs in your browser, and no file ever leaves your machine.',
+      pageSub:'Drop in any files or whole folders and we’ll pack and compress them into a single ZIP — easy to send and to store. Fast, simple and professional-quality.',
       dropBig:'Drag files or folders here', or2:'or', choose:'Choose files',
       orFolder:'or', addFolder:'add a whole folder',
       fmtAny:'Any file', fmtFolders:'Folders', fmtMany:'Multiple files',
@@ -374,8 +374,8 @@
       zMeta:(c,s)=>`${c} · ${s}`,
       stOrigK:'Before', stNewK:'ZIP', stSaveK:'Saved',
       dl:'Download ZIP', againBtn:'New archive',
-      seam:'Everything is local: files are compressed and packed into a ZIP right in your browser — no file is sent to a server, and nothing leaves your machine.',
-      foot:'KOLKLI · Compress ZIP · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Compress ZIP · Fast, simple and professional quality',
       copied:'Copied ✓',
       errNoFile:'Add some files to the archive first',
       errFail:'Creating the ZIP failed — please try again',
@@ -384,7 +384,7 @@
       dir:'ltr',
       kick:'Сжатие · Сжать ZIP',
       pageTitle:'Соберите файлы в один ZIP-архив',
-      pageSub:'Перетащите любые файлы или целые папки — мы упакуем и сожмём их в единый ZIP, удобный для отправки и хранения. Всё работает в вашем браузере, и ни один файл не покидает устройство.',
+      pageSub:'Перетащите любые файлы или целые папки — мы упакуем и сожмём их в единый ZIP, удобный для отправки и хранения. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите файлы или папки сюда', or2:'или', choose:'Выбрать файлы',
       orFolder:'или', addFolder:'добавить целую папку',
       fmtAny:'Любой файл', fmtFolders:'Папки', fmtMany:'Несколько файлов',
@@ -403,8 +403,8 @@
       zMeta:(c,s)=>`${c} · ${s}`,
       stOrigK:'До', stNewK:'ZIP', stSaveK:'Экономия',
       dl:'Скачать ZIP', againBtn:'Новый архив',
-      seam:'Всё локально: файлы сжимаются и упаковываются в ZIP прямо в вашем браузере — ни один файл не отправляется на сервер, ничего не покидает устройство.',
-      foot:'KOLKLI · Сжать ZIP · Приватно и быстро, прямо в браузере',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Сжать ZIP · Быстро, просто и профессионального качества',
       copied:'Скопировано ✓',
       errNoFile:'Сначала добавьте файлы в архив',
       errFail:'Не удалось создать ZIP — попробуйте ещё раз',

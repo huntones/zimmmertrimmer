@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — ממיר צבעים</title>
-<meta name="description" content="Free color converter — convert between HEX, RGB, HSL and CMYK instantly, with ready-to-copy CSS. Pick a color, paste any value, and get all formats. Fast, private, right in your browser.">
+<meta name="description" content="Free color converter — convert between HEX, RGB, HSL and CMYK instantly, with ready-to-copy CSS. Pick a color, paste any value, and get all formats. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -77,7 +77,7 @@
     border-radius:12px;background:var(--panel-2);cursor:pointer;flex-shrink:0;}
   input[type=color]::-webkit-color-swatch-wrapper{padding:4px;}
   input[type=color]::-webkit-color-swatch{border:none;border-radius:8px;}
-  .hexfield{flex:1;display:flex;align-items:center;gap:2px;background:var(--panel-2);border:1px solid var(--line);
+  .hexfield{flex:1;display:flex;direction:ltr;align-items:center;gap:2px;background:var(--panel-2);border:1px solid var(--line);
     border-radius:12px;padding:0 12px;transition:border-color .12s,box-shadow .12s;}
   .hexfield:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
   .hexfield .hash{color:var(--faint);font-family:var(--mono);font-size:16px;}
@@ -112,7 +112,7 @@
   .finputs.wide{gap:8px;}
   .fin{flex:1;min-width:0;}
   .fin > span{display:block;font-size:10px;font-weight:700;color:var(--faint);text-align:center;margin-bottom:4px;font-family:var(--mono);letter-spacing:.06em;}
-  .fin input{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:9px;
+  .fin input{width:100%;direction:ltr;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:9px;
     font-family:var(--mono);font-size:13.5px;font-weight:600;text-align:center;padding:8px 4px;transition:border-color .12s,box-shadow .12s;}
   .fin input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
   .fin.hex-in input{text-align:start;text-transform:uppercase;padding-inline:10px;}
@@ -234,24 +234,24 @@
     he:{ dir:'rtl',
       kick:'ממיר צבעים',
       pageTitle:'ממיר צבעים — HEX, RGB, HSL ו-CMYK',
-      pageSub:'בחרו צבע או הדביקו ערך באחד הפורמטים, וקבלו מייד את כל השאר — HEX, RGB, HSL ו-CMYK — עם קוד מוכן להעתקה. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'בחרו צבע או הדביקו ערך באחד הפורמטים, וקבלו מייד את כל השאר — HEX, RGB, HSL ו-CMYK — עם קוד מוכן להעתקה. מהיר, פשוט ובאיכות מקצועית.',
       randomBtn:'צבע אקראי', eyedropBtn:'טפטפת', copy:'העתקה', copiedMsg:'הועתק ✓',
       note:'CMYK מיועד להדפסה והוא קירוב בלבד — הצבע במסך (RGB) עשוי להיראות מעט שונה מהתוצאה המודפסת.',
-      foot:'KOLKLI · ממיר צבעים · פרטי ומהיר, ישירות בדפדפן' },
+      foot:'KOLKLI · ממיר צבעים · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Color Converter',
       pageTitle:'Color Converter — HEX, RGB, HSL & CMYK',
-      pageSub:'Pick a color or paste a value in any format and instantly get all the others — HEX, RGB, HSL and CMYK — with ready-to-copy code. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Pick a color or paste a value in any format and instantly get all the others — HEX, RGB, HSL and CMYK — with ready-to-copy code. Fast, simple and professional-quality.',
       randomBtn:'Random', eyedropBtn:'Eyedropper', copy:'Copy', copiedMsg:'Copied ✓',
       note:'CMYK is for print and is an approximation only — an on-screen (RGB) color can look a little different once printed.',
-      foot:'KOLKLI · Color Converter · Private and fast, right in your browser' },
+      foot:'KOLKLI · Color Converter · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Конвертер цвета',
       pageTitle:'Конвертер цвета — HEX, RGB, HSL и CMYK',
-      pageSub:'Выберите цвет или вставьте значение в любом формате и мгновенно получите все остальные — HEX, RGB, HSL и CMYK — с готовым кодом для копирования. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Выберите цвет или вставьте значение в любом формате и мгновенно получите все остальные — HEX, RGB, HSL и CMYK — с готовым кодом для копирования. Быстро, просто и профессионального качества.',
       randomBtn:'Случайный', eyedropBtn:'Пипетка', copy:'Копировать', copiedMsg:'Скопировано ✓',
       note:'CMYK предназначен для печати и является лишь приближением — экранный цвет (RGB) может немного отличаться от напечатанного.',
-      foot:'KOLKLI · Конвертер цвета · Приватно и быстро, прямо в браузере' }
+      foot:'KOLKLI · Конвертер цвета · Быстро, просто и профессионального качества' }
   };
 
   const PRESETS = ['#000000','#FFFFFF','#7B34FF','#3F85FF','#E0447A','#22B04B','#F5A623','#0FA6AB','#EF4444','#111827'];

@@ -59,9 +59,8 @@
   button{font-family:var(--sans);}
 
   /* ---------- layout ---------- */
-  /* content box matches the header's 75% bar (+44px for our 22px side padding)
-     so the sidebar's right edge lines up with the header logo instead of falling short */
-  .dash-wrap{max-width:calc(75% + 44px);width:100%;margin:0 auto;padding:22px 22px 60px;}
+  /* content box spans the viewport while keeping the same side padding as the shared header */
+  .dash-wrap{width:100%;max-width:none;margin:0 auto;padding:22px 22px 60px;}
   .dash{display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start;}
 
   /* ---------- mobile bar ---------- */
@@ -74,7 +73,18 @@
   /* ---------- sidebar ---------- */
   .side{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:var(--shadow);
     position:sticky;top:88px;display:flex;flex-direction:column;gap:4px;}
+  .side-logo{display:none;}
+  .side-logo img{display:block;width:auto;height:34px;}
+  .side-nav-card{display:flex;flex-direction:column;gap:4px;}
   .side-scrim{display:none;}
+  .side-tools{display:flex;justify-content:flex-end;margin:0 0 4px;}
+  .side-settings-btn{width:40px;height:40px;border:1px solid var(--line);border-radius:12px;background:var(--panel);
+    color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);
+    transition:background .12s,border-color .12s,color .12s,transform .08s;}
+  .side-settings-btn:hover,.side-settings-btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dim);}
+  .side-settings-btn:active{transform:translateY(1px);}
+  .side-settings-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s ease;}
+  .side-settings-btn:hover svg,.side-settings-btn.on svg{transform:rotate(45deg);}
 
   .cat{border-radius:12px;}
   .cat-head{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border:none;background:none;cursor:pointer;
@@ -89,6 +99,8 @@
   .cat.open .cat-head .cat-chev{transform:rotate(180deg);}
   .cat.on > .cat-head{color:var(--accent-dim);}
   .cat.on > .cat-head .cat-ic{background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);}
+  .cat.no-subs .cat-head{cursor:pointer;}
+  .cat.no-subs .cat-chev{display:none;}
 
   .subs{display:none;flex-direction:column;gap:2px;padding:2px 4px 8px;}
   .cat.open .subs{display:flex;}
@@ -98,6 +110,54 @@
   .subitem:hover{background:var(--panel-2);color:var(--ink-2);}
   .subitem.active{background:var(--accent-soft);color:var(--accent-dim);border-color:var(--accent);}
   .subitem.active .dot{opacity:1;}
+  .mp-tone-select{--svc:#4f46e5;--svc-bg:rgba(79,70,229,.12);--svc-line:rgba(79,70,229,.42);--svc-shadow:rgba(79,70,229,.22);}
+  .mp-tone-receive{--svc:#0891b2;--svc-bg:rgba(8,145,178,.12);--svc-line:rgba(8,145,178,.42);--svc-shadow:rgba(8,145,178,.22);}
+  .mp-tone-send{--svc:#f97316;--svc-bg:rgba(249,115,22,.14);--svc-line:rgba(249,115,22,.44);--svc-shadow:rgba(249,115,22,.24);}
+  .mp-tone-review{--svc:#16a34a;--svc-bg:rgba(22,163,74,.13);--svc-line:rgba(22,163,74,.42);--svc-shadow:rgba(22,163,74,.22);}
+  .edit-tone-audio{--svc:#c026d3;--svc-bg:rgba(192,38,211,.12);--svc-line:rgba(192,38,211,.40);--svc-shadow:rgba(192,38,211,.22);}
+  .edit-tone-video{--svc:#2563eb;--svc-bg:rgba(37,99,235,.12);--svc-line:rgba(37,99,235,.40);--svc-shadow:rgba(37,99,235,.22);}
+  .edit-tone-images{--svc:#ca8a04;--svc-bg:rgba(202,138,4,.14);--svc-line:rgba(202,138,4,.42);--svc-shadow:rgba(202,138,4,.22);}
+  .edit-tone-docs{--svc:#dc2626;--svc-bg:rgba(220,38,38,.12);--svc-line:rgba(220,38,38,.38);--svc-shadow:rgba(220,38,38,.20);}
+  .cat.on.mp-tone-select > .cat-head,
+  .cat.on.mp-tone-receive > .cat-head,
+  .cat.on.mp-tone-send > .cat-head,
+  .cat.on.mp-tone-review > .cat-head,
+  .cat.on.edit-tone-audio > .cat-head,
+  .cat.on.edit-tone-video > .cat-head,
+  .cat.on.edit-tone-images > .cat-head,
+  .cat.on.edit-tone-docs > .cat-head{color:var(--svc);}
+  .cat.on.mp-tone-select > .cat-head .cat-ic,
+  .cat.on.mp-tone-receive > .cat-head .cat-ic,
+  .cat.on.mp-tone-send > .cat-head .cat-ic,
+  .cat.on.mp-tone-review > .cat-head .cat-ic,
+  .cat.on.edit-tone-audio > .cat-head .cat-ic,
+  .cat.on.edit-tone-video > .cat-head .cat-ic,
+  .cat.on.edit-tone-images > .cat-head .cat-ic,
+  .cat.on.edit-tone-docs > .cat-head .cat-ic{background:var(--svc);color:#fff;box-shadow:0 4px 12px var(--svc-shadow);}
+  .subitem.mp-tone-select .dot,
+  .subitem.mp-tone-receive .dot,
+  .subitem.mp-tone-send .dot,
+  .subitem.mp-tone-review .dot,
+  .subitem.edit-tone-audio .dot,
+  .subitem.edit-tone-video .dot,
+  .subitem.edit-tone-images .dot,
+  .subitem.edit-tone-docs .dot{background:var(--svc);opacity:.75;}
+  .subitem.mp-tone-select:hover,
+  .subitem.mp-tone-receive:hover,
+  .subitem.mp-tone-send:hover,
+  .subitem.mp-tone-review:hover,
+  .subitem.edit-tone-audio:hover,
+  .subitem.edit-tone-video:hover,
+  .subitem.edit-tone-images:hover,
+  .subitem.edit-tone-docs:hover{background:var(--svc-bg);color:var(--svc);}
+  .subitem.active.mp-tone-select,
+  .subitem.active.mp-tone-receive,
+  .subitem.active.mp-tone-send,
+  .subitem.active.mp-tone-review,
+  .subitem.active.edit-tone-audio,
+  .subitem.active.edit-tone-video,
+  .subitem.active.edit-tone-images,
+  .subitem.active.edit-tone-docs{background:var(--svc-bg);color:var(--svc);border-color:var(--svc-line);}
   .client-subbar{display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:6px;align-items:center;}
   .client-subbar .subitem{min-width:0;}
   .side-add-project{width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:var(--panel);
@@ -114,6 +174,17 @@
   .project-nav.active{background:var(--accent-soft);color:var(--accent-dim);}
   .project-nav .pn-dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.65;flex-shrink:0;}
   .project-nav .pn-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .side-links{display:flex;flex-direction:column;gap:4px;margin-top:2px;padding-top:6px;}
+  .side-link{display:flex;align-items:center;gap:11px;min-height:44px;padding:9px 12px;border-radius:12px;color:var(--ink-2);
+    width:100%;border:0;background:transparent;font-family:var(--sans);font-size:14px;font-weight:800;text-align:start;cursor:pointer;transition:background .12s,color .12s;}
+  .side-link:hover,.side-link.active{background:var(--tool-bg,var(--panel-2));color:var(--tool,var(--accent-dim));}
+  .side-link-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:var(--tool-bg,var(--accent-soft));color:var(--tool,var(--accent-dim));}
+  .side-link-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .side-link.ai{--tool:#9333ea;--tool-bg:rgba(147,51,234,.12);}
+  .side-link.editing{--tool:#7c3aed;--tool-bg:rgba(124,58,237,.12);}
+  .side-link.design{--tool:#0d9488;--tool-bg:rgba(13,148,136,.12);}
+  .side-link.text{--tool:#be123c;--tool-bg:rgba(190,18,60,.12);}
+  .side-below-tools{border-top:1px solid var(--line);margin-top:8px;padding-top:10px;}
   /* Editable nav-item labels (pencil + inline save) */
   .subitem .lbl-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .subitem .lbl-btn{width:26px;height:26px;flex-shrink:0;border:none;background:none;border-radius:8px;color:inherit;
@@ -131,21 +202,36 @@
   .subitem .lbl-input{flex:1;min-width:0;border:none;background:none;outline:none;color:var(--ink);
     font-family:var(--sans);font-size:13.5px;font-weight:600;padding:0;}
 
-  /* plan chip pinned at the bottom of the sidebar */
+  /* plan chip + storage pinned at the bottom of the sidebar, merged into one block */
   .side-plan{margin-top:8px;border-top:1px solid var(--line);padding-top:12px;}
-  .planchip{display:flex;align-items:center;gap:11px;padding:12px;border-radius:14px;background:var(--grad-soft);border:1px solid var(--line);}
+  /* the plan + storage share ONE bordered container so they read as a single unit */
+  .plan-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow-sm);}
+  .planchip{display:flex;align-items:center;gap:11px;padding:12px;background:var(--grad-soft);border:none;border-radius:0;}
   .planchip .pc-ic{width:36px;height:36px;flex-shrink:0;border-radius:10px;display:flex;align-items:center;justify-content:center;
     background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);}
   .planchip .pc-ic svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   .planchip .pc-tx{min-width:0;flex:1;display:flex;flex-direction:column;}
   .planchip .pc-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
   .planchip .pc-name{font-size:15px;font-weight:800;line-height:1.2;}
+  .storage-chip{display:flex;align-items:center;gap:12px;margin-top:0;padding:12px;border-radius:0;background:transparent;border:none;border-top:1px solid var(--line);box-shadow:none;}
+  .storage-ring{--p:0;width:54px;height:54px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;position:relative;
+    background:conic-gradient(var(--accent) calc(var(--p) * 1%), var(--line) 0);}
+  .storage-ring::before{content:'';position:absolute;inset:7px;border-radius:50%;background:var(--panel);}
+  .storage-ring span{position:relative;font-family:var(--mono);font-size:12px;font-weight:900;color:var(--ink);}
+  .storage-tx{min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .storage-title{font-size:13px;font-weight:850;color:var(--ink-2);line-height:1.15;}
+  .storage-line{font-size:11.5px;font-weight:650;color:var(--muted);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .storage-left{font-size:11px;color:var(--accent-dim);font-weight:800;}
   .side-plan .upg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:9px;color:#fff;border:none;cursor:pointer;
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
     font-weight:700;font-size:13.5px;padding:11px 14px;border-radius:11px;text-shadow:0 1px 2px rgba(0,0,0,.18);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
   .side-plan .upg:hover{filter:brightness(1.05);} .side-plan .upg:active{transform:translateY(1px);}
   .side-plan .upg svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .side-account{width:100%;margin-top:auto;padding-top:14px;}
+  .side-account .dash-acct-btn{width:100%;justify-content:flex-start;background:var(--panel);border-color:var(--line);box-shadow:var(--shadow-sm);}
+  .side-account .dash-acct-name{flex:1;min-width:0;text-align:start;}
+  .side-account .dash-acct-menu{top:auto;bottom:calc(100% + 9px);inset-inline-end:0;width:min(270px,100%);}
 
   /* admin-only shortcut, pinned above the nav */
   .side-admin{display:flex;align-items:center;gap:11px;padding:9px 12px;margin-bottom:6px;border-radius:12px;
@@ -162,6 +248,44 @@
     border-radius:14px;padding:12px 16px;font-size:13.5px;margin-bottom:16px;}
   .guestnote svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   .guestnote a{font-weight:700;color:var(--accent-dim);cursor:pointer;text-decoration:underline;}
+
+  .dash-search{position:relative;z-index:35;margin:0 0 18px;}
+  .dash-search-box{position:relative;display:flex;align-items:center;gap:8px;width:min(780px,100%);height:58px;margin-inline:auto;
+    background:var(--panel);border:1px solid var(--line);border-radius:999px;box-shadow:var(--shadow-sm),0 10px 30px rgba(123,52,255,.10);
+    padding-inline-start:26px;padding-inline-end:7px;transition:border-color .14s,box-shadow .14s;}
+  .dash-search-box:focus-within{border-color:#9a8cff;box-shadow:0 0 0 3px rgba(123,52,255,.18),0 14px 34px rgba(123,52,255,.20);}
+  .dash-search-box input{flex:1;min-width:0;height:100%;border:0;background:transparent;color:var(--ink);
+    font-family:var(--sans);font-size:15px;font-weight:600;outline:none;padding:0;}
+  .dash-search-box input::placeholder{color:var(--muted);font-weight:500;}
+  .dash-search-box input::-webkit-search-cancel-button{-webkit-appearance:none;}
+  .dash-search-btn{flex-shrink:0;width:44px;height:44px;border:0;border-radius:50%;cursor:pointer;display:grid;place-items:center;
+    background:linear-gradient(140deg,#7b34ff 0%,#3f85ff 100%);box-shadow:0 6px 16px rgba(123,52,255,.40);
+    transition:filter .14s,transform .08s;}
+  .dash-search-btn:hover{filter:brightness(1.06);}
+  .dash-search-btn:active{transform:scale(.94);}
+  .dash-search-btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  .dash-search-results{display:none;position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);width:min(860px,100%);max-height:min(460px,70vh);overflow:auto;
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-lg);padding:6px;}
+  .dash-search.open .dash-search-results{display:block;}
+  .ds-row{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 12px;border-radius:12px;text-decoration:none;color:inherit;}
+  .ds-row:hover{background:var(--panel-2);}
+  .ds-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);flex-shrink:0;}
+  .ds-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .ds-ic.project{background:#eef2ff;color:#4f46e5;}
+  .ds-ic.file{background:#eaf5ff;color:#2377d6;}
+  .ds-ic.order{background:#e8f7f8;color:#0f8b94;}
+  .ds-ic.client{background:#fff3df;color:#c06a12;}
+  .ds-ic.send{background:#fff0e8;color:#e06622;}
+  .ds-ic.review{background:#edf8ef;color:#2f9b55;}
+  .ds-ic.processed{background:#f2ecff;color:#6d4df2;}
+  .ds-type{display:inline-flex;align-items:center;width:max-content;max-width:100%;height:20px;padding:0 8px;border-radius:999px;background:var(--panel-2);color:var(--muted);font-size:10.5px;font-weight:850;letter-spacing:.02em;text-transform:uppercase;}
+  .ds-title{display:block;margin-top:4px;color:var(--ink);font-size:14px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ds-meta{display:block;margin-top:2px;color:var(--muted);font-size:12px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ds-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:34px;padding:0 12px;border-radius:9px;border:1px solid var(--line);
+    background:var(--panel);color:var(--accent-dim);font-family:var(--sans);font-size:12.5px;font-weight:850;text-decoration:none;cursor:pointer;white-space:nowrap;}
+  .ds-action:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .ds-action svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .ds-empty{padding:20px 14px;text-align:center;color:var(--muted);font-size:13px;font-weight:650;}
 
   .phead{display:flex;align-items:center;gap:16px;margin:2px 0 22px;}
   .phead .avatar{width:56px;height:56px;flex-shrink:0;border-radius:16px;display:flex;align-items:center;justify-content:center;
@@ -199,9 +323,8 @@
   .plan-badge{font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
     padding:4px 11px;border-radius:999px;}
   .plan-badge.free{color:var(--muted);background:var(--panel);border:1px solid var(--line);}
-  .plan-badge.lite{color:var(--info-dim);background:var(--info-soft);border:1px solid var(--info);}
-  .plan-badge.pro{color:#fff;background:var(--grad);border:1px solid transparent;box-shadow:0 4px 12px var(--grad-shadow);}
-  .plan-badge.business{color:#fff;background:linear-gradient(135deg,#1f2937,#4338ca);border:1px solid transparent;box-shadow:0 4px 12px rgba(67,56,202,.35);}
+  .plan-badge.creator{color:#fff;background:var(--grad);border:1px solid transparent;box-shadow:0 4px 12px var(--grad-shadow);}
+  .plan-badge.studio{color:#fff;background:linear-gradient(135deg,#1f2937,#4338ca);border:1px solid transparent;box-shadow:0 4px 12px rgba(67,56,202,.35);}
   .sc-price{font-size:14px;color:var(--muted);margin-top:10px;}
   .sc-price b{font-size:22px;color:var(--ink);font-weight:800;}
   .sc-actions{display:flex;flex-direction:column;gap:10px;align-items:stretch;}
@@ -214,6 +337,10 @@
   .sc-top-plan{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--success-dim);
     background:var(--success-soft);border:1px solid var(--success);padding:11px 18px;border-radius:12px;white-space:nowrap;}
   .sc-top-plan svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  /* 7-day free-trial pill on the subscription card */
+  .sc-trial{display:inline-flex;align-items:center;gap:7px;margin-top:11px;font-size:12.5px;font-weight:700;
+    color:var(--accent-dim);background:var(--accent-soft);border:1px solid var(--accent);border-radius:999px;padding:6px 13px;}
+  .sc-trial svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
 
   /* demo plan switcher */
   .demoswitch{margin-top:18px;padding-top:16px;border-top:1px dashed var(--line);}
@@ -253,6 +380,51 @@
   .qcard .q-ic svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   .qcard .q-t{font-size:14.5px;font-weight:700;}
   .qcard .q-d{font-size:12.5px;color:var(--muted);line-height:1.4;}
+  .dt-shell{display:flex;flex-direction:column;gap:22px;}
+  .dt-hero{text-align:center;padding:34px 16px 28px;border-radius:22px;background:
+    radial-gradient(55% 70% at 50% 0%,rgba(124,58,237,.08),transparent 68%),
+    linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,0));}
+  .dt-kicker{display:inline-flex;align-items:center;gap:8px;min-height:28px;padding:5px 13px;border-radius:999px;
+    background:var(--accent-soft);color:var(--accent-dim);font-family:var(--mono);font-size:11px;font-weight:850;letter-spacing:.04em;text-transform:uppercase;}
+  .dt-hero h2{margin:16px 0 10px;font-size:clamp(28px,4.2vw,44px);line-height:1.06;font-weight:900;letter-spacing:0;}
+  .dt-hero p{margin:0 auto;color:var(--muted);font-size:16px;line-height:1.65;max-width:64ch;}
+  .dt-head{display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid var(--line);padding-top:18px;}
+  .dt-head h3{margin:0;font-size:22px;font-weight:900;letter-spacing:0;}
+  .dt-head .btn{min-height:38px;border-radius:999px;padding:0 15px;font-size:12.8px;}
+  .dt-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+  .dt-card{min-height:156px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:10px;padding:20px;
+    position:relative;border:1px solid var(--line);border-radius:14px;background:var(--panel);box-shadow:var(--shadow-sm);color:inherit;text-decoration:none;
+    transition:transform .14s,border-color .14s,box-shadow .14s,background .14s;}
+  .dt-card:hover{transform:translateY(-3px);border-color:#f4a3c4;box-shadow:var(--shadow-lg);}
+  .dt-card.tool-card{display:block;padding:0;overflow:hidden;}
+  .tool-card-link{display:flex;min-height:156px;flex-direction:column;justify-content:center;align-items:flex-start;gap:10px;padding:20px;color:inherit;text-decoration:none;}
+  .dt-ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:#fde7f0;color:#e0447a;margin-bottom:6px;}
+  .dt-ic svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
+  .dt-name{display:block;font-size:15.5px;font-weight:900;color:var(--ink);line-height:1.25;}
+  .dt-desc{display:block;font-size:12.8px;color:var(--muted);line-height:1.45;}
+  .tool-fav-btn{position:absolute;top:12px;right:12px;z-index:5;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel);color:var(--muted);display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow-sm);
+    transition:background .12s,color .12s,border-color .12s,transform .08s;}
+  html[dir="rtl"] .tool-fav-btn{left:12px;right:auto;}
+  html:not([dir="rtl"]) .tool-fav-btn{right:12px;left:auto;}
+  .tool-fav-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-soft);}
+  .tool-fav-btn:active{transform:translateY(1px);}
+  .tool-fav-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
+  .tool-fav-btn.is-fav{color:#f59e0b;background:#fff7df;border-color:#f4c56a;}
+  .tool-fav-btn.is-fav svg{fill:currentColor;}
+  .ai-demo-badge{position:absolute;top:14px;right:14px;z-index:4;display:inline-flex;align-items:center;justify-content:center;min-height:22px;padding:0 8px;border-radius:7px;border:1px solid var(--success);background:var(--success-soft);color:var(--success-dim);font-size:10.5px;font-weight:900;}
+  html:not([dir="rtl"]) .ai-demo-badge{left:14px;right:auto;}
+  .fav-empty{min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;
+    border:1px dashed var(--line);border-radius:16px;background:var(--panel);box-shadow:var(--shadow-sm);padding:28px;}
+  .fav-empty .fe-ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-dim);}
+  .fav-empty .fe-ic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .fav-empty h3{margin:4px 0 0;font-size:18px;font-weight:900;}
+  .fav-empty p{margin:0;color:var(--muted);font-size:13.5px;}
+  .edit-hub-section{display:flex;flex-direction:column;gap:14px;}
+  .edit-hub-title{display:flex;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:18px;}
+  .edit-hub-title h3{margin:0;font-size:21px;font-weight:900;letter-spacing:0;color:var(--ink);}
+  .edit-hub-title .section-ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-dim);}
+  .edit-hub-title .section-ic svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
 
   /* ---------- generic form rows ---------- */
   .frow{display:flex;flex-direction:column;gap:6px;margin-bottom:15px;}
@@ -390,6 +562,125 @@
   .project-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;}
   .project-actions .btn{padding:9px 12px;font-size:12.8px;border-radius:10px;white-space:nowrap;}
   .project-empty{padding:44px 22px;text-align:center;}
+  .mp-shell{display:flex;flex-direction:column;gap:18px;}
+  .mp-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+  .mp-head h2{font-size:22px;font-weight:850;margin:0 0 4px;letter-spacing:0;}
+  .mp-head .csub{font-size:13.5px;color:var(--muted);margin:0;max-width:64ch;}
+  .mp-new-request{min-height:42px;padding:0 17px;border-radius:999px;font-size:13.5px;white-space:nowrap;text-decoration:none;}
+  .mp-tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+  .mp-tool{display:flex;align-items:center;gap:12px;min-height:92px;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--panel);
+    box-shadow:var(--shadow-sm);cursor:pointer;color:var(--ink);text-align:start;transition:border-color .14s,background .14s,transform .08s,box-shadow .14s;}
+  .mp-tool:hover{border-color:var(--svc,var(--accent));background:var(--svc-bg,var(--panel-2));}
+  .mp-tool:active{transform:translateY(1px);}
+  .mp-tool.on{border-color:var(--svc,var(--accent));background:var(--svc-bg,var(--accent-soft));box-shadow:0 10px 24px var(--svc-shadow,rgba(124,58,237,.12));}
+  .mp-tool-ic{width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--svc-bg,var(--grad-soft));color:var(--svc,var(--accent));}
+  .mp-tool.on .mp-tool-ic{background:var(--svc,var(--grad));color:#fff;box-shadow:0 5px 14px var(--svc-shadow,var(--grad-shadow));}
+  .mp-tool-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .mp-tool-t{display:block;font-size:15px;font-weight:850;line-height:1.15;}
+  .mp-tool-d{display:block;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.25;}
+  .mp-section-title{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:2px;}
+  .mp-section-title h3{margin:0;font-size:17px;font-weight:850;letter-spacing:0;}
+  .mp-section-title span{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;}
+  .mp-clients{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+  .mp-client{display:flex;flex-direction:column;gap:14px;min-height:248px;padding:17px;border:1px solid var(--line);border-top:3px solid var(--svc-line,var(--line));border-radius:8px;background:var(--panel);box-shadow:var(--shadow-sm);}
+  .mp-client-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  .mp-badge{display:inline-flex;align-items:center;gap:7px;min-height:28px;padding:5px 10px;border-radius:8px;background:var(--svc-bg,var(--accent-soft));color:var(--svc,var(--accent-dim));border:1px solid var(--svc-line,transparent);
+    font-size:11.5px;font-weight:850;text-transform:uppercase;letter-spacing:.03em;}
+  .mp-badge svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
+  .mp-menu{width:28px;height:28px;border:0;background:transparent;color:var(--faint);display:grid;place-items:center;border-radius:8px;cursor:pointer;transition:background .12s,color .12s;}
+  .mp-menu:hover{background:var(--danger-soft);color:var(--danger);}
+  .mp-menu:focus-visible{outline:2px solid var(--danger);outline-offset:1px;}
+  .mp-menu svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  /* confirm dialog */
+  .kc-overlay{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:20px;background:rgba(17,20,32,.44);opacity:0;transition:opacity .18s;}
+  .kc-overlay.show{opacity:1;}
+  .kc-modal{width:min(400px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 60px rgba(17,20,32,.28);padding:22px 22px 18px;transform:translateY(8px) scale(.98);transition:transform .18s;}
+  .kc-overlay.show .kc-modal{transform:none;}
+  .kc-title{margin:0 0 8px;font-size:18px;font-weight:850;color:var(--ink);}
+  .kc-body{margin:0 0 20px;font-size:14px;line-height:1.55;color:var(--muted);}
+  .kc-actions{display:flex;gap:10px;justify-content:flex-end;}
+  .kc-btn{min-height:40px;padding:0 18px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;border:1px solid var(--line);transition:filter .14s,background .14s;}
+  .kc-cancel{background:var(--panel-2);color:var(--ink-2);}
+  .kc-cancel:hover{background:var(--line-2);}
+  .kc-ok.danger{background:var(--danger);border-color:var(--danger);color:#fff;}
+  .kc-ok.danger:hover{filter:brightness(1.06);}
+  .mp-client-id{display:flex;align-items:center;gap:12px;}
+  .mp-avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--svc-bg,var(--grad-soft));color:var(--svc,var(--accent-dim));font-weight:850;border:1px solid var(--svc-line,transparent);}
+  .mp-client-name{display:block;font-size:16px;font-weight:850;line-height:1.2;}
+  .mp-number{display:block;margin-top:4px;font-size:12px;font-weight:850;color:var(--svc,var(--accent-dim));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mp-client-mail{display:block;font-size:12.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:28ch;}
+  .mp-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;border-block:1px solid var(--line-2);padding:13px 0;}
+  .mp-fact{min-width:0;}
+  .mp-fact b{display:block;font-size:13px;font-weight:850;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mp-fact span{display:block;font-size:11.5px;color:var(--faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mp-note{font-size:13px;color:var(--ink-2);line-height:1.45;margin:0;min-height:38px;}
+  .mp-client-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;}
+  .mp-foot-actions{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .mp-copy{width:38px;height:38px;flex-shrink:0;display:inline-grid;place-items:center;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel);color:var(--muted);cursor:pointer;box-shadow:var(--shadow-sm);transition:border-color .12s,color .12s,background .12s,transform .08s;}
+  .mp-copy:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .mp-copy:active{transform:translateY(1px);}
+  .mp-copy svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  /* status pill — color reflects the link/project STATE, not the service tone */
+  .mp-status{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;border-radius:999px;padding:6px 12px;
+    border:1px solid transparent;white-space:nowrap;color:var(--muted);background:var(--panel-2);}
+  .mp-status::before{content:'';width:8px;height:8px;border-radius:999px;background:currentColor;flex-shrink:0;}
+  .mp-status.st-active{color:var(--success-dim);background:var(--success-soft);}
+  .mp-status.st-active::before{background:var(--success);box-shadow:0 0 0 3px color-mix(in srgb,var(--success) 22%,transparent);animation:mppulse 1.8s ease-in-out infinite;}
+  .mp-status.st-success{color:var(--success-dim);background:var(--success-soft);}
+  .mp-status.st-info{color:var(--info-dim);background:var(--info-soft);}
+  .mp-status.st-warn{color:var(--warn);background:var(--warm-soft);border-color:var(--warm-line);}
+  .mp-status.st-danger{color:var(--danger);background:var(--danger-soft);}
+  .mp-status.st-neutral{color:var(--muted);background:var(--panel-2);border-color:var(--line);}
+  @keyframes mppulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+  .mp-id-txt{min-width:0;}
+  .mp-client-phone{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);margin-top:3px;direction:ltr;}
+  .mp-client-phone svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.85;}
+  .mp-files-link{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:0 12px;border-radius:8px;border:1px solid var(--accent);background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);font-size:12.8px;font-weight:850;white-space:nowrap;text-decoration:none;transition:background .12s,filter .12s,transform .08s;}
+  .mp-files-link:hover{background:var(--accent-soft);}
+  .mp-files-link:active{transform:translateY(1px);}
+  .mp-files-link svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
+  .mp-client-foot .btn{padding:9px 12px;border-radius:8px;font-size:12.8px;white-space:nowrap;}
+
+  /* ---------- processed files history ---------- */
+  .pf-card{overflow:hidden;padding:0;}
+  .pf-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:22px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .pf-head h2{font-size:18px;font-weight:800;margin:0 0 4px;letter-spacing:-0.01em;}
+  .pf-head .csub{font-size:13px;color:var(--muted);margin:0;max-width:72ch;}
+  .pf-plan{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:7px 12px;border-radius:999px;
+    background:var(--accent-soft);color:var(--accent-dim);font-size:12px;font-weight:800;white-space:nowrap;}
+  .pf-plan svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .pf-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:18px;}
+  .pf-item{display:flex;flex-direction:column;gap:14px;min-height:230px;padding:17px;border:1px solid var(--line);
+    border-radius:8px;background:var(--panel);box-shadow:var(--shadow-sm);position:relative;transition:border-color .16s,box-shadow .16s,background .16s;}
+  .pf-item.is-selected{border-color:var(--accent);background:linear-gradient(180deg,var(--panel),rgba(124,58,237,.045));box-shadow:0 0 0 2px var(--accent-soft),var(--shadow);}
+  .pf-select{position:absolute;top:9px;right:9px;z-index:3;width:28px;height:28px;border-radius:999px;display:grid;place-items:center;cursor:pointer;}
+  .pf-select input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer;}
+  .pf-select span{width:24px;height:24px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:transparent;display:grid;place-items:center;box-shadow:var(--shadow-sm);transition:background .14s,border-color .14s,color .14s,transform .12s;}
+  .pf-select svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
+  .pf-select:hover span{border-color:var(--accent);transform:translateY(-1px);}
+  .pf-select input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px;}
+  .pf-select input:checked + span{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 8px 18px rgba(124,58,237,.25);}
+  .pf-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  .pf-file{display:flex;align-items:center;gap:12px;min-width:0;}
+  .pf-ic{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:var(--grad-soft);color:var(--accent);}
+  .pf-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .pf-name{display:block;font-size:15px;font-weight:850;line-height:1.25;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pf-size{display:block;font-size:12px;color:var(--muted);margin-top:3px;}
+  .pf-action{display:inline-flex;align-items:center;gap:7px;min-height:28px;padding:5px 10px;border-radius:8px;
+    background:var(--accent-soft);color:var(--accent-dim);font-size:11.5px;font-weight:850;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
+  .pf-action svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .pf-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-block:1px solid var(--line-2);padding:13px 0;}
+  .pf-k{display:block;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);margin-bottom:2px;}
+  .pf-v{display:block;font-size:12.8px;font-weight:700;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pf-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;}
+  .pf-foot .btn{border-radius:8px;font-size:12.8px;padding:9px 12px;white-space:nowrap;}
+  .pf-empty{padding:44px 20px;text-align:center;}
+  .pf-tools{padding:0 18px 18px;}
+  .pf-bulk{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 18px 0;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);box-shadow:var(--shadow-sm);}
+  .pf-bulk-count{font-size:13px;font-weight:850;color:var(--accent-dim);}
+  .pf-bulk-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .pf-bulk .btn{border-radius:8px;font-size:12.5px;padding:8px 11px;}
 
   footer.dfoot{text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);margin-top:30px;}
 
@@ -405,12 +696,40 @@
     .side-scrim.open{opacity:1;visibility:visible;}
     .metrics{grid-template-columns:repeat(2,1fr);}
     .quick{grid-template-columns:repeat(2,1fr);}
+    .mp-tools{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .mp-clients{grid-template-columns:1fr;}
+    .dt-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .pf-list{grid-template-columns:1fr;}
     .project-row{grid-template-columns:1fr 1fr;gap:12px;}
     .project-main,.project-actions{grid-column:1/-1;}
     .project-actions{justify-content:flex-start;}
   }
   @media (max-width:560px){
     .metrics,.quick,.feats,.grid2{grid-template-columns:1fr;}
+    .mp-head{align-items:stretch;}
+    .mp-new-request{width:100%;}
+    .mp-tools{grid-template-columns:1fr;}
+    .mp-tool{min-height:76px;}
+    .dt-grid{grid-template-columns:1fr;}
+    .dt-head{align-items:flex-start;flex-direction:column;}
+    .mp-section-title{align-items:flex-start;flex-direction:column;gap:4px;}
+    .mp-facts{grid-template-columns:1fr;}
+    .mp-client-foot{align-items:stretch;flex-direction:column;}
+    .mp-foot-actions{width:100%;}
+    .mp-client-foot .btn,.mp-files-link{flex:1;width:100%;}
+    .pf-head{padding:18px;}
+    .pf-list{padding:14px;}
+    .pf-bulk{align-items:stretch;flex-direction:column;margin:14px 14px 0;}
+    .pf-bulk-actions{width:100%;}
+    .pf-bulk .btn{flex:1;}
+    .pf-meta{grid-template-columns:1fr;}
+    .pf-foot{align-items:stretch;flex-direction:column;}
+    .pf-foot .btn{width:100%;}
+    .dash-search-box{width:100%;}
+    .ds-row{grid-template-columns:36px minmax(0,1fr);gap:10px;padding:10px;}
+    .ds-ic{width:36px;height:36px;border-radius:10px;}
+    .ds-ic svg{width:18px;height:18px;}
+    .ds-action{grid-column:2;justify-self:start;height:32px;}
     .sc-actions{width:100%;}
     .phead .avatar{width:48px;height:48px;font-size:20px;}
     .project-head{flex-direction:column;align-items:stretch;}
@@ -513,16 +832,118 @@
   .ri-noresults{text-align:center;color:var(--faint);font-size:13px;padding:30px 10px;}
   .ri-toast{position:fixed;bottom:24px;inset-inline:0;margin-inline:auto;width:max-content;max-width:90vw;background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:10px 18px;border-radius:999px;box-shadow:var(--shadow-lg);z-index:9999;opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s;pointer-events:none;}
   .ri-toast.show{opacity:1;transform:translateY(0);}
+  body.dash-signed-in #site-header{display:none!important;}
+  .dash-top{display:none;position:sticky;top:0;z-index:58;background:rgba(255,255,255,.86);backdrop-filter:saturate(1.35) blur(12px);
+    border-bottom:1px solid #e6e9f6;box-shadow:0 8px 26px rgba(30,37,80,.05);}
+  body.dash-signed-in .dash-top{display:block;}
+  .dash-top-bar{height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 22px;}
+  .dash-logo{display:flex;align-items:center;flex-shrink:0;}
+  .dash-logo img{display:block;width:auto;height:34px;}
+  .dash-acct{position:relative;display:inline-flex;align-items:center;}
+  .dash-acct-btn{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 7px 0 13px;border-radius:999px;
+    border:1px solid #e8ebfb;background:#fff;color:#111735;box-shadow:0 8px 24px rgba(30,37,80,.06);cursor:pointer;
+    font-family:var(--sans);font-size:14px;font-weight:800;transition:border-color .14s,box-shadow .14s,transform .08s;}
+  html[dir="rtl"] .dash-acct-btn{padding:0 13px 0 7px;}
+  .dash-acct-btn:hover,.dash-acct.open .dash-acct-btn{border-color:#ccd4fb;box-shadow:0 12px 28px rgba(30,37,80,.10);}
+  .dash-acct-btn:active{transform:translateY(1px);}
+  .dash-acct-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .dash-avatar-sm,.dash-acct-av{border-radius:50%;overflow:hidden;display:grid;place-items:center;flex-shrink:0;
+    background:linear-gradient(135deg,#7b34ff,#3f85ff);color:#fff;font-weight:900;line-height:1;}
+  .dash-avatar-sm{width:30px;height:30px;font-size:13px;}
+  .dash-acct-av{width:42px;height:42px;font-size:17px;}
+  .dash-avatar-sm img,.dash-acct-av img{width:100%;height:100%;object-fit:cover;}
+  .dash-acct-name{max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dash-acct-chev{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;transition:transform .16s;}
+  .dash-acct.open .dash-acct-chev{transform:rotate(180deg);}
+  .dash-acct-menu{position:absolute;top:calc(100% + 9px);inset-inline-end:0;width:270px;padding:7px;border-radius:16px;background:#fff;
+    border:1px solid #e8ebfb;box-shadow:0 22px 52px rgba(30,37,80,.18);opacity:0;visibility:hidden;transform:translateY(-6px);
+    pointer-events:none;transition:opacity .16s,visibility .16s,transform .16s;}
+  .dash-acct.open .dash-acct-menu{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
+  .dash-acct-head{display:flex;align-items:center;gap:12px;padding:11px 12px 13px;}
+  .dash-acct-id{min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .dash-acct-full{font-size:14px;font-weight:900;color:#1b2138;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dash-acct-mail{font-size:12px;font-weight:650;color:#8a92aa;direction:ltr;text-align:start;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dash-acct-sep{height:1px;background:#eceefb;margin:5px 7px;}
+  .dash-acct-item{display:flex;align-items:center;gap:11px;width:100%;min-height:40px;padding:9px 11px;border:0;border-radius:10px;
+    background:transparent;color:#1b2138;text-decoration:none;cursor:pointer;font-family:var(--sans);font-size:13.5px;font-weight:800;
+    text-align:start;transition:background .12s,color .12s;}
+  .dash-acct-item:hover{background:#f5f6ff;color:#5d43f5;}
+  .dash-acct-item.danger{color:#e5484d;}
+  .dash-acct-item.danger:hover{background:#fdecec;color:#e5484d;}
+  .dash-acct-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  @media(min-width:901px){
+    body.dash-signed-in{--dash-side-w:344px;}
+    body.dash-signed-in .dash-wrap{width:auto;margin:0 var(--dash-side-w) 0 0;padding:96px 22px 60px;}
+    body.dash-signed-in .dash{display:block;}
+    body.dash-signed-in .side{
+      position:fixed;top:0;right:0;bottom:0;z-index:72;width:var(--dash-side-w);height:100vh;
+      overflow-y:auto;border:0;border-radius:0;background:var(--bg);box-shadow:-18px 0 44px rgba(28,32,48,.08);
+      padding:0 18px 22px;gap:0;display:flex;flex-direction:column;
+    }
+    body.dash-signed-in .side-logo{
+      display:flex;align-items:center;justify-content:center;height:88px;margin:0 -18px 22px;background:var(--panel);
+      border-bottom:1px solid var(--line);box-shadow:0 12px 28px rgba(30,37,80,.05);
+    }
+    body.dash-signed-in .side-nav-card{
+      background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:var(--shadow);
+      flex:1;min-height:0;
+    }
+    body.dash-signed-in .dash-top{
+      position:fixed;top:0;left:0;right:var(--dash-side-w);background:transparent;border-bottom:0;box-shadow:none;
+      pointer-events:none;
+    }
+    body.dash-signed-in .dash-top-bar{height:76px;justify-content:flex-start;direction:ltr;padding:0 22px;}
+    body.dash-signed-in .dash-logo{display:none;}
+    body.dash-signed-in .dash-acct{direction:rtl;pointer-events:auto;}
+    body.dash-signed-in .dash-acct-menu{direction:rtl;}
+  }
   @media(max-width:860px){
     .ri-body{grid-template-columns:1fr;}
     .ri-detail{position:static;}
+  }
+  @media(max-width:640px){
+    .dash-top-bar{height:64px;padding:0 14px;}
+    .dash-logo img{height:28px;}
+    .dash-acct-name,.dash-acct-chev{display:none;}
+    .dash-acct-btn{width:42px;padding:0;justify-content:center;}
+    .dash-acct-menu{width:min(270px,calc(100vw - 28px));}
   }
 </style>
 <link rel="stylesheet" href="./header.css">
 </head>
 <body>
 <div id="site-header"></div>
+<script>
+(function(){
+  function signedIn(){
+    try{
+      var email=(localStorage.getItem('ac_session')||'').toLowerCase();
+      var users=JSON.parse(localStorage.getItem('ac_users')||'[]');
+      return !!(email && Array.isArray(users) && users.some(function(u){ return (u.email||'').toLowerCase()===email; }));
+    }catch(e){ return false; }
+  }
+  function syncHeader(){
+    document.body.classList.toggle('dash-signed-in', signedIn());
+  }
+  window.addEventListener('kolkli:auth', syncHeader);
+  window.addEventListener('storage', function(e){
+    if(!e || e.key===null || e.key==='ac_session' || e.key==='ac_users'){
+      syncHeader();
+    }
+  });
+  syncHeader();
+})();
+</script>
 <script src="./header.js"></script>
+
+<header class="dash-top" id="dashTop" aria-label="KOLKLI">
+  <div class="dash-top-bar">
+    <div class="dash-logo">
+      <img src="./assets/logo.png" alt="KOLKLI" width="139" height="34" decoding="async">
+    </div>
+    <div class="dash-acct" id="dashAcct"></div>
+  </div>
+</header>
 
 <div class="dash-wrap">
   <div class="dash-mbar">
@@ -542,11 +963,26 @@
 </div>
 <div class="side-scrim" id="sideScrim"></div>
 
+<script src="./project-numbering.js"></script>
 <script src="./request-store.js"></script>
+<script src="./review-store.js"></script>
+<script src="./processed-files.js"></script>
 <script src="./vendor/jszip.min.js"></script>
 <script>
 (function(){
   var el = function(id){ return document.getElementById(id); };
+  function isDashboardPage(){
+    var path = location.pathname.toLowerCase().replace(/\/+$/, '');
+    var file = path.split('/').pop() || '';
+    return file === 'dashboard.html' || file === 'dashboard';
+  }
+  if(!isDashboardPage()){
+    var dashWrap = document.querySelector('.dash-wrap');
+    var dashScrim = document.getElementById('sideScrim');
+    if(dashWrap) dashWrap.remove();
+    if(dashScrim) dashScrim.remove();
+    return;
+  }
 
   /* =====================================================
      i18n (he / en / ru)
@@ -574,7 +1010,7 @@
       quickTitle:'קיצורי דרך',
       qAudioT:'עריכת אודיו', qAudioD:'חיתוך, נרמול והמרה',
       qVideoT:'עריכת וידאו', qVideoD:'חיתוך, המרה ודחיסה',
-      qOrgT:'ארגון קבצים', qOrgD:'מיון, תיוק וארגון',
+      qOrgT:'בחירת קבצים', qOrgD:'מיון, תיוק וארגון',
       qSendT:'שליחת קבצים', qSendD:'לינק לשיתוף מהיר',
       /* account details */
       detailsTitle:'פרטי חשבון', detailsSub:'המידע האישי המשויך לחשבון שלכם.',
@@ -602,7 +1038,7 @@
       invPaid:'שולם', invDownload:'הורדה',
       /* my audio */
       audioTitle:'האודיו שלי', audioSub:'הקבצים והפרויקטים שערכתם ב-KOLKLI Audio.',
-      audioEmptyT:'אין עדיין קבצי אודיו', audioEmptyP:'פתחו את עורך האודיו כדי לחתוך, לנרמל ולהמיר — הכול ישירות בדפדפן.',
+      audioEmptyT:'אין עדיין קבצי אודיו', audioEmptyP:'פתחו את עורך האודיו כדי לחתוך, לנרמל ולהמיר',
       openAudio:'פתחו את עורך האודיו',
       /* my video */
       videoTitle:'הווידאו שלי', videoSub:'הקליפים והפרויקטים שערכתם ב-KOLKLI Video.',
@@ -610,11 +1046,11 @@
       openVideo:'פתחו את חותך הווידאו',
       /* my images */
       imgTitle:'התמונות שלי', imgSub:'הקבצים שערכתם והמרתם בכלי התמונות של KOLKLI.',
-      imgEmptyT:'אין עדיין תמונות', imgEmptyP:'חתכו, שנו גודל, המירו ודחסו תמונות — או הסירו רקע ב-AI, הכול בדפדפן.',
+      imgEmptyT:'אין עדיין תמונות', imgEmptyP:'חתכו, שנו גודל, המירו ודחסו תמונות — או הסירו רקע ב-AI.',
       openImg:'פתחו את כלי התמונות',
       /* my documents */
       docTitle:'המסמכים שלי', docSub:'הקבצים שהמרתם, מיזגתם ודחסתם בכלי המסמכים של KOLKLI.',
-      docEmptyT:'אין עדיין מסמכים', docEmptyP:'המירו מסמכים, צרו PDF, מזגו ודחסו — או סכמו מסמך ב-AI, הכול בדפדפן.',
+      docEmptyT:'אין עדיין מסמכים', docEmptyP:'המירו מסמכים, צרו PDF, מזגו ודחסו — או סכמו מסמך ב-AI.',
       openDoc:'פתחו את כלי המסמכים',
       /* organize */
       orgTitle:'הפרויקטים שלי', orgSub:'נהלו את כל הפרויקטים והגלריות של הלקוחות במקום אחד.',
@@ -634,7 +1070,7 @@
       openAudio:'עריכת אודיו חדשה', openVideo:'עריכת וידאו חדשה',
       reqTitle:'הזמנות שהתקבלו', reqSub:'קישורי העלאה שיצרתם והקבצים שהתקבלו מהלקוחות.',
       reqEmptyT:'עדיין אין בקשות', reqEmptyP:'צרו קישור העלאה, שלחו ללקוח, וקבלו את הקבצים ישירות לתיקייה מסודרת.',
-      openReq:'בקשה חדשה', reqNew:'בקשה חדשה', reqManage:'ניהול הבקשות',
+      openReq:'בקשה חדשה', reqNew:'יצירת טופס העלאה', reqManage:'ניהול הבקשות', selNew:'יצירת גלריית בחירה', sendNew:'יצירת שליחת קבצים',
       ri:{
         searchPh:'חיפוש בקשות…',
         sort_new:'החדשות ביותר', sort_old:'הישנות ביותר', sort_name:'לפי שם', sort_files:'הכי הרבה קבצים',
@@ -653,8 +1089,8 @@
         openFull:'עמוד מלא', detNoFiles:'עדיין לא התקבלו קבצים', dl:'הורדה', noResults:'לא נמצאו בקשות',
         dlAll:'הורד הכל (ZIP)', zipping:'מכין ZIP…', dlAllEmpty:'אין קבצים להורדה'
       },
-      reviewTitle:'הערות מלקוחות', reviewSub:'פרויקטים ששלחתם ללקוח לצפייה, הערות ואישור.', reviewEmptyT:'עדיין אין פרויקטים', reviewEmptyP:'צרו פרויקט, העלו חומרים, ושתפו קישור ממותג לצפייה ואישור.', openReview:'פרויקט חדש', reviewNew:'פרויקט חדש', reviewManage:'ניהול הפרויקטים',
-      footer:'KOLKLI · העריכה רצה בדפדפן שלכם · הקבצים נשארים אצלכם.'
+      reviewTitle:'הערות מלקוחות', reviewSub:'פרויקטים ששלחתם ללקוח לצפייה, הערות ואישור.', reviewEmptyT:'עדיין אין פרויקטים', reviewEmptyP:'צרו פרויקט, העלו חומרים, ושתפו קישור ממותג לצפייה ואישור.', openReview:'פרויקט חדש', reviewNew:'יצירת שליחה לאישור', reviewManage:'ניהול הפרויקטים',
+      footer:'KOLKLI. מהיר, פשוט ובאיכות מקצועית.'
     },
     en:{
       dir:'ltr',
@@ -701,16 +1137,16 @@
       thDate:'Date', thDesc:'Description', thAmount:'Amount', thStatus:'Status', thInvoice:'Invoice',
       invPaid:'Paid', invDownload:'Download',
       audioTitle:'My audio', audioSub:'Files and projects you edited in KOLKLI Audio.',
-      audioEmptyT:'No audio files yet', audioEmptyP:'Open the audio editor to cut, normalize and convert — right in your browser.',
+      audioEmptyT:'No audio files yet', audioEmptyP:'Open the audio editor to cut, normalize and convert',
       openAudio:'Open the audio editor',
       videoTitle:'My video', videoSub:'Clips and projects you edited in KOLKLI Video.',
       videoEmptyT:'No video files yet', videoEmptyP:'Open the video cutter to trim, convert and compress clips.',
       openVideo:'Open the video cutter',
       imgTitle:'My images', imgSub:'Images you edited and converted with KOLKLI image tools.',
-      imgEmptyT:'No images yet', imgEmptyP:'Crop, resize, convert and compress images — or remove the background with AI, right in your browser.',
+      imgEmptyT:'No images yet', imgEmptyP:'Crop, resize, convert and compress images',
       openImg:'Open the image tools',
       docTitle:'My documents', docSub:'Files you converted, merged and compressed with KOLKLI document tools.',
-      docEmptyT:'No documents yet', docEmptyP:'Convert documents, make a PDF, merge and compress — or summarize with AI, right in your browser.',
+      docEmptyT:'No documents yet', docEmptyP:'Convert documents, make a PDF, merge and compress',
       openDoc:'Open the document tools',
       orgTitle:'My projects', orgSub:'Manage every client project and gallery in one place.',
       orgEmptyT:'No projects yet', orgEmptyP:'Create a new project to start organizing files by client.',
@@ -728,7 +1164,7 @@
       openAudio:'New audio edit', openVideo:'New video edit',
       reqTitle:'Orders received', reqSub:'Upload links you created and the files clients sent back.',
       reqEmptyT:'No requests yet', reqEmptyP:'Create an upload link, send it to a client, and receive files straight into an organized folder.',
-      openReq:'New request', reqNew:'New request', reqManage:'Manage requests',
+      openReq:'New request', reqNew:'File request', reqManage:'Manage requests', selNew:'New selection', sendNew:'Send files',
       ri:{
         searchPh:'Search requests…',
         sort_new:'Newest first', sort_old:'Oldest first', sort_name:'By name', sort_files:'Most files',
@@ -748,7 +1184,7 @@
         dlAll:'Download all (ZIP)', zipping:'Zipping…', dlAllEmpty:'No files to download'
       },
       reviewTitle:'Client comments', reviewSub:'Projects you sent to a client to view, comment on and approve.', reviewEmptyT:'No projects yet', reviewEmptyP:'Create a project, upload materials, and share a branded link to view and approve.', openReview:'New project', reviewNew:'New project', reviewManage:'Manage projects',
-      footer:'KOLKLI · Editing runs in your browser · Your files stay with you.'
+      footer:'KOLKLI. Fast, simple and professional-quality.'
     },
     ru:{
       dir:'ltr',
@@ -795,16 +1231,16 @@
       thDate:'Дата', thDesc:'Описание', thAmount:'Сумма', thStatus:'Статус', thInvoice:'Счёт',
       invPaid:'Оплачено', invDownload:'Скачать',
       audioTitle:'Моё аудио', audioSub:'Файлы и проекты, отредактированные в KOLKLI Audio.',
-      audioEmptyT:'Пока нет аудиофайлов', audioEmptyP:'Откройте аудиоредактор, чтобы обрезать, нормализовать и конвертировать — прямо в браузере.',
+      audioEmptyT:'Пока нет аудиофайлов', audioEmptyP:'Откройте аудиоредактор, чтобы обрезать, нормализовать и конвертировать',
       openAudio:'Открыть аудиоредактор',
       videoTitle:'Моё видео', videoSub:'Клипы и проекты, отредактированные в KOLKLI Video.',
       videoEmptyT:'Пока нет видеофайлов', videoEmptyP:'Откройте видеорезак, чтобы обрезать, конвертировать и сжимать клипы.',
       openVideo:'Открыть видеорезак',
       imgTitle:'Мои изображения', imgSub:'Изображения, отредактированные и конвертированные в инструментах KOLKLI.',
-      imgEmptyT:'Пока нет изображений', imgEmptyP:'Обрезайте, меняйте размер, конвертируйте и сжимайте — или удаляйте фон с помощью AI, прямо в браузере.',
+      imgEmptyT:'Пока нет изображений', imgEmptyP:'Обрезайте, меняйте размер, конвертируйте и сжимайте',
       openImg:'Открыть инструменты изображений',
       docTitle:'Мои документы', docSub:'Файлы, конвертированные, объединённые и сжатые в инструментах KOLKLI.',
-      docEmptyT:'Пока нет документов', docEmptyP:'Конвертируйте документы, создавайте PDF, объединяйте и сжимайте — или делайте AI-резюме, прямо в браузере.',
+      docEmptyT:'Пока нет документов', docEmptyP:'Конвертируйте документы, создавайте PDF, объединяйте и сжимайте',
       openDoc:'Открыть инструменты документов',
       orgTitle:'Мои проекты', orgSub:'Управляйте проектами и галереями клиентов в одном месте.',
       orgEmptyT:'Пока нет проектов', orgEmptyP:'Создайте новый проект, чтобы организовать файлы по клиентам.',
@@ -822,7 +1258,7 @@
       openAudio:'Новый аудиопроект', openVideo:'Новый видеопроект',
       reqTitle:'Полученные заказы', reqSub:'Созданные ссылки для загрузки и файлы, присланные клиентами.',
       reqEmptyT:'Запросов пока нет', reqEmptyP:'Создайте ссылку для загрузки, отправьте клиенту и получайте файлы прямо в упорядоченную папку.',
-      openReq:'Новый запрос', reqNew:'Новый запрос', reqManage:'Управление запросами',
+      openReq:'Новый запрос', reqNew:'Запрос файлов', reqManage:'Управление запросами', selNew:'Новый выбор', sendNew:'Отправить файлы',
       ri:{
         searchPh:'Поиск запросов…',
         sort_new:'Сначала новые', sort_old:'Сначала старые', sort_name:'По имени', sort_files:'Больше файлов',
@@ -842,7 +1278,7 @@
         dlAll:'Скачать всё (ZIP)', zipping:'Упаковка…', dlAllEmpty:'Нет файлов для скачивания'
       },
       reviewTitle:'Комментарии клиентов', reviewSub:'Проекты, отправленные клиенту для просмотра, комментариев и одобрения.', reviewEmptyT:'Проектов пока нет', reviewEmptyP:'Создайте проект, загрузите материалы и поделитесь брендированной ссылкой для просмотра и одобрения.', openReview:'Новый проект', reviewNew:'Новый проект', reviewManage:'Управление проектами',
-      footer:'KOLKLI · Редактирование в вашем браузере · Ваши файлы остаются у вас.'
+      footer:'KOLKLI · Ваши файлы остаются у вас. Быстро, просто и профессионального качества.'
     }
   };
 
@@ -850,37 +1286,40 @@
      Plans (Free / Lite / Pro) + demo usage
      ===================================================== */
   var INF = Infinity;
+  // Prices carry both currencies; the active one follows the UI language
+  // (₪ for Hebrew, $ for English & Russian) via cur()/planNum() below.
   var PLANS = {
-    free:{ key:'free', name:'Free', price:0,
-      limits:{ storageGB:2, transferGB:2, transfersMo:10, files:50, links:5, keepDays:3 },
+    free:{ key:'free', name:'Free', price:{ ils:0, usd:0 },
+      limits:{ storageGB:3, transferGB:3, transfersMo:10, files:50, links:5, keepDays:7 },
       feats:{
-        he:['שליחה עד 2GB בכל פעם','2GB אחסון בענן','קבצים נשמרים 3 ימים','כלי עריכה בסיסיים','עריכה מקומית בדפדפן'],
-        en:['Up to 2GB per transfer','2GB cloud storage','Files kept for 3 days','Basic editing tools','Local in-browser editing'],
-        ru:['До 2 ГБ за передачу','2 ГБ в облаке','Файлы хранятся 3 дня','Базовые инструменты','Локальное редактирование']
+        he:['עד 3 פרויקטים פעילים','עד 3GB אחסון והעברה','קבצים נשמרים 7 ימים','ארגון · בקשה · משוב — 2 ביום','כלי PDF בסיסיים','עריכה והמרה מהירות'],
+        en:['Up to 3 active projects','Up to 3GB storage & transfer','Files kept for 7 days','Organize · request · review — 2/day','Basic PDF tools','Fast editing & conversion'],
+        ru:['До 3 активных проектов','До 3 ГБ хранилища и передачи','Файлы хранятся 7 дней','Организация · запрос · ревью — 2/день','Базовые PDF-инструменты','Быстрое редактирование и конвертация']
       }},
-    lite:{ key:'lite', name:'Lite', price:6.99,
-      limits:{ storageGB:100, transferGB:20, transfersMo:100, files:1000, links:50, keepDays:14 },
+    creator:{ key:'creator', name:'Creator', price:{ ils:89, usd:24 },
+      limits:{ storageGB:250, transferGB:25, transfersMo:INF, files:INF, links:INF, keepDays:90 },
       feats:{
-        he:['שליחה עד 20GB בכל פעם','100GB אחסון בענן','קבצים נשמרים 14 יום','כל כלי העריכה','הגנה בסיסמה','בלי פרסומות'],
-        en:['Up to 20GB per transfer','100GB cloud storage','Files kept for 14 days','All editing tools','Password protection','No ads'],
-        ru:['До 20 ГБ за передачу','100 ГБ в облаке','Файлы хранятся 14 дней','Все инструменты','Защита паролем','Без рекламы']
+        he:['100 פרויקטים · 500 קבצים לכל אחד','250GB אחסון · עד 25GB בהעברה','קבצים נשמרים 90 יום','כל הכלים + Review Studio','מיתוג אישי וקישורים ממותגים','עד 10 פעולות AI ביום','עד 2 חברי צוות'],
+        en:['100 projects · 500 files each','250GB storage · up to 25GB/transfer','Files kept for 90 days','All tools + Review Studio','Custom branding & branded links','Up to 10 AI actions/day','Up to 2 team members'],
+        ru:['100 проектов · 500 файлов','250 ГБ · до 25 ГБ за передачу','Файлы хранятся 90 дней','Все инструменты + Review Studio','Свой брендинг и фирменные ссылки','До 10 AI-операций в день','До 2 участников']
       }},
-    pro:{ key:'pro', name:'Pro', price:14.99,
-      limits:{ storageGB:1024, transferGB:100, transfersMo:INF, files:INF, links:INF, keepDays:30 },
+    studio:{ key:'studio', name:'Studio', price:{ ils:249, usd:69 },
+      limits:{ storageGB:1000, transferGB:100, transfersMo:INF, files:INF, links:INF, keepDays:365 },
       feats:{
-        he:['שליחה עד 100GB בכל פעם','1TB אחסון בענן','קבצים נשמרים 30 יום','כל הכלים + כלי AI','התראות הורדה','תמיכה מהירה בעדיפות','בלי פרסומות'],
-        en:['Up to 100GB per transfer','1TB cloud storage','Files kept for 30 days','All tools + AI tools','Download notifications','Priority support','No ads'],
-        ru:['До 100 ГБ за передачу','1 ТБ в облаке','Файлы хранятся 30 дней','Все инструменты + AI','Уведомления о скачивании','Приоритетная поддержка','Без рекламы']
-      }},
-    business:{ key:'business', name:'Business', price:39.99,
-      limits:{ storageGB:5120, transferGB:200, transfersMo:INF, files:INF, links:INF, keepDays:90 },
-      feats:{
-        he:['5 מושבים לצוות (+$9 למושב)','5TB אחסון משותף','שליחה עד 200GB בכל פעם','White-label ומיתוג מלא','ניהול צוות והרשאות','חיוב מרוכז','קבצים נשמרים 90 יום','כל הכלים + AI','תמיכה בעדיפות'],
-        en:['5 team seats (+$9/seat)','5TB shared storage','Up to 200GB per transfer','Full white-label branding','Team management & roles','Centralized billing','Files kept for 90 days','All tools + AI','Priority support'],
-        ru:['5 мест для команды (+$9/место)','5 ТБ общего хранилища','До 200 ГБ за передачу','Полный white-label брендинг','Управление командой и роли','Единый счёт','Файлы хранятся 90 дней','Все инструменты + AI','Приоритетная поддержка']
+        he:['500 פרויקטים · 2,000 קבצים לכל אחד','1TB אחסון · עד 100GB בהעברה','שמירת קבצים עד שנה','White-label מלא + דומיין אישי','עד 10 משתמשי צוות והרשאות','אוטומציות מייל ודוחות שימוש','אבטחה: 2FA ויומן פעילות'],
+        en:['500 projects · 2,000 files each','1TB storage · up to 100GB/transfer','Files kept up to 1 year','Full white-label + custom domain','Up to 10 team members & roles','Email automations & usage reports','Security: 2FA & activity log'],
+        ru:['500 проектов · 2 000 файлов','1 ТБ · до 100 ГБ за передачу','Файлы хранятся до года','Полный white-label + свой домен','До 10 участников и роли','Email-автоматизация и отчёты','Безопасность: 2FA и журнал']
       }}
   };
-  var PLAN_ORDER = ['free','lite','pro','business'];
+  var PLAN_ORDER = ['free','creator','studio'];
+  // Legacy plan slugs (lite/pro/business) map onto the new tiers so older
+  // stored accounts keep resolving.
+  function normalizePlan(p){
+    p = String(p||'').toLowerCase();
+    if(p==='lite') return 'creator';
+    if(p==='pro'||p==='business') return 'studio';
+    return PLANS[p] ? p : 'free';
+  }
   // demo usage in absolute terms; bars shrink as the plan grows (motivates upgrade)
   /* =====================================================
      Navigation model (labels live here; arrow = collapsible)
@@ -895,27 +1334,26 @@
     { id:'teamsec', icon:'users', he:'צוות', en:'Team', ru:'Команда', open:true, add:{ view:'team', label:'inviteMember' }, items:[
       { id:'team', he:'הצוות שלי', en:'My Team', ru:'Моя команда', editable:true }
     ]},
+    { id:'projects', icon:'layers', he:'הפרויקטים שלי', en:'MY PROJECTS', ru:'MY PROJECTS', open:true, items:[
+      { id:'project-select',  he:'פרויקטים לבחירה',  en:'Select Files',  ru:'Select Files' },
+      { id:'project-receive', he:'פרויקטים שהתקבלו', en:'Receive Files', ru:'Receive Files' },
+      { id:'project-send',    he:'פרויקטים שנשלחו',  en:'Send Files',    ru:'Send Files' },
+      { id:'project-review',  he:'פרויקטים לאישור',  en:'Review Files',  ru:'Review Files' }
+    ]},
     // "My File Tools" — one central home for the user's OWN files & actions
-    // (edit / convert / compress / AI) across every file type. Deliberately
-    // separate from the client-facing tools below (Organize / Send / Request).
-    { id:'mytools', icon:'files', he:'כלי הקבצים שלי', en:'My File Tools', ru:'Мои файлы и инструменты', items:[
+    // (edit / convert / compress / AI) across every file type.
+    { id:'mytools', icon:'files', he:'הקבצים שלי', en:'My File Tools', ru:'Мои файлы и инструменты', items:[
       { id:'my-audio',  he:'אודיו',   en:'Audio',     ru:'Аудио' },
       { id:'my-video',  he:'וידאו',   en:'Video',     ru:'Видео' },
       { id:'my-images', he:'תמונות',  en:'Images',    ru:'Изображения' },
       { id:'my-docs',   he:'מסמכים',  en:'Documents', ru:'Документы' }
-    ]},
-    { id:'organize', icon:'folder', he:'KOLKLI Organize', en:'KOLKLI Organize', ru:'KOLKLI Organize', items:[
-      { id:'my-files', he:'הפרויקטים שלי', en:'My projects', ru:'Мои проекты' }
-    ]},
-    { id:'send', icon:'send', he:'KOLKLI Send Files', en:'KOLKLI Send Files', ru:'KOLKLI Send Files', add:{ href:'send.html', label:'openSend' }, items:[
-      { id:'my-transfers', he:'קבצים שנשלחו', en:'Sent files', ru:'Отправленные файлы' }
-    ]},
-    { id:'request', icon:'inbox', he:'KOLKLI Request', en:'KOLKLI Request', ru:'KOLKLI Request', add:{ href:'request.html', label:'reqNew' }, items:[
-      { id:'my-requests', he:'הזמנות שהתקבלו', en:'Requests Received', ru:'Полученные запросы' }
-    ]},
-    { id:'review', icon:'check', he:'KOLKLI Review', en:'KOLKLI Review', ru:'KOLKLI Review', add:{ href:'review.html', label:'reviewNew' }, items:[
-      { id:'my-reviews', he:'הערות מלקוחות', en:'Client comments', ru:'Комментарии клиентов' }
     ]}
+  ];
+  var SIDE_TOOL_LINKS = [
+    { view:'editing-tools', href:'editing/', icon:'scissors', cls:'editing', he:'כלי עריכה', en:'Editing Tools', ru:'Editing Tools' },
+    { view:'ai-tools', href:'ai/', icon:'sparkles', cls:'ai', he:'כלי AI', en:'AI Tools', ru:'AI Tools' },
+    { view:'dev-tools', href:'dev-tools/', icon:'palette', cls:'design', he:'כלי עיצוב ודיגיטל', en:'Design & Digital', ru:'Design & Digital' },
+    { href:'text-tools.html', icon:'text', cls:'text', he:'כלי טקסט', en:'Text Tools', ru:'Text Tools' }
   ];
 
   /* =====================================================
@@ -930,6 +1368,7 @@
     music:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
     film:'<rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/>',
     folder:'<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+    pick:'<rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8 12 3 3 5-6"/>',
     send:'<path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9z"/>',
     inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
     chev:'<polyline points="6 9 12 15 18 9"/>',
@@ -939,6 +1378,25 @@
     drive:'<line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/>',
     swap:'<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
     files:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+    sparkles:'<path d="m12 3-1.8 5.4a2 2 0 0 1-1.3 1.3L3.5 11.5l5.4 1.8a2 2 0 0 1 1.3 1.3L12 20l1.8-5.4a2 2 0 0 1 1.3-1.3l5.4-1.8-5.4-1.8a2 2 0 0 1-1.3-1.3z"/><path d="M5 3v3"/><path d="M19 18v3"/><path d="M3.5 5h3"/><path d="M17.5 19.5h3"/>',
+    palette:'<circle cx="13.5" cy="6.5" r="1.1"/><circle cx="17" cy="10.5" r="1.1"/><circle cx="8" cy="7" r="1.1"/><circle cx="6.5" cy="12" r="1.1"/><path d="M12 3C6.5 3 2 7.1 2 12.2 2 17.1 6.1 21 11.2 21H13a2 2 0 0 0 2-2c0-.5-.2-.9-.5-1.3-.3-.4-.5-.8-.5-1.2A1.5 1.5 0 0 1 15.5 15H17c2.8 0 5-2.2 5-5 0-3.9-4.5-7-10-7Z"/>',
+    swatch:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+    contrast:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z"/>',
+    gradient:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m21 5-16 16"/><path d="m21 11-10 10"/><path d="m21 17-4 4"/>',
+    shadow:'<rect x="3" y="3" width="13" height="13" rx="2"/><path d="M21 8v11a2 2 0 0 1-2 2H8"/>',
+    radius:'<path d="M21 21v-6a8 8 0 0 0-8-8H7"/><path d="M3 3v3"/><path d="M3 3h3"/>',
+    minify:'<path d="M4 9V6a2 2 0 0 1 2-2h3"/><path d="M20 9V6a2 2 0 0 0-2-2h-3"/><path d="M4 15v3a2 2 0 0 0 2 2h3"/><path d="M20 15v3a2 2 0 0 1-2 2h-3"/><line x1="7" y1="12" x2="17" y2="12"/>',
+    braces:'<path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1"/><path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1"/>',
+    tags:'<path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1"/>',
+    code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+    star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    ruler:'<rect x="2" y="8" width="20" height="8" rx="1"/><line x1="6.5" y1="8" x2="6.5" y2="12"/><line x1="10" y1="8" x2="10" y2="11"/><line x1="13.5" y1="8" x2="13.5" y2="12"/><line x1="17" y1="8" x2="17" y2="11"/>',
+    ratio:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 4 20 16"/>',
+    image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+    crop:'<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>',
+    eraser:'<path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4L14 4a2 2 0 0 1 2.8 0l4.2 4.2a2 2 0 0 1 0 2.8L12 20"/><path d="M22 21H7"/><path d="m5 13 6 6"/>',
+    text:'<path d="M4 7V5h16v2"/><path d="M9 19h6"/><path d="M12 5v14"/>',
     link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
     arrow:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
     scissors:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/>',
@@ -953,8 +1411,10 @@
     minimize:'<polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/>',
     info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
     shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
+    gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>',
     camera:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
     dots:'<circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/>',
+    x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
     clock:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>',
     search:'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
     download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
@@ -963,7 +1423,7 @@
     openext:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
     archive:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>'
   };
-  var PLAN_ICON = { free:'zap', lite:'zap', pro:'crown', business:'shield' };
+  var PLAN_ICON = { free:'zap', creator:'crown', studio:'shield' };
 
   /* =====================================================
      State
@@ -999,10 +1459,13 @@
   var lang='he', t=I18N.he;
   var view='account';
   var reqState={ sel:null, filter:'all', q:'', sort:'new' };
+  var dashSearchState={ q:'', open:false };
+  var pfSelection={};
   var reqBC=null;
   var user=null, isGuest=false, plan='free';
   var activeProjectId=null;
   var editingLabel=null; // id of the nav item whose label is being renamed inline
+  var settingsNavOpen=false;
   var focusInvite=false; // set by the sidebar "+" so loadTeam focuses the invite email
   // User-customized sidebar labels (white-label: rename "My Clients" etc. per studio)
   function loadLabels(){ try{ return JSON.parse(lsGetOwn(LABELS_KEY))||{}; }catch(e){ return {}; } }
@@ -1016,9 +1479,11 @@
   var notif = (function(){ try{ return JSON.parse(lsGetOwn(NOTIF_KEY))||{download:true,updates:false}; }catch(e){ return {download:true,updates:false}; } })();
 
   function loadUser(){
+    // Revert any finished 7-day trials to Free before we read the plan.
+    try{ if(window.KolkliTrial && KolkliTrial.sweep) KolkliTrial.sweep(); }catch(_){}
     var email = lsGet(SESSION_KEY);
     var u = email ? loadUsers().find(function(x){ return x.email===email; }) : null;
-    if(u){ isGuest=false; user=u; plan = /^(free|lite|pro|business)$/.test(u.plan||'') ? u.plan : 'free'; }
+    if(u){ isGuest=false; user=u; plan = normalizePlan(u.plan); }
     else { isGuest=true; user={ name:'Guest', email:'', created:Date.now(), plan:'free' }; plan = 'free'; }
     if(!PLANS[plan]) plan='free';
   }
@@ -1060,7 +1525,7 @@
   }
   function fmtProjectSize(mb){
     mb=Number(mb)||0;
-    return mb>=1024 ? (Math.round(mb/1024*10)/10)+' GB' : Math.round(mb)+' MB';
+    return mb>=1000 ? (Math.round(mb/1000*10)/10)+' GB' : Math.round(mb)+' MB';
   }
   // "New project" / sidebar "+" no longer prompts here — it navigates to the
   // album-settings page (files.html?new=1) where the client/album is filled in.
@@ -1069,9 +1534,67 @@
      Helpers
      ===================================================== */
   function esc(x){ return String(x).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-  function fmtGB(n){ if(n===INF) return '∞'; if(n>=1024) return (n/1024)+' TB'; return (Math.round(n*100)/100)+' GB'; }
+  function fmtGB(n){ if(n===INF) return '∞'; if(n>=1000) return (Math.round(n/1000*100)/100)+' TB'; return (Math.round(n*100)/100)+' GB'; }
   function fmtNum(n){ return n===INF ? '∞' : String(n); }
   function nameFor(o){ return o[lang]||o.en; }
+  var FAV_BASE_KEY='kolkli_favorites';
+  var FAV_TEXT={
+    he:{ title:'מועדפים', add:'הוספה למועדפים', remove:'הסרה מהמועדפים', emptyT:'אין עדיין מועדפים', emptyP:'סמנו כוכב על כלי כדי לשמור אותו כאן לגישה מהירה.' },
+    en:{ title:'Favorites', add:'Add to favorites', remove:'Remove from favorites', emptyT:'No favorites yet', emptyP:'Star a tool to keep it here for quick access.' },
+    ru:{ title:'Избранное', add:'Добавить в избранное', remove:'Убрать из избранного', emptyT:'Пока нет избранного', emptyP:'Нажмите звезду на инструменте, чтобы сохранить его здесь.' }
+  };
+  function favText(k){ var set=FAV_TEXT[lang]||FAV_TEXT.en; return set[k]||FAV_TEXT.en[k]||k; }
+  function favKey(){ return FAV_BASE_KEY+'::'+currentOwnerId(); }
+  function favRead(){ try{ var a=JSON.parse(lsGet(favKey())||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+  function favWrite(a){
+    lsSet(favKey(), JSON.stringify(a||[]));
+    try{ window.dispatchEvent(new CustomEvent('kolkli:favorites')); }catch(e){}
+  }
+  function favCanonHref(h){ return String(h||'#').replace(/^(\.\.\/|\.\/)+/,''); }
+  function favSlug(v){ return encodeURIComponent(String(v||'tool').toLowerCase()).replace(/%/g,'') || 'tool'; }
+  function favToolId(o, href){ return favCanonHref(href)+'::'+favSlug(o.en||o.he||o.ru||href); }
+  function favPayload(o, href){
+    return {
+      id:favToolId(o, href),
+      href:favCanonHref(href),
+      ic:o.ic||'star',
+      he:o.he||o.en||'',
+      en:o.en||o.he||'',
+      ru:o.ru||o.en||o.he||'',
+      dhe:o.dhe||'',
+      den:o.den||'',
+      dru:o.dru||''
+    };
+  }
+  function favIs(id){ return favRead().some(function(x){ return x&&x.id===id; }); }
+  function favButtonHtml(item){
+    var on=favIs(item.id);
+    var label=favText(on?'remove':'add');
+    return '<button class="tool-fav-btn '+(on?'is-fav':'')+'" type="button" data-fav-id="'+esc(item.id)+'" data-fav-payload="'+esc(JSON.stringify(item))+'" aria-pressed="'+(on?'true':'false')+'" title="'+esc(label)+'" aria-label="'+esc(label)+'">'+s(ICON.star)+'</button>';
+  }
+  function favToggle(item){
+    if(!item||!item.id) return;
+    var list=favRead();
+    var idx=list.findIndex(function(x){ return x&&x.id===item.id; });
+    if(idx>-1) list.splice(idx,1);
+    else list.unshift(item);
+    favWrite(list);
+  }
+  function favSyncButtons(){
+    var ids=favRead().map(function(x){ return x&&x.id; });
+    document.querySelectorAll('[data-fav-id]').forEach(function(b){
+      var on=ids.indexOf(b.getAttribute('data-fav-id'))>-1;
+      var label=favText(on?'remove':'add');
+      b.classList.toggle('is-fav', on);
+      b.setAttribute('aria-pressed', on?'true':'false');
+      b.setAttribute('title', label);
+      b.setAttribute('aria-label', label);
+    });
+  }
+  function isSettingsCat(cat){ return cat && cat.id==='profile'; }
+  function isSettingsView(id){
+    return NAV.some(function(c){ return isSettingsCat(c) && c.items.some(function(it){ return it.id===id; }); });
+  }
   function pct(used,limit){ if(limit===INF||limit===0) return 6; return Math.max(3, Math.min(100, Math.round(used/limit*100))); }
   function displayName(){ return (user.name && user.name.trim()) ? user.name.trim() : (user.email ? user.email.split('@')[0] : 'Guest'); }
   function readOwnArray(k){ try{ var a=JSON.parse(lsGetOwn(k)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
@@ -1086,7 +1609,7 @@
     var sends=readOwnArray('kolkli_send_links');
     var reviews=readOwnArray('rv_projects');
     var bytes=0, filesCount=0, activeLinks=0;
-    projects.forEach(function(p){ filesCount+=Number(p.files)||0; bytes+=(Number(p.sizeMB)||0)*1048576; });
+    projects.forEach(function(p){ filesCount+=Number(p.files)||0; bytes+=(Number(p.sizeMB)||0)*1e6; });
     reqs.forEach(function(r){
       var fs=r.files||[]; filesCount+=fs.length; activeLinks+=activeRecord(r)?1:0;
       bytes+=fs.reduce(function(s,f){ return s+(Number(f.size)||0); },0);
@@ -1099,7 +1622,7 @@
       bytes+=items.reduce(function(s,f){ return s+(Number(f.size)||0); },0);
     });
     return {
-      storageGB: Math.round((bytes/1073741824)*100)/100,
+      storageGB: Math.round((bytes/1e9)*100)/100,
       transfersMo: sends.filter(function(s){ return sameMonth(s.createdAt); }).length,
       files: filesCount,
       links: activeLinks
@@ -1109,6 +1632,109 @@
   function avatarInner(){
     if(user.avatar) return '<img class="avatar-img" src="'+esc(user.avatar)+'" alt="">';
     return esc(initial());
+  }
+  function dashTopLabel(id, fallback){
+    for(var i=0;i<NAV.length;i++){
+      for(var j=0;j<NAV[i].items.length;j++){
+        if(NAV[i].items[j].id===id) return labelFor(id, nameFor(NAV[i].items[j]));
+      }
+    }
+    return fallback;
+  }
+  function dashTopAvatar(cls){
+    return '<span class="'+cls+'">'+avatarInner()+'</span>';
+  }
+  function renderDashTop(){
+    var box=el('dashAcct');
+    if(!box) return;
+    if(isGuest){
+      box.innerHTML='';
+      document.body.classList.remove('dash-signed-in');
+      return;
+    }
+    document.body.classList.add('dash-signed-in');
+    var name=displayName();
+    box.innerHTML =
+      '<button class="dash-acct-btn" id="dashAcctBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="'+esc(name)+'">'+
+        dashTopAvatar('dash-avatar-sm')+
+        '<span class="dash-acct-name">'+esc(name)+'</span>'+
+        '<svg class="dash-acct-chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>'+
+      '</button>'+
+      '<div class="dash-acct-menu" id="dashAcctMenu" role="menu">'+
+        '<div class="dash-acct-head">'+dashTopAvatar('dash-acct-av')+
+          '<span class="dash-acct-id"><span class="dash-acct-full">'+esc(name)+'</span>'+
+          (user.email ? '<span class="dash-acct-mail">'+esc(user.email)+'</span>' : '')+'</span>'+
+        '</div>'+
+        '<div class="dash-acct-sep"></div>'+
+        '<button class="dash-acct-item" type="button" role="menuitem" data-dash-view="account">'+s(ICON.user)+'<span>'+esc(dashTopLabel('account','My Account'))+'</span></button>'+
+        '<a class="dash-acct-item" role="menuitem" href="account-settings.html">'+s(ICON.gear)+'<span>'+esc(dashTopLabel('settings',t.settingsTitle))+'</span></a>'+
+        '<button class="dash-acct-item" type="button" role="menuitem" data-dash-view="payments">'+s(ICON.card)+'<span>'+esc(dashTopLabel('payments','Payments'))+'</span></button>'+
+        '<div class="dash-acct-sep"></div>'+
+        '<button class="dash-acct-item danger" type="button" role="menuitem" id="dashLogout">'+s(ICON.logout)+'<span>'+esc(t.logout)+'</span></button>'+
+      '</div>';
+    wireDashTop();
+  }
+  function accountMenuHtml(extraClass, prefix){
+    if(isGuest) return '';
+    var name=displayName();
+    return '<div class="dash-acct '+esc(extraClass||'')+'" id="'+esc(prefix)+'Acct">'+
+      '<button class="dash-acct-btn" id="'+esc(prefix)+'AcctBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="'+esc(name)+'">'+
+        dashTopAvatar('dash-avatar-sm')+
+        '<span class="dash-acct-name">'+esc(name)+'</span>'+
+        '<svg class="dash-acct-chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>'+
+      '</button>'+
+      '<div class="dash-acct-menu" role="menu">'+
+        '<div class="dash-acct-head">'+dashTopAvatar('dash-acct-av')+
+          '<span class="dash-acct-id"><span class="dash-acct-full">'+esc(name)+'</span>'+
+          (user.email ? '<span class="dash-acct-mail">'+esc(user.email)+'</span>' : '')+'</span>'+
+        '</div>'+
+        '<div class="dash-acct-sep"></div>'+
+        '<button class="dash-acct-item" type="button" role="menuitem" data-dash-view="account">'+s(ICON.user)+'<span>'+esc(dashTopLabel('account','My Account'))+'</span></button>'+
+        '<a class="dash-acct-item" role="menuitem" href="account-settings.html">'+s(ICON.gear)+'<span>'+esc(dashTopLabel('settings',t.settingsTitle))+'</span></a>'+
+        '<button class="dash-acct-item" type="button" role="menuitem" data-dash-view="payments">'+s(ICON.card)+'<span>'+esc(dashTopLabel('payments','Payments'))+'</span></button>'+
+        '<div class="dash-acct-sep"></div>'+
+        '<button class="dash-acct-item danger" type="button" role="menuitem" data-side-logout>'+s(ICON.logout)+'<span>'+esc(t.logout)+'</span></button>'+
+      '</div>'+
+    '</div>';
+  }
+  function closeDashTopMenu(){
+    var wrap=el('dashAcct'), btn=el('dashAcctBtn');
+    if(wrap) wrap.classList.remove('open');
+    if(btn) btn.setAttribute('aria-expanded','false');
+  }
+  function closeSideAccountMenu(){
+    var wrap=el('sideAcct'), btn=el('sideAcctBtn');
+    if(wrap) wrap.classList.remove('open');
+    if(btn) btn.setAttribute('aria-expanded','false');
+  }
+  function wireDashTop(){
+    var wrap=el('dashAcct'), btn=el('dashAcctBtn');
+    if(!wrap || !btn) return;
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var open=wrap.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open?'true':'false');
+    });
+    wrap.querySelectorAll('[data-dash-view]').forEach(function(b){
+      b.addEventListener('click', function(){
+        closeDashTopMenu();
+        selectView(b.getAttribute('data-dash-view'));
+      });
+    });
+    var lo=el('dashLogout');
+    if(lo) lo.addEventListener('click', function(){
+      closeDashTopMenu();
+      if(confirm(t.logoutConfirm)){ lsDel(SESSION_KEY); location.href='index.html'; }
+    });
+    if(!wireDashTop._docBound){
+      document.addEventListener('click', function(e){
+        var w=el('dashAcct');
+        if(w && w.classList.contains('open') && !w.contains(e.target)) closeDashTopMenu();
+      });
+      document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeDashTopMenu(); });
+      wireDashTop._docBound=true;
+    }
   }
   // Big avatar in the account header. Guests can't save, so theirs is static.
   function avatarBlock(){
@@ -1156,7 +1782,9 @@
   }
   function memberYear(){ var d=new Date(user.created||Date.now()); return d.getFullYear(); }
   function currentTitle(){
+    if(view==='favorites') return favText('title');
     for(var i=0;i<NAV.length;i++){ for(var j=0;j<NAV[i].items.length;j++){ if(NAV[i].items[j].id===view) return labelFor(NAV[i].items[j].id, nameFor(NAV[i].items[j])); } }
+    for(var k=0;k<SIDE_TOOL_LINKS.length;k++){ if(SIDE_TOOL_LINKS[k].view===view) return nameFor(SIDE_TOOL_LINKS[k]); }
     return 'KOLKLI';
   }
   function nextBillDate(){
@@ -1164,12 +1792,109 @@
     try{ return d.toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{year:'numeric',month:'long',day:'numeric'}); }
     catch(e){ return d.toISOString().slice(0,10); }
   }
-  function money(p){ return p===0 ? t.free : '$'+p.toFixed(2); }
+  // Currency follows the UI language: ₪ for Hebrew, $ for English & Russian.
+  var CUR = { he:{ sym:'₪', field:'ils', dec:0 }, en:{ sym:'$', field:'usd', dec:2 }, ru:{ sym:'$', field:'usd', dec:2 } };
+  function cur(){ return CUR[lang] || CUR.en; }
+  function planNum(P){ return (P.price && P.price[cur().field]) || 0; }   // active-currency price
+  function money(p){ var c=cur(); return (+p||0)===0 ? t.free : c.sym+(+p).toFixed(c.dec); }
+  // 7-day free trial (trial.js): status + a localized "N days left · no card" note.
+  function trialStatus(){ try{ return (window.KolkliTrial && KolkliTrial.status) ? KolkliTrial.status(user) : null; }catch(_){ return null; } }
+  function trialActive(){ var st=trialStatus(); return !!(st && st.active); }
+  function trialNoteHtml(){
+    var st=trialStatus(); if(!st || !st.active) return '';
+    var d=st.daysLeft;
+    var txt=({ he:'ניסיון חינם · נותרו '+d+' ימים · ללא כרטיס אשראי',
+               en:'Free trial · '+d+' day'+(d===1?'':'s')+' left · no card required',
+               ru:'Бесплатный период · осталось '+d+' дн. · без карты' })[lang] || '';
+    return '<div class="sc-trial">'+s(ICON.zap)+'<span>'+esc(txt)+'</span></div>';
+  }
+  function trialEndsText(){
+    var st=trialStatus(); if(!st) return '';
+    var d; try{ d=new Date(st.endsAt).toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{year:'numeric',month:'long',day:'numeric'}); }catch(e){ d=''; }
+    return ({ he:'ניסיון חינם מסתיים ב־'+d+' · ללא כרטיס אשראי',
+              en:'Free trial ends '+d+' · no card on file',
+              ru:'Пробный период заканчивается '+d+' · без карты' })[lang] || '';
+  }
 
   /* =====================================================
      Sidebar render
      ===================================================== */
   // A sidebar item whose label the user can rename (pencil → inline input → save).
+  function projectToneClass(id){
+    var key = (typeof PROJECT_VIEW !== 'undefined' && PROJECT_VIEW[id]) ? PROJECT_VIEW[id] : '';
+    return key ? ' mp-tone-'+key : '';
+  }
+  var EDIT_VIEW = { 'my-audio':'audio', 'my-video':'video', 'my-images':'images', 'my-docs':'docs' };
+  var EDIT_ORDER = ['my-audio','my-video','my-images','my-docs'];
+  function editToneClass(id){
+    var key = EDIT_VIEW[id] || '';
+    return key ? ' edit-tone-'+key : '';
+  }
+  function navToneClass(id){ return projectToneClass(id)+editToneClass(id); }
+  function sideToolLinksHtml(){
+    return '<div class="side-links">'+SIDE_TOOL_LINKS.map(function(x){
+      var inner = '<span class="side-link-ic">'+s(ICON[x.icon])+'</span>'+
+        '<span>'+esc(nameFor(x))+'</span>';
+      if(x.view){
+        return '<button class="side-link '+esc(x.cls)+' '+(view===x.view?'active':'')+'" type="button" data-view="'+esc(x.view)+'">'+inner+'</button>';
+      }
+      return '<a class="side-link '+esc(x.cls)+'" href="'+esc(x.href)+'">'+
+        inner+
+      '</a>';
+    }).join('')+'</div>';
+  }
+  function sideTeamSectionHtml(){
+    var cat=NAV.find(function(c){ return c.id==='teamsec'; });
+    if(!cat) return '';
+    var isOn=cat.items.some(function(it){ return it.id===view; });
+    return '<div class="cat no-subs '+(isOn?'on':'')+'" data-cat="'+esc(cat.id)+'">'+
+      '<button class="cat-head" type="button" data-view="team">'+
+        '<span class="cat-ic">'+s(ICON[cat.icon])+'</span>'+
+        '<span class="cat-name">'+esc(nameFor(cat))+'</span>'+
+      '</button>'+
+    '</div>';
+  }
+  function sideFavoritesSectionHtml(){
+    return '<div class="cat no-subs '+(view==='favorites'?'on':'')+'" data-cat="favorites">'+
+      '<button class="cat-head" type="button" data-view="favorites">'+
+        '<span class="cat-ic">'+s(ICON.star)+'</span>'+
+        '<span class="cat-name">'+esc(favText('title'))+'</span>'+
+      '</button>'+
+    '</div>';
+  }
+  function sideBelowToolsHtml(){
+    return '<div class="side-below-tools">'+sideFavoritesSectionHtml()+sideTeamSectionHtml()+'</div>';
+  }
+  function storageText(){
+    return ({
+      he:{ title:'STORAGE', used:'נוצל', of:'מתוך', left:'נותר' },
+      en:{ title:'STORAGE', used:'Used', of:'of', left:'Left' },
+      ru:{ title:'STORAGE', used:'Used', of:'of', left:'Left' }
+    })[lang] || { title:'STORAGE', used:'Used', of:'of', left:'Left' };
+  }
+  function fmtStorageGB(gb){
+    if(gb===INF) return '∞';
+    gb=Math.max(0,Number(gb)||0);
+    if(gb>=1000) return (Math.round(gb/1000*10)/10)+' TB';
+    if(gb>=1) return (Math.round(gb*10)/10)+' GB';
+    var mb=gb*1000;
+    return (mb<10 ? Math.round(mb*10)/10 : Math.round(mb))+' MB';
+  }
+  function storagePctRaw(used,limit){
+    used=Number(used)||0;
+    if(!limit || limit===INF) return 0;
+    return Math.max(0, Math.min(100, Math.round(used/limit*100)));
+  }
+  function sideStorageHtml(){
+    var P=PLANS[plan], L=P.limits, u=currentUsage(), used=Number(u.storageGB)||0, total=L.storageGB;
+    var p=storagePctRaw(used,total), left=(total===INF?INF:Math.max(0,total-used)), st=storageText();
+    return '<div class="storage-chip" title="'+esc(st.used+' '+fmtStorageGB(used)+' '+st.of+' '+fmtStorageGB(total))+'">'+
+      '<span class="storage-ring" style="--p:'+p+'"><span>'+p+'%</span></span>'+
+      '<span class="storage-tx"><span class="storage-title">'+esc(st.title)+'</span>'+
+      '<span class="storage-line">'+esc(st.used+' '+fmtStorageGB(used)+' '+st.of+' '+fmtStorageGB(total))+'</span>'+
+      '<span class="storage-left">'+esc(st.left+' '+fmtStorageGB(left))+'</span></span>'+
+    '</div>';
+  }
   function editableItem(id, label, active){
     if(editingLabel===id){
       return '<div class="subitem editing">'+
@@ -1189,11 +1914,20 @@
     if(isAdmin()){
       html += '<a class="side-admin" href="admin.html"><span class="sa-ic">'+s(ICON.shield)+'</span><span>'+esc(t.adminPanel)+'</span></a>';
     }
+    html += '<div class="side-tools">'+
+      '<button class="side-settings-btn '+(settingsNavOpen?'on':'')+'" type="button" data-settings-toggle '+
+        'title="'+esc(t.settingsTitle)+'" aria-label="'+esc(t.settingsTitle)+'" aria-expanded="'+(settingsNavOpen?'true':'false')+'">'+s(ICON.gear)+'</button>'+
+    '</div>';
     NAV.forEach(function(cat){
+      if(cat.id==='teamsec') return;
+      if(isSettingsCat(cat) && !settingsNavOpen) return;
       var isOn = cat.items.some(function(it){ return it.id===view; });
-      var open = cat.open || isOn;
+      var noSubs = cat.id==='projects' || cat.id==='mytools';
+      var open = !noSubs && (cat.open || isOn);
       var subs;
-      if(cat.id==='organize'){
+      if(noSubs){
+        subs = '';
+      } else if(cat.id==='organize'){
         subs = '<div class="client-subbar">'+
           editableItem('my-files', labelFor('my-files', nameFor(cat.items[0])), view==='my-files' && !activeProjectId)+
           '<button class="side-add-project" type="button" id="sideNewProject" title="'+esc(t.newProject)+'" aria-label="'+esc(t.newProject)+'">'+s(ICON.plus)+'</button>'+
@@ -1214,32 +1948,44 @@
       } else {
         subs = cat.items.map(function(it){
           if(it.editable) return editableItem(it.id, labelFor(it.id, nameFor(it)), it.id===view);
-          return '<div class="subitem '+(it.id===view?'active':'')+'" data-view="'+it.id+'">'+
+          return '<div class="subitem '+(it.id===view?'active':'')+navToneClass(it.id)+'" data-view="'+it.id+'">'+
             '<span class="dot"></span><span>'+esc(nameFor(it))+'</span></div>';
         }).join('');
       }
-      html += '<div class="cat '+(open?'open':'')+' '+(isOn?'on':'')+'" data-cat="'+cat.id+'">'+
-        '<button class="cat-head" type="button" data-cattoggle="'+cat.id+'">'+
+      var headTag = 'button';
+      var headTarget = '';
+      if(noSubs) headTarget = isOn ? view : (cat.id==='mytools' ? 'my-audio' : 'project-receive');
+      var headAttr = noSubs ? ' type="button" data-view="'+esc(headTarget)+'"' : ' type="button" data-cattoggle="'+cat.id+'"';
+      html += '<div class="cat '+(open?'open':'')+' '+(isOn?'on':'')+(noSubs?' no-subs':'')+(cat.id==='projects'?projectToneClass(view):cat.id==='mytools'?editToneClass(view):'')+'" data-cat="'+cat.id+'">'+
+        '<'+headTag+' class="cat-head"'+headAttr+'>'+
           '<span class="cat-ic">'+s(ICON[cat.icon])+'</span>'+
           '<span class="cat-name">'+esc(nameFor(cat))+'</span>'+
           '<span class="cat-chev">'+s(ICON.chev)+'</span>'+
-        '</button>'+
-        '<div class="subs">'+subs+'</div>'+
+        '</'+headTag+'>'+
+        (noSubs ? '' : '<div class="subs">'+subs+'</div>')+
       '</div>';
     });
+    html += sideToolLinksHtml();
+    html += sideBelowToolsHtml();
 
     // plan chip + upgrade at the bottom
     var P=PLANS[plan];
     html += '<div class="side-plan">'+
-      '<div class="planchip">'+
-        '<span class="pc-ic">'+s(ICON[PLAN_ICON[plan]])+'</span>'+
-        '<span class="pc-tx"><span class="pc-lbl">'+esc(t.yourPlan)+'</span><span class="pc-name">'+esc(P.name)+'</span></span>'+
+      '<div class="plan-card">'+
+        '<div class="planchip">'+
+          '<span class="pc-ic">'+s(ICON[PLAN_ICON[plan]])+'</span>'+
+          '<span class="pc-tx"><span class="pc-lbl">'+esc(t.yourPlan)+'</span><span class="pc-name">'+esc(P.name)+'</span></span>'+
+        '</div>'+
+        sideStorageHtml()+
       '</div>'+
-      (plan==='business' ? '' :
+      (plan==='studio' ? '' :
         '<button class="upg" type="button" id="sideUpg">'+s(ICON.zap)+'<span>'+esc(t.upgrade)+'</span></button>')+
     '</div>';
+    html += accountMenuHtml('side-account','side');
 
-    el('side').innerHTML = html;
+    el('side').innerHTML =
+      '<div class="side-logo"><img src="./assets/logo.png" alt="KOLKLI" width="139" height="34" decoding="async"></div>'+
+      '<div class="side-nav-card">'+html+'</div>';
   }
 
   /* =====================================================
@@ -1256,7 +2002,7 @@
   function viewAccount(){
     var P=PLANS[plan], L=P.limits;
     // subscription card
-    var actions = plan==='business'
+    var actions = plan==='studio'
       ? '<div class="sc-top-plan">'+s(ICON.check)+esc(t.topPlan)+' 🎉</div>'
       : '<a class="btn-up" href="pricing/">'+s(ICON.zap)+esc(t.upgrade)+'</a>';
     var sub = '<div class="card subcard">'+
@@ -1265,7 +2011,8 @@
           '<div class="sc-kick">'+esc(t.yourPlan)+'</div>'+
           '<div class="sc-planline"><span class="sc-planname">'+esc(P.name)+'</span>'+
             '<span class="plan-badge '+plan+'">'+esc(P.name)+'</span></div>'+
-          '<div class="sc-price"><b>'+esc(money(P.price))+'</b>'+(P.price?(' '+esc(t.perMonth)):'')+'</div>'+
+          '<div class="sc-price"><b>'+esc(money(planNum(P)))+'</b>'+(planNum(P)?(' '+esc(t.perMonth)):'')+'</div>'+
+          trialNoteHtml()+
         '</div>'+
         '<div class="sc-actions">'+actions+'</div>'+
       '</div>'+
@@ -1306,6 +2053,252 @@
     var quick = '<div class="card"><h2>'+esc(t.quickTitle)+'</h2><p class="csub"></p><div class="quick">'+q+'</div></div>';
 
     return sub + usage + limits + quick;
+  }
+
+  var DEV_TOOLS_TEXT = {
+    he:{
+      kick:'כלי עיצוב ופיתוח',
+      title:'כלי עיצוב ופיתוח',
+      sub:'ממירים, מחוללים ובודקים לצבע, CSS, קוד ו-SEO — הכול בדפדפן.',
+      all:'כל הכלים',
+      full:'פתיחה בעמוד מלא'
+    },
+    en:{
+      kick:'Design & Dev Tools',
+      title:'Design & Dev Tools',
+      sub:'Converters, generators and checkers for color, CSS, code and SEO, all in your browser.',
+      all:'All tools',
+      full:'Open full page'
+    },
+    ru:{
+      kick:'Инструменты дизайна',
+      title:'Инструменты дизайна и разработки',
+      sub:'Конвертеры, генераторы и проверки для цвета, CSS, кода и SEO прямо в браузере.',
+      all:'Все инструменты',
+      full:'Открыть страницу'
+    }
+  };
+  var DEV_TOOLS = [
+    {ic:'swatch',he:'ממיר צבעים',en:'Color Converter',ru:'Конвертер цвета',dhe:'HEX, RGB, HSL, CMYK',den:'HEX, RGB, HSL, CMYK',dru:'HEX, RGB, HSL, CMYK',href:'../color-convert.html'},
+    {ic:'palette',he:'פלטת צבעים',en:'Palette Generator',ru:'Генератор палитры',dhe:'פלטה מצבע או מתמונה',den:'From a color or image',dru:'Из цвета или изображения',href:'../palette-generator.html'},
+    {ic:'contrast',he:'בודק ניגודיות',en:'Contrast Checker',ru:'Проверка контраста',dhe:'קריאות טקסט על רקע',den:'Text vs. background',dru:'Текст на фоне',href:'../contrast-checker.html'},
+    {ic:'gradient',he:'מחולל Gradient',en:'CSS Gradient',ru:'Градиент',dhe:'גרדיאנט + קוד CSS',den:'Gradient + CSS code',dru:'Градиент + CSS',href:'../gradient-generator.html'},
+    {ic:'shadow',he:'Box Shadow',en:'Box Shadow',ru:'Box Shadow',dhe:'צל תיבה + קוד CSS',den:'Box shadow + CSS',dru:'Тень + CSS',href:'../box-shadow.html'},
+    {ic:'radius',he:'Border Radius',en:'Border Radius',ru:'Border Radius',dhe:'פינות מעוגלות + CSS',den:'Rounded corners + CSS',dru:'Скругления + CSS',href:'../border-radius.html'},
+    {ic:'image',he:'תמונה ל-Base64',en:'Image to Base64',ru:'Изображение в Base64',dhe:'הטמעת תמונה בקוד',den:'Inline an image in code',dru:'Встроить изображение в код',href:'../image-to-base64.html'},
+    {ic:'minify',he:'כיווץ CSS/JS',en:'Minify CSS/JS',ru:'Минификация CSS/JS',dhe:'הקטנת קבצי קוד',den:'Shrink code files',dru:'Сжать файлы кода',href:'../minify.html'},
+    {ic:'braces',he:'JSON Formatter',en:'JSON Formatter',ru:'JSON Formatter',dhe:'סידור ובדיקת JSON',den:'Prettify and validate',dru:'Форматирование JSON',href:'../json-formatter.html'},
+    {ic:'link',he:'URL Encoder/Decoder',en:'URL Encoder/Decoder',ru:'URL Encoder/Decoder',dhe:'קידוד ופענוח כתובות',den:'Encode and decode URLs',dru:'Кодировать и декодировать URL',href:'../url-encode.html'},
+    {ic:'tags',he:'מחולל Meta Tags',en:'Meta Tags',ru:'Meta Tags',dhe:'Title, OG ו-SEO',den:'Title, OG and SEO',dru:'Title, OG и SEO',href:'../meta-tags.html'},
+    {ic:'text',he:'בודק אורך Meta',en:'Meta Length',ru:'Длина Meta',dhe:'אורך Title ותיאור',den:'Title and description length',dru:'Длина Title и Description',href:'../meta-length.html'},
+    {ic:'star',he:'מחולל Favicon',en:'Favicon',ru:'Favicon',dhe:'אייקון לאתר בכל הגדלים',den:'Site icon, all sizes',dru:'Иконка сайта во всех размерах',href:'../favicon-generator.html'},
+    {ic:'code',he:'מחולל Embed',en:'Embed Code',ru:'Embed Code',dhe:'קוד הטמעה לאתר',den:'Embed code for your site',dru:'Код вставки для сайта',href:'../embed-code.html'},
+    {ic:'ruler',he:'ממיר מידות מסך',en:'Screen Units',ru:'Единицы экрана',dhe:'px, rem, em ו-%',den:'px, rem, em and %',dru:'px, rem, em и %',href:'../screen-units.html'},
+    {ic:'ratio',he:'יחס תמונה',en:'Aspect Ratio',ru:'Aspect Ratio',dhe:'חישוב יחס גובה-רוחב',den:'Aspect ratio calculator',dru:'Калькулятор пропорций',href:'../aspect-ratio.html'},
+    {ic:'crop',he:'מחולל Placeholder',en:'Placeholder',ru:'Placeholder',dhe:'תמונות ממלא מקום',den:'Placeholder images',dru:'Изображения-заглушки',href:'../placeholder-generator.html'},
+    {ic:'eraser',he:'מנקה HTML',en:'HTML Cleaner',ru:'Очистка HTML',dhe:'ניקוי קוד מיותר',den:'Strip messy HTML',dru:'Очистка лишнего HTML',href:'../html-cleaner.html'}
+  ];
+  var AI_TOOLS_TEXT = {
+    he:{
+      kick:'סטודיו AI',
+      title:'כלים חכמים יותר, מבוססי AI',
+      sub:'הכלים המתקדמים ביותר שלנו — נחשפים בקרוב.',
+      all:'כל כלי ה-AI',
+      full:'פתיחה בעמוד מלא',
+      demo:'דמו'
+    },
+    en:{
+      kick:'AI Studio',
+      title:'Smarter Tools, Powered By AI',
+      sub:'Our most advanced tools are gathered here for faster creative work.',
+      all:'All AI tools',
+      full:'Open full page',
+      demo:'Demo'
+    },
+    ru:{
+      kick:'AI Studio',
+      title:'Smarter AI Tools',
+      sub:'Our most advanced tools are gathered here for faster creative work.',
+      all:'All AI tools',
+      full:'Open full page',
+      demo:'Demo'
+    }
+  };
+  var AI_TOOLS = [
+    {ic:'sparkles',he:'הסרת רקע AI',en:'AI Remove Background',ru:'AI Remove Background',dhe:'מסיר רקע מתמונות בלחיצה, עם קצוות נקיים.',den:'Erase image backgrounds in a click.',dru:'Erase image backgrounds in a click.',href:'remove-bg.html',demo:true},
+    {ic:'music',he:'ניקוי אודיו AI',en:'AI Audio Cleanup',ru:'AI Audio Cleanup',dhe:'מסיר רעשי רקע והדים מכל הקלטה.',den:'Remove noise and enhance voice.',dru:'Remove noise and enhance voice.',href:'ai-audio-cleanup.html',demo:true},
+    {ic:'text',he:'יצירת כתוביות AI',en:'AI Subtitles',ru:'AI Subtitles',dhe:'מתמלל וידאו ואודיו לכתוביות מסונכרנות.',den:'Auto transcript and captions.',dru:'Auto transcript and captions.',href:'subtitle-generator.html',demo:true},
+    {ic:'crop',he:'חיתוך חכם AI',en:'AI Smart Crop',ru:'AI Smart Crop',dhe:'ממקם את הנושא וחותך אוטומטית לכל יחס.',den:'AI centers the crop on your subject.',dru:'AI centers the crop on your subject.',href:'ai-smart-crop.html',demo:true},
+    {ic:'image',he:'שחזור תמונה AI',en:'AI Photo Restore',ru:'AI Photo Restore',dhe:'משפר תמונות ישנות ומטושטשות לתוצאה גבוהה.',den:'Restore and enhance old photos.',dru:'Restore and enhance old photos.',href:'restore-image.html',demo:true},
+    {ic:'zap',he:'מאסטרינג AI',en:'AI Mastering',ru:'AI Mastering',dhe:'מאזן ומחדד את המיקס לסאונד מקצועי.',den:'Polish audio into a mastered sound.',dru:'Polish audio into a mastered sound.',href:'ai-master.html',demo:true},
+    {ic:'eraser',he:'הסרת אובייקטים AI',en:'AI Object Remover',ru:'AI Object Remover',dhe:'מוחק עצמים לא רצויים מהתמונה בלי עקבות.',den:'Erase objects and refill the image.',dru:'Erase objects and refill the image.',href:'ai-object-remover.html',demo:true},
+    {ic:'files',he:'סיכום PDF AI',en:'AI PDF Summary',ru:'AI PDF Summary',dhe:'מפיק תקציר ונקודות מפתח מכל מסמך.',den:'Summarize any PDF into key points.',dru:'Summarize any PDF into key points.',href:'ai-summarize-pdf.html',demo:true}
+  ];
+  var EDITING_TOOLS_TEXT = {
+    he:{
+      kick:'כלי עריכה',
+      title:'כל כלי העריכה במקום אחד',
+      sub:'אודיו, תמונות, וידאו, מסמכים ו-PDF — הכל רץ בדפדפן, בלי התקנות.'
+    },
+    en:{
+      kick:'Editing Tools',
+      title:'All Editing Tools In One Place',
+      sub:'Audio, images, video, documents and PDF tools, all in your browser.'
+    },
+    ru:{
+      kick:'Editing Tools',
+      title:'Все инструменты редактирования в одном месте',
+      sub:'Аудио, изображения, видео, документы и PDF прямо в браузере.'
+    }
+  };
+  var EDITING_TOOL_GROUPS = [
+    { icon:'music', he:'אודיו', en:'Audio', ru:'Аудио', tools:[
+      {ic:'scissors',he:'חותך אודיו',en:'Audio Cutter',ru:'Обрезка аудио',dhe:'חיתוך וקיצור MP3',den:'Trim and cut MP3',dru:'Обрезка MP3',href:'app.html'},
+      {ic:'merge',he:'מיזוג אודיו',en:'Merge Audio',ru:'Объединить аудио',dhe:'איחוד רצועות לקובץ',den:'Join tracks into one',dru:'Склейка треков',href:'merge-audio.html'},
+      {ic:'refresh',he:'המרת אודיו',en:'Convert Audio',ru:'Конвертация аудио',dhe:'MP3, WAV, FLAC ועוד',den:'MP3, WAV, FLAC and more',dru:'MP3, WAV, FLAC',href:'convert.html'},
+      {ic:'minimize',he:'דחיסת אודיו',en:'Compress Audio',ru:'Сжать аудио',dhe:'קובץ אודיו קטן יותר',den:'Smaller audio files',dru:'Уменьшение аудио',href:'compress-audio.html'},
+      {ic:'sparkles',he:'ניקוי אודיו AI',en:'AI Audio Cleanup',ru:'AI очистка аудио',dhe:'הסרת רעש ושיפור קול',den:'Remove noise and enhance voice',dru:'Удаление шума',href:'ai-audio-cleanup.html'}
+    ]},
+    { icon:'camera', he:'תמונות', en:'Images', ru:'Изображения', tools:[
+      {ic:'image',he:'שינוי גודל',en:'Resize Image',ru:'Изменить размер',dhe:'שינוי מידות מהיר',den:'Change dimensions fast',dru:'Изменение размеров',href:'resize-image.html'},
+      {ic:'crop',he:'חיתוך תמונה',en:'Crop Image',ru:'Обрезать изображение',dhe:'חיתוך ויישור',den:'Crop and straighten',dru:'Обрезка и выравнивание',href:'crop-image.html'},
+      {ic:'sparkles',he:'הסרת רקע',en:'Remove Background',ru:'Удалить фон',dhe:'הסרה בקליק אחד',den:'One-click cutout',dru:'Удаление фона',href:'remove-bg.html'},
+      {ic:'files',he:'המרת תמונה',en:'Convert Image',ru:'Конвертация изображения',dhe:'PNG, JPG, WebP ועוד',den:'PNG, JPG, WebP and more',dru:'PNG, JPG, WebP',href:'image-convert.html'},
+      {ic:'minimize',he:'דחיסת תמונה',en:'Compress Image',ru:'Сжать изображение',dhe:'תמונה קטנה יותר',den:'Smaller images',dru:'Сжатие изображений',href:'compress-image.html'}
+    ]},
+    { icon:'film', he:'וידאו', en:'Video', ru:'Видео', tools:[
+      {ic:'scissors',he:'חותך וידאו',en:'Video Cutter',ru:'Обрезка видео',dhe:'חיתוך קטעים במהירות',den:'Trim clips fast',dru:'Быстрая обрезка',href:'video-cut.html'},
+      {ic:'minimize',he:'דחיסת וידאו',en:'Compress Video',ru:'Сжать видео',dhe:'הקטנת נפח הקובץ',den:'Shrink file size',dru:'Уменьшение файла',href:'compress-video.html'},
+      {ic:'refresh',he:'המרת וידאו',en:'Convert Video',ru:'Конвертация видео',dhe:'פורמטים נפוצים לווידאו',den:'Common video formats',dru:'Форматы видео',href:'video-convert.html'},
+      {ic:'music',he:'חילוץ אודיו',en:'Extract Audio',ru:'Извлечь аудио',dhe:'שמירת הסאונד בלבד',den:'Pull the soundtrack',dru:'Извлечь звук',href:'extract-audio.html'},
+      {ic:'sparkles',he:'כתוביות AI',en:'AI Subtitles',ru:'AI субтитры',dhe:'תמלול וידאו לכתוביות',den:'Transcribe video to subtitles',dru:'Субтитры из видео',href:'subtitle-generator.html'}
+    ]},
+    { icon:'files', he:'מסמכים ו-PDF', en:'Documents & PDF', ru:'Документы и PDF', tools:[
+      {ic:'merge',he:'מיזוג PDF',en:'Merge PDF',ru:'Объединить PDF',dhe:'איחוד קבצי PDF',den:'Combine PDFs',dru:'Склейка PDF',href:'merge-pdf.html'},
+      {ic:'minimize',he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF',dhe:'הקטנת נפח PDF',den:'Reduce PDF size',dru:'Уменьшение PDF',href:'compress-pdf.html'},
+      {ic:'image',he:'PDF ל-JPG',en:'PDF to JPG',ru:'PDF в JPG',dhe:'המרת עמודים לתמונות',den:'Pages to images',dru:'Страницы в изображения',href:'pdf-to-jpg.html'},
+      {ic:'files',he:'DOC ל-PDF',en:'DOC to PDF',ru:'DOC в PDF',dhe:'המרת Word ל-PDF',den:'Word to PDF',dru:'Word в PDF',href:'doc-to-pdf.html'},
+      {ic:'sparkles',he:'סיכום PDF AI',en:'AI PDF Summary',ru:'AI конспект PDF',dhe:'תקציר ונקודות מפתח',den:'Summary and key points',dru:'Краткое содержание',href:'ai-summarize-pdf.html'}
+    ]}
+  ];
+  function devToolsText(k){
+    var set=DEV_TOOLS_TEXT[lang] || DEV_TOOLS_TEXT.en;
+    return set[k] || DEV_TOOLS_TEXT.en[k] || k;
+  }
+  function aiToolsText(k){
+    var set=AI_TOOLS_TEXT[lang] || AI_TOOLS_TEXT.en;
+    return set[k] || AI_TOOLS_TEXT.en[k] || k;
+  }
+  function editingToolsText(k){
+    var set=EDITING_TOOLS_TEXT[lang] || EDITING_TOOLS_TEXT.en;
+    return set[k] || EDITING_TOOLS_TEXT.en[k] || k;
+  }
+  function editingToolGroupTitle(g){ return g[lang] || g.en || g.he || ''; }
+  function devToolTitle(o){ return o[lang] || o.en || o.he || ''; }
+  function devToolDesc(o){ return o['d'+lang] || o.den || o.dhe || ''; }
+  function dashboardToolHref(h){ return String(h||'#').replace(/^\.\.\//,''); }
+  function editingToolCard(o){ return favoriteToolCard(favPayload(o, dashboardToolHref(o.href))); }
+  function editingToolGroupHtml(g){
+    var icon=ICON[g.icon] || ICON.scissors;
+    return '<div class="edit-hub-section">'+
+      '<div class="edit-hub-title"><span class="section-ic">'+s(icon)+'</span><h3>'+esc(editingToolGroupTitle(g))+'</h3></div>'+
+      '<div class="dt-grid">'+g.tools.map(editingToolCard).join('')+'</div>'+
+    '</div>';
+  }
+  function viewEditingTools(){
+    return '<section class="dt-shell">'+
+      '<div class="dt-hero">'+
+        '<span class="dt-kicker">'+esc(editingToolsText('kick'))+'</span>'+
+        '<h2>'+esc(editingToolsText('title'))+'</h2>'+
+        '<p>'+esc(editingToolsText('sub'))+'</p>'+
+      '</div>'+
+      EDITING_TOOL_GROUPS.map(editingToolGroupHtml).join('')+
+    '</section>';
+  }
+  function devToolCard(o){
+    var icon=ICON[o.ic] || ICON.files;
+    var href=dashboardToolHref(o.href);
+    var item=favPayload(o, href);
+    return '<article class="dt-card tool-card">'+
+      favButtonHtml(item)+
+      '<a class="tool-card-link" href="'+esc(href)+'">'+
+        '<span class="dt-ic">'+s(icon)+'</span>'+
+        '<span class="dt-name">'+esc(devToolTitle(o))+'</span>'+
+        '<span class="dt-desc">'+esc(devToolDesc(o))+'</span>'+
+      '</a>'+
+    '</article>';
+  }
+  function aiToolCard(o){
+    var icon=ICON[o.ic] || ICON.sparkles;
+    var href=dashboardToolHref(o.href);
+    var item=favPayload(o, href);
+    return '<article class="dt-card tool-card">'+
+      favButtonHtml(item)+
+      (o.demo ? '<span class="ai-demo-badge">'+esc(aiToolsText('demo'))+'</span>' : '')+
+      '<a class="tool-card-link" href="'+esc(href)+'">'+
+        '<span class="dt-ic">'+s(icon)+'</span>'+
+        '<span class="dt-name">'+esc(devToolTitle(o))+'</span>'+
+        '<span class="dt-desc">'+esc(devToolDesc(o))+'</span>'+
+      '</a>'+
+    '</article>';
+  }
+  function favToolTitle(o){ return o[lang] || o.en || o.he || ''; }
+  function favToolDesc(o){ return o['d'+lang] || o.den || o.dhe || ''; }
+  function favoriteToolCard(o){
+    var icon=ICON[o.ic] || ICON.star;
+    return '<article class="dt-card tool-card">'+
+      favButtonHtml(o)+
+      '<a class="tool-card-link" href="'+esc(o.href||'#')+'">'+
+        '<span class="dt-ic">'+s(icon)+'</span>'+
+        '<span class="dt-name">'+esc(favToolTitle(o))+'</span>'+
+        '<span class="dt-desc">'+esc(favToolDesc(o))+'</span>'+
+      '</a>'+
+    '</article>';
+  }
+  function viewFavorites(){
+    var list=favRead();
+    if(!list.length){
+      return '<section class="dt-shell">'+
+        '<div class="dt-head"><h3>'+esc(favText('title'))+'</h3></div>'+
+        '<div class="fav-empty">'+
+          '<span class="fe-ic">'+s(ICON.star)+'</span>'+
+          '<h3>'+esc(favText('emptyT'))+'</h3>'+
+          '<p>'+esc(favText('emptyP'))+'</p>'+
+        '</div>'+
+      '</section>';
+    }
+    return '<section class="dt-shell">'+
+      '<div class="dt-head"><h3>'+esc(favText('title'))+'</h3></div>'+
+      '<div class="dt-grid">'+list.map(favoriteToolCard).join('')+'</div>'+
+    '</section>';
+  }
+  function viewDevTools(){
+    return '<section class="dt-shell">'+
+      '<div class="dt-hero">'+
+        '<span class="dt-kicker">'+esc(devToolsText('kick'))+'</span>'+
+        '<h2>'+esc(devToolsText('title'))+'</h2>'+
+        '<p>'+esc(devToolsText('sub'))+'</p>'+
+      '</div>'+
+      '<div class="dt-head">'+
+        '<h3>'+esc(devToolsText('all'))+'</h3>'+
+        '<a class="btn ghost" href="dev-tools/">'+s(ICON.openext)+esc(devToolsText('full'))+'</a>'+
+      '</div>'+
+      '<div class="dt-grid">'+DEV_TOOLS.map(devToolCard).join('')+'</div>'+
+    '</section>';
+  }
+  function viewAiTools(){
+    return '<section class="dt-shell">'+
+      '<div class="dt-hero">'+
+        '<span class="dt-kicker">'+esc(aiToolsText('kick'))+'</span>'+
+        '<h2>'+esc(aiToolsText('title'))+'</h2>'+
+        '<p>'+esc(aiToolsText('sub'))+'</p>'+
+      '</div>'+
+      '<div class="dt-head">'+
+        '<h3>'+esc(aiToolsText('all'))+'</h3>'+
+        '<a class="btn ghost" href="ai/">'+s(ICON.openext)+esc(aiToolsText('full'))+'</a>'+
+      '</div>'+
+      '<div class="dt-grid">'+AI_TOOLS.map(aiToolCard).join('')+'</div>'+
+    '</section>';
   }
 
   function viewDetails(){
@@ -1361,23 +2354,26 @@
 
   function viewPayments(){
     var P=PLANS[plan];
-    var billLine = P.price===0
-      ? '<div class="opt-d">'+esc(t.freeNoBill)+'</div>'
-      : '<div class="opt-d">'+esc(t.nextBill)+': '+esc(nextBillDate())+'</div>';
+    var onTrial = trialActive();
+    var billLine = onTrial
+      ? '<div class="opt-d">'+esc(trialEndsText())+'</div>'
+      : (planNum(P)===0
+          ? '<div class="opt-d">'+esc(t.freeNoBill)+'</div>'
+          : '<div class="opt-d">'+esc(t.nextBill)+': '+esc(nextBillDate())+'</div>');
     var manageBtn;
     if(billingOn()){
       manageBtn = (plan!=='free')
         ? '<button class="btn ghost" type="button" data-billing-portal>'+esc(t.manage)+'</button>'
-        : '<button class="btn primary" type="button" data-billing-checkout="business">'+s(ICON.zap)+esc(t.upgrade)+'</button>';
+        : '<button class="btn primary" type="button" data-billing-checkout="creator">'+s(ICON.zap)+esc(t.upgrade)+'</button>';
     } else {
-      manageBtn = (plan==='pro'||plan==='business')
+      manageBtn = (plan==='studio')
         ? '<a class="btn ghost" href="pricing/">'+esc(t.manage)+'</a>'
         : '<a class="btn primary" href="pricing/">'+s(ICON.zap)+esc(t.upgrade)+'</a>';
     }
 
-    // demo billing history: paid rows only for paid plans
+    // demo billing history: paid rows only for paid plans (never during a trial)
     var hist;
-    if(P.price===0){
+    if(planNum(P)===0 || onTrial){
       hist = '<p class="csub" style="margin:0">'+esc(t.histNone)+'</p>';
     } else {
       var rows='';
@@ -1387,7 +2383,7 @@
         var ds;
         try{ ds=d.toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{year:'numeric',month:'short',day:'numeric'}); }
         catch(e){ ds=d.toISOString().slice(0,10); }
-        rows += '<tr><td>'+esc(ds)+'</td><td>KOLKLI '+esc(P.name)+'</td><td>$'+P.price.toFixed(2)+'</td>'+
+        rows += '<tr><td>'+esc(ds)+'</td><td>KOLKLI '+esc(P.name)+'</td><td>'+esc(money(planNum(P)))+'</td>'+
           '<td><span class="inv-status">'+esc(t.invPaid)+'</span></td>'+
           '<td><span class="inv-dl">'+esc(t.invDownload)+'</span></td></tr>';
       }
@@ -1398,7 +2394,7 @@
     return '<div class="card">'+
       '<h2>'+esc(t.payTitle)+'</h2><p class="csub">'+esc(t.paySub)+'</p>'+
       '<div class="payrow" style="padding:14px 0;border-bottom:1px solid var(--line-2)">'+
-        '<div class="opt-tx"><div class="opt-t">'+esc(t.curPlanTitle)+': '+esc(P.name)+' · '+esc(money(P.price))+(P.price?(' '+esc(t.perMonth)):'')+'</div>'+billLine+'</div>'+
+        '<div class="opt-tx"><div class="opt-t">'+esc(t.curPlanTitle)+': '+esc(P.name)+' · '+esc(money(planNum(P)))+(planNum(P)?(' '+esc(t.perMonth)):'')+'</div>'+billLine+'</div>'+
         manageBtn+
       '</div>'+
       '<div style="padding-top:16px">'+
@@ -1426,39 +2422,608 @@
     '</div>';
   }
 
-  function viewProjects(){
-    var projects=loadProjects();
-    if(activeProjectId && !projects.some(function(p){ return p.id===activeProjectId; })) activeProjectId=null;
-    var rows=projects.map(function(p){
-      var st=p.status||'draft';
-      var stClass=(st==='sent'||st==='approved') ? ' '+st : '';
-      return '<article class="project-row '+(activeProjectId===p.id?'on':'')+'">'+
-        '<div class="project-main">'+
-          '<span class="project-mark">'+s(ICON.folder)+'</span>'+
-          '<span style="min-width:0"><span class="project-title">'+esc(p.name)+'</span>'+
-            '<span class="project-client">'+esc(t.projectClient)+': '+esc(p.client||p.name)+'</span></span>'+
-        '</div>'+
-        '<div class="project-stat"><div class="ps-l">'+esc(t.projectFiles)+'</div><div class="ps-v"><span dir="ltr">'+esc(p.files||0)+' · '+esc(fmtProjectSize(p.sizeMB))+'</span></div></div>'+
-        '<div class="project-stat"><div class="ps-l">'+esc(t.projectSelected)+'</div><div class="ps-v">'+esc(p.selected||0)+'</div></div>'+
-        '<div class="project-stat"><div class="ps-l">'+esc(t.projectUpdated)+'</div><div class="ps-v">'+esc(fmtProjectDate(p.updated))+'</div></div>'+
-        '<div class="project-actions">'+
-          '<span class="project-status'+stClass+'">'+esc(projectStatusText(st))+'</span>'+
-          '<a class="btn ghost" href="files.html">'+s(ICON.folder)+esc(t.projectOpen)+'</a>'+
-          '<a class="btn primary" href="send.html">'+s(ICON.send)+esc(t.projectShare)+'</a>'+
-        '</div>'+
-      '</article>';
-    }).join('');
-    if(!rows){
-      rows = '<div class="project-empty empty"><div class="ei">'+s(ICON.folder)+'</div>'+
-        '<h3>'+esc(t.orgEmptyT)+'</h3><p>'+esc(t.orgEmptyP)+'</p>'+
-        '<button class="btn primary" type="button" data-new-project>'+s(ICON.plus)+esc(t.newProject)+'</button></div>';
+  var PROJECT_ORDER = ['select','receive','send','review'];
+  var PROJECT_VIEW = {
+    'project-select':'select',
+    'project-receive':'receive',
+    'project-send':'send',
+    'project-review':'review',
+    'my-files':'select',
+    'my-requests':'receive',
+    'my-transfers':'send',
+    'my-reviews':'review'
+  };
+  var PROJECT_SERVICES = {
+    select:{ view:'project-select', tone:'select', title:'Select Files', desc:'Client selection links', icon:'pick', badge:'SELECT FILES', section:'Clients choosing files', href:'files.html', cta:'Open selection' },
+    receive:{ view:'project-receive', tone:'receive', title:'Receive Files', desc:'Files received from clients', icon:'inbox', badge:'FILE REQUEST', section:'Files received from clients', href:'request.html', cta:'Open request' },
+    send:{ view:'project-send', tone:'send', title:'Send Files', desc:'Packages sent to clients', icon:'send', badge:'SENT FILES', section:'Files sent to clients', href:'send.html', cta:'Open transfer' },
+    review:{ view:'project-review', tone:'review', title:'Review Files', desc:'Materials sent for approval', icon:'check', badge:'REVIEW FILES', section:'Client review projects', href:'review.html', cta:'Open review' }
+  };
+  var PROJECT_DEMO = {
+    select:[
+      { client:'Daniel Smith', email:'daniel.smith@email.com', phone:'054-2210148', link:'https://kolkli.com/s/SEL-8821', title:'Daniel Smith - Event Photos', f1:'124 files', l1:'Gallery', f2:'48 selected', l2:'Chosen', f3:'Jul 07, 2026', l3:'Link sent', note:'Selection link sent to the client for choosing final materials.', status:'Waiting for selection' },
+      { client:'Maya Cohen', email:'maya.cohen@email.com', phone:'052-8843007', link:'https://kolkli.com/s/SEL-8822', title:'Family Album Selection', f1:'86 files', l1:'Gallery', f2:'21 selected', l2:'Chosen', f3:'Jul 06, 2026', l3:'Link sent', note:'Client is choosing favorites from the private gallery.', status:'In progress' },
+      { client:'Amit Levi', email:'amit.levi@email.com', phone:'050-7712394', link:'https://kolkli.com/s/SEL-8823', title:'Product Shoot Picks', f1:'63 files', l1:'Gallery', f2:'12 selected', l2:'Chosen', f3:'Jul 05, 2026', l3:'Link sent', note:'Selection package is separated from send, receive and review work.', status:'Awaiting picks' }
+    ],
+    receive:[
+      { client:'Daniel Smith', email:'daniel.smith@email.com', phone:'054-2210148', title:'Daniel Smith - Event Upload', f1:'25 files', l1:'Received', f2:'3.2 GB', l2:'Total size', f3:'Jul 14, 2026', l3:'Expires', note:'Client uploaded photos and video through a file request.', status:'Pending review' },
+      { client:'Noa Bar', email:'noa.bar@email.com', phone:'053-9042118', title:'Brand Assets Upload', f1:'18 files', l1:'Received', f2:'820 MB', l2:'Total size', f3:'Jul 12, 2026', l3:'Expires', note:'Logo, reference images and copy arrived from the client.', status:'Received' },
+      { client:'Ron Studio', email:'hello@ronstudio.com', phone:'077-3301920', title:'Wedding Raw Files', f1:'42 files', l1:'Received', f2:'8.6 GB', l2:'Total size', f3:'Jul 18, 2026', l3:'Expires', note:'Incoming files are shown only inside Receive Files.', status:'Active request' }
+    ],
+    send:[
+      { client:'Daniel Smith', email:'daniel.smith@email.com', phone:'054-2210148', link:'https://kolkli.com/d/SND-24061985', title:'Final Event Delivery', f1:'32 files', l1:'Sent', f2:'4 downloads', l2:'Activity', f3:'Jul 07, 2026', l3:'Sent on', note:'Final files were sent from the workspace to the client.', status:'Delivered' },
+      { client:'Moran Halevi', email:'moran@email.com', phone:'052-6640912', link:'https://kolkli.com/d/SND-24061986', title:'Edited Portraits Pack', f1:'14 files', l1:'Sent', f2:'1 download', l2:'Activity', f3:'Jul 06, 2026', l3:'Sent on', note:'Transfer package contains edited images only.', status:'Downloaded' },
+      { client:'Studio North', email:'team@studionorth.com', phone:'077-2298400', link:'https://kolkli.com/d/SND-24061987', title:'Commercial Cut Exports', f1:'9 files', l1:'Sent', f2:'0 downloads', l2:'Activity', f3:'Jul 05, 2026', l3:'Sent on', note:'Outgoing delivery stays separate from received uploads.', status:'Link active' }
+    ],
+    review:[
+      { client:'Daniel Smith', email:'daniel.smith@email.com', phone:'054-2210148', link:'https://kolkli.com/v/RVW-3310', title:'Event Highlights Review', f1:'16 files', l1:'Materials', f2:'3 comments', l2:'Feedback', f3:'Jul 07, 2026', l3:'Shared on', note:'Materials were sent to the client for comments and approval.', status:'Waiting approval' },
+      { client:'Ella Agency', email:'ella@agency.com', phone:'058-4471250', link:'https://kolkli.com/v/RVW-3311', title:'Campaign Visual Review', f1:'28 files', l1:'Materials', f2:'7 comments', l2:'Feedback', f3:'Jul 06, 2026', l3:'Shared on', note:'Review project contains client feedback, not delivery files.', status:'Changes requested' },
+      { client:'Ben Ari', email:'ben@ari.com', phone:'050-3390871', link:'https://kolkli.com/v/RVW-3312', title:'Album Proofing', f1:'54 files', l1:'Materials', f2:'0 comments', l2:'Feedback', f3:'Jul 04, 2026', l3:'Shared on', note:'Approval workflow remains inside Review Files only.', status:'In review' }
+    ]
+  };
+  // ---- My Projects view localization ---------------------------------
+  // The services/cards above are authored in English; translate the visible
+  // strings at render time so the Hebrew (RTL) and Russian dashboards read
+  // natively. English (en) has no map and passes every string through.
+  var PROJECT_L10N = {
+    he:{
+      myProjects:'הפרויקטים שלי', clientCards:'כרטיסי לקוח',
+      svc:{
+        select:{ title:'פרויקטים לבחירה', badge:'בחירת קבצים', section:'לקוחות בוחרים קבצים', cta:'פתיחת בחירה' },
+        receive:{ title:'פרויקטים שהתקבלו', badge:'קבצים שהתקבלו', section:'קבצים שהתקבלו מלקוחות', cta:'פתיחת בקשה' },
+        send:{ title:'פרויקטים שנשלחו', badge:'קבצים שנשלחו', section:'קבצים שנשלחו ללקוחות', cta:'פתיחת העברה' },
+        review:{ title:'פרויקטים לאישור', badge:'אישור למסירה', section:'פרויקטים לאישור לקוח', cta:'פתיחת אישור' }
+      },
+      label:{
+        'Gallery':'גלריה', 'Chosen':'נבחרו', 'Link sent':'קישור נשלח', 'Updated':'עודכן',
+        'Received':'התקבלו', 'Total size':'נפח כולל', 'Expires':'תפוגה', 'Created':'נוצר',
+        'Sent':'נשלחו', 'Activity':'פעילות', 'Sent on':'תאריך שליחה',
+        'Materials':'חומרים', 'Feedback':'משוב', 'Shared on':'תאריך שיתוף'
+      },
+      unit:{ files:'קבצים', selected:'נבחרו', download:'הורדה', downloads:'הורדות', comment:'הערה', comments:'הערות' },
+      status:{
+        'Waiting for selection':'ממתין לבחירה', 'In progress':'בתהליך', 'Awaiting picks':'ממתין לבחירות',
+        'Pending review':'ממתין לבדיקה', 'Received':'התקבל', 'Active request':'בקשה פעילה',
+        'Delivered':'נמסר', 'Downloaded':'הורד', 'Link active':'קישור פעיל',
+        'Waiting approval':'ממתין לאישור', 'Changes requested':'התבקשו שינויים', 'In review':'בבדיקה',
+        draft:'טיוטה', sent:'נשלח', approved:'מאושר', closed:'סגור', expired:'פג תוקף', changes:'התבקשו שינויים', review:'בבדיקה'
+      },
+      note:{
+        'Selection link sent to the client for choosing final materials.':'קישור בחירה נשלח ללקוח לבחירת החומרים הסופיים.',
+        'Client is choosing favorites from the private gallery.':'הלקוח בוחר מועדפים מהגלריה הפרטית.',
+        'Selection package is separated from send, receive and review work.':'חבילת הבחירה נפרדת מעבודות השליחה, הקבלה והאישור.',
+        'Client selection project from KOLKLI Select Files.':'פרויקט בחירת קבצים של הלקוח מתוך KOLKLI.',
+        'Client uploaded photos and video through a file request.':'הלקוח העלה תמונות וסרטון דרך בקשת קבצים.',
+        'Logo, reference images and copy arrived from the client.':'לוגו, תמונות ייחוס וטקסט התקבלו מהלקוח.',
+        'Incoming files are shown only inside Receive Files.':'קבצים נכנסים מוצגים רק בתוך קבלת קבצים.',
+        'Files received from the client through a request link.':'קבצים שהתקבלו מהלקוח דרך קישור בקשה.',
+        'Final files were sent from the workspace to the client.':'הקבצים הסופיים נשלחו ממרחב העבודה ללקוח.',
+        'Transfer package contains edited images only.':'חבילת ההעברה מכילה תמונות ערוכות בלבד.',
+        'Outgoing delivery stays separate from received uploads.':'משלוח יוצא נשאר נפרד מהעלאות שהתקבלו.',
+        'Files sent from your workspace to the client.':'קבצים שנשלחו ממרחב העבודה שלך ללקוח.',
+        'Materials were sent to the client for comments and approval.':'החומרים נשלחו ללקוח להערות ואישור.',
+        'Review project contains client feedback, not delivery files.':'פרויקט האישור מכיל משוב לקוח, לא קבצי מסירה.',
+        'Approval workflow remains inside Review Files only.':'תהליך האישור נשאר בתוך אישור למסירה בלבד.',
+        'Materials sent to the client for review and approval.':'החומרים נשלחו ללקוח לצפייה ואישור.'
+      }
+    },
+    ru:{
+      myProjects:'MY PROJECTS', clientCards:'карточек клиентов',
+      svc:{
+        select:{ title:'Select Files', badge:'SELECT FILES', section:'Клиенты выбирают файлы', cta:'Открыть выбор' },
+        receive:{ title:'Receive Files', badge:'FILE REQUEST', section:'Файлы, полученные от клиентов', cta:'Открыть запрос' },
+        send:{ title:'Send Files', badge:'SENT FILES', section:'Файлы, отправленные клиентам', cta:'Открыть передачу' },
+        review:{ title:'Review Files', badge:'REVIEW FILES', section:'Проекты на согласование', cta:'Открыть проверку' }
+      },
+      label:{
+        'Gallery':'Галерея', 'Chosen':'Выбрано', 'Link sent':'Ссылка отправлена', 'Updated':'Обновлено',
+        'Received':'Получено', 'Total size':'Общий размер', 'Expires':'Истекает', 'Created':'Создано',
+        'Sent':'Отправлено', 'Activity':'Активность', 'Sent on':'Дата отправки',
+        'Materials':'Материалы', 'Feedback':'Отзывы', 'Shared on':'Дата отправки'
+      },
+      unit:{ files:'файлов', selected:'выбрано', download:'загрузка', downloads:'загрузок', comment:'комментарий', comments:'комментариев' },
+      status:{
+        'Waiting for selection':'Ожидает выбора', 'In progress':'В процессе', 'Awaiting picks':'Ожидает выбора',
+        'Pending review':'Ожидает проверки', 'Received':'Получено', 'Active request':'Активный запрос',
+        'Delivered':'Доставлено', 'Downloaded':'Скачано', 'Link active':'Ссылка активна',
+        'Waiting approval':'Ожидает согласования', 'Changes requested':'Запрошены изменения', 'In review':'На проверке',
+        draft:'Черновик', sent:'Отправлено', approved:'Согласовано', closed:'Закрыто', expired:'Истекло', changes:'Запрошены изменения', review:'На проверке'
+      },
+      note:{
+        'Selection link sent to the client for choosing final materials.':'Ссылка на выбор отправлена клиенту для выбора финальных материалов.',
+        'Client is choosing favorites from the private gallery.':'Клиент выбирает избранное из приватной галереи.',
+        'Selection package is separated from send, receive and review work.':'Пакет выбора отделён от отправки, получения и проверки.',
+        'Client selection project from KOLKLI Select Files.':'Проект выбора файлов клиента из KOLKLI.',
+        'Client uploaded photos and video through a file request.':'Клиент загрузил фото и видео через запрос файлов.',
+        'Logo, reference images and copy arrived from the client.':'Логотип, референсы и текст получены от клиента.',
+        'Incoming files are shown only inside Receive Files.':'Входящие файлы показаны только в разделе получения файлов.',
+        'Files received from the client through a request link.':'Файлы, полученные от клиента по ссылке запроса.',
+        'Final files were sent from the workspace to the client.':'Финальные файлы отправлены клиенту из рабочего пространства.',
+        'Transfer package contains edited images only.':'Пакет передачи содержит только обработанные изображения.',
+        'Outgoing delivery stays separate from received uploads.':'Исходящая доставка отделена от полученных загрузок.',
+        'Files sent from your workspace to the client.':'Файлы, отправленные клиенту из вашего рабочего пространства.',
+        'Materials were sent to the client for comments and approval.':'Материалы отправлены клиенту для комментариев и согласования.',
+        'Review project contains client feedback, not delivery files.':'Проект проверки содержит отзывы клиента, а не файлы доставки.',
+        'Approval workflow remains inside Review Files only.':'Процесс согласования остаётся только в разделе проверки файлов.',
+        'Materials sent to the client for review and approval.':'Материалы отправлены клиенту для проверки и согласования.'
+      }
     }
-    return '<div class="card projects-card">'+
-      '<div class="project-head">'+
-        '<div><h2>'+esc(t.clientsTitle)+'</h2><p class="csub">'+esc(t.clientsSub)+'</p></div>'+
-        '<button class="btn primary" type="button" data-new-project>'+s(ICON.plus)+esc(t.newProject)+'</button>'+
+  };
+  function projL10n(){ return PROJECT_L10N[lang]; }
+  // Localized copy for the "delete project" confirmation dialog.
+  function projDelText(){
+    var d={
+      he:{ title:'מחיקת פרויקט', body:'הפרויקט יוסר מרשימת הפרויקטים שלך. לא ניתן לשחזר את הפעולה.', ok:'מחיקה', cancel:'ביטול', done:'הפרויקט נמחק' },
+      en:{ title:'Delete project', body:'This project will be removed from your list. This action cannot be undone.', ok:'Delete', cancel:'Cancel', done:'Project deleted' },
+      ru:{ title:'Удалить проект', body:'Проект будет удалён из вашего списка. Это действие нельзя отменить.', ok:'Удалить', cancel:'Отмена', done:'Проект удалён' }
+    };
+    return d[lang] || d.he;
+  }
+  // Lightweight, theme-aware confirm dialog. opts:{title,body,ok,cancel,danger,onOk}
+  function kConfirm(opts){
+    opts=opts||{};
+    var prev=el('kConfirm'); if(prev) prev.remove();
+    var wrap=document.createElement('div');
+    wrap.id='kConfirm'; wrap.className='kc-overlay';
+    wrap.setAttribute('dir', lang==='he' ? 'rtl' : 'ltr');
+    wrap.innerHTML=
+      '<div class="kc-modal" role="dialog" aria-modal="true" aria-labelledby="kcTitle">'+
+        '<h3 id="kcTitle" class="kc-title">'+esc(opts.title||'')+'</h3>'+
+        '<p class="kc-body">'+esc(opts.body||'')+'</p>'+
+        '<div class="kc-actions">'+
+          '<button type="button" class="kc-btn kc-cancel">'+esc(opts.cancel||'')+'</button>'+
+          '<button type="button" class="kc-btn kc-ok'+(opts.danger?' danger':'')+'">'+esc(opts.ok||'')+'</button>'+
+        '</div>'+
+      '</div>';
+    document.body.appendChild(wrap);
+    function close(){ document.removeEventListener('keydown', onKey); wrap.classList.remove('show'); setTimeout(function(){ wrap.remove(); }, 200); }
+    function onKey(e){ if(e.key==='Escape') close(); }
+    wrap.querySelector('.kc-cancel').addEventListener('click', close);
+    wrap.addEventListener('click', function(e){ if(e.target===wrap) close(); });
+    wrap.querySelector('.kc-ok').addEventListener('click', function(){ close(); if(opts.onOk) opts.onOk(); });
+    document.addEventListener('keydown', onKey);
+    requestAnimationFrame(function(){ wrap.classList.add('show'); wrap.querySelector('.kc-ok').focus(); });
+  }
+  function projMyProjectsText(){ var m=projL10n(); return m ? m.myProjects : 'MY PROJECTS'; }
+  function projCardsCountText(n){ var m=projL10n(); return n+' '+(m ? m.clientCards : 'CLIENT CARDS'); }
+  function svcText(key,field){ var m=projL10n(); return (m&&m.svc[key]&&m.svc[key][field]) || (PROJECT_SERVICES[key]||{})[field] || ''; }
+  function projLabel(str){ var m=projL10n(); return (m&&m.label[str]) || str; }
+  function projStatus(str){ var m=projL10n(); return (m&&m.status[str]) || str; }
+  function projNote(str){ var m=projL10n(); return (m&&m.note[str]) || str; }
+  // Translate the trailing unit word in a fact value ("124 files" -> "124 קבצים");
+  // leaves dates, sizes ("3.2 GB") and anything unrecognized untouched.
+  function projFact(str){
+    var m=projL10n(); if(!m) return str;
+    str=String(str); var i=str.lastIndexOf(' '); if(i<0) return str;
+    var u=m.unit[str.slice(i+1)]; return u ? (str.slice(0,i)+' '+u) : str;
+  }
+  function projectNumberApi(){ return window.KolkliProjectNumbers || null; }
+  function ensureProjectNumbers(key,list,saveFn){
+    var api=projectNumberApi();
+    return api && api.ensureAll ? api.ensureAll(key,list,saveFn) : (list || []);
+  }
+  function projectNumberText(key,item){
+    var api=projectNumberApi();
+    return api && api.display ? api.display(key,item,lang) : '';
+  }
+  function projectNumberHay(key,item){
+    var api=projectNumberApi();
+    return api && api.haystack ? api.haystack(key,item) : [];
+  }
+  function projectServiceKey(){ return PROJECT_VIEW[view] || 'select'; }
+  function fmtDashBytes(n){
+    n=Number(n)||0;
+    if(n>=1073741824) return (n/1073741824).toFixed(1)+' GB';
+    if(n>=1048576) return Math.round(n/1048576)+' MB';
+    if(n>=1024) return Math.round(n/1024)+' KB';
+    return n ? n+' B' : '0 B';
+  }
+  function projectDate(ms){
+    var d=new Date(ms||Date.now());
+    if(isNaN(d.getTime())) return '';
+    try{ return d.toLocaleDateString(lang==='he'?'en-US':lang==='ru'?'ru-RU':'en-US',{month:'short',day:'2-digit',year:'numeric'}); }
+    catch(e){ return d.toISOString().slice(0,10); }
+  }
+  function projectInitials(name){
+    var parts=String(name||'Client').trim().split(/\s+/).slice(0,2);
+    return parts.map(function(p){ return p.charAt(0).toUpperCase(); }).join('') || 'CL';
+  }
+  function projectCardsFor(key){
+    var cards=[];
+    if(key==='select'){
+      var projects=ensureProjectNumbers('select', loadProjects(), saveProjects);
+      cards=projects.slice(0,3).map(function(p){
+        return { client:p.client||p.name||'Client', email:'', phone:p.phone||'', link:p.link||p.url||'', title:p.name||'Selection project',
+          f1:(p.files||0)+' files', l1:'Gallery', f2:(p.selected||0)+' selected', l2:'Chosen',
+          f3:projectDate(p.updated), l3:'Updated', note:'Client selection project from KOLKLI Select Files.', status:projectStatusText(p.status||'draft'),
+          projectNumberText:projectNumberText('select',p), projectNumber:p.projectNumber };
+      });
+    } else if(key==='receive'){
+      var reqs=window.KR ? ensureProjectNumbers('receive', KR.loadRequests(), KR.saveRequests).slice().sort(function(a,b){ return (b.createdAt||0)-(a.createdAt||0); }) : [];
+      cards=reqs.slice(0,3).map(function(r){
+        var sub=(r.submissions&&r.submissions[0])||{};
+        var files=(r.files||[]);
+        var bytes=window.KR ? KR.reqBytes(r) : (r.files||[]).reduce(function(a,f){ return a+(Number(f.size)||0); },0);
+        return { client:sub.name||r.client||r.name||'Client', email:sub.email||'', phone:sub.phone||r.phone||'', title:r.name||'File request',
+          f1:files.length+' files', l1:'Received', f2:(window.KR?KR.fmtBytes(bytes):fmtDashBytes(bytes)), l2:'Total size',
+          f3:riExpiry(r)||projectDate(r.createdAt), l3:r.expiresAt?'Expires':'Created', note:r.desc||sub.note||'Files received from the client through a request link.',
+          status:riStatusLabel(riStatus(r)), filesCount:files.length, filesHref:'request.html?tab=manage&files='+encodeURIComponent(r.token),
+          projectNumberText:projectNumberText('receive',r), projectNumber:r.projectNumber };
+      });
+    } else if(key==='send'){
+      var sends=ensureProjectNumbers('send', readOwnArray('kolkli_send_links'), function(list){ lsSetOwn('kolkli_send_links', JSON.stringify((list||[]).slice(0,100))); });
+      cards=sends.slice(0,3).map(function(x,i){
+        return { client:x.client||('Client '+(i+1)), email:x.email||'', phone:x.phone||'', link:x.url||x.link||(x.token?('https://kolkli.com/d/'+x.token):''), title:x.name||('Sent package '+(i+1)),
+          f1:(x.files||0)+' files', l1:'Sent', f2:(x.downloads||0)+' downloads', l2:'Activity',
+          f3:projectDate(x.createdAt), l3:'Sent on', note:'Files sent from your workspace to the client.', status:x.downloads?'Downloaded':'Link active',
+          projectNumberText:projectNumberText('send',x), projectNumber:x.projectNumber };
+      });
+    } else if(key==='review'){
+      var reviews=(window.RV&&RV.loadProjects) ? ensureProjectNumbers('review', RV.loadProjects(), RV.saveProjects) : readOwnArray('rv_projects');
+      cards=reviews.slice(0,3).map(function(p,i){
+        return { client:p.client||('Client '+(i+1)), email:p.email||'', phone:p.phone||'', link:p.link||p.url||(p.token?('https://kolkli.com/v/'+p.token):''), title:p.name||'Review project',
+          f1:(p.items||[]).length+' files', l1:'Materials', f2:(p.comments||[]).length+' comments', l2:'Feedback',
+          f3:projectDate(p.createdAt), l3:'Shared on', note:p.message||'Materials sent to the client for review and approval.', status:(window.RV&&RV.statusOf)?RV.statusOf(p):(p.status||'In review'),
+          projectNumberText:projectNumberText('review',p), projectNumber:p.projectNumber };
+      });
+    }
+    if(cards.length<3) cards=cards.concat((PROJECT_DEMO[key]||[]).slice(cards.length));
+    return cards.slice(0,3);
+  }
+  function projectToolHtml(activeKey){
+    return PROJECT_ORDER.map(function(key){
+      var svc=PROJECT_SERVICES[key], on=key===activeKey;
+      return '<button class="mp-tool mp-tone-'+esc(svc.tone)+' '+(on?'on':'')+'" type="button" data-project-view="'+esc(svc.view)+'" aria-pressed="'+(on?'true':'false')+'">'+
+        '<span class="mp-tool-ic">'+s(ICON[svc.icon])+'</span>'+
+        '<span><span class="mp-tool-t">'+esc(svcText(key,'title'))+'</span></span>'+
+      '</button>';
+    }).join('');
+  }
+  function projectFilesActionText(n){
+    n=Number(n)||0;
+    if(lang==='he') return 'קבצים ('+n+')';
+    if(lang==='ru') return 'Файлы ('+n+')';
+    return 'Files ('+n+')';
+  }
+  function projectFilesCount(card){
+    if(typeof card.filesCount==='number') return card.filesCount;
+    var m=String(card.f1||'').match(/\d+/);
+    return m ? Number(m[0]) : 0;
+  }
+  // Map any status string (English canonical OR already-localized he/ru) to a
+  // semantic state, so the pill color reflects the link's STATE — not the
+  // service tone. Keyword-based so it survives translation.
+  function projStatusTone(raw){
+    var s=String(raw||'').toLowerCase();
+    function has(){ for(var i=0;i<arguments.length;i++){ if(s.indexOf(arguments[i])>=0) return true; } return false; }
+    if(has('expire','פג','истек')) return 'danger';
+    if(has('closed','סגור','закрыт','draft','טיוטה','черновик')) return 'neutral';
+    if(has('change','שינויים','изменени')) return 'warn';
+    if(has('active','פעיל','активн')) return 'active';
+    // waiting/pending BEFORE success — else "waiting APPROVal" matches the "approv" (approved) keyword
+    if(has('wait','pending','awaiting','ממתין','ожида')) return 'warn';
+    if(has('approv','deliver','download','received','מאושר','נמסר','הורד','התקבל','согласова','доставл','скача','получен')) return 'success';
+    if(has('sent','progress','review','נשלח','בתהליך','בבדיקה','отправл','процесс','провер')) return 'info';
+    return 'info';
+  }
+  function projCopyLinkLabel(){ return lang==='he' ? 'העתקת קישור' : lang==='ru' ? 'Копировать ссылку' : 'Copy link'; }
+  function projectClientHtml(card, svc){
+    var filesAction = svc.tone==='receive'
+      ? '<a class="mp-files-link" href="'+esc(card.filesHref||'request.html?tab=manage')+'">'+s(ICON.folder)+esc(projectFilesActionText(projectFilesCount(card)))+'</a>'
+      : '';
+    var copyAction = card.link
+      ? '<button type="button" class="mp-copy" data-copy-link="'+esc(card.link)+'" aria-label="'+esc(projCopyLinkLabel())+'" title="'+esc(projCopyLinkLabel())+'">'+s(ICON.link)+'</button>'
+      : '';
+    return '<article class="mp-client mp-tone-'+esc(svc.tone)+'">'+
+      '<div class="mp-client-top">'+
+        '<span class="mp-badge">'+s(ICON[svc.icon])+esc(svcText(svc.tone,'badge'))+'</span>'+
+        '<button type="button" class="mp-menu" data-del-project aria-label="'+esc(projDelText().title)+'">'+s(ICON.x)+'</button>'+
       '</div>'+
-      '<div class="project-list">'+rows+'</div>'+
+      '<div class="mp-client-id">'+
+        '<span class="mp-avatar">'+esc(projectInitials(card.client))+'</span>'+
+        '<span class="mp-id-txt"><span class="mp-client-name">'+esc(card.client)+'</span>'+
+          (card.projectNumberText ? '<span class="mp-number">'+esc(card.projectNumberText)+'</span>' : '')+
+          '<span class="mp-client-mail" dir="ltr">'+esc(card.email||card.title)+'</span>'+
+          (card.phone ? '<span class="mp-client-phone" dir="ltr">'+s(ICON.phone)+esc(card.phone)+'</span>' : '')+
+        '</span>'+
+      '</div>'+
+      '<div class="mp-facts">'+
+        '<span class="mp-fact"><b>'+esc(projFact(card.f1))+'</b><span>'+esc(projLabel(card.l1))+'</span></span>'+
+        '<span class="mp-fact"><b>'+esc(projFact(card.f2))+'</b><span>'+esc(projLabel(card.l2))+'</span></span>'+
+        '<span class="mp-fact"><b>'+esc(projFact(card.f3))+'</b><span>'+esc(projLabel(card.l3))+'</span></span>'+
+      '</div>'+
+      '<p class="mp-note">'+esc(projNote(card.note))+'</p>'+
+      '<div class="mp-client-foot">'+
+        '<span class="mp-status st-'+projStatusTone(card.status)+'">'+esc(projStatus(card.status))+'</span>'+
+        '<span class="mp-foot-actions">'+copyAction+filesAction+'<a class="btn ghost" href="'+esc(svc.href)+'">'+esc(svcText(svc.tone,'cta'))+'</a></span>'+
+      '</div>'+
+    '</article>';
+  }
+  function viewProjects(){
+    var key=projectServiceKey(), svc=PROJECT_SERVICES[key], cards=projectCardsFor(key);
+    var action = key==='receive'
+      ? '<a class="btn primary mp-new-request" href="request.html">'+s(ICON.plus)+esc(t.reqNew)+'</a>'
+      : key==='select'
+      ? '<a class="btn primary mp-new-request" href="files.html?new=1">'+s(ICON.plus)+esc(t.selNew)+'</a>'
+      : key==='send'
+      ? '<a class="btn primary mp-new-request" href="send.html">'+s(ICON.plus)+esc(t.sendNew)+'</a>'
+      : key==='review'
+      ? '<a class="btn primary mp-new-request" href="review.html">'+s(ICON.plus)+esc(t.reviewNew)+'</a>'
+      : '';
+    return '<section class="mp-shell">'+
+      '<div class="mp-head"><div><h2>'+esc(projMyProjectsText())+'</h2></div>'+action+'</div>'+
+      '<div class="mp-tools">'+projectToolHtml(key)+'</div>'+
+      '<div class="mp-section-title"><h3>'+esc(svcText(key,'section'))+'</h3><span>'+esc(projCardsCountText(cards.length))+'</span></div>'+
+      '<div class="mp-clients">'+cards.map(function(c){ return projectClientHtml(c, svc); }).join('')+'</div>'+
+    '</section>';
+  }
+
+  var PF_TEXT = {
+    he:{
+      history:'היסטוריית קבצים שעובדו',
+      sub:'קבצים שעברו עיבוד בכלי המדיה נשמרים כאן לפי סוג הקובץ, עם הפעולה שבוצעה ואפשרות הורדה חוזרת.',
+      planLine:function(lim,count){ return count+' קבצים · נשמרים '+lim.keepDays+' ימים · עד '+lim.max+' קבצים בחבילה הנוכחית'; },
+      emptyT:'עדיין אין קבצים מעובדים',
+      emptyP:'לאחר שתבצעו פעולה באחד מכלי המדיה ותורידו את התוצאה, היא תופיע כאן.',
+      unavailable:'היסטוריית הקבצים לא זמינה בדפדפן הזה.',
+      action:'פעולה', tool:'כלי', created:'נוצר', expires:'נשמר עד',
+      download:'הורדה', remove:'מחיקה', processed:'עיבוד',
+      missing:'הקובץ כבר לא זמין להורדה.',
+      removed:'הקובץ נמחק מההיסטוריה.',
+      removeConfirm:'למחוק את הקובץ מההיסטוריה?'
+    },
+    en:{
+      history:'Processed file history',
+      sub:'Processed media-tool results are saved here by file type, with the action performed and repeat download access.',
+      planLine:function(lim,count){ return count+' files · kept '+lim.keepDays+' days · up to '+lim.max+' files on the current plan'; },
+      emptyT:'No processed files yet',
+      emptyP:'After you run a media tool and download the result, it will appear here.',
+      unavailable:'File history is not available in this browser.',
+      action:'Action', tool:'Tool', created:'Created', expires:'Kept until',
+      download:'Download', remove:'Delete', processed:'Processed',
+      missing:'This file is no longer available for download.',
+      removed:'File removed from history.',
+      removeConfirm:'Delete this file from history?'
+    },
+    ru:{
+      history:'История обработанных файлов',
+      sub:'Результаты инструментов сохраняются здесь по типу файла, с действием и повторной загрузкой.',
+      planLine:function(lim,count){ return count+' файлов · хранение '+lim.keepDays+' дней · до '+lim.max+' файлов в текущем плане'; },
+      emptyT:'Обработанных файлов пока нет',
+      emptyP:'После обработки файла и скачивания результата он появится здесь.',
+      unavailable:'История файлов недоступна в этом браузере.',
+      action:'Действие', tool:'Инструмент', created:'Создан', expires:'Хранится до',
+      download:'Скачать', remove:'Удалить', processed:'Обработано',
+      missing:'Этот файл больше недоступен для скачивания.',
+      removed:'Файл удален из истории.',
+      removeConfirm:'Удалить файл из истории?'
+    }
+  };
+  var PF_ACTIONS = {
+    he:{ 'Compression':'דחיסה', 'Conversion':'המרה', 'Resize':'שינוי גודל', 'Crop':'חיתוך', 'Merge':'מיזוג', 'Audio extraction':'חילוץ אודיו', 'Loudness normalize':'נרמול עוצמה', 'Audio edit':'עריכת אודיו', 'Video cut':'חיתוך וידאו', 'Watermark':'סימן מים', 'Background removal':'הסרת רקע', 'Image restore':'שחזור תמונה', 'Object removal':'הסרת אובייקט', 'Smart crop':'חיתוך חכם', 'Audio cleanup':'ניקוי אודיו', 'AI mastering':'מאסטרינג AI', 'AI summary':'סיכום AI', 'Subtitle generation':'יצירת כתוביות' },
+    ru:{ 'Compression':'Сжатие', 'Conversion':'Конвертация', 'Resize':'Размер', 'Crop':'Обрезка', 'Merge':'Объединение', 'Audio extraction':'Извлечение аудио', 'Loudness normalize':'Нормализация', 'Audio edit':'Редактирование аудио', 'Video cut':'Обрезка видео', 'Watermark':'Водяной знак', 'Background removal':'Удаление фона', 'Image restore':'Восстановление', 'Object removal':'Удаление объекта', 'Smart crop':'Умная обрезка', 'Audio cleanup':'Очистка аудио', 'AI mastering':'AI мастеринг', 'AI summary':'AI резюме', 'Subtitle generation':'Субтитры' }
+  };
+  function pfText(k){ var set=PF_TEXT[lang]||PF_TEXT.en; return set[k]||PF_TEXT.en[k]||k; }
+  function pfDeleteDialogText(name){
+    name=String(name||'').trim();
+    var filePart=name ? (' "'+name+'"') : '';
+    var copy={
+      he:{
+        title:'האם להסיר את הקובץ?',
+        body:'הקובץ יוסר מהפרויקט לצמיתות ולא יהיה ניתן לשחזר אותו לאחר מכן.',
+        ok:'מחיקה',
+        cancel:'ביטול'
+      },
+      en:{
+        title:'Delete file',
+        body:'The file'+filePart+' will be removed from history. This action cannot be undone.',
+        ok:'Confirm delete',
+        cancel:'Cancel delete'
+      },
+      ru:{
+        title:'Удалить файл',
+        body:name ? ('Файл "'+name+'" будет удален из истории. Это действие нельзя отменить.') : 'Файл будет удален из истории. Это действие нельзя отменить.',
+        ok:'Удалить',
+        cancel:'Отменить'
+      }
+    };
+    return copy[lang] || copy.he;
+  }
+  function pfPlanLine(lim,count){ var f=pfText('planLine'); return typeof f==='function' ? f(lim,count) : ''; }
+  function pfAction(a){ return ((PF_ACTIONS[lang]||{})[a]) || a || pfText('processed'); }
+  function pfMultiText(k,n){
+    var copy={
+      he:{
+        select:'\u05d1\u05d7\u05d9\u05e8\u05ea \u05e7\u05d5\u05d1\u05e5',
+        selected:function(x){ return x+' \u05e0\u05d1\u05d7\u05e8\u05d5'; },
+        selectAll:'\u05d1\u05d7\u05e8 \u05d4\u05db\u05dc',
+        clear:'\u05d1\u05d9\u05d8\u05d5\u05dc \u05d1\u05d7\u05d9\u05e8\u05d4',
+        download:'\u05d4\u05d5\u05e8\u05d3\u05d4',
+        remove:'\u05de\u05d7\u05d9\u05e7\u05d4',
+        cancel:'\u05d1\u05d9\u05d8\u05d5\u05dc',
+        removeTitle:'\u05d4\u05d0\u05dd \u05dc\u05d4\u05e1\u05d9\u05e8 \u05d0\u05ea \u05d4\u05e7\u05d1\u05e6\u05d9\u05dd?',
+        removeBody:function(x){ return x+' \u05e7\u05d1\u05e6\u05d9\u05dd \u05d9\u05d5\u05e1\u05e8\u05d5 \u05de\u05d4\u05e4\u05e8\u05d5\u05d9\u05e7\u05d8 \u05dc\u05e6\u05de\u05d9\u05ea\u05d5\u05ea \u05d5\u05dc\u05d0 \u05d9\u05d4\u05d9\u05d4 \u05e0\u05d9\u05ea\u05df \u05dc\u05e9\u05d7\u05d6\u05e8 \u05d0\u05d5\u05ea\u05dd \u05dc\u05d0\u05d7\u05e8 \u05de\u05db\u05df.'; },
+        removed:function(x){ return x+' \u05e7\u05d1\u05e6\u05d9\u05dd \u05e0\u05de\u05d7\u05e7\u05d5 \u05de\u05d4\u05d4\u05d9\u05e1\u05d8\u05d5\u05e8\u05d9\u05d4.'; }
+      },
+      en:{
+        select:'Select file',
+        selected:function(x){ return x+' selected'; },
+        selectAll:'Select all',
+        clear:'Clear selection',
+        download:'Download',
+        remove:'Delete',
+        cancel:'Cancel',
+        removeTitle:'Delete selected files?',
+        removeBody:function(x){ return x+' files will be permanently removed from the project and cannot be restored later.'; },
+        removed:function(x){ return x+' files were removed from history.'; }
+      },
+      ru:{
+        select:'Select file',
+        selected:function(x){ return x+' selected'; },
+        selectAll:'Select all',
+        clear:'Clear selection',
+        download:'Download',
+        remove:'Delete',
+        cancel:'Cancel',
+        removeTitle:'Delete selected files?',
+        removeBody:function(x){ return x+' files will be permanently removed from the project and cannot be restored later.'; },
+        removed:function(x){ return x+' files were removed from history.'; }
+      }
+    };
+    var set=copy[lang]||copy.en, val=set[k]||copy.en[k]||k;
+    return typeof val==='function' ? val(n||0) : val;
+  }
+  function pfSelKey(kind){ return kind || view || 'processed'; }
+  function pfSel(kind){
+    var key=pfSelKey(kind);
+    if(!pfSelection[key]) pfSelection[key]={};
+    return pfSelection[key];
+  }
+  function pfSelectedIds(kind){
+    var sel=pfSel(kind);
+    return Object.keys(sel).filter(function(id){ return !!sel[id]; });
+  }
+  function pfIsSelected(kind,id){ return !!pfSel(kind)[id]; }
+  function pfSetSelected(kind,id,on){
+    if(!id) return;
+    var sel=pfSel(kind);
+    if(on) sel[id]=true;
+    else delete sel[id];
+  }
+  function pfClearSelection(kind){ delete pfSelection[pfSelKey(kind)]; }
+  function pfPruneSelection(kind,rows){
+    var keep={};
+    (rows||[]).forEach(function(r){ if(r && r.id) keep[r.id]=true; });
+    var sel=pfSel(kind);
+    Object.keys(sel).forEach(function(id){ if(!keep[id]) delete sel[id]; });
+  }
+  function pfBulkHtml(kind,rows){
+    var selected=pfSelectedIds(kind);
+    if(!selected.length) return '';
+    var canSelectMore=selected.length<(rows||[]).length;
+    return '<div class="pf-bulk" data-pf-bulk="'+esc(kind)+'">'+
+      '<span class="pf-bulk-count">'+esc(pfMultiText('selected',selected.length))+'</span>'+
+      '<div class="pf-bulk-actions">'+
+        (canSelectMore ? '<button class="btn ghost" type="button" data-pf-select-all="'+esc(kind)+'">'+s(ICON.check)+esc(pfMultiText('selectAll'))+'</button>' : '')+
+        '<button class="btn ghost" type="button" data-pf-clear="'+esc(kind)+'">'+esc(pfMultiText('clear'))+'</button>'+
+        '<button class="btn primary" type="button" data-pf-download-selected="'+esc(kind)+'">'+s(ICON.download)+esc(pfMultiText('download'))+'</button>'+
+        '<button class="btn danger" type="button" data-pf-remove-selected="'+esc(kind)+'">'+s(ICON.trash)+esc(pfMultiText('remove'))+'</button>'+
+      '</div>'+
+    '</div>';
+  }
+  function pfBulkDeleteDialogText(count){
+    return {
+      title:pfMultiText('removeTitle',count),
+      body:pfMultiText('removeBody',count),
+      ok:pfMultiText('remove',count),
+      cancel:pfMultiText('cancel',count)
+    };
+  }
+  function processedConfig(kind){
+    var L=function(o){ return o[lang]||o.en; };
+    var cfg={
+      'my-audio':{ category:'audio', icon:'music', title:t.audioTitle, sub:t.audioSub, emptyT:t.audioEmptyT, emptyP:t.audioEmptyP,
+        cta:{href:'app.html',label:t.openAudio},
+        tools:[{ic:'scissors',href:'app.html',label:L({he:'עריכת אודיו',en:'Edit Audio',ru:'Редактор'})},{ic:'merge',href:'merge-audio.html',label:L({he:'מיזוג',en:'Merge',ru:'Объединить'})},{ic:'refresh',href:'convert.html',label:L({he:'המרה',en:'Convert',ru:'Конвертация'})},{ic:'minimize',href:'compress-audio.html',label:L({he:'דחיסה',en:'Compress',ru:'Сжатие'})},{ic:'zap',href:'ai-audio-cleanup.html',label:L({he:'ניקוי AI',en:'AI Cleanup',ru:'AI-очистка'})}] },
+      'my-video':{ category:'video', icon:'film', title:t.videoTitle, sub:t.videoSub, emptyT:t.videoEmptyT, emptyP:t.videoEmptyP,
+        cta:{href:'video-cut.html',label:t.openVideo},
+        tools:[{ic:'scissors',href:'video-cut.html',label:L({he:'חיתוך',en:'Cut',ru:'Обрезка'})},{ic:'refresh',href:'video-convert.html',label:L({he:'המרה',en:'Convert',ru:'Конвертация'})},{ic:'minimize',href:'compress-video.html',label:L({he:'דחיסה',en:'Compress',ru:'Сжатие'})},{ic:'music',href:'mp4-to-mp3.html',label:L({he:'חילוץ אודיו',en:'Extract Audio',ru:'Извлечь аудио'})},{ic:'files',href:'subtitle-generator.html',label:L({he:'כתוביות',en:'Subtitles',ru:'Субтитры'})}] },
+      'my-images':{ category:'images', icon:'camera', title:t.imgTitle, sub:t.imgSub, emptyT:t.imgEmptyT, emptyP:t.imgEmptyP,
+        cta:{href:'image-convert.html',label:t.openImg},
+        tools:[{ic:'scissors',href:'crop-image.html',label:L({he:'חיתוך',en:'Crop',ru:'Обрезка'})},{ic:'swap',href:'resize-image.html',label:L({he:'שינוי גודל',en:'Resize',ru:'Размер'})},{ic:'refresh',href:'image-convert.html',label:L({he:'המרה',en:'Convert',ru:'Конвертация'})},{ic:'minimize',href:'compress-image.html',label:L({he:'דחיסה',en:'Compress',ru:'Сжатие'})},{ic:'zap',href:'remove-bg.html',label:L({he:'הסרת רקע',en:'Remove BG',ru:'Удалить фон'})}] },
+      'my-docs':{ category:'documents', icon:'files', title:t.docTitle, sub:t.docSub, emptyT:t.docEmptyT, emptyP:t.docEmptyP,
+        cta:{href:'doc-convert.html',label:t.openDoc},
+        tools:[{ic:'refresh',href:'doc-convert.html',label:L({he:'המרת מסמך',en:'Convert',ru:'Конвертация'})},{ic:'files',href:'doc-to-pdf.html',label:L({he:'ל-PDF',en:'To PDF',ru:'В PDF'})},{ic:'merge',href:'merge-pdf.html',label:L({he:'מיזוג PDF',en:'Merge PDF',ru:'Объединить PDF'})},{ic:'minimize',href:'compress-pdf.html',label:L({he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF'})},{ic:'zap',href:'ai-summarize-pdf.html',label:L({he:'סיכום AI',en:'AI Summary',ru:'AI-резюме'})}] }
+    };
+    return cfg[kind] || cfg['my-audio'];
+  }
+  function processedDate(ms){
+    if(!ms) return '-';
+    var d=new Date(ms);
+    if(isNaN(d.getTime())) return '-';
+    try{ return d.toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{year:'numeric',month:'short',day:'numeric'}); }
+    catch(e){ return d.toISOString().slice(0,10); }
+  }
+  function processedItemHtml(rec,cfg,kind){
+    var selected=pfIsSelected(kind,rec.id);
+    return '<article class="pf-item '+(selected?'is-selected':'')+'">'+
+      '<label class="pf-select" title="'+esc(pfMultiText('select'))+'">'+
+        '<input type="checkbox" data-pf-select="'+esc(rec.id)+'" data-pf-kind="'+esc(kind)+'" aria-label="'+esc(pfMultiText('select'))+'" '+(selected?'checked':'')+'>'+
+        '<span aria-hidden="true">'+s(ICON.check)+'</span>'+
+      '</label>'+
+      '<div class="pf-top">'+
+        '<div class="pf-file"><span class="pf-ic">'+s(ICON[cfg.icon])+'</span><span><span class="pf-name" title="'+esc(rec.name||'')+'">'+esc(rec.name||'processed-file')+'</span><span class="pf-size">'+esc(fmtDashBytes(rec.size))+'</span></span></div>'+
+        '<span class="pf-action">'+s(ICON.zap)+esc(pfAction(rec.action))+'</span>'+
+      '</div>'+
+      '<div class="pf-meta">'+
+        '<span><span class="pf-k">'+esc(pfText('tool'))+'</span><span class="pf-v">'+esc(rec.tool||'KOLKLI')+'</span></span>'+
+        '<span><span class="pf-k">'+esc(pfText('created'))+'</span><span class="pf-v">'+esc(processedDate(rec.createdAt))+'</span></span>'+
+        '<span><span class="pf-k">'+esc(pfText('expires'))+'</span><span class="pf-v">'+esc(processedDate(rec.expiresAt))+'</span></span>'+
+        '<span><span class="pf-k">'+esc(pfText('action'))+'</span><span class="pf-v">'+esc(pfAction(rec.action))+'</span></span>'+
+      '</div>'+
+      '<div class="pf-foot">'+
+        '<button class="btn primary" type="button" data-pf-download="'+esc(rec.id)+'">'+s(ICON.download)+esc(pfText('download'))+'</button>'+
+        '<button class="btn ghost" type="button" data-pf-remove="'+esc(rec.id)+'">'+s(ICON.trash)+esc(pfText('remove'))+'</button>'+
+      '</div>'+
+    '</article>';
+  }
+  function processedToolsHtml(cfg){
+    return (cfg.tools||[]).map(function(x){ return '<a href="'+esc(x.href)+'">'+s(ICON[x.ic])+esc(x.label)+'</a>'; }).join('');
+  }
+  function navCategory(id){
+    return NAV.find(function(cat){ return cat.id===id; }) || null;
+  }
+  function navItem(id){
+    for(var i=0;i<NAV.length;i++){
+      for(var j=0;j<NAV[i].items.length;j++){
+        if(NAV[i].items[j].id===id) return NAV[i].items[j];
+      }
+    }
+    return null;
+  }
+  function editToolsTitle(){
+    var cat=navCategory('mytools');
+    return cat ? nameFor(cat) : 'My File Tools';
+  }
+  function editToolLabel(kind){
+    var item=navItem(kind);
+    return item ? nameFor(item) : processedConfig(kind).title;
+  }
+  function editToolHtml(activeKind){
+    return EDIT_ORDER.map(function(kind){
+      var cfg=processedConfig(kind), tone=EDIT_VIEW[kind]||'audio', on=kind===activeKind;
+      return '<button class="mp-tool edit-tone-'+esc(tone)+' '+(on?'on':'')+'" type="button" data-edit-view="'+esc(kind)+'" aria-pressed="'+(on?'true':'false')+'">'+
+        '<span class="mp-tool-ic">'+s(ICON[cfg.icon])+'</span>'+
+        '<span><span class="mp-tool-t">'+esc(editToolLabel(kind))+'</span></span>'+
+      '</button>';
+    }).join('');
+  }
+  function viewEditTools(kind){
+    kind = EDIT_VIEW[kind] ? kind : 'my-audio';
+    return '<section class="mp-shell">'+
+      '<div class="mp-head"><div><h2>'+esc(editToolsTitle())+'</h2></div></div>'+
+      '<div class="mp-tools">'+editToolHtml(kind)+'</div>'+
+      viewProcessedFiles(kind)+
+    '</section>';
+  }
+  function viewProcessedFiles(kind){
+    var cfg=processedConfig(kind), api=window.KolkliProcessedFiles;
+    var lim=(api&&api.getLimits) ? api.getLimits() : { keepDays:(PLANS[plan]&&PLANS[plan].limits.keepDays)||7, max:(plan==='studio'?1000:(plan==='creator'?250:50)) };
+    var rows=(api&&api.list) ? api.list({ category:cfg.category }) : [];
+    var body;
+    pfPruneSelection(kind,rows);
+    if(!api || !api.list){
+      body='<div class="pf-empty empty"><div class="ei">'+s(ICON.info)+'</div><h3>'+esc(pfText('emptyT'))+'</h3><p>'+esc(pfText('unavailable'))+'</p></div>';
+    } else if(rows.length){
+      body=pfBulkHtml(kind,rows)+'<div class="pf-list">'+rows.map(function(r){ return processedItemHtml(r,cfg,kind); }).join('')+'</div>';
+    } else {
+      body='<div class="pf-empty empty"><div class="ei">'+s(ICON[cfg.icon])+'</div><h3>'+esc(cfg.emptyT||pfText('emptyT'))+'</h3><p>'+esc(pfText('emptyP'))+'</p><a class="btn primary" href="'+esc(cfg.cta.href)+'" style="text-decoration:none">'+s(ICON.arrow)+esc(cfg.cta.label)+'</a></div>';
+    }
+    return '<div class="card pf-card">'+
+      '<div class="pf-head"><div><h2>'+esc(cfg.title)+'</h2><p class="csub">'+esc(pfText('history')+' - '+cfg.sub)+'</p><p class="csub">'+esc(pfText('sub'))+'</p></div>'+
+      '<span class="pf-plan">'+s(ICON.clock)+esc(pfPlanLine(lim, rows.length))+'</span></div>'+
+      body+
+      '<div class="toolrow pf-tools">'+processedToolsHtml(cfg)+'</div>'+
     '</div>';
   }
 
@@ -1994,34 +3559,322 @@
 
   var VIEWS = {
     account: viewAccount,
+    favorites: viewFavorites,
+    'editing-tools': viewEditingTools,
+    'ai-tools': viewAiTools,
+    'dev-tools': viewDevTools,
     team: viewTeam,
     details: viewDetails,
     settings: viewSettings,
     payments: viewPayments,
-    'my-audio': function(){ return emptyPanel({ icon:'music', title:t.audioTitle, sub:t.audioSub,
-      emptyT:t.audioEmptyT, emptyP:t.audioEmptyP, cta:{href:'app.html',label:t.openAudio},
-      tools:[{ic:'scissors',href:'app.html',label:({he:'עריכת אודיו',en:'Edit Audio',ru:'Редактор'})[lang]},{ic:'merge',href:'merge-audio.html',label:({he:'מיזוג',en:'Merge',ru:'Объединить'})[lang]},{ic:'refresh',href:'convert.html',label:({he:'המרה',en:'Convert',ru:'Конвертация'})[lang]},{ic:'minimize',href:'compress-audio.html',label:({he:'דחיסה',en:'Compress',ru:'Сжатие'})[lang]},{ic:'zap',href:'ai-audio-cleanup.html',label:({he:'ניקוי AI',en:'AI Cleanup',ru:'AI-очистка'})[lang]}] }); },
-    'my-video': function(){ return emptyPanel({ icon:'film', title:t.videoTitle, sub:t.videoSub,
-      emptyT:t.videoEmptyT, emptyP:t.videoEmptyP, cta:{href:'video-cut.html',label:t.openVideo},
-      tools:[{ic:'scissors',href:'video-cut.html',label:({he:'חיתוך',en:'Cut',ru:'Обрезка'})[lang]},{ic:'refresh',href:'video-convert.html',label:({he:'המרה',en:'Convert',ru:'Конвертация'})[lang]},{ic:'minimize',href:'compress-video.html',label:({he:'דחיסה',en:'Compress',ru:'Сжатие'})[lang]},{ic:'music',href:'mp4-to-mp3.html',label:({he:'חילוץ אודיו',en:'Extract Audio',ru:'Извлечь аудио'})[lang]},{ic:'files',href:'subtitle-generator.html',label:({he:'כתוביות',en:'Subtitles',ru:'Субтитры'})[lang]}] }); },
-    'my-images': function(){ return emptyPanel({ icon:'camera', title:t.imgTitle, sub:t.imgSub,
-      emptyT:t.imgEmptyT, emptyP:t.imgEmptyP, cta:{href:'image-convert.html',label:t.openImg},
-      tools:[{ic:'scissors',href:'crop-image.html',label:({he:'חיתוך',en:'Crop',ru:'Обрезка'})[lang]},{ic:'swap',href:'resize-image.html',label:({he:'שינוי גודל',en:'Resize',ru:'Размер'})[lang]},{ic:'refresh',href:'image-convert.html',label:({he:'המרה',en:'Convert',ru:'Конвертация'})[lang]},{ic:'minimize',href:'compress-image.html',label:({he:'דחיסה',en:'Compress',ru:'Сжатие'})[lang]},{ic:'zap',href:'remove-bg.html',label:({he:'הסרת רקע',en:'Remove BG',ru:'Удалить фон'})[lang]}] }); },
-    'my-docs': function(){ return emptyPanel({ icon:'files', title:t.docTitle, sub:t.docSub,
-      emptyT:t.docEmptyT, emptyP:t.docEmptyP, cta:{href:'doc-convert.html',label:t.openDoc},
-      tools:[{ic:'refresh',href:'doc-convert.html',label:({he:'המרת מסמך',en:'Convert',ru:'Конвертация'})[lang]},{ic:'files',href:'doc-to-pdf.html',label:({he:'ל-PDF',en:'To PDF',ru:'В PDF'})[lang]},{ic:'merge',href:'merge-pdf.html',label:({he:'מיזוג PDF',en:'Merge PDF',ru:'Объединить PDF'})[lang]},{ic:'minimize',href:'compress-pdf.html',label:({he:'דחיסת PDF',en:'Compress PDF',ru:'Сжать PDF'})[lang]},{ic:'zap',href:'ai-summarize-pdf.html',label:({he:'סיכום AI',en:'AI Summary',ru:'AI-резюме'})[lang]}] }); },
+    'my-audio': function(){ return viewEditTools('my-audio'); },
+    'my-video': function(){ return viewEditTools('my-video'); },
+    'my-images': function(){ return viewEditTools('my-images'); },
+    'my-docs': function(){ return viewEditTools('my-docs'); },
+    'project-select': viewProjects,
+    'project-receive': viewProjects,
+    'project-send': viewProjects,
+    'project-review': viewProjects,
     'my-files': viewProjects,
-    'my-transfers': function(){ return emptyPanel({ icon:'send', title:t.sendTitle, sub:t.sendSub,
-      emptyT:t.sendEmptyT, emptyP:t.sendEmptyP, cta:{href:'send.html',label:t.openSend} }); },
-    'my-requests': viewRequests,
-    'my-reviews': function(){ return emptyPanel({ icon:'check', title:t.reviewTitle, sub:t.reviewSub,
-      emptyT:t.reviewEmptyT, emptyP:t.reviewEmptyP, cta:{href:'review.html',label:t.openReview},
-      tools:[{ic:'link',href:'review.html',label:t.reviewNew},{ic:'drive',href:'review.html?tab=manage',label:t.reviewManage}] }); }
+    'my-transfers': viewProjects,
+    'my-requests': viewProjects,
+    'my-reviews': viewProjects
   };
 
   /* =====================================================
      Render + wiring
      ===================================================== */
+  var DS_TEXT = {
+    he:{
+      label:'חיפוש כללי',
+      placeholder:'חיפוש בפרויקטים, קבצים, הזמנות ולקוחות',
+      noResults:'לא נמצאו תוצאות',
+      open:'פתיחה',
+      download:'הורדה',
+      fileRequest:'בקשת קבצים',
+      receivedFile:'קובץ שהתקבל',
+      sentPackage:'חבילת שליחה',
+      reviewProject:'פרויקט ביקורת',
+      processedFile:'קובץ מעובד',
+      types:{ project:'פרויקט', file:'קובץ', order:'הזמנה', client:'לקוח', send:'שליחה', review:'ביקורת', processed:'קובץ מעובד' }
+    },
+    en:{
+      label:'Global search',
+      placeholder:'Search projects, files, orders and clients',
+      noResults:'No results found',
+      open:'Open',
+      download:'Download',
+      fileRequest:'File request',
+      receivedFile:'Received file',
+      sentPackage:'Sent package',
+      reviewProject:'Review project',
+      processedFile:'Processed file',
+      types:{ project:'Project', file:'File', order:'Order', client:'Client', send:'Send', review:'Review', processed:'Processed file' }
+    }
+  };
+  function dsSet(){ return DS_TEXT[lang] || DS_TEXT.en; }
+  function dsText(k){ return dsSet()[k] || DS_TEXT.en[k] || k; }
+  function dsType(k){
+    var set=dsSet().types || {};
+    return set[k] || DS_TEXT.en.types[k] || k;
+  }
+  function dsBits(v){
+    var out=[];
+    function add(x){
+      if(Array.isArray(x)){ x.forEach(add); return; }
+      if(x===null || x===undefined) return;
+      var s=String(x).trim();
+      if(s) out.push(s);
+    }
+    add(v);
+    return out;
+  }
+  function normSearch(x){
+    var str=String(x===null||x===undefined?'':x).toLowerCase();
+    try{ str=str.normalize('NFKD').replace(/[\u0300-\u036f]/g,''); }catch(e){}
+    return str.replace(/[\u200e\u200f]/g,' ').replace(/[\s\-_.,:;\/\\()\[\]{}]+/g,' ').trim();
+  }
+  function dsFileIcon(kind){
+    kind=String(kind||'').toLowerCase();
+    if(kind==='audio') return 'music';
+    if(kind==='video') return 'film';
+    if(kind==='image' || kind==='images') return 'camera';
+    return 'files';
+  }
+  function dsPush(out,o){
+    var title=String(o.title||'').trim();
+    if(!title) return null;
+    var meta=dsBits(o.meta).slice(0,5);
+    var item={
+      type:o.type || 'file',
+      icon:o.icon || 'search',
+      title:title,
+      meta:meta.join(' · '),
+      href:o.href || '#',
+      hay:normSearch(dsBits([title, meta, o.hay, o.id]).join(' ')),
+      downloadType:o.downloadType || '',
+      downloadId:o.downloadId || '',
+      downloadName:o.downloadName || title
+    };
+    out.push(item);
+    return item;
+  }
+  function buildGlobalSearchIndex(){
+    var out=[], clientMap={};
+    function addClient(name,email,phone,source,href,hay){
+      var title=String(name||email||phone||'').trim();
+      if(!title) return;
+      var key=normSearch(email||phone||title);
+      if(!key) return;
+      if(clientMap[key]){
+        clientMap[key].hay += ' '+normSearch(dsBits([source,hay]).join(' '));
+        if(source && clientMap[key].meta.indexOf(source)<0) clientMap[key].meta += (clientMap[key].meta?' · ':'')+source;
+        return;
+      }
+      clientMap[key]=dsPush(out,{
+        type:'client', icon:'user', title:title,
+        meta:[email, phone, source],
+        href:href || 'dashboard.html#project-select',
+        hay:[email, phone, source, hay]
+      });
+    }
+
+    ensureProjectNumbers('select', loadProjects(), saveProjects).forEach(function(p){
+      var href='dashboard.html#project-select';
+      var numText=projectNumberText('select',p);
+      dsPush(out,{
+        type:'project', icon:'folder', title:p.name || p.id || dsType('project'),
+        meta:[numText, p.client, projectStatusText(p.status||'draft'), (p.files||0)+' files', projectDate(p.updated)],
+        href:href,
+        hay:[p.id, p.name, p.client, p.email, p.phone, p.status, p.files, p.selected, p.sizeMB, p.updated, p.projectNumber, numText].concat(projectNumberHay('select',p))
+      });
+      addClient(p.client, p.email, p.phone, dsType('project'), href, [p.id, p.name, p.status, p.projectNumber, numText]);
+    });
+
+    var reqs=window.KR ? ensureProjectNumbers('receive', KR.loadRequests(), KR.saveRequests) : readOwnArray('kr_requests');
+    reqs.forEach(function(r){
+      var href='request.html?tab=manage';
+      var subs=r.submissions||[];
+      var files=r.files||[];
+      var bytes=window.KR ? KR.reqBytes(r) : files.reduce(function(a,f){ return a+(Number(f.size)||0); },0);
+      var first=subs[0]||{};
+      var numText=projectNumberText('receive',r);
+      dsPush(out,{
+        type:'order', icon:'inbox', title:r.name || r.token || dsText('fileRequest'),
+        meta:[numText, first.name, r.token?('#'+r.token):'', riStatusLabel(riStatus(r)), files.length+' files', fmtDashBytes(bytes)],
+        href:href,
+        hay:[r.token, r.name, r.desc, r.folder, r.status, r.projectNumber, numText, (r.types||[]).join(' '), subs.map(function(su){ return dsBits([su.name,su.email,su.phone,su.note]).join(' '); }).join(' ')].concat(projectNumberHay('receive',r))
+      });
+      if(!subs.length) addClient(r.client, r.email, r.phone, dsText('fileRequest'), href, [r.token, r.name, r.desc, r.projectNumber, numText]);
+      subs.forEach(function(su){
+        addClient(su.name, su.email, su.phone, dsText('fileRequest'), href, [r.token, r.name, r.desc, su.note, r.projectNumber, numText]);
+      });
+      files.forEach(function(f){
+        var sub=subs.filter(function(su){ return su.id===f.subId; })[0] || first;
+        dsPush(out,{
+          type:'file', icon:dsFileIcon(f.kind), title:f.name || f.id || dsType('file'),
+          meta:[dsText('receivedFile'), numText, r.name, sub.name, fmtDashBytes(f.size)],
+          href:href,
+          hay:[f.id, f.name, f.ext, f.kind, r.token, r.name, r.desc, r.projectNumber, numText, sub.name, sub.email, sub.phone, sub.note].concat(projectNumberHay('receive',r)),
+          downloadType:'request',
+          downloadId:f.id,
+          downloadName:f.name
+        });
+      });
+    });
+
+    ensureProjectNumbers('send', readOwnArray('kolkli_send_links'), function(list){ lsSetOwn('kolkli_send_links', JSON.stringify((list||[]).slice(0,100))); }).forEach(function(x,i){
+      var href=x.token ? ('download.html?t='+encodeURIComponent(x.token)) : 'send.html?tab=manage';
+      var sendClient=x.client || x.recipient || x.recipients || '';
+      var numText=projectNumberText('send',x);
+      dsPush(out,{
+        type:'send', icon:'send', title:x.name || sendClient || (dsText('sentPackage')+' '+(i+1)),
+        meta:[numText, sendClient, x.email, x.token?('#'+x.token):'', (x.files||0)+' files', fmtDashBytes(x.bytes)],
+        href:href,
+        hay:[x.token, x.name, x.client, x.email, x.phone, x.sender, x.recipient, x.recipients, x.message, x.fileNames, x.files, x.bytes, x.downloads, x.createdAt, x.projectNumber, numText].concat(projectNumberHay('send',x))
+      });
+      addClient(sendClient, x.email || x.recipient || x.recipients, x.phone, dsType('send'), href, [x.token, x.name, x.sender, x.message, x.fileNames, x.projectNumber, numText]);
+      (x.fileNames||[]).forEach(function(name){
+        dsPush(out,{
+          type:'file', icon:'files', title:name,
+          meta:[dsType('send'), numText, sendClient, x.token?('#'+x.token):'', fmtDashBytes(x.bytes)],
+          href:href,
+          hay:[name, sendClient, x.email, x.recipient, x.recipients, x.message, x.token, x.projectNumber, numText].concat(projectNumberHay('send',x))
+        });
+      });
+    });
+
+    var reviews=(window.RV&&RV.loadProjects) ? ensureProjectNumbers('review', RV.loadProjects(), RV.saveProjects) : readOwnArray('rv_projects');
+    reviews.forEach(function(p,i){
+      var href=p.token ? ('review.html?p='+encodeURIComponent(p.token)) : 'review.html?tab=manage';
+      var status=(window.RV&&RV.statusOf) ? RV.statusOf(p) : (p.status||'');
+      var numText=projectNumberText('review',p);
+      dsPush(out,{
+        type:'review', icon:'check', title:p.name || (dsText('reviewProject')+' '+(i+1)),
+        meta:[numText, p.client, p.email, p.token?('#'+p.token):'', status, (p.items||[]).length+' files'],
+        href:href,
+        hay:[p.token, p.name, p.client, p.email, p.phone, p.message, p.status, status, (p.comments||[]).length, p.projectNumber, numText].concat(projectNumberHay('review',p))
+      });
+      addClient(p.client, p.email, p.phone, dsType('review'), href, [p.token, p.name, p.message, p.projectNumber, numText]);
+      (p.items||[]).forEach(function(f){
+        dsPush(out,{
+          type:'file', icon:dsFileIcon(f.kind), title:f.name || f.path || f.id || dsType('file'),
+          meta:[dsType('review'), numText, p.name, p.client, (window.RV&&RV.fmtBytes)?RV.fmtBytes(f.size):fmtDashBytes(f.size)],
+          href:href,
+          hay:[f.id, f.name, f.path, f.ext, f.kind, p.token, p.name, p.client, p.email, p.projectNumber, numText].concat(projectNumberHay('review',p)),
+          downloadType:'review',
+          downloadId:f.id,
+          downloadName:f.name || f.path
+        });
+      });
+    });
+
+    if(window.KolkliProcessedFiles && KolkliProcessedFiles.list){
+      var map={ audio:'my-audio', video:'my-video', images:'my-images', image:'my-images', documents:'my-docs', doc:'my-docs' };
+      KolkliProcessedFiles.list({category:'all'}).forEach(function(rec){
+        dsPush(out,{
+          type:'processed', icon:dsFileIcon(rec.category), title:rec.name || dsText('processedFile'),
+          meta:[pfAction(rec.action), rec.tool, fmtDashBytes(rec.size), processedDate(rec.createdAt)],
+          href:'dashboard.html#'+(map[rec.category]||'my-audio'),
+          hay:[rec.id, rec.name, rec.action, pfAction(rec.action), rec.tool, rec.sourcePage, rec.category, rec.type],
+          downloadType:'processed',
+          downloadId:rec.id,
+          downloadName:rec.name
+        });
+      });
+    }
+    return out;
+  }
+  function globalSearchResults(q){
+    var words=normSearch(q).split(/\s+/).filter(Boolean);
+    if(words.join('').length<2) return [];
+    return buildGlobalSearchIndex().filter(function(item){
+      return words.every(function(w){ return item.hay.indexOf(w)>-1; });
+    }).slice(0,12);
+  }
+  function dashSearchResultHtml(r){
+    var icon=ICON[r.icon] || ICON.search;
+    var action=r.downloadType
+      ? '<button class="ds-action" type="button" data-ds-download="'+esc(r.downloadType)+'" data-ds-id="'+esc(r.downloadId)+'" data-ds-name="'+esc(r.downloadName)+'">'+s(ICON.download)+esc(dsText('download'))+'</button>'
+      : '<a class="ds-action" href="'+esc(r.href)+'">'+s(ICON.openext)+esc(dsText('open'))+'</a>';
+    return '<div class="ds-row" data-ds-type="'+esc(r.type)+'">'+
+      '<span class="ds-ic '+esc(r.type)+'">'+s(icon)+'</span>'+
+      '<span class="ds-main"><span class="ds-type">'+esc(dsType(r.type))+'</span><span class="ds-title" title="'+esc(r.title)+'">'+esc(r.title)+'</span><span class="ds-meta">'+esc(r.meta)+'</span></span>'+
+      action+
+    '</div>';
+  }
+  function dashSearchResultsHtml(q){
+    if(normSearch(q).replace(/\s/g,'').length<2) return '';
+    var rows=globalSearchResults(q);
+    if(!rows.length) return '<div class="ds-empty">'+esc(dsText('noResults'))+'</div>';
+    return rows.map(dashSearchResultHtml).join('');
+  }
+  function dashboardSearchHtml(){
+    return '<section class="dash-search" id="dashSearch" role="search">'+
+      '<div class="dash-search-box">'+
+        '<input id="dashSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="'+esc(dsText('placeholder'))+'" value="'+esc(dashSearchState.q||'')+'" aria-label="'+esc(dsText('label'))+'">'+
+        '<button type="button" class="dash-search-btn" id="dashSearchBtn" aria-label="'+esc(dsText('label'))+'">'+s(ICON.search)+'</button>'+
+      '</div>'+
+      '<div class="dash-search-results" id="dashSearchResults"></div>'+
+    '</section>';
+  }
+  function updateDashboardSearchResults(){
+    var root=el('dashSearch'), input=el('dashSearchInput'), box=el('dashSearchResults');
+    if(!root || !input || !box) return;
+    dashSearchState.q=input.value || '';
+    var open=normSearch(dashSearchState.q).replace(/\s/g,'').length>=2 && dashSearchState.open;
+    box.innerHTML=open ? dashSearchResultsHtml(dashSearchState.q) : '';
+    root.classList.toggle('open', open);
+  }
+  function dsDownload(type,id,name){
+    if(!id) return;
+    if(type==='processed'){
+      if(!window.KolkliProcessedFiles || !KolkliProcessedFiles.download){ riToast(pfText('missing')); return; }
+      KolkliProcessedFiles.download(id).then(function(r){ if(!r || !r.ok) riToast(pfText('missing')); });
+      return;
+    }
+    if(type==='request'){
+      if(!window.KR || !KR.getBlob){ riToast(pfText('missing')); return; }
+      KR.getBlob(id).then(function(blob){ if(blob) riTrigger(blob,name||'file'); else riToast(pfText('missing')); }, function(){ riToast(pfText('missing')); });
+      return;
+    }
+    if(type==='review'){
+      if(!window.RV || !RV.getBlob){ riToast(pfText('missing')); return; }
+      RV.getBlob(id).then(function(blob){ if(blob) riTrigger(blob,name||'file'); else riToast(pfText('missing')); }, function(){ riToast(pfText('missing')); });
+    }
+  }
+  function wireDashboardSearch(){
+    var input=el('dashSearchInput'), root=el('dashSearch'), box=el('dashSearchResults');
+    if(!input || !root || !box) return;
+    input.value=dashSearchState.q || '';
+    input.addEventListener('input', function(){ dashSearchState.open=true; updateDashboardSearchResults(); });
+    input.addEventListener('focus', function(){ dashSearchState.open=true; updateDashboardSearchResults(); });
+    var btn=el('dashSearchBtn');
+    if(btn) btn.addEventListener('click', function(){ dashSearchState.open=true; input.focus(); updateDashboardSearchResults(); });
+    input.addEventListener('keydown', function(e){
+      if(e.key==='Escape'){ dashSearchState.open=false; root.classList.remove('open'); input.blur(); }
+    });
+    box.addEventListener('click', function(e){
+      var dl=e.target.closest('[data-ds-download]');
+      if(dl){
+        e.preventDefault();
+        dsDownload(dl.getAttribute('data-ds-download'), dl.getAttribute('data-ds-id'), dl.getAttribute('data-ds-name'));
+        return;
+      }
+      if(e.target.closest('a')) dashSearchState.open=false;
+    });
+    if(!wireDashboardSearch._docBound){
+      document.addEventListener('click', function(e){
+        if(e.target.closest('#dashSearch')) return;
+        dashSearchState.open=false;
+        var r=el('dashSearch');
+        if(r) r.classList.remove('open');
+      });
+      wireDashboardSearch._docBound=true;
+    }
+    updateDashboardSearchResults();
+  }
+
   function guestBanner(){
     if(!isGuest) return '';
     return '<div class="guestnote">'+s(ICON.info)+'<span>'+esc(t.guestNote)+
@@ -2035,17 +3888,27 @@
       head = '<div class="phead">'+avatarBlock()+
         '<div><h1>'+esc(t.hi(displayName()))+'</h1><p>'+esc(t.welcomeSub)+'</p></div></div>';
     }
-    el('main').innerHTML = guestBanner() + head + fn();
+    el('main').innerHTML = guestBanner() + dashboardSearchHtml() + head + fn();
     el('mBarTitle').textContent = currentTitle();
     document.title = 'KOLKLI — '+currentTitle();
     wireMain();
   }
 
-  function render(){ renderSide(); renderMain(); }
+  function render(){ renderDashTop(); renderSide(); renderMain(); }
 
   function selectView(id){
+    if(id==='settings'){
+      location.href='account-settings.html';
+      return;
+    }
     view=id;
     if(id!=='my-files') activeProjectId=null;
+    if(!isSettingsView(id)) settingsNavOpen=false;
+    try{
+      if(location.hash.replace(/^#/,'')!==id){
+        history.replaceState(null,'',location.pathname+location.search+'#'+id);
+      }
+    }catch(e){}
     // keep the owning category open
     NAV.forEach(function(c){ if(c.items.some(function(it){return it.id===id;})) c.open=true; });
     closeDrawer();
@@ -2069,6 +3932,29 @@
 
   function wireSide(){
     el('side').addEventListener('click', function(e){
+      var sideAcctBtn=e.target.closest('#sideAcctBtn');
+      if(sideAcctBtn){
+        e.preventDefault();
+        e.stopPropagation();
+        var wrap=el('sideAcct');
+        if(wrap){
+          var open=wrap.classList.toggle('open');
+          sideAcctBtn.setAttribute('aria-expanded', open?'true':'false');
+        }
+        return;
+      }
+      var sideLogout=e.target.closest('[data-side-logout]');
+      if(sideLogout){
+        closeSideAccountMenu();
+        if(confirm(t.logoutConfirm)){ lsDel(SESSION_KEY); location.href='index.html'; }
+        return;
+      }
+      var settingsTog=e.target.closest('[data-settings-toggle]');
+      if(settingsTog){
+        settingsNavOpen=!settingsNavOpen;
+        renderSide();
+        return;
+      }
       var tog=e.target.closest('[data-cattoggle]');
       if(tog){
         var id=tog.getAttribute('data-cattoggle');
@@ -2106,10 +3992,147 @@
       if(e.key==='Enter'){ e.preventDefault(); commitLabel(inp.getAttribute('data-label-input')); }
       else if(e.key==='Escape'){ e.preventDefault(); editingLabel=null; renderSide(); }
     });
+    if(!wireSide._docBound){
+      document.addEventListener('click', function(e){
+        var w=el('sideAcct');
+        if(w && w.classList.contains('open') && !w.contains(e.target)) closeSideAccountMenu();
+      });
+      document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeSideAccountMenu(); });
+      wireSide._docBound=true;
+    }
   }
 
   function wireMain(){
     var host=el('main');
+    wireDashboardSearch();
+    host.querySelectorAll('[data-fav-id]').forEach(function(b){
+      b.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var item=null;
+        try{ item=JSON.parse(b.getAttribute('data-fav-payload')||'{}'); }catch(_){}
+        favToggle(item);
+        if(view==='favorites') renderMain();
+        else favSyncButtons();
+        renderSide();
+      });
+    });
+    host.querySelectorAll('[data-project-view]').forEach(function(b){
+      b.addEventListener('click', function(){ selectView(b.getAttribute('data-project-view')); });
+    });
+    host.querySelectorAll('[data-edit-view]').forEach(function(b){
+      b.addEventListener('click', function(){ selectView(b.getAttribute('data-edit-view')); });
+    });
+    host.querySelectorAll('[data-del-project]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var card=b.closest('.mp-client'); if(!card) return;
+        var d=projDelText();
+        kConfirm({ title:d.title, body:d.body, ok:d.ok, cancel:d.cancel, danger:true, onOk:function(){
+          card.style.transition='opacity .18s'; card.style.opacity='0';
+          setTimeout(function(){ card.remove(); }, 180);
+          riToast(d.done);
+        }});
+      });
+    });
+    host.querySelectorAll('[data-copy-link]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var link=b.getAttribute('data-copy-link')||'';
+        var msg=(lang==='he')?'הקישור הועתק ✓':(lang==='ru')?'Ссылка скопирована ✓':'Link copied ✓';
+        var done=function(){ riToast(msg); };
+        try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(link).then(done,done); return; } }catch(e){}
+        var ta=document.createElement('textarea'); ta.value=link; document.body.appendChild(ta); ta.select();
+        try{ document.execCommand('copy'); }catch(_){ } ta.remove(); done();
+      });
+    });
+    host.querySelectorAll('[data-pf-select]').forEach(function(input){
+      input.addEventListener('change', function(){
+        var kind=input.getAttribute('data-pf-kind') || view;
+        pfSetSelected(kind,input.getAttribute('data-pf-select'),input.checked);
+        renderMain();
+      });
+    });
+    host.querySelectorAll('[data-pf-select-all]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var kind=b.getAttribute('data-pf-select-all') || view;
+        host.querySelectorAll('[data-pf-select]').forEach(function(input){
+          if((input.getAttribute('data-pf-kind')||view)===kind){
+            pfSetSelected(kind,input.getAttribute('data-pf-select'),true);
+          }
+        });
+        renderMain();
+      });
+    });
+    host.querySelectorAll('[data-pf-clear]').forEach(function(b){
+      b.addEventListener('click', function(){
+        pfClearSelection(b.getAttribute('data-pf-clear') || view);
+        renderMain();
+      });
+    });
+    host.querySelectorAll('[data-pf-download-selected]').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(!window.KolkliProcessedFiles || !KolkliProcessedFiles.download){ riToast(pfText('missing')); return; }
+        var ids=pfSelectedIds(b.getAttribute('data-pf-download-selected') || view);
+        if(!ids.length) return;
+        ids.forEach(function(id){
+          KolkliProcessedFiles.download(id).then(function(r){
+            if(!r || !r.ok) riToast(pfText('missing'));
+          });
+        });
+      });
+    });
+    host.querySelectorAll('[data-pf-remove-selected]').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(!window.KolkliProcessedFiles || !KolkliProcessedFiles.remove) return;
+        var kind=b.getAttribute('data-pf-remove-selected') || view;
+        var ids=pfSelectedIds(kind);
+        if(!ids.length) return;
+        var copy=ids.length===1 ? (function(){
+          var all=KolkliProcessedFiles.list ? KolkliProcessedFiles.list({category:'all'}) : [];
+          var rec=all.filter(function(r){ return r.id===ids[0]; })[0];
+          return pfDeleteDialogText(rec ? rec.name : '');
+        })() : pfBulkDeleteDialogText(ids.length);
+        kConfirm({
+          title:copy.title,
+          body:copy.body,
+          ok:copy.ok,
+          cancel:copy.cancel,
+          danger:true,
+          onOk:function(){
+            ids.forEach(function(id){ KolkliProcessedFiles.remove(id); });
+            pfClearSelection(kind);
+            riToast(ids.length===1 ? pfText('removed') : pfMultiText('removed',ids.length));
+            renderMain();
+          }
+        });
+      });
+    });
+    host.querySelectorAll('[data-pf-download]').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(!window.KolkliProcessedFiles || !KolkliProcessedFiles.download){ riToast(pfText('missing')); return; }
+        KolkliProcessedFiles.download(b.getAttribute('data-pf-download')).then(function(r){
+          if(!r || !r.ok) riToast(pfText('missing'));
+        });
+      });
+    });
+    host.querySelectorAll('[data-pf-remove]').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(!window.KolkliProcessedFiles || !KolkliProcessedFiles.remove) return;
+        var card=b.closest('.pf-item');
+        var nameEl=card ? card.querySelector('.pf-name') : null;
+        var copy=pfDeleteDialogText(nameEl ? nameEl.textContent : '');
+        kConfirm({
+          title:copy.title,
+          body:copy.body,
+          ok:copy.ok,
+          cancel:copy.cancel,
+          danger:true,
+          onOk:function(){
+            KolkliProcessedFiles.remove(b.getAttribute('data-pf-remove'));
+            riToast(pfText('removed'));
+          }
+        });
+      });
+    });
     host.querySelectorAll('[data-new-project]').forEach(function(b){
       b.addEventListener('click', function(){ location.href='files.html?new=1'; });
     });
@@ -2146,6 +4169,7 @@
         if(i>-1){ users[i].name=nm; saveUsers(users); user=users[i]; }
       }
       var m=el('savedMsg'); if(m){ m.classList.add('show'); setTimeout(function(){ m.classList.remove('show'); }, 1800); }
+      renderDashTop();
       renderSide();
     });
     // settings: logout / delete
@@ -2206,13 +4230,27 @@
   /* =====================================================
      Init
      ===================================================== */
-  // Deep-link: dashboard.html#settings (etc.) opens that view directly — used by
-  // the header account menu. Only accepts ids that exist in NAV.
+  // Deep-links open dashboard views; legacy #settings redirects to the standalone
+  // account-settings page so settings stay separate from the file workspace.
   function viewFromHash(){
     var h=(location.hash||'').replace(/^#/,'');
     if(!h) return null;
+    if(PROJECT_VIEW[h]) return h;
+    if(VIEWS[h]) return h;
     return NAV.some(function(c){ return c.items.some(function(it){ return it.id===h; }); }) ? h : null;
   }
+
+  if((location.hash||'').replace(/^#/,'')==='settings'){
+    location.replace('account-settings.html');
+    return;
+  }
+
+  window.addEventListener('storage', function(e){
+    if(!e || !e.key || e.key.indexOf(FAV_BASE_KEY+'::')!==0) return;
+    if(view==='favorites') renderMain();
+    else favSyncButtons();
+    renderSide();
+  });
 
   applyTheme(lsGet('theme')||'light');
   loadUser();
@@ -2241,6 +4279,9 @@
     var before = user && user.email;
     loadUser();
     if((user && user.email) !== before) render();
+  });
+  window.addEventListener('kolkli:processed-files', function(){
+    if(/^my-(audio|video|images|docs)$/.test(view)) renderMain();
   });
   wireSide();
   el('mMenuBtn').addEventListener('click', openDrawer);

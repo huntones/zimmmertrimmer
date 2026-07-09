@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחשבון יחס תמונה</title>
-<meta name="description" content="Free aspect ratio calculator — enter a width and height to get the simplified ratio, lock a ratio to resize proportionally, or pick presets like 16:9, 4:5, 9:16 and 21:9. Live preview and one-click copy. Fast, private, right in your browser.">
+<meta name="description" content="Free aspect ratio calculator — enter a width and height to get the simplified ratio, lock a ratio to resize proportionally, or pick presets like 16:9, 4:5, 9:16 and 21:9. Live preview and one-click copy. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -263,7 +263,7 @@
     he:{ dir:'rtl',
       kick:'מחשבון יחס תמונה',
       pageTitle:'מחשבון יחס תמונה — חשבו ושמרו על יחס רוחב-גובה',
-      pageSub:'הזינו רוחב וגובה וקבלו מיד את היחס המצומצם, או בחרו יחס נפוץ ונעלו אותו כדי שהממד השני יחושב אוטומטית. תצוגה מקדימה חיה, יחסים מותאמים אישית והעתקה בלחיצה. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'הזינו רוחב וגובה וקבלו מיד את היחס המצומצם, או בחרו יחס נפוץ ונעלו אותו כדי שהממד השני יחושב אוטומטית. תצוגה מקדימה חיה, יחסים מותאמים אישית והעתקה בלחיצה. מהיר, פשוט ובאיכות מקצועית.',
       dimTitle:'מידות', presetTitle:'יחסים נפוצים', previewTitle:'תצוגה מקדימה',
       widthLabel:'רוחב', heightLabel:'גובה', lockLabel:'נעילת יחס',
       customLabel:'יחס מותאם אישית', copySize:'העתקת מידות',
@@ -273,11 +273,11 @@
       u191:'תצוגה מקדימה של קישור (Open Graph)', u219:'קולנועי, מסך אולטרה-רחב',
       copy:'העתקה', copiedMsg:'הועתק ✓',
       note:'נעילת היחס שומרת על היחס בין רוחב לגובה — שינוי ממד אחד יעדכן אוטומטית את השני. בטלו את הנעילה כדי לערוך רוחב וגובה בנפרד, והיחס יחושב מעצמו.',
-      foot:'KOLKLI · מחשבון יחס תמונה · פרטי ומהיר, ישירות בדפדפן' },
+      foot:'KOLKLI · מחשבון יחס תמונה · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Aspect Ratio Calculator',
       pageTitle:'Aspect Ratio Calculator — Lock & Resize Any Ratio',
-      pageSub:'Enter a width and height to get the simplified ratio instantly, or pick a common ratio and lock it so the other dimension is calculated for you. Live preview, custom ratios and one-click copy. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Enter a width and height to get the simplified ratio instantly, or pick a common ratio and lock it so the other dimension is calculated for you. Live preview, custom ratios and one-click copy. Fast, simple and professional-quality.',
       dimTitle:'Dimensions', presetTitle:'Common ratios', previewTitle:'Preview',
       widthLabel:'Width', heightLabel:'Height', lockLabel:'Lock ratio',
       customLabel:'Custom ratio', copySize:'Copy size',
@@ -287,11 +287,11 @@
       u191:'Link preview (Open Graph)', u219:'Cinematic, ultrawide',
       copy:'Copy', copiedMsg:'Copied ✓',
       note:'Locking the ratio keeps width and height proportional — change one and the other updates automatically. Unlock to edit width and height independently, and the ratio is calculated for you.',
-      foot:'KOLKLI · Aspect Ratio Calculator · Private and fast, right in your browser' },
+      foot:'KOLKLI · Aspect Ratio Calculator · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Калькулятор соотношения сторон',
       pageTitle:'Калькулятор соотношения сторон — фиксация и пересчёт',
-      pageSub:'Введите ширину и высоту, чтобы мгновенно получить упрощённое соотношение, или выберите готовое соотношение и зафиксируйте его — второй размер рассчитается автоматически. Живой предпросмотр, произвольные соотношения и копирование одним щелчком. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Введите ширину и высоту, чтобы мгновенно получить упрощённое соотношение, или выберите готовое соотношение и зафиксируйте его — второй размер рассчитается автоматически. Живой предпросмотр, произвольные соотношения и копирование одним щелчком. Быстро, просто и профессионального качества.',
       dimTitle:'Размеры', presetTitle:'Частые соотношения', previewTitle:'Предпросмотр',
       widthLabel:'Ширина', heightLabel:'Высота', lockLabel:'Зафиксировать',
       customLabel:'Своё соотношение', copySize:'Копировать размер',
@@ -301,7 +301,7 @@
       u191:'Превью ссылки (Open Graph)', u219:'Кинематографический, сверхширокий',
       copy:'Копировать', copiedMsg:'Скопировано ✓',
       note:'Фиксация соотношения сохраняет пропорции: измените один размер — второй пересчитается автоматически. Снимите фиксацию, чтобы менять ширину и высоту независимо, а соотношение рассчитается само.',
-      foot:'KOLKLI · Калькулятор соотношения сторон · Приватно и быстро, прямо в браузере' }
+      foot:'KOLKLI · Калькулятор соотношения сторон · Быстро, просто и профессионального качества' }
   };
 
   const LOCK_CLOSED = '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';

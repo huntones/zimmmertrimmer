@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — מחולל Box Shadow</title>
-<meta name="description" content="Free CSS box-shadow generator — design a shadow with live preview by dragging offset, blur, spread, color and opacity, then copy ready-to-use CSS. Inset support. Fast, private, right in your browser.">
+<meta name="description" content="Free CSS box-shadow generator — design a shadow with live preview by dragging offset, blur, spread, color and opacity, then copy ready-to-use CSS. Inset support. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -47,7 +47,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 64px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 20px 64px;}
 
   /* page intro */
   .pagehead{margin:4px 0 22px;}
@@ -252,33 +252,33 @@
     he:{ dir:'rtl',
       kick:'מחולל Box Shadow',
       pageTitle:'מחולל Box Shadow ל-CSS',
-      pageSub:'עצבו צל לאלמנטים עם תצוגה חיה — הזיזו את הצל, שנו טשטוש, פיזור, צבע ושקיפות, והעתיקו את קוד ה-CSS המוכן. הכול רץ בדפדפן, שום דבר לא נשלח לשרת.',
+      pageSub:'עצבו צל לאלמנטים עם תצוגה חיה — הזיזו את הצל, שנו טשטוש, פיזור, צבע ושקיפות, והעתיקו את קוד ה-CSS המוכן. מהיר, פשוט ובאיכות מקצועית.',
       copy:'העתקה', copiedMsg:'הועתק ✓',
       offsetX:'היסט אופקי (X)', offsetY:'היסט אנכי (Y)', blur:'טשטוש', spread:'פיזור',
       colorLabel:'צבע הצל', opacity:'שקיפות', inset:'צל פנימי (inset)',
       fillLabel:'צבע האלמנט', bgLabel:'רקע התצוגה', random:'צל אקראי',
       note:'אפשר לשלב כמה צללים יחד — הפרידו ביניהם בפסיקים בתוך box-shadow כדי ליצור עומק (למתקדמים).',
-      foot:'KOLKLI · מחולל Box Shadow · פרטי ומהיר, ישירות בדפדפן' },
+      foot:'KOLKLI · מחולל Box Shadow · מהיר, פשוט ובאיכות מקצועית' },
     en:{ dir:'ltr',
       kick:'Box-Shadow Generator',
       pageTitle:'CSS Box-Shadow Generator',
-      pageSub:'Design a CSS box-shadow with a live preview — drag the offset, blur, spread, color and opacity, then copy the ready-made CSS. Everything runs in your browser; nothing is sent to a server.',
+      pageSub:'Design a CSS box-shadow with a live preview — drag the offset, blur, spread, color and opacity, then copy the ready-made CSS. Fast, simple and professional-quality.',
       copy:'Copy', copiedMsg:'Copied ✓',
       offsetX:'Offset X', offsetY:'Offset Y', blur:'Blur', spread:'Spread',
       colorLabel:'Shadow color', opacity:'Opacity', inset:'Inset shadow',
       fillLabel:'Element color', bgLabel:'Preview background', random:'Random shadow',
       note:'You can stack several shadows — separate them with commas inside box-shadow to build up depth (advanced).',
-      foot:'KOLKLI · Box-Shadow Generator · Private and fast, right in your browser' },
+      foot:'KOLKLI · Box-Shadow Generator · Fast, simple and professional quality' },
     ru:{ dir:'ltr',
       kick:'Генератор Box-Shadow',
       pageTitle:'Генератор CSS box-shadow',
-      pageSub:'Создайте CSS box-shadow с живым предпросмотром — меняйте смещение, размытие, разброс, цвет и прозрачность, затем скопируйте готовый CSS. Всё работает в браузере; ничего не отправляется на сервер.',
+      pageSub:'Создайте CSS box-shadow с живым предпросмотром — меняйте смещение, размытие, разброс, цвет и прозрачность, затем скопируйте готовый CSS. Быстро, просто и профессионального качества.',
       copy:'Копировать', copiedMsg:'Скопировано ✓',
       offsetX:'Смещение X', offsetY:'Смещение Y', blur:'Размытие', spread:'Разброс',
       colorLabel:'Цвет тени', opacity:'Прозрачность', inset:'Внутренняя тень',
       fillLabel:'Цвет элемента', bgLabel:'Фон предпросмотра', random:'Случайная тень',
       note:'Можно наложить несколько теней — перечислите их через запятую внутри box-shadow, чтобы создать глубину (для продвинутых).',
-      foot:'KOLKLI · Генератор Box-Shadow · Приватно и быстро, прямо в браузере' }
+      foot:'KOLKLI · Генератор Box-Shadow · Быстро, просто и профессионального качества' }
   };
 
   const BGPRESETS = ['#eef0f6','#ffffff','#1c2030','#0d0f14','#dbe4ff','#ffe4c4'];

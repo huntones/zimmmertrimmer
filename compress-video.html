@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — דחיסת וידאו</title>
-<meta name="description" content="Compress video files right in your browser — shrink big clips for email, WhatsApp and the web. Pick a compression level, drop the resolution, mute audio, and download. Nothing leaves your machine.">
+<meta name="description" content="shrink big clips for email, WhatsApp and the web. Pick a compression level, drop the resolution, mute audio, and download. Fast, simple and professional-quality.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -53,7 +53,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{max-width:75%;margin:0 auto;padding:22px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:22px 20px 60px;}
 
   /* page intro */
   .pagehead{margin:4px 0 20px;}
@@ -346,8 +346,8 @@
     he:{
       dir:'rtl', langIco:'EN',
       kick:'דחיסת וידאו',
-      pageTitle:'דחסו קובצי וידאו — בלי להעלות לשרת',
-      pageSub:'גררו סרטון כבד, בחרו רמת דחיסה, הורידו רזולוציה או השתיקו את הסאונד — וקבלו קובץ קטן בהרבה, מוכן למייל, לוואטסאפ ולרשת. הדחיסה מתבצעת בדפדפן שלכם, שום קובץ לא עוזב את המחשב.',
+      pageTitle:'דחסו קובצי וידאו',
+      pageSub:'גררו סרטון כבד, בחרו רמת דחיסה, הורידו רזולוציה או השתיקו את הסאונד — וקבלו קובץ קטן בהרבה, מוכן למייל, לוואטסאפ ולרשת. מהיר, פשוט ובאיכות מקצועית.',
       dropBig:'גררו קובצי וידאו לכאן', or2:'או', choose:'בחרו קבצים',
       sizeNote:'MP4 · WEBM · MKV · MOV · AVI · M4V', remove:'הסרה',
       totalLbl:'סה״כ', optTitle:'הגדרות דחיסה',
@@ -359,23 +359,23 @@
       muteLbl:'הסרת אודיו', muteHint:'משתיק את הסאונד ומקטין עוד',
       estLbl:'גודל משוער אחרי דחיסה',
       convBtn:'דחסו עכשיו', working:'דוחס…',
-      rtNote:'הדחיסה רצה בזמן אמת בדפדפן — סרטון ארוך ייקח בערך את משך הניגון שלו.',
+      rtNote:'הדחיסה מהירה — סרטון ארוך ייקח בערך את משך הניגון שלו.',
       readyTitle:'הדחיסה הושלמה!',
       readySub:n=>`${n} ${n===1?'קובץ מוכן':'קבצים מוכנים'} להורדה.`,
       savedOverall:(pct,from,to)=>`נחסכו <b>${pct}%</b> — מ־${from} ל־${to}`,
       dlAll:'הורדת הכול', againBtn:'דחיסה נוספת',
       origLbl:'מקור', savedTxt:p=>`↓ ${p}% קטן יותר`, grewTxt:p=>`↑ ${p}% גדול יותר`,
       failed:'הדחיסה נכשלה — הפורמט אינו נתמך בדפדפן הזה',
-      seam:'דחיסה מקומית: הווידאו מקודד מחדש כאן ועכשיו, ישירות בדפדפן, דרך מנוע ה־MediaRecorder המובנה (MP4/WebM). הפורמטים MKV/MOV/AVI מפוענחים לקידוד ויוצאים כ־MP4/WebM — הקבצים תמיד נשארים אצלכם.',
-      foot:'KOLKLI · דחיסת וידאו · פרטי ומהיר, ישירות בדפדפן',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      foot:'KOLKLI · דחיסת וידאו · מהיר, פשוט ובאיכות מקצועית',
       errNoFiles:'צריך לצרף לפחות קובץ וידאו אחד', errDecode:'לא הצלחנו לפענח אף קובץ',
       copied:'הקישור הועתק ✓', dlWord:'הורדה',
     },
     en:{
       dir:'ltr', langIco:'עב',
       kick:'Compress video',
-      pageTitle:'Compress video files — without uploading',
-      pageSub:'Drop a heavy clip, pick a compression level, drop the resolution or mute the audio — and get a much smaller file, ready for email, WhatsApp and the web. Compression runs in your browser; nothing leaves your machine.',
+      pageTitle:'Compress video files',
+      pageSub:'Drop a heavy clip, pick a compression level, drop the resolution or mute the audio — and get a much smaller file, ready for email, WhatsApp and the web. Fast, simple and professional-quality.',
       dropBig:'Drag video files here', or2:'or', choose:'Choose files',
       sizeNote:'MP4 · WEBM · MKV · MOV · AVI · M4V', remove:'Remove',
       totalLbl:'Total', optTitle:'Compress options',
@@ -387,23 +387,23 @@
       muteLbl:'Remove audio', muteHint:'Mutes sound, shrinks more',
       estLbl:'Estimated size after',
       convBtn:'Compress now', working:'Compressing…',
-      rtNote:'Compression runs in real time in your browser — a long clip takes about its own play length.',
+      rtNote:'Compression runs in real time — a long clip takes about its own play length.',
       readyTitle:'Compression done!',
       readySub:n=>`${n} ${n===1?'file':'files'} ready to download.`,
       savedOverall:(pct,from,to)=>`Saved <b>${pct}%</b> — ${from} → ${to}`,
       dlAll:'Download all', againBtn:'Compress more',
       origLbl:'source', savedTxt:p=>`↓ ${p}% smaller`, grewTxt:p=>`↑ ${p}% larger`,
       failed:'Compression failed — not supported by this browser',
-      seam:'Local compression: video is re-encoded right here, right now, in your browser via the built-in MediaRecorder engine (MP4/WebM). MKV/MOV/AVI are decoded for encoding and come out as MP4/WebM — your files always stay with you.',
-      foot:'KOLKLI · Video compression · Private and fast, right in your browser',
+      seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
+      foot:'KOLKLI · Video compression · Fast, simple and professional quality',
       errNoFiles:'Add at least one video file', errDecode:'We could not decode any file',
       copied:'Link copied ✓', dlWord:'Download',
     },
     ru:{
       dir:'ltr',
       kick:'Сжатие видео',
-      pageTitle:'Сжимайте видеофайлы — без загрузки на сервер',
-      pageSub:'Перетащите тяжёлый клип, выберите уровень сжатия, снизьте разрешение или уберите звук — и получите намного меньший файл, готовый для почты, WhatsApp и веба. Сжатие идёт в вашем браузере; ничего не покидает устройство.',
+      pageTitle:'Сжимайте видеофайлы',
+      pageSub:'Перетащите тяжёлый клип, выберите уровень сжатия, снизьте разрешение или уберите звук — и получите намного меньший файл, готовый для почты, WhatsApp и веба. Быстро, просто и профессионального качества.',
       dropBig:'Перетащите видеофайлы сюда', or2:'или', choose:'Выбрать файлы',
       sizeNote:'MP4 · WEBM · MKV · MOV · AVI · M4V', remove:'Удалить',
       totalLbl:'Всего', optTitle:'Параметры сжатия',
@@ -415,16 +415,16 @@
       muteLbl:'Убрать звук', muteHint:'Отключает звук, сильнее уменьшает',
       estLbl:'Примерный размер после',
       convBtn:'Сжать', working:'Сжатие…',
-      rtNote:'Сжатие идёт в реальном времени в вашем браузере — длинный клип занимает примерно своё время воспроизведения.',
+      rtNote:'Обработка быстрая — длинный клип занимает примерно своё время воспроизведения.',
       readyTitle:'Сжатие завершено!',
       readySub:n=>`Готово к скачиванию: ${n}.`,
       savedOverall:(pct,from,to)=>`Экономия <b>${pct}%</b> — ${from} → ${to}`,
       dlAll:'Скачать всё', againBtn:'Ещё сжатие',
       origLbl:'оригинал', savedTxt:p=>`↓ на ${p}% меньше`, grewTxt:p=>`↑ на ${p}% больше`,
       failed:'Сжатие не удалось — не поддерживается этим браузером',
-      seam:'Локальное сжатие: видео перекодируется прямо здесь и сейчас, в вашем браузере через встроенный движок MediaRecorder (MP4/WebM). MKV/MOV/AVI декодируются для кодирования и выходят как MP4/WebM — ваши файлы всегда остаются у вас.',
-      foot:'KOLKLI · Сжатие видео · Приватно и быстро, прямо в браузере',
-      errNoFiles:'Добавьте хотя бы один видеофайл', errDecode:'Не удалось декодировать ни один файл',
+      seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
+      foot:'KOLKLI · Сжатие видео · Быстро, просто и профессионального качества',
+      errNoFiles:'Быстро, просто и профессионального качества.',
       copied:'Ссылка скопирована ✓', dlWord:'Скачать',
     },
   };

@@ -17,9 +17,19 @@
      STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SUPABASE_SERVICE_ROLE_KEY
    Vars (wrangler.toml):
      SUPABASE_URL, SUPABASE_ANON_KEY, ALLOWED_ORIGIN, SUCCESS_URL, CANCEL_URL,
-     PLAN_PRICES  (JSON map plan → Stripe price id)
+     PLAN_PRICES  (JSON map plan → Stripe price id; keys: creator, studio)
    ============================================================ */
 import Stripe from 'stripe';
+
+const BUILT_IN_PROMOS = {
+  KOLKLI2026: {
+    code: 'Kolkli2026',
+    percentOff: 100,
+    duration: 'once',
+    expiresAt: '2026-08-31T23:59:59+03:00',
+    plans: ['creator', 'studio']
+  }
+};
 
 export default {
   async fetch(request, env) {
@@ -69,6 +79,39 @@ function stripeClient(env) {
   });
 }
 function planPrices(env) { try { return JSON.parse(env.PLAN_PRICES || '{}'); } catch (_) { return {}; } }
+function normalizePromoCode(code) { return String(code || '').trim().toUpperCase(); }
+function promoExpirySeconds(promo) {
+  const ms = Date.parse(promo && promo.expiresAt);
+  return Number.isFinite(ms) ? Math.floor(ms / 1000) : undefined;
+}
+function promoApplies(promo, plan) {
+  if (!promo) return false;
+  const expires = promoExpirySeconds(promo);
+  if (expires && Math.floor(Date.now() / 1000) > expires) return false;
+  return !promo.plans || promo.plans.indexOf(plan) > -1;
+}
+async function ensurePromotionCode(stripe, key, promo) {
+  const code = promo.code || key;
+  const existing = await stripe.promotionCodes.list({ code, limit: 1 });
+  if (existing.data && existing.data[0]) return existing.data[0];
+
+  const expires = promoExpirySeconds(promo);
+  const couponParams = {
+    percent_off: promo.percentOff,
+    duration: promo.duration || 'once',
+    name: `${code} - ${promo.percentOff}% off`,
+    metadata: { source: 'kolkli', code }
+  };
+  if (expires) couponParams.redeem_by = expires;
+
+  const promotionParams = {
+    code,
+    coupon: (await stripe.coupons.create(couponParams)).id,
+    metadata: { source: 'kolkli', plans: (promo.plans || []).join(',') }
+  };
+  if (expires) promotionParams.expires_at = expires;
+  return stripe.promotionCodes.create(promotionParams);
+}
 
 // Verify the Supabase JWT (asks Supabase; no JWT secret needed).
 async function verifyUser(request, env) {
@@ -118,6 +161,7 @@ async function handleCheckout(body, user, env, cors) {
   const orgId = String(body.orgId || '');
   const plan = String(body.plan || '');
   const seats = Math.max(1, parseInt(body.seats || '1', 10) || 1);
+  const promoCode = normalizePromoCode(body.promoCode || body.coupon || body.promo);
   if (!orgId || !plan) return json({ error: 'orgId and plan required' }, cors, 400);
 
   const role = await orgRole(orgId, user, env);
@@ -128,17 +172,38 @@ async function handleCheckout(body, user, env, cors) {
 
   const org = await getOrg(orgId, env);
   const stripe = stripeClient(env);
-  const session = await stripe.checkout.sessions.create({
+  const metadata = { orgId, plan };
+  const sessionParams = {
     mode: 'subscription',
     line_items: [{ price, quantity: seats }],
     customer: org && org.stripe_customer ? org.stripe_customer : undefined,
     customer_email: org && org.stripe_customer ? undefined : user.email,
     client_reference_id: orgId,
-    metadata: { orgId, plan },
-    subscription_data: { metadata: { orgId, plan } },
+    metadata,
+    subscription_data: { metadata },
     success_url: env.SUCCESS_URL || `${env.ALLOWED_ORIGIN}/dashboard.html#team`,
     cancel_url: env.CANCEL_URL || `${env.ALLOWED_ORIGIN}/pricing/`
-  });
+  };
+
+  if (promoCode) {
+    const promo = BUILT_IN_PROMOS[promoCode];
+    if (!promoApplies(promo, plan)) return json({ error: 'invalid promo code' }, cors, 400);
+    const promotion = await ensurePromotionCode(stripe, promoCode, promo);
+    metadata.promoCode = promo.code || promoCode;
+    sessionParams.discounts = [{ promotion_code: promotion.id }];
+  } else {
+    let hasActivePromo = false;
+    for (const key of Object.keys(BUILT_IN_PROMOS)) {
+      const promo = BUILT_IN_PROMOS[key];
+      if (promoApplies(promo, plan)) {
+        await ensurePromotionCode(stripe, key, promo);
+        hasActivePromo = true;
+      }
+    }
+    if (hasActivePromo) sessionParams.allow_promotion_codes = true;
+  }
+
+  const session = await stripe.checkout.sessions.create(sessionParams);
   return json({ url: session.url }, cors);
 }
 
@@ -200,7 +265,7 @@ async function applySub(orgId, sub, priceToPlan, customer, env) {
   if (!orgId) return;
   const item = sub.items && sub.items.data && sub.items.data[0];
   const priceId = item && item.price && item.price.id;
-  const plan = priceToPlan[priceId] || 'pro';
+  const plan = priceToPlan[priceId] || 'creator';
   const seats = (item && item.quantity) || 1;
   await patchOrg(orgId, { plan, seats, stripe_customer: customer, stripe_subscription: sub.id }, env);
 }
