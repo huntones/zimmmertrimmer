@@ -605,7 +605,9 @@
   .kc-ok.danger{background:var(--danger);border-color:var(--danger);color:#fff;}
   .kc-ok.danger:hover{filter:brightness(1.06);}
   .mp-client-id{display:flex;align-items:center;gap:12px;}
-  .mp-avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--svc-bg,var(--grad-soft));color:var(--svc,var(--accent-dim));font-weight:850;border:1px solid var(--svc-line,transparent);}
+  .mp-avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--svc-bg,var(--grad-soft));color:var(--svc,var(--accent-dim));font-weight:850;border:1px solid var(--svc-line,transparent);overflow:hidden;}
+  .mp-avatar.has-img{background:var(--panel);}
+  .mp-avatar-img{width:100%;height:100%;object-fit:cover;display:block;}
   .mp-client-name{display:block;font-size:16px;font-weight:850;line-height:1.2;}
   .mp-number{display:block;margin-top:4px;font-size:12px;font-weight:850;color:var(--svc,var(--accent-dim));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .mp-client-mail{display:block;font-size:12.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:28ch;}
@@ -873,13 +875,17 @@
   .dash-acct-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   @media(min-width:901px){
     body.dash-signed-in{--dash-side-w:344px;}
-    body.dash-signed-in .dash-wrap{width:auto;margin:0 var(--dash-side-w) 0 0;padding:96px 22px 60px;}
+    /* the rail lives on the inline-START edge — RIGHT in Hebrew/RTL, LEFT in English/LTR.
+       Logical props (inset-inline-start / margin-inline-start) mirror automatically; only
+       the box-shadow direction is physical, so it gets an html[dir="ltr"] override below. */
+    body.dash-signed-in .dash-wrap{width:auto;margin:0;margin-inline-start:var(--dash-side-w);padding:96px 22px 60px;}
     body.dash-signed-in .dash{display:block;}
     body.dash-signed-in .side{
-      position:fixed;top:0;right:0;bottom:0;z-index:72;width:var(--dash-side-w);height:100vh;
-      overflow-y:auto;border:0;border-radius:0;background:var(--bg);box-shadow:-18px 0 44px rgba(28,32,48,.08);
+      position:fixed;top:0;inset-inline-start:0;bottom:0;z-index:72;width:var(--dash-side-w);height:100vh;
+      overflow-y:auto;border:0;border-radius:0;background:var(--panel);box-shadow:-18px 0 44px rgba(28,32,48,.08);
       padding:0 18px 22px;gap:0;display:flex;flex-direction:column;
     }
+    html[dir="ltr"] body.dash-signed-in .side{box-shadow:18px 0 44px rgba(28,32,48,.08);}
     body.dash-signed-in .side-logo{
       display:flex;align-items:center;justify-content:center;height:88px;margin:0 -18px 22px;background:var(--panel);
       border-bottom:1px solid var(--line);box-shadow:0 12px 28px rgba(30,37,80,.05);
@@ -889,13 +895,19 @@
       flex:1;min-height:0;
     }
     body.dash-signed-in .dash-top{
-      position:fixed;top:0;left:0;right:var(--dash-side-w);background:transparent;border-bottom:0;box-shadow:none;
+      position:fixed;top:0;inset-inline-end:0;inset-inline-start:var(--dash-side-w);background:transparent;border-bottom:0;box-shadow:none;
       pointer-events:none;
     }
-    body.dash-signed-in .dash-top-bar{height:76px;justify-content:flex-start;direction:ltr;padding:0 22px;}
+    body.dash-signed-in .dash-top-bar{height:76px;padding:0 22px;}
     body.dash-signed-in .dash-logo{display:none;}
-    body.dash-signed-in .dash-acct{direction:rtl;pointer-events:auto;}
-    body.dash-signed-in .dash-acct-menu{direction:rtl;}
+    body.dash-signed-in .dash-acct{pointer-events:auto;}
+    /* keep the account widget pinned to the OUTER edge of the bar (the edge away from the
+       rail): far LEFT in Hebrew/RTL, far RIGHT in English/LTR — and let its own contents
+       read in the page's language. */
+    html[dir="rtl"] body.dash-signed-in .dash-top-bar{justify-content:flex-start;direction:ltr;}
+    html[dir="rtl"] body.dash-signed-in .dash-acct,
+    html[dir="rtl"] body.dash-signed-in .dash-acct-menu{direction:rtl;}
+    html[dir="ltr"] body.dash-signed-in .dash-top-bar{justify-content:flex-end;}
   }
   @media(max-width:860px){
     .ri-body{grid-template-columns:1fr;}
@@ -941,7 +953,6 @@
     <div class="dash-logo">
       <img src="./assets/logo.png" alt="KOLKLI" width="139" height="34" decoding="async">
     </div>
-    <div class="dash-acct" id="dashAcct"></div>
   </div>
 </header>
 
@@ -1335,10 +1346,10 @@
       { id:'team', he:'הצוות שלי', en:'My Team', ru:'Моя команда', editable:true }
     ]},
     { id:'projects', icon:'layers', he:'הפרויקטים שלי', en:'MY PROJECTS', ru:'MY PROJECTS', open:true, items:[
-      { id:'project-select',  he:'פרויקטים לבחירה',  en:'Select Files',  ru:'Select Files' },
       { id:'project-receive', he:'פרויקטים שהתקבלו', en:'Receive Files', ru:'Receive Files' },
-      { id:'project-send',    he:'פרויקטים שנשלחו',  en:'Send Files',    ru:'Send Files' },
-      { id:'project-review',  he:'פרויקטים לאישור',  en:'Review Files',  ru:'Review Files' }
+      { id:'project-select',  he:'פרויקטים לבחירה',  en:'Select Files',  ru:'Select Files' },
+      { id:'project-review',  he:'פרויקטים לאישור',  en:'Review Files',  ru:'Review Files' },
+      { id:'project-send',    he:'פרויקטים שנשלחו',  en:'Send Files',    ru:'Send Files' }
     ]},
     // "My File Tools" — one central home for the user's OWN files & actions
     // (edit / convert / compress / AI) across every file type.
@@ -1465,7 +1476,6 @@
   var user=null, isGuest=false, plan='free';
   var activeProjectId=null;
   var editingLabel=null; // id of the nav item whose label is being renamed inline
-  var settingsNavOpen=false;
   var focusInvite=false; // set by the sidebar "+" so loadTeam focuses the invite email
   // User-customized sidebar labels (white-label: rename "My Clients" etc. per studio)
   function loadLabels(){ try{ return JSON.parse(lsGetOwn(LABELS_KEY))||{}; }catch(e){ return {}; } }
@@ -1592,9 +1602,6 @@
     });
   }
   function isSettingsCat(cat){ return cat && cat.id==='profile'; }
-  function isSettingsView(id){
-    return NAV.some(function(c){ return isSettingsCat(c) && c.items.some(function(it){ return it.id===id; }); });
-  }
   function pct(used,limit){ if(limit===INF||limit===0) return 6; return Math.max(3, Math.min(100, Math.round(used/limit*100))); }
   function displayName(){ return (user.name && user.name.trim()) ? user.name.trim() : (user.email ? user.email.split('@')[0] : 'Guest'); }
   function readOwnArray(k){ try{ var a=JSON.parse(lsGetOwn(k)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
@@ -1644,35 +1651,11 @@
   function dashTopAvatar(cls){
     return '<span class="'+cls+'">'+avatarInner()+'</span>';
   }
+  // The account menu is rendered once, in the sidebar (see accountMenuHtml).
+  // Duplicating it in the top bar was redundant, so renderDashTop now only keeps
+  // the signed-in body class in sync for the dashboard layout.
   function renderDashTop(){
-    var box=el('dashAcct');
-    if(!box) return;
-    if(isGuest){
-      box.innerHTML='';
-      document.body.classList.remove('dash-signed-in');
-      return;
-    }
-    document.body.classList.add('dash-signed-in');
-    var name=displayName();
-    box.innerHTML =
-      '<button class="dash-acct-btn" id="dashAcctBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="'+esc(name)+'">'+
-        dashTopAvatar('dash-avatar-sm')+
-        '<span class="dash-acct-name">'+esc(name)+'</span>'+
-        '<svg class="dash-acct-chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>'+
-      '</button>'+
-      '<div class="dash-acct-menu" id="dashAcctMenu" role="menu">'+
-        '<div class="dash-acct-head">'+dashTopAvatar('dash-acct-av')+
-          '<span class="dash-acct-id"><span class="dash-acct-full">'+esc(name)+'</span>'+
-          (user.email ? '<span class="dash-acct-mail">'+esc(user.email)+'</span>' : '')+'</span>'+
-        '</div>'+
-        '<div class="dash-acct-sep"></div>'+
-        '<button class="dash-acct-item" type="button" role="menuitem" data-dash-view="account">'+s(ICON.user)+'<span>'+esc(dashTopLabel('account','My Account'))+'</span></button>'+
-        '<a class="dash-acct-item" role="menuitem" href="account-settings.html">'+s(ICON.gear)+'<span>'+esc(dashTopLabel('settings',t.settingsTitle))+'</span></a>'+
-        '<button class="dash-acct-item" type="button" role="menuitem" data-dash-view="payments">'+s(ICON.card)+'<span>'+esc(dashTopLabel('payments','Payments'))+'</span></button>'+
-        '<div class="dash-acct-sep"></div>'+
-        '<button class="dash-acct-item danger" type="button" role="menuitem" id="dashLogout">'+s(ICON.logout)+'<span>'+esc(t.logout)+'</span></button>'+
-      '</div>';
-    wireDashTop();
+    document.body.classList.toggle('dash-signed-in', !isGuest);
   }
   function accountMenuHtml(extraClass, prefix){
     if(isGuest) return '';
@@ -1697,44 +1680,10 @@
       '</div>'+
     '</div>';
   }
-  function closeDashTopMenu(){
-    var wrap=el('dashAcct'), btn=el('dashAcctBtn');
-    if(wrap) wrap.classList.remove('open');
-    if(btn) btn.setAttribute('aria-expanded','false');
-  }
   function closeSideAccountMenu(){
     var wrap=el('sideAcct'), btn=el('sideAcctBtn');
     if(wrap) wrap.classList.remove('open');
     if(btn) btn.setAttribute('aria-expanded','false');
-  }
-  function wireDashTop(){
-    var wrap=el('dashAcct'), btn=el('dashAcctBtn');
-    if(!wrap || !btn) return;
-    btn.addEventListener('click', function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      var open=wrap.classList.toggle('open');
-      btn.setAttribute('aria-expanded', open?'true':'false');
-    });
-    wrap.querySelectorAll('[data-dash-view]').forEach(function(b){
-      b.addEventListener('click', function(){
-        closeDashTopMenu();
-        selectView(b.getAttribute('data-dash-view'));
-      });
-    });
-    var lo=el('dashLogout');
-    if(lo) lo.addEventListener('click', function(){
-      closeDashTopMenu();
-      if(confirm(t.logoutConfirm)){ lsDel(SESSION_KEY); location.href='index.html'; }
-    });
-    if(!wireDashTop._docBound){
-      document.addEventListener('click', function(e){
-        var w=el('dashAcct');
-        if(w && w.classList.contains('open') && !w.contains(e.target)) closeDashTopMenu();
-      });
-      document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeDashTopMenu(); });
-      wireDashTop._docBound=true;
-    }
   }
   // Big avatar in the account header. Guests can't save, so theirs is static.
   function avatarBlock(){
@@ -1915,12 +1864,14 @@
       html += '<a class="side-admin" href="admin.html"><span class="sa-ic">'+s(ICON.shield)+'</span><span>'+esc(t.adminPanel)+'</span></a>';
     }
     html += '<div class="side-tools">'+
-      '<button class="side-settings-btn '+(settingsNavOpen?'on':'')+'" type="button" data-settings-toggle '+
-        'title="'+esc(t.settingsTitle)+'" aria-label="'+esc(t.settingsTitle)+'" aria-expanded="'+(settingsNavOpen?'true':'false')+'">'+s(ICON.gear)+'</button>'+
+      '<button class="side-settings-btn" type="button" data-settings-toggle '+
+        'title="'+esc(t.settingsTitle)+'" aria-label="'+esc(t.settingsTitle)+'">'+s(ICON.gear)+'</button>'+
     '</div>';
     NAV.forEach(function(cat){
       if(cat.id==='teamsec') return;
-      if(isSettingsCat(cat) && !settingsNavOpen) return;
+      // profile/settings items live on the standalone account-settings page now,
+      // reached via the gear button — never rendered inline in the sidebar.
+      if(isSettingsCat(cat)) return;
       var isOn = cat.items.some(function(it){ return it.id===view; });
       var noSubs = cat.id==='projects' || cat.id==='mytools';
       var open = !noSubs && (cat.open || isOn);
@@ -2422,7 +2373,7 @@
     '</div>';
   }
 
-  var PROJECT_ORDER = ['select','receive','send','review'];
+  var PROJECT_ORDER = ['receive','select','review','send'];
   var PROJECT_VIEW = {
     'project-select':'select',
     'project-receive':'receive',
@@ -2433,6 +2384,17 @@
     'my-transfers':'send',
     'my-reviews':'review'
   };
+  // Placeholder client photo used only by the demo data below, so the "client
+  // uploaded a picture" state is visible. Real cards read the client's own
+  // avatar via card.avatar (see projectCardsFor).
+  var DEMO_CLIENT_AVATAR = 'data:image/svg+xml,'+encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 88 88'>"+
+    "<defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'>"+
+    "<stop offset='0' stop-color='#22c1c3'/><stop offset='1' stop-color='#0f6d8f'/></linearGradient></defs>"+
+    "<rect width='88' height='88' fill='url(#g)'/>"+
+    "<circle cx='44' cy='34' r='15' fill='#ffffff' opacity='.95'/>"+
+    "<path d='M17 82c0-15 12-25 27-25s27 10 27 25z' fill='#ffffff' opacity='.95'/></svg>"
+  );
   var PROJECT_SERVICES = {
     select:{ view:'project-select', tone:'select', title:'Select Files', desc:'Client selection links', icon:'pick', badge:'SELECT FILES', section:'Clients choosing files', href:'files.html', cta:'Open selection' },
     receive:{ view:'project-receive', tone:'receive', title:'Receive Files', desc:'Files received from clients', icon:'inbox', badge:'FILE REQUEST', section:'Files received from clients', href:'request.html', cta:'Open request' },
@@ -2628,6 +2590,12 @@
     var parts=String(name||'Client').trim().split(/\s+/).slice(0,2);
     return parts.map(function(p){ return p.charAt(0).toUpperCase(); }).join('') || 'CL';
   }
+  // Client avatar: show the uploaded profile photo (round) when the client has
+  // one; otherwise fall back to their name initials.
+  function projectAvatarHtml(card){
+    if(card && card.avatar) return '<span class="mp-avatar has-img"><img class="mp-avatar-img" src="'+esc(card.avatar)+'" alt="'+esc(card.client||'')+'"></span>';
+    return '<span class="mp-avatar">'+esc(projectInitials(card&&card.client))+'</span>';
+  }
   function projectCardsFor(key){
     var cards=[];
     if(key==='select'){
@@ -2636,6 +2604,7 @@
         return { client:p.client||p.name||'Client', email:'', phone:p.phone||'', link:p.link||p.url||'', title:p.name||'Selection project',
           f1:(p.files||0)+' files', l1:'Gallery', f2:(p.selected||0)+' selected', l2:'Chosen',
           f3:projectDate(p.updated), l3:'Updated', note:'Client selection project from KOLKLI Select Files.', status:projectStatusText(p.status||'draft'),
+          avatar:p.clientAvatar||p.avatar||'',
           projectNumberText:projectNumberText('select',p), projectNumber:p.projectNumber };
       });
     } else if(key==='receive'){
@@ -2648,6 +2617,7 @@
           f1:files.length+' files', l1:'Received', f2:(window.KR?KR.fmtBytes(bytes):fmtDashBytes(bytes)), l2:'Total size',
           f3:riExpiry(r)||projectDate(r.createdAt), l3:r.expiresAt?'Expires':'Created', note:r.desc||sub.note||'Files received from the client through a request link.',
           status:riStatusLabel(riStatus(r)), filesCount:files.length, filesHref:'request.html?tab=manage&files='+encodeURIComponent(r.token),
+          avatar:sub.avatar||r.clientAvatar||r.avatar||'',
           projectNumberText:projectNumberText('receive',r), projectNumber:r.projectNumber };
       });
     } else if(key==='send'){
@@ -2656,6 +2626,7 @@
         return { client:x.client||('Client '+(i+1)), email:x.email||'', phone:x.phone||'', link:x.url||x.link||(x.token?('https://kolkli.com/d/'+x.token):''), title:x.name||('Sent package '+(i+1)),
           f1:(x.files||0)+' files', l1:'Sent', f2:(x.downloads||0)+' downloads', l2:'Activity',
           f3:projectDate(x.createdAt), l3:'Sent on', note:'Files sent from your workspace to the client.', status:x.downloads?'Downloaded':'Link active',
+          avatar:x.clientAvatar||x.avatar||'',
           projectNumberText:projectNumberText('send',x), projectNumber:x.projectNumber };
       });
     } else if(key==='review'){
@@ -2664,6 +2635,7 @@
         return { client:p.client||('Client '+(i+1)), email:p.email||'', phone:p.phone||'', link:p.link||p.url||(p.token?('https://kolkli.com/v/'+p.token):''), title:p.name||'Review project',
           f1:(p.items||[]).length+' files', l1:'Materials', f2:(p.comments||[]).length+' comments', l2:'Feedback',
           f3:projectDate(p.createdAt), l3:'Shared on', note:p.message||'Materials sent to the client for review and approval.', status:(window.RV&&RV.statusOf)?RV.statusOf(p):(p.status||'In review'),
+          avatar:p.clientAvatar||p.avatar||'',
           projectNumberText:projectNumberText('review',p), projectNumber:p.projectNumber };
       });
     }
@@ -2720,7 +2692,7 @@
         '<button type="button" class="mp-menu" data-del-project aria-label="'+esc(projDelText().title)+'">'+s(ICON.x)+'</button>'+
       '</div>'+
       '<div class="mp-client-id">'+
-        '<span class="mp-avatar">'+esc(projectInitials(card.client))+'</span>'+
+        projectAvatarHtml(card)+
         '<span class="mp-id-txt"><span class="mp-client-name">'+esc(card.client)+'</span>'+
           (card.projectNumberText ? '<span class="mp-number">'+esc(card.projectNumberText)+'</span>' : '')+
           '<span class="mp-client-mail" dir="ltr">'+esc(card.email||card.title)+'</span>'+
@@ -3903,7 +3875,6 @@
     }
     view=id;
     if(id!=='my-files') activeProjectId=null;
-    if(!isSettingsView(id)) settingsNavOpen=false;
     try{
       if(location.hash.replace(/^#/,'')!==id){
         history.replaceState(null,'',location.pathname+location.search+'#'+id);
@@ -3949,10 +3920,17 @@
         if(confirm(t.logoutConfirm)){ lsDel(SESSION_KEY); location.href='index.html'; }
         return;
       }
+      var dashView=e.target.closest('[data-dash-view]');
+      if(dashView){
+        closeSideAccountMenu();
+        selectView(dashView.getAttribute('data-dash-view'));
+        return;
+      }
       var settingsTog=e.target.closest('[data-settings-toggle]');
       if(settingsTog){
-        settingsNavOpen=!settingsNavOpen;
-        renderSide();
+        // The gear ("הגדרות חשבון") opens the standalone settings page, which holds
+        // everything that used to live in the inline profile submenu.
+        location.href='account-settings.html';
         return;
       }
       var tog=e.target.closest('[data-cattoggle]');
