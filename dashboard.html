@@ -10,6 +10,7 @@
     --bg:#ffffff; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
     --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
     --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --sel-bg:#eef0f6; --sel-line:#c9d0e0;
     --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
     --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
     --danger:#e5484d; --danger-soft:#fdecec;
@@ -31,6 +32,7 @@
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
     --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
     --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --sel-bg:#212734; --sel-line:#39414f;
     --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
     --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
     --danger:#ff6b6b; --danger-soft:#2a1719;
@@ -647,6 +649,15 @@
   .mp-files-link svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
   .mp-client-foot .btn{padding:9px 12px;border-radius:8px;font-size:12.8px;white-space:nowrap;}
   .mpr-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}.mpr-card{container-type:inline-size;overflow:hidden;border:1px solid #e7eaf2;border-radius:24px;background:var(--panel);box-shadow:0 14px 42px rgba(41,52,86,.10)}.mpr-main{padding:22px 28px 0}.mpr-topline{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}.mpr-close{width:36px;height:36px;border:0;background:transparent;color:#11182e;display:grid;place-items:center;cursor:pointer;border-radius:10px}.mpr-close:hover{background:var(--danger-soft);color:var(--danger)}.mpr-close svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2}.mpr-eyebrow{display:inline-flex;align-items:center;gap:13px;min-height:44px;padding:0 16px;border:1px solid #e1e6f0;border-radius:14px;color:#304be8;background:linear-gradient(135deg,#f7f9ff,#fff);font-size:15px;font-weight:900}.mpr-eyebrow svg{width:18px;height:18px;stroke:#11182e;fill:none;stroke-width:2}.mpr-hero{display:grid;grid-template-columns:210px minmax(0,1fr);gap:34px;align-items:center;direction:ltr;margin-bottom:22px}.mpr-cover{height:138px;border-radius:16px;overflow:hidden;position:relative;background:url('assets/hero-bg.jpg') center/cover;box-shadow:0 7px 18px rgba(12,20,40,.20)}.mpr-cover:after{content:'';position:absolute;inset:auto 0 0;height:48%;background:linear-gradient(transparent,rgba(5,10,20,.82))}.mpr-cover-count{position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:2;padding:5px 10px;border-radius:999px;background:rgba(6,12,25,.78);color:#fff;font-size:14px;font-weight:850}.mpr-cover-label{position:absolute;z-index:2;bottom:9px;left:14px;color:#fff;font-size:13px;font-weight:850;direction:rtl}.mpr-person{display:flex;align-items:center;gap:22px;direction:rtl;min-width:0}.mpr-avatar{width:112px;height:112px;flex:0 0 112px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#e8ffff,#dfe4ff);color:#2649a4;font-size:38px;font-weight:900;box-shadow:0 9px 24px rgba(53,87,180,.13)}.mpr-avatar img{width:100%;height:100%;object-fit:cover}.mpr-person-copy{min-width:0;text-align:right}.mpr-name-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.mpr-name{font-size:30px;font-weight:950;line-height:1.15}.mpr-live{padding:4px 11px;border-radius:9px;background:#eaf9eb;color:#2bb83c;font-size:12px;font-weight:850}.mpr-contact{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;color:#7581a4;font-size:12.5px;font-weight:650}.mpr-contact strong{color:#2972e9}.mpr-contact .sep{color:#c5cada}.mpr-date{margin-top:5px;color:#7581a4;font-size:12.5px;font-weight:650}.mpr-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:18px;direction:ltr}.mpr-stat{min-height:88px;border:1px solid #e7eaf1;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:16px;background:var(--panel);box-shadow:0 7px 18px rgba(40,54,91,.06);direction:rtl}.mpr-stat svg{width:33px;height:33px;stroke:currentColor;fill:none;stroke-width:1.8}.mpr-stat:nth-child(1){color:#6540ff}.mpr-stat:nth-child(2){color:#35bd58}.mpr-stat:nth-child(3){color:#3388f2}.mpr-stat:nth-child(4){color:#f27c00}.mpr-stat b{display:block;color:var(--ink);font-size:20px;font-weight:950}.mpr-stat span{display:block;color:#77809a;font-size:12px;margin-top:5px}.mpr-message{text-align:right;padding:0 12px 17px;border-bottom:1px solid #e5e9f1;color:#293047;font-size:14px;line-height:1.65}.mpr-message b{display:block}.mpr-actions{display:flex;align-items:center;gap:14px;padding:15px 0 18px;direction:rtl}.mpr-action{height:48px;border:1px solid #e1e5ee;border-radius:13px;background:var(--panel);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:0 19px;font-size:14px;font-weight:850;cursor:pointer;text-decoration:none}.mpr-action svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2}.mpr-action.share{min-width:220px;color:#6933ff;border-color:#743cff}.mpr-action.access{min-width:195px;background:#f6f8fc}.mpr-action.more{width:48px;padding:0;border-radius:50%}.mpr-status{margin-inline-start:auto;border:0;border-radius:999px;background:#ebfaed;color:#2bad39}.mpr-tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #eef0f5;background:#fff}.mpr-tab{height:68px;border:0;border-bottom:3px solid transparent;background:transparent;color:#283149;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:750}.mpr-tab svg{width:20px;height:20px;stroke:#7180a3;fill:none;stroke-width:2}.mpr-tab.on{color:#287bf0;border-bottom-color:#3489f5}.mpr-tab.on svg{stroke:#3489f5}.mpr-bottom{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;padding:28px;background:#fff;border-top:1px solid #f0f1f5;direction:rtl}.mpr-bottom .mpr-action{width:100%;height:54px}.mpr-bottom .primary{background:linear-gradient(135deg,#8242ff,#4d12ff);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(100,44,255,.24)}.mpr-bottom .danger{color:#ff3939;border-color:#ff5353;background:#fff}
+
+  /* Selected order/project card — click marks the current order with a gentle
+     gray wash so it stays clearly identifiable while moving around the page.
+     Only one card is selected at a time (see selectedProjectKey). */
+  .mpr-card,.mp-client{cursor:pointer;transition:background .15s ease,border-color .15s ease,box-shadow .15s ease}
+  .mpr-card.is-selected,.mp-client.is-selected{background:var(--sel-bg)}
+  .mpr-card.is-selected{border-color:var(--sel-line);box-shadow:0 0 0 1.5px var(--sel-line),0 14px 42px rgba(41,52,86,.10)}
+  .mpr-card.is-selected .mpr-tabs,.mpr-card.is-selected .mpr-bottom{background:var(--sel-bg)}
+  .mp-client.is-selected{box-shadow:0 0 0 1.5px var(--sel-line),var(--shadow-sm)}
 
   /* receive cards: 2 per row on wide screens; a single full-width card below
      ~1600px so every card stays wide enough (~600px+) to read exactly like the
@@ -2802,11 +2813,11 @@
     return '<span class="mp-status st-'+projStatusTone(card.status)+'">'+esc(projStatus(card.status))+'</span>';
   }
   function projCopyLinkLabel(){ return lang==='he' ? 'העתקת קישור' : lang==='ru' ? 'Копировать ссылку' : 'Copy link'; }
-  function projectReceiveHtml(card){
+  function projectReceiveHtml(card, pkey){
     var n=projectFilesCount(card), href=card.filesHref||'request.html?tab=manage', initials=projectInitials(card.client);
     var avatar=card.avatar?'<img src="'+esc(card.avatar)+'" alt="'+esc(card.client)+'">':esc(initials);
     var phone=card.phone||'050-1234567', email=card.email||'client@email.com';
-    return '<article class="mpr-card">'+
+    return '<article class="mpr-card" data-proj-key="'+esc(pkey||'')+'">'+
       '<div class="mpr-main">'+
         '<div class="mpr-topline"><span class="mpr-eyebrow">'+s(ICON.arrow)+s(ICON.inbox)+'קבצים שהתקבלו</span><button class="mpr-close" type="button" data-del-project aria-label="מחיקה">'+s(ICON.x)+'</button></div>'+
         '<div class="mpr-hero"><div class="mpr-cover"><span class="mpr-cover-count">+'+n+'</span><span class="mpr-cover-label">'+n+' קבצים</span></div><div class="mpr-person"><span class="mpr-avatar">'+avatar+'</span><div class="mpr-person-copy"><div class="mpr-name-row"><strong class="mpr-name">'+esc(card.client)+'</strong><span class="mpr-live">לקוח קיים</span></div><div class="mpr-contact"><span>'+esc(email)+'</span><span class="sep">|</span><span>פרויקט שהתקבל</span><strong>'+esc(card.projectNumberText||'#10002')+'</strong></div><div class="mpr-date">'+esc(phone)+' &nbsp; · &nbsp; התקבל: '+esc(card.f3||projectDate(Date.now()))+'</div></div></div></div>'+
@@ -2818,14 +2829,14 @@
       '<div class="mpr-bottom"><a class="mpr-action primary" href="'+esc(href)+'">'+s(ICON.folder)+'הצג קבצים</a><button class="mpr-action" type="button">'+s(ICON.archive)+'ייצוא ZIP</button><a class="mpr-action" href="'+esc(href)+'">'+s(ICON.download)+'הורד הכל</a><button class="mpr-action danger" type="button" data-del-project>'+s(ICON.trash)+'מחיקה</button></div>'+
     '</article>';
   }
-  function projectClientHtml(card, svc){
+  function projectClientHtml(card, svc, pkey){
     var filesAction = svc.tone==='receive'
       ? '<a class="mp-files-link" href="'+esc(card.filesHref||'request.html?tab=manage')+'">'+s(ICON.folder)+esc(projectFilesActionText(projectFilesCount(card)))+'</a>'
       : '';
     var copyAction = card.link
       ? '<button type="button" class="mp-copy" data-copy-link="'+esc(card.link)+'" aria-label="'+esc(projCopyLinkLabel())+'" title="'+esc(projCopyLinkLabel())+'">'+s(ICON.link)+'</button>'
       : '';
-    return '<article class="mp-client mp-tone-'+esc(svc.tone)+'">'+
+    return '<article class="mp-client mp-tone-'+esc(svc.tone)+'" data-proj-key="'+esc(pkey||'')+'">'+
       '<div class="mp-client-top">'+
         '<span class="mp-badge">'+s(ICON[svc.icon])+esc(svcText(svc.tone,'badge'))+'</span>'+
         '<button type="button" class="mp-menu" data-del-project aria-label="'+esc(projDelText().title)+'">'+s(ICON.x)+'</button>'+
@@ -2850,6 +2861,17 @@
       '</div>'+
     '</article>';
   }
+  // Which order/project card is currently selected. Kept in memory (not per
+  // view) so the gray highlight follows the user across view switches and any
+  // main re-render — reapplied in wireMain(). One card selected at a time.
+  var selectedProjectKey=null;
+  // Stable id for a card so its selected state survives re-renders. Namespaced
+  // by service key (a card belongs to exactly one service view) and by index,
+  // which disambiguates demo cards that can share a client/number.
+  function projectCardKey(svcKey, card, i){
+    var id = card.projectNumber || card.projectNumberText || card.link || card.client || 'card';
+    return svcKey+':'+id+':'+i;
+  }
   function viewProjects(){
     var key=projectServiceKey(), svc=PROJECT_SERVICES[key], cards=projectCardsFor(key);
     var action = key==='receive'
@@ -2865,7 +2887,7 @@
       '<div class="mp-head"><div><h2>'+esc(projMyProjectsText())+'</h2></div>'+action+'</div>'+
       '<div class="mp-tools">'+projectToolHtml(key)+'</div>'+
       '<div class="mp-section-title"><h3>'+esc(svcText(key,'section'))+'</h3><span>'+esc(projCardsCountText(cards.length))+'</span></div>'+
-      '<div class="'+(key==='receive'?'mpr-list':'mp-clients')+'">'+cards.map(function(c){ return key==='receive' ? projectReceiveHtml(c) : projectClientHtml(c, svc); }).join('')+'</div>'+
+      '<div class="'+(key==='receive'?'mpr-list':'mp-clients')+'">'+cards.map(function(c,i){ var pkey=projectCardKey(key,c,i); return key==='receive' ? projectReceiveHtml(c, pkey) : projectClientHtml(c, svc, pkey); }).join('')+'</div>'+
     '</section>';
   }
 
@@ -4159,6 +4181,19 @@
           setTimeout(function(){ card.remove(); }, 180);
           riToast(d.done);
         }});
+      });
+    });
+    // Order/project card selection: click marks the card with a gentle gray
+    // wash. Only one card is selected at a time, and the choice is reapplied on
+    // every render (below) so it survives view switches and any main re-render.
+    host.querySelectorAll('[data-proj-key]').forEach(function(card){
+      var pk=card.getAttribute('data-proj-key');
+      if(pk && pk===selectedProjectKey) card.classList.add('is-selected');
+      card.addEventListener('click', function(){
+        if(!pk || pk===selectedProjectKey) return;
+        selectedProjectKey=pk;
+        host.querySelectorAll('[data-proj-key].is-selected').forEach(function(o){ o.classList.remove('is-selected'); });
+        card.classList.add('is-selected');
       });
     });
     host.querySelectorAll('[data-copy-link]').forEach(function(b){
