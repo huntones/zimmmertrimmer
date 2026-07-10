@@ -464,7 +464,10 @@
   .gcard:active{transform:translateY(1px);}
   .gcard.isnew{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft);}
   .gc-thumb{position:relative;aspect-ratio:4/3;background:var(--panel-2);display:flex;align-items:center;justify-content:center;color:var(--faint);overflow:hidden;}
-  .gc-thumb.image{color:var(--info);} .gc-thumb.video{color:var(--danger);} .gc-thumb.audio{color:var(--accent);}
+  /* tint each card's thumb with the same per-type background used on the kind badges,
+     so an audio card reads as "audio" at a glance (image/video get the tint only until their real thumbnail loads over it). */
+  .gc-thumb.image{color:var(--info);background:var(--info-soft);} .gc-thumb.video{color:var(--danger);background:var(--danger-soft);} .gc-thumb.audio{color:var(--accent-dim);background:var(--accent-soft);}
+  .gc-thumb.doc{color:var(--info-dim);background:var(--info-soft);} .gc-thumb.other{color:var(--muted);background:var(--panel-2);}
   .gc-thumb img,.gc-thumb video{width:100%;height:100%;object-fit:cover;display:block;}
   .gc-thumb .ph{display:flex;}
   .gc-thumb .ph svg{width:38px;height:38px;}
@@ -769,7 +772,7 @@
       kick:'Kolkli Request',
       pageTitle:'קבלו קבצים ישירות מהלקוחות שלכם',
       pageSub:'צרו קישור העלאה, שלחו ללקוח, וכל הקבצים נכנסים אוטומטית לתיקייה מסודרת אצלכם. הלקוח לא צריך חשבון או התחברות.',
-      tabCreate:'בקשה חדשה', tabManage:'הזמנות שהתקבלו',
+      tabCreate:'יצירת טופס העלאה', tabManage:'הזמנות שהתקבלו',
       formTitle:'יצירת קישור לקבלת קבצים',
       fName:'שם הבקשה', fNamePh:'לדוגמה: תמונות לאירוע',
       fDesc:'הנחיות ללקוח', fDescPh:'מה בדיוק להעלות? כמה מילים שיראה הלקוח…',
@@ -823,7 +826,7 @@
       kick:'Kolkli Request',
       pageTitle:'Receive files directly from your clients',
       pageSub:'Create an upload link, send it to your client, and every file lands automatically in an organized folder on your side. Your client needs no account and no login.',
-      tabCreate:'New request', tabManage:'Orders received',
+      tabCreate:'Create upload form', tabManage:'Orders received',
       formTitle:'Create a file request',
       fName:'Request name', fNamePh:'e.g. Event photos',
       fDesc:'Instructions for the client', fDescPh:'What exactly should they upload? A few words shown to the client…',
@@ -877,7 +880,7 @@
       kick:'Kolkli Request',
       pageTitle:'Получайте файлы напрямую от клиентов',
       pageSub:'Создайте ссылку для загрузки, отправьте её клиенту — и каждый файл автоматически попадает в упорядоченную папку у вас. Клиенту не нужен аккаунт и вход.',
-      tabCreate:'Новый запрос', tabManage:'Полученные заказы',
+      tabCreate:'Создать форму загрузки', tabManage:'Полученные заказы',
       formTitle:'Создать запрос файлов',
       fName:'Название запроса', fNamePh:'напр. Фото с мероприятия',
       fDesc:'Инструкции для клиента', fDescPh:'Что именно загрузить? Пара слов, которые увидит клиент…',

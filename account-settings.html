@@ -45,7 +45,11 @@
     font-family:var(--mono);font-size:11px;font-weight:850;letter-spacing:.05em;text-transform:uppercase;padding:6px 13px;margin-bottom:14px;}
   .hero h1{margin:0 0 10px;font-size:clamp(30px,4vw,46px);line-height:1.08;font-weight:900;letter-spacing:0;}
   .hero p{margin:0 auto;color:var(--muted);font-size:16px;max-width:68ch;}
-  .settings-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:22px;align-items:start;max-width:1280px;margin:0 auto;}
+  /* Full-width, right-anchored layout — matches the dashboard (.dash): the nav
+     is the first grid column, so in RTL it sits flush against the right padding
+     edge, aligned with the header logo; the panels fill all remaining width to
+     its left. No centered max-width, so no dead band strands on the right. */
+  .settings-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:22px;align-items:start;max-width:none;margin:0;}
   .settings-nav{position:sticky;top:92px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:var(--shadow);}
   .nav-title{font-size:12px;font-weight:900;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin:4px 10px 10px;}
   .settings-nav a{display:flex;align-items:center;gap:11px;min-height:42px;border-radius:12px;padding:9px 11px;color:var(--ink-2);font-size:13.5px;font-weight:800;transition:background .12s,color .12s;}

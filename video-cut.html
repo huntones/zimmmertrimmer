@@ -348,15 +348,15 @@
       lblStart:'התחלה', lblEnd:'סיום', lblClip:'אורך הקטע',
       btnPlaySel:'נגן קטע', btnSetStart:'התחלה כאן', btnSetEnd:'סיום כאן',
       modeLbl:'אופן החיתוך',
-      modeFast:'מהיר', modeFastSub:'ללא קידוד · נצמד לפריים מפתח',
-      modePrecise:'מדויק', modePreciseSub:'קידוד מחדש · חיתוך מדויק',
+      modeFast:'מהיר', modeFastSub:'קידוד מהיר · אורך מדויק',
+      modePrecise:'איכותי', modePreciseSub:'איכות גבוהה · אורך מדויק',
       muteLbl:'הסרת אודיו', muteSub:'הקטע ייחתך ללא פס קול',
       cutBtn:'חתכו עכשיו', working:'חותך…', engineLoading:'טוען מנוע…',
-      rtNote:'העיבוד מהיר — . מצב "מהיר" כמעט מיידי; מצב "מדויק" מקודד מחדש ולכן איטי יותר בקטעים ארוכים.',
+      rtNote:'שני המצבים חותכים בדיוק לאורך שנבחר. "מהיר" מקודד מהר יותר (איכות מעט נמוכה יותר); "איכותי" מקודד באיכות גבוהה ולכן איטי יותר בקטעים ארוכים.',
       readyTitle:'הקטע מוכן!', readySub:'הקטע החתוך מוכן להורדה.',
       dlBtn:'הורדה', againBtn:'חתכו קטע נוסף', newBtn:'סרטון חדש',
       origLbl:'מקור', clipLbl:'קטע',
-      failed:'החיתוך נכשל — נסו את מצב "מדויק" או קובץ אחר',
+      failed:'החיתוך נכשל — נסו את מצב "איכותי" או קובץ אחר',
       seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
       foot:'KOLKLI · חותך וידאו · מהיר, פשוט ובאיכות מקצועית',
       errNoFile:'צריך להעלות קובץ וידאו', errRange:'בחרו קטע באורך של לפחות רבע שנייה',
@@ -375,15 +375,15 @@
       lblStart:'Start', lblEnd:'End', lblClip:'Clip length',
       btnPlaySel:'Play clip', btnSetStart:'Start here', btnSetEnd:'End here',
       modeLbl:'Cut mode',
-      modeFast:'Fast', modeFastSub:'no re-encode · snaps to keyframe',
-      modePrecise:'Precise', modePreciseSub:'re-encode · frame-accurate',
+      modeFast:'Fast', modeFastSub:'quick encode · exact length',
+      modePrecise:'Quality', modePreciseSub:'high quality · exact length',
       muteLbl:'Remove audio', muteSub:'Cut the clip without its soundtrack',
       cutBtn:'Cut now', working:'Cutting…', engineLoading:'Loading engine…',
-      rtNote:'Processing is fast — . "Fast" is near-instant; "Precise" re-encodes and is slower on long clips.',
+      rtNote:'Both modes cut to the exact selected length. "Fast" encodes quicker (slightly lower quality); "Quality" encodes at higher quality and is slower on long clips.',
       readyTitle:'Clip ready!', readySub:'Your trimmed clip is ready to download.',
       dlBtn:'Download', againBtn:'Cut another clip', newBtn:'New video',
       origLbl:'source', clipLbl:'clip',
-      failed:'Cut failed — try "Precise" mode or a different file',
+      failed:'Cut failed — try "Quality" mode or a different file',
       seam:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
       foot:'KOLKLI · Video cutter · Fast, simple and professional quality',
       errNoFile:'Add a video file', errRange:'Pick a clip of at least a quarter second',
@@ -402,15 +402,15 @@
       lblStart:'Начало', lblEnd:'Конец', lblClip:'Длина клипа',
       btnPlaySel:'Играть клип', btnSetStart:'Начало здесь', btnSetEnd:'Конец здесь',
       modeLbl:'Режим нарезки',
-      modeFast:'Быстрый', modeFastSub:'без перекодирования · по ключевому кадру',
-      modePrecise:'Точный', modePreciseSub:'перекодирование · с точностью до кадра',
+      modeFast:'Быстрый', modeFastSub:'быстрое кодирование · точная длина',
+      modePrecise:'Качество', modePreciseSub:'высокое качество · точная длина',
       muteLbl:'Убрать звук', muteSub:'Вырезать клип без звуковой дорожки',
       cutBtn:'Вырезать', working:'Нарезка…', engineLoading:'Загрузка движка…',
-      rtNote:'Обработка быстрая — . «Быстрый» — почти мгновенно; «Точный» перекодирует и медленнее на длинных клипах.',
+      rtNote:'Оба режима обрезают точно до выбранной длины. «Быстрый» кодирует быстрее (чуть ниже качество); «Качество» кодирует с более высоким качеством и медленнее на длинных клипах.',
       readyTitle:'Клип готов!', readySub:'Ваш обрезанный клип готов к скачиванию.',
       dlBtn:'Скачать', againBtn:'Вырезать ещё', newBtn:'Новое видео',
       origLbl:'оригинал', clipLbl:'клип',
-      failed:'Нарезка не удалась — попробуйте режим «Точный» или другой файл',
+      failed:'Нарезка не удалась — попробуйте режим «Качество» или другой файл',
       seam:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
       foot:'KOLKLI · Обрезка видео · Быстро, просто и профессионального качества',
       errNoFile:'Добавьте видеофайл', errRange:'Выберите клип не короче четверти секунды',
@@ -579,22 +579,24 @@
 
     el('progName').textContent=t.working; setProg(0);
     const mute=el('mute').checked;
-    const outExt = mode==='precise' ? 'mp4' : srcExt;
+    const outExt = 'mp4';   // both modes re-encode to H.264/AAC → exact-length clip
     const inName = 'in.'+srcExt;
     const outName = 'out.'+outExt;
     const dlName = baseName(file.name)+'_cut.'+outExt;
 
     try{
       await ffmpeg.writeFile(inName, await fetchFile(file));
+      // Re-encode with `-t` so the clip is exactly `d` seconds. Stream copy was
+      // dropped: it snapped the cut to the nearest keyframe, so the length drifted
+      // by up to a second. "Fast" trades quality for speed (ultrafast); "Precise"
+      // encodes at higher quality. Both land on the exact selected length.
       let args = ['-ss', s.toFixed(3), '-i', inName, '-t', d.toFixed(3)];
-      if(mode==='precise'){
-        args = args.concat(['-c:v','libx264','-preset','veryfast','-crf','20','-pix_fmt','yuv420p']);
-        args = args.concat(mute ? ['-an'] : ['-c:a','aac','-b:a','192k']);
-        args = args.concat(['-movflags','+faststart']);
-      }else{
-        args = args.concat(['-c','copy','-avoid_negative_ts','make_zero']);
-        if(mute) args.push('-an');
-      }
+      const vq = mode==='precise' ? ['-preset','veryfast','-crf','20'] : ['-preset','ultrafast','-crf','23'];
+      // force even dimensions so libx264/yuv420p accepts odd-sized sources (stream
+      // copy used to accept any size; a re-encode needs w/h divisible by 2).
+      args = args.concat(['-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','-c:v','libx264', ...vq, '-pix_fmt','yuv420p']);
+      args = args.concat(mute ? ['-an'] : ['-c:a','aac','-b:a','192k']);
+      args = args.concat(['-movflags','+faststart']);
       args.push(outName);
       await ffmpeg.exec(args);
       const data = await ffmpeg.readFile(outName);

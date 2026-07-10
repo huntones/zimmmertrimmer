@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -7,7 +7,7 @@
 <meta name="description" content="Your KOLKLI dashboard — manage your profile, audio, video, files and transfers. See your plan, limits and current usage.">
 <style>
   :root {
-    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --bg:#ffffff; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
     --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
     --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
     --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
@@ -52,9 +52,7 @@
   body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;overflow-x:clip;
     -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
   body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background:
-      radial-gradient(56% 38% at 12% 2%,rgba(124,58,237,0.09),transparent 60%),
-      radial-gradient(52% 40% at 90% 0%,rgba(59,111,246,0.08),transparent 60%);}
+    background:var(--bg);}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
 
@@ -77,14 +75,6 @@
   .side-logo img{display:block;width:auto;height:34px;}
   .side-nav-card{display:flex;flex-direction:column;gap:4px;}
   .side-scrim{display:none;}
-  .side-tools{display:flex;justify-content:flex-end;margin:0 0 4px;}
-  .side-settings-btn{width:40px;height:40px;border:1px solid var(--line);border-radius:12px;background:var(--panel);
-    color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);
-    transition:background .12s,border-color .12s,color .12s,transform .08s;}
-  .side-settings-btn:hover,.side-settings-btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dim);}
-  .side-settings-btn:active{transform:translateY(1px);}
-  .side-settings-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s ease;}
-  .side-settings-btn:hover svg,.side-settings-btn.on svg{transform:rotate(45deg);}
 
   .cat{border-radius:12px;}
   .cat-head{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border:none;background:none;cursor:pointer;
@@ -399,6 +389,8 @@
   .dt-card.tool-card{display:block;padding:0;overflow:hidden;}
   .tool-card-link{display:flex;min-height:156px;flex-direction:column;justify-content:center;align-items:flex-start;gap:10px;padding:20px;color:inherit;text-decoration:none;}
   .dt-ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:#fde7f0;color:#e0447a;margin-bottom:6px;}
+  /* design/dev-tools cards use the mint-green of the "Design & Digital" sidebar category (--tool:#0d9488) */
+  .dt-ic--design{background:rgba(13,148,136,.12);color:#0d9488;}
   .dt-ic svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
   .dt-name{display:block;font-size:15.5px;font-weight:900;color:var(--ink);line-height:1.25;}
   .dt-desc{display:block;font-size:12.8px;color:var(--muted);line-height:1.45;}
@@ -634,6 +626,17 @@
   .mp-status.st-warn{color:var(--warn);background:var(--warm-soft);border-color:var(--warm-line);}
   .mp-status.st-danger{color:var(--danger);background:var(--danger-soft);}
   .mp-status.st-neutral{color:var(--muted);background:var(--panel-2);border-color:var(--line);}
+  /* Select-page status pills - dedicated color + icon per selection state */
+  .mp-sel-status{border-color:transparent;}
+  .mp-sel-status::before{display:none;}
+  .mp-sel-status svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .mp-status.sel-wait{color:#C96A00;background:#FFF7E6;}
+  .mp-status.sel-progress{color:#1769D1;background:#EAF3FF;}
+  .mp-status.sel-done{color:#16804A;background:#EAF8F0;}
+  .mp-status.sel-view{color:#6B3CC9;background:#F3EEFF;}
+  .mp-status.sel-blocked{color:#6C757D;background:#F1F3F5;}
+  .mp-sel-status.sel-progress svg{animation:mpspin 1.1s linear infinite;transform-origin:50% 50%;}
+  @keyframes mpspin{to{transform:rotate(360deg);}}
   @keyframes mppulse{0%,100%{opacity:1;}50%{opacity:.4;}}
   .mp-id-txt{min-width:0;}
   .mp-client-phone{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);margin-top:3px;direction:ltr;}
@@ -643,6 +646,57 @@
   .mp-files-link:active{transform:translateY(1px);}
   .mp-files-link svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
   .mp-client-foot .btn{padding:9px 12px;border-radius:8px;font-size:12.8px;white-space:nowrap;}
+  .mpr-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}.mpr-card{container-type:inline-size;overflow:hidden;border:1px solid #e7eaf2;border-radius:24px;background:var(--panel);box-shadow:0 14px 42px rgba(41,52,86,.10)}.mpr-main{padding:22px 28px 0}.mpr-topline{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}.mpr-close{width:36px;height:36px;border:0;background:transparent;color:#11182e;display:grid;place-items:center;cursor:pointer;border-radius:10px}.mpr-close:hover{background:var(--danger-soft);color:var(--danger)}.mpr-close svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2}.mpr-eyebrow{display:inline-flex;align-items:center;gap:13px;min-height:44px;padding:0 16px;border:1px solid #e1e6f0;border-radius:14px;color:#304be8;background:linear-gradient(135deg,#f7f9ff,#fff);font-size:15px;font-weight:900}.mpr-eyebrow svg{width:18px;height:18px;stroke:#11182e;fill:none;stroke-width:2}.mpr-hero{display:grid;grid-template-columns:210px minmax(0,1fr);gap:34px;align-items:center;direction:ltr;margin-bottom:22px}.mpr-cover{height:138px;border-radius:16px;overflow:hidden;position:relative;background:url('assets/hero-bg.jpg') center/cover;box-shadow:0 7px 18px rgba(12,20,40,.20)}.mpr-cover:after{content:'';position:absolute;inset:auto 0 0;height:48%;background:linear-gradient(transparent,rgba(5,10,20,.82))}.mpr-cover-count{position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:2;padding:5px 10px;border-radius:999px;background:rgba(6,12,25,.78);color:#fff;font-size:14px;font-weight:850}.mpr-cover-label{position:absolute;z-index:2;bottom:9px;left:14px;color:#fff;font-size:13px;font-weight:850;direction:rtl}.mpr-person{display:flex;align-items:center;gap:22px;direction:rtl;min-width:0}.mpr-avatar{width:112px;height:112px;flex:0 0 112px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#e8ffff,#dfe4ff);color:#2649a4;font-size:38px;font-weight:900;box-shadow:0 9px 24px rgba(53,87,180,.13)}.mpr-avatar img{width:100%;height:100%;object-fit:cover}.mpr-person-copy{min-width:0;text-align:right}.mpr-name-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.mpr-name{font-size:30px;font-weight:950;line-height:1.15}.mpr-live{padding:4px 11px;border-radius:9px;background:#eaf9eb;color:#2bb83c;font-size:12px;font-weight:850}.mpr-contact{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;color:#7581a4;font-size:12.5px;font-weight:650}.mpr-contact strong{color:#2972e9}.mpr-contact .sep{color:#c5cada}.mpr-date{margin-top:5px;color:#7581a4;font-size:12.5px;font-weight:650}.mpr-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:18px;direction:ltr}.mpr-stat{min-height:88px;border:1px solid #e7eaf1;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:16px;background:var(--panel);box-shadow:0 7px 18px rgba(40,54,91,.06);direction:rtl}.mpr-stat svg{width:33px;height:33px;stroke:currentColor;fill:none;stroke-width:1.8}.mpr-stat:nth-child(1){color:#6540ff}.mpr-stat:nth-child(2){color:#35bd58}.mpr-stat:nth-child(3){color:#3388f2}.mpr-stat:nth-child(4){color:#f27c00}.mpr-stat b{display:block;color:var(--ink);font-size:20px;font-weight:950}.mpr-stat span{display:block;color:#77809a;font-size:12px;margin-top:5px}.mpr-message{text-align:right;padding:0 12px 17px;border-bottom:1px solid #e5e9f1;color:#293047;font-size:14px;line-height:1.65}.mpr-message b{display:block}.mpr-actions{display:flex;align-items:center;gap:14px;padding:15px 0 18px;direction:rtl}.mpr-action{height:48px;border:1px solid #e1e5ee;border-radius:13px;background:var(--panel);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:0 19px;font-size:14px;font-weight:850;cursor:pointer;text-decoration:none}.mpr-action svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2}.mpr-action.share{min-width:220px;color:#6933ff;border-color:#743cff}.mpr-action.access{min-width:195px;background:#f6f8fc}.mpr-action.more{width:48px;padding:0;border-radius:50%}.mpr-status{margin-inline-start:auto;border:0;border-radius:999px;background:#ebfaed;color:#2bad39}.mpr-tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #eef0f5;background:#fff}.mpr-tab{height:68px;border:0;border-bottom:3px solid transparent;background:transparent;color:#283149;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:750}.mpr-tab svg{width:20px;height:20px;stroke:#7180a3;fill:none;stroke-width:2}.mpr-tab.on{color:#287bf0;border-bottom-color:#3489f5}.mpr-tab.on svg{stroke:#3489f5}.mpr-bottom{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;padding:28px;background:#fff;border-top:1px solid #f0f1f5;direction:rtl}.mpr-bottom .mpr-action{width:100%;height:54px}.mpr-bottom .primary{background:linear-gradient(135deg,#8242ff,#4d12ff);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(100,44,255,.24)}.mpr-bottom .danger{color:#ff3939;border-color:#ff5353;background:#fff}
+
+  /* receive cards: 2 per row on wide screens; a single full-width card below
+     ~1600px so every card stays wide enough (~600px+) to read exactly like the
+     reference image (hero, 4 stat tiles, tab row & action row all on one line). */
+  @media (max-width:1600px){.mpr-list{grid-template-columns:1fr}}
+  /* mild proportional shrink — KEEP the full image layout (side-by-side hero,
+     4 stats in a row, 4 tabs, 4 buttons), just smaller. This is what makes the
+     2-up ~600-900px card look one-to-one with the picture, only scaled down. */
+  @container (max-width:900px){
+    .mpr-main{padding:18px 20px 0}.mpr-topline{margin-bottom:16px}
+    .mpr-eyebrow{min-height:38px;font-size:13px;gap:9px;padding:0 12px}.mpr-eyebrow svg{width:15px;height:15px}
+    .mpr-hero{grid-template-columns:150px minmax(0,1fr);gap:20px;margin-bottom:18px}.mpr-cover{height:106px}
+    .mpr-cover-count{font-size:12px;padding:4px 8px}.mpr-cover-label{font-size:11px;bottom:7px;left:10px}
+    .mpr-avatar{width:78px;height:78px;flex-basis:78px;font-size:27px}
+    .mpr-person{gap:14px}.mpr-name{font-size:21px}.mpr-name-row{gap:9px}
+    .mpr-live{font-size:11px;padding:3px 8px}
+    .mpr-contact{font-size:11.5px;gap:6px;margin-top:9px}.mpr-date{font-size:11.5px;margin-top:4px}
+    .mpr-stats{gap:10px;margin-bottom:14px}
+    .mpr-stat{min-height:66px;gap:9px}.mpr-stat svg{width:23px;height:23px}.mpr-stat b{font-size:15px}.mpr-stat span{font-size:11px;margin-top:3px}
+    .mpr-message{padding:0 6px 13px;font-size:13px;line-height:1.55}
+    .mpr-actions{gap:9px;padding:12px 0 14px}
+    .mpr-action{height:42px;padding:0 13px;font-size:12.5px}.mpr-action svg{width:16px;height:16px}
+    .mpr-action.share{min-width:150px}.mpr-action.access{min-width:130px}.mpr-action.more{width:42px}
+    .mpr-tab{height:54px;font-size:12px;gap:6px}.mpr-tab svg{width:16px;height:16px}
+    .mpr-bottom{gap:14px;padding:18px}.mpr-bottom .mpr-action{height:48px}
+  }
+  /* only genuinely narrow cards (phones) fall back to the stacked layout */
+  @container (max-width:460px){
+    .mpr-main{padding:18px 18px 0}.mpr-topline{margin-bottom:16px}
+    .mpr-eyebrow{min-height:40px;font-size:13.5px;gap:10px;padding:0 13px}.mpr-eyebrow svg{width:16px;height:16px}
+    .mpr-hero{grid-template-columns:1fr;gap:16px;margin-bottom:18px}.mpr-cover{height:120px}
+    .mpr-person{gap:16px}.mpr-avatar{width:76px;height:76px;flex-basis:76px;font-size:27px}
+    .mpr-name{font-size:22px}.mpr-name-row{gap:10px}
+    .mpr-stats{grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+    .mpr-stat{min-height:72px;gap:12px}.mpr-stat svg{width:27px;height:27px}.mpr-stat b{font-size:17px}
+    .mpr-message{padding:0 4px 15px;font-size:13.5px}
+    .mpr-actions{flex-wrap:wrap;gap:10px;padding:14px 0 16px}
+    .mpr-action{height:44px;padding:0 15px;font-size:13px}
+    .mpr-action.share,.mpr-action.access{min-width:0;flex:1 1 auto}.mpr-action.more{flex:0 0 44px}
+    .mpr-status{margin-inline-start:0}
+    .mpr-tabs{grid-template-columns:repeat(2,1fr)}.mpr-tab{height:56px;font-size:13px;gap:8px}.mpr-tab svg{width:18px;height:18px}
+    .mpr-bottom{grid-template-columns:repeat(2,1fr);gap:12px;padding:18px}.mpr-bottom .mpr-action{height:50px}
+  }
+  @container (max-width:340px){
+    .mpr-main{padding:16px 14px 0}
+    .mpr-stats{grid-template-columns:1fr}
+    .mpr-tabs{grid-template-columns:1fr}.mpr-tab{height:50px;justify-content:flex-start;padding:0 16px}
+    .mpr-bottom{grid-template-columns:1fr}
+    .mpr-action.share,.mpr-action.access{flex:1 1 100%}
+  }
 
   /* ---------- processed files history ---------- */
   .pf-card{overflow:hidden;padding:0;}
@@ -650,27 +704,30 @@
   .pf-head h2{font-size:18px;font-weight:800;margin:0 0 4px;letter-spacing:-0.01em;}
   .pf-head .csub{font-size:13px;color:var(--muted);margin:0;max-width:72ch;}
   .pf-plan{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:7px 12px;border-radius:999px;
-    background:var(--accent-soft);color:var(--accent-dim);font-size:12px;font-weight:800;white-space:nowrap;}
+    background:var(--svc-bg,var(--accent-soft));color:var(--svc,var(--accent-dim));font-size:12px;font-weight:800;white-space:nowrap;}
   .pf-plan svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   .pf-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:18px;}
   .pf-item{display:flex;flex-direction:column;gap:14px;min-height:230px;padding:17px;border:1px solid var(--line);
-    border-radius:8px;background:var(--panel);box-shadow:var(--shadow-sm);position:relative;transition:border-color .16s,box-shadow .16s,background .16s;}
-  .pf-item.is-selected{border-color:var(--accent);background:linear-gradient(180deg,var(--panel),rgba(124,58,237,.045));box-shadow:0 0 0 2px var(--accent-soft),var(--shadow);}
-  .pf-select{position:absolute;top:9px;right:9px;z-index:3;width:28px;height:28px;border-radius:999px;display:grid;place-items:center;cursor:pointer;}
+    border-radius:8px;background:var(--svc-bg,var(--panel));box-shadow:var(--shadow-sm);position:relative;transition:border-color .16s,box-shadow .16s,background .16s;}
+  .pf-item.is-selected{border-color:var(--svc,var(--accent));background:var(--svc-bg,var(--panel));box-shadow:0 0 0 2px var(--svc-line,var(--accent-soft)),var(--shadow);}
+  /* checkbox lives in a reserved leading gutter that only opens in select mode — never overlaps the file icon */
+  .pf-select{position:absolute;top:24px;inset-inline-start:14px;z-index:3;width:28px;height:28px;border-radius:999px;display:none;place-items:center;cursor:pointer;}
+  .pf-card.pf-selecting .pf-item{padding-inline-start:54px;}
+  .pf-card.pf-selecting .pf-select{display:grid;}
   .pf-select input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer;}
   .pf-select span{width:24px;height:24px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:transparent;display:grid;place-items:center;box-shadow:var(--shadow-sm);transition:background .14s,border-color .14s,color .14s,transform .12s;}
   .pf-select svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
-  .pf-select:hover span{border-color:var(--accent);transform:translateY(-1px);}
-  .pf-select input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px;}
-  .pf-select input:checked + span{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 8px 18px rgba(124,58,237,.25);}
+  .pf-select:hover span{border-color:var(--svc,var(--accent));transform:translateY(-1px);}
+  .pf-select input:focus-visible + span{outline:2px solid var(--svc,var(--accent));outline-offset:2px;}
+  .pf-select input:checked + span{background:var(--svc,var(--accent));border-color:var(--svc,var(--accent));color:#fff;box-shadow:0 8px 18px var(--svc-shadow,rgba(124,58,237,.25));}
   .pf-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
   .pf-file{display:flex;align-items:center;gap:12px;min-width:0;}
-  .pf-ic{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:var(--grad-soft);color:var(--accent);}
+  .pf-ic{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:var(--svc-bg,var(--grad-soft));color:var(--svc,var(--accent));}
   .pf-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   .pf-name{display:block;font-size:15px;font-weight:850;line-height:1.25;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .pf-size{display:block;font-size:12px;color:var(--muted);margin-top:3px;}
   .pf-action{display:inline-flex;align-items:center;gap:7px;min-height:28px;padding:5px 10px;border-radius:8px;
-    background:var(--accent-soft);color:var(--accent-dim);font-size:11.5px;font-weight:850;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
+    background:var(--svc-bg,var(--accent-soft));color:var(--svc,var(--accent-dim));font-size:11.5px;font-weight:850;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
   .pf-action svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   .pf-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-block:1px solid var(--line-2);padding:13px 0;}
   .pf-k{display:block;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);margin-bottom:2px;}
@@ -679,10 +736,49 @@
   .pf-foot .btn{border-radius:8px;font-size:12.8px;padding:9px 12px;white-space:nowrap;}
   .pf-empty{padding:44px 20px;text-align:center;}
   .pf-tools{padding:0 18px 18px;}
+  .pf-head-side{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .pf-mode-btn{border-radius:999px;font-size:12.5px;padding:8px 13px;white-space:nowrap;}
+  .pf-mode-btn.on{background:var(--svc-bg,var(--accent-soft));border-color:var(--svc,var(--accent));color:var(--svc,var(--accent-dim));}
   .pf-bulk{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 18px 0;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);box-shadow:var(--shadow-sm);}
-  .pf-bulk-count{font-size:13px;font-weight:850;color:var(--accent-dim);}
+  .pf-bulk .btn[disabled]{opacity:.5;cursor:not-allowed;pointer-events:none;}
+  .pf-bulk-count{font-size:13px;font-weight:850;color:var(--svc,var(--accent-dim));}
   .pf-bulk-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .pf-bulk .btn{border-radius:8px;font-size:12.5px;padding:8px 11px;}
+
+  /* Full processed-file card — matched to the supplied reference */
+  .pf-list{grid-template-columns:1fr;gap:20px;padding:20px}
+  .pf-item{display:block;min-height:0;padding:0 38px;border:1.5px solid #d9c9ff;border-radius:25px;background:#fff;box-shadow:0 12px 28px rgba(76,48,142,.13);overflow:hidden;color:#171b2d}
+  .pf-item .pf-select{display:grid;position:absolute;top:49px;inset-inline-start:36px;width:34px;height:34px}
+  .pf-item .pf-select span{width:34px;height:34px;border-radius:7px;border-color:#9ca8c0;box-shadow:none}
+  .pf-hero{min-height:247px;padding:38px 0 24px;display:grid;grid-template-columns:150px minmax(0,1fr) 310px;gap:28px;align-items:start;direction:ltr}
+  .pf-audio-icon{width:122px;height:122px;border-radius:18px;margin-inline-start:64px;background:linear-gradient(145deg,#f0ddff,#ead7ff);display:grid;place-items:center;color:#8b3df4}
+  .pf-audio-icon svg{width:62px;height:62px;stroke:currentColor;fill:none;stroke-width:1.8}
+  .pf-maininfo{direction:rtl;text-align:right;min-width:0}
+  .pf-titleline{display:flex;align-items:center;gap:12px;direction:rtl;margin-bottom:39px}
+  .pf-titleline .pf-name{font-size:24px;font-weight:900;direction:ltr;text-align:left;max-width:100%;color:#151a2b}
+  .pf-edit-pen{color:#8346f7;font-size:25px;line-height:1}
+  .pf-pills{display:flex;gap:16px;direction:ltr;flex-wrap:wrap}
+  .pf-pill{padding:8px 15px;border-radius:9px;background:#f0eff8;color:#596178;font-size:15px;font-weight:700;white-space:nowrap}
+  .pf-pill.primary{background:#eee1ff;color:#7f3ef1}
+  .pf-player{direction:rtl;text-align:right}
+  .pf-player-tools{display:flex;gap:18px;justify-content:flex-start;direction:rtl;margin-bottom:28px}
+  .pf-square{width:57px;height:57px;border:1px solid #ece8f7;border-radius:12px;background:#fff;display:grid;place-items:center;color:#20283f;box-shadow:0 5px 14px rgba(59,39,112,.10);font-size:27px}
+  .pf-square.link{color:#7e3eff}.pf-square svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:2}
+  .pf-wave-row{display:flex;align-items:center;gap:18px;direction:ltr}
+  .pf-wave{height:58px;flex:1;display:flex;align-items:center;gap:3px;overflow:hidden}
+  .pf-wave i{display:block;width:3px;border-radius:4px;background:linear-gradient(#c183ff,#8342ff)}
+  .pf-play{width:66px;height:66px;border-radius:50%;border:1px solid #eee9fa;background:#fff;box-shadow:0 7px 18px rgba(73,43,145,.14);display:grid;place-items:center;color:#37405a;font-size:29px;padding-inline-start:4px}
+  .pf-duration{text-align:left;font-size:19px;font-weight:850;margin-top:8px;padding-left:3px}
+  .pf-details{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #ebe6f5;border-bottom:1px solid #ebe6f5;padding:31px 0 29px;direction:ltr}
+  .pf-detail{min-height:142px;padding:0 45px;border-left:1px solid #e7e1f1;direction:rtl;text-align:right}
+  .pf-detail:first-child{border-left:0}.pf-detail-icon{height:42px;color:#7d37ee;margin-bottom:12px}.pf-detail-icon svg{width:31px;height:31px;stroke:currentColor;fill:none;stroke-width:1.9}
+  .pf-detail-label{color:#838ca2;font-size:15px;margin-bottom:12px}.pf-detail-value{font-size:18px;font-weight:850}.pf-detail-sub{font-size:14px;color:#69738e;margin-top:3px}.pf-tags{display:flex;gap:10px;flex-wrap:wrap}.pf-tags span{background:#f0eff7;color:#626b82;border-radius:8px;padding:6px 12px}.pf-addtag{display:block;color:#8245f3;margin-top:14px;font-weight:700}
+  .pf-stats{height:104px;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;border-bottom:1px solid #ebe6f5;direction:ltr}
+  .pf-stat{text-align:center;border-left:1px solid #e8e2f1;font-size:14px;color:#7b849b}.pf-stat:first-child{border-left:0}.pf-stat b{display:block;color:#151a2b;font-size:18px;margin-bottom:4px}.pf-stat .green{color:#36ad45}
+  .pf-actions{display:flex;align-items:center;gap:38px;padding:31px 0 37px;direction:ltr}
+  .pf-actionbtn{height:61px;border:1px solid #e5e1ee;border-radius:12px;background:#fff;box-shadow:0 5px 14px rgba(63,44,112,.08);padding:0 26px;display:inline-flex;align-items:center;justify-content:center;gap:12px;font-size:16px;font-weight:800;color:#293147;white-space:nowrap}
+  .pf-actionbtn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2}.pf-actionbtn.download{margin-left:auto;min-width:187px;background:linear-gradient(110deg,#5c20f1,#9b45ff);color:#fff;border:0;box-shadow:0 10px 21px rgba(106,39,241,.24)}.pf-actionbtn.danger{color:#e43b43;margin-right:auto}
+  @media(max-width:1050px){.pf-hero{grid-template-columns:110px 1fr}.pf-player{grid-column:1/-1}.pf-audio-icon{margin-inline-start:40px}.pf-details{grid-template-columns:1fr 1fr}.pf-detail{border-bottom:1px solid #eee8f5;padding:20px}.pf-actions{gap:10px;flex-wrap:wrap}.pf-actionbtn.download{margin-left:0}.pf-actionbtn.danger{margin-right:0}}
 
   footer.dfoot{text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);margin-top:30px;}
 
@@ -719,6 +815,7 @@
     .mp-client-foot{align-items:stretch;flex-direction:column;}
     .mp-foot-actions{width:100%;}
     .mp-client-foot .btn,.mp-files-link{flex:1;width:100%;}
+    /* .mpr-* narrow layout is handled by the per-card @container queries above */
     .pf-head{padding:18px;}
     .pf-list{padding:14px;}
     .pf-bulk{align-items:stretch;flex-direction:column;margin:14px 14px 0;}
@@ -876,22 +973,22 @@
   @media(min-width:901px){
     body.dash-signed-in{--dash-side-w:344px;}
     /* the rail lives on the inline-START edge — RIGHT in Hebrew/RTL, LEFT in English/LTR.
-       Logical props (inset-inline-start / margin-inline-start) mirror automatically; only
-       the box-shadow direction is physical, so it gets an html[dir="ltr"] override below. */
+       Logical props (inset-inline-start / margin-inline-start / border-inline-end) mirror
+       automatically, so the divider line always faces the main content. */
     body.dash-signed-in .dash-wrap{width:auto;margin:0;margin-inline-start:var(--dash-side-w);padding:96px 22px 60px;}
     body.dash-signed-in .dash{display:block;}
     body.dash-signed-in .side{
       position:fixed;top:0;inset-inline-start:0;bottom:0;z-index:72;width:var(--dash-side-w);height:100vh;
-      overflow-y:auto;border:0;border-radius:0;background:var(--panel);box-shadow:-18px 0 44px rgba(28,32,48,.08);
+      overflow-y:auto;border:0;border-inline-end:1px solid var(--line);border-radius:0;background:var(--panel);
       padding:0 18px 22px;gap:0;display:flex;flex-direction:column;
     }
-    html[dir="ltr"] body.dash-signed-in .side{box-shadow:18px 0 44px rgba(28,32,48,.08);}
     body.dash-signed-in .side-logo{
       display:flex;align-items:center;justify-content:center;height:88px;margin:0 -18px 22px;background:var(--panel);
-      border-bottom:1px solid var(--line);box-shadow:0 12px 28px rgba(30,37,80,.05);
+      border-bottom:1px solid var(--line);
     }
+    /* menu/tools area sits directly on the white rail — no card, no border, no rounded corners */
     body.dash-signed-in .side-nav-card{
-      background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:var(--shadow);
+      background:transparent;border:0;border-radius:0;padding:0;box-shadow:none;
       flex:1;min-height:0;
     }
     body.dash-signed-in .dash-top{
@@ -1432,7 +1529,9 @@
     phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
     mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
     openext:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
-    archive:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>'
+    archive:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>',
+    eye:'<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>',
+    lock:'<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
   };
   var PLAN_ICON = { free:'zap', creator:'crown', studio:'shield' };
 
@@ -1472,6 +1571,7 @@
   var reqState={ sel:null, filter:'all', q:'', sort:'new' };
   var dashSearchState={ q:'', open:false };
   var pfSelection={};
+  var pfSelectMode={};
   var reqBC=null;
   var user=null, isGuest=false, plan='free';
   var activeProjectId=null;
@@ -1863,10 +1963,8 @@
     if(isAdmin()){
       html += '<a class="side-admin" href="admin.html"><span class="sa-ic">'+s(ICON.shield)+'</span><span>'+esc(t.adminPanel)+'</span></a>';
     }
-    html += '<div class="side-tools">'+
-      '<button class="side-settings-btn" type="button" data-settings-toggle '+
-        'title="'+esc(t.settingsTitle)+'" aria-label="'+esc(t.settingsTitle)+'">'+s(ICON.gear)+'</button>'+
-    '</div>';
+    // Settings gear removed from the top of the side rail — it duplicated the
+    // "הגדרות חשבון" gear already available in the account menu at the bottom.
     NAV.forEach(function(cat){
       if(cat.id==='teamsec') return;
       // profile/settings items live on the standalone account-settings page now,
@@ -2173,7 +2271,7 @@
     return '<article class="dt-card tool-card">'+
       favButtonHtml(item)+
       '<a class="tool-card-link" href="'+esc(href)+'">'+
-        '<span class="dt-ic">'+s(icon)+'</span>'+
+        '<span class="dt-ic dt-ic--design">'+s(icon)+'</span>'+
         '<span class="dt-name">'+esc(devToolTitle(o))+'</span>'+
         '<span class="dt-desc">'+esc(devToolDesc(o))+'</span>'+
       '</a>'+
@@ -2403,9 +2501,11 @@
   };
   var PROJECT_DEMO = {
     select:[
-      { client:'Daniel Smith', email:'daniel.smith@email.com', phone:'054-2210148', link:'https://kolkli.com/s/SEL-8821', title:'Daniel Smith - Event Photos', f1:'124 files', l1:'Gallery', f2:'48 selected', l2:'Chosen', f3:'Jul 07, 2026', l3:'Link sent', note:'Selection link sent to the client for choosing final materials.', status:'Waiting for selection' },
-      { client:'Maya Cohen', email:'maya.cohen@email.com', phone:'052-8843007', link:'https://kolkli.com/s/SEL-8822', title:'Family Album Selection', f1:'86 files', l1:'Gallery', f2:'21 selected', l2:'Chosen', f3:'Jul 06, 2026', l3:'Link sent', note:'Client is choosing favorites from the private gallery.', status:'In progress' },
-      { client:'Amit Levi', email:'amit.levi@email.com', phone:'050-7712394', link:'https://kolkli.com/s/SEL-8823', title:'Product Shoot Picks', f1:'63 files', l1:'Gallery', f2:'12 selected', l2:'Chosen', f3:'Jul 05, 2026', l3:'Link sent', note:'Selection package is separated from send, receive and review work.', status:'Awaiting picks' }
+      { client:'Daniel Smith', email:'daniel.smith@email.com', phone:'054-2210148', link:'https://kolkli.com/s/SEL-8821', title:'Daniel Smith - Event Photos', f1:'124 files', l1:'Gallery', f2:'0 selected', l2:'Chosen', f3:'Jul 07, 2026', l3:'Link sent', note:'Selection link sent to the client for choosing final materials.', status:'Waiting for selection' },
+      { client:'Maya Cohen', email:'maya.cohen@email.com', phone:'052-8843007', link:'https://kolkli.com/s/SEL-8822', title:'Family Album Selection', f1:'86 files', l1:'Gallery', f2:'21 selected', l2:'Chosen', f3:'Jul 06, 2026', l3:'Link sent', note:'Client is choosing favorites from the private gallery.', status:'Selection in progress' },
+      { client:'Amit Levi', email:'amit.levi@email.com', phone:'050-7712394', link:'https://kolkli.com/s/SEL-8823', title:'Product Shoot Picks', f1:'63 files', l1:'Gallery', f2:'63 selected', l2:'Chosen', f3:'Jul 05, 2026', l3:'Link sent', note:'Selection package is separated from send, receive and review work.', status:'Selection complete' },
+      { client:'Yael Mizrahi', email:'yael.mizrahi@email.com', phone:'053-8890442', link:'https://kolkli.com/s/SEL-8824', title:'Studio Portfolio Preview', f1:'54 files', l1:'Gallery', f2:'0 selected', l2:'Chosen', f3:'Jul 04, 2026', l3:'Link sent', note:'Client can view the gallery but cannot change the selection.', status:'View only' },
+      { client:'Ron Studio', email:'hello@ronstudio.com', phone:'077-3301920', link:'https://kolkli.com/s/SEL-8825', title:'Archived Event Gallery', f1:'42 files', l1:'Gallery', f2:'0 selected', l2:'Chosen', f3:'Jul 01, 2026', l3:'Link sent', note:'The selection link is closed and no longer available.', status:'Selection unavailable' }
     ],
     receive:[
       { client:'Daniel Smith', email:'daniel.smith@email.com', phone:'054-2210148', title:'Daniel Smith - Event Upload', f1:'25 files', l1:'Received', f2:'3.2 GB', l2:'Total size', f3:'Jul 14, 2026', l3:'Expires', note:'Client uploaded photos and video through a file request.', status:'Pending review' },
@@ -2444,7 +2544,7 @@
       },
       unit:{ files:'קבצים', selected:'נבחרו', download:'הורדה', downloads:'הורדות', comment:'הערה', comments:'הערות' },
       status:{
-        'Waiting for selection':'ממתין לבחירה', 'In progress':'בתהליך', 'Awaiting picks':'ממתין לבחירות',
+        'Waiting for selection':'ממתין לבחירה', 'In progress':'בחירה בתהליך', 'Selection in progress':'בחירה בתהליך', 'Selection complete':'הבחירה הסתיימה', 'View only':'לצפייה בלבד', 'Selection unavailable':'הבחירה אינה זמינה', 'Awaiting picks':'ממתין לבחירה',
         'Pending review':'ממתין לבדיקה', 'Received':'התקבל', 'Active request':'בקשה פעילה',
         'Delivered':'נמסר', 'Downloaded':'הורד', 'Link active':'קישור פעיל',
         'Waiting approval':'ממתין לאישור', 'Changes requested':'התבקשו שינויים', 'In review':'בבדיקה',
@@ -2466,7 +2566,9 @@
         'Materials were sent to the client for comments and approval.':'החומרים נשלחו ללקוח להערות ואישור.',
         'Review project contains client feedback, not delivery files.':'פרויקט האישור מכיל משוב לקוח, לא קבצי מסירה.',
         'Approval workflow remains inside Review Files only.':'תהליך האישור נשאר בתוך אישור למסירה בלבד.',
-        'Materials sent to the client for review and approval.':'החומרים נשלחו ללקוח לצפייה ואישור.'
+        'Materials sent to the client for review and approval.':'החומרים נשלחו ללקוח לצפייה ואישור.',
+        'Client can view the gallery but cannot change the selection.':'הלקוח יכול לצפות בגלריה אך אינו יכול לשנות את הבחירה.',
+        'The selection link is closed and no longer available.':'קישור הבחירה נסגר ואינו זמין עוד.'
       }
     },
     ru:{
@@ -2485,7 +2587,7 @@
       },
       unit:{ files:'файлов', selected:'выбрано', download:'загрузка', downloads:'загрузок', comment:'комментарий', comments:'комментариев' },
       status:{
-        'Waiting for selection':'Ожидает выбора', 'In progress':'В процессе', 'Awaiting picks':'Ожидает выбора',
+        'Waiting for selection':'Ожидает выбора', 'In progress':'Выбор в процессе', 'Selection in progress':'Выбор в процессе', 'Selection complete':'Выбор завершён', 'View only':'Только просмотр', 'Selection unavailable':'Выбор недоступен', 'Awaiting picks':'Ожидает выбора',
         'Pending review':'Ожидает проверки', 'Received':'Получено', 'Active request':'Активный запрос',
         'Delivered':'Доставлено', 'Downloaded':'Скачано', 'Link active':'Ссылка активна',
         'Waiting approval':'Ожидает согласования', 'Changes requested':'Запрошены изменения', 'In review':'На проверке',
@@ -2507,7 +2609,9 @@
         'Materials were sent to the client for comments and approval.':'Материалы отправлены клиенту для комментариев и согласования.',
         'Review project contains client feedback, not delivery files.':'Проект проверки содержит отзывы клиента, а не файлы доставки.',
         'Approval workflow remains inside Review Files only.':'Процесс согласования остаётся только в разделе проверки файлов.',
-        'Materials sent to the client for review and approval.':'Материалы отправлены клиенту для проверки и согласования.'
+        'Materials sent to the client for review and approval.':'Материалы отправлены клиенту для проверки и согласования.',
+        'Client can view the gallery but cannot change the selection.':'Клиент может просматривать галерею, но не может изменить выбор.',
+        'The selection link is closed and no longer available.':'Ссылка на выбор закрыта и больше недоступна.'
       }
     }
   };
@@ -2639,6 +2743,7 @@
           projectNumberText:projectNumberText('review',p), projectNumber:p.projectNumber };
       });
     }
+    if(key==='select' && cards.length===0) return (PROJECT_DEMO.select||[]).slice(0,5);
     if(cards.length<3) cards=cards.concat((PROJECT_DEMO[key]||[]).slice(cards.length));
     return cards.slice(0,3);
   }
@@ -2653,7 +2758,7 @@
   }
   function projectFilesActionText(n){
     n=Number(n)||0;
-    if(lang==='he') return 'קבצים ('+n+')';
+    if(lang==='he') return 'הצג קבצים';
     if(lang==='ru') return 'Файлы ('+n+')';
     return 'Files ('+n+')';
   }
@@ -2678,7 +2783,41 @@
     if(has('sent','progress','review','נשלח','בתהליך','בבדיקה','отправл','процесс','провер')) return 'info';
     return 'info';
   }
+  // Select-page selection state -> dedicated pill class + icon. Keyword based
+  // so it survives localization (English canonical, Hebrew or Russian labels).
+  function projSelectStatus(raw){
+    var s=String(raw||'').toLowerCase();
+    function has(){ for(var i=0;i<arguments.length;i++){ if(s.indexOf(arguments[i])>=0) return true; } return false; }
+    if(has('complete','finished','done','approv','הסתיימ','אושר','заверш','готов')) return { cls:'sel-done', icon:'check' };
+    if(has('view only','view-only','viewonly','לצפייה','просмотр')) return { cls:'sel-view', icon:'eye' };
+    if(has('unavailable','blocked','closed','expired','locked','אינה זמינה','לא זמינה','חסומ','נעול','недоступ','заблок','закрыт')) return { cls:'sel-blocked', icon:'lock' };
+    if(has('in progress','progress','בתהליך','процесс')) return { cls:'sel-progress', icon:'refresh' };
+    return { cls:'sel-wait', icon:'clock' };
+  }
+  function projStatusPillHtml(card, svc){
+    if(svc && svc.tone==='select'){
+      var ss=projSelectStatus(card.status);
+      return '<span class="mp-status mp-sel-status '+ss.cls+'">'+s(ICON[ss.icon])+esc(projStatus(card.status))+'</span>';
+    }
+    return '<span class="mp-status st-'+projStatusTone(card.status)+'">'+esc(projStatus(card.status))+'</span>';
+  }
   function projCopyLinkLabel(){ return lang==='he' ? 'העתקת קישור' : lang==='ru' ? 'Копировать ссылку' : 'Copy link'; }
+  function projectReceiveHtml(card){
+    var n=projectFilesCount(card), href=card.filesHref||'request.html?tab=manage', initials=projectInitials(card.client);
+    var avatar=card.avatar?'<img src="'+esc(card.avatar)+'" alt="'+esc(card.client)+'">':esc(initials);
+    var phone=card.phone||'050-1234567', email=card.email||'client@email.com';
+    return '<article class="mpr-card">'+
+      '<div class="mpr-main">'+
+        '<div class="mpr-topline"><span class="mpr-eyebrow">'+s(ICON.arrow)+s(ICON.inbox)+'קבצים שהתקבלו</span><button class="mpr-close" type="button" data-del-project aria-label="מחיקה">'+s(ICON.x)+'</button></div>'+
+        '<div class="mpr-hero"><div class="mpr-cover"><span class="mpr-cover-count">+'+n+'</span><span class="mpr-cover-label">'+n+' קבצים</span></div><div class="mpr-person"><span class="mpr-avatar">'+avatar+'</span><div class="mpr-person-copy"><div class="mpr-name-row"><strong class="mpr-name">'+esc(card.client)+'</strong><span class="mpr-live">לקוח קיים</span></div><div class="mpr-contact"><span>'+esc(email)+'</span><span class="sep">|</span><span>פרויקט שהתקבל</span><strong>'+esc(card.projectNumberText||'#10002')+'</strong></div><div class="mpr-date">'+esc(phone)+' &nbsp; · &nbsp; התקבל: '+esc(card.f3||projectDate(Date.now()))+'</div></div></div></div>'+
+        '<div class="mpr-stats"><div class="mpr-stat">'+s(ICON.inbox)+'<div><b>עד 5 ימים</b><span>תפוגה</span></div></div><div class="mpr-stat">'+s(ICON.drive)+'<div><b>'+esc(card.f2||'0 GB')+'</b><span>נפח כולל</span></div></div><div class="mpr-stat">'+s(ICON.files)+'<div><b>'+n+'</b><span>קבצים</span></div></div><div class="mpr-stat">'+s(ICON.download)+'<div><b>0</b><span>הורדות</span></div></div></div>'+
+        '<div class="mpr-message"><b>הודעה מהלקוח</b>'+esc(card.note||'שלום, מצרף את כל החומרים לאירוע. תודה רבה!')+'</div>'+
+        '<div class="mpr-actions"><button class="mpr-action mpr-status" type="button">'+s(ICON.check)+'פעילה⌄</button><button class="mpr-action more" type="button">•••</button><a class="mpr-action access" href="'+esc(href)+'">'+s(ICON.shield)+'גישה ואבטחה</a><button class="mpr-action share" type="button" data-copy-link="'+esc(card.link||href)+'">'+s(ICON.link)+'שיתוף קישור</button></div>'+
+      '</div>'+
+      '<div class="mpr-tabs"><span class="mpr-tab on">'+s(ICON.folder)+'קבצים ('+n+')</span><span class="mpr-tab">'+s(ICON.gradient)+'היסטוריית הורדות</span><span class="mpr-tab">'+s(ICON.clock)+'פעולות</span><span class="mpr-tab">'+s(ICON.info)+'פרטים נוספים</span></div>'+
+      '<div class="mpr-bottom"><a class="mpr-action primary" href="'+esc(href)+'">'+s(ICON.folder)+'הצג קבצים</a><button class="mpr-action" type="button">'+s(ICON.archive)+'ייצוא ZIP</button><a class="mpr-action" href="'+esc(href)+'">'+s(ICON.download)+'הורד הכל</a><button class="mpr-action danger" type="button" data-del-project>'+s(ICON.trash)+'מחיקה</button></div>'+
+    '</article>';
+  }
   function projectClientHtml(card, svc){
     var filesAction = svc.tone==='receive'
       ? '<a class="mp-files-link" href="'+esc(card.filesHref||'request.html?tab=manage')+'">'+s(ICON.folder)+esc(projectFilesActionText(projectFilesCount(card)))+'</a>'
@@ -2706,7 +2845,7 @@
       '</div>'+
       '<p class="mp-note">'+esc(projNote(card.note))+'</p>'+
       '<div class="mp-client-foot">'+
-        '<span class="mp-status st-'+projStatusTone(card.status)+'">'+esc(projStatus(card.status))+'</span>'+
+        projStatusPillHtml(card, svc)+
         '<span class="mp-foot-actions">'+copyAction+filesAction+'<a class="btn ghost" href="'+esc(svc.href)+'">'+esc(svcText(svc.tone,'cta'))+'</a></span>'+
       '</div>'+
     '</article>';
@@ -2726,7 +2865,7 @@
       '<div class="mp-head"><div><h2>'+esc(projMyProjectsText())+'</h2></div>'+action+'</div>'+
       '<div class="mp-tools">'+projectToolHtml(key)+'</div>'+
       '<div class="mp-section-title"><h3>'+esc(svcText(key,'section'))+'</h3><span>'+esc(projCardsCountText(cards.length))+'</span></div>'+
-      '<div class="mp-clients">'+cards.map(function(c){ return projectClientHtml(c, svc); }).join('')+'</div>'+
+      '<div class="'+(key==='receive'?'mpr-list':'mp-clients')+'">'+cards.map(function(c){ return key==='receive' ? projectReceiveHtml(c) : projectClientHtml(c, svc); }).join('')+'</div>'+
     '</section>';
   }
 
@@ -2807,6 +2946,8 @@
     var copy={
       he:{
         select:'\u05d1\u05d7\u05d9\u05e8\u05ea \u05e7\u05d5\u05d1\u05e5',
+        enter:'\u05d1\u05d7\u05d9\u05e8\u05d4 \u05de\u05e8\u05d5\u05d1\u05d4',
+        exit:'\u05e1\u05d9\u05d5\u05dd \u05d1\u05d7\u05d9\u05e8\u05d4',
         selected:function(x){ return x+' \u05e0\u05d1\u05d7\u05e8\u05d5'; },
         selectAll:'\u05d1\u05d7\u05e8 \u05d4\u05db\u05dc',
         clear:'\u05d1\u05d9\u05d8\u05d5\u05dc \u05d1\u05d7\u05d9\u05e8\u05d4',
@@ -2819,6 +2960,8 @@
       },
       en:{
         select:'Select file',
+        enter:'Select multiple',
+        exit:'Done',
         selected:function(x){ return x+' selected'; },
         selectAll:'Select all',
         clear:'Clear selection',
@@ -2831,6 +2974,8 @@
       },
       ru:{
         select:'Select file',
+        enter:'Выбрать несколько',
+        exit:'Готово',
         selected:function(x){ return x+' selected'; },
         selectAll:'Select all',
         clear:'Clear selection',
@@ -2863,6 +3008,12 @@
     else delete sel[id];
   }
   function pfClearSelection(kind){ delete pfSelection[pfSelKey(kind)]; }
+  function pfInSelectMode(kind){ return !!pfSelectMode[pfSelKey(kind)]; }
+  function pfSetSelectMode(kind,on){
+    var key=pfSelKey(kind);
+    if(on){ pfSelectMode[key]=true; }
+    else { delete pfSelectMode[key]; delete pfSelection[key]; }
+  }
   function pfPruneSelection(kind,rows){
     var keep={};
     (rows||[]).forEach(function(r){ if(r && r.id) keep[r.id]=true; });
@@ -2870,16 +3021,18 @@
     Object.keys(sel).forEach(function(id){ if(!keep[id]) delete sel[id]; });
   }
   function pfBulkHtml(kind,rows){
+    if(!pfInSelectMode(kind)) return '';
     var selected=pfSelectedIds(kind);
-    if(!selected.length) return '';
-    var canSelectMore=selected.length<(rows||[]).length;
+    var total=(rows||[]).length;
+    var canSelectMore=selected.length<total;
+    var none=selected.length===0;
     return '<div class="pf-bulk" data-pf-bulk="'+esc(kind)+'">'+
       '<span class="pf-bulk-count">'+esc(pfMultiText('selected',selected.length))+'</span>'+
       '<div class="pf-bulk-actions">'+
         (canSelectMore ? '<button class="btn ghost" type="button" data-pf-select-all="'+esc(kind)+'">'+s(ICON.check)+esc(pfMultiText('selectAll'))+'</button>' : '')+
-        '<button class="btn ghost" type="button" data-pf-clear="'+esc(kind)+'">'+esc(pfMultiText('clear'))+'</button>'+
-        '<button class="btn primary" type="button" data-pf-download-selected="'+esc(kind)+'">'+s(ICON.download)+esc(pfMultiText('download'))+'</button>'+
-        '<button class="btn danger" type="button" data-pf-remove-selected="'+esc(kind)+'">'+s(ICON.trash)+esc(pfMultiText('remove'))+'</button>'+
+        (none ? '' : '<button class="btn ghost" type="button" data-pf-clear="'+esc(kind)+'">'+esc(pfMultiText('clear'))+'</button>')+
+        '<button class="btn primary" type="button" data-pf-download-selected="'+esc(kind)+'"'+(none?' disabled':'')+'>'+s(ICON.download)+esc(pfMultiText('download'))+'</button>'+
+        '<button class="btn danger" type="button" data-pf-remove-selected="'+esc(kind)+'"'+(none?' disabled':'')+'>'+s(ICON.trash)+esc(pfMultiText('remove'))+'</button>'+
       '</div>'+
     '</div>';
   }
@@ -2918,25 +3071,16 @@
   }
   function processedItemHtml(rec,cfg,kind){
     var selected=pfIsSelected(kind,rec.id);
+    var wave=''; for(var wi=0;wi<58;wi++) wave+='<i style="height:'+(14+((wi*17)%43))+'px"></i>';
     return '<article class="pf-item '+(selected?'is-selected':'')+'">'+
       '<label class="pf-select" title="'+esc(pfMultiText('select'))+'">'+
         '<input type="checkbox" data-pf-select="'+esc(rec.id)+'" data-pf-kind="'+esc(kind)+'" aria-label="'+esc(pfMultiText('select'))+'" '+(selected?'checked':'')+'>'+
         '<span aria-hidden="true">'+s(ICON.check)+'</span>'+
       '</label>'+
-      '<div class="pf-top">'+
-        '<div class="pf-file"><span class="pf-ic">'+s(ICON[cfg.icon])+'</span><span><span class="pf-name" title="'+esc(rec.name||'')+'">'+esc(rec.name||'processed-file')+'</span><span class="pf-size">'+esc(fmtDashBytes(rec.size))+'</span></span></div>'+
-        '<span class="pf-action">'+s(ICON.zap)+esc(pfAction(rec.action))+'</span>'+
-      '</div>'+
-      '<div class="pf-meta">'+
-        '<span><span class="pf-k">'+esc(pfText('tool'))+'</span><span class="pf-v">'+esc(rec.tool||'KOLKLI')+'</span></span>'+
-        '<span><span class="pf-k">'+esc(pfText('created'))+'</span><span class="pf-v">'+esc(processedDate(rec.createdAt))+'</span></span>'+
-        '<span><span class="pf-k">'+esc(pfText('expires'))+'</span><span class="pf-v">'+esc(processedDate(rec.expiresAt))+'</span></span>'+
-        '<span><span class="pf-k">'+esc(pfText('action'))+'</span><span class="pf-v">'+esc(pfAction(rec.action))+'</span></span>'+
-      '</div>'+
-      '<div class="pf-foot">'+
-        '<button class="btn primary" type="button" data-pf-download="'+esc(rec.id)+'">'+s(ICON.download)+esc(pfText('download'))+'</button>'+
-        '<button class="btn ghost" type="button" data-pf-remove="'+esc(rec.id)+'">'+s(ICON.trash)+esc(pfText('remove'))+'</button>'+
-      '</div>'+
+      '<div class="pf-hero"><div class="pf-audio-icon">'+s(ICON.music)+'</div><div class="pf-maininfo"><div class="pf-titleline"><span class="pf-edit-pen">&#9998;</span><span class="pf-name" title="'+esc(rec.name||'')+'">'+esc(rec.name||'processed-file')+'</span></div><div class="pf-pills"><span class="pf-pill primary">MP3</span><span class="pf-pill">'+esc(fmtDashBytes(rec.size))+'</span><span class="pf-pill">44.1 kHz</span><span class="pf-pill">320 kbps</span></div></div><div class="pf-player"><div class="pf-player-tools"><button class="pf-square">&#8942;</button><button class="pf-square link">'+s(ICON.link)+'</button><button class="pf-square">&#9734;</button></div><div class="pf-wave-row"><div class="pf-wave">'+wave+'</div><button class="pf-play">&#9654;</button></div><div class="pf-duration">03:24</div></div></div>'+
+      '<div class="pf-details"><div class="pf-detail"><div class="pf-detail-icon">'+s(ICON.clock)+'</div><div class="pf-detail-label">&#1504;&#1493;&#1510;&#1512;</div><div class="pf-detail-value">'+esc(processedDate(rec.createdAt))+'</div><div class="pf-detail-sub">12:45</div></div><div class="pf-detail"><div class="pf-detail-icon">'+s(ICON.send)+'</div><div class="pf-detail-label">&#1504;&#1493;&#1505;&#1507; &#1506;&#1500; &#1497;&#1491;&#1497;</div><div class="pf-detail-value">Amir Sade</div><div class="pf-detail-sub" dir="ltr">amir@email.com</div></div><div class="pf-detail"><div class="pf-detail-icon">'+s(ICON.folder)+'</div><div class="pf-detail-label">&#1511;&#1496;&#1490;&#1493;&#1512;&#1497;&#1492;</div><div class="pf-detail-value">&#1504;&#1512;&#1502;&#1493;&#1500; &#1506;&#1493;&#1510;&#1502;&#1492;</div></div><div class="pf-detail"><div class="pf-detail-icon">'+s(ICON.tags)+'</div><div class="pf-detail-label">&#1514;&#1490;&#1497;&#1501;</div><div class="pf-tags"><span>&#1506;&#1489;&#1493;&#1491;&#1492;</span><span>&#1489;&#1512;&#1502;&#1493;&#1500;</span></div><span class="pf-addtag">+ &#1492;&#1493;&#1505;&#1507; &#1514;&#1490;</span></div></div>'+
+      '<div class="pf-stats"><div class="pf-stat"><b>12</b>&#1510;&#1508;&#1497;&#1493;&#1514;</div><div class="pf-stat"><b>8</b>&#1492;&#1493;&#1512;&#1491;&#1493;&#1514;</div><div class="pf-stat"><b>&#1508;&#1512;&#1496;&#1497;</b>&#1490;&#1497;&#1513;&#1492;</div><div class="pf-stat"><b class="green">&#1511;&#1497;&#1513;&#1493;&#1512; &#1508;&#1506;&#1497;&#1500;</b>&#1492;&#1493;&#1506;&#1514;&#1511;</div><div class="pf-stat"><b>3</b>&#1513;&#1493;&#1514;&#1508;&#1497;&#1501;</div></div>'+
+      '<div class="pf-actions"><button class="pf-actionbtn danger" type="button" data-pf-remove="'+esc(rec.id)+'">'+s(ICON.trash)+'&#1502;&#1495;&#1497;&#1511;&#1492;</button><button class="pf-actionbtn">'+s(ICON.clock)+'&#1492;&#1497;&#1505;&#1496;&#1493;&#1512;&#1497;&#1497;&#1514; &#1508;&#1506;&#1493;&#1500;&#1493;&#1514;</button><button class="pf-actionbtn">'+s(ICON.shield)+'&#1488;&#1489;&#1496;&#1495;&#1492; &#1493;&#1490;&#1497;&#1513;&#1492;</button><button class="pf-actionbtn">'+s(ICON.send)+'&#1513;&#1497;&#1514;&#1493;&#1507;</button><button class="pf-actionbtn download" type="button" data-pf-download="'+esc(rec.id)+'">'+s(ICON.download)+esc(pfText('download'))+'</button></div>'+
     '</article>';
   }
   function processedToolsHtml(cfg){
@@ -2984,6 +3128,8 @@
     var rows=(api&&api.list) ? api.list({ category:cfg.category }) : [];
     var body;
     pfPruneSelection(kind,rows);
+    var canSelect=!!(api && api.list && rows.length);
+    var selMode=canSelect && pfInSelectMode(kind);
     if(!api || !api.list){
       body='<div class="pf-empty empty"><div class="ei">'+s(ICON.info)+'</div><h3>'+esc(pfText('emptyT'))+'</h3><p>'+esc(pfText('unavailable'))+'</p></div>';
     } else if(rows.length){
@@ -2991,9 +3137,12 @@
     } else {
       body='<div class="pf-empty empty"><div class="ei">'+s(ICON[cfg.icon])+'</div><h3>'+esc(cfg.emptyT||pfText('emptyT'))+'</h3><p>'+esc(pfText('emptyP'))+'</p><a class="btn primary" href="'+esc(cfg.cta.href)+'" style="text-decoration:none">'+s(ICON.arrow)+esc(cfg.cta.label)+'</a></div>';
     }
-    return '<div class="card pf-card">'+
+    var toggleBtn = canSelect
+      ? '<button class="btn ghost pf-mode-btn'+(selMode?' on':'')+'" type="button" data-pf-toggle-mode="'+esc(kind)+'" aria-pressed="'+(selMode?'true':'false')+'">'+s(selMode?ICON.x:ICON.pick)+esc(pfMultiText(selMode?'exit':'enter'))+'</button>'
+      : '';
+    return '<div class="card pf-card'+editToneClass(kind)+(selMode?' pf-selecting':'')+'">'+
       '<div class="pf-head"><div><h2>'+esc(cfg.title)+'</h2><p class="csub">'+esc(pfText('history')+' - '+cfg.sub)+'</p><p class="csub">'+esc(pfText('sub'))+'</p></div>'+
-      '<span class="pf-plan">'+s(ICON.clock)+esc(pfPlanLine(lim, rows.length))+'</span></div>'+
+      '<div class="pf-head-side">'+toggleBtn+'<span class="pf-plan">'+s(ICON.clock)+esc(pfPlanLine(lim, rows.length))+'</span></div></div>'+
       body+
       '<div class="toolrow pf-tools">'+processedToolsHtml(cfg)+'</div>'+
     '</div>';
@@ -4022,6 +4171,13 @@
         try{ document.execCommand('copy'); }catch(_){ } ta.remove(); done();
       });
     });
+    host.querySelectorAll('[data-pf-toggle-mode]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var kind=b.getAttribute('data-pf-toggle-mode') || view;
+        pfSetSelectMode(kind, !pfInSelectMode(kind));
+        renderMain();
+      });
+    });
     host.querySelectorAll('[data-pf-select]').forEach(function(input){
       input.addEventListener('change', function(){
         var kind=input.getAttribute('data-pf-kind') || view;
@@ -4272,3 +4428,4 @@
 </script>
 </body>
 </html>
+

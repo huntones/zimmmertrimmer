@@ -65,16 +65,15 @@
 
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
 
-  /* layout: tool list + workspace */
-  .tt-grid{display:grid;grid-template-columns:250px 1fr;gap:18px;align-items:start;}
-  @media (max-width:900px){ .tt-grid{grid-template-columns:1fr;} }
+  /* layout: workspace on top, tool picker along the bottom */
+  .tt-grid{display:flex;flex-direction:column;gap:18px;}
 
-  /* sidebar */
-  .tt-side{padding:10px;position:sticky;top:88px;max-height:calc(100vh - 104px);overflow:auto;}
-  @media (max-width:900px){ .tt-side{position:static;max-height:none;} }
+  /* tool picker — full-width panel below the workspace */
+  .tt-side{padding:16px 18px;display:flex;flex-direction:column;gap:14px;}
+  .tt-grp-block{display:flex;flex-direction:column;gap:8px;}
   .tt-grp{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);
-    padding:12px 10px 6px;}
-  .tt-grp:first-child{padding-top:4px;}
+    padding:0 2px;}
+  .tt-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;}
   .tt-nav{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-radius:11px;
     background:none;cursor:pointer;text-align:start;color:var(--ink-2);font-family:var(--sans);font-size:13.5px;
     font-weight:600;transition:background .12s,color .12s;}
@@ -151,6 +150,15 @@
   .tt-stat-card .num{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--accent-dim);line-height:1.1;}
   .tt-stat-card .lab{font-size:12px;color:var(--muted);margin-top:4px;}
 
+  /* ---------- dashboard rail (right-hand column) — filled by dash-sidebar.js ---------- */
+  .page-shell{display:flex;gap:20px;align-items:flex-start;}
+  .page-main{flex:1;min-width:0;}
+  /* menu/tools rail is an integral white column — no card, no border, no rounded corners;
+     only a subtle line separates it from the main content */
+  #dashRail{width:322px;flex-shrink:0;align-self:flex-start;position:sticky;top:88px;max-height:calc(100vh - 104px);overflow-y:auto;
+    background:var(--panel);border:0;border-inline-end:1px solid var(--line);border-radius:0;padding:8px 14px;box-shadow:none;}
+  @media (max-width:1000px){ .page-shell{flex-direction:column;} #dashRail{width:100%;position:static;max-height:none;border-inline-end:0;padding:8px 0;} }
+
   footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
     background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
@@ -163,6 +171,9 @@
 <div id="site-header"></div>
 <script src="./header.js"></script>
 <div class="wrap">
+ <div class="page-shell">
+  <aside id="dashRail" aria-label="Dashboard menu"></aside>
+  <div class="page-main">
 
   <div class="pagehead">
     <span class="kick" id="kick"></span>
@@ -171,8 +182,6 @@
   </div>
 
   <div class="tt-grid">
-    <aside class="tt-side card" id="ttSide"></aside>
-
     <div class="tt-work">
       <div class="tt-toolhead">
         <span class="thi" id="thIcon"></span>
@@ -211,12 +220,17 @@
 
       <div class="tt-note" id="ttNote"></div>
     </div>
+
+    <aside class="tt-side card" id="ttSide"></aside>
   </div>
 
   <footer id="foot"></footer>
+  </div><!-- /page-main -->
+ </div><!-- /page-shell -->
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="./dash-sidebar.js"></script>
 <script>
 (function(){
   const el = id => document.getElementById(id);
@@ -694,11 +708,12 @@
     const groups=['edit','list','dev'];
     let html='';
     groups.forEach(g=>{
-      html+='<div class="tt-grp">'+t.grp[g]+'</div>';
+      html+='<div class="tt-grp-block"><div class="tt-grp">'+t.grp[g]+'</div><div class="tt-nav-grid">';
       TOOLS.filter(x=>x.grp===g).forEach(tool=>{
         html+='<button type="button" class="tt-nav'+(tool.id===curId?' on':'')+'" data-id="'+tool.id+'">'+
           '<span class="nvi">'+svg(tool.ic)+'</span><span>'+tool.names[lang]+'</span></button>';
       });
+      html+='</div></div>';
     });
     el('ttSide').innerHTML=html;
   }
@@ -823,6 +838,7 @@
     el('copyBtn').innerHTML=svg('copyIco')+'<span>'+t.copy+'</span>';
     el('dlBtn').innerHTML=svg('dl')+'<span>'+t.download+'</span>';
     el('foot').textContent=t.foot;
+    if(window.KolkliSidebar) window.KolkliSidebar.setLang(lang);
     document.title='KOLKLI — '+t.title;
   }
   function applyLang(l){
@@ -848,7 +864,7 @@
   }
 
   /* ---------- events ---------- */
-  el('ttSide').addEventListener('click', e=>{ const b=e.target.closest('[data-id]'); if(b) selectTool(b.getAttribute('data-id')); });
+  el('ttSide').addEventListener('click', e=>{ const b=e.target.closest('[data-id]'); if(b){ selectTool(b.getAttribute('data-id')); window.scrollTo({top:0,behavior:'smooth'}); } });
   el('ttOpts').addEventListener('input', e=>{ const c=e.target.closest('.tt-check'); if(c) c.classList.toggle('on', e.target.checked); run(); });
   el('ttOpts').addEventListener('change', run);
   el('ttIn').addEventListener('input', debounce(run, 90));

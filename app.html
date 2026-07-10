@@ -1352,9 +1352,10 @@
       // Force an exact clip-length output. `-ss`/`-t` as *input* options seek
       // imprecisely on VBR/MP3 sources (clips drifted to 61/63/65s), so we
       // enforce the length inside the filtergraph: reset the timeline to a clean
-      // 0-based one, apad so we never fall short, then atrim to exactly `clip`
-      // seconds. The output-side `-t` is a final muxer-level safety cap.
-      const cutAf = `${af},asetpts=N/SR/TB,apad,atrim=0:${clip}`;
+      // 0-based one, pad to exactly `clip` seconds (whole_dur pins the total so
+      // we can never fall short), then atrim to exactly `clip`. The output-side
+      // `-t` is a final muxer-level safety cap. Result: precisely `clip` seconds.
+      const cutAf = `${af},asetpts=N/SR/TB,apad=whole_dur=${clip},atrim=0:${clip}`;
       await ffmpeg.exec(['-ss',startAt.toFixed(3),'-i',safeIn,'-af',cutAf,'-t',clip.toFixed(3),...f.args(settings.br),...meta,outFile]);
       encoding=false;
       const data=await ffmpeg.readFile(outFile);
