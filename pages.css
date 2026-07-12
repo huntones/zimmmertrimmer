@@ -200,6 +200,8 @@ a.aicard.hov:hover{transform:translateY(-3px);border-color:var(--accent);box-sha
 .addon p{margin:0;font-size:12.8px;color:var(--muted);line-height:1.45;}
 @media (max-width:860px){ .addons{grid-template-columns:repeat(2,1fr);} }
 @media (max-width:560px){ .addons{grid-template-columns:1fr;} }
+/* keep plans + add-ons centered at ~70% instead of stretching edge-to-edge on wide screens */
+@media (min-width:1000px){ .wrap.pricing-wrap{max-width:70%;margin-inline:auto;} }
 
 /* ---------- faq ---------- */
 .faq{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px;}

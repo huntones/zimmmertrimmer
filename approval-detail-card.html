@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — כרטיס אישור מסירה</title>
+<meta name="description" content="Delivery-approval detail card (RTL): title bar with close, centered client identity, stats strip, message, meta row with live status and a full action bar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6; --sep:#e7eaf2;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --acc:#22b04b; --acc-dim:#1c9a41; --acc-ink:#15803d; --acc-soft:#e6f6ec; --acc-line:#bfe6cb;
+    --acc-grad:linear-gradient(105deg,#34c65c 0%,#1fa244 100%);
+    --acc-glow:rgba(28,154,65,0.30);
+    --danger:#e5484d; --danger-dim:#cf3b40; --danger-soft:#fdecec; --danger-line:#f1c4c6;
+    --amber:#e0a30f; --amber-dim:#b8860b; --amber-soft:#fdf1d6; --amber-glow:rgba(224,163,15,.22);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 22px 55px rgba(20,24,44,0.10);
+    --sans:'Heebo','Space Grotesk',system-ui,'Segoe UI',sans-serif;
+    --mono:'Space Grotesk',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  }
+  html[data-theme="dark"]{
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833; --sep:#333b49;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --acc:#37c26a; --acc-dim:#4ec98a; --acc-ink:#4ec98a; --acc-soft:#132a1c; --acc-line:#245536;
+    --acc-grad:linear-gradient(105deg,#37c26a 0%,#22b04b 100%);
+    --acc-glow:rgba(78,201,138,0.42);
+    --danger:#ff6b6b; --danger-dim:#ff8080; --danger-soft:#2a1719; --danger-line:#4a2a2c;
+    --amber:#e8b84b; --amber-dim:#e8b84b; --amber-soft:#2c2718; --amber-glow:rgba(232,184,75,.22);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;
+    display:flex;flex-direction:column;align-items:center;gap:22px;padding:40px 18px 64px;}
+  body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(58% 40% at 15% 4%,rgba(34,176,75,0.10),transparent 60%),
+      radial-gradient(52% 40% at 88% 2%,rgba(59,111,246,0.06),transparent 60%);}
+  button{font-family:inherit;}
+  svg{display:block;}
+
+  /* theme toggle */
+  .themebtn{position:fixed;inset-block-start:16px;inset-inline-end:16px;width:40px;height:40px;border-radius:12px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;box-shadow:var(--shadow-sm);
+    display:flex;align-items:center;justify-content:center;z-index:50;transition:border-color .12s;}
+  .themebtn:hover{border-color:var(--acc);}
+  .themebtn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .themebtn .moon{display:none;}
+  html[data-theme="dark"] .themebtn .sun{display:none;}
+  html[data-theme="dark"] .themebtn .moon{display:block;}
+
+  /* page intro */
+  .intro{text-align:center;max-width:54ch;margin-top:6px;}
+  .intro .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--acc-dim);background:var(--acc-soft);
+    padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+  .intro h1{font-size:clamp(22px,3.4vw,30px);font-weight:800;letter-spacing:-0.02em;margin:0 0 8px;}
+  .intro p{font-size:14px;color:var(--muted);margin:0;}
+
+  /* ====================== APPROVAL DETAIL CARD ====================== */
+  .card{width:100%;max-width:920px;background:var(--panel);border:1px solid var(--line);border-radius:26px;
+    box-shadow:var(--shadow-lg);overflow:hidden;position:relative;
+    transition:box-shadow .2s ease,border-color .2s ease,opacity .25s ease,transform .25s ease;}
+  .card.dismissed{opacity:0;transform:scale(.97);pointer-events:none;}
+  .divider{height:1px;background:var(--line-2);}
+  .ltr{direction:ltr;unicode-bidi:isolate;}
+  .plain{unicode-bidi:plaintext;}
+
+  /* ---------- title bar: close (start) · approval badge (end) ---------- */
+  .titlebar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 22px 0;}
+  .closebtn{width:44px;height:44px;border:1px solid var(--line);border-radius:13px;background:var(--panel);
+    color:var(--ink-2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+    box-shadow:var(--shadow-sm);transition:border-color .12s,color .12s,background .12s,transform .08s;}
+  .closebtn:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .closebtn:active{transform:translateY(1px);}
+  .closebtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .badge{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:12px;
+    background:var(--acc-soft);border:1px solid var(--acc-line);color:var(--acc-dim);font-size:14px;font-weight:800;white-space:nowrap;}
+  .badge svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ---------- header: check (end) · centered identity · avatar + actions (start) ---------- */
+  .head{display:flex;align-items:center;gap:18px;padding:14px 26px 24px;}
+  .hero-check{width:96px;height:96px;flex-shrink:0;order:3;border-radius:22px;background:var(--acc-soft);
+    border:1px solid var(--acc-line);color:var(--acc);display:grid;place-items:center;}
+  .hero-check svg{width:52px;height:52px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  .identity{order:2;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;}
+  .name-row{display:flex;align-items:center;gap:8px;max-width:100%;}
+  .name{font-size:clamp(22px,2.6vw,28px);font-weight:900;letter-spacing:-0.02em;color:var(--ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .edit{flex-shrink:0;width:28px;height:28px;border:none;background:transparent;border-radius:8px;color:var(--acc);
+    cursor:pointer;display:grid;place-items:center;transition:background .12s;}
+  .edit:hover{background:var(--acc-soft);}
+  .edit svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .contact{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:14px;font-weight:600;
+    text-decoration:none;max-width:100%;transition:color .12s;}
+  .contact:hover{color:var(--acc-dim);}
+  .contact .val{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .contact svg{width:15px;height:15px;flex-shrink:0;color:var(--faint);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .contact:hover svg{color:var(--acc-dim);}
+
+  .head-side{order:1;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .head-actions{display:flex;align-items:center;gap:10px;}
+  .iconbtn{width:44px;height:44px;flex-shrink:0;border:1px solid var(--line);border-radius:13px;background:var(--panel);
+    color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+    box-shadow:var(--shadow-sm);transition:border-color .12s,color .12s,background .12s,transform .08s;}
+  .iconbtn:hover{border-color:var(--acc);color:var(--acc-dim);}
+  .iconbtn:active{transform:translateY(1px);}
+  .iconbtn svg{width:19px;height:19px;}
+  .iconbtn.star svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .iconbtn.star.on{background:var(--acc-soft);border-color:var(--acc-line);color:var(--acc);}
+  .iconbtn.star.on svg{fill:var(--acc);}
+  .iconbtn.link svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .iconbtn.kebab svg{fill:currentColor;}
+  .avatar{width:66px;height:66px;flex-shrink:0;border-radius:50%;background:var(--acc-soft);color:var(--acc-ink);
+    border:1px solid var(--acc-line);display:grid;place-items:center;font-size:22px;font-weight:800;letter-spacing:.01em;}
+  html[data-theme="dark"] .avatar{color:var(--acc-dim);}
+
+  /* ---------- stats strip ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);}
+  .stat{padding:20px 22px;position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .stat + .stat::before{content:'';position:absolute;inset-inline-start:0;inset-block:16px;width:1px;background:var(--line-2);}
+  .stat .s-text{min-width:0;}
+  .stat .s-label{font-size:12.5px;color:var(--muted);margin-bottom:4px;}
+  .stat .s-value{font-size:18px;font-weight:800;color:var(--ink);line-height:1.15;letter-spacing:-0.01em;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .stat .s-value.ltr{direction:ltr;text-align:right;}
+  .stat .s-sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .stat .s-sub.ok{color:var(--acc-dim);font-weight:700;}
+  .stat .s-ico{flex-shrink:0;color:var(--acc);}
+  .stat .s-ico svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ---------- quote / message ---------- */
+  .quote{margin:0 26px;background:var(--acc-soft);border:1px solid var(--acc-line);border-radius:16px;
+    padding:18px 22px;display:flex;align-items:flex-start;gap:14px;}
+  .quote p{margin:0;flex:1;min-width:0;font-size:15.5px;color:var(--acc-ink);line-height:1.6;font-weight:600;}
+  html[data-theme="dark"] .quote p{color:var(--ink-2);}
+  .quote .qmark{flex-shrink:0;font-family:Georgia,'Times New Roman',serif;font-size:42px;line-height:.7;
+    font-weight:700;color:var(--acc);opacity:.9;}
+
+  /* ---------- meta strip (facts + live status) ---------- */
+  .meta{margin:0 26px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:16px;
+    display:grid;grid-template-columns:repeat(5,1fr);}
+  .m-item{padding:16px 18px;position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .m-item + .m-item::before{content:'';position:absolute;inset-inline-start:0;inset-block:14px;width:1px;background:var(--line);}
+  .m-item .m-text{min-width:0;}
+  .m-item .m-label{font-size:12px;color:var(--muted);margin-bottom:5px;}
+  .m-item .m-value{font-size:15px;font-weight:800;color:var(--ink);line-height:1.15;letter-spacing:-0.01em;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .m-item .m-value.ltr{direction:ltr;text-align:right;}
+  .m-item .m-value.ok{color:var(--acc-dim);}
+  .m-item .m-ico{width:38px;height:38px;flex-shrink:0;border-radius:11px;background:var(--panel);
+    border:1px solid var(--line-2);color:var(--ink-2);display:grid;place-items:center;box-shadow:var(--shadow-sm);}
+  .m-item .m-ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .m-item .m-ico.ok{background:var(--acc-soft);border-color:var(--acc-line);color:var(--acc);}
+  /* status dot — amber = stage-1 "changes received" (mirrors the KOLKLI status palette) */
+  .m-item .m-ico.status{background:var(--amber-soft);border-color:transparent;color:var(--amber);}
+  .m-item .m-ico.status .dot{width:12px;height:12px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px var(--amber-glow);}
+  .m-item.status .m-value{color:var(--amber-dim);}
+
+  /* ---------- actions ---------- */
+  .actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:22px 26px;}
+  .abtn{display:inline-flex;align-items:center;justify-content:center;gap:9px;height:52px;padding:0 20px;border-radius:14px;
+    font-size:14.5px;font-weight:700;cursor:pointer;background:var(--panel);border:1px solid var(--line);color:var(--ink-2);
+    box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s,background .12s,color .12s,filter .14s;}
+  .abtn:hover{border-color:var(--acc);color:var(--ink);}
+  .abtn:active{transform:translateY(1px);}
+  .abtn svg{width:18px;height:18px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .abtn.danger{color:var(--danger-dim);border-color:var(--danger-line);}
+  .abtn.danger:hover{color:var(--danger);border-color:var(--danger);background:var(--danger-soft);}
+  .abtn.primary{color:#fff;border:none;text-shadow:0 1px 2px rgba(0,0,0,.18);padding:0 26px;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--acc-grad);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 8px 20px var(--acc-glow);}
+  .abtn.primary:hover{filter:brightness(1.05);border:none;color:#fff;}
+  /* primary sits at the inline-start (right in RTL); delete gets pushed to the inline-end (left) */
+  .abtn.del{margin-inline-start:auto;}
+
+  /* toast */
+  .toast{position:fixed;inset-block-end:24px;inset-inline-start:50%;transform:translateX(50%) translateY(20px);opacity:0;
+    pointer-events:none;background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 20px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;white-space:nowrap;}
+  .toast.show{opacity:1;transform:translateX(50%) translateY(0);}
+
+  /* responsive */
+  @media (max-width:780px){
+    .head{flex-wrap:wrap;justify-content:center;}
+    .hero-check{order:1;width:76px;height:76px;} .hero-check svg{width:40px;height:40px;}
+    .identity{order:3;flex-basis:100%;}
+    .head-side{order:2;flex-direction:row;gap:14px;}
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .stat:nth-child(3)::before{content:none;}
+    .quote,.meta{margin:0 18px;}
+    .meta{grid-template-columns:repeat(2,1fr);}
+    .m-item:nth-child(odd)::before{content:none;}
+    .abtn.del{margin-inline-start:0;}
+    .abtn.primary{flex:1 1 100%;order:-1;}
+  }
+  @media (max-width:460px){
+    .stats,.meta{grid-template-columns:1fr;}
+    .stat + .stat::before,.m-item + .m-item::before{content:none;}
+    .stat,.m-item{border-top:1px solid var(--line-2);}
+    .stats .stat:first-child,.meta .m-item:first-child{border-top:none;}
+    .actions .abtn{flex:1 1 100%;}
+  }
+</style>
+</head>
+<body>
+
+<button class="themebtn" id="themeBtn" type="button" aria-label="החלפת ערכת נושא" title="מצב כהה / בהיר">
+  <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+</button>
+
+<div class="intro">
+  <span class="kick">אישור מסירה</span>
+  <h1>כרטיס אישור ללקוח</h1>
+  <p>תצוגת פירוט של אישור מסירה — זהות הלקוח, סטטוס, קבצים ומטא־נתונים במקום אחד.</p>
+</div>
+
+<!-- ====================== THE CARD ====================== -->
+<article class="card" id="card">
+
+  <!-- title bar: close (start) · approval badge (end) -->
+  <div class="titlebar">
+    <button class="closebtn" id="closeBtn" type="button" aria-label="סגירה">
+      <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <span class="badge">
+      <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+      <span>קבצים לאישור</span>
+    </span>
+  </div>
+
+  <!-- header: avatar + actions (start) · centered identity · hero check (end) -->
+  <div class="head">
+    <div class="head-side">
+      <div class="head-actions">
+        <button class="iconbtn star" id="starBtn" type="button" aria-label="הוספה למועדפים" aria-pressed="false">
+          <svg viewBox="0 0 24 24"><path d="M12 2 15.09 8.26 22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2Z"/></svg>
+        </button>
+        <button class="iconbtn link" id="linkBtn" type="button" aria-label="העתקת קישור">
+          <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+        </button>
+        <button class="iconbtn kebab" id="kebabBtn" type="button" aria-label="עוד פעולות">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+        </button>
+      </div>
+      <div class="avatar" aria-hidden="true">EA</div>
+    </div>
+
+    <div class="identity">
+      <div class="name-row">
+        <span class="name plain" id="clientName">Ella Agency</span>
+        <button class="edit" id="editBtn" type="button" aria-label="עריכת שם">
+          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+      </div>
+      <a class="contact" href="mailto:ella@agency.com">
+        <span class="val ltr">ella@agency.com</span>
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+      </a>
+      <a class="contact" href="tel:+972584471250">
+        <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg>
+        <span class="val ltr">058-4471250</span>
+      </a>
+    </div>
+
+    <div class="hero-check" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-4.5"/></svg>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- stats: files → comments → share date → approval validity (right→left in RTL) -->
+  <div class="stats">
+    <div class="stat">
+      <div class="s-text">
+        <div class="s-label">קבצים</div>
+        <div class="s-value">28</div>
+        <div class="s-sub">חומרים</div>
+      </div>
+      <div class="s-ico"><svg viewBox="0 0 24 24"><path d="M4 20V6a2 2 0 0 1 2-2h4l2 2.5h6a2 2 0 0 1 2 2v11.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/></svg></div>
+    </div>
+    <div class="stat">
+      <div class="s-text">
+        <div class="s-label">הערות</div>
+        <div class="s-value">7</div>
+        <div class="s-sub">מצורפות</div>
+      </div>
+      <div class="s-ico"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-11.9 7.8L3 21l1.7-6.1A8.5 8.5 0 1 1 21 11.5Z"/></svg></div>
+    </div>
+    <div class="stat">
+      <div class="s-text">
+        <div class="s-label">תאריך שיתוף</div>
+        <div class="s-value ltr" id="shareDate">Jul 06, 2026</div>
+        <div class="s-sub ltr" id="shareTime">10:45</div>
+      </div>
+      <div class="s-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M16 2.5v4M8 2.5v4M3 10h18"/></svg></div>
+    </div>
+    <div class="stat">
+      <div class="s-text">
+        <div class="s-label">תוקף האישור</div>
+        <div class="s-value ltr" id="validEnd">Jul 20, 2026</div>
+        <div class="s-sub ok" id="validLeft">עוד 14 ימים</div>
+      </div>
+      <div class="s-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+    </div>
+  </div>
+
+  <div class="divider" style="margin-bottom:20px"></div>
+
+  <!-- quote / message -->
+  <div class="quote">
+    <p>פרויקט האישור מכיל משוב ללקוח, לא קבצי מסירה.</p>
+    <span class="qmark" aria-hidden="true">&rdquo;</span>
+  </div>
+
+  <!-- meta: status → security → share link → file type → total size (right→left in RTL) -->
+  <div class="meta" style="margin-top:16px">
+    <div class="m-item status">
+      <div class="m-text">
+        <div class="m-label">סטטוס</div>
+        <div class="m-value" id="statusVal">התקבלו שינויים</div>
+      </div>
+      <div class="m-ico status"><span class="dot"></span></div>
+    </div>
+    <div class="m-item">
+      <div class="m-text">
+        <div class="m-label">אבטחה</div>
+        <div class="m-value">סיסמה</div>
+      </div>
+      <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.4-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.4 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1Z"/></svg></div>
+    </div>
+    <div class="m-item">
+      <div class="m-text">
+        <div class="m-label">קישור שיתוף</div>
+        <div class="m-value ok">פעיל</div>
+      </div>
+      <div class="m-ico ok"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></div>
+    </div>
+    <div class="m-item">
+      <div class="m-text">
+        <div class="m-label">סוג הקבצים</div>
+        <div class="m-value">MIX</div>
+      </div>
+      <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg></div>
+    </div>
+    <div class="m-item">
+      <div class="m-text">
+        <div class="m-label">נפח כולל</div>
+        <div class="m-value ltr">320 MB</div>
+      </div>
+      <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9h-9Z"/><path d="M12 3v9h9A9 9 0 0 0 12 3Z"/></svg></div>
+    </div>
+  </div>
+
+  <div class="divider" style="margin-top:22px"></div>
+
+  <!-- actions: open (primary, start) … download … access … history … delete (end) -->
+  <div class="actions">
+    <button class="abtn primary" id="openBtn" type="button">
+      <svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-11.9 7.8L3 21l1.7-6.1A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+      הצג קבצים לאישור
+    </button>
+    <button class="abtn" id="downloadBtn" type="button">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
+      הורדה
+    </button>
+    <button class="abtn" id="accessBtn" type="button">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      אבטחה וגישה
+    </button>
+    <button class="abtn" id="historyBtn" type="button">
+      <svg viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+      היסטוריית פעילות
+    </button>
+    <button class="abtn danger del" id="deleteBtn" type="button">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg>
+      מחיקה
+    </button>
+  </div>
+
+</article>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const root = document.documentElement, card = $('#card');
+
+  /* theme */
+  try { if (localStorage.getItem('kolkli_theme') === 'dark') root.setAttribute('data-theme','dark'); } catch(_){}
+  $('#themeBtn').addEventListener('click', () => {
+    const dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) root.removeAttribute('data-theme'); else root.setAttribute('data-theme','dark');
+    try { localStorage.setItem('kolkli_theme', dark ? 'light' : 'dark'); } catch(_){}
+  });
+
+  /* toast */
+  let toastT; const toast = $('#toast');
+  function showToast(msg){
+    toast.textContent = msg; toast.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('show'), 1900);
+  }
+  async function copy(text){
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch(_){
+      try { const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); return true; }
+      catch(e){ return false; }
+    }
+  }
+
+  /* favorite */
+  const starBtn = $('#starBtn');
+  starBtn.addEventListener('click', () => {
+    const on = starBtn.classList.toggle('on');
+    starBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    showToast(on ? 'נוסף למועדפים ★' : 'הוסר מהמועדפים');
+  });
+
+  /* inline name edit */
+  $('#editBtn').addEventListener('click', () => {
+    const el = $('#clientName'), cur = el.textContent.trim();
+    const val = window.prompt('עריכת שם הלקוח', cur);
+    if (val && val.trim()) el.textContent = val.trim();
+  });
+
+  /* actions (demo) */
+  $('#linkBtn').addEventListener('click', async () => {
+    if (await copy('https://kolkli.com/a/EA-10001')) showToast('הקישור הועתק ✓');
+  });
+  $('#openBtn').addEventListener('click',     () => showToast('פותח את האישור…'));
+  $('#downloadBtn').addEventListener('click', () => showToast('מוריד את הקבצים…'));
+  $('#accessBtn').addEventListener('click',   () => showToast('אבטחה וגישה'));
+  $('#historyBtn').addEventListener('click',  () => showToast('היסטוריית פעילות'));
+  $('#kebabBtn').addEventListener('click',    () => showToast('עוד פעולות'));
+  $('#deleteBtn').addEventListener('click',   () => { card.classList.add('dismissed'); showToast('הכרטיס נמחק'); });
+  $('#closeBtn').addEventListener('click',    () => { card.classList.add('dismissed'); showToast('נסגר'); });
+})();
+</script>
+</body>
+</html>

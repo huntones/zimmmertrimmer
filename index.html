@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — Everything you need to work with files</title>
+<link rel="canonical" href="https://kolkli.com/">
 <meta name="description" content="Upload once — then edit, convert, compress, organize and send your files. Audio, images, video, documents, converters and AI tools in one place. Fast, simple and professional-quality.">
 <style>
   :root {
@@ -482,11 +483,6 @@
     background-repeat:no-repeat;
     -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 62%,rgba(0,0,0,.9) 71%,rgba(0,0,0,.6) 79%,rgba(0,0,0,.28) 86%,transparent 92%);
             mask-image:linear-gradient(180deg,#000 0%,#000 62%,rgba(0,0,0,.9) 71%,rgba(0,0,0,.6) 79%,rgba(0,0,0,.28) 86%,transparent 92%);}
-  /* blurred twin of the image, revealed only over the faded bottom band so the
-     colour seam at the corners smears away; icons above stay perfectly sharp */
-  .topbg.topbg-blur{filter:blur(22px);
-    -webkit-mask-image:linear-gradient(180deg,transparent 70%,rgba(0,0,0,.4) 81%,#000 89%,#000 95%,transparent 100%);
-            mask-image:linear-gradient(180deg,transparent 70%,rgba(0,0,0,.4) 81%,#000 89%,#000 95%,transparent 100%);}
   /* the image already carries the 3D file icons + light rays,
      so retire the CSS-drawn duplicates in the hero */
   .hero3d{display:none!important;}
@@ -526,7 +522,6 @@
 </head>
 <body>
 <div class="topbg" aria-hidden="true"></div>
-<div class="topbg topbg-blur" aria-hidden="true"></div>
 
 <!-- ===================== NAV ===================== -->
 <div id="site-header"></div>
@@ -548,7 +543,7 @@
     </div>
 
     <div class="herobtns">
-      <a class="cta lg" href="./auth.html?mode=signup"><span data-i18n="heroCta1"></span></a>
+      <a class="cta lg" href="./auth?mode=signup"><span data-i18n="heroCta1"></span></a>
       <a class="ghost lg" href="#how"><svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg><span data-i18n="heroCta2"></span></a>
     </div>
   </div>
@@ -560,7 +555,7 @@
     <h2 class="tsec-h" data-i18n="toolsH"></h2>
     <div class="tsec-underline"></div>
     <div class="toolgrid reveal">
-      <a class="card toolcard hov" href="./send.html"><span class="tc-ic" style="color:#7b34ff"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></span><h3 data-i18n="tc1t"></h3><p data-i18n="tc1p"></p></a>
+      <a class="card toolcard hov" href="./send"><span class="tc-ic" style="color:#7b34ff"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></span><h3 data-i18n="tc1t"></h3><p data-i18n="tc1p"></p></a>
       <a class="card toolcard hov" href="./ai/"><span class="tc-ic" style="color:#6f44ff"><svg viewBox="0 0 24 24"><path d="M12 2l2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2z"/><path d="M19 3v3M20.5 4.5h-3"/></svg></span><h3 data-i18n="tc2t"></h3><p data-i18n="tc2p"></p></a>
       <a class="card toolcard hov" href="./compress/"><span class="tc-ic" style="color:#6355ff"><svg viewBox="0 0 24 24"><path d="M21 8v13H3V8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg></span><h3 data-i18n="tc3t"></h3><p data-i18n="tc3p"></p></a>
       <a class="card toolcard hov" href="./audio/"><span class="tc-ic" style="color:#5765ff"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span><h3 data-i18n="tc4t"></h3><p data-i18n="tc4p"></p></a>
@@ -623,7 +618,7 @@
       <p data-i18n="sendP"></p>
     </div>
     <div class="chips reveal" id="sendGrid" style="justify-content:center"></div>
-    <div style="text-align:center;margin-top:30px" class="reveal"><a class="cta" href="./send.html"><span data-i18n="navSend"></span></a></div>
+    <div style="text-align:center;margin-top:30px" class="reveal"><a class="cta" href="./send"><span data-i18n="navSend"></span></a></div>
   </div>
 </section>
 
@@ -815,89 +810,89 @@
     ],
     popular:[
       {i:'☁️',status:'soon',he:['שליחת קבצים גדולים','שלחו עד 3GB בלינק אחד.'],en:['Send Large Files','Share up to 3GB with one link.'],ru:['Отправка больших файлов','Отправьте до 3 ГБ одной ссылкой.']},
-      {i:'✂️',status:'live',href:'./app.html',he:['חותך אודיו','חתכו וערכו אודיו אונליין.'],en:['Audio Cutter','Cut & edit audio online.'],ru:['Обрезка аудио','Режьте и редактируйте аудио онлайн.']},
-      {i:'🎬',status:'live',href:'./video-cut.html',he:['חותך וידאו','חתכו וקצרו סרטונים.'],en:['Video Cutter','Trim or cut video.'],ru:['Обрезка видео','Обрезайте или режьте видео.']},
-      {i:'🪄',status:'live',href:'./remove-bg.html',he:['הסרת רקע','הסירו רקע מתמונות.'],en:['Remove Background','Erase image backgrounds.'],ru:['Удаление фона','Убирайте фон с изображений.']},
-      {i:'🖼️',status:'live',href:'./heic-to-jpg.html',he:['HEIC ל-JPG','המירו תמונות אייפון.'],en:['HEIC to JPG','Convert iPhone photos.'],ru:['HEIC в JPG','Конвертируйте фото с iPhone.']},
+      {i:'✂️',status:'live',href:'./app',he:['חותך אודיו','חתכו וערכו אודיו אונליין.'],en:['Audio Cutter','Cut & edit audio online.'],ru:['Обрезка аудио','Режьте и редактируйте аудио онлайн.']},
+      {i:'🎬',status:'live',href:'./video-cut',he:['חותך וידאו','חתכו וקצרו סרטונים.'],en:['Video Cutter','Trim or cut video.'],ru:['Обрезка видео','Обрезайте или режьте видео.']},
+      {i:'🪄',status:'live',href:'./remove-bg',he:['הסרת רקע','הסירו רקע מתמונות.'],en:['Remove Background','Erase image backgrounds.'],ru:['Удаление фона','Убирайте фон с изображений.']},
+      {i:'🖼️',status:'live',href:'./heic-to-jpg',he:['HEIC ל-JPG','המירו תמונות אייפון.'],en:['HEIC to JPG','Convert iPhone photos.'],ru:['HEIC в JPG','Конвертируйте фото с iPhone.']},
       {i:'📄',status:'soon',he:['DOC ל-PDF','המירו מסמכים ל-PDF.'],en:['DOC to PDF','Convert documents to PDF.'],ru:['DOC в PDF','Конвертируйте документы в PDF.']},
-      {i:'🎵',status:'live',href:'./mp4-to-mp3.html',he:['MP4 ל-MP3','חלצו אודיו מווידאו.'],en:['MP4 to MP3','Extract audio from video.'],ru:['MP4 в MP3','Извлекайте звук из видео.']},
-      {i:'🗜️',status:'live',href:'./compress-image.html',he:['דחיסת תמונה','הקטינו את גודל התמונה.'],en:['Compress Image','Reduce image file size.'],ru:['Сжатие изображения','Уменьшайте размер изображений.']},
+      {i:'🎵',status:'live',href:'./mp4-to-mp3',he:['MP4 ל-MP3','חלצו אודיו מווידאו.'],en:['MP4 to MP3','Extract audio from video.'],ru:['MP4 в MP3','Извлекайте звук из видео.']},
+      {i:'🗜️',status:'live',href:'./compress-image',he:['דחיסת תמונה','הקטינו את גודל התמונה.'],en:['Compress Image','Reduce image file size.'],ru:['Сжатие изображения','Уменьшайте размер изображений.']},
       {i:'📕',status:'soon',he:['דחיסת PDF','הקטינו קובצי PDF.'],en:['Compress PDF','Shrink PDF files.'],ru:['Сжатие PDF','Уменьшайте PDF-файлы.']},
       {i:'📎',status:'soon',he:['מיזוג PDF','אחדו כמה קבצי PDF.'],en:['Merge PDF','Combine PDF files.'],ru:['Объединение PDF','Объединяйте PDF-файлы.']},
-      {i:'🏞️',status:'live',href:'./pdf-to-jpg.html',he:['PDF ל-JPG','המירו עמודי PDF לתמונות.'],en:['PDF to JPG','Turn PDF pages into images.'],ru:['PDF в JPG','Превращайте страницы PDF в изображения.']},
-      {i:'🗂️',status:'live',href:'./files.html',he:['בחירת קבצים','ארגנו קבצים בתיקיות ותגיות.'],en:['Organize Files','Sort files into folders & tags.'],ru:['Упорядочить файлы','Сортируйте файлы по папкам и тегам.']},
+      {i:'🏞️',status:'live',href:'./pdf-to-jpg',he:['PDF ל-JPG','המירו עמודי PDF לתמונות.'],en:['PDF to JPG','Turn PDF pages into images.'],ru:['PDF в JPG','Превращайте страницы PDF в изображения.']},
+      {i:'🗂️',status:'live',href:'./files',he:['בחירת קבצים','ארגנו קבצים בתיקיות ותגיות.'],en:['Organize Files','Sort files into folders & tags.'],ru:['Упорядочить файлы','Сортируйте файлы по папкам и тегам.']},
       {i:'✨',status:'soon',he:['שדרוג AI','שפרו איכות תמונה עם AI.'],en:['AI Upscaler','Enhance image quality with AI.'],ru:['AI-апскейлер','Улучшайте качество изображений с AI.']}
     ],
     ai:[
-      {i:'🪄',he:['הסרת רקע AI'],en:['AI Remove Background'],ru:['AI-удаление фона'],href:'./remove-bg.html'},
-      {i:'🎧',he:['ניקוי אודיו AI'],en:['AI Audio Cleaner'],ru:['AI-очистка звука'],href:'./ai-audio-cleanup.html'},
-      {i:'💬',he:['יצירת כתוביות AI'],en:['AI Subtitle Generator'],ru:['AI-генератор субтитров'],status:'live',href:'./subtitle-generator.html'},
-      {i:'🖼️',he:['חיתוך חכם AI'],en:['AI Smart Crop'],ru:['AI-умная обрезка'],href:'./ai-smart-crop.html'},
-      {i:'🩹',he:['שחזור תמונה AI'],en:['AI Restore Photo'],ru:['AI-восстановление фото'],href:'./restore-image.html'},
-      {i:'🎚️',he:['מאסטרינג AI'],en:['AI Master Audio'],ru:['AI-мастеринг аудио'],href:'./ai-master.html'},
+      {i:'🪄',he:['הסרת רקע AI'],en:['AI Remove Background'],ru:['AI-удаление фона'],href:'./remove-bg'},
+      {i:'🎧',he:['ניקוי אודיו AI'],en:['AI Audio Cleaner'],ru:['AI-очистка звука'],href:'./ai-audio-cleanup'},
+      {i:'💬',he:['יצירת כתוביות AI'],en:['AI Subtitle Generator'],ru:['AI-генератор субтитров'],status:'live',href:'./subtitle-generator'},
+      {i:'🖼️',he:['חיתוך חכם AI'],en:['AI Smart Crop'],ru:['AI-умная обрезка'],href:'./ai-smart-crop'},
+      {i:'🩹',he:['שחזור תמונה AI'],en:['AI Restore Photo'],ru:['AI-восстановление фото'],href:'./restore-image'},
+      {i:'🎚️',he:['מאסטרינג AI'],en:['AI Master Audio'],ru:['AI-мастеринг аудио'],href:'./ai-master'},
       {i:'🧽',he:['הסרת אובייקטים AI'],en:['AI Remove Objects'],ru:['AI-удаление объектов']},
-      {i:'📝',he:['סיכום PDF AI'],en:['AI Summarize PDF'],ru:['AI-конспект PDF'],href:'./ai-summarize-pdf.html'}
+      {i:'📝',he:['סיכום PDF AI'],en:['AI Summarize PDF'],ru:['AI-конспект PDF'],href:'./ai-summarize-pdf'}
     ],
     tools:[
-      {i:'✂️', c:'v', cat:['audio'], href:'./app.html', he:['חותך אודיו','חתכו וערכו קבצי שמע אונליין.'], en:['Audio Cutter','Cut & edit audio online.'], ru:['Обрезка аудио','Режьте и редактируйте аудио онлайн.']},
-      {i:'🔗', c:'b', cat:['audio'], href:'./merge-audio.html', he:['מיזוג אודיו','אחדו כמה קבצי שמע לאחד.'], en:['Merge Audio','Combine audio files into one.'], ru:['Объединение аудио','Объединяйте аудиофайлы в один.']},
-      {i:'🎵', c:'g', cat:['audio','convert'], href:'./mp4-to-mp3.html', he:['MP4 ל-MP3','חלצו שמע מסרטון וידאו.'], en:['MP4 to MP3','Extract audio from video.'], ru:['MP4 в MP3','Извлекайте звук из видео.']},
-      {i:'🎧', c:'t', cat:['audio','video'], href:'./extract-audio.html', new:true, he:['חילוץ אודיו','שמרו את פס הקול מכל וידאו.'], en:['Extract Audio','Save the soundtrack from any video.'], ru:['Извлечение аудио','Сохраняйте звуковую дорожку из любого видео.']},
-      {i:'🎚️', c:'g', cat:['audio'], href:'./normalize-audio.html', new:true, he:['נורמליזציית עוצמה','יישרו כמה שירים לאותה עוצמה (LUFS).'], en:['Loudness Normalize','Level a batch of tracks to one loudness (LUFS).'], ru:['Нормализация громкости','Выровняйте партию треков до одной громкости (LUFS).']},
-      {i:'✨', c:'v', cat:['audio'], href:'./ai-audio-cleanup.html', new:true, he:['ניקוי אודיו AI','הסירו רעש ושפרו את הקול עם AI.'], en:['AI Audio Cleanup','Remove noise & enhance voice with AI.'], ru:['AI-очистка аудио','Убирайте шум и улучшайте голос с AI.']},
-      {i:'🖼️', c:'b', cat:['images','convert'], href:'./heic-to-jpg.html', he:['HEIC ל-JPG','המירו תמונות אייפון ל-JPG.'], en:['HEIC to JPG','Convert iPhone photos to JPG.'], ru:['HEIC в JPG','Конвертируйте фото iPhone в JPG.']},
-      {i:'📐', c:'g', cat:['images'], href:'./resize-image.html', he:['שינוי גודל תמונה','שנו מידות לפי פיקסל או אחוז.'], en:['Resize Image','Resize by pixels or percentage.'], ru:['Изменение размера','Меняйте размер по пикселям или процентам.']},
-      {i:'🔄', c:'y', cat:['images','convert'], href:'./image-convert.html', he:['המרת תמונה','PNG, JPG ו-WEBP הדדית.'], en:['Convert Image','PNG, JPG & WEBP, back and forth.'], ru:['Конвертация изображений','PNG, JPG и WEBP в обе стороны.']},
-      {i:'🪄', c:'v', cat:['images'], href:'./remove-bg.html', new:true, he:['הסרת רקע','מחקו רקע מתמונה בקליק.'], en:['Remove Background','Erase image backgrounds in a click.'], ru:['Удаление фона','Убирайте фон с изображения в один клик.']},
-      {i:'💧', c:'t', cat:['images'], href:'./watermark.html', new:true, he:['סימן מים','הוסיפו טקסט או לוגו על התמונה.'], en:['Watermark','Overlay text or a logo on your photo.'], ru:['Водяной знак','Наложите текст или логотип на фото.']},
-      {i:'🖼️', c:'v', cat:['images'], href:'./ai-smart-crop.html', new:true, he:['חיתוך חכם AI','ה-AI ממקם את החיתוך על הנושא.'], en:['AI Smart Crop','AI centers the crop on your subject.'], ru:['AI-умная обрезка','AI центрирует кадр по объекту.']},
-      {i:'🧽', c:'v', cat:['images'], href:'./ai-object-remover.html', new:true, he:['הסרת אובייקטים AI','מחקו כל דבר מהתמונה ו-AI ישלים.'], en:['AI Object Remover','Erase anything; AI fills it back in.'], ru:['AI-удаление объектов','Сотрите что угодно; AI восстановит фон.']},
-      {i:'🩹', c:'v', cat:['images'], href:'./restore-image.html', new:true, he:['שחזור תמונה AI','שחזרו ושפרו תמונות ישנות עם AI.'], en:['AI Photo Restore','Restore & enhance old photos with AI.'], ru:['AI-восстановление фото','Восстанавливайте и улучшайте старые фото с AI.']},
-      {i:'🎬', c:'v', cat:['video'], href:'./video-cut.html', he:['חותך וידאו','חתכו וקצרו סרטונים.'], en:['Video Cutter','Trim or cut videos.'], ru:['Обрезка видео','Обрезайте или режьте видео.']},
-      {i:'🎞️', c:'b', cat:['video','convert'], href:'./video-convert.html', he:['המרת וידאו','MOV, AVI ו-MKV ל-MP4.'], en:['Convert Video','MOV, AVI & MKV to MP4.'], ru:['Конвертация видео','MOV, AVI и MKV в MP4.']},
-      {i:'🗜️', c:'y', cat:['video','compress'], href:'./compress-video.html', he:['דחיסת וידאו','הקטינו סרטונים בלי לאבד איכות.'], en:['Compress Video','Shrink videos, keep the quality.'], ru:['Сжатие видео','Уменьшайте видео, сохраняя качество.']},
-      {i:'💬', c:'v', cat:['video','audio'], href:'./subtitle-generator.html', new:true, he:['כתוביות AI','תמלול וכתוביות אוטומטי לכל וידאו או אודיו.'], en:['AI Subtitles','Auto transcript & captions for any video or audio.'], ru:['AI-субтитры','Авто-транскрипция и субтитры для любого видео или аудио.']},
-      {i:'📎', c:'p', cat:['documents'], href:'./merge-pdf.html', he:['מיזוג PDF','אחדו כמה קבצי PDF לאחד.'], en:['Merge PDF','Combine PDFs into one file.'], ru:['Объединение PDF','Объединяйте PDF в один файл.']},
-      {i:'📕', c:'g', cat:['documents','compress'], href:'./compress-pdf.html', he:['דחיסת PDF','הקטינו את גודל ה-PDF.'], en:['Compress PDF','Reduce PDF file size.'], ru:['Сжатие PDF','Уменьшайте размер PDF.']},
-      {i:'🏞️', c:'y', cat:['documents','convert'], href:'./pdf-to-jpg.html', new:true, he:['PDF ל-JPG','המירו כל עמוד PDF לתמונה.'], en:['PDF to JPG','Turn every PDF page into an image.'], ru:['PDF в JPG','Превращайте каждую страницу PDF в изображение.']},
-      {i:'📄', c:'b', cat:['documents','convert'], href:'./doc-to-pdf.html', he:['DOC ל-PDF','המירו מסמכי Word ל-PDF.'], en:['DOC to PDF','Convert Word docs to PDF.'], ru:['DOC в PDF','Конвертируйте документы Word в PDF.']},
-      {i:'📝', c:'t', cat:['documents','convert'], href:'./doc-convert.html', new:true, he:['המרת מסמך','המירו בין פורמטים של מסמכים.'], en:['Convert Document','Convert between document formats.'], ru:['Конвертация документов','Конвертируйте между форматами документов.']},
-      {i:'🔁', c:'y', cat:['convert'], href:'./convert.html', he:['ממיר קבצים','המרה בין מאות פורמטים.'], en:['Convert Files','Convert hundreds of formats.'], ru:['Конвертация файлов','Конвертируйте сотни форматов.']},
-      {i:'🗂️', c:'p', cat:['documents'], href:'./files.html', he:['בחירת קבצים','ארגנו בתיקיות ותגיות.'], en:['Organize Files','Sort into folders & tags.'], ru:['Упорядочить файлы','Сортируйте по папкам и тегам.']},
-      {i:'🗄️', c:'y', cat:['convert'], href:'./archive-convert.html', new:true, he:['ממיר ארכיונים','ארזו קבצים ל-ZIP או GZIP.'], en:['Archive Converter','Bundle files into ZIP or GZIP.'], ru:['Конвертер архивов','Упакуйте файлы в ZIP или GZIP.']},
-      {i:'🔤', c:'v', cat:['convert'], href:'./font-convert.html', new:true, he:['ממיר גופנים','המירו גופנים בין פורמטים.'], en:['Font Converter','Convert fonts between formats.'], ru:['Конвертер шрифтов','Конвертируйте шрифты между форматами.']},
-      {i:'📚', c:'b', cat:['convert'], href:'./ebook-convert.html', new:true, he:['ממיר ספרים','EPUB ל-PDF, HTML או טקסט.'], en:['Ebook Converter','EPUB to PDF, HTML or text.'], ru:['Конвертер эл. книг','EPUB в PDF, HTML или текст.']},
-      {i:'📊', c:'g', cat:['convert'], href:'./spreadsheet-convert.html', new:true, he:['ממיר גיליונות','XLSX, CSV, ODS ו-HTML.'], en:['Spreadsheet Converter','XLSX, CSV, ODS & HTML.'], ru:['Конвертер таблиц','XLSX, CSV, ODS и HTML.']},
-      {i:'📽️', c:'t', cat:['convert'], href:'./presentation-convert.html', new:true, he:['ממיר מצגות','PPTX ל-PDF, HTML או טקסט.'], en:['Presentation Converter','PPTX to PDF, HTML or text.'], ru:['Конвертер презентаций','PPTX в PDF, HTML или текст.']},
-      {i:'🧾', c:'v', cat:['documents'], href:'./ai-summarize-pdf.html', new:true, he:['סיכום PDF AI','תקציר חכם לכל מסמך PDF.'], en:['AI Summarize PDF','A smart summary of any PDF.'], ru:['AI-конспект PDF','Умное резюме любого PDF.']},
-      {i:'🎨', c:'v', cat:[], href:'./color-convert.html', new:true, he:['ממיר צבעים','המרה בין HEX, RGB, HSL ו-CMYK.'], en:['Color Converter','Convert between HEX, RGB, HSL & CMYK.'], ru:['Конвертер цвета','Конвертация HEX, RGB, HSL и CMYK.']},
-      {i:'🎨', c:'g', cat:[], href:'./palette-generator.html', new:true, he:['מחולל פלטת צבעים','הרמוניות צבע מוכנות ל-CSS.'], en:['Palette Generator','Harmonious color palettes for CSS.'], ru:['Генератор палитр','Гармоничные палитры для CSS.']},
-      {i:'🌗', c:'y', cat:[], href:'./contrast-checker.html', new:true, he:['בודק ניגודיות','בדיקת קריאות טקסט לפי תקן WCAG.'], en:['Contrast Checker','Check text readability against WCAG.'], ru:['Проверка контраста','Проверка читаемости текста по WCAG.']},
-      {i:'🌈', c:'t', cat:[], href:'./gradient-generator.html', new:true, he:['מחולל Gradient','גרדיאנט חי עם קוד CSS מוכן.'], en:['Gradient Generator','Live gradients with ready CSS.'], ru:['Генератор градиентов','Живые градиенты с готовым CSS.']},
-      {i:'🟪', c:'p', cat:[], href:'./box-shadow.html', new:true, he:['מחולל Box Shadow','עיצוב צל עם תצוגה חיה וקוד CSS.'], en:['Box Shadow','Design shadows with live preview & CSS.'], ru:['Box Shadow','Тени с превью и готовым CSS.']},
-      {i:'⬜', c:'b', cat:[], href:'./border-radius.html', new:true, he:['מחולל Border Radius','פינות מעוגלות עם תצוגה חיה וקוד CSS.'], en:['Border Radius','Rounded corners with live preview & CSS.'], ru:['Border Radius','Скругление углов с превью и CSS.']},
-      {i:'☁️', c:'b', cat:[], href:'./send.html', he:['שליחת קבצים','שלחו קבצים גדולים בלינק אחד.'], en:['Send Files','Share big files with one link.'], ru:['Отправка файлов','Делитесь большими файлами одной ссылкой.']},
-      {i:'✅', c:'p', cat:[], href:'./review.html', new:true, he:['אישור קבצים','שלחו עבודה ללקוח לצפייה, הערות ואישור.'], en:['Approve Files','Send work to a client for sign-off.'], ru:['Утверждение файлов','Отправьте работу клиенту на просмотр и одобрение.']},
-      {i:'🔗', c:'b', cat:['marketing'], href:'./utm-builder.html', new:true, he:['בונה קישורי UTM','בנו קישורים מסודרים למעקב קמפיינים.'], en:['UTM Link Builder','Build tidy links to track campaigns.'], ru:['UTM-конструктор','Создавайте аккуратные ссылки для отслеживания кампаний.']},
-      {i:'🔳', c:'v', cat:['marketing'], href:'./qr-generator.html', new:true, he:['מחולל QR Code','QR לקישור, וואטסאפ, תפריט או קובץ.'], en:['QR Code Generator','QR for a link, WhatsApp, menu or file.'], ru:['Генератор QR-кодов','QR для ссылки, WhatsApp, меню или файла.']},
-      {i:'💬', c:'g', cat:['marketing'], href:'./whatsapp-link.html', new:true, he:['קישור וואטסאפ','קישור עם הודעה מוכנה מראש.'], en:['WhatsApp Link','A link with a ready-to-send message.'], ru:['Ссылка WhatsApp','Ссылка с готовым сообщением.']},
-      {i:'✉️', c:'y', cat:['marketing'], href:'./mailto-link.html', new:true, he:['קישור Mailto','פתיחת מייל עם נושא וטקסט מוכנים.'], en:['Mailto Link','Open an email with subject and body ready.'], ru:['Mailto-ссылка','Открытие письма с готовой темой и текстом.']},
-      {i:'📏', c:'t', cat:['marketing'], href:'./ad-text-checker.html', new:true, he:['בודק אורך למודעות','בדקו אורך כותרת, תיאור ו-CTA.'], en:['Ad Text Length Checker','Check headline, description and CTA length.'], ru:['Проверка длины текста','Проверяйте длину заголовка, описания и CTA.']},
-      {i:'🎯', c:'p', cat:['marketing'], href:'./cta-generator.html', new:true, he:['מחולל CTA','כפתורי פעולה קצרים לפי מטרה.'], en:['CTA Generator','Short action buttons by goal.'], ru:['CTA-генератор','Короткие кнопки действий по цели.']},
-      {i:'✍️', c:'v', cat:['marketing'], href:'./copy-generator.html', new:true, he:['מחולל קופי קצר','וריאציות לכותרות, מודעות ופוסטים.'], en:['Copy Generator','Variations for headlines, ads and posts.'], ru:['Генератор текстов','Варианты заголовков, объявлений и постов.']},
-      {i:'👁️', c:'b', cat:['marketing'], href:'./link-preview.html', new:true, he:['תצוגה מקדימה לקישור','איך הקישור ייראה בשיתוף.'], en:['Link Preview','See how your link looks when shared.'], ru:['Превью ссылки','Как ссылка выглядит при отправке.']},
-      {i:'🧩', c:'g', cat:['marketing'], href:'./embed-code.html', new:true, he:['קוד הטמעה','iframe לסרטון, מפה, טופס או קובץ.'], en:['Embed Code','iframe for a video, map, form or file.'], ru:['Код вставки','iframe для видео, карты, формы или файла.']},
-      {i:'↪️', c:'y', cat:['marketing'], href:'./redirect-generator.html', new:true, he:['מחולל Redirect','יצירת הפניה מהירה לקישור יעד.'], en:['Redirect Generator','Create a quick redirect to a target link.'], ru:['Генератор редиректа','Создайте быстрый редирект на нужную ссылку.']},
-      {i:'➗', c:'v', cat:['calc'], href:'./percent-calculator.html', new:true, he:['מחשבון אחוזים','הנחה, מע״מ, תוספת, שינוי וטיפ.'], en:['Percentage Calculator','Discount, VAT, markup, change & tips.'], ru:['Калькулятор процентов','Скидка, НДС, наценка, изменение и чаевые.']},
-      {i:'⏱️', c:'b', cat:['calc'], href:'./work-hours-calculator.html', new:true, he:['מחשבון שעות עבודה','משך בין שעות, הפסקות וסיכום שכר.'], en:['Work Hours Calculator','Duration between times, breaks & pay.'], ru:['Калькулятор рабочих часов','Длительность, перерывы и оплата.']},
-      {i:'📐', c:'g', cat:['calc'], href:'./unit-converter.html', new:true, he:['ממיר יחידות','משקל, אורך, נפח, טמפרטורה ועוד.'], en:['Unit Converter','Weight, length, volume, temperature & more.'], ru:['Конвертер единиц','Вес, длина, объём, температура и другое.']},
-      {i:'🌐', c:'y', cat:['calc'], href:'./timezone-converter.html', new:true, he:['ממיר אזורי זמן','תיאום שיחות עם לקוחות מחו״ל.'], en:['Time Zone Converter','Coordinate calls with clients abroad.'], ru:['Конвертер часовых поясов','Согласование звонков с клиентами.']},
-      {i:'🔑', c:'t', cat:['calc'], href:'./password-generator.html', new:true, he:['מחולל סיסמאות','סיסמאות חזקות עם אורך ותווים לבחירה.'], en:['Password Generator','Strong passwords with length & char sets.'], ru:['Генератор паролей','Надёжные пароли с выбором длины и символов.']},
-      {i:'🏷️', c:'p', cat:['calc'], href:'./filename-generator.html', new:true, he:['מחולל שמות קבצים','תבנית, תאריך, לקוח, פרויקט ומספר רץ.'], en:['File Name Generator','Template, date, client, project & number.'], ru:['Генератор имён файлов','Шаблон, дата, клиент, проект и номер.']},
-      {i:'🎨', c:'v', cat:['calc'], href:'./color-code-generator.html', new:true, he:['מחולל קוד צבע','HEX, RGB ו-HSL עם גוונים.'], en:['Color Code Generator','HEX, RGB and HSL with shades.'], ru:['Генератор кода цвета','HEX, RGB и HSL с оттенками.']},
-      {i:'🖌️', c:'b', cat:['calc'], href:'./image-color-picker.html', new:true, he:['בחירת צבעים מתמונה','חילוץ פלטת צבעים מתמונה.'], en:['Image Color Picker','Extract a color palette from an image.'], ru:['Пипетка цвета','Извлечение палитры из изображения.']},
-      {i:'📝', c:'g', cat:['calc'], href:'./lorem-ipsum-generator.html', new:true, he:['מחולל Lorem Ipsum','טקסט דמה לעיצוב ופריסה.'], en:['Lorem Ipsum Generator','Placeholder text for design & layout.'], ru:['Генератор Lorem Ipsum','Текст-заполнитель для дизайна.']},
-      {i:'🆔', c:'y', cat:['calc'], href:'./uuid-generator.html', new:true, he:['מחולל UUID','מזהים אקראיים למפתחים ולמערכות.'], en:['UUID Generator','Random IDs for developers & systems.'], ru:['Генератор UUID','Случайные ID для разработчиков и систем.']}
+      {i:'✂️', c:'v', cat:['audio'], href:'./app', he:['חותך אודיו','חתכו וערכו קבצי שמע אונליין.'], en:['Audio Cutter','Cut & edit audio online.'], ru:['Обрезка аудио','Режьте и редактируйте аудио онлайн.']},
+      {i:'🔗', c:'b', cat:['audio'], href:'./merge-audio', he:['מיזוג אודיו','אחדו כמה קבצי שמע לאחד.'], en:['Merge Audio','Combine audio files into one.'], ru:['Объединение аудио','Объединяйте аудиофайлы в один.']},
+      {i:'🎵', c:'g', cat:['audio','convert'], href:'./mp4-to-mp3', he:['MP4 ל-MP3','חלצו שמע מסרטון וידאו.'], en:['MP4 to MP3','Extract audio from video.'], ru:['MP4 в MP3','Извлекайте звук из видео.']},
+      {i:'🎧', c:'t', cat:['audio','video'], href:'./extract-audio', new:true, he:['חילוץ אודיו','שמרו את פס הקול מכל וידאו.'], en:['Extract Audio','Save the soundtrack from any video.'], ru:['Извлечение аудио','Сохраняйте звуковую дорожку из любого видео.']},
+      {i:'🎚️', c:'g', cat:['audio'], href:'./normalize-audio', new:true, he:['נורמליזציית עוצמה','יישרו כמה שירים לאותה עוצמה (LUFS).'], en:['Loudness Normalize','Level a batch of tracks to one loudness (LUFS).'], ru:['Нормализация громкости','Выровняйте партию треков до одной громкости (LUFS).']},
+      {i:'✨', c:'v', cat:['audio'], href:'./ai-audio-cleanup', new:true, he:['ניקוי אודיו AI','הסירו רעש ושפרו את הקול עם AI.'], en:['AI Audio Cleanup','Remove noise & enhance voice with AI.'], ru:['AI-очистка аудио','Убирайте шум и улучшайте голос с AI.']},
+      {i:'🖼️', c:'b', cat:['images','convert'], href:'./heic-to-jpg', he:['HEIC ל-JPG','המירו תמונות אייפון ל-JPG.'], en:['HEIC to JPG','Convert iPhone photos to JPG.'], ru:['HEIC в JPG','Конвертируйте фото iPhone в JPG.']},
+      {i:'📐', c:'g', cat:['images'], href:'./resize-image', he:['שינוי גודל תמונה','שנו מידות לפי פיקסל או אחוז.'], en:['Resize Image','Resize by pixels or percentage.'], ru:['Изменение размера','Меняйте размер по пикселям или процентам.']},
+      {i:'🔄', c:'y', cat:['images','convert'], href:'./image-convert', he:['המרת תמונה','PNG, JPG ו-WEBP הדדית.'], en:['Convert Image','PNG, JPG & WEBP, back and forth.'], ru:['Конвертация изображений','PNG, JPG и WEBP в обе стороны.']},
+      {i:'🪄', c:'v', cat:['images'], href:'./remove-bg', new:true, he:['הסרת רקע','מחקו רקע מתמונה בקליק.'], en:['Remove Background','Erase image backgrounds in a click.'], ru:['Удаление фона','Убирайте фон с изображения в один клик.']},
+      {i:'💧', c:'t', cat:['images'], href:'./watermark', new:true, he:['סימן מים','הוסיפו טקסט או לוגו על התמונה.'], en:['Watermark','Overlay text or a logo on your photo.'], ru:['Водяной знак','Наложите текст или логотип на фото.']},
+      {i:'🖼️', c:'v', cat:['images'], href:'./ai-smart-crop', new:true, he:['חיתוך חכם AI','ה-AI ממקם את החיתוך על הנושא.'], en:['AI Smart Crop','AI centers the crop on your subject.'], ru:['AI-умная обрезка','AI центрирует кадр по объекту.']},
+      {i:'🧽', c:'v', cat:['images'], href:'./ai-object-remover', new:true, he:['הסרת אובייקטים AI','מחקו כל דבר מהתמונה ו-AI ישלים.'], en:['AI Object Remover','Erase anything; AI fills it back in.'], ru:['AI-удаление объектов','Сотрите что угодно; AI восстановит фон.']},
+      {i:'🩹', c:'v', cat:['images'], href:'./restore-image', new:true, he:['שחזור תמונה AI','שחזרו ושפרו תמונות ישנות עם AI.'], en:['AI Photo Restore','Restore & enhance old photos with AI.'], ru:['AI-восстановление фото','Восстанавливайте и улучшайте старые фото с AI.']},
+      {i:'🎬', c:'v', cat:['video'], href:'./video-cut', he:['חותך וידאו','חתכו וקצרו סרטונים.'], en:['Video Cutter','Trim or cut videos.'], ru:['Обрезка видео','Обрезайте или режьте видео.']},
+      {i:'🎞️', c:'b', cat:['video','convert'], href:'./video-convert', he:['המרת וידאו','MOV, AVI ו-MKV ל-MP4.'], en:['Convert Video','MOV, AVI & MKV to MP4.'], ru:['Конвертация видео','MOV, AVI и MKV в MP4.']},
+      {i:'🗜️', c:'y', cat:['video','compress'], href:'./compress-video', he:['דחיסת וידאו','הקטינו סרטונים בלי לאבד איכות.'], en:['Compress Video','Shrink videos, keep the quality.'], ru:['Сжатие видео','Уменьшайте видео, сохраняя качество.']},
+      {i:'💬', c:'v', cat:['video','audio'], href:'./subtitle-generator', new:true, he:['כתוביות AI','תמלול וכתוביות אוטומטי לכל וידאו או אודיו.'], en:['AI Subtitles','Auto transcript & captions for any video or audio.'], ru:['AI-субтитры','Авто-транскрипция и субтитры для любого видео или аудио.']},
+      {i:'📎', c:'p', cat:['documents'], href:'./merge-pdf', he:['מיזוג PDF','אחדו כמה קבצי PDF לאחד.'], en:['Merge PDF','Combine PDFs into one file.'], ru:['Объединение PDF','Объединяйте PDF в один файл.']},
+      {i:'📕', c:'g', cat:['documents','compress'], href:'./compress-pdf', he:['דחיסת PDF','הקטינו את גודל ה-PDF.'], en:['Compress PDF','Reduce PDF file size.'], ru:['Сжатие PDF','Уменьшайте размер PDF.']},
+      {i:'🏞️', c:'y', cat:['documents','convert'], href:'./pdf-to-jpg', new:true, he:['PDF ל-JPG','המירו כל עמוד PDF לתמונה.'], en:['PDF to JPG','Turn every PDF page into an image.'], ru:['PDF в JPG','Превращайте каждую страницу PDF в изображение.']},
+      {i:'📄', c:'b', cat:['documents','convert'], href:'./doc-to-pdf', he:['DOC ל-PDF','המירו מסמכי Word ל-PDF.'], en:['DOC to PDF','Convert Word docs to PDF.'], ru:['DOC в PDF','Конвертируйте документы Word в PDF.']},
+      {i:'📝', c:'t', cat:['documents','convert'], href:'./doc-convert', new:true, he:['המרת מסמך','המירו בין פורמטים של מסמכים.'], en:['Convert Document','Convert between document formats.'], ru:['Конвертация документов','Конвертируйте между форматами документов.']},
+      {i:'🔁', c:'y', cat:['convert'], href:'./convert', he:['ממיר קבצים','המרה בין מאות פורמטים.'], en:['Convert Files','Convert hundreds of formats.'], ru:['Конвертация файлов','Конвертируйте сотни форматов.']},
+      {i:'🗂️', c:'p', cat:['documents'], href:'./files', he:['בחירת קבצים','ארגנו בתיקיות ותגיות.'], en:['Organize Files','Sort into folders & tags.'], ru:['Упорядочить файлы','Сортируйте по папкам и тегам.']},
+      {i:'🗄️', c:'y', cat:['convert'], href:'./archive-convert', new:true, he:['ממיר ארכיונים','ארזו קבצים ל-ZIP או GZIP.'], en:['Archive Converter','Bundle files into ZIP or GZIP.'], ru:['Конвертер архивов','Упакуйте файлы в ZIP или GZIP.']},
+      {i:'🔤', c:'v', cat:['convert'], href:'./font-convert', new:true, he:['ממיר גופנים','המירו גופנים בין פורמטים.'], en:['Font Converter','Convert fonts between formats.'], ru:['Конвертер шрифтов','Конвертируйте шрифты между форматами.']},
+      {i:'📚', c:'b', cat:['convert'], href:'./ebook-convert', new:true, he:['ממיר ספרים','EPUB ל-PDF, HTML או טקסט.'], en:['Ebook Converter','EPUB to PDF, HTML or text.'], ru:['Конвертер эл. книг','EPUB в PDF, HTML или текст.']},
+      {i:'📊', c:'g', cat:['convert'], href:'./spreadsheet-convert', new:true, he:['ממיר גיליונות','XLSX, CSV, ODS ו-HTML.'], en:['Spreadsheet Converter','XLSX, CSV, ODS & HTML.'], ru:['Конвертер таблиц','XLSX, CSV, ODS и HTML.']},
+      {i:'📽️', c:'t', cat:['convert'], href:'./presentation-convert', new:true, he:['ממיר מצגות','PPTX ל-PDF, HTML או טקסט.'], en:['Presentation Converter','PPTX to PDF, HTML or text.'], ru:['Конвертер презентаций','PPTX в PDF, HTML или текст.']},
+      {i:'🧾', c:'v', cat:['documents'], href:'./ai-summarize-pdf', new:true, he:['סיכום PDF AI','תקציר חכם לכל מסמך PDF.'], en:['AI Summarize PDF','A smart summary of any PDF.'], ru:['AI-конспект PDF','Умное резюме любого PDF.']},
+      {i:'🎨', c:'v', cat:[], href:'./color-convert', new:true, he:['ממיר צבעים','המרה בין HEX, RGB, HSL ו-CMYK.'], en:['Color Converter','Convert between HEX, RGB, HSL & CMYK.'], ru:['Конвертер цвета','Конвертация HEX, RGB, HSL и CMYK.']},
+      {i:'🎨', c:'g', cat:[], href:'./palette-generator', new:true, he:['מחולל פלטת צבעים','הרמוניות צבע מוכנות ל-CSS.'], en:['Palette Generator','Harmonious color palettes for CSS.'], ru:['Генератор палитр','Гармоничные палитры для CSS.']},
+      {i:'🌗', c:'y', cat:[], href:'./contrast-checker', new:true, he:['בודק ניגודיות','בדיקת קריאות טקסט לפי תקן WCAG.'], en:['Contrast Checker','Check text readability against WCAG.'], ru:['Проверка контраста','Проверка читаемости текста по WCAG.']},
+      {i:'🌈', c:'t', cat:[], href:'./gradient-generator', new:true, he:['מחולל Gradient','גרדיאנט חי עם קוד CSS מוכן.'], en:['Gradient Generator','Live gradients with ready CSS.'], ru:['Генератор градиентов','Живые градиенты с готовым CSS.']},
+      {i:'🟪', c:'p', cat:[], href:'./box-shadow', new:true, he:['מחולל Box Shadow','עיצוב צל עם תצוגה חיה וקוד CSS.'], en:['Box Shadow','Design shadows with live preview & CSS.'], ru:['Box Shadow','Тени с превью и готовым CSS.']},
+      {i:'⬜', c:'b', cat:[], href:'./border-radius', new:true, he:['מחולל Border Radius','פינות מעוגלות עם תצוגה חיה וקוד CSS.'], en:['Border Radius','Rounded corners with live preview & CSS.'], ru:['Border Radius','Скругление углов с превью и CSS.']},
+      {i:'☁️', c:'b', cat:[], href:'./send', he:['שליחת קבצים','שלחו קבצים גדולים בלינק אחד.'], en:['Send Files','Share big files with one link.'], ru:['Отправка файлов','Делитесь большими файлами одной ссылкой.']},
+      {i:'✅', c:'p', cat:[], href:'./review', new:true, he:['אישור קבצים','שלחו עבודה ללקוח לצפייה, הערות ואישור.'], en:['Approve Files','Send work to a client for sign-off.'], ru:['Утверждение файлов','Отправьте работу клиенту на просмотр и одобрение.']},
+      {i:'🔗', c:'b', cat:['marketing'], href:'./utm-builder', new:true, he:['בונה קישורי UTM','בנו קישורים מסודרים למעקב קמפיינים.'], en:['UTM Link Builder','Build tidy links to track campaigns.'], ru:['UTM-конструктор','Создавайте аккуратные ссылки для отслеживания кампаний.']},
+      {i:'🔳', c:'v', cat:['marketing'], href:'./qr-generator', new:true, he:['מחולל QR Code','QR לקישור, וואטסאפ, תפריט או קובץ.'], en:['QR Code Generator','QR for a link, WhatsApp, menu or file.'], ru:['Генератор QR-кодов','QR для ссылки, WhatsApp, меню или файла.']},
+      {i:'💬', c:'g', cat:['marketing'], href:'./whatsapp-link', new:true, he:['קישור וואטסאפ','קישור עם הודעה מוכנה מראש.'], en:['WhatsApp Link','A link with a ready-to-send message.'], ru:['Ссылка WhatsApp','Ссылка с готовым сообщением.']},
+      {i:'✉️', c:'y', cat:['marketing'], href:'./mailto-link', new:true, he:['קישור Mailto','פתיחת מייל עם נושא וטקסט מוכנים.'], en:['Mailto Link','Open an email with subject and body ready.'], ru:['Mailto-ссылка','Открытие письма с готовой темой и текстом.']},
+      {i:'📏', c:'t', cat:['marketing'], href:'./ad-text-checker', new:true, he:['בודק אורך למודעות','בדקו אורך כותרת, תיאור ו-CTA.'], en:['Ad Text Length Checker','Check headline, description and CTA length.'], ru:['Проверка длины текста','Проверяйте длину заголовка, описания и CTA.']},
+      {i:'🎯', c:'p', cat:['marketing'], href:'./cta-generator', new:true, he:['מחולל CTA','כפתורי פעולה קצרים לפי מטרה.'], en:['CTA Generator','Short action buttons by goal.'], ru:['CTA-генератор','Короткие кнопки действий по цели.']},
+      {i:'✍️', c:'v', cat:['marketing'], href:'./copy-generator', new:true, he:['מחולל קופי קצר','וריאציות לכותרות, מודעות ופוסטים.'], en:['Copy Generator','Variations for headlines, ads and posts.'], ru:['Генератор текстов','Варианты заголовков, объявлений и постов.']},
+      {i:'👁️', c:'b', cat:['marketing'], href:'./link-preview', new:true, he:['תצוגה מקדימה לקישור','איך הקישור ייראה בשיתוף.'], en:['Link Preview','See how your link looks when shared.'], ru:['Превью ссылки','Как ссылка выглядит при отправке.']},
+      {i:'🧩', c:'g', cat:['marketing'], href:'./embed-code', new:true, he:['קוד הטמעה','iframe לסרטון, מפה, טופס או קובץ.'], en:['Embed Code','iframe for a video, map, form or file.'], ru:['Код вставки','iframe для видео, карты, формы или файла.']},
+      {i:'↪️', c:'y', cat:['marketing'], href:'./redirect-generator', new:true, he:['מחולל Redirect','יצירת הפניה מהירה לקישור יעד.'], en:['Redirect Generator','Create a quick redirect to a target link.'], ru:['Генератор редиректа','Создайте быстрый редирект на нужную ссылку.']},
+      {i:'➗', c:'v', cat:['calc'], href:'./percent-calculator', new:true, he:['מחשבון אחוזים','הנחה, מע״מ, תוספת, שינוי וטיפ.'], en:['Percentage Calculator','Discount, VAT, markup, change & tips.'], ru:['Калькулятор процентов','Скидка, НДС, наценка, изменение и чаевые.']},
+      {i:'⏱️', c:'b', cat:['calc'], href:'./work-hours-calculator', new:true, he:['מחשבון שעות עבודה','משך בין שעות, הפסקות וסיכום שכר.'], en:['Work Hours Calculator','Duration between times, breaks & pay.'], ru:['Калькулятор рабочих часов','Длительность, перерывы и оплата.']},
+      {i:'📐', c:'g', cat:['calc'], href:'./unit-converter', new:true, he:['ממיר יחידות','משקל, אורך, נפח, טמפרטורה ועוד.'], en:['Unit Converter','Weight, length, volume, temperature & more.'], ru:['Конвертер единиц','Вес, длина, объём, температура и другое.']},
+      {i:'🌐', c:'y', cat:['calc'], href:'./timezone-converter', new:true, he:['ממיר אזורי זמן','תיאום שיחות עם לקוחות מחו״ל.'], en:['Time Zone Converter','Coordinate calls with clients abroad.'], ru:['Конвертер часовых поясов','Согласование звонков с клиентами.']},
+      {i:'🔑', c:'t', cat:['calc'], href:'./password-generator', new:true, he:['מחולל סיסמאות','סיסמאות חזקות עם אורך ותווים לבחירה.'], en:['Password Generator','Strong passwords with length & char sets.'], ru:['Генератор паролей','Надёжные пароли с выбором длины и символов.']},
+      {i:'🏷️', c:'p', cat:['calc'], href:'./filename-generator', new:true, he:['מחולל שמות קבצים','תבנית, תאריך, לקוח, פרויקט ומספר רץ.'], en:['File Name Generator','Template, date, client, project & number.'], ru:['Генератор имён файлов','Шаблон, дата, клиент, проект и номер.']},
+      {i:'🎨', c:'v', cat:['calc'], href:'./color-code-generator', new:true, he:['מחולל קוד צבע','HEX, RGB ו-HSL עם גוונים.'], en:['Color Code Generator','HEX, RGB and HSL with shades.'], ru:['Генератор кода цвета','HEX, RGB и HSL с оттенками.']},
+      {i:'🖌️', c:'b', cat:['calc'], href:'./image-color-picker', new:true, he:['בחירת צבעים מתמונה','חילוץ פלטת צבעים מתמונה.'], en:['Image Color Picker','Extract a color palette from an image.'], ru:['Пипетка цвета','Извлечение палитры из изображения.']},
+      {i:'📝', c:'g', cat:['calc'], href:'./lorem-ipsum-generator', new:true, he:['מחולל Lorem Ipsum','טקסט דמה לעיצוב ופריסה.'], en:['Lorem Ipsum Generator','Placeholder text for design & layout.'], ru:['Генератор Lorem Ipsum','Текст-заполнитель для дизайна.']},
+      {i:'🆔', c:'y', cat:['calc'], href:'./uuid-generator', new:true, he:['מחולל UUID','מזהים אקראיים למפתחים ולמערכות.'], en:['UUID Generator','Random IDs for developers & systems.'], ru:['Генератор UUID','Случайные ID для разработчиков и систем.']}
     ],
     cats:[
       {i:'🎨',href:'./dev-tools/',he:['כלי עיצוב ופיתוח','צבע, CSS, קוד ו-SEO — כלים למעצבים ולמפתחים.'],en:['Design & Dev Tools','Color, CSS, code & SEO utilities.'],ru:['Инструменты дизайна и кода','Цвет, CSS, код и SEO.'],cap:{he:'18 כלים',en:'18 tools',ru:'18 инструментов'}},
@@ -911,7 +906,7 @@
       {i:'🧮',href:'./calc/',he:['חישובים והמרות','אחוזים, יחידות, זמן, צבע וסיסמאות.'],en:['Calculators & Converters','Percent, units, time, color & passwords.'],ru:['Калькуляторы и конвертеры','Проценты, единицы, время, цвет и пароли.'],cap:{he:'10 כלים',en:'10 tools',ru:'10 инструментов'}}
     ],
     hubs:[
-      {id:'audio', i:'🎵', cta:{href:'./app.html', k:'ctaEditor'},
+      {id:'audio', i:'🎵', cta:{href:'./app', k:'ctaEditor'},
        he:['אודיו','חתכו, נרמלו, המירו ועשו מאסטרינג — מהר ופשוט.'],
        en:['Audio','Cut, normalize, convert & master — fast and simple.'],
        ru:['Аудио','Обрезка, нормализация, конвертация и мастеринг — быстро и просто.'],
@@ -921,12 +916,12 @@
        en:['Images','Resize, crop, convert and compress images.'],
        ru:['Изображения','Изменяйте размер, обрезайте, конвертируйте и сжимайте изображения.'],
        tools:[{he:'שינוי גודל',en:'Resize',ru:'Размер',s:'live'},{he:'חיתוך',en:'Crop',ru:'Обрезка',s:'live'},{he:'סיבוב',en:'Rotate',ru:'Поворот',s:'soon'},{he:'הסרת רקע',en:'Remove BG',ru:'Удалить фон',s:'live'},{he:'דחיסה',en:'Compress',ru:'Сжатие',s:'soon'},{he:'המרה',en:'Convert',ru:'Конвертация',s:'soon'},{he:'סימן מים',en:'Watermark',ru:'Водяной знак',s:'live'},{he:'שיפור AI',en:'AI Enhance',ru:'AI-улучшение',s:'soon'},{he:'שחזור AI',en:'AI Restore',ru:'AI-восстановление',s:'live'},{he:'הרחבה AI',en:'AI Expand',ru:'AI-расширение',s:'soon'}]},
-      {id:'video', i:'🎬', cta:{href:'./video-cut.html', k:'ctaCut'},
+      {id:'video', i:'🎬', cta:{href:'./video-cut', k:'ctaCut'},
        he:['וידאו','חתכו, המירו, דחסו וחלצו אודיו.'],
        en:['Video','Trim, convert, compress and extract audio.'],
        ru:['Видео','Обрезайте, конвертируйте, сжимайте и извлекайте звук.'],
        tools:[{he:'חיתוך',en:'Trim',ru:'Обрезка',s:'live'},{he:'דחיסה',en:'Compress',ru:'Сжатие',s:'soon'},{he:'המרה',en:'Convert',ru:'Конвертация',s:'soon'},{he:'חילוץ אודיו',en:'Extract Audio',ru:'Извлечь звук',s:'soon'},{he:'השתקה',en:'Mute',ru:'Без звука',s:'soon'},{he:'שינוי גודל',en:'Resize',ru:'Размер',s:'soon'},{he:'יצירת שורטס',en:'Shorts Maker',ru:'Создание Shorts',s:'soon'},{he:'כתוביות AI',en:'AI Subtitle',ru:'AI-субтитры',s:'live'},{he:'שדרוג AI',en:'AI Upscale',ru:'AI-апскейл',s:'soon'}]},
-      {id:'documents', i:'📄', cta:{href:'./files.html', k:'ctaOrganize'},
+      {id:'documents', i:'📄', cta:{href:'./files', k:'ctaOrganize'},
        he:['מסמכים','כלי PDF, OCR ובחירת קבצים.'],
        en:['Documents','PDF tools, OCR and file organizing.'],
        ru:['Документы','Инструменты PDF, OCR и упорядочивание файлов.'],
@@ -1006,13 +1001,13 @@
     ],
     footerCols:[
       {t:{he:'כלים',en:'Tools',ru:'Инструменты'}, links:[
-        {he:'אודיו',en:'Audio',ru:'Аудио',href:'./app.html'},{he:'תמונות',en:'Images',ru:'Изображения',href:'./images/'},
+        {he:'אודיו',en:'Audio',ru:'Аудио',href:'./app'},{he:'תמונות',en:'Images',ru:'Изображения',href:'./images/'},
         {he:'וידאו',en:'Video',ru:'Видео',href:'./video/'},{he:'מסמכים',en:'Documents',ru:'Документы',href:'./documents/'},
         {he:'ממירים',en:'Converters',ru:'Конвертеры',href:'./converters/'},{he:'דחיסה',en:'Compress',ru:'Сжатие',href:'./compress/'},{he:'שיווק',en:'Marketing',ru:'Маркетинг',href:'./marketing/'},{he:'מחשבונים',en:'Calculators',ru:'Калькуляторы',href:'./calc/'},
         {he:'כלי עיצוב ופיתוח',en:'Design & Dev',ru:'Дизайн и код',href:'./dev-tools/'}]},
       {t:{he:'AI',en:'AI',ru:'AI'}, links:[
-        {he:'סטודיו AI',en:'AI Studio',ru:'AI-студия',href:'./ai/'},{he:'חיתוך חכם',en:'Smart Crop',ru:'Умная обрезка',href:'./ai-smart-crop.html'},{he:'הסרת רקע',en:'Remove BG',ru:'Удалить фон',href:'./remove-bg.html'},
-        {he:'ניקוי אודיו',en:'Audio Cleaner',ru:'Очистка звука',href:'./ai-audio-cleanup.html'},{he:'כתוביות',en:'Subtitles',ru:'Субтитры',href:'./subtitle-generator.html'},{he:'סיכום PDF',en:'Summarize PDF',ru:'Конспект PDF',href:'./ai-summarize-pdf.html'},{he:'שדרוג תמונה',en:'Upscaler',ru:'Апскейлер'}]},
+        {he:'סטודיו AI',en:'AI Studio',ru:'AI-студия',href:'./ai/'},{he:'חיתוך חכם',en:'Smart Crop',ru:'Умная обрезка',href:'./ai-smart-crop'},{he:'הסרת רקע',en:'Remove BG',ru:'Удалить фон',href:'./remove-bg'},
+        {he:'ניקוי אודיו',en:'Audio Cleaner',ru:'Очистка звука',href:'./ai-audio-cleanup'},{he:'כתוביות',en:'Subtitles',ru:'Субтитры',href:'./subtitle-generator'},{he:'סיכום PDF',en:'Summarize PDF',ru:'Конспект PDF',href:'./ai-summarize-pdf'},{he:'שדרוג תמונה',en:'Upscaler',ru:'Апскейлер'}]},
       {t:{he:'חברה',en:'Company',ru:'Компания'}, links:[
         {he:'אודות',en:'About',ru:'О нас'},{he:'מסלולים ומחירים',en:'Pricing',ru:'Цены',href:'./pricing/'},
         {he:'בלוג',en:'Blog',ru:'Блог'},{he:'צור קשר',en:'Contact',ru:'Контакты'}]},
@@ -1053,13 +1048,13 @@
     const feats = p.feats.map(f=>`<li>${check}${f[L]}</li>`).join('');
     // Free → sign-up; paid plans (Creator/Studio) → the checkout flow.
     const slug = (p.en[0]||'').toLowerCase();
-    const href = slug==='free' ? './auth.html?mode=signup' : `./checkout.html?plan=${slug}`;
+    const href = slug==='free' ? './auth?mode=signup' : `./checkout.html?plan=${slug}`;
     const btn = p.pop
       ? `<a class="cta" href="${href}">${p.cta[L]}</a>`
       : `<a class="ghost" href="${href}">${p.cta[L]}</a>`;
     // Creator is the trialed tier → offer the no-card 7-day trial via sign-up.
     const trialTxt = { he:'או 7 ימי ניסיון חינם — ללא כרטיס אשראי', en:'or start 7 days free — no credit card', ru:'или 7 дней бесплатно — без карты' };
-    const trial = slug==='creator' ? `<a class="plan-trial" href="./auth.html?mode=signup">${trialTxt[L]}</a>` : '';
+    const trial = slug==='creator' ? `<a class="plan-trial" href="./auth?mode=signup">${trialTxt[L]}</a>` : '';
     return `<div class="plan ${p.pop?'pop':''}">${ribbon}<h3>${name}</h3>
       <div class="price">${p.price[L]}<span>${S.perMonth}</span></div><p class="tagline">${tagline}</p>
       <ul>${feats}</ul>${btn}${trial}</div>`;
@@ -1086,7 +1081,7 @@
     }).join('');
 
 
-    el('sendGrid').innerHTML = DATA.send.map(s=>`<a class="chip" href="./send.html">${badge('live',S)}${s[L]}</a>`).join('');
+    el('sendGrid').innerHTML = DATA.send.map(s=>`<a class="chip" href="./send">${badge('live',S)}${s[L]}</a>`).join('');
 
     el('whyGrid').innerHTML = DATA.why.map(w=>{
       const [h,p]=w[L]; return `<div class="card"><div class="ico">${w.i}</div><h3>${h}</h3><p>${p}</p></div>`;

@@ -9,7 +9,7 @@
 
    Usage:  <div id="dashRail"></div>  +  <script src="./dash-sidebar.js"></script>
    Nav items deep-link into the dashboard via its hash router
-   (dashboard.html#project-receive, #favorites, #team, …).
+   (dashboard.html#project-all, #favorites, #team, …).
    Optional: window.KolkliSidebar.setLang('he'|'en'|'ru') to follow a page
    language switch;  window.KolkliSidebar.render() to force a refresh.
    ===================================================================== */
@@ -81,9 +81,9 @@
 
   /* ---------- i18n ---------- */
   var STR = {
-    he: { projects: 'הפרויקטים שלי', mytools: 'הקבצים שלי', editing: 'כלי עריכה', ai: 'כלי AI', design: 'כלי עיצוב ודיגיטל', text: 'כלי טקסט', favorites: 'מועדפים', team: 'צוות', yourPlan: 'המנוי הפעיל שלך', upgrade: 'שדרגו מנוי', logout: 'התנתקות', myAccount: 'החשבון שלי', settings: 'הגדרות חשבון', payments: 'תשלומים', storage: 'STORAGE', used: 'נוצל', of: 'מתוך', left: 'נותר' },
-    en: { projects: 'My Projects', mytools: 'My Files', editing: 'Editing Tools', ai: 'AI Tools', design: 'Design & Digital', text: 'Text Tools', favorites: 'Favorites', team: 'Team', yourPlan: 'Your active plan', upgrade: 'Upgrade plan', logout: 'Log out', myAccount: 'My Account', settings: 'Account Settings', payments: 'Payments', storage: 'STORAGE', used: 'Used', of: 'of', left: 'Left' },
-    ru: { projects: 'Мои проекты', mytools: 'Мои файлы', editing: 'Editing Tools', ai: 'AI Tools', design: 'Design & Digital', text: 'Text Tools', favorites: 'Избранное', team: 'Команда', yourPlan: 'Ваш активный план', upgrade: 'Улучшить план', logout: 'Выйти', myAccount: 'Мой аккаунт', settings: 'Настройки аккаунта', payments: 'Платежи', storage: 'STORAGE', used: 'Used', of: 'of', left: 'Left' }
+    he: { projects: 'הפרויקטים שלי', mytools: 'הקבצים שלי', editing: 'כלי עריכה', ai: 'כלי AI', design: 'כלי עיצוב ודיגיטל', text: 'כלי טקסט', favorites: 'מועדפים', team: 'צוות', yourPlan: 'המנוי הפעיל שלך', upgrade: 'שדרגו מנוי', logout: 'התנתקות', myAccount: 'דשבורד', settings: 'הגדרות חשבון', payments: 'תשלומים', storage: 'STORAGE', used: 'נוצל', of: 'מתוך', left: 'נותר' },
+    en: { projects: 'My Projects', mytools: 'My Files', editing: 'Editing Tools', ai: 'AI Tools', design: 'Design & Digital', text: 'Text Tools', favorites: 'Favorites', team: 'Team', yourPlan: 'Your active plan', upgrade: 'Upgrade plan', logout: 'Log out', myAccount: 'Dashboard', settings: 'Account Settings', payments: 'Payments', storage: 'STORAGE', used: 'Used', of: 'of', left: 'Left' },
+    ru: { projects: 'Мои проекты', mytools: 'Мои файлы', editing: 'Editing Tools', ai: 'AI Tools', design: 'Design & Digital', text: 'Text Tools', favorites: 'Избранное', team: 'Команда', yourPlan: 'Ваш активный план', upgrade: 'Улучшить план', logout: 'Выйти', myAccount: 'Дашборд', settings: 'Настройки аккаунта', payments: 'Платежи', storage: 'STORAGE', used: 'Used', of: 'of', left: 'Left' }
   };
   var lang = 'he';
   function detectLang() {
@@ -110,10 +110,16 @@
     crown: '<path d="M2 7l4.5 4L12 4l5.5 7L22 7l-2 12H4L2 7z"/>',
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
     user: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/>',
+    grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
     gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>',
     card: '<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>',
-    logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>'
+    logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+    globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/>',
+    check: '<polyline points="20 6 9 17 4 12"/>'
   };
+  // Interface languages offered inside the account menu (endonym + writing dir).
+  var LANGS = [{ code: 'he', name: 'עברית', dir: 'rtl' }, { code: 'en', name: 'English', dir: 'ltr' }, { code: 'ru', name: 'Русский', dir: 'ltr' }];
+  var LANG_LABEL = { he: 'שפות', en: 'Language', ru: 'Язык' };
   function s(inner) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (inner || '') + '</svg>'; }
 
   /* ---------- html builders (mirror the dashboard rail) ---------- */
@@ -125,10 +131,10 @@
   function toolLinks() {
     var st = T();
     var links = [
-      { cls: 'editing', icon: 'scissors', label: st.editing, href: 'dashboard.html#editing-tools' },
-      { cls: 'ai',      icon: 'sparkles', label: st.ai,      href: 'dashboard.html#ai-tools' },
-      { cls: 'design',  icon: 'palette',  label: st.design,  href: 'dashboard.html#dev-tools' },
-      { cls: 'text',    icon: 'text',     label: st.text,    href: 'text-tools.html', active: true }
+      { cls: 'editing', icon: 'scissors', label: st.editing, href: 'dashboard#editing-tools' },
+      { cls: 'ai',      icon: 'sparkles', label: st.ai,      href: 'dashboard#ai-tools' },
+      { cls: 'design',  icon: 'palette',  label: st.design,  href: 'dashboard#dev-tools' },
+      { cls: 'text',    icon: 'text',     label: st.text,    href: 'text-tools', active: true }
     ];
     return '<div class="side-links">' + links.map(function (x) {
       return '<a class="side-link ' + x.cls + (x.active ? ' active' : '') + '" href="' + esc(x.href) + '">' +
@@ -138,8 +144,8 @@
   function belowTools() {
     var st = T();
     return '<div class="side-below-tools">' +
-      catHead('star', st.favorites, 'dashboard.html#favorites') +
-      catHead('users', st.team, 'dashboard.html#team') + '</div>';
+      catHead('star', st.favorites, 'dashboard#favorites') +
+      catHead('users', st.team, 'dashboard#team') + '</div>';
   }
   function storageHtml() {
     var st = T(), used = usedStorageGB(), total = PLANS[plan].limits.storageGB;
@@ -162,6 +168,22 @@
       (plan === 'studio' ? '' : '<a class="upg" href="pricing/">' + s(ICON.zap) + '<span>' + esc(st.upgrade) + '</span></a>') +
     '</div>';
   }
+  function langSwitchHtml() {
+    var cur = lang;
+    var curName = (LANGS.filter(function (L) { return L.code === cur; })[0] || LANGS[0]).name;
+    var opts = LANGS.map(function (L) {
+      var on = L.code === cur;
+      return '<button class="dash-acct-langopt' + (on ? ' active' : '') + '" type="button" role="option" data-side-lang="' + L.code + '" aria-selected="' + (on ? 'true' : 'false') + '" lang="' + L.code + '" dir="' + L.dir + '">' +
+        '<span>' + esc(L.name) + '</span>' + s(ICON.check) + '</button>';
+    }).join('');
+    return '<div class="dash-acct-langbox" id="sideAcctLang" role="group" aria-label="' + esc(LANG_LABEL[cur] || 'Language') + '">' +
+      '<button class="dash-acct-langhead" id="sideAcctLangBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="sideAcctLangMenu">' +
+        s(ICON.globe) + '<span>' + esc(LANG_LABEL[cur] || 'Language') + '</span><b>' + esc(curName) + '</b>' +
+        '<svg class="dash-acct-langchev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</button>' +
+      '<div class="dash-acct-langopts" id="sideAcctLangMenu" role="listbox">' + opts + '</div>' +
+    '</div>';
+  }
   function accountHtml() {
     if (isGuest) return '';
     var name = displayName(), st = T();
@@ -176,17 +198,17 @@
           '<span class="dash-acct-id"><span class="dash-acct-full">' + esc(name) + '</span>' +
           (user.email ? '<span class="dash-acct-mail">' + esc(user.email) + '</span>' : '') + '</span></div>' +
         '<div class="dash-acct-sep"></div>' +
-        '<a class="dash-acct-item" role="menuitem" href="dashboard.html#account">' + s(ICON.user) + '<span>' + esc(st.myAccount) + '</span></a>' +
-        '<a class="dash-acct-item" role="menuitem" href="account-settings.html">' + s(ICON.gear) + '<span>' + esc(st.settings) + '</span></a>' +
-        '<a class="dash-acct-item" role="menuitem" href="dashboard.html#payments">' + s(ICON.card) + '<span>' + esc(st.payments) + '</span></a>' +
+        '<a class="dash-acct-item" role="menuitem" href="dashboard#account">' + s(ICON.grid) + '<span>' + esc(st.myAccount) + '</span></a>' +
+        '<a class="dash-acct-item" role="menuitem" href="account-settings">' + s(ICON.gear) + '<span>' + esc(st.settings) + '</span></a>' +
+        langSwitchHtml() +
         '<div class="dash-acct-sep"></div>' +
         '<button class="dash-acct-item danger" type="button" data-side-logout>' + s(ICON.logout) + '<span>' + esc(st.logout) + '</span></button>' +
       '</div></div></div>';
   }
   function railHtml() {
     var st = T();
-    return catHead('layers', st.projects, 'dashboard.html#project-receive') +
-      catHead('files', st.mytools, 'dashboard.html#my-audio') +
+    return catHead('layers', st.projects, 'dashboard#project-all') +
+      catHead('files', st.mytools, 'dashboard#my-all') +
       toolLinks() + belowTools() + planHtml() + accountHtml();
   }
 
@@ -202,10 +224,31 @@
     if (w) w.classList.remove('open');
     if (b) b.setAttribute('aria-expanded', 'false');
   }
+  // Switch the interface language. Hands off to the host page's applyLang
+  // (window.__setLang) so the whole page — including this rail, which the page
+  // re-renders via KolkliSidebar.setLang — follows; falls back to a local
+  // re-render if the page never registered a hook. Notifies the shared header.
+  function applyLang(l) {
+    if (!STR[l]) return;
+    try { localStorage.setItem('ac_lang', l); } catch (_) {}
+    lang = l;
+    if (typeof window.__setLang === 'function') {
+      window.__setLang(l);
+    } else {
+      document.documentElement.setAttribute('lang', l);
+      document.documentElement.setAttribute('dir', l === 'he' ? 'rtl' : 'ltr');
+      render();
+    }
+    try { window.dispatchEvent(new CustomEvent('kolkli:lang', { detail: l })); } catch (_) {}
+  }
   function onDocClick(e) {
     var btn = e.target.closest ? e.target.closest('#sideAcctBtn') : null;
     if (btn) { e.preventDefault(); var w = document.getElementById('sideAcct'); var open = w.classList.toggle('open'); btn.setAttribute('aria-expanded', open ? 'true' : 'false'); return; }
-    if (e.target.closest && e.target.closest('[data-side-logout]')) { e.preventDefault(); lsDel(SESSION_KEY); try { window.dispatchEvent(new CustomEvent('kolkli:auth')); } catch (_) {} location.href = 'dashboard.html'; return; }
+    var langBtn = e.target.closest ? e.target.closest('#sideAcctLangBtn') : null;
+    if (langBtn) { e.preventDefault(); var lb = document.getElementById('sideAcctLang'); if (lb) { var lopen = lb.classList.toggle('open'); langBtn.setAttribute('aria-expanded', lopen ? 'true' : 'false'); } return; }
+    var langOpt = e.target.closest ? e.target.closest('[data-side-lang]') : null;
+    if (langOpt) { e.preventDefault(); applyLang(langOpt.getAttribute('data-side-lang')); return; }
+    if (e.target.closest && e.target.closest('[data-side-logout]')) { e.preventDefault(); lsDel(SESSION_KEY); try { window.dispatchEvent(new CustomEvent('kolkli:auth')); } catch (_) {} location.href = 'dashboard'; return; }
     if (!(e.target.closest && e.target.closest('#sideAcct'))) closeAcct();
   }
 
@@ -219,7 +262,7 @@
     '.cat-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}' +
     '.cat-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
     '.side-links{display:flex;flex-direction:column;gap:4px;margin-top:2px;padding-top:6px;}' +
-    '.side-link{display:flex;align-items:center;gap:11px;min-height:44px;padding:9px 12px;border-radius:12px;color:var(--ink-2);width:100%;border:0;background:transparent;font-family:var(--sans);font-size:14px;font-weight:800;text-align:start;cursor:pointer;transition:background .12s,color .12s;}' +
+    '.side-link{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;color:var(--ink-2);width:100%;border:0;background:transparent;font-family:var(--sans);font-size:14.5px;font-weight:800;text-align:start;cursor:pointer;transition:background .12s,color .12s;}' +
     '.side-link:hover,.side-link.active{background:var(--tool-bg,var(--panel-2));color:var(--tool,var(--accent-dim));}' +
     '.side-link-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:var(--tool-bg,var(--accent-soft));color:var(--tool,var(--accent-dim));}' +
     '.side-link-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}' +
@@ -249,7 +292,7 @@
     '.side-plan .upg svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}' +
     '.side-account{width:100%;margin-top:14px;padding-top:14px;}' +
     '.dash-acct{position:relative;display:inline-flex;align-items:center;width:100%;}' +
-    '.dash-acct-btn{display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 10px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);cursor:pointer;font-family:var(--sans);font-weight:750;font-size:14px;width:100%;justify-content:flex-start;box-shadow:var(--shadow-sm);transition:border-color .13s,box-shadow .13s;}' +
+    '.dash-acct-btn{display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 10px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--accent) 30%,var(--line));background:var(--panel);color:var(--ink-2);cursor:pointer;font-family:var(--sans);font-weight:750;font-size:14px;width:100%;justify-content:flex-start;box-shadow:var(--shadow-sm);transition:border-color .13s,box-shadow .13s;}' +
     '.dash-acct-btn:hover,.dash-acct.open .dash-acct-btn{border-color:var(--accent);}' +
     '.dash-acct-btn:active{transform:translateY(1px);}' +
     '.dash-avatar-sm,.dash-acct-av{border-radius:50%;overflow:hidden;display:grid;place-items:center;flex-shrink:0;background:var(--grad);color:#fff;font-weight:800;}' +
@@ -270,7 +313,21 @@
     '.dash-acct-item:hover{background:var(--accent-soft);color:var(--accent-dim);}' +
     '.dash-acct-item.danger{color:var(--danger);}' +
     '.dash-acct-item.danger:hover{background:var(--danger-soft);color:var(--danger);}' +
-    '.dash-acct-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}';
+    '.dash-acct-item svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}' +
+    '.dash-acct-langbox{margin:2px 3px;padding:8px 6px 6px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);}' +
+    '.dash-acct-langhead{width:100%;display:flex;align-items:center;gap:11px;padding:2px 5px 8px;border:0;background:none;cursor:pointer;font-family:var(--sans);text-align:start;color:var(--ink-2);font-size:13.5px;font-weight:800;}' +
+    '.dash-acct-langhead svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;color:var(--muted);}' +
+    '.dash-acct-langhead b{margin-inline-start:auto;color:var(--accent-dim);font-size:12.5px;font-weight:800;}' +
+    '.dash-acct-langhead .dash-acct-langchev{width:13px;height:13px;color:var(--muted);transition:transform .18s;}' +
+    '.dash-acct-langbox.open .dash-acct-langhead .dash-acct-langchev{transform:rotate(180deg);}' +
+    '.dash-acct-langopts{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;}' +
+    '.dash-acct-langbox.open .dash-acct-langopts{display:grid;}' +
+    '.dash-acct-langopt{min-width:0;height:32px;border:0;border-radius:9px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--sans);font-size:12px;font-weight:800;color:var(--muted);transition:background .12s,color .12s,box-shadow .12s;}' +
+    '.dash-acct-langopt>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
+    '.dash-acct-langopt:hover{background:var(--panel);color:var(--accent-dim);}' +
+    '.dash-acct-langopt.active{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}' +
+    '.dash-acct-langopt svg{display:none;width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;}' +
+    '.dash-acct-langopt.active svg{display:block;}';
 
   function injectCSS() {
     if (document.getElementById('kolkli-sidebar-css')) return;

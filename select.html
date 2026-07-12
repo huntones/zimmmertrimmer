@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — בחירת חומרים ללקוח</title>
+<link rel="canonical" href="https://kolkli.com/select">
 <meta name="description" content="A branded gallery where your client hand-picks the photos and videos they want — with live quotas, folders and one-click sharing.">
 <style>
   :root {
@@ -431,6 +432,15 @@
     font-weight:700;font-size:14px;color:#fff;background:var(--grad-btn);box-shadow:0 6px 18px var(--grad-btn-glow);}
   .lb-pick.on{background:var(--success);box-shadow:0 6px 18px rgba(34,176,75,.4);}
   .lb-pick svg{width:17px;height:17px;}
+  /* prev / next arrows shown while an image is enlarged */
+  .lb-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:52px;height:52px;border-radius:50%;
+    border:none;cursor:pointer;background:rgba(255,255,255,.12);color:#fff;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+    display:flex;align-items:center;justify-content:center;transition:background .12s,transform .12s;}
+  .lb-nav:hover{background:rgba(255,255,255,.26);}
+  .lb-nav:active{transform:translateY(-50%) scale(.93);}
+  .lb-nav svg{width:26px;height:26px;}
+  .lb-nav.lb-nav-l{inset-inline-start:18px;left:18px;} .lb-nav.lb-nav-r{inset-inline-end:18px;right:18px;}
+  @media (max-width:560px){ .lb-nav{width:44px;height:44px;} .lb-nav svg{width:22px;height:22px;} .lb-nav.lb-nav-l{left:8px;} .lb-nav.lb-nav-r{right:8px;} }
 
   /* ---------- kebab popover ---------- */
   .popover{position:fixed;z-index:95;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:5px;
@@ -457,11 +467,49 @@
   .poweredby:hover{opacity:.72;} .poweredby img{height:18px;width:auto;display:block;}
   html[data-theme="dark"] .poweredby img{filter:brightness(1.12);}
   .pbwrap{text-align:center;}
+  /* ---------- manager (read-only) view ---------- */
+  .mgr-banner{display:flex;gap:14px;align-items:flex-start;margin:0 0 20px;padding:15px 18px;border-radius:16px;
+    background:var(--grad-soft);border:1px solid var(--accent-soft);box-shadow:var(--shadow-sm);}
+  html[data-theme="dark"] .mgr-banner{border-color:var(--line);}
+  .mgr-banner .mgr-ic{width:42px;height:42px;flex:0 0 auto;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:var(--panel);border:1px solid var(--accent-soft);color:var(--accent-dim);}
+  .mgr-banner .mgr-ic svg{width:22px;height:22px;}
+  .mgr-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:700;
+    letter-spacing:.05em;text-transform:uppercase;color:var(--accent-dim);}
+  .mgr-title{font-size:15.5px;font-weight:700;color:var(--ink);margin-top:3px;}
+  .mgr-desc{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.55;max-width:82ch;}
+  body.manager #addFilesBtn,
+  body.manager #selectAllBtn,
+  body.manager #moveSel,
+  body.manager #deleteBtn,
+  body.manager #addFolderBtn,
+  body.manager #drop,
+  body.manager .lb-pick,
+  body.manager #popover [data-act="pick"],
+  body.manager #popover [data-act="del"],
+  body.manager #popover .sepline{display:none !important;}
+  body.manager .fcheck,
+  body.manager .lrow-check{pointer-events:none;}
+  body.manager .fthumb:hover .fcheck{opacity:0;}
+  body.manager .fcard.sel .fcheck{opacity:1;}
+  body.manager .fcard:hover{transform:none;border-color:var(--line);box-shadow:var(--shadow);}
   .hidden{display:none !important;}
 </style>
 </head>
 <body>
 <div class="wrap">
+
+  <!-- ============ manager (read-only) banner ============ -->
+  <div class="mgr-banner hidden" id="mgrBanner" role="status" aria-live="polite">
+    <div class="mgr-ic" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+    </div>
+    <div class="mgr-tx">
+      <div class="mgr-badge"><span data-i18n="mgrBadge"></span></div>
+      <div class="mgr-title" data-i18n="mgrTitle"></div>
+      <div class="mgr-desc" data-i18n="mgrDesc"></div>
+    </div>
+  </div>
 
   <!-- ============ page header ============ -->
   <div class="pageheader">
@@ -610,7 +658,7 @@
   </div>
 
   <div class="pbwrap">
-    <a class="poweredby" href="./index.html" aria-label="KOLKLI">
+    <a class="poweredby" href="./" aria-label="KOLKLI">
       <span data-i18n="poweredBy"></span>
       <img src="./assets/logo.png" alt="KOLKLI" width="139" height="34" decoding="async">
     </a>
@@ -624,7 +672,7 @@
     <div class="bb-limit" id="bbLimit"></div>
     <div class="bb-save">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
-      <span data-i18n="autosave"></span>
+      <span id="autosaveTxt" data-i18n="autosave"></span>
     </div>
   </div>
 </div>
@@ -644,6 +692,8 @@
       <button class="lb-pick" id="lbPick" type="button"></button>
     </div>
   </div>
+  <button type="button" class="lb-nav lb-nav-l" id="lbArrowL" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <button type="button" class="lb-nav lb-nav-r" id="lbArrowR" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
 </div>
 
 <!-- ============ kebab popover ============ -->
@@ -659,6 +709,11 @@
 <script>
 (function(){
   const el = id => document.getElementById(id);
+  // Manager (read-only) view: the studio opens the client's own selection gallery
+  // from the dashboard "show selections" CTA (select.html?view=manager) to follow
+  // the live picks. Everything renders exactly as the client sees it, but every
+  // editing action (pick, upload, delete, move, new folder) is disabled.
+  const MANAGER = (function(){ try{ return new URLSearchParams(location.search).get('view')==='manager'; }catch(e){ return false; } })();
   const IMG_CAP = 50, VID_CAP = 5;
   const LANGS = [
     { code:'he', name:'\u05e2\u05d1\u05e8\u05d9\u05ea', dir:'rtl' },
@@ -672,7 +727,7 @@
 
   /* ---------------- i18n ---------------- */
   const I18N = {
-    he:{ dir:'rtl', langIco:'עב',
+    he:{ dir:'rtl', mgrBadge:'תצוגת מנהל', mgrTitle:'צפייה בבחירות הלקוח בזמן אמת', mgrDesc:'זוהי בדיוק התצוגה שהלקוח רואה. הקבצים, הנתונים והבחירות מתעדכנים בזמן אמת — אך במצב צפייה בלבד, ללא אפשרות לבחור או לערוך בחירות בשם הלקוח.', mgrReadonly:'תצוגת מנהל · צפייה בלבד — הבחירות מתעדכנות בזמן אמת', langIco:'עב',
       pageTitle:'בחירת חומרים ללקוח',
       pageSub:'הלקוח יכול לבחור עד 50 תמונות ו-5 סרטונים מתוך כלל הקבצים בגלריה. המערכת מציגה בזמן אמת כמה קבצים נבחרו מכל סוג ומונעת בחירה מעבר למכסה שהוגדרה.',
       share:'שיתוף', help:'עזרה',
@@ -701,7 +756,7 @@
       shareTitle:'שיתוף הגלריה עם הלקוח', shareSub:'שלחו את הקישור ללקוח — הוא יוכל לבחור חומרים ללא צורך בחשבון.', shareCopy:'העתקה', shareCopied:'הועתק',
       delTitle:'למחוק את הקבצים שנבחרו?', delSub:n=>`${n} קבצים יוסרו מהגלריה. לא ניתן לשחזר את הפעולה בהדגמה.`, delCancel:'ביטול', delConfirm:'מחק',
     },
-    en:{ dir:'ltr', langIco:'EN',
+    en:{ dir:'ltr', mgrBadge:'Manager view', mgrTitle:'Tracking the client’s selection live', mgrDesc:'This is exactly what the client sees. Files, stats and picks update in real time — but in view-only mode, with no way to select or edit the selection on the client’s behalf.', mgrReadonly:'Manager view · read-only — selections update in real time', langIco:'EN',
       pageTitle:'Client material selection',
       pageSub:'Your client can pick up to 50 photos and 5 videos out of the whole gallery. Counts update live per file type, and selecting beyond the defined quota is blocked automatically.',
       share:'Share', help:'Help',
@@ -729,7 +784,7 @@
       shareTitle:'Share the gallery with your client', shareSub:'Send the link to your client — they can pick materials without an account.', shareCopy:'Copy', shareCopied:'Copied',
       delTitle:'Delete the selected files?', delSub:n=>`${n} files will be removed from the gallery. This can’t be undone in the demo.`, delCancel:'Cancel', delConfirm:'Delete',
     },
-    ru:{ dir:'ltr', langIco:'RU',
+    ru:{ dir:'ltr', mgrBadge:'Режим менеджера', mgrTitle:'Отслеживание выбора клиента в реальном времени', mgrDesc:'Это именно то, что видит клиент. Файлы, статистика и выбор обновляются в реальном времени — но только для просмотра, без возможности выбирать или изменять выбор за клиента.', mgrReadonly:'Режим менеджера · только просмотр — выбор обновляется в реальном времени', langIco:'RU',
       pageTitle:'Выбор материалов для клиента',
       pageSub:'Клиент может выбрать до 50 фото и 5 видео из всей галереи. Счётчики обновляются в реальном времени по каждому типу файлов, а выбор сверх заданной квоты блокируется автоматически.',
       share:'Поделиться', help:'Помощь',
@@ -824,6 +879,50 @@
   function esc(x){ return String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function ls(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+  /* ---------------- persistence: uploaded files survive refresh / reopen / re-login ----------------
+     The FILES / FOLDERS arrays above are only the demo gallery seed (no real bytes). Anything the
+     client UPLOADS is persisted exactly the way the rest of the app does it (see request-store.js and
+     processed-files.js): one metadata row per file in project-scoped localStorage, plus the raw bytes
+     in IndexedDB. On load we rebuild the gallery from that store (not from the in-memory seed), so
+     uploads never vanish. Bytes are written to storage FIRST; only on success is the metadata row
+     recorded, so a row can never point at missing bytes. */
+  const SEL_STORE = (function(){
+    const META_KEY='kolkli_select_files', FOLDER_KEY='kolkli_select_folders', DB_NAME='kolkli_select', DB_STORE='blobs';
+    function safeId(v){ return String(v==null?'':v).toLowerCase().replace(/[^a-z0-9_.@-]+/g,'_') || 'guest'; }
+    // Owner = the studio account when signed in (recorded on each row as the User ID). Not part of the
+    // storage key on purpose: the client uploads with no login, and we must NOT lose their files if the
+    // studio later opens the same gallery signed in. The PROJECT is what scopes storage.
+    function ownerId(){
+      const email=(ls('ac_session')||'').toLowerCase(); if(!email) return 'guest';
+      try{ const users=JSON.parse(ls('ac_users')||'[]')||[];
+        for(let i=0;i<users.length;i++){ if((users[i].email||'').toLowerCase()===email) return safeId(users[i].id||users[i].userId||email); }
+      }catch(e){}
+      return safeId(email);
+    }
+    // Project scope from the URL (?p= / ?project= / ?id= / ?token=) so a gallery ALWAYS saves and loads
+    // under the same key. One function feeds both save and fetch, so they can never disagree.
+    function projectId(){
+      try{ const q=new URLSearchParams(location.search); return safeId(q.get('p')||q.get('project')||q.get('id')||q.get('token')||'default'); }
+      catch(e){ return 'default'; }
+    }
+    const S={}; S.ownerId=ownerId; S.projectId=projectId;
+    S.scope=function(){ return projectId(); };
+    function metaKey(){ return META_KEY+'::'+S.scope(); }
+    function folderKey(){ return FOLDER_KEY+'::'+S.scope(); }
+    S.readMeta=function(){ try{ const a=JSON.parse(ls(metaKey())||'[]'); return Array.isArray(a)?a:[]; }catch(e){ console.error('[select] readMeta failed',e); return []; } };
+    S.writeMeta=function(a){ try{ lsSet(metaKey(),JSON.stringify(a||[])); }catch(e){ console.error('[select] writeMeta failed',e); } };
+    S.readFolders=function(){ try{ const a=JSON.parse(ls(folderKey())||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } };
+    S.writeFolders=function(a){ try{ lsSet(folderKey(),JSON.stringify(a||[])); }catch(e){ console.error('[select] writeFolders failed',e); } };
+    S.persistFolder=function(id,label){ const a=S.readFolders(); if(!a.some(x=>x.id===id)){ a.push({id:id,label:label}); S.writeFolders(a); } };
+    function idb(){ return new Promise((res,rej)=>{ let r; try{ r=indexedDB.open(DB_NAME,1); }catch(e){ rej(e); return; }
+      r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains(DB_STORE)) r.result.createObjectStore(DB_STORE); };
+      r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+    S.putBlob=function(k,v){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(DB_STORE,'readwrite'); tx.objectStore(DB_STORE).put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })); };
+    S.getBlob=function(k){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(DB_STORE,'readonly'); const rq=tx.objectStore(DB_STORE).get(k); rq.onsuccess=()=>res(rq.result||null); rq.onerror=()=>rej(rq.error); })); };
+    S.delBlob=function(k){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(DB_STORE,'readwrite'); tx.objectStore(DB_STORE).delete(k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })).catch(()=>{}); };
+    return S;
+  })();
   function extOf(n){ const m=/\.([a-z0-9]+)$/i.exec(n||''); return m?m[1].toUpperCase():'FILE'; }
   function fmtSize(mb){ if(mb>=1) return mb.toFixed(1)+' MB'; return Math.round(mb*1024)+' KB'; }
   function mmss(s){ s=Math.max(0,Math.floor(s||0)); const m=Math.floor(s/60), r=s%60; return m+':'+String(r).padStart(2,'0'); }
@@ -995,7 +1094,7 @@
   }
 
   /* ---------------- selection ---------------- */
-  function togglePick(id){
+  function togglePick(id){ if(MANAGER) return;
     const f = FILES.find(x=>x.id===id); if(!f) return;
     if(selected.has(id)){ selected.delete(id); }
     else{
@@ -1006,7 +1105,7 @@
     }
     refreshAll();
   }
-  function selectAll(){
+  function selectAll(){ if(MANAGER) return;
     const items = visible();
     let c = counts(), changed=false;
     for(const f of items){
@@ -1018,32 +1117,98 @@
     if(!changed) toast(t.allSelected,'ok');
     refreshAll();
   }
-  function deleteSelected(){
+  function deleteSelected(){ if(MANAGER) return;
     const n = selected.size; if(!n) return;
     openConfirm(t.delTitle, t.delSub(n), t.delConfirm, t.delCancel, ()=>{
+      const _removed=[];
       FILES = FILES.filter(f=>{
         if(!selected.has(f.id)) return true;
         // decrement catalog counts
         galleryTotal = Math.max(0, galleryTotal-1);
         const fol = FOLDERS.find(x=>x.id===f.album); if(fol) fol.count=Math.max(0,fol.count-1);
         if(f.url){ try{ URL.revokeObjectURL(f.url); }catch(e){} }
+        if(f.uploaded) _removed.push(f.id);
         return false;
       });
+      selRemove(_removed);   // stored rows + blobs go too, so the delete survives a reload
       selected.clear();
       closeOverlay(); toast(t.deleted(n),'ok'); refreshAll();
     });
   }
-  function moveSelected(dest){
+  function moveSelected(dest){ if(MANAGER) return;
     const n = selected.size; if(!n || !dest) return;
     const folder = FOLDERS.find(f=>f.id===dest); const label = folder ? (t[folder.key]||folder.key) : dest;
     selected.forEach(id=>{ const f=FILES.find(x=>x.id===id); if(f && f.album!==dest){
       const from=FOLDERS.find(x=>x.id===f.album); if(from) from.count=Math.max(0,from.count-1);
       f.album=dest; if(folder) folder.count++;
     }});
-    el('moveSel').value=''; toast(t.moved(n,label),'ok'); refreshAll();
+    el('moveSel').value=''; selSyncAlbums(); toast(t.moved(n,label),'ok'); refreshAll();
   }
 
   function refreshAll(){ renderGrid(); renderFolders(); renderChips(); updateStats(); }
+
+  /* ---------------- persistence wiring (uploads only) ---------------- */
+  // Store one uploaded file: bytes to IndexedDB FIRST, then the metadata row. If storage fails we roll
+  // the file back out of the in-memory gallery so what is on screen always matches what will reload.
+  function selPersistUploaded(f, file){
+    return SEL_STORE.putBlob(f.blobKey, file).then(()=>{
+      const rec={ id:f.id, name:f.name, kind:f.kind, album:f.album, mb:f.mb, dur:f.dur||0, tags:f.tags||[], hue:f.hue,
+                  blobKey:f.blobKey, ownerId:SEL_STORE.ownerId(), projectId:SEL_STORE.projectId(), status:'stored', createdAt:Date.now() };
+      const arr=SEL_STORE.readMeta(); arr.unshift(rec); SEL_STORE.writeMeta(arr);
+      console.info('[select] saved upload', rec.name, '-> project', SEL_STORE.scope(), 'folder', rec.album);
+      return rec;
+    }).catch(e=>{
+      console.error('[select] upload persist FAILED for', f.name, e);
+      FILES=FILES.filter(x=>x.id!==f.id); galleryTotal=Math.max(0,galleryTotal-1);
+      const fol=FOLDERS.find(x=>x.id===f.album); if(fol) fol.count=Math.max(0,fol.count-1);
+      if(f.url){ try{ URL.revokeObjectURL(f.url); }catch(_){} }
+      toast((lang==='he'?'\u05dc\u05d0 \u05e0\u05d9\u05ea\u05df \u05dc\u05e9\u05de\u05d5\u05e8 \u05d0\u05ea \u05d4\u05e7\u05d5\u05d1\u05e5: ':lang==='ru'?'\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0441\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0444\u0430\u0439\u043b: ':'Could not save file: ')+f.name,'warn'); refreshAll();
+      return null;
+    });
+  }
+  // Mirror in-memory album moves onto the stored rows (same folder id on save and on fetch).
+  function selSyncAlbums(){
+    const arr=SEL_STORE.readMeta(); if(!arr.length) return; let changed=false;
+    arr.forEach(r=>{ const f=FILES.find(x=>x.id===r.id); if(f && r.album!==f.album){ r.album=f.album; changed=true; } });
+    if(changed) SEL_STORE.writeMeta(arr);
+  }
+  // Drop stored rows + blobs for deleted uploads so a delete also survives a reload.
+  function selRemove(ids){
+    if(!ids||!ids.length) return;
+    const drop={}; ids.forEach(id=>{ drop[id]=1; });
+    const arr=SEL_STORE.readMeta(); const keep=arr.filter(r=>!drop[r.id]);
+    if(keep.length!==arr.length) SEL_STORE.writeMeta(keep);
+    arr.forEach(r=>{ if(drop[r.id]) SEL_STORE.delBlob(r.blobKey||r.id); });
+  }
+  // Keep the id counter ahead of any restored id so new uploads never collide with rehydrated ones.
+  function selBumpUid(id){ const m=String(id||'').match(/[0-9]+$/); if(m){ const n=parseInt(m[0],10); if(n>uid) uid=n; } }
+  // On load: rebuild uploaded folders + files from the store (req: fetch from storage, not memory).
+  function selHydrate(){
+    let folders=[], meta=[];
+    try{ folders=SEL_STORE.readFolders(); meta=SEL_STORE.readMeta(); }
+    catch(e){ console.error('[select] hydrate read failed', e); return; }
+    folders.forEach(fo=>{ if(fo && fo.id && !FOLDERS.some(x=>x.id===fo.id)){
+      FOLDERS.push({ id:fo.id, key:'__'+fo.id, count:0 });
+      I18N.he['__'+fo.id]=fo.label; I18N.en['__'+fo.id]=fo.label; I18N.ru['__'+fo.id]=fo.label; t['__'+fo.id]=fo.label;
+      selBumpUid(fo.id);
+    }});
+    console.info('[select] hydrate:', meta.length, 'stored file(s), project', SEL_STORE.scope());
+    const restores=[];
+    meta.slice().reverse().forEach(rec=>{ // oldest first so unshift restores newest-on-top order
+      if(!rec || !rec.id || FILES.some(x=>x.id===rec.id)) return;
+      const f={ id:rec.id, name:rec.name, kind:rec.kind, album:rec.album, mb:rec.mb, dur:rec.dur||0,
+                tags:rec.tags||[], url:null, hue:rec.hue, blobKey:rec.blobKey||rec.id, uploaded:true };
+      if(!FOLDERS.some(x=>x.id===f.album)) f.album=(activeAlbum!=='all'?activeAlbum:'more');
+      FILES.unshift(f); galleryTotal++;
+      const fol=FOLDERS.find(x=>x.id===f.album); if(fol) fol.count++;
+      selBumpUid(rec.id);
+      if(f.kind==='image'){
+        restores.push(SEL_STORE.getBlob(f.blobKey).then(blob=>{ if(blob){ try{ f.url=URL.createObjectURL(blob); }catch(_){} } })
+          .catch(e=>{ console.error('[select] getBlob failed', rec.name, e); }));
+      }
+    });
+    if(restores.length) Promise.all(restores).then(()=>refreshAll()).catch(()=>{});
+  }
 
   /* ---------------- add files (upload button + drag-drop of files or folders) ---------------- */
   // A dropped/selected folder is preserved as albums: one album per sub-folder path (the album
@@ -1057,9 +1222,10 @@
     FOLDERS.push({ id, key:'__'+id, count:0 });
     I18N.he['__'+id]=dirPath; I18N.en['__'+id]=dirPath; I18N.ru['__'+id]=dirPath; t['__'+id]=dirPath;
     foldersExpanded=true;
+    SEL_STORE.persistFolder(id, dirPath);
     return id;
   }
-  function handleFiles(items){
+  function handleFiles(items){ if(MANAGER) return;
     const arr = (items||[]); if(!arr.length) return;
     arr.forEach(it=>{
       const file = it.file || it;
@@ -1071,9 +1237,11 @@
       else if(/^video\//.test(file.type)) kind='video';
       const f = mk(file.name, kind, dest, Math.max(0.01, file.size/1048576), 0, []);
       if(kind==='image'){ try{ f.url=URL.createObjectURL(file); }catch(e){} }
+      f.blobKey=f.id; f.uploaded=true;
       FILES.unshift(f);
       galleryTotal++;
       const fol=FOLDERS.find(x=>x.id===dest); if(fol) fol.count++;
+      selPersistUploaded(f, file);   // persist bytes to storage + metadata row (never lost on reload)
     });
     toast(t.added(arr.length),'ok');
     renderMoveSel(); refreshAll();
@@ -1118,7 +1286,17 @@
       ? `<div class="gradthumb" style="${gradStyle(f.hue)}"></div>`
       : thumbInner(f);
     syncLbPick();
+    syncLbNav();
     el('lightbox').classList.add('show');
+  }
+  // show the prev/next arrows only when there is more than one file to step through,
+  // and label each edge by its logical direction (RTL: forward = left edge)
+  function syncLbNav(){
+    const multi = visible().length>1;
+    const L=el('lbArrowL'), R=el('lbArrowR');
+    L.style.display = multi?'':'none'; R.style.display = multi?'':'none';
+    L.setAttribute('aria-label', t.dir==='rtl'?'Next':'Previous');
+    R.setAttribute('aria-label', t.dir==='rtl'?'Previous':'Next');
   }
   function syncLbPick(){
     const f=FILES.find(x=>x.id===lbId); if(!f) return;
@@ -1129,6 +1307,14 @@
       : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>${esc(t.selectItem)}`;
   }
   function closeLightbox(){ el('lightbox').classList.remove('show'); lbId=null; }
+  // step through the currently-visible files while the lightbox is open (+1 next, -1 prev, wraps around)
+  function navLightbox(step){
+    if(lbId==null) return;
+    const items=visible(); if(items.length<2) return;
+    const idx=items.findIndex(x=>x.id===lbId); if(idx<0) return;
+    const n=items.length;
+    openLightbox(items[(idx+step+n)%n].id);
+  }
 
   /* ---------------- kebab popover ---------------- */
   function openKebab(id, anchor){
@@ -1197,6 +1383,7 @@
     document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
     document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
     document.querySelectorAll('[data-i18n-title]').forEach(n=>{ const k=n.getAttribute('data-i18n-title'); if(typeof t[k]==='string') n.setAttribute('title',t[k]); });
+    if(MANAGER){ const as=el('autosaveTxt'); if(as) as.textContent=t.mgrReadonly; }
   }
   function applyLang(l){
     if(!I18N[l]) l='he';
@@ -1241,11 +1428,12 @@
   el('folders').addEventListener('click',e=>{ const f=e.target.closest('[data-album]'); if(!f) return; activeAlbum=f.getAttribute('data-album'); refreshAll(); });
   el('showMoreBtn').addEventListener('click',()=>{ foldersExpanded=!foldersExpanded; renderFolders(); });
   el('addFolderBtn').addEventListener('click',()=>{ const nf=el('newFolder'); nf.classList.toggle('show'); if(nf.classList.contains('show')){ el('newFolderInput').focus(); } });
-  function saveFolder(){
+  function saveFolder(){ if(MANAGER) return;
     const v=(el('newFolderInput').value||'').trim(); if(!v) return;
     const id='fol'+(++uid);
     FOLDERS.push({ id, key:'__'+id, count:0 });
     t['__'+id]=v; I18N.he['__'+id]=v; I18N.en['__'+id]=v; I18N.ru['__'+id]=v; // custom folder keeps its literal name in all langs
+    SEL_STORE.persistFolder(id, v);
     el('newFolderInput').value=''; el('newFolder').classList.remove('show'); foldersExpanded=true;
     renderMoveSel(); renderFolders(); toast(t.folderAdded,'ok');
   }
@@ -1294,6 +1482,9 @@
   // lightbox
   el('lbClose').addEventListener('click',closeLightbox);
   el('lightbox').addEventListener('click',e=>{ if(e.target.id==='lightbox') closeLightbox(); });
+  // on-screen arrows mirror the keyboard: left edge behaves like ArrowLeft, right edge like ArrowRight
+  el('lbArrowL').addEventListener('click',()=>navLightbox(t.dir==='rtl'?1:-1));
+  el('lbArrowR').addEventListener('click',()=>navLightbox(t.dir==='rtl'?-1:1));
   el('lbPick').addEventListener('click',()=>{ if(lbId){ togglePick(lbId); syncLbPick(); } });
   // popover
   el('popover').addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b) return; const id=el('popover').dataset.id; const act=b.getAttribute('data-act'); closeKebab();
@@ -1303,11 +1494,21 @@
     else if(act==='del'){ selected.clear(); selected.add(id); deleteSelected(); }
   });
   document.addEventListener('click',e=>{ if(!e.target.closest('#popover') && !e.target.closest('[data-kebab]')) closeKebab(); });
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeKebab(); closeLightbox(); closeOverlay(); } });
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){ closeKebab(); closeLightbox(); closeOverlay(); return; }
+    // arrow navigation inside the enlarged (lightbox) view — RTL: → previous, ← next
+    if((e.key==='ArrowLeft'||e.key==='ArrowRight') && el('lightbox').classList.contains('show')){
+      e.preventDefault();
+      const forward = t.dir==='rtl' ? e.key==='ArrowLeft' : e.key==='ArrowRight';
+      navLightbox(forward ? 1 : -1);
+    }
+  });
   window.addEventListener('scroll',closeKebab,{passive:true});
 
   /* ---------------- init ---------------- */
+  if(MANAGER){ document.body.classList.add('manager'); var _mb=el('mgrBanner'); if(_mb) _mb.classList.remove('hidden'); }
   applyTheme(ls('theme')||'light');
+  selHydrate();   // rebuild uploaded files from storage BEFORE the first render (fetch from storage, not memory)
   const saved=ls('ac_lang'); applyLang(saved==='en'||saved==='ru'||saved==='he'?saved:'he');
 })();
 </script>

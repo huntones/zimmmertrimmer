@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — Review & approve</title>
+<link rel="canonical" href="https://kolkli.com/proof">
 <meta name="description" content="Review the work, leave your comments and approve — no account needed.">
 <style>
   :root {
@@ -25,6 +26,8 @@
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
     --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+    /* responsive player height: scales with the viewport but stays compact so the whole page fits one screen */
+    --playerH:clamp(200px,38vh,400px);
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -51,7 +54,7 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{width:100%;max-width:none;margin:0 auto;padding:18px 20px 60px;}
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:16px 20px 28px;}
 
   .topbar{display:flex;align-items:center;justify-content:flex-end;gap:9px;margin-bottom:14px;}
   .pillbtn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:999px;
@@ -75,6 +78,11 @@
   .langopt.active{color:var(--accent-dim);}
   .langopt svg{width:15px;height:15px;opacity:0;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
   .langopt.active svg{opacity:1;}
+  /* guest auth: log in + sign up so a reviewing client can open an account */
+  .tb-signup{display:inline-flex;align-items:center;height:36px;padding:0 15px;border-radius:999px;color:#fff;
+    font-size:12.5px;font-weight:700;white-space:nowrap;cursor:pointer;
+    background:var(--grad-btn);box-shadow:0 4px 12px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .tb-signup:hover{filter:brightness(1.06);} .tb-signup:active{transform:scale(0.97);}
 
   .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:24px;}
 
@@ -112,18 +120,19 @@
   /* stage */
   .stage{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start;}
   @media (max-width:800px){ .stage{grid-template-columns:1fr;} }
-  .media{background:#0b0d14;border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:220px;display:flex;align-items:center;justify-content:center;}
-  .media img,.media video{max-width:100%;max-height:64vh;display:block;object-fit:contain;}
+  .media{background:#0b0d14;border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:180px;display:flex;align-items:center;justify-content:center;}
+  .media img{max-width:100%;max-height:var(--playerH);display:block;object-fit:contain;}
   .media audio{width:92%;margin:26px 0;}
-  .media iframe{width:100%;height:66vh;border:none;background:#fff;}
+  .media iframe{width:100%;height:var(--playerH);border:none;background:#fff;}
   .media .dlonly{padding:40px 20px;text-align:center;color:#c7ccda;}
   .media .dlonly .di{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);color:#fff;}
   .media .dlonly .di svg{width:28px;height:28px;}
   .media .dlonly .nm{font-size:14px;font-weight:600;color:#fff;margin-bottom:14px;word-break:break-word;}
 
   /* ---- modern custom video player ---- */
-  .vplayer{position:relative;width:100%;display:flex;align-items:center;justify-content:center;background:#000;line-height:0;user-select:none;}
-  .vplayer video{width:100%;max-width:100%;max-height:64vh;display:block;object-fit:contain;background:#000;cursor:pointer;}
+  /* large 16:9 player that fills the stage column (matches the reference size) */
+  .vplayer{position:relative;width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:#000;line-height:0;user-select:none;}
+  .vplayer video{width:100%;height:100%;max-width:100%;max-height:none;display:block;object-fit:contain;background:#000;cursor:pointer;}
   .vp-big{position:absolute;inset:0;margin:auto;width:74px;height:74px;border-radius:50%;border:none;cursor:pointer;
     background:rgba(12,15,26,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#fff;
     display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(0,0,0,.45);
@@ -154,6 +163,7 @@
   .vp-volwrap:hover .vp-vol,.vp-volwrap:focus-within .vp-vol{width:66px;}
   .vp-volwrap{display:flex;align-items:center;}
   .vp-vol .vp-seek{min-width:56px;width:56px;margin-inline:4px 2px;}
+  .vplayer:fullscreen,.vplayer:-webkit-full-screen{aspect-ratio:auto;}
   .vplayer:fullscreen video,.vplayer:-webkit-full-screen video{max-height:100vh;height:100vh;}
 
   .side{display:flex;flex-direction:column;gap:12px;}
@@ -163,7 +173,7 @@
     cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
   .iconbtn:hover{border-color:var(--accent);color:var(--accent);} .iconbtn svg{width:16px;height:16px;}
 
-  .thread{display:flex;flex-direction:column;gap:9px;max-height:44vh;overflow-y:auto;padding-inline-end:2px;}
+  .thread{display:flex;flex-direction:column;gap:9px;max-height:clamp(150px,26vh,300px);overflow-y:auto;padding-inline-end:2px;}
   .cmt{border:1px solid var(--line-2);border-radius:11px;padding:10px 12px;background:var(--panel-2);}
   .cmt-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;}
   .cmt-av{width:24px;height:24px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--grad);color:#fff;font-weight:700;font-size:11px;}
@@ -280,6 +290,8 @@
 
   .filterbtn{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;font-weight:600;}
   .filterbtn svg{width:13px;height:13px;}
+  .filterbtn.on{color:var(--accent);}
+  .filterbtn.on svg{fill:currentColor;stroke:currentColor;}
   /* numbered comment cards */
   .cmt{cursor:pointer;transition:border-color .12s,background .12s;} .cmt:hover{border-color:var(--accent);}
   .cmt-num{width:22px;height:22px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--grad);color:#fff;font-family:var(--mono);font-weight:700;font-size:11px;}
@@ -348,7 +360,7 @@
 <div class="wrap">
   <div class="topbar">
     <div class="tb-start">
-      <a class="tb-logo" href="./index.html" aria-label="KOLKLI"><img src="./assets/logo.png" alt="KOLKLI" width="98" height="24" decoding="async"></a>
+      <a class="tb-logo" href="./" aria-label="KOLKLI"><img src="./assets/logo.png" alt="KOLKLI" width="98" height="24" decoding="async"></a>
       <button class="tb-grid" id="appsBtn" type="button" aria-label="Apps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
     </div>
     <div class="tb-title" data-i18n="reviewSub"></div>
@@ -363,6 +375,8 @@
         <div class="langmenu" id="langMenu" role="listbox" aria-label="Language"></div>
       </div>
       <button class="pillbtn ico" id="themeToggle" type="button" aria-label="Theme"><span id="themeIco">🌙</span></button>
+      <a class="pillbtn" href="./auth">התחברות</a>
+      <a class="tb-signup" href="./auth?mode=signup">הרשמה</a>
     </div>
   </div>
 
@@ -488,7 +502,7 @@
   </div>
 
   <div class="pbwrap">
-    <a class="poweredby" id="poweredBy" href="./index.html" aria-label="KOLKLI">
+    <a class="poweredby" id="poweredBy" href="./" aria-label="KOLKLI">
       <span data-i18n="poweredBy"></span>
       <img src="./assets/logo.png" alt="KOLKLI" width="139" height="34" decoding="async">
     </a>
@@ -501,6 +515,8 @@
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="./supabase-config.js"></script>
+<script src="./kolkli-db.js"></script>
 <script src="./review-store.js"></script>
 <script>
 (function(){
@@ -622,10 +638,33 @@
   let viewedMarked=false;
   let mediaDuration=0, mediaW=0, mediaH=0, tlZoom=1, pendingAtt=null;
   function fresh(){ return isDemo ? proj : RV.getProject(token); }
-  function persist(p){ if(isDemo){ proj=p; return; } RV.upsertProject(p); proj=p; }
+  // Local cache write only — the reviewing client is anonymous and cannot
+  // own-upsert the server row. Server writes go through the token-gated RPC
+  // helpers below (which map to the guarded project_* RPCs). All no-ops when
+  // Supabase is unconfigured, so the local demo behaves exactly as before.
+  function persist(p){ if(isDemo){ proj=p; return; } RV.upsertProjectLocal(p); proj=p; }
+  function dbOn(){ return !isDemo && window.KolkliDB && KolkliDB.enabled(); }
+  function dbComment(c,ev){ if(dbOn()) KolkliDB.addComment('review', token, c, ev||null); }
+  function dbDecision(dec,status,ev){ if(dbOn()) KolkliDB.setDecision('review', token, dec, status||null, ev||null); }
+  function dbEvent(ev){ if(dbOn()) KolkliDB.addEvent('review', token, ev); }
   function isTimed(it){ return !!(it && (it.kind==='video'||it.kind==='audio')); }
   function pinColor(i){ return i%2 ? 'var(--info)' : 'var(--accent)'; }
   function shortDate(ms){ const d=new Date(ms); try{ return d.toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(_){ return ''; } }
+  // comment-thread filter: cycles All → Mine → time/page-marked (see #filterBtn handler)
+  let cmtFilter='all';
+  const CMT_FILTERS=['all','mine','marks'];
+  function cmtMatchesFilter(c){
+    if(cmtFilter==='mine'){ const me=(clientName()||'').toLowerCase(); const w=((c.author&&c.author.trim())||'').toLowerCase(); return !!me && w===me; }
+    if(cmtFilter==='marks'){ return c.tcode!=null || c.page!=null; }
+    return true;
+  }
+  function filterName(mode){
+    const L={ he:{all:'כל התגובות',mine:'התגובות שלי',marks:'עם סימון זמן/עמוד'},
+              en:{all:'All comments',mine:'My comments',marks:'Time / page marked'},
+              ru:{all:'Все комментарии',mine:'Мои комментарии',marks:'С меткой времени/страницы'} };
+    return (L[lang]||L.en)[mode];
+  }
+  function filterEmptyMsg(){ const L={he:'אין תגובות התואמות לסינון',en:'No comments match this filter',ru:'Нет комментариев по этому фильтру'}; return L[lang]||L.en; }
   function orderedComments(){
     const it=activeItem(); if(!it) return [];
     return RV.commentsOf(proj,it.id).slice().sort((a,b)=>{
@@ -707,7 +746,7 @@
   async function fillStripThumbs(items){
     for(const it of items){
       if(it.kind!=='image') continue;
-      try{ const blob=await RV.getBlob(it.id); if(!blob) continue;
+      try{ const blob=await RV.loadItemBlob(token, it.id); if(!blob) continue;
         const holder=document.querySelector(`[data-sthumb="${it.id}"]`); if(!holder) continue;
         holder.innerHTML=`<img src="${URL.createObjectURL(blob)}" alt="">`;
       }catch(_){}
@@ -723,7 +762,7 @@
     el('dlBtn').classList.toggle('hidden', !(it && proj.perms.download));
     el('tlCard').classList.toggle('hidden', !isTimed(it));
     if(!it){ box.innerHTML=''; updateFileSub(); return; }
-    let blob=null; if(!isDemo){ try{ blob=await RV.getBlob(it.id); }catch(_){} }
+    let blob=null; if(!isDemo){ try{ blob=await RV.loadItemBlob(token, it.id); }catch(_){} }
 
     if(isTimed(it) && !blob){
       // demo / missing file: show a poster and drive the timeline from a known duration
@@ -735,7 +774,7 @@
     const url=URL.createObjectURL(blob); activeUrl=url;
     if(it.kind==='image') box.innerHTML=`<img src="${url}" alt="${RV.escapeHtml(it.name)}">`;
     else if(it.kind==='video'){ box.innerHTML=videoPlayerHTML(url); activeMedia=box.querySelector('video'); wireVideoPlayer(box.querySelector('.vplayer')); }
-    else if(it.kind==='audio'){ box.innerHTML=`<audio src="${url}" controls></audio>`; activeMedia=box.querySelector('audio'); }
+    else if(it.kind==='audio'){ box.innerHTML=`<audio src="${url}" controls controlsList="nodownload noplaybackrate"></audio>`; activeMedia=box.querySelector('audio'); }
     else if(it.ext==='pdf') box.innerHTML=`<iframe src="${url}"></iframe>`;
     else box.innerHTML=`<div class="dlonly"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg></div><div class="nm">${RV.escapeHtml(it.name)}</div></div>`;
     if(activeMedia){
@@ -747,7 +786,7 @@
     updateFileSub(); renderAddFoot();
   }
   function demoPosterHTML(it){
-    return `<div class="vplayer" style="aspect-ratio:16/9;width:100%;background:radial-gradient(120% 120% at 30% 20%,#2b3566 0%,#141a2e 55%,#0b0d14 100%)">
+    return `<div class="vplayer" style="width:100%;background:radial-gradient(120% 120% at 30% 20%,#2b3566 0%,#141a2e 55%,#0b0d14 100%)">
       <button class="vp-big" type="button" aria-label="preview" tabindex="-1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button></div>`;
   }
   function updateFileSub(){
@@ -802,13 +841,16 @@
   }
   function renderThread(){
     const it=activeItem();
-    const items=orderedComments();
+    const all=orderedComments();
+    const items = cmtFilter==='all' ? all : all.filter(cmtMatchesFilter);
     el('cmtCount').textContent=t.cmtCount(items.length);
     const thread=el('thread');
     if(!it){ thread.innerHTML=''; return; }
-    if(!items.length){ thread.innerHTML=`<div class="threadEmpty">${t.threadEmpty}</div>`; return; }
+    if(!all.length){ thread.innerHTML=`<div class="threadEmpty">${t.threadEmpty}</div>`; return; }
+    if(!items.length){ thread.innerHTML=`<div class="threadEmpty">${filterEmptyMsg()}</div>`; return; }
     const me=(clientName()||'').toLowerCase();
-    thread.innerHTML=items.map((c,i)=>{
+    thread.innerHTML=items.map((c)=>{
+      const i=all.indexOf(c);   // numbering stays aligned with the timeline pins, which use the full order
       const who=(c.author&&c.author.trim())?c.author.trim():t.anon;
       const mine = me && who.toLowerCase()===me;
       const pos = c.tcode!=null ? `<span class="cmt-tc" data-seek="${c.tcode}">${clockSvg()} ${mmss(c.tcode)}</span>`
@@ -899,10 +941,11 @@
     if(viewedMarked) return; viewedMarked=true;
     const f=fresh(); if(!f) return;
     if(f.status==='draft'||f.status==='sent'){
+      const ev={type:'viewed', at:Date.now(), who:clientName()};
       f.status='viewed';
-      f.events=(f.events||[]).concat([{type:'viewed', at:Date.now(), who:clientName()}]);
+      f.events=(f.events||[]).concat([ev]);
       persist(f);
-      if(!isDemo) RV.post({type:'viewed', token, who:clientName()});
+      if(!isDemo){ RV.post({type:'viewed', token, who:clientName()}); dbEvent(ev); }
     }
   }
   async function addComment(){
@@ -916,13 +959,14 @@
     const c={ id:'rc'+RV.randToken(), itemId:it.id, author:who, title, body, at:Date.now(), tcode:null, page:null, decision:null, resolved:false };
     if(isTimed(it)) c.tcode=Math.floor((activeMedia?activeMedia.currentTime:demoTime)||0);
     else if(it.ext==='pdf'){ const pn=el('pageNum'); if(pn && +pn.value>0) c.page=+pn.value; }
-    if(pendingAtt){ const aid='ra'+RV.randToken(); if(!isDemo){ try{ await RV.putBlob(aid, pendingAtt.file); }catch(_){} } c.att={ id:aid, name:pendingAtt.file.name, size:pendingAtt.file.size }; }
+    if(pendingAtt){ const aid='ra'+RV.randToken(); if(!isDemo){ try{ await RV.saveItemBlob(token, aid, pendingAtt.file); }catch(_){} } c.att={ id:aid, name:pendingAtt.file.name, size:pendingAtt.file.size }; }
+    const ev={type:'commented', at:Date.now(), who};
     f.comments=(f.comments||[]).concat([c]);
-    f.events=(f.events||[]).concat([{type:'commented', at:Date.now(), who}]);
+    f.events=(f.events||[]).concat([ev]);
     if(f.status==='draft'||f.status==='sent') f.status='viewed';
     persist(f);
     if(who) saveName(who);
-    if(!isDemo) RV.post({type:'commented', token, who});
+    if(!isDemo){ RV.post({type:'commented', token, who}); dbComment(c, ev); }
     el('cBody').value=''; el('cTitle').value=''; clearAtt();
     renderThread(); renderStrip(); renderSeekPins(); renderTimeline(); renderDecide();
     document.querySelectorAll('.sthumb').forEach(s=>s.classList.toggle('on', s.getAttribute('data-item')===activeId));
@@ -935,15 +979,18 @@
     if(state==='changes'||state==='rejected'){ note=(el('cBody').value||'').trim(); }
     const f=fresh(); if(!f){ notice('ntMissingT','ntMissingB'); return; }
     if(RV.statusOf(f)==='closed'){ notice('ntClosedT','ntClosedB'); return; }
-    f.decision={ state, by:who, at:Date.now(), version:activeVer };
+    const dec={ state, by:who, at:Date.now(), version:activeVer };
+    const ev={type:state, at:Date.now(), who};
+    f.decision=dec;
     f.status = state==='approved'? 'approved':'changes';   // keep owner-page status enum
-    f.events=(f.events||[]).concat([{type:state, at:Date.now(), who}]);
+    f.events=(f.events||[]).concat([ev]);
+    let noteComment=null;
     if((state==='changes'||state==='rejected') && note){
       const it=activeItem();
-      if(it) f.comments=(f.comments||[]).concat([{ id:'rc'+RV.randToken(), itemId:it.id, author:who, title:'', body:note, at:Date.now(), tcode:(isTimed(it)?Math.floor((activeMedia?activeMedia.currentTime:demoTime)||0):null), page:null, decision:state, resolved:false }]);
+      if(it){ noteComment={ id:'rc'+RV.randToken(), itemId:it.id, author:who, title:'', body:note, at:Date.now(), tcode:(isTimed(it)?Math.floor((activeMedia?activeMedia.currentTime:demoTime)||0):null), page:null, decision:state, resolved:false }; f.comments=(f.comments||[]).concat([noteComment]); }
     }
     persist(f); saveName(who);
-    if(!isDemo) RV.post({type:state, token, who});
+    if(!isDemo){ RV.post({type:state, token, who}); dbDecision(dec, f.status, ev); if(noteComment) dbComment(noteComment, null); }
     if(state!=='approved') el('cBody').value='';
     renderThread(); renderStrip(); renderSeekPins(); renderTimeline(); renderDecide();
     toast(state==='approved'? t.approvedToast : state==='rejected'? t.rejectedToast : t.changesToast);
@@ -952,11 +999,12 @@
     const f=fresh(); if(!f) return;
     f.decision=null; f.status='viewed';
     persist(f); renderDecide();
+    if(!isDemo) dbDecision(null, 'viewed', null);
   }
   function saveName(n){ RV.lsSet('rv_client_name', n); }
   function setAtt(file){ pendingAtt={file}; el('attName').textContent=file.name; el('attChip').classList.remove('hidden'); }
   function clearAtt(){ pendingAtt=null; el('attInput').value=''; el('attChip').classList.add('hidden'); }
-  async function fetchAtt(id,name){ try{ const blob=await RV.getBlob(id); if(!blob) return; const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000); }catch(_){} }
+  async function fetchAtt(id,name){ try{ const blob=await RV.loadItemBlob(token, id); if(!blob) return; const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000); }catch(_){} }
   function demoProject(){
     const now=Date.now(), day=86400000;
     return {
@@ -1120,7 +1168,13 @@
     const s=e.target.closest('[data-seek]'); if(s){ const v=s.getAttribute('data-seek'); if(v!=='') seekTo(+v); }
   });
   el('postBtn').addEventListener('click',addComment);
-  el('dlBtn').addEventListener('click',async()=>{ const it=activeItem(); if(!it) return; if(!proj.perms.download||isDemo){ toast(t.dlBlocked); return; } const blob=await RV.getBlob(it.id); if(!blob) return; const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=it.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000); });
+  el('filterBtn').addEventListener('click',()=>{
+    cmtFilter=CMT_FILTERS[(CMT_FILTERS.indexOf(cmtFilter)+1)%CMT_FILTERS.length];
+    el('filterBtn').classList.toggle('on', cmtFilter!=='all');
+    toast(filterName(cmtFilter));
+    renderThread();
+  });
+  el('dlBtn').addEventListener('click',async()=>{ const it=activeItem(); if(!it) return; if(!proj.perms.download||isDemo){ toast(t.dlBlocked); return; } const blob=await RV.loadItemBlob(token, it.id); if(!blob) return; const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=it.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000); });
   el('decideBar').addEventListener('click',e=>{
     if(e.target.closest('#approveBtn')) decide('approved');
     else if(e.target.closest('#changesBtn')) decide('changes');
@@ -1139,9 +1193,9 @@
   el('attInput').addEventListener('change',e=>{ const f=e.target.files&&e.target.files[0]; if(f) setAtt(f); });
   el('attX').addEventListener('click',clearAtt);
   el('mentionBtn').addEventListener('click',()=>{ const ta=el('cBody'); ta.value+=(ta.value&&!/\s$/.test(ta.value)?' ':'')+'@'; ta.focus(); });
-  el('backBtn').addEventListener('click',()=>{ location.href='./review.html'; });
+  el('backBtn').addEventListener('click',()=>{ location.href='./review'; });
   el('helpBtn').addEventListener('click',()=>toast(t.helpMsg));
-  el('appsBtn').addEventListener('click',()=>{ location.href='./index.html'; });
+  el('appsBtn').addEventListener('click',()=>{ location.href='./'; });
   el('pwForm').addEventListener('submit',unlock);
   el('langBtn').addEventListener('click',toggleLangMenu);
   el('langMenu').addEventListener('click',e=>{
@@ -1163,14 +1217,19 @@
   const wantsDemo = /[?&]demo=1/.test(location.search) || token==='demo';
   if(wantsDemo){ isDemo=true; proj=demoProject(); token='demo'; if(!ls('rv_client_name')) RV.lsSet('rv_client_name','טל זימר'); enterReview(); return; }
   if(!token){ notice('ntMissingT','ntMissingB'); return; }
-  proj=RV.getProject(token);
-  if(!proj){ notice('ntMissingT','ntMissingB'); return; }
-  applyBrand(proj.brand);
-  const st=RV.statusOf(proj);
-  if(st==='expired'){ notice('ntExpiredT','ntExpiredB'); return; }
-  if(st==='closed'){ notice('ntClosedT','ntClosedB'); return; }
-  if(proj.password){ show('pwState'); setTimeout(()=>el('pwInput').focus(),40); return; }
-  enterReview();
+  // Cross-device: fetch this project by its token from the server into the local
+  // mirror first (the token is the access secret). Instant local read when
+  // Supabase is unconfigured — behaves exactly as the old demo.
+  (RV.pullToken ? RV.pullToken(token) : Promise.resolve(RV.getProject(token))).then(function(){
+    proj=RV.getProject(token);
+    if(!proj){ notice('ntMissingT','ntMissingB'); return; }
+    applyBrand(proj.brand);
+    const st=RV.statusOf(proj);
+    if(st==='expired'){ notice('ntExpiredT','ntExpiredB'); return; }
+    if(st==='closed'){ notice('ntClosedT','ntClosedB'); return; }
+    if(proj.password){ show('pwState'); setTimeout(()=>el('pwInput').focus(),40); return; }
+    enterReview();
+  });
 })();
 </script>
 <script src="./notify-sound.js" defer></script>

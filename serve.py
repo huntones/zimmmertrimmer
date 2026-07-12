@@ -71,8 +71,51 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except _HANGUP:
             pass
 
+    # --- clean-URL handling (mirrors Cloudflare Pages, so local dev matches prod) --
+    def _split_path(self):
+        p, q = self.path, ""
+        if "?" in p:
+            p, q = p.split("?", 1)
+            q = "?" + q
+        return p, q
+
+    def _clean_redirect_target(self):
+        # 301 any legacy .html URL to its extensionless / directory form.
+        p, q = self._split_path()
+        low = p.lower()
+        if low.endswith(".html"):
+            if low.endswith("/index.html"):
+                clean = p[: -len("index.html")]   # ".../index.html" -> ".../"
+            else:
+                clean = p[:-5]                     # "/app.html"      -> "/app"
+            if not clean.startswith("/"):
+                clean = "/" + clean
+            return clean + q
+        return None
+
+    def _rewrite_extensionless(self):
+        # Serve "/app" from app.html (200, no redirect) when the file exists.
+        p, q = self._split_path()
+        if p.endswith("/"):
+            return
+        last = p.rsplit("/", 1)[-1]
+        if "." in last:
+            return                                  # an asset (.js/.css/.wasm/…)
+        if os.path.isdir(self.translate_path(p)):
+            return                                  # a real dir -> base adds the slash
+        if os.path.isfile(self.translate_path(p + ".html")):
+            self.path = p + ".html" + q
+
     # --- HTTP Range support (stdlib SimpleHTTPRequestHandler lacks it) -----
     def send_head(self):
+        redirect = self._clean_redirect_target()
+        if redirect is not None:
+            self.send_response(301)
+            self.send_header("Location", redirect)
+            self.end_headers()
+            return None
+        self._rewrite_extensionless()
+
         rng = self.headers.get("Range")
         if not rng:
             return super().send_head()

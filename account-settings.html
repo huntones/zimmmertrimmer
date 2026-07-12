@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI - הגדרות חשבון</title>
+<link rel="canonical" href="https://kolkli.com/account-settings">
 <meta name="description" content="ניהול הגדרות החשבון, פרטים אישיים, תשלומים, אבטחה, התראות וצוות ב-KOLKLI.">
 <link rel="stylesheet" href="header.css">
 <style>
@@ -49,12 +50,12 @@
      is the first grid column, so in RTL it sits flush against the right padding
      edge, aligned with the header logo; the panels fill all remaining width to
      its left. No centered max-width, so no dead band strands on the right. */
-  .settings-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:22px;align-items:start;max-width:none;margin:0;}
+  .settings-layout{display:block;max-width:none;margin:0;}
   .settings-nav{position:sticky;top:92px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:var(--shadow);}
-  .nav-title{font-size:12px;font-weight:900;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin:4px 10px 10px;}
-  .settings-nav a{display:flex;align-items:center;gap:11px;min-height:42px;border-radius:12px;padding:9px 11px;color:var(--ink-2);font-size:13.5px;font-weight:800;transition:background .12s,color .12s;}
+  .nav-title{font-size:12.5px;font-weight:900;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin:4px 10px 12px;}
+  .settings-nav a{display:flex;align-items:center;gap:12px;min-height:48px;border-radius:12px;padding:12px 13px;color:var(--ink-2);font-size:14.5px;font-weight:800;transition:background .12s,color .12s;}
   .settings-nav a:hover,.settings-nav a.active{background:var(--accent-soft);color:var(--accent-dim);}
-  .settings-nav svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .settings-nav svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
   .settings-main{display:flex;flex-direction:column;gap:18px;}
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px;}
   .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;border-bottom:1px solid var(--line-2);padding-bottom:16px;}
@@ -91,6 +92,22 @@
   .table{width:100%;border-collapse:collapse;margin-top:10px;}
   .table th,.table td{text-align:start;border-bottom:1px solid var(--line-2);padding:10px 8px;font-size:13px;}
   .table th{font-size:11px;color:var(--faint);letter-spacing:.05em;text-transform:uppercase;}
+  .table tr:last-child td{border-bottom:none;}
+  .billing-plan{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding-bottom:18px;border-bottom:1px solid var(--line-2);margin-bottom:18px;}
+  .billing-plan .bp-name{font-size:15px;font-weight:800;color:var(--ink);}
+  .billing-plan .bp-name b{font-weight:900;}
+  .billing-plan .bp-sub{font-size:13px;color:var(--muted);margin-top:3px;}
+  .pm-title{font-size:14px;font-weight:850;margin:0 0 10px;}
+  .pm-empty{display:flex;align-items:center;gap:12px;background:var(--panel-2);border:1px dashed var(--line);border-radius:12px;padding:16px;}
+  .pm-empty .pm-ic{width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .pm-empty .pm-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .pm-empty .pm-tx{flex:1;min-width:0;}
+  .pm-empty .pm-t{font-size:14px;font-weight:700;color:var(--ink);}
+  .pm-empty .pm-d{font-size:12.5px;color:var(--muted);}
+  .inv-status{display:inline-block;font-size:10.5px;font-weight:850;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--success);background:var(--success-soft);border:1px solid var(--success);border-radius:6px;padding:2px 8px;white-space:nowrap;}
+  .inv-dl{color:var(--accent-dim);font-weight:800;cursor:pointer;}
   .security-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;}
   .activity{display:flex;flex-direction:column;gap:9px;}
   .activity-row{display:flex;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--panel-2);font-size:13px;}
@@ -105,6 +122,21 @@
     .settings-nav .nav-title{display:none;}
     .settings-nav a{white-space:nowrap;min-width:max-content;}
     .grid2,.option-list,.billing-card,.security-grid{grid-template-columns:1fr;}
+  }
+  /* Desktop: the "הגדרות" nav is a full-height rail pinned flush to the inline-START
+     edge (RIGHT in RTL) — from just under the sticky 72px header to the bottom of the
+     viewport. No border/radius/shadow: it drops the card look and reads as part of the
+     page shell, with a single divider facing the content — mirroring the dashboard's
+     white side rail. The panels fill all remaining width beside it. */
+  @media (min-width:901px){
+    .wrap{width:auto;margin-inline-start:280px;}
+    .settings-nav{
+      position:fixed;top:72px;inset-inline-start:0;bottom:0;width:280px;height:auto;z-index:40;
+      overflow-y:auto;background:var(--panel);border:0;border-inline-end:1px solid var(--line);
+      border-radius:0;box-shadow:none;padding:28px 18px;
+      display:flex;flex-direction:column;gap:8px;
+    }
+    .settings-nav .nav-title{margin:2px 10px 12px;}
   }
 </style>
 </head>
@@ -173,11 +205,26 @@
 
       <section class="panel" id="billing">
         <div class="panel-head"><div><h2 data-i="billingTitle">תשלומים וחבילה</h2><p data-i="billingSub">החבילה הפעילה, אמצעי תשלום, חשבוניות והיסטוריית חיובים.</p></div></div>
-        <div class="billing-card">
-          <div class="mini-card"><h3 data-i="activePlan">החבילה הפעילה</h3><strong id="activePlanName">Free</strong><p data-i="billingNote">ניתן לשדרג או לשנות חבילה בכל רגע.</p><div class="actions"><a class="btn primary" href="pricing/" data-i="upgrade">שדרוג או שינוי חבילה</a></div></div>
-          <div class="mini-card"><h3 data-i="paymentMethod">אמצעי תשלום</h3><p data-i="paymentNone">לא הוגדר אמצעי תשלום.</p><button class="btn" type="button" data-i="addPayment">הוספת אמצעי תשלום</button></div>
+        <div class="billing-plan">
+          <div>
+            <div class="bp-name"><span data-i="curPlan">החבילה הנוכחית</span>: <span id="billPlanLine"></span></div>
+            <div class="bp-sub" id="billNextLine"></div>
+          </div>
+          <a class="btn" id="billManage" href="pricing/"></a>
         </div>
-        <table class="table"><thead><tr><th data-i="date">תאריך</th><th data-i="desc">תיאור</th><th data-i="amount">סכום</th><th data-i="invoice">חשבונית</th></tr></thead><tbody><tr><td>-</td><td data-i="noBilling">אין עדיין חיובים להצגה</td><td>-</td><td>-</td></tr></tbody></table>
+        <div class="pm-block">
+          <div class="pm-title" data-i="paymentMethod">אמצעי תשלום</div>
+          <div class="pm-empty">
+            <span class="pm-ic"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>
+            <span class="pm-tx"><span class="pm-t" data-i="pmNoneT">לא הוגדר אמצעי תשלום</span><br><span class="pm-d" data-i="pmNoneD">הוסיפו כרטיס כדי לשדרג לחבילה בתשלום.</span></span>
+            <button class="btn" type="button" id="billAddCard"></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="billing-history">
+        <div class="panel-head"><div><h2 data-i="histTitle">היסטוריית חיובים</h2><p data-i="histSub">חשבוניות ותשלומים קודמים בחשבון.</p></div></div>
+        <table class="table"><thead><tr><th data-i="date">תאריך</th><th data-i="desc">תיאור</th><th data-i="amount">סכום</th><th data-i="status">סטטוס</th><th data-i="invoice">חשבונית</th></tr></thead><tbody id="billHistBody"></tbody></table>
       </section>
 
       <section class="panel" id="security">
@@ -212,7 +259,7 @@
 
       <section class="panel" id="team">
         <div class="panel-head"><div><h2 data-i="teamTitle">צוות והרשאות</h2><p data-i="teamSub">זמין למשתמשים בעלי חבילה הכוללת ניהול צוות.</p></div><span class="tag" data-i="teamBadge">Studio</span></div>
-        <div class="mini-card"><h3 data-i="teamManage">ניהול צוות</h3><p data-i="teamText">הזמינו חברי צוות, הגדירו תפקידים והרשאות, ועקבו אחרי מושבים זמינים.</p><div class="actions"><a class="btn" href="dashboard.html#team" data-i="openTeam">פתיחת ניהול צוות</a></div></div>
+        <div class="mini-card"><h3 data-i="teamManage">ניהול צוות</h3><p data-i="teamText">הזמינו חברי צוות, הגדירו תפקידים והרשאות, ועקבו אחרי מושבים זמינים.</p><div class="actions"><a class="btn" href="dashboard#team" data-i="openTeam">פתיחת ניהול צוות</a></div></div>
       </section>
 
       <section class="panel danger-panel" id="delete">
@@ -252,8 +299,8 @@
   var prefs=readJson(scoped(PREF_KEY), { timezone:'Asia/Jerusalem', density:'comfortable' });
   var notif=readJson(scoped(NOTIF_KEY), { download:true, updates:false, billing:true, security:true, twofa:false });
   var T={
-    he:{kick:'KOLKLI SETTINGS',title:'הגדרות חשבון',sub:'אזור נפרד לניהול החשבון, החבילה, האבטחה, ההתראות והצוות שלכם.',navTitle:'הגדרות',navOverview:'החשבון שלי',navDetails:'פרטי חשבון',navPrefs:'הגדרות חשבון',navBilling:'תשלומים וחבילה',navSecurity:'אבטחה וסיסמה',navNotifications:'התראות',navTeam:'צוות והרשאות',navDelete:'מחיקת חשבון',overviewTitle:'החשבון שלי',overviewSub:'סיכום כללי של החשבון והפעילות שלכם.',helloTitle:'שלום',workspaceTitle:'אזור הגדרות',workspaceSub:'כאן מנהלים הגדרות כלליות בלבד, בנפרד מהקבצים והפרויקטים.',detailsTitle:'פרטי חשבון',detailsSub:'שם, תמונת פרופיל, אימייל, טלפון ופרטים אישיים.',changePhoto:'החלפת תמונה',removePhoto:'הסרת תמונה',fullName:'שם מלא',email:'אימייל',phone:'טלפון',role:'תפקיד / עסק',save:'שמירת שינויים',saved:'נשמר בהצלחה',prefsTitle:'הגדרות חשבון',prefsSub:'שפה, אזור זמן, העדפות מערכת והתראות בסיס.',language:'שפת ממשק',timezone:'אזור זמן',theme:'ערכת נושא',light:'בהיר',dark:'כהה',density:'צפיפות ממשק',comfortable:'נוחה',compact:'קומפקטית',billingTitle:'תשלומים וחבילה',billingSub:'החבילה הפעילה, אמצעי תשלום, חשבוניות והיסטוריית חיובים.',activePlan:'החבילה הפעילה',billingNote:'ניתן לשדרג או לשנות חבילה בכל רגע.',upgrade:'שדרוג או שינוי חבילה',paymentMethod:'אמצעי תשלום',paymentNone:'לא הוגדר אמצעי תשלום.',addPayment:'הוספת אמצעי תשלום',date:'תאריך',desc:'תיאור',amount:'סכום',invoice:'חשבונית',noBilling:'אין עדיין חיובים להצגה',securityTitle:'אבטחה וסיסמה',securitySub:'החלפת סיסמה, אימות דו-שלבי, מכשירים מחוברים ופעילות אחרונה.',passwordTitle:'החלפת סיסמה',oldPass:'סיסמה נוכחית',newPass:'סיסמה חדשה',savePass:'עדכון סיסמה',securityChecks:'בקרות אבטחה',twofa:'אימות דו-שלבי',twofaSub:'הוספת שכבת הגנה לחשבון.',device:'מכשיר מחובר',lastActivity:'פעילות אחרונה',notificationsTitle:'התראות',notificationsSub:'הגדירו אילו עדכונים לקבל במייל ובהתראות מערכת.',downloadAlert:'התראת הורדה',downloadAlertSub:'מייל כאשר מישהו מוריד קובץ ששלחתם.',productUpdates:'עדכוני מוצר',productUpdatesSub:'חדשות, טיפים וכלים חדשים.',billingAlerts:'התראות חיוב',billingAlertsSub:'חשבוניות, תשלומים ושינויים בחבילה.',securityAlerts:'התראות אבטחה',securityAlertsSub:'כניסות חדשות ושינויי סיסמה.',teamTitle:'צוות והרשאות',teamSub:'זמין למשתמשים בעלי חבילה הכוללת ניהול צוות.',teamBadge:'Studio',teamManage:'ניהול צוות',teamText:'הזמינו חברי צוות, הגדירו תפקידים והרשאות, ועקבו אחרי מושבים זמינים.',openTeam:'פתיחת ניהול צוות',deleteTitle:'מחיקת חשבון',deleteSub:'אזור נפרד ומובחן לפעולות בלתי הפיכות.',deleteWarn:'מחיקת החשבון תסיר לצמיתות פרטים אישיים, פרויקטים, קבצים, צוותים והיסטוריית חיובים. לא ניתן לשחזר פעולה זו לאחר מכן.',deleteBtn:'מחיקת חשבון',deleteConfirm:'למחוק את החשבון לצמיתות? לא ניתן לבטל פעולה זו.'},
-    en:{kick:'KOLKLI SETTINGS',title:'Account Settings',sub:'A separate area for your account, plan, security, notifications and team.',navTitle:'Settings',navOverview:'My Account',navDetails:'Account Details',navPrefs:'Account Settings',navBilling:'Billing & Plan',navSecurity:'Security & Password',navNotifications:'Notifications',navTeam:'Team & Permissions',navDelete:'Delete Account',overviewTitle:'My Account',overviewSub:'A clear summary of your account and activity.',helloTitle:'Hello',workspaceTitle:'Settings Area',workspaceSub:'General account settings only, separate from files and projects.',detailsTitle:'Account Details',detailsSub:'Name, profile photo, email, phone and personal details.',changePhoto:'Change Photo',removePhoto:'Remove Photo',fullName:'Full Name',email:'Email',phone:'Phone',role:'Role / Business',save:'Save Changes',saved:'Saved',prefsTitle:'Account Settings',prefsSub:'Language, timezone, system preferences and defaults.',language:'Interface Language',timezone:'Timezone',theme:'Theme',light:'Light',dark:'Dark',density:'Interface Density',comfortable:'Comfortable',compact:'Compact',billingTitle:'Billing & Plan',billingSub:'Active plan, payment method, invoices and billing history.',activePlan:'Active Plan',billingNote:'You can upgrade or change plan at any time.',upgrade:'Upgrade or Change Plan',paymentMethod:'Payment Method',paymentNone:'No payment method is configured.',addPayment:'Add Payment Method',date:'Date',desc:'Description',amount:'Amount',invoice:'Invoice',noBilling:'No billing history yet',securityTitle:'Security & Password',securitySub:'Password, 2FA, connected devices and recent activity.',passwordTitle:'Change Password',oldPass:'Current Password',newPass:'New Password',savePass:'Update Password',securityChecks:'Security Controls',twofa:'Two-factor authentication',twofaSub:'Add another protection layer.',device:'Connected Device',lastActivity:'Recent Activity',notificationsTitle:'Notifications',notificationsSub:'Choose which email and system updates to receive.',downloadAlert:'Download Alert',downloadAlertSub:'Email when someone downloads a file you sent.',productUpdates:'Product Updates',productUpdatesSub:'News, tips and new tools.',billingAlerts:'Billing Alerts',billingAlertsSub:'Invoices, payments and plan changes.',securityAlerts:'Security Alerts',securityAlertsSub:'New logins and password changes.',teamTitle:'Team & Permissions',teamSub:'Available for plans that include team management.',teamBadge:'Studio',teamManage:'Team Management',teamText:'Invite teammates, set roles and manage seats.',openTeam:'Open Team Management',deleteTitle:'Delete Account',deleteSub:'A separate area for irreversible actions.',deleteWarn:'Deleting the account permanently removes personal details, projects, files, teams and billing history. This cannot be undone.',deleteBtn:'Delete Account',deleteConfirm:'Delete this account permanently? This cannot be undone.'}
+    he:{kick:'KOLKLI SETTINGS',title:'הגדרות חשבון',sub:'אזור נפרד לניהול החשבון, החבילה, האבטחה, ההתראות והצוות שלכם.',navTitle:'הגדרות',navOverview:'החשבון שלי',navDetails:'פרטי חשבון',navPrefs:'הגדרות חשבון',navBilling:'תשלומים וחבילה',navSecurity:'אבטחה וסיסמה',navNotifications:'התראות',navTeam:'צוות והרשאות',navDelete:'מחיקת חשבון',overviewTitle:'החשבון שלי',overviewSub:'סיכום כללי של החשבון והפעילות שלכם.',helloTitle:'שלום',workspaceTitle:'אזור הגדרות',workspaceSub:'כאן מנהלים הגדרות כלליות בלבד, בנפרד מהקבצים והפרויקטים.',detailsTitle:'פרטי חשבון',detailsSub:'שם, תמונת פרופיל, אימייל, טלפון ופרטים אישיים.',changePhoto:'החלפת תמונה',removePhoto:'הסרת תמונה',fullName:'שם מלא',email:'אימייל',phone:'טלפון',role:'תפקיד / עסק',save:'שמירת שינויים',saved:'נשמר בהצלחה',prefsTitle:'הגדרות חשבון',prefsSub:'שפה, אזור זמן, העדפות מערכת והתראות בסיס.',language:'שפת ממשק',timezone:'אזור זמן',theme:'ערכת נושא',light:'בהיר',dark:'כהה',density:'צפיפות ממשק',comfortable:'נוחה',compact:'קומפקטית',billingTitle:'תשלומים וחבילה',billingSub:'החבילה הפעילה, אמצעי תשלום, חשבוניות והיסטוריית חיובים.',curPlan:'החבילה הנוכחית',perMonth:'לחודש',nextBill:'החיוב הבא',freeNoBill:'החבילה החינמית — אין חיוב.',free:'חינם',manage:'ניהול חבילה',upgrade:'שדרוג או שינוי חבילה',paymentMethod:'אמצעי תשלום',pmNoneT:'לא הוגדר אמצעי תשלום',pmNoneD:'הוסיפו כרטיס כדי לשדרג לחבילה בתשלום.',addPayment:'הוספת כרטיס',histTitle:'היסטוריית חיובים',histSub:'חשבוניות ותשלומים קודמים בחשבון.',date:'תאריך',desc:'תיאור',amount:'סכום',status:'סטטוס',invoice:'חשבונית',invPaid:'שולם',invDownload:'הורדה',noBilling:'אין עדיין חיובים להצגה',securityTitle:'אבטחה וסיסמה',securitySub:'החלפת סיסמה, אימות דו-שלבי, מכשירים מחוברים ופעילות אחרונה.',passwordTitle:'החלפת סיסמה',oldPass:'סיסמה נוכחית',newPass:'סיסמה חדשה',savePass:'עדכון סיסמה',securityChecks:'בקרות אבטחה',twofa:'אימות דו-שלבי',twofaSub:'הוספת שכבת הגנה לחשבון.',device:'מכשיר מחובר',lastActivity:'פעילות אחרונה',notificationsTitle:'התראות',notificationsSub:'הגדירו אילו עדכונים לקבל במייל ובהתראות מערכת.',downloadAlert:'התראת הורדה',downloadAlertSub:'מייל כאשר מישהו מוריד קובץ ששלחתם.',productUpdates:'עדכוני מוצר',productUpdatesSub:'חדשות, טיפים וכלים חדשים.',billingAlerts:'התראות חיוב',billingAlertsSub:'חשבוניות, תשלומים ושינויים בחבילה.',securityAlerts:'התראות אבטחה',securityAlertsSub:'כניסות חדשות ושינויי סיסמה.',teamTitle:'צוות והרשאות',teamSub:'זמין למשתמשים בעלי חבילה הכוללת ניהול צוות.',teamBadge:'Studio',teamManage:'ניהול צוות',teamText:'הזמינו חברי צוות, הגדירו תפקידים והרשאות, ועקבו אחרי מושבים זמינים.',openTeam:'פתיחת ניהול צוות',deleteTitle:'מחיקת חשבון',deleteSub:'אזור נפרד ומובחן לפעולות בלתי הפיכות.',deleteWarn:'מחיקת החשבון תסיר לצמיתות פרטים אישיים, פרויקטים, קבצים, צוותים והיסטוריית חיובים. לא ניתן לשחזר פעולה זו לאחר מכן.',deleteBtn:'מחיקת חשבון',deleteConfirm:'למחוק את החשבון לצמיתות? לא ניתן לבטל פעולה זו.'},
+    en:{kick:'KOLKLI SETTINGS',title:'Account Settings',sub:'A separate area for your account, plan, security, notifications and team.',navTitle:'Settings',navOverview:'My Account',navDetails:'Account Details',navPrefs:'Account Settings',navBilling:'Billing & Plan',navSecurity:'Security & Password',navNotifications:'Notifications',navTeam:'Team & Permissions',navDelete:'Delete Account',overviewTitle:'My Account',overviewSub:'A clear summary of your account and activity.',helloTitle:'Hello',workspaceTitle:'Settings Area',workspaceSub:'General account settings only, separate from files and projects.',detailsTitle:'Account Details',detailsSub:'Name, profile photo, email, phone and personal details.',changePhoto:'Change Photo',removePhoto:'Remove Photo',fullName:'Full Name',email:'Email',phone:'Phone',role:'Role / Business',save:'Save Changes',saved:'Saved',prefsTitle:'Account Settings',prefsSub:'Language, timezone, system preferences and defaults.',language:'Interface Language',timezone:'Timezone',theme:'Theme',light:'Light',dark:'Dark',density:'Interface Density',comfortable:'Comfortable',compact:'Compact',billingTitle:'Billing & Plan',billingSub:'Active plan, payment method, invoices and billing history.',curPlan:'Current plan',perMonth:'per month',nextBill:'Next billing',freeNoBill:'Free plan — no billing.',free:'Free',manage:'Manage plan',upgrade:'Upgrade or Change Plan',paymentMethod:'Payment Method',pmNoneT:'No payment method',pmNoneD:'Add a card to upgrade to a paid plan.',addPayment:'Add card',histTitle:'Billing history',histSub:'Past invoices and payments on your account.',date:'Date',desc:'Description',amount:'Amount',status:'Status',invoice:'Invoice',invPaid:'Paid',invDownload:'Download',noBilling:'No billing history yet',securityTitle:'Security & Password',securitySub:'Password, 2FA, connected devices and recent activity.',passwordTitle:'Change Password',oldPass:'Current Password',newPass:'New Password',savePass:'Update Password',securityChecks:'Security Controls',twofa:'Two-factor authentication',twofaSub:'Add another protection layer.',device:'Connected Device',lastActivity:'Recent Activity',notificationsTitle:'Notifications',notificationsSub:'Choose which email and system updates to receive.',downloadAlert:'Download Alert',downloadAlertSub:'Email when someone downloads a file you sent.',productUpdates:'Product Updates',productUpdatesSub:'News, tips and new tools.',billingAlerts:'Billing Alerts',billingAlertsSub:'Invoices, payments and plan changes.',securityAlerts:'Security Alerts',securityAlertsSub:'New logins and password changes.',teamTitle:'Team & Permissions',teamSub:'Available for plans that include team management.',teamBadge:'Studio',teamManage:'Team Management',teamText:'Invite teammates, set roles and manage seats.',openTeam:'Open Team Management',deleteTitle:'Delete Account',deleteSub:'A separate area for irreversible actions.',deleteWarn:'Deleting the account permanently removes personal details, projects, files, teams and billing history. This cannot be undone.',deleteBtn:'Delete Account',deleteConfirm:'Delete this account permanently? This cannot be undone.'}
   };
   function lang(){ return lsGet('ac_lang') || document.documentElement.lang || 'he'; }
   function applyText(){
@@ -261,9 +308,45 @@
     document.documentElement.lang=l; document.documentElement.dir=l==='he'?'rtl':'ltr';
     document.querySelectorAll('[data-i]').forEach(function(n){ var k=n.getAttribute('data-i'); if(d[k]) n.textContent=d[k]; });
     document.title='KOLKLI - '+d.title;
+    renderBilling();
   }
   window.__setLang=function(l){ lsSet('ac_lang', l); applyText(); var sel=el('langSelect'); if(sel) sel.value=l; };
   function planName(){ var p=String(user.plan||'free').toLowerCase(); return p.charAt(0).toUpperCase()+p.slice(1); }
+  // Plan pricing mirrors the dashboard (PLANS): currency follows the UI language
+  // (₪ for Hebrew, $ otherwise). Payment method + history are demo placeholders.
+  var BILL_PLANS={ free:{name:'Free',price:{ils:0,usd:0}}, creator:{name:'Creator',price:{ils:89,usd:24}}, studio:{name:'Studio',price:{ils:249,usd:69}} };
+  var BILL_CUR={ he:{sym:'₪',field:'ils',dec:0}, en:{sym:'$',field:'usd',dec:2} };
+  function billCur(){ return BILL_CUR[lang()] || BILL_CUR.en; }
+  function billTxt(){ return T[lang()] || T.he; }
+  function billMoney(p){ var c=billCur(); return (+p||0)===0 ? billTxt().free : c.sym+(+p).toFixed(c.dec); }
+  function billPlanKey(){ var p=String(user.plan||'free').toLowerCase(); return BILL_PLANS[p]?p:'free'; }
+  function billFmt(d,opts){ try{ return d.toLocaleDateString(lang()==='he'?'he-IL':'en-US',opts); }catch(e){ return d.toISOString().slice(0,10); } }
+  function renderBilling(){
+    if(!el('billPlanLine')) return;
+    var d=billTxt(), key=billPlanKey(), P=BILL_PLANS[key], price=P.price[billCur().field]||0;
+    el('billPlanLine').innerHTML='<b>'+P.name+'</b> · '+billMoney(price)+(price>0?(' '+d.perMonth):'');
+    var next=new Date(); next.setMonth(next.getMonth()+1);
+    el('billNextLine').textContent=price===0 ? d.freeNoBill : (d.nextBill+': '+billFmt(next,{year:'numeric',month:'long',day:'numeric'}));
+    var mg=el('billManage');
+    if(key==='free'){ mg.textContent=d.upgrade; mg.className='btn primary'; }
+    else { mg.textContent=d.manage; mg.className='btn'; }
+    var plus='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>';
+    el('billAddCard').innerHTML=plus+'<span>'+d.addPayment+'</span>';
+    var rows='';
+    if(price===0){
+      rows='<tr><td>-</td><td>'+d.noBilling+'</td><td>-</td><td>-</td><td>-</td></tr>';
+    } else {
+      var now=new Date();
+      for(var i=0;i<3;i++){
+        var dt=new Date(now.getFullYear(), now.getMonth()-i, 1);
+        var ds=billFmt(dt,{year:'numeric',month:'short',day:'numeric'});
+        rows+='<tr><td>'+ds+'</td><td>KOLKLI '+P.name+'</td><td>'+billMoney(price)+'</td>'+
+          '<td><span class="inv-status">'+d.invPaid+'</span></td>'+
+          '<td><span class="inv-dl">'+d.invDownload+'</span></td></tr>';
+      }
+    }
+    el('billHistBody').innerHTML=rows;
+  }
   function avatarHtml(){
     if(user.avatar) return '<img src="'+user.avatar+'" alt="">';
     var n=(user.name||user.email||'?').trim();
@@ -273,7 +356,6 @@
     el('helloName').textContent=(user.name||user.email||'Guest');
     el('helloEmail').textContent=user.email||'';
     el('planTag').textContent=planName();
-    el('activePlanName').textContent=planName();
     el('avatarBox').innerHTML=avatarHtml();
     el('name').value=user.name||'';
     el('email').value=user.email||'';
@@ -304,7 +386,7 @@
     reader.onload=function(){ user.avatar=reader.result; persistUser(); renderUser(); };
     reader.readAsDataURL(file);
   });
-  el('deleteAccount').addEventListener('click', function(){ if(confirm((T[lang()]||T.he).deleteConfirm)){ var users=loadUsers().filter(function(x){ return (x.email||'').toLowerCase()!==(user.email||'').toLowerCase(); }); saveUsers(users); lsDel(SESSION_KEY); location.href='index.html'; } });
+  el('deleteAccount').addEventListener('click', function(){ if(confirm((T[lang()]||T.he).deleteConfirm)){ var users=loadUsers().filter(function(x){ return (x.email||'').toLowerCase()!==(user.email||'').toLowerCase(); }); saveUsers(users); lsDel(SESSION_KEY); location.href='./'; } });
   document.querySelectorAll('[data-nav]').forEach(function(a){ a.addEventListener('click', function(){ document.querySelectorAll('[data-nav]').forEach(function(x){ x.classList.remove('active'); }); a.classList.add('active'); }); });
   applyText(); renderUser();
 })();

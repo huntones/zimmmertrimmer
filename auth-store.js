@@ -220,7 +220,7 @@
     if (!CONFIGURED) return { ok: false, code: 'not_configured' };
     await whenReady();
     if (!client) return { ok: false, code: 'not_configured' };
-    var redirect = location.origin + location.pathname.replace(/[^/]*$/, '') + 'auth.html';
+    var redirect = location.origin + location.pathname.replace(/[^/]*$/, '') + 'auth';
     var res = await client.auth.resetPasswordForEmail(email, { redirectTo: redirect });
     return res.error ? { ok: false, message: res.error.message } : { ok: true };
   }

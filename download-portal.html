@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — הקבצים מוכנים להורדה</title>
+<link rel="canonical" href="https://kolkli.com/download-portal">
+<meta name="description" content="Recipient download portal: top nav, branded hero with a stat bar, copy-link + QR share row, colored file list / grid and a trust strip — KOLKLI style.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f6fa; --panel:#ffffff; --panel-2:#f6f7fb; --line:#e8ebf2; --line-2:#eef0f6; --sep:#e7eaf2;
+    --ink:#1e2333; --ink-2:#2b3140; --muted:#7581a4; --faint:#9aa2bd;
+    --success:#22a251; --success-soft:#e7f6ec; --success-line:#bfe6cb;
+    --info:#2f7de0; --info-soft:#e8f1fe; --info-line:#c3dbfb;
+    --danger:#e5484d; --danger-soft:#fdecec; --danger-line:#f6c9ca;
+    --violet:#7c56f0; --violet-soft:#efe9fe; --violet-line:#d8cbfa;
+    --amber:#e08a1e; --amber-soft:#fff2dc; --amber-line:#f6dcae;
+    --teal:#0e9bb0; --teal-soft:#e2f6fa; --teal-line:#bfe6ee;
+    --send:#f97316; --send-dim:#ea580c; --send-ink:#c2410c; --send-soft:#fff1e6; --send-line:#f9d3ac;
+    --send-grad:linear-gradient(105deg,#fb8b3c 0%,#f4700f 100%);
+    --send-glow:rgba(234,88,12,0.30);
+    --hero-1:#fdefe1; --hero-2:#fce4d1; --hero-3:#fbdbc0;
+    --shadow:0 1px 2px rgba(23,30,54,0.04), 0 8px 24px rgba(23,30,54,0.06);
+    --shadow-lg:0 2px 6px rgba(23,30,54,0.05), 0 20px 48px rgba(23,30,54,0.09);
+    --shadow-sm:0 1px 2px rgba(23,30,54,0.05);
+    --sans:'Heebo','Space Grotesk',system-ui,'Segoe UI',sans-serif;
+    --mono:'Space Grotesk',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  }
+  html[data-theme="dark"]{
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833; --sep:#2a303c;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --success:#37c26a; --success-soft:#132a1c; --success-line:#1f4630;
+    --info:#5b95f8; --info-soft:#182338; --info-line:#2b3d63;
+    --danger:#ff6b6b; --danger-soft:#2a1719; --danger-line:#5a2a2c;
+    --violet:#a689ff; --violet-soft:#241a3a; --violet-line:#3b2d5c;
+    --amber:#e8b84b; --amber-soft:#2c2718; --amber-line:#574a24;
+    --teal:#22c3d6; --teal-soft:#0f2a30; --teal-line:#1d4a52;
+    --send:#fb923c; --send-dim:#fdba74; --send-ink:#fdba74; --send-soft:#2c2012; --send-line:#573a1c;
+    --send-grad:linear-gradient(105deg,#fb923c 0%,#f97316 100%);
+    --send-glow:rgba(251,146,60,0.40);
+    --hero-1:#241a12; --hero-2:#2a1d12; --hero-3:#20160f;
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  a{color:inherit;text-decoration:none;}
+  button,select,input{font-family:inherit;}
+  svg{display:block;}
+
+  /* ================= TOP NAV ================= */
+  .nav{position:sticky;top:0;z-index:40;background:var(--panel);border-bottom:1px solid var(--line);}
+  .nav-in{max-width:1180px;margin:0 auto;height:66px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .brand{display:flex;align-items:center;gap:9px;}
+  .brand .wm{font-size:22px;font-weight:900;letter-spacing:-0.02em;color:var(--ink);}
+  .brand .kbox{width:32px;height:32px;border-radius:9px;background:var(--send-grad);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;box-shadow:0 5px 12px var(--send-glow);}
+  .nav-end{display:flex;align-items:center;gap:6px;}
+  .nav-item{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 12px;border-radius:10px;
+    background:transparent;border:none;color:var(--ink-2);font-size:13.5px;font-weight:600;cursor:pointer;
+    transition:background .12s,color .12s;}
+  .nav-item:hover{background:var(--panel-2);color:var(--ink);}
+  .nav-item svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;}
+  .nav-item .chev{width:13px;height:13px;stroke:var(--faint);}
+  .secure-chip{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 13px;border-radius:999px;
+    background:var(--send-soft);border:1px solid var(--send-line);color:var(--send-dim);font-size:12.5px;font-weight:800;white-space:nowrap;}
+  .secure-chip svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;}
+  .icobtn{width:38px;height:38px;border-radius:10px;border:none;background:transparent;color:var(--muted);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;}
+  .icobtn:hover{background:var(--panel-2);color:var(--ink);}
+  .icobtn svg{width:18px;height:18px;}
+  /* guest auth: log in + sign up so a recipient can open an account without leaving the download */
+  .nav-sep{width:1px;height:22px;background:var(--line);margin:0 4px;flex-shrink:0;}
+  .nav-login{display:inline-flex;align-items:center;height:38px;padding:0 14px;border-radius:10px;
+    background:transparent;border:1px solid var(--line);color:var(--ink-2);font-size:13.5px;font-weight:700;
+    white-space:nowrap;cursor:pointer;transition:border-color .12s,color .12s;}
+  .nav-login:hover{border-color:var(--send);color:var(--send-dim);}
+  .nav-signup{display:inline-flex;align-items:center;height:38px;padding:0 16px;border-radius:10px;color:#fff;
+    font-size:13.5px;font-weight:800;white-space:nowrap;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--send-grad);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 14px var(--send-glow);transition:filter .14s,transform .08s;}
+  .nav-signup:hover{filter:brightness(1.05);} .nav-signup:active{transform:translateY(1px);}
+
+  .page{max-width:1180px;margin:0 auto;padding:24px 24px 72px;display:flex;flex-direction:column;gap:20px;}
+
+  /* ================= HERO ================= */
+  .hero{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--send-line);box-shadow:var(--shadow);
+    background:linear-gradient(115deg,var(--hero-1) 0%,var(--hero-2) 55%,var(--hero-3) 100%);}
+  .hero::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.6;
+    background:
+      radial-gradient(40% 60% at 92% -10%,rgba(255,255,255,.55),transparent 60%),
+      radial-gradient(60% 90% at 30% 120%,rgba(249,115,22,.12),transparent 60%);}
+  html[data-theme="dark"] .hero::before{opacity:.35;background:radial-gradient(50% 80% at 30% 120%,rgba(249,115,22,.20),transparent 60%);}
+  .hero-in{position:relative;z-index:1;display:flex;align-items:center;gap:20px;padding:26px 30px;}
+
+  .hero-art{flex-shrink:0;width:210px;filter:drop-shadow(0 16px 26px rgba(196,88,20,.28));}
+  .hero-art svg{width:100%;height:auto;}
+
+  .hero-copy{flex:1;min-width:0;text-align:right;}
+  .tag{display:inline-flex;align-items:center;height:26px;padding:0 12px;border-radius:999px;
+    background:var(--send-soft);border:1px solid var(--send-line);color:var(--send-dim);font-size:12px;font-weight:800;margin-bottom:12px;}
+  .hero-title{display:flex;align-items:center;gap:13px;justify-content:flex-end;}
+  .hero-title h1{margin:0;font-size:clamp(24px,3.4vw,33px);font-weight:900;letter-spacing:-0.02em;color:var(--ink);}
+  .check{width:46px;height:46px;flex-shrink:0;border-radius:50%;background:var(--send-grad);color:#fff;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px var(--send-glow);}
+  .check svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.6;}
+  .hero-sub{margin:9px 0 20px;font-size:15px;color:var(--ink-2);opacity:.9;}
+
+  /* white stat bar inside hero */
+  .statbar{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);
+    display:grid;grid-template-columns:repeat(5,1fr);overflow:hidden;}
+  .stat{position:relative;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;}
+  .stat + .stat::before{content:'';position:absolute;inset-inline-start:0;inset-block:12px;width:1px;background:var(--sep);}
+  .stat .st-tx{min-width:0;}
+  .stat .st-k{font-size:11.5px;color:var(--muted);margin-bottom:3px;white-space:nowrap;}
+  .stat .st-v{font-size:14.5px;font-weight:800;color:var(--ink);letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .stat .st-v[dir="ltr"]{direction:ltr;text-align:right;}
+  .stat .st-ic{width:30px;height:30px;flex-shrink:0;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    background:var(--send-soft);color:var(--send-dim);}
+  .stat .st-ic svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+
+  /* ================= LINK SHARE ================= */
+  .linkrow{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
+    padding:18px 22px;display:flex;align-items:center;gap:20px;}
+  .copybtn{display:inline-flex;align-items:center;gap:9px;height:48px;padding:0 20px;border-radius:12px;border:none;cursor:pointer;
+    color:#fff;font-size:14px;font-weight:800;white-space:nowrap;flex-shrink:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--send-grad);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 8px 18px var(--send-glow);transition:filter .14s,transform .08s;}
+  .copybtn:hover{filter:brightness(1.05);} .copybtn:active{transform:translateY(1px);}
+  .copybtn svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2;}
+  .linkfield{flex:1;min-width:0;display:flex;align-items:center;gap:10px;height:48px;padding:0 15px;border-radius:12px;
+    background:var(--panel-2);border:1px solid var(--line);}
+  .linkfield svg{width:17px;height:17px;stroke:var(--faint);fill:none;stroke-width:2;flex-shrink:0;}
+  .linkfield input{flex:1;min-width:0;border:none;background:transparent;color:var(--ink-2);font-size:14px;font-family:var(--mono);
+    direction:ltr;text-align:left;}
+  .linkfield input:focus{outline:none;}
+  .qrwrap{display:flex;align-items:center;gap:13px;flex-shrink:0;}
+  .qrwrap .qr-tx{text-align:left;font-size:12.5px;color:var(--muted);line-height:1.4;max-width:15ch;}
+  .qrwrap .qr-tx b{display:block;color:var(--ink-2);font-weight:800;}
+  .qr{width:74px;height:74px;border-radius:12px;padding:7px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-sm);flex-shrink:0;}
+  .qr svg{width:100%;height:100%;}
+
+  /* ================= FILES ================= */
+  .files{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;}
+  .files-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 22px;border-bottom:1px solid var(--line-2);}
+  .viewtoggle{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:3px;gap:2px;}
+  .viewtoggle button{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border:none;border-radius:8px;
+    background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;transition:background .12s,color .12s;}
+  .viewtoggle button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+  .viewtoggle button.active{background:var(--send-grad);color:#fff;box-shadow:0 4px 10px var(--send-glow);}
+  .files-title{display:inline-flex;align-items:center;gap:9px;font-size:15px;font-weight:800;color:var(--ink);}
+  .files-title .fi{width:34px;height:34px;border-radius:10px;background:var(--send-soft);color:var(--send-dim);
+    display:flex;align-items:center;justify-content:center;}
+  .files-title .fi svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;}
+
+  /* list */
+  .lhead{display:grid;grid-template-columns:1fr 118px 110px 168px 150px;gap:12px;align-items:center;
+    padding:12px 22px;font-size:12px;color:var(--muted);font-weight:700;border-bottom:1px solid var(--line-2);}
+  .frow{display:grid;grid-template-columns:1fr 118px 110px 168px 150px;gap:12px;align-items:center;
+    padding:11px 22px;border-bottom:1px solid var(--line-2);transition:background .12s;}
+  .frow:last-child{border-bottom:none;}
+  .frow:hover{background:var(--panel-2);}
+  .frow.is-hidden{display:none;}
+  .fmain{display:flex;align-items:center;gap:13px;min-width:0;flex-direction:row-reverse;justify-content:flex-end;}
+  .thumb{width:40px;height:40px;flex-shrink:0;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;
+    background:var(--k-soft,var(--panel-2));color:var(--k-ink,var(--muted));position:relative;}
+  .thumb svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;}
+  .thumb .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.28);}
+  .thumb .play svg{width:15px;height:15px;fill:#fff;stroke:none;}
+  .fname{min-width:0;text-align:right;}
+  .fname .nm{font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    unicode-bidi:plaintext;}
+  .fname .mob{display:none;font-size:11.5px;color:var(--faint);font-family:var(--mono);margin-top:2px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:8px;font-size:11.5px;font-weight:800;
+    letter-spacing:.02em;background:var(--k-soft,var(--panel-2));color:var(--k-ink,var(--muted));border:1px solid var(--k-line,transparent);}
+  .badge svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;}
+  .fsize,.fdate{font-size:13px;color:var(--ink-2);font-family:var(--mono);}
+  .fdate{color:var(--muted);font-size:12.5px;}
+  .facts{display:flex;align-items:center;gap:9px;justify-content:flex-start;}
+  .dlbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:10px;cursor:pointer;
+    background:var(--send-soft);border:1px solid var(--send-line);color:var(--send-dim);font-size:13px;font-weight:800;
+    transition:background .12s,color .12s,border-color .12s;white-space:nowrap;}
+  .dlbtn:hover{background:var(--send-grad);color:#fff;border-color:transparent;box-shadow:0 5px 13px var(--send-glow);}
+  .dlbtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;}
+  .kebab{width:34px;height:34px;flex-shrink:0;border:none;border-radius:9px;background:transparent;color:var(--faint);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;}
+  .kebab:hover{background:var(--panel-2);color:var(--muted);}
+  .kebab svg{width:17px;height:17px;fill:currentColor;}
+
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:15px;padding:18px 22px;}
+  .gcard{border:1px solid var(--line-2);border-radius:15px;background:var(--panel);padding:15px 14px 14px;
+    display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;position:relative;
+    transition:border-color .14s,box-shadow .14s,transform .1s;}
+  .gcard:hover{border-color:var(--send-line);box-shadow:var(--shadow);transform:translateY(-2px);}
+  .gcard.is-hidden{display:none;}
+  .gthumb{width:100%;height:82px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:var(--k-soft,var(--panel-2));color:var(--k-ink,var(--muted));}
+  .gthumb svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:1.8;}
+  .gnm{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.35;unicode-bidi:plaintext;
+    display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;max-width:100%;}
+  .grow{display:flex;align-items:center;justify-content:center;gap:8px;}
+  .gsz{font-size:11px;color:var(--faint);font-family:var(--mono);}
+  .gdl{width:100%;margin-top:3px;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;border-radius:10px;
+    border:1px solid var(--send-line);background:var(--send-soft);color:var(--send-dim);font-size:12.5px;font-weight:800;cursor:pointer;
+    transition:background .12s,color .12s;}
+  .gdl:hover{background:var(--send-grad);color:#fff;border-color:transparent;}
+  .gdl svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;}
+
+  .k-img{--k-soft:var(--success-soft);--k-ink:var(--success);--k-line:var(--success-line);}
+  .k-vid{--k-soft:var(--violet-soft);--k-ink:var(--violet);--k-line:var(--violet-line);}
+  .k-pdf{--k-soft:var(--danger-soft);--k-ink:var(--danger);--k-line:var(--danger-line);}
+  .k-aud{--k-soft:var(--amber-soft);--k-ink:var(--amber);--k-line:var(--amber-line);}
+  .k-doc{--k-soft:var(--info-soft);--k-ink:var(--info);--k-line:var(--info-line);}
+  .k-xls{--k-soft:var(--teal-soft);--k-ink:var(--teal);--k-line:var(--teal-line);}
+  .k-zip{--k-soft:var(--panel-2);--k-ink:var(--muted);--k-line:var(--line);}
+  .k-txt{--k-soft:var(--panel-2);--k-ink:var(--muted);--k-line:var(--line);}
+
+  .morewrap{display:flex;justify-content:center;padding:14px 20px 20px;}
+  .morebtn{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 22px;border-radius:12px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);font-size:13.5px;font-weight:700;cursor:pointer;
+    box-shadow:var(--shadow-sm);transition:border-color .12s,color .12s;}
+  .morebtn:hover{border-color:var(--send);color:var(--send-dim);}
+  .morebtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .2s;}
+  .morebtn.open svg{transform:rotate(180deg);}
+
+  /* ================= TRUST STRIP ================= */
+  .trust{background:linear-gradient(180deg,var(--send-soft),transparent 140%);border:1px solid var(--send-line);
+    border-radius:18px;display:grid;grid-template-columns:repeat(4,1fr);overflow:hidden;}
+  .trust-i{display:flex;align-items:center;gap:13px;padding:20px 22px;position:relative;}
+  .trust-i + .trust-i::before{content:'';position:absolute;inset-inline-start:0;inset-block:16px;width:1px;background:var(--send-line);}
+  .trust-i .ti{width:44px;height:44px;flex-shrink:0;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:var(--panel);border:1px solid var(--send-line);color:var(--send-dim);box-shadow:var(--shadow-sm);}
+  .trust-i .ti svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;}
+  .trust-i .tt{min-width:0;}
+  .trust-i .tt .tk{font-size:14px;font-weight:800;color:var(--ink);line-height:1.2;}
+  .trust-i .tt .ts{font-size:12px;color:var(--muted);margin-top:3px;}
+
+  .foot{text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);margin-top:2px;}
+
+  /* toast */
+  .toast{position:fixed;inset-block-end:24px;inset-inline-start:50%;transform:translateX(-50%) translateY(20px);opacity:0;
+    pointer-events:none;background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 20px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;white-space:nowrap;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* responsive */
+  @media (max-width:900px){
+    .statbar{grid-template-columns:repeat(3,1fr);}
+    .stat:nth-child(4)::before,.stat:nth-child(1)::before{content:none;}
+    .stat:nth-child(n+4){border-top:1px solid var(--sep);}
+    .linkrow{flex-wrap:wrap;}
+    .qrwrap{order:3;width:100%;justify-content:flex-end;}
+  }
+  @media (max-width:760px){
+    .nav-item span,.secure-chip,.nav-sep{display:none;}
+    .hero-art{display:none;}
+    .hero-copy{text-align:right;}
+    .lhead{display:none;}
+    .frow{grid-template-columns:1fr auto;gap:10px;}
+    .frow .badge,.frow .fsize,.frow .fdate{display:none;}
+    .fname .mob{display:block;}
+    .trust{grid-template-columns:repeat(2,1fr);}
+    .trust-i:nth-child(3)::before,.trust-i:nth-child(1)::before{content:none;}
+    .trust-i:nth-child(n+3){border-top:1px solid var(--send-line);}
+  }
+  @media (max-width:520px){
+    .statbar{grid-template-columns:1fr 1fr;}
+    .stat + .stat::before{content:none;}
+    .stat{border-top:1px solid var(--sep);}
+    .stat:nth-child(-n+2){border-top:none;}
+    .stat:nth-child(odd){border-inline-start:1px solid var(--sep);}
+    .trust{grid-template-columns:1fr;}
+    .trust-i + .trust-i::before{content:none;}
+    .trust-i:nth-child(n+2){border-top:1px solid var(--send-line);}
+    .files-head{flex-direction:column-reverse;align-items:stretch;gap:12px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= TOP NAV ================= -->
+<nav class="nav">
+  <div class="nav-in">
+    <div class="brand">
+      <span class="wm">KOLKLI</span>
+      <span class="kbox">K</span>
+    </div>
+    <div class="nav-end">
+      <button class="nav-item" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span>עברית</span>
+        <svg class="chev" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <button class="nav-item" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        <span>עזרה</span>
+      </button>
+      <button class="icobtn" id="themeBtn" type="button" aria-label="מצב כהה / בהיר" title="מצב כהה / בהיר">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <span class="secure-chip">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.4-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.4 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1Z"/></svg>
+        שיתוף קבצים מאובטח
+      </span>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <a class="nav-login" href="./auth">התחברות</a>
+      <a class="nav-signup" href="./auth?mode=signup">הרשמה</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <div class="hero-in">
+
+      <!-- illustration -->
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 220 190" fill="none">
+          <ellipse cx="110" cy="172" rx="86" ry="12" fill="rgba(196,88,20,.14)"/>
+          <!-- papers/photos peeking -->
+          <g transform="rotate(-9 70 70)"><rect x="48" y="34" width="46" height="58" rx="6" fill="#fff" stroke="#ffe0c0"/><rect x="55" y="44" width="32" height="5" rx="2.5" fill="#ffd3a6"/><rect x="55" y="54" width="24" height="4" rx="2" fill="#ffe4c6"/></g>
+          <g transform="rotate(-2 110 62)"><rect x="86" y="26" width="46" height="60" rx="6" fill="#fff" stroke="#e6ecf6"/><circle cx="100" cy="44" r="6" fill="#bcd3f5"/><path d="M90 68l10-12 8 9 6-6 8 9v6H90z" fill="#cfe0f7"/></g>
+          <g transform="rotate(8 150 66)"><rect x="128" y="30" width="46" height="60" rx="6" fill="#fff" stroke="#ffe0c0"/><rect x="140" y="48" width="22" height="22" rx="4" fill="#ffb066"/><path d="M147 54v10l8-5-8-5z" fill="#fff"/></g>
+          <!-- folder -->
+          <path d="M32 84c0-6 5-11 11-11h36l11 13h74c6 0 11 5 11 11v56c0 6-5 11-11 11H43c-6 0-11-5-11-11V84Z" fill="#f59a3c"/>
+          <path d="M32 100c0-6 5-11 11-11h130c6 0 11 5 11 11l-9 58c-1 6-6 10-12 10H53c-6 0-11-4-12-10L32 100Z" fill="url(#pf)"/>
+          <!-- download cloud -->
+          <path d="M92 128a15 15 0 0 1 29-4 12 12 0 0 1 2 24H95a13 13 0 0 1-3-20Z" fill="#fff"/>
+          <path d="M107 118v20M99 130l8 9 8-9" stroke="#ee6f10" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="pf" x1="32" y1="90" x2="185" y2="165" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#ffca8a"/><stop offset="1" stop-color="#fb9a48"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <!-- copy -->
+      <div class="hero-copy">
+        <span class="tag">שליחת קבצים</span>
+        <div class="hero-title">
+          <h1>הקבצים שלך מוכנים להורדה!</h1>
+          <span class="check"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        </div>
+        <p class="hero-sub">כל הקבצים, התמונות, הסרטונים והמסמכים נשלחו אליך.</p>
+
+        <div class="statbar">
+          <div class="stat">
+            <div class="st-tx"><div class="st-k">תוקף הקישור</div><div class="st-v">7 ימים</div></div>
+            <div class="st-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+          </div>
+          <div class="stat">
+            <div class="st-tx"><div class="st-k">תאריך שליחה</div><div class="st-v" dir="ltr">19.05.2024 14:30</div></div>
+            <div class="st-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+          </div>
+          <div class="stat">
+            <div class="st-tx"><div class="st-k">גודל כולל</div><div class="st-v" dir="ltr">2.48 GB</div></div>
+            <div class="st-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="M3 8l9 5 9-5"/></svg></div>
+          </div>
+          <div class="stat">
+            <div class="st-tx"><div class="st-k">סה״כ קבצים</div><div class="st-v" id="heroCount">56 קבצים</div></div>
+            <div class="st-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6l2 3h8a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/></svg></div>
+          </div>
+          <div class="stat">
+            <div class="st-tx"><div class="st-k">סוג הקבצים</div><div class="st-v">תמונות, וידאו ועוד</div></div>
+            <div class="st-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= LINK SHARE ================= -->
+  <section class="linkrow">
+    <button class="copybtn" id="copyBtn">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      העתקת קישור
+    </button>
+    <div class="linkfield">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+      <input id="linkInput" type="text" readonly value="https://kolkli.com/download/8f3a7c2d8e6b4f1a" aria-label="קישור להורדה">
+    </div>
+    <div class="qrwrap">
+      <span class="qr-tx"><b>סרוק להורדה מהירה</b>בטלפון הנייד</span>
+      <div class="qr"><svg id="qr" viewBox="0 0 100 100" shape-rendering="crispEdges" aria-label="QR"></svg></div>
+    </div>
+  </section>
+
+  <!-- ================= FILES ================= -->
+  <section class="files">
+    <div class="files-head">
+      <div class="viewtoggle" role="tablist" aria-label="תצוגה">
+        <button id="viewList" class="active">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          תצוגת רשימה
+        </button>
+        <button id="viewGrid">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          תצוגת תמונות
+        </button>
+      </div>
+      <div class="files-title">
+        <span class="fi"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg></span>
+        <span>תכולת הקבצים (<span id="totalCount">56</span>)</span>
+      </div>
+    </div>
+
+    <!-- LIST -->
+    <div id="listView">
+      <div class="lhead">
+        <div>שם הקובץ</div>
+        <div>סוג</div>
+        <div>גודל</div>
+        <div>תאריך</div>
+        <div></div>
+      </div>
+      <div id="listBody"></div>
+    </div>
+
+    <!-- GRID -->
+    <div id="gridView" style="display:none">
+      <div class="grid" id="gridBody"></div>
+    </div>
+
+    <div class="morewrap" id="moreWrap">
+      <button class="morebtn" id="moreBtn">
+        <span id="moreLbl">הצג עוד קבצים</span>
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= TRUST STRIP ================= -->
+  <section class="trust">
+    <div class="trust-i">
+      <span class="ti"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+      <span class="tt"><span class="tk">תוקף קישור</span><span class="ts">הקישור תקף למשך 7 ימים בלבד</span></span>
+    </div>
+    <div class="trust-i">
+      <span class="ti"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="14" height="10" rx="2"/><path d="M2 17h14M17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/></svg></span>
+      <span class="tt"><span class="tk">זמין בכל מקום</span><span class="ts">נגיש מכל מכשיר ובכל זמן</span></span>
+    </div>
+    <div class="trust-i">
+      <span class="ti"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.4-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.4 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+      <span class="tt"><span class="tk">מאובטח</span><span class="ts">הקבצים מוגנים ומועברים בצורה מאובטחת</span></span>
+    </div>
+    <div class="trust-i">
+      <span class="ti"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg></span>
+      <span class="tt"><span class="tk">ללא הרשמה</span><span class="ts">הורדה מהירה ללא צורך בהרשמה</span></span>
+    </div>
+  </section>
+
+  <div class="foot">הורדת קבצים · הדגמה מקומית · KOLKLI</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  /* theme */
+  const root = document.documentElement;
+  try{ if(localStorage.getItem('kolkli-theme')==='dark') root.setAttribute('data-theme','dark'); }catch(_){}
+  $('themeBtn').addEventListener('click',()=>{
+    const dark = root.getAttribute('data-theme')==='dark';
+    if(dark) root.removeAttribute('data-theme'); else root.setAttribute('data-theme','dark');
+    try{ localStorage.setItem('kolkli-theme', dark?'light':'dark'); }catch(_){}
+  });
+
+  /* toast */
+  let toastT; const toastEl=$('toast');
+  function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show');
+    clearTimeout(toastT); toastT=setTimeout(()=>toastEl.classList.remove('show'),1900); }
+
+  /* ---- QR (decorative, deterministic) ---- */
+  (function drawQR(){
+    const N=25, cell=100/N; let r='';
+    const on=(x,y)=>{ r+=`<rect x="${(x*cell).toFixed(2)}" y="${(y*cell).toFixed(2)}" width="${cell.toFixed(2)}" height="${cell.toFixed(2)}" fill="#1e2333"/>`; };
+    const finder=(ox,oy)=>{ for(let y=0;y<7;y++)for(let x=0;x<7;x++){ const edge=(x===0||x===6||y===0||y===6); const core=(x>=2&&x<=4&&y>=2&&y<=4); if(edge||core) on(ox+x,oy+y); } };
+    const inFinder=(x,y)=>((x<8&&y<8)||(x>N-9&&y<8)||(x<8&&y>N-9));
+    for(let y=0;y<N;y++)for(let x=0;x<N;x++){ if(inFinder(x,y))continue; if(((x*7+y*13+x*y*5)%9)<3) on(x,y); }
+    finder(0,0); finder(N-7,0); finder(0,N-7);
+    document.getElementById('qr').innerHTML=r;
+  })();
+
+  /* ---- data ---- */
+  const FILES = [
+    {name:'DSC_4587.jpg',            type:'JPG',  kind:'img', size:'5.7 MB',  date:'19.05.2024 14:30'},
+    {name:'סרטון-אירוע-תקציר.mp4',   type:'MP4',  kind:'vid', size:'12.4 MB', date:'19.05.2024 14:28'},
+    {name:'תוכנית-אירוע.pdf',        type:'PDF',  kind:'pdf', size:'2.1 MB',  date:'19.05.2024 14:27'},
+    {name:'הקלטה-רגע.mp3',           type:'MP3',  kind:'aud', size:'845 KB',  date:'19.05.2024 14:26'},
+    {name:'רשימת-משתתפים.docx',      type:'DOCX', kind:'doc', size:'1.2 MB',  date:'19.05.2024 14:24'},
+    {name:'DSC_4588.jpg',            type:'JPG',  kind:'img', size:'6.1 MB',  date:'19.05.2024 14:22'},
+    {name:'לוגו-מותג-סופי.png',       type:'PNG',  kind:'img', size:'1.8 MB',  date:'19.05.2024 14:20'},
+    {name:'גיליון-תקציב.xlsx',        type:'XLSX', kind:'xls', size:'560 KB',  date:'19.05.2024 14:18'},
+    {name:'ראיון-מלא.mp4',           type:'MP4',  kind:'vid', size:'88.5 MB', date:'19.05.2024 14:15'},
+    {name:'סיכום-פגישה.pdf',         type:'PDF',  kind:'pdf', size:'640 KB',  date:'19.05.2024 14:12'},
+    {name:'נכסי-מותג.zip',           type:'ZIP',  kind:'zip', size:'124 MB',  date:'19.05.2024 14:08'},
+    {name:'הערות.txt',               type:'TXT',  kind:'txt', size:'9 KB',    date:'19.05.2024 14:05'},
+  ];
+  const INITIAL = 5;
+  let expanded = false;
+
+  const ICON = {
+    img:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>',
+    vid:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="16" rx="2"/><path d="m22 8-6 4 6 4V8Z"/></svg>',
+    pdf:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M8 15h1.5a1.5 1.5 0 0 0 0-3H8v5"/></svg>',
+    aud:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    doc:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M8 13h8M8 17h8M8 9h2"/></svg>',
+    xls:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="m8 12 4 6M12 12l-4 6"/></svg>',
+    zip:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M11 6h1M11 9h1M11 12h1M11 15h1"/></svg>',
+    txt:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M8 13h8M8 17h6M8 9h3"/></svg>',
+  };
+  const PLAY = '<span class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>';
+  const DL = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>';
+  const KEBAB = '<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>';
+  const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function render(){
+    const cut = expanded ? FILES.length : INITIAL;
+    $('listBody').innerHTML = FILES.map((f,i)=>`
+      <div class="frow ${i>=cut?'is-hidden':''}">
+        <div class="fmain">
+          <span class="thumb ${'k-'+f.kind}">${ICON[f.kind]}${f.kind==='vid'?PLAY:''}</span>
+          <span class="fname"><span class="nm" title="${esc(f.name)}">${esc(f.name)}</span><span class="mob">${f.type} · ${f.size} · ${f.date}</span></span>
+        </div>
+        <div><span class="badge ${'k-'+f.kind}">${f.type}</span></div>
+        <div class="fsize">${f.size}</div>
+        <div class="fdate">${f.date}</div>
+        <div class="facts">
+          <button class="dlbtn" data-dl="${i}">${DL}הורדה</button>
+          <button class="kebab" data-more="${i}" aria-label="עוד">${KEBAB}</button>
+        </div>
+      </div>`).join('');
+
+    $('gridBody').innerHTML = FILES.map((f,i)=>`
+      <div class="gcard ${i>=cut?'is-hidden':''}">
+        <span class="gthumb ${'k-'+f.kind}">${ICON[f.kind]}</span>
+        <span class="gnm" title="${esc(f.name)}">${esc(f.name)}</span>
+        <div class="grow"><span class="badge ${'k-'+f.kind}">${f.type}</span><span class="gsz">${f.size}</span></div>
+        <button class="gdl" data-dl="${i}">${DL}הורדה</button>
+      </div>`).join('');
+
+    $('moreBtn').classList.toggle('open', expanded);
+    $('moreLbl').textContent = expanded ? 'הצג פחות' : `הצג עוד קבצים (${FILES.length-INITIAL})`;
+    $('moreWrap').style.display = FILES.length>INITIAL ? '' : 'none';
+  }
+
+  function setView(v){
+    const list = v==='list';
+    $('viewList').classList.toggle('active', list);
+    $('viewGrid').classList.toggle('active', !list);
+    $('listView').style.display = list ? '' : 'none';
+    $('gridView').style.display = list ? 'none' : '';
+  }
+  $('viewList').addEventListener('click',()=>setView('list'));
+  $('viewGrid').addEventListener('click',()=>setView('grid'));
+  $('moreBtn').addEventListener('click',()=>{ expanded=!expanded; render(); });
+
+  document.addEventListener('click',e=>{
+    const dl=e.target.closest('[data-dl]'); if(dl){ toast('מוריד: '+FILES[+dl.getAttribute('data-dl')].name); return; }
+    if(e.target.closest('[data-more]')) toast('עוד פעולות');
+  });
+
+  async function copy(text){
+    try{ await navigator.clipboard.writeText(text); return true; }
+    catch(_){ try{ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); return true; }catch(e){ return false; } }
+  }
+  $('copyBtn').addEventListener('click',async()=>{ if(await copy($('linkInput').value)) toast('הקישור הועתק ✓'); });
+  $('linkInput').addEventListener('focus',e=>e.target.select());
+
+  /* counts */
+  $('totalCount').textContent = FILES.length;
+  $('heroCount').textContent = FILES.length + ' קבצים';
+  render();
+})();
+</script>
+</body>
+</html>

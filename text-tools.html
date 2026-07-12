@@ -4,7 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — כלי טקסט</title>
+<link rel="canonical" href="https://kolkli.com/text-tools">
 <meta name="description" content="Free text tools — reverse, sort, dedupe, clean whitespace, split & join, change case, extract emails/links, count words, make hashtags, slugify, URL encode/decode, format JSON and clean CSV. Fast, simple and professional-quality.">
+<script>
+  /* Embedded inside the dashboard (iframe / ?embed=1)? Strip the standalone chrome
+     — header, dashboard rail, page hero and footer — so only the tool workspace shows.
+     Set before first paint to avoid a flash of the full page. */
+  try{ if(new URLSearchParams(location.search).has('embed') || window.self!==window.top){ document.documentElement.classList.add('tt-embed'); } }catch(e){}
+</script>
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -69,22 +76,20 @@
   .tt-grid{display:flex;flex-direction:column;gap:18px;}
 
   /* tool picker — full-width panel below the workspace */
-  .tt-side{padding:16px 18px;display:flex;flex-direction:column;gap:14px;}
-  .tt-grp-block{display:flex;flex-direction:column;gap:8px;}
+  .tt-side{padding:16px 18px;display:flex;flex-direction:column;gap:14px;align-items:center;}
+  .tt-grp-block{display:flex;flex-direction:column;gap:8px;align-items:center;width:100%;}
   .tt-grp{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);
-    padding:0 2px;}
-  .tt-nav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;}
-  .tt-nav{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-radius:11px;
-    background:none;cursor:pointer;text-align:start;color:var(--ink-2);font-family:var(--sans);font-size:13.5px;
-    font-weight:600;transition:background .12s,color .12s;}
-  .tt-nav:hover{background:var(--panel-2);color:var(--ink);}
-  .tt-nav.on{background:var(--accent-soft);color:var(--accent-dim);}
-  .tt-nav .nvi{width:30px;height:30px;flex-shrink:0;border-radius:9px;display:flex;align-items:center;justify-content:center;
-    background:var(--panel-2);color:var(--muted);transition:background .12s,color .12s;}
-  .tt-nav:hover .nvi{color:var(--ink);}
-  .tt-nav.on .nvi{background:var(--panel);color:var(--accent);}
-  .tt-nav .nvi svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-  .tt-nav span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    padding:0 2px;text-align:center;}
+  /* tool picker chips — styled exactly like the "My Files" audio action pills (.toolrow a in dashboard.html) */
+  .tt-nav-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .tt-nav{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:1px solid var(--line);border-radius:999px;
+    background:var(--panel);box-shadow:var(--shadow-sm);cursor:pointer;text-align:start;color:var(--ink-2);
+    font-family:var(--sans);font-size:13.5px;font-weight:600;transition:border-color .12s,background .12s,color .12s;}
+  .tt-nav:hover{border-color:var(--accent);}
+  .tt-nav.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim);}
+  .tt-nav .nvi{display:inline-flex;align-items:center;justify-content:center;color:currentColor;}
+  .tt-nav .nvi svg{width:15px;height:15px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .tt-nav span{white-space:nowrap;}
 
   /* workspace */
   .tt-work{min-width:0;}
@@ -164,6 +169,17 @@
     background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
     box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ---------- embedded mode: running inside the dashboard via same-origin iframe ---------- */
+  html.tt-embed, html.tt-embed body{background:transparent;min-height:0;}
+  html.tt-embed #site-header,
+  html.tt-embed #dashRail,
+  html.tt-embed .pagehead,
+  html.tt-embed #foot{display:none !important;}
+  html.tt-embed .wrap{padding:0;margin:0;max-width:none;}
+  html.tt-embed .page-shell{display:block;gap:0;}
+  html.tt-embed .page-main{padding:0;min-width:0;}
+  html.tt-embed .tt-grid{margin-top:0;}
 </style>
 <link rel="stylesheet" href="./header.css">
 </head>
@@ -880,6 +896,16 @@
   applyTheme(ls('theme')||'light');
   const startId=location.hash.replace(/^#/,''); if(startId && TOOL_BY_ID[startId]) curId=startId;
   applyLang(detectLang());
+
+  /* ---------- embedded height sync ---------- */
+  // When running inside the dashboard iframe, report our content height to the parent
+  // so it can size the frame — the tool then scrolls with the dashboard, not inside a box.
+  if(document.documentElement.classList.contains('tt-embed')){
+    const postH=()=>{ try{ parent.postMessage({type:'kolkli-tt-height', height:Math.ceil(document.body.getBoundingClientRect().height)}, '*'); }catch(_){} };
+    if(window.ResizeObserver){ new ResizeObserver(postH).observe(document.body); }
+    window.addEventListener('load', postH);
+    postH(); setTimeout(postH,150); setTimeout(postH,500);
+  }
 })();
 </script>
 </body>

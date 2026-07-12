@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
 <title>KOLKLI — Admin</title>
+<link rel="canonical" href="https://kolkli.com/admin">
 <meta name="description" content="KOLKLI admin panel — manage users, plans and permissions.">
 <style>
   :root {
@@ -320,8 +321,8 @@
         '<h2>'+esc(t.denyTitle)+'</h2>'+
         '<p>'+esc(t.denyMsg)+'</p>'+
         '<div class="row">'+
-          '<a class="btn primary" href="./dashboard.html">'+esc(t.denyDash)+'</a>'+
-          '<a class="btn ghost" href="./auth.html">'+esc(t.denyLogin)+'</a>'+
+          '<a class="btn primary" href="./dashboard">'+esc(t.denyDash)+'</a>'+
+          '<a class="btn ghost" href="./auth">'+esc(t.denyLogin)+'</a>'+
         '</div>'+
       '</div>';
   }
@@ -341,7 +342,7 @@
           '<h1>'+esc(t.title)+'<span class="adm-tag">'+esc(t.tag)+'</span></h1>'+
           '<p>'+esc(t.sub)+'</p>'+
         '</div>'+
-        '<a class="ah-back" href="./dashboard.html">'+s(t.dir==='rtl'?ICON.arrow:ICON.arrowBack)+esc(t.back)+'</a>'+
+        '<a class="ah-back" href="./dashboard">'+s(t.dir==='rtl'?ICON.arrow:ICON.arrowBack)+esc(t.back)+'</a>'+
       '</div>'+
       '<div class="astats" id="astats"></div>'+
       '<div class="card">'+
@@ -454,7 +455,7 @@
     var isMe = email.toLowerCase()===sessionEmail();
     if(isMe && !confirm(t.selfDelConfirm)) return;
     saveUsers(loadUsers().filter(function(x){ return (x.email||'')!==email; }));
-    if(isMe){ lsDel(SESSION_KEY); location.href='./index.html'; return; }
+    if(isMe){ lsDel(SESSION_KEY); location.href='./'; return; }
     renderStats(); renderUsers();
   }
 

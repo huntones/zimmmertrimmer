@@ -4,12 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — Kolkli Request</title>
+<link rel="canonical" href="https://kolkli.com/request">
 <meta name="description" content="Create upload links and receive files directly from your clients into an organized folder.">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
     --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
-    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe; --accent-line:#d9c9ff;
     --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
     --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
     --danger:#e5484d; --danger-soft:#fdecec;
@@ -30,7 +31,7 @@
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
     --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
-    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a; --accent-line:#3b2d5c;
     --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
     --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
     --danger:#ff6b6b; --danger-soft:#2a1719;
@@ -51,10 +52,20 @@
   body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
     -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  /* decorative hero background (art at top, fades into the page) — mirrors index.html's .topbg */
+  .reqbg{position:absolute;top:0;left:0;right:0;height:calc(100vw*1024/1536);max-height:760px;
+    z-index:0;pointer-events:none;overflow:hidden;
+    background:url('./assets/request-bg.jpg') center top / 100% auto no-repeat;
+    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 50%,rgba(0,0,0,.55) 72%,transparent 92%);
+            mask-image:linear-gradient(180deg,#000 0%,#000 50%,rgba(0,0,0,.55) 72%,transparent 92%);}
+  body.received-screen .reqbg,html[data-theme="dark"] .reqbg{display:none;}
+  #site-header{position:relative;z-index:5;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{width:100%;max-width:none;margin:0 auto;padding:16px 0 18px;}
-  @media (max-width:840px){ .wrap{width:100%;max-width:none;padding:18px 14px 48px;} }
+  .wrap{width:100%;max-width:none;margin:0 auto;padding:16px 22px 18px;position:relative;z-index:1;}
+  @media (max-width:840px){ .wrap{padding:18px 14px 48px;} }
+  /* comfortable 70% spread once the screen is wide enough to keep the two-column form roomy */
+  @media (min-width:1200px){ .wrap{width:70%;padding-inline:0;} }
 
   /* page intro */
   .pagehead{text-align:center;margin:0 auto 12px;}
@@ -136,12 +147,12 @@
 
   @media (min-width:841px){
     .wrap{padding-top:8px;padding-bottom:8px;}
-    .pagehead{margin-bottom:12px;}
+    .pagehead{margin-bottom:8px;}
     .pagehead .kick{font-size:11.5px;padding:4px 10px;margin-bottom:8px;}
-    .pagehead h2{font-size:clamp(23px,2.5vw,30px);margin-bottom:4px;}
-    .pagehead p{font-size:14.5px;line-height:1.4;max-width:60ch;}
-    .tabs{margin-bottom:14px;}
-    .tab{height:38px;padding:0 15px;font-size:13.5px;}
+    .pagehead h2{font-size:clamp(21px,2.2vw,26px);margin-bottom:3px;}
+    .pagehead p{font-size:13.5px;line-height:1.35;max-width:58ch;}
+    .tabs{margin-bottom:10px;}
+    .tab{height:34px;padding:0 15px;font-size:13.5px;}
     .grid{grid-template-columns:minmax(0,1fr) minmax(260px,320px);gap:14px;}
     .form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px;padding:16px;}
     .form h3{grid-column:1/-1;margin:0;font-size:15.5px;}
@@ -184,13 +195,13 @@
   }
 
   @media (min-width:1100px) and (min-height:760px){
-    .wrap{padding-top:12px;padding-bottom:12px;}
-    .pagehead{margin-bottom:14px;}
-    .pagehead .kick{font-size:12px;padding:4px 11px;margin-bottom:9px;}
-    .pagehead h2{font-size:clamp(26px,2.7vw,34px);margin-bottom:6px;}
-    .pagehead p{font-size:15.5px;line-height:1.5;max-width:64ch;}
-    .tabs{margin-bottom:16px;}
-    .tab{height:40px;padding:0 17px;font-size:14.5px;}
+    .wrap{padding-top:8px;padding-bottom:8px;}
+    .pagehead{margin-bottom:9px;}
+    .pagehead .kick{font-size:12px;padding:4px 11px;margin-bottom:5px;}
+    .pagehead h2{font-size:clamp(21px,2vw,25px);margin-bottom:3px;}
+    .pagehead p{font-size:14px;line-height:1.35;max-width:62ch;}
+    .tabs{margin-bottom:10px;}
+    .tab{height:36px;padding:0 17px;font-size:14.5px;}
     .grid{grid-template-columns:minmax(0,1fr) minmax(310px,380px);gap:16px;}
     .form{gap:12px 16px;padding:20px;}
     .form h3{font-size:17px;}
@@ -272,6 +283,8 @@
   .minibtn:hover{border-color:var(--accent);color:var(--accent-dim);} .minibtn svg{width:14px;height:14px;}
   .minibtn.danger:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
   .minibtn.go{color:var(--accent-dim);border-color:var(--accent);background:var(--accent-soft);}
+  .minibtn.edit{color:var(--accent-dim);border-color:var(--accent-line);background:var(--accent-soft);}
+  .minibtn.edit:hover{border-color:var(--accent);}
 
   @media (max-width:1020px){
     .reqlist{grid-template-columns:repeat(2,minmax(0,1fr));}
@@ -390,9 +403,9 @@
   body.received-screen .rvsum .sum-l{display:grid;grid-template-columns:repeat(2,1fr);gap:3px 34px;border-inline-start:1px solid #eee9f7}.received-screen .sum-title{grid-column:1/-1}.received-screen .sum-row{font-size:12px;padding:3px 0}.received-screen .sum-row .k{min-width:86px}.received-screen .sum-badge{position:absolute;left:38px;top:253px}
   body.received-screen .rvpanel{padding:18px 24px 26px;border-radius:16px;border-color:#ebe7f5;box-shadow:0 7px 20px rgba(65,48,122,.08)}
   .received-screen .rvp-head{margin-bottom:10px}.received-screen .rvp-name{font-size:18px}.received-screen .rvp-id{font-size:9px}.received-screen .rvp-ico{width:42px;height:42px;background:#fff;border:1px solid #d9c9ff}
-  .received-screen .rvpanel .rvtools{direction:rtl}.received-screen .filterchips{order:2;margin-inline-start:auto}.received-screen .rvtools-r{order:1;margin-inline-start:0;direction:ltr}.received-screen .rvsearch{width:150px}.received-screen .sortsel{height:36px}.received-screen .fchip{background:#fff;padding:7px 16px}.received-screen .fchip.on{color:#6f35eb;background:#f3edff}
+  .received-screen .rvpanel .rvtools{direction:rtl}.received-screen .filterchips{order:1;margin-inline-start:0}.received-screen .rvtools-r{order:2;margin-inline-start:0;margin-inline-end:auto;direction:ltr}.received-screen .rvsearch{width:150px}.received-screen .sortsel{height:36px}.received-screen .fchip{background:#fff;padding:7px 16px}.received-screen .fchip.on{color:#6f35eb;background:#f3edff}
   .received-screen .fgrid-group{margin-top:12px}.received-screen .fg-head{border:0;margin:0 0 9px;justify-content:flex-start}.received-screen .fg-ava{display:none}.received-screen .fg-count{margin-inline-start:10px}.received-screen .fgrid{grid-template-columns:repeat(7,minmax(130px,1fr));gap:12px}.received-screen .gcard{border-radius:10px;border-color:#e7e2f0;box-shadow:0 4px 10px rgba(65,45,115,.06)}
-  .received-screen .gc-thumb{aspect-ratio:1.45;background:linear-gradient(145deg,#f6dcf2,#eee4ff)}.received-screen .gcard:nth-child(even) .gc-thumb{background:linear-gradient(145deg,#dcecff,#eee8ff)}.received-screen .gc-thumb .ph{width:54px;height:54px;background:rgba(255,255,255,.55);border-radius:50%;align-items:center;justify-content:center}.received-screen .gc-thumb .ph svg{width:27px;height:27px}.received-screen .gc-body{text-align:center}.received-screen .gc-nm{font-size:11px}.received-screen .gc-meta{justify-content:space-between}.received-screen .gc-act{top:7px;right:7px}
+  .received-screen .gc-thumb{aspect-ratio:1.45;background:linear-gradient(145deg,#f6dcf2,#eee4ff)}.received-screen .gcard:nth-child(even) .gc-thumb{background:linear-gradient(145deg,#dcecff,#eee8ff)}.received-screen .gc-thumb .ph{width:54px;height:54px;background:rgba(255,255,255,.55);border-radius:50%;align-items:center;justify-content:center}.received-screen .gc-thumb .ph svg{width:27px;height:27px}.received-screen .gc-body{text-align:center}.received-screen .gc-nm{font-size:11px}.received-screen .gc-meta{justify-content:space-between}.received-screen .gc-act{top:7px;left:7px;right:auto}
   @media(max-width:1000px){body.received-screen .request-received-hero{grid-template-columns:180px 1fr}.rrh-right{display:none}.received-screen .fgrid{grid-template-columns:repeat(3,1fr)}body.received-screen .rvsum .sum-l,body.received-screen .rvsum .sum-r{padding:20px}}
   @media(max-width:620px){body.received-screen .request-received-hero{grid-template-columns:1fr;height:auto;padding:30px 16px}.rrh-art{display:none}.rrh-copy h1{font-size:22px}.received-screen .fgrid{grid-template-columns:repeat(2,1fr)}body.received-screen .rvsum{grid-template-columns:1fr}.received-screen .rvtools-r{width:100%;flex-wrap:wrap}}
 
@@ -511,6 +524,107 @@
   .nores{text-align:center;padding:40px 20px;color:var(--muted);}
   .nores svg{width:30px;height:30px;color:var(--faint);margin-bottom:10px;}
   .nores p{margin:0;font-size:14px;}
+
+  /* ================= create-link : redesigned create view ================= */
+  .cl-grid{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:22px;align-items:start;}
+  @media (max-width:900px){ .cl-grid{grid-template-columns:1fr;} }
+  .cl-card{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);}
+  .cl-form{padding:16px 28px 18px;min-width:0;}
+  @media (max-width:560px){ .cl-form{padding:18px 18px 20px;} }
+
+  .cl-fhd{display:flex;align-items:center;gap:16px;}
+  .cl-fhd-txt{flex:1;min-width:0;}
+  .cl-fhd-txt h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink);}
+  .cl-fhd-txt p{margin:3px 0 0;font-size:13.5px;color:var(--muted);}
+  .cl-fhd-ico{width:46px;height:46px;flex-shrink:0;border-radius:14px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);}
+  .cl-fhd-ico svg{width:22px;height:22px;}
+  .cl-div{height:1px;background:var(--line-2);margin:11px -28px 13px;}
+  @media (max-width:560px){ .cl-div{margin:15px -18px 17px;} }
+
+  .cl-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 16px;}
+  @media (max-width:760px){ .cl-fields{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  @media (max-width:460px){ .cl-fields{grid-template-columns:1fr;} }
+  .cl-field{min-width:0;}
+  .cl-span2{grid-column:span 2;}
+  @media (max-width:760px){ .cl-span2{grid-column:1/-1;} }
+
+  .cl-lbl{display:block;font-size:13.5px;font-weight:700;color:var(--ink-2);margin-bottom:6px;}
+  .cl-req{color:var(--danger);}
+  .cl-sub{font-size:12px;color:var(--faint);margin-top:5px;}
+
+  .cl-inp{width:100%;height:42px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:12px;
+    font-family:var(--sans);font-size:14px;padding:0 14px;transition:border-color .12s,box-shadow .12s,background .12s;}
+  .cl-ta{height:auto;min-height:52px;padding:9px 14px;resize:vertical;line-height:1.5;}
+  .cl-inp::placeholder{color:var(--faint);}
+  .cl-inp:focus{outline:none;border-color:var(--accent);background:var(--panel);box-shadow:0 0 0 3px var(--accent-soft);}
+  .cl-newfolder{margin-top:8px;}
+
+  .cl-sel{position:relative;}
+  .cl-sel select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:14px;padding-left:40px;}
+  .cl-has-lead select{padding-right:40px;}
+  .cl-chev{position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--faint);display:flex;}
+  .cl-chev svg{width:16px;height:16px;}
+  .cl-lead{position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--accent);display:flex;}
+  .cl-lead svg{width:16px;height:16px;}
+
+  .cl-typewrap{position:relative;}
+  .cl-typebox{display:flex;align-items:center;gap:7px;min-height:42px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:12px;padding:7px 9px 7px 38px;flex-wrap:wrap;}
+  #createGrid .tchip{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;
+    background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 10px;user-select:none;white-space:nowrap;
+    transition:background .12s,border-color .12s,color .12s;}
+  #createGrid .tchip svg{width:14px;height:14px;flex-shrink:0;}
+  #createGrid .tchip:hover{border-color:var(--accent-line);color:var(--ink-2);}
+  #createGrid .tchip.on{background:var(--accent-soft);border-color:transparent;color:var(--accent-dim);}
+
+  .cl-pwrow{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:10px 0;}
+  .cl-chk{display:inline-flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;color:var(--ink-2);cursor:pointer;margin-right:auto;}
+  .cl-chk input{position:absolute;opacity:0;width:0;height:0;}
+  .cl-box{width:19px;height:19px;border-radius:6px;border:1.6px solid var(--line);background:var(--panel-2);display:grid;place-items:center;
+    color:#fff;transition:background .14s,border-color .14s;flex-shrink:0;}
+  .cl-box svg{width:12px;height:12px;opacity:0;transition:opacity .12s;}
+  .cl-chk input:checked + .cl-box{background:var(--accent);border-color:var(--accent);}
+  .cl-chk input:checked + .cl-box svg{opacity:1;}
+  .cl-info{display:inline-flex;color:var(--faint);}
+  .cl-info svg{width:15px;height:15px;}
+  .cl-pwinput{flex:0 0 100%;max-width:280px;margin-right:auto;margin-top:2px;}
+
+  .cl-notify{grid-column:span 1;display:flex;align-items:center;gap:12px;align-self:center;}
+  @media (max-width:760px){ .cl-notify{grid-column:1/-1;} }
+  .cl-nt{font-size:13.5px;font-weight:600;color:var(--ink-2);}
+  .cl-switch{position:relative;flex-shrink:0;width:44px;height:26px;cursor:pointer;}
+  .cl-switch input{position:absolute;opacity:0;width:0;height:0;}
+  .cl-track{position:absolute;inset:0;border-radius:999px;background:var(--line);transition:background .18s;}
+  .cl-knob{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.25);transition:transform .18s;}
+  .cl-switch input:checked + .cl-track{background:linear-gradient(180deg,#9575ff,#7546f3);}
+  .cl-switch input:checked ~ .cl-knob{transform:translateX(-18px);}
+
+  .cl-msgfield{grid-column:span 3;}
+  @media (max-width:760px){ .cl-msgfield{grid-column:1/-1;} }
+
+  .cl-submit{grid-column:1/-1;width:100%;height:48px;margin-top:2px;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    color:#fff;border:none;cursor:pointer;background:linear-gradient(180deg,#8a63ff 0%,#6a34f2 100%);border-radius:14px;font-family:var(--sans);
+    font-size:15px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 10px 24px rgba(108,52,242,.34);transition:filter .14s,transform .08s;}
+  .cl-submit:hover{filter:brightness(1.05);} .cl-submit:active{transform:translateY(1px);}
+  .cl-submit svg{width:19px;height:19px;}
+  .cl-err{grid-column:1/-1;font-size:12px;color:var(--danger);min-height:14px;text-align:center;margin-top:-2px;}
+
+  /* preview */
+  .cl-prev{padding:26px 22px 22px;position:sticky;top:16px;}
+  @media (max-width:900px){ .cl-prev{position:static;} }
+  .cl-pv-logo{width:120px;height:26px;margin:0 auto 22px;border-radius:8px;background:linear-gradient(90deg,var(--line-2),var(--line));opacity:.9;}
+  .cl-pv-ava{width:82px;height:82px;margin:0 auto 16px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);}
+  .cl-pv-ava svg{width:36px;height:36px;}
+  .cl-pv-name{text-align:center;font-size:18px;font-weight:800;color:var(--ink);word-break:break-word;}
+  .cl-pv-desc{text-align:center;font-size:13px;color:var(--muted);margin-top:6px;white-space:pre-wrap;word-break:break-word;}
+  .cl-pv-sub{text-align:center;font-size:13px;color:var(--muted);margin-top:6px;}
+  .cl-pv-drop{margin-top:18px;border:1.6px dashed var(--accent-line);border-radius:14px;padding:22px 14px;text-align:center;
+    background:linear-gradient(180deg,var(--accent-soft),transparent 130%);}
+  .cl-pv-pick{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--accent-dim);}
+  .cl-pv-pick svg{width:17px;height:17px;}
+  .cl-pv-hint{text-align:center;font-size:12px;color:var(--faint);margin-top:12px;}
+  .cl-pv-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px;}
 </style>
 <link rel="stylesheet" href="./header.css">
 <style>
@@ -520,6 +634,7 @@
 <body>
 <div id="site-header"></div>
 <script src="./header.js"></script>
+<div class="reqbg" aria-hidden="true"></div>
 <div class="wrap">
 
   <div class="pagehead">
@@ -542,37 +657,62 @@
 
   <!-- ============ CREATE ============ -->
   <div id="createView">
-    <div class="grid" id="createGrid">
-      <div class="col">
-        <div class="card form">
-          <h3 data-i18n="formTitle"></h3>
+    <div class="cl-grid" id="createGrid">
 
-          <div class="opt">
-            <div class="optlbl"><span data-i18n="fName"></span> <span class="req">*</span></div>
-            <input class="inp" id="fName" type="text" data-i18n-ph="fNamePh">
+      <!-- ===== form (right) ===== -->
+      <section class="cl-card cl-form">
+        <header class="cl-fhd">
+          <div class="cl-fhd-txt">
+            <h1 data-i18n="formTitle"></h1>
+            <p data-i18n="formSub"></p>
+          </div>
+          <div class="cl-fhd-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+          </div>
+        </header>
+
+        <div class="cl-div"></div>
+
+        <div class="cl-fields">
+
+          <!-- request name -->
+          <div class="cl-field cl-span2">
+            <label class="cl-lbl" for="fName"><span data-i18n="fName"></span> <span class="cl-req">*</span></label>
+            <input class="cl-inp" id="fName" type="text" data-i18n-ph="fNamePh">
           </div>
 
-          <div class="opt">
-            <div class="optlbl" data-i18n="fDesc"></div>
-            <textarea class="ta" id="fDesc" data-i18n-ph="fDescPh"></textarea>
+          <!-- instructions -->
+          <div class="cl-field cl-span2">
+            <label class="cl-lbl" for="fDesc" data-i18n="fDesc"></label>
+            <input class="cl-inp" id="fDesc" type="text" data-i18n-ph="fDescPh">
           </div>
 
-          <div class="opt">
-            <div class="optlbl" data-i18n="fFolder"></div>
-            <select class="inp" id="fFolder"></select>
-            <input class="inp hidden" id="fNewFolder" type="text" data-i18n-ph="fNewFolderPh" style="margin-top:8px">
+          <!-- target folder -->
+          <div class="cl-field cl-span2">
+            <label class="cl-lbl" for="fFolder" data-i18n="fFolder"></label>
+            <div class="cl-sel">
+              <span class="cl-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+              <select class="cl-inp" id="fFolder"></select>
+            </div>
+            <input class="cl-inp cl-newfolder hidden" id="fNewFolder" type="text" data-i18n-ph="fNewFolderPh">
           </div>
 
-          <div class="opt">
-            <div class="optlbl" data-i18n="fTypes"></div>
-            <div class="typechips" id="fTypes"></div>
-            <div class="hint" data-i18n="fTypesHint"></div>
+          <!-- allowed file types -->
+          <div class="cl-field cl-span2">
+            <label class="cl-lbl" data-i18n="fTypes"></label>
+            <div class="cl-typewrap">
+              <span class="cl-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+              <div class="cl-typebox" id="fTypes"></div>
+            </div>
+            <div class="cl-sub" data-i18n="fTypesHint"></div>
           </div>
 
-          <div class="two">
-            <div class="opt">
-              <div class="optlbl" data-i18n="fMaxFile"></div>
-              <select class="inp" id="fMaxFile">
+          <!-- max file size -->
+          <div class="cl-field">
+            <label class="cl-lbl" for="fMaxFile" data-i18n="fMaxFile"></label>
+            <div class="cl-sel">
+              <span class="cl-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+              <select class="cl-inp" id="fMaxFile">
                 <option value="0" data-i18n="noLimit"></option>
                 <option value="25">25 MB</option>
                 <option value="100">100 MB</option>
@@ -580,9 +720,14 @@
                 <option value="2000">2 GB</option>
               </select>
             </div>
-            <div class="opt">
-              <div class="optlbl" data-i18n="fMaxCount"></div>
-              <select class="inp" id="fMaxCount">
+          </div>
+
+          <!-- max count -->
+          <div class="cl-field">
+            <label class="cl-lbl" for="fMaxCount" data-i18n="fMaxCount"></label>
+            <div class="cl-sel">
+              <span class="cl-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+              <select class="cl-inp" id="fMaxCount">
                 <option value="0" data-i18n="noLimit"></option>
                 <option value="5" selected>5</option>
                 <option value="10">10</option>
@@ -592,10 +737,12 @@
             </div>
           </div>
 
-          <div class="two">
-            <div class="opt">
-              <div class="optlbl" data-i18n="fMaxTotal"></div>
-              <select class="inp" id="fMaxTotal">
+          <!-- max total -->
+          <div class="cl-field">
+            <label class="cl-lbl" for="fMaxTotal" data-i18n="fMaxTotal"></label>
+            <div class="cl-sel">
+              <span class="cl-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+              <select class="cl-inp" id="fMaxTotal">
                 <option value="0" data-i18n="noLimit"></option>
                 <option value="100">100 MB</option>
                 <option value="500">500 MB</option>
@@ -603,9 +750,15 @@
                 <option value="5000">5 GB</option>
               </select>
             </div>
-            <div class="opt">
-              <div class="optlbl" data-i18n="fExpiry"></div>
-              <select class="inp" id="fExpiry">
+          </div>
+
+          <!-- expiry -->
+          <div class="cl-field">
+            <label class="cl-lbl" for="fExpiry" data-i18n="fExpiry"></label>
+            <div class="cl-sel cl-has-lead">
+              <span class="cl-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+              <span class="cl-lead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+              <select class="cl-inp" id="fExpiry">
                 <option value="0" data-i18n="expNever"></option>
                 <option value="1" data-i18n="exp1"></option>
                 <option value="3" data-i18n="exp3"></option>
@@ -615,45 +768,57 @@
             </div>
           </div>
 
-          <div class="opt">
-            <label class="chkline"><input type="checkbox" id="fPwToggle"><span data-i18n="fPw"></span></label>
-            <input class="inp hidden" id="fPassword" type="text" dir="ltr" data-i18n-ph="fPwPh">
+          <!-- password -->
+          <div class="cl-pwrow">
+            <label class="cl-chk">
+              <input type="checkbox" id="fPwToggle">
+              <span class="cl-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+              <span data-i18n="fPw"></span>
+              <span class="cl-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+            </label>
+            <input class="cl-inp cl-pwinput hidden" id="fPassword" type="text" dir="ltr" data-i18n-ph="fPwPh">
           </div>
 
-          <div class="opt">
-            <div class="optlbl" data-i18n="fThanks"></div>
-            <textarea class="ta" id="fThanks" data-i18n-ph="fThanksPh"></textarea>
+          <!-- notify toggle -->
+          <div class="cl-notify">
+            <label class="cl-switch">
+              <input type="checkbox" id="fNotify" checked>
+              <span class="cl-track"></span>
+              <span class="cl-knob"></span>
+            </label>
+            <span class="cl-nt" data-i18n="fNotify"></span>
           </div>
 
-          <div class="opt">
-            <label class="chkline"><input type="checkbox" id="fNotify" checked><span data-i18n="fNotify"></span></label>
+          <!-- message to client -->
+          <div class="cl-field cl-msgfield">
+            <label class="cl-lbl" for="fThanks" data-i18n="fThanks"></label>
+            <textarea class="cl-inp cl-ta" id="fThanks" data-i18n-ph="fThanksPh"></textarea>
           </div>
 
-          <button class="primary" id="createBtn" type="button">
+          <!-- submit -->
+          <button class="cl-submit" id="createBtn" type="button">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
             <span data-i18n="createBtn"></span>
           </button>
-          <div class="opterr" id="createErr"></div>
-        </div>
-      </div>
+          <div class="cl-err" id="createErr"></div>
 
-      <!-- live preview of the client screen -->
-      <div class="col">
-        <div class="card side">
-          <div class="plabel" data-i18n="previewLabel"></div>
-          <div class="pvcard">
-            <div class="pv-top">
-              <div class="pv-ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
-              <div class="pv-name" id="pvName"></div>
-              <div class="pv-desc" id="pvDesc"></div>
-            </div>
-            <div class="pv-body">
-              <div class="pv-drop" data-i18n="previewDrop"></div>
-              <div class="pv-chips" id="pvChips"></div>
-            </div>
-          </div>
         </div>
-      </div>
+      </section>
+
+      <!-- ===== live client preview (left) ===== -->
+      <aside class="cl-card cl-prev">
+        <div class="cl-pv-logo"></div>
+        <div class="cl-pv-ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
+        <div class="cl-pv-name" id="pvName"></div>
+        <div class="cl-pv-desc" id="pvDesc"></div>
+        <div class="cl-pv-sub" data-i18n="previewDrop"></div>
+        <div class="cl-pv-drop">
+          <span class="cl-pv-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="previewPick"></span></span>
+        </div>
+        <div class="cl-pv-hint" id="pvMax"></div>
+        <div class="cl-pv-chips" id="pvChips"></div>
+      </aside>
+
     </div>
 
     <!-- share result -->
@@ -674,22 +839,18 @@
         </button>
       </div>
       <div class="row2">
+        <button id="editReqBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          <span data-i18n="aEdit"></span>
+        </button>
+        <button id="shareBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+          <span data-i18n="shareBtn"></span>
+        </button>
         <a id="openClientBtn" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
           <span data-i18n="openClient"></span>
         </a>
-        <button id="emailShareBtn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
-          <span data-i18n="shareEmail"></span>
-        </button>
-        <a id="waShareBtn" class="wa" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.8 14.01c-.24.68-1.42 1.31-1.96 1.35-.5.05-1.14.24-3.71-.79-3.12-1.26-5.1-4.44-5.26-4.65-.15-.21-1.25-1.66-1.25-3.17s.79-2.25 1.07-2.56c.28-.31.61-.38.81-.38.2 0 .41 0 .58.01.19.01.44-.07.69.53.24.6.83 2.06.9 2.21.07.15.12.32.02.53-.1.21-.15.32-.29.5-.15.18-.31.4-.44.53-.15.15-.3.32-.13.61.17.29.77 1.27 1.66 2.06 1.14 1.02 2.1 1.33 2.4 1.48.29.15.46.12.63-.07.17-.19.72-.84.91-1.13.19-.29.39-.24.65-.15.26.1 1.66.78 1.94.93.29.15.48.22.55.34.07.13.07.72-.17 1.4z"/></svg>
-          <span data-i18n="shareWa"></span>
-        </a>
-        <button id="toManageBtn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
-          <span data-i18n="toManage"></span>
-        </button>
       </div>
       <div class="seam">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
@@ -720,7 +881,7 @@
   <div id="receivedView" class="hidden">
     <section class="request-received-hero">
       <div class="rrh-art"><span class="rrh-float a">&#9835;</span><span class="rrh-float b">&#9654;</span><span class="rrh-float c">&#9638;</span><div class="rrh-folder"><svg viewBox="0 0 24 24"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div></div>
-      <div class="rrh-copy"><span class="rrh-kick">KOLKLI REQUEST</span><h1>קבלו קבצים ישירות מהלקוחות שלכם</h1><p>צרו קישור העלאה, שתפו עם הלקוחות, וכל הקבצים נכנסים אוטומטית לתיקייה מסודרת אצלכם. הלקוח לא צריך חשבון או התחברות.</p><div class="rrh-btns"><button class="rrh-btn">יצירת טופס העלאה &nbsp;＋</button><button class="rrh-btn primary">הזמנות שהתקבלו &nbsp; 2</button></div></div>
+      <div class="rrh-copy"><span class="rrh-kick">KOLKLI REQUEST</span><h1>קבלו קבצים ישירות מהלקוחות שלכם</h1><p>צרו קישור העלאה, שתפו עם הלקוחות, וכל הקבצים נכנסים אוטומטית לתיקייה מסודרת אצלכם. הלקוח לא צריך חשבון או התחברות.</p><div class="rrh-btns"><button class="rrh-btn">יצירת טופס העלאה &nbsp;＋</button><button class="rrh-btn primary">טפסי העלאה שיצרתי &nbsp; 2</button></div></div>
       <div class="rrh-art rrh-right"><div class="rrh-orbit">&#8682;</div></div>
     </section>
     <div class="rvhead">
@@ -789,6 +950,9 @@
 </div>
 
 <script src="./project-numbering.js"></script>
+<script src="./supabase-config.js"></script>
+<script src="./auth-store.js"></script>
+<script src="./kolkli-db.js"></script>
 <script src="./request-store.js"></script>
 <script src="./vendor/qrcode.min.js"></script>
 <script>
@@ -801,8 +965,9 @@
       kick:'Kolkli Request',
       pageTitle:'קבלו קבצים ישירות מהלקוחות שלכם',
       pageSub:'צרו קישור העלאה, שלחו ללקוח, וכל הקבצים נכנסים אוטומטית לתיקייה מסודרת אצלכם. הלקוח לא צריך חשבון או התחברות.',
-      tabCreate:'יצירת טופס העלאה', tabManage:'הזמנות שהתקבלו',
-      formTitle:'יצירת קישור לקבלת קבצים',
+      tabCreate:'יצירת טופס העלאה', tabManage:'טפסים שיצרת',
+      formTitle:'יצירת קישור לקבלת קבצים', formSub:'שלחו קבצים בקלות ותנהלו את ההעלאה',
+      editTitle:'עריכת בקשת קבצים', editSub:'עדכנו את פרטי הבקשה ושמרו את השינויים', saveEditBtn:'שמירת שינויים', editToast:'הבקשה עודכנה ✓',
       fName:'שם הבקשה', fNamePh:'לדוגמה: תמונות לאירוע',
       fDesc:'הנחיות ללקוח', fDescPh:'מה בדיוק להעלות? כמה מילים שיראה הלקוח…',
       fFolder:'תיקיית יעד', fNewFolderPh:'שם תיקייה חדשה', newFolderOpt:'＋ תיקייה חדשה…',
@@ -815,21 +980,21 @@
       fNotify:'הודיעו לי כשמתקבלים קבצים',
       createBtn:'צרו קישור העלאה',
       tImage:'תמונות', tVideo:'וידאו', tAudio:'אודיו', tDoc:'מסמכים',
-      previewLabel:'מה שהלקוח יראה', previewDrop:'גררו קבצים לכאן או בחרו מהמכשיר',
+      previewLabel:'מה שהלקוח יראה', previewDrop:'גררו קבצים לכאן או בחרו מהמכשיר', previewPick:'בחר קבצים', pvPerFile:s=>'עד '+s+' לקובץ אחד', pvAnySize:'כל גודל קובץ מותר',
       readyTitle:'הקישור מוכן!', readySub:'שלחו את הקישור ללקוח. כל קובץ שיעלה יופיע כאן אצלכם.',
       copy:'העתקה', copied:'הקישור הועתק ✓',
-      openClient:'תצוגת הלקוח', shareEmail:'שליחה במייל', shareWa:'וואטסאפ', toManage:'לניהול הבקשות',
+      openClient:'תצוגת הלקוח', shareEmail:'שליחה במייל', shareWa:'וואטסאפ', toManage:'לניהול הבקשות', shareBtn:'שיתוף',
       qrDl:'הורדת קוד QR',
       seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
       foot:'KOLKLI · Kolkli Request · הדגמה מקומית עד לחיבור השרת',
-      mgTitle:'הזמנות שהתקבלו', newReq:'בקשה חדשה',
+      mgTitle:'טפסים שיצרת', newReq:'בקשה חדשה',
       mgEmptyTitle:'עדיין אין בקשות', mgEmptyBody:'צרו בקשה ראשונה כדי לקבל קבצים מלקוחות בקישור אחד.',
       stActive:'פעיל', stExpired:'פג תוקף', stClosed:'נסגר',
       chipFolder:f=>`תיקייה: ${f}`, chipFiles:n=>`${n} קבצים`, chipSize:s=>s,
       chipCreated:d=>`נוצר ${d}`, chipExpires:d=>`פג ${d}`, chipExpired:'פג תוקף', chipNoExpiry:'ללא תפוגה',
       chipExpSoon:d=>`פג בעוד ${d}`,
       newN:n=> n===1?'חדש':`${n} חדשים`,
-      aFiles:n=>`קבצים (${n})`, aCopy:'העתקת קישור', aClose:'סגירה', aDup:'שכפול', aDel:'מחיקה',
+      aFiles:n=>`קבצים (${n})`, aEdit:'עריכה', aCopy:'העתקת קישור', aClose:'סגירה', aDup:'שכפול', aDel:'מחיקה',
       confTitleClose:'סגירת הבקשה', confClose:'לסגור את הבקשה? לא יתקבלו קבצים חדשים, אך הקבצים שכבר התקבלו יישמרו.',
       confTitleDel:'מחיקת הבקשה', confDel:'האם למחוק את הבקשה? כל הקבצים שהתקבלו יימחקו לצמיתות ולא ניתן יהיה לשחזר אותם.', confCancel:'ביטול',
       dupSuffix:' (עותק)', copiedShort:'הקישור הועתק ✓', closedToast:'הבקשה נסגרה', delToast:'הבקשה נמחקה',
@@ -855,8 +1020,9 @@
       kick:'Kolkli Request',
       pageTitle:'Receive files directly from your clients',
       pageSub:'Create an upload link, send it to your client, and every file lands automatically in an organized folder on your side. Your client needs no account and no login.',
-      tabCreate:'Create upload form', tabManage:'Orders received',
-      formTitle:'Create a file request',
+      tabCreate:'Create upload form', tabManage:'Forms you created',
+      formTitle:'Create a file request', formSub:'Send files easily and manage every upload',
+      editTitle:'Edit file request', editSub:'Update the request details and save your changes', saveEditBtn:'Save changes', editToast:'Request updated ✓',
       fName:'Request name', fNamePh:'e.g. Event photos',
       fDesc:'Instructions for the client', fDescPh:'What exactly should they upload? A few words shown to the client…',
       fFolder:'Target folder', fNewFolderPh:'New folder name', newFolderOpt:'＋ New folder…',
@@ -869,21 +1035,21 @@
       fNotify:'Notify me when files arrive',
       createBtn:'Create upload link',
       tImage:'Images', tVideo:'Video', tAudio:'Audio', tDoc:'Documents',
-      previewLabel:'What your client will see', previewDrop:'Drag files here or pick from your device',
+      previewLabel:'What your client will see', previewDrop:'Drag files here or pick from your device', previewPick:'Choose files', pvPerFile:s=>'Up to '+s+' per file', pvAnySize:'Any file size allowed',
       readyTitle:'Your link is ready!', readySub:'Send the link to your client. Every file they upload shows up here for you.',
       copy:'Copy', copied:'Link copied ✓',
-      openClient:'Client view', shareEmail:'Send by email', shareWa:'WhatsApp', toManage:'Manage requests',
+      openClient:'Client view', shareEmail:'Send by email', shareWa:'WhatsApp', toManage:'Manage requests', shareBtn:'Share',
       qrDl:'Download QR code',
       seam:'This is a local demo: requests and files are stored in this browser. Once the server is connected, the link works for any client on any device.',
       foot:'KOLKLI · Kolkli Request · Local demo until the server is connected',
-      mgTitle:'Orders received', newReq:'New request',
+      mgTitle:'Forms you created', newReq:'New request',
       mgEmptyTitle:'No requests yet', mgEmptyBody:'Create your first file request to receive files from clients with a single link.',
       stActive:'Active', stExpired:'Expired', stClosed:'Closed',
       chipFolder:f=>`Folder: ${f}`, chipFiles:n=>`${n} files`, chipSize:s=>s,
       chipCreated:d=>`Created ${d}`, chipExpires:d=>`Expires ${d}`, chipExpired:'Expired', chipNoExpiry:'No expiry',
       chipExpSoon:d=>`Expires in ${d}`,
       newN:n=> n===1?'new':`${n} new`,
-      aFiles:n=>`Files (${n})`, aCopy:'Copy link', aClose:'Close', aDup:'Duplicate', aDel:'Delete',
+      aFiles:n=>`Files (${n})`, aEdit:'Edit', aCopy:'Copy link', aClose:'Close', aDup:'Duplicate', aDel:'Delete',
       confTitleClose:'Close request', confClose:'Close this request? No new files will be accepted, but files already received are kept.',
       confTitleDel:'Delete request', confDel:'Delete this request? Every received file will be permanently removed and cannot be recovered.', confCancel:'Cancel',
       dupSuffix:' (copy)', copiedShort:'Link copied ✓', closedToast:'Request closed', delToast:'Request deleted',
@@ -909,8 +1075,9 @@
       kick:'Kolkli Request',
       pageTitle:'Получайте файлы напрямую от клиентов',
       pageSub:'Создайте ссылку для загрузки, отправьте её клиенту — и каждый файл автоматически попадает в упорядоченную папку у вас. Клиенту не нужен аккаунт и вход.',
-      tabCreate:'Создать форму загрузки', tabManage:'Полученные заказы',
-      formTitle:'Создать запрос файлов',
+      tabCreate:'Создать форму загрузки', tabManage:'Созданные вами формы',
+      formTitle:'Создать запрос файлов', formSub:'Отправляйте файлы легко и управляйте загрузкой',
+      editTitle:'Редактировать запрос файлов', editSub:'Обновите данные запроса и сохраните изменения', saveEditBtn:'Сохранить изменения', editToast:'Запрос обновлён ✓',
       fName:'Название запроса', fNamePh:'напр. Фото с мероприятия',
       fDesc:'Инструкции для клиента', fDescPh:'Что именно загрузить? Пара слов, которые увидит клиент…',
       fFolder:'Целевая папка', fNewFolderPh:'Имя новой папки', newFolderOpt:'＋ Новая папка…',
@@ -923,21 +1090,21 @@
       fNotify:'Уведомлять меня о поступлении файлов',
       createBtn:'Создать ссылку для загрузки',
       tImage:'Изображения', tVideo:'Видео', tAudio:'Аудио', tDoc:'Документы',
-      previewLabel:'Что увидит ваш клиент', previewDrop:'Перетащите файлы сюда или выберите на устройстве',
+      previewLabel:'Что увидит ваш клиент', previewDrop:'Перетащите файлы сюда или выберите на устройстве', previewPick:'Выбрать файлы', pvPerFile:s=>'До '+s+' на файл', pvAnySize:'Любой размер файла',
       readyTitle:'Ваша ссылка готова!', readySub:'Отправьте ссылку клиенту. Каждый загруженный файл появится здесь у вас.',
       copy:'Копировать', copied:'Ссылка скопирована ✓',
-      openClient:'Вид клиента', shareEmail:'Отправить по почте', shareWa:'WhatsApp', toManage:'К управлению запросами',
+      openClient:'Вид клиента', shareEmail:'Отправить по почте', shareWa:'WhatsApp', toManage:'К управлению запросами', shareBtn:'Поделиться',
       qrDl:'Скачать QR-код',
       seam:'Это локальная демонстрация: запросы и файлы хранятся в этом браузере. После подключения сервера ссылка работает для любого клиента на любом устройстве.',
       foot:'KOLKLI · Kolkli Request · Локальная демонстрация до подключения сервера',
-      mgTitle:'Полученные заказы', newReq:'Новый запрос',
+      mgTitle:'Созданные вами формы', newReq:'Новый запрос',
       mgEmptyTitle:'Запросов пока нет', mgEmptyBody:'Создайте первый запрос файлов, чтобы получать файлы от клиентов по одной ссылке.',
       stActive:'Активен', stExpired:'Истёк', stClosed:'Закрыт',
       chipFolder:f=>`Папка: ${f}`, chipFiles:n=>`${n} файлов`, chipSize:s=>s,
       chipCreated:d=>`Создан ${d}`, chipExpires:d=>`Истекает ${d}`, chipExpired:'Истёк', chipNoExpiry:'Без срока',
       chipExpSoon:d=>`Истекает через ${d}`,
       newN:n=> n===1?'новый':`${n} новых`,
-      aFiles:n=>`Файлы (${n})`, aCopy:'Копировать ссылку', aClose:'Закрыть', aDup:'Дублировать', aDel:'Удалить',
+      aFiles:n=>`Файлы (${n})`, aEdit:'Редактировать', aCopy:'Копировать ссылку', aClose:'Закрыть', aDup:'Дублировать', aDel:'Удалить',
       confTitleClose:'Закрыть запрос', confClose:'Закрыть этот запрос? Новые файлы приниматься не будут, но уже полученные файлы сохранятся.',
       confTitleDel:'Удалить запрос', confDel:'Удалить этот запрос? Все полученные файлы будут удалены безвозвратно и не подлежат восстановлению.', confCancel:'Отмена',
       dupSuffix:' (копия)', copiedShort:'Ссылка скопирована ✓', closedToast:'Запрос закрыт', delToast:'Запрос удалён',
@@ -967,6 +1134,7 @@
   let view='create';
   let createTypes = {};           // {image:true,...}
   let lastToken=null;             // request just created (for share panel)
+  let editToken=null;             // request being edited in the create form (null = new)
   let rvToken=null;               // request open in received view
   let rvSort='new', rvFilter='all', rvView='list', rvSearch='';
   let rvCollapsed=new Set(), rvNewIds=new Set(), gridUrls=[];
@@ -999,7 +1167,7 @@
     });
   }
   function ls(k){ return KR.ls(k); }
-  function uploadUrl(token){ return new URL('upload.html?req='+token, location.href).href; }
+  function uploadUrl(token){ return new URL('upload?req='+token, location.href).href; }
 
   function daysWord(n){ n=+n; return n===1? t.dayU : t.daysU(n); }
   function fmtDate(ms){
@@ -1065,6 +1233,8 @@
     const ex=+el('fExpiry').value; if(ex) chips.push(daysWord(ex));
     if(el('fPwToggle').checked) chips.push('🔒');
     el('pvChips').innerHTML = chips.map(c=>`<span class="chip">${KR.escapeHtml(c)}</span>`).join('');
+    const pvMaxEl=el('pvMax');
+    if(pvMaxEl){ const sz=mf?(mf>=1000?(mf/1000)+' GB':mf+' MB'):''; pvMaxEl.textContent = mf? (t.pvPerFile?t.pvPerFile(sz):sz) : (t.pvAnySize||''); }
   }
 
   async function createRequest(){
@@ -1072,13 +1242,48 @@
     const name=el('fName').value.trim();
     if(!name){ el('createErr').textContent=t.errName; return; }
     const pwOn=el('fPwToggle').checked, pwVal=el('fPassword').value;
-    if(pwOn && !pwVal){ el('createErr').textContent=t.errPw; return; }
+    // When editing a password-protected request the field starts empty (the hash
+    // can't be shown); leaving it blank keeps the existing password.
+    const keepExistingPw = editToken && pwOn && !pwVal && !!(KR.getRequest(editToken)||{}).password;
+    if(pwOn && !pwVal && !keepExistingPw){ el('createErr').textContent=t.errPw; return; }
 
     let folder=el('fFolder').value;
     if(folder==='__new'){ folder=el('fNewFolder').value.trim() || 'Inbox'; }
 
     const rawMaxCount=+el('fMaxCount').value;
     const effectiveMaxCount=rawMaxCount || 5;
+
+    // Editing an existing request: update in place, preserving its token, files,
+    // submissions, created date and project number. No new usage quota is consumed.
+    if(editToken){
+      const existing=KR.getRequest(editToken);
+      if(existing){
+        const days=+el('fExpiry').value;
+        KR.addFolder(folder);
+        existing.name=name;
+        existing.desc=el('fDesc').value.trim();
+        existing.folder=folder;
+        existing.types=TYPE_KEYS.filter(k=>createTypes[k]);
+        existing.maxFileMB=+el('fMaxFile').value;
+        existing.maxCount=effectiveMaxCount;
+        existing.maxTotalMB=+el('fMaxTotal').value;
+        existing.expiresAt = days? Date.now()+days*86400000 : 0;
+        existing.thankYou=el('fThanks').value.trim();
+        existing.notify=el('fNotify').checked;
+        if(pwOn){ if(pwVal) existing.password=await KR.hashPass(pwVal); }
+        else existing.password=null;
+        KR.upsertRequest(existing);
+        try{ KR.saveCreateDefaults(Object.assign(readCreateSettings(),{folder:existing.folder})); }catch(_){}
+        lastToken=existing.token;
+        editToken=null; syncCreateChrome();
+        toast(t.editToast);
+        showShare(existing);
+        updateCount();
+        return;
+      }
+      editToken=null; syncCreateChrome();   // stale token → fall through to creating anew
+    }
+
     let req;
     try{
       req = await withUsage('request-files', { files:effectiveMaxCount }, async()=>{
@@ -1109,6 +1314,8 @@
       throw err;
     }
     lastToken=req.token;
+    // remember the settings just used as the owner's defaults for the next form
+    try{ KR.saveCreateDefaults(Object.assign(readCreateSettings(),{folder:req.folder})); }catch(_){}
     showShare(req);
     updateCount();
   }
@@ -1117,7 +1324,6 @@
     const url=uploadUrl(req.token);
     el('shareLink').textContent=url;
     el('openClientBtn').href=url;
-    el('waShareBtn').href='https://wa.me/?text='+encodeURIComponent(t.waText(req.name,url));
     const chips=[];
     const num=projectNumberText(req);
     if(num) chips.push(`<span class="chip">${KR.escapeHtml(num)}</span>`);
@@ -1148,16 +1354,91 @@
   }
   function downloadQR(){ const png=el('qrBox')._png; if(!png) return; const a=document.createElement('a'); a.href=png; a.download='kolkli-request-qr.png'; document.body.appendChild(a); a.click(); a.remove(); }
 
-  function resetCreate(){
-    el('fName').value=''; el('fDesc').value=''; el('fThanks').value=''; el('fPassword').value='';
-    el('fPwToggle').checked=false; el('fPassword').classList.add('hidden');
-    el('fNotify').checked=true;
-    el('fMaxFile').value='0'; el('fMaxCount').value='5'; el('fMaxTotal').value='0'; el('fExpiry').value='7';
-    createTypes={}; renderTypeChips(); fillFolders();
+  // ---------- sticky create-form defaults ----------
+  // Snapshot just the *settings* (not name/instructions/password) so each new
+  // form opens with the owner's previous choices. Persisted via KR.*CreateDefaults.
+  function readCreateSettings(){
+    let folder=el('fFolder').value;
+    if(folder==='__new') folder=el('fNewFolder').value.trim();
+    return {
+      folder: (folder && folder!=='__new') ? folder : '',
+      types: TYPE_KEYS.filter(k=>createTypes[k]),
+      maxFile: el('fMaxFile').value,
+      maxCount: el('fMaxCount').value,
+      maxTotal: el('fMaxTotal').value,
+      expiry: el('fExpiry').value,
+      pwProtect: el('fPwToggle').checked,
+      notify: el('fNotify').checked,
+      thankYou: el('fThanks').value.trim()
+    };
+  }
+  function persistCreateSettings(){ try{ KR.saveCreateDefaults(readCreateSettings()); }catch(_){} }
+  function setSelectValue(id,val,fallback){
+    const sel=el(id); if(!sel) return;
+    const has = val!=null && Array.prototype.some.call(sel.options,o=>o.value===String(val));
+    sel.value = has ? String(val) : fallback;
+  }
+  // Fill the form's settings from the owner's saved defaults (or the factory
+  // fallbacks below, which match the original hardcoded defaults for a new user).
+  function applyCreateDefaults(d){
+    d = d || KR.loadCreateDefaults() || {};
+    fillFolders(d.folder || undefined);
+    setSelectValue('fMaxFile', d.maxFile, '0');
+    setSelectValue('fMaxCount', d.maxCount, '5');
+    setSelectValue('fMaxTotal', d.maxTotal, '0');
+    setSelectValue('fExpiry', d.expiry, '7');
+    createTypes={};
+    (Array.isArray(d.types)?d.types:[]).forEach(k=>{ if(TYPE_KEYS.indexOf(k)>=0) createTypes[k]=true; });
+    renderTypeChips();
+    el('fNotify').checked = (d.notify!==undefined) ? !!d.notify : true;
+    const pwOn=!!d.pwProtect;
+    el('fPwToggle').checked=pwOn;
+    el('fPassword').classList.toggle('hidden',!pwOn);
+    el('fThanks').value = d.thankYou || '';
     el('fNewFolder').classList.add('hidden'); el('fNewFolder').value='';
+  }
+
+  function resetCreate(){
+    editToken=null;
+    el('fName').value=''; el('fDesc').value=''; el('fPassword').value='';
+    applyCreateDefaults();
     el('createErr').textContent=''; lastToken=null;
     el('shareCard').classList.remove('show'); el('createGrid').classList.remove('hidden');
+    syncCreateChrome();
     renderPreview();
+  }
+
+  // Swap the create form's title/subtitle/submit label between "new request" and
+  // "edit request" wording based on editToken. Called after every applyStatic()
+  // (which repaints the default i18n text) so the edit chrome survives lang switches.
+  function syncCreateChrome(){
+    const editing=!!editToken;
+    const hd=document.querySelector('.cl-fhd-txt');
+    if(hd){ hd.querySelector('h1').textContent = editing ? t.editTitle : t.formTitle;
+            hd.querySelector('p').textContent  = editing ? t.editSub   : t.formSub; }
+    const btnLbl=el('createBtn').querySelector('[data-i18n="createBtn"]');
+    if(btnLbl) btnLbl.textContent = editing ? t.saveEditBtn : t.createBtn;
+  }
+
+  // Load an existing request into the create form for editing. Pre-fills every
+  // saved setting from the request itself (not the sticky defaults) and flips the
+  // form into edit mode; createRequest() then updates in place instead of creating.
+  function enterEditMode(token){
+    const req=KR.getRequest(token); if(!req){ resetCreate(); setView('create'); return; }
+    editToken=token;
+    const days = req.expiresAt ? Math.max(0, Math.round((req.expiresAt-(req.createdAt||req.expiresAt))/86400000)) : 0;
+    applyCreateDefaults({
+      folder:req.folder, maxFile:req.maxFileMB, maxCount:req.maxCount, maxTotal:req.maxTotalMB,
+      expiry:days, types:req.types, notify:req.notify, pwProtect:!!req.password, thankYou:req.thankYou
+    });
+    el('fName').value = req.name || '';
+    el('fDesc').value = req.desc || '';
+    el('fPassword').value = '';
+    el('createErr').textContent=''; lastToken=null;
+    el('shareCard').classList.remove('show'); el('createGrid').classList.remove('hidden');
+    syncCreateChrome();
+    renderPreview();
+    setView('create');
   }
 
   // ---------- manage ----------
@@ -1186,6 +1467,7 @@
 
     const actions=[];
     actions.push(`<button class="minibtn go" data-act="files">${folderSvg()} ${t.aFiles(req.files.length)}</button>`);
+    actions.push(`<button class="minibtn edit" data-act="edit">${editSvg()} ${t.aEdit}</button>`);
     actions.push(`<button class="minibtn" data-act="copy">${copySvg()} ${t.aCopy}</button>`);
     if(st==='active') actions.push(`<button class="minibtn" data-act="close">${t.aClose}</button>`);
     actions.push(`<button class="minibtn" data-act="dup">${t.aDup}</button>`);
@@ -1375,7 +1657,7 @@
   function fillThumbs(){
     el('subList').querySelectorAll('.gc-thumb[data-thumb]').forEach(node=>{
       const id=node.getAttribute('data-thumb'), kind=node.getAttribute('data-kind');
-      KR.getBlob(id).then(blob=>{
+      KR.loadFileBlob(rvToken, id).then(blob=>{
         if(!blob) return;
         const url=URL.createObjectURL(blob); gridUrls.push(url);
         if(kind==='image'){
@@ -1427,7 +1709,7 @@
   }
   async function downloadFile(id){
     const f=fileById(id); if(!f) return;
-    const blob=await KR.getBlob(id); if(!blob) return;
+    const blob=await KR.loadFileBlob(rvToken, id); if(!blob) return;
     const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=f.name;
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
   }
@@ -1443,12 +1725,12 @@
   }
   async function previewFile(id){
     const f=fileById(id); if(!f) return;
-    const blob=await KR.getBlob(id); if(!blob) return;
+    const blob=await KR.loadFileBlob(rvToken, id); if(!blob) return;
     const url=URL.createObjectURL(blob);
     el('pvTitle').textContent=f.name; const body=el('pvBody');
     if(f.kind==='image') body.innerHTML=`<img src="${url}" alt="">`;
     else if(f.kind==='video') body.innerHTML=`<video src="${url}" controls autoplay playsinline></video>`;
-    else if(f.kind==='audio') body.innerHTML=`<audio src="${url}" controls autoplay></audio>`;
+    else if(f.kind==='audio') body.innerHTML=`<audio src="${url}" controls controlsList="nodownload noplaybackrate" autoplay></audio>`;
     else body.innerHTML=`<iframe src="${url}"></iframe>`;
     el('pv').classList.add('show');
   }
@@ -1481,6 +1763,7 @@
     renderPreview();
     if(view==='manage') renderManage();
     if(view==='received') renderReceived(false);
+    syncCreateChrome();
     if(lastToken){ const r=KR.getRequest(lastToken); if(r) showShare(r); }
   }
   function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); const ic=el('themeIco'); if(ic) ic.textContent=dark?'☀️':'🌙'; KR.lsSet('theme',dark?'dark':'light'); }
@@ -1491,6 +1774,7 @@
   function folderSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'; }
   function lockSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'; }
   function copySvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'; }
+  function editSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>'; }
   function trashSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'; }
   function eyeSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>'; }
   function dlSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>'; }
@@ -1508,21 +1792,29 @@
   el('tabManage').addEventListener('click',()=>setView('manage'));
   el('newReqBtn').addEventListener('click',()=>{ resetCreate(); setView('create'); });
   el('emptyNewBtn').addEventListener('click',()=>{ resetCreate(); setView('create'); });
-  el('toManageBtn').addEventListener('click',()=>setView('manage'));
+  el('editReqBtn').addEventListener('click',()=>{ if(lastToken) enterEditMode(lastToken); });
   el('backBtn').addEventListener('click',()=>setView('manage'));
 
   ['fName','fDesc','fMaxFile','fMaxCount','fExpiry'].forEach(id=>el(id).addEventListener('input',renderPreview));
-  el('fPwToggle').addEventListener('change',e=>{ el('fPassword').classList.toggle('hidden',!e.target.checked); if(e.target.checked) el('fPassword').focus(); renderPreview(); });
-  el('fFolder').addEventListener('change',e=>{ el('fNewFolder').classList.toggle('hidden', e.target.value!=='__new'); if(e.target.value==='__new') el('fNewFolder').focus(); });
-  el('fTypes').addEventListener('click',e=>{ const c=e.target.closest('[data-type]'); if(!c) return; const k=c.getAttribute('data-type'); createTypes[k]=!createTypes[k]; c.classList.toggle('on',createTypes[k]); renderPreview(); });
+  // persist the settings as sticky per-owner defaults whenever one of them changes
+  ['fMaxFile','fMaxCount','fMaxTotal','fExpiry'].forEach(id=>el(id).addEventListener('change',persistCreateSettings));
+  el('fThanks').addEventListener('input',persistCreateSettings);
+  el('fNotify').addEventListener('change',persistCreateSettings);
+  el('fPwToggle').addEventListener('change',e=>{ el('fPassword').classList.toggle('hidden',!e.target.checked); if(e.target.checked) el('fPassword').focus(); renderPreview(); persistCreateSettings(); });
+  el('fFolder').addEventListener('change',e=>{ el('fNewFolder').classList.toggle('hidden', e.target.value!=='__new'); if(e.target.value==='__new') el('fNewFolder').focus(); else persistCreateSettings(); });
+  el('fTypes').addEventListener('click',e=>{ const c=e.target.closest('[data-type]'); if(!c) return; const k=c.getAttribute('data-type'); createTypes[k]=!createTypes[k]; c.classList.toggle('on',createTypes[k]); renderPreview(); persistCreateSettings(); });
   el('createBtn').addEventListener('click',createRequest);
 
   el('copyBtn').addEventListener('click',()=>{ if(lastToken) copyLink(lastToken); toast(t.copied); });
   el('qrDlBtn').addEventListener('click',downloadQR);
-  el('emailShareBtn').addEventListener('click',()=>{
+  el('shareBtn').addEventListener('click',async()=>{
     if(!lastToken) return; const req=KR.getRequest(lastToken); const url=uploadUrl(lastToken);
-    const href='mailto:?subject='+encodeURIComponent(t.emailSubject(req.name))+'&body='+encodeURIComponent(t.emailBody(req.name,url,req.desc));
-    const a=document.createElement('a'); a.href=href; a.style.display='none'; document.body.appendChild(a); a.click(); a.remove();
+    if(navigator.share){
+      try{ await navigator.share({title:req.name||t.readyTitle, text:t.waText(req.name,url)}); }
+      catch(_){ /* share sheet dismissed */ }
+    }else{
+      copyLink(lastToken); toast(t.copied);
+    }
   });
 
   el('reqList').addEventListener('click',e=>{
@@ -1531,6 +1823,7 @@
     if(!btn){ return; }
     const act=btn.getAttribute('data-act');
     if(act==='files') openReceived(token);
+    else if(act==='edit') enterEditMode(token);
     else if(act==='copy') copyLink(token);
     else if(act==='close') closeRequest(token);
     else if(act==='dup') duplicateRequest(token);
@@ -1573,12 +1866,25 @@
   // ---------- init ----------
   applyTheme(ls('theme')||'light');
   applyLang(KR.detectLang());
-  fillFolders(); renderTypeChips(); renderPreview(); updateCount();
+  applyCreateDefaults(); renderPreview(); updateCount();
   requestNotifyPerm();
   const initParams=new URLSearchParams(location.search);
   const initFilesToken=initParams.get('files');
-  if(initFilesToken && KR.getRequest(initFilesToken)) openReceived(initFilesToken);
-  else if(initParams.get('tab')==='manage') setView('manage');
+  const initEditToken=initParams.get('edit');
+  const routeInit=function(){
+    if(initEditToken) enterEditMode(initEditToken);
+    else if(initFilesToken && KR.getRequest(initFilesToken)) openReceived(initFilesToken);
+    else if(initParams.get('tab')==='manage') setView('manage');
+    else if(initParams.get('tab')==='create') setView('create');
+  };
+  // Cross-device: hydrate this owner's requests from the server into the local
+  // mirror first (instant no-op when Supabase is unconfigured), then route.
+  (KR.pullMine ? KR.pullMine() : Promise.resolve()).then(function(){
+    updateCount();
+    const tk=initEditToken||initFilesToken;
+    if(tk && !KR.getRequest(tk) && KR.pullToken){ KR.pullToken(tk).then(routeInit); }
+    else routeInit();
+  });
 })();
 </script>
 </body>

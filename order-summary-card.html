@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — כרטיס הזמנה</title>
+<meta name="description" content="Received-order header card: top action bar (received-files link · delivery status · menu) above the client identity beside the package stat row and order number.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e7eaf2; --sep:#dbe0ec;
+    --ink:#1c2030; --ink-2:#3a4568; --muted:#7581a4; --faint:#9aa2bd;
+    --avatar-grad:linear-gradient(135deg,#eef1ff,#e2e6ff); --avatar-ink:#5b53d6;
+    --order-ink:#2972e9;
+    --c-exp:#6540ff; --c-file:#3388f2; --c-size:#35bd58; --c-dl:#f27c00; --c-recv:#0891b2;
+    --shadow:0 12px 34px rgba(41,52,86,.09);
+    --sans:'Heebo','Space Grotesk',system-ui,'Segoe UI',sans-serif;
+    --mono:'Space Grotesk',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  }
+  html[data-theme="dark"]{
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --sep:#333b49;
+    --ink:#eef1f6; --ink-2:#c8cfdd; --muted:#8b93a4; --faint:#6b7280;
+    --avatar-grad:linear-gradient(135deg,#232a3f,#1e2333); --avatar-ink:#a6a0ff;
+    --order-ink:#6ea2ff;
+    --c-exp:#9a7bff; --c-file:#5b95f8; --c-size:#4fce74; --c-dl:#ff9f45; --c-recv:#22c3d6;
+    --shadow:0 14px 40px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;
+    display:flex;flex-direction:column;align-items:center;gap:26px;padding:56px 18px 72px;}
+  svg{display:block;}
+
+  /* theme toggle */
+  .themebtn{position:fixed;top:18px;inset-inline-start:18px;width:40px;height:40px;border-radius:12px;
+    border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;box-shadow:var(--shadow);z-index:9;}
+  .themebtn:hover{color:var(--ink);}
+  .themebtn svg{width:19px;height:19px;}
+
+  .intro{text-align:center;max-width:56ch;}
+  .intro .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--c-file);background:rgba(51,136,242,.12);
+    padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+  .intro h1{font-size:clamp(22px,3.4vw,30px);font-weight:800;letter-spacing:-0.02em;margin:0 0 8px;}
+  .intro p{font-size:14px;color:var(--muted);margin:0;}
+
+  /* ===================== ORDER CARD ===================== */
+  .card{width:100%;max-width:900px;background:var(--panel);border:1px solid var(--line);
+    border-radius:22px;box-shadow:var(--shadow);overflow:hidden;}
+
+  /* ---- top action bar (received-files · status · menu) ---- */
+  .card-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:16px 20px;border-bottom:1px solid var(--line);}
+  .bar-receive{display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border-radius:12px;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);
+    font-size:13.5px;font-weight:800;text-decoration:none;white-space:nowrap;cursor:pointer;
+    transition:border-color .15s ease,background .15s ease;}
+  .bar-receive:hover{border-color:var(--c-file);background:rgba(51,136,242,.06);}
+  .bar-receive .ic{width:17px;height:17px;color:var(--c-recv);}
+  .bar-receive svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:2;}
+  .bar-side{display:inline-flex;align-items:center;gap:8px;}
+  /* delivery status pill — mirrors the received-files status palette:
+     uploading = progress/amber · ready = wait/blue · done = done/green */
+  .bar-status{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;
+    background:var(--st-bg);color:var(--st-ink);font-size:12.5px;font-weight:850;white-space:nowrap;
+    --st-bg:#eaf3ff;--st-ink:#1769d1;--st-glow:rgba(23,105,209,.18);}
+  .bar-status::after{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;
+    box-shadow:0 0 0 3px var(--st-glow);}
+  .bar-status.st-uploading{--st-bg:#fff7e6;--st-ink:#c96a00;--st-glow:rgba(201,106,0,.18);}
+  .bar-status.st-uploading::after{animation:statuspulse 1.6s ease-in-out infinite;}
+  .bar-status.st-ready{--st-bg:#eaf3ff;--st-ink:#1769d1;--st-glow:rgba(23,105,209,.18);}
+  .bar-status.st-done{--st-bg:#eaf8f0;--st-ink:#16804a;--st-glow:rgba(22,128,74,.18);}
+  @keyframes statuspulse{0%,100%{box-shadow:0 0 0 3px var(--st-glow);}50%{box-shadow:0 0 0 6px transparent;}}
+  html[data-theme="dark"] .bar-status.st-uploading{--st-bg:rgba(201,106,0,.20);--st-ink:#ff9f45;--st-glow:rgba(255,159,69,.20);}
+  html[data-theme="dark"] .bar-status.st-ready{--st-bg:rgba(23,105,209,.18);--st-ink:#6ea2ff;--st-glow:rgba(110,162,255,.20);}
+  html[data-theme="dark"] .bar-status.st-done{--st-bg:rgba(22,128,74,.22);--st-ink:#37c26a;--st-glow:rgba(55,194,106,.20);}
+  .bar-menu{width:34px;height:34px;border-radius:10px;border:1px solid transparent;background:transparent;
+    color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;}
+  .bar-menu:hover{border-color:#e5484d;color:#e5484d;background:rgba(229,72,77,.06);}
+  .bar-menu svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;}
+
+  /* ---- body: person (right) beside stats (left) ---- */
+  .card-body{display:grid;grid-template-columns:minmax(230px,auto) 1fr;align-items:center;
+    gap:34px;padding:24px 26px;}
+
+  .person{display:flex;align-items:center;gap:14px;min-width:0;}
+  .avatar{width:64px;height:64px;flex:0 0 64px;border-radius:50%;display:grid;place-items:center;
+    overflow:hidden;background:var(--avatar-grad);color:var(--avatar-ink);font-size:22px;font-weight:900;}
+  .avatar img{width:100%;height:100%;object-fit:cover;}
+  .person-copy{min-width:0;text-align:right;}
+  .person-name{display:block;font-size:20px;font-weight:900;letter-spacing:-0.01em;line-height:1.2;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .crow{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;font-weight:600;
+    margin-top:5px;min-width:0;}
+  .crow svg{width:15px;height:15px;stroke:var(--faint);fill:none;stroke-width:1.9;flex-shrink:0;}
+  .crow .v{direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .crow.he .v{direction:rtl;}
+
+  /* stat row + order number */
+  .stats-wrap{min-width:0;display:flex;flex-direction:column;gap:14px;}
+  /* no outer frame — flat until pressed, then the whole box fills gray (mouse-down / :active) */
+  .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    border-radius:14px;background:var(--panel);overflow:hidden;transition:background .12s ease;}
+  .stats:active{background:var(--panel-2);}
+  .stat{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;gap:7px;padding:18px 8px;min-width:0;}
+  .stat + .stat::before{content:'';position:absolute;inset-inline-start:0;top:14px;bottom:14px;width:1px;background:var(--sep);}
+  .stat svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.85;flex-shrink:0;}
+  .stat:nth-child(1){color:var(--c-exp);}
+  .stat:nth-child(2){color:var(--c-file);}
+  .stat:nth-child(3){color:var(--c-size);}
+  .stat:nth-child(4){color:var(--c-dl);}
+  .stat-txt{min-width:0;width:100%;line-height:1.2;}
+  .stat b{display:block;color:var(--ink);font-size:17px;font-weight:900;line-height:1.1;}
+  .stat:nth-child(1) b{font-size:13px;}          /* expiry is text, keep on one line */
+  .stat b[dir="ltr"]{direction:ltr;}
+  .stat span{display:block;color:var(--muted);font-size:11px;font-weight:600;margin-top:4px;}
+  .order{font-size:13px;font-weight:800;color:var(--muted);text-align:center;}
+  .order b{color:var(--order-ink);font-weight:900;direction:ltr;unicode-bidi:isolate;display:inline-block;}
+
+  @media (max-width:680px){
+    .card-body{grid-template-columns:1fr;gap:22px;}
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .stat + .stat::before{display:none;}
+    .stat{border-top:1px solid var(--sep);}
+    .stat:nth-child(-n+2){border-top:none;}
+    .stat:nth-child(odd){border-inline-start:1px solid var(--sep);}
+  }
+  @media (max-width:440px){
+    .card-bar{flex-wrap:wrap;}
+  }
+</style>
+</head>
+<body>
+  <button class="themebtn" id="themeBtn" aria-label="החלפת ערכת נושא" title="מצב כהה / בהיר">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+
+  <div class="intro">
+    <span class="kick">Order card</span>
+    <h1>כרטיס הזמנה</h1>
+    <p>שורת פעולה למעלה, ומתחתיה פרטי הלקוח לצד נתוני החבילה ומספר ההזמנה.</p>
+  </div>
+
+  <article class="card">
+
+    <!-- action bar: received-files (right) · delivery status + menu (left) -->
+    <header class="card-bar">
+      <a class="bar-receive" href="request?tab=manage">
+        <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></span>
+        <span>קבצים שהתקבלו</span>
+      </a>
+      <div class="bar-side">
+        <span class="bar-status st-ready" data-status>מוכן להורדה</span>
+        <button class="bar-menu" type="button" aria-label="מחיקת הזמנה">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- body: client identity (right) beside package stats (left) -->
+    <div class="card-body">
+
+      <div class="person">
+        <span class="avatar" data-avatar>טז</span>
+        <div class="person-copy">
+          <strong class="person-name" data-name>טל זימר</strong>
+          <span class="crow"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg><span class="v" data-email>client@email.com</span></span>
+          <span class="crow"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span class="v" data-phone>050-1234567</span></span>
+          <span class="crow he"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="v" data-received>נוצר בתאריך: 10/7/2026</span></span>
+        </div>
+      </div>
+
+      <div class="stats-wrap">
+        <!-- DOM order = right→left in RTL: expiry (rightmost) → downloads (leftmost) -->
+        <div class="stats">
+          <div class="stat">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            <div class="stat-txt"><b data-expiry>עד 5 ימים</b><span>תפוגה</span></div>
+          </div>
+          <div class="stat">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <div class="stat-txt"><b data-files>0</b><span>קבצים</span></div>
+          </div>
+          <div class="stat">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/></svg>
+            <div class="stat-txt"><b dir="ltr" data-size>0 B</b><span>נפח כולל</span></div>
+          </div>
+          <div class="stat">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <div class="stat-txt"><b data-downloads>0</b><span>הורדות</span></div>
+          </div>
+        </div>
+        <div class="order">מספר הזמנה: <b data-order>#10002</b></div>
+      </div>
+
+    </div>
+  </article>
+
+  <script>
+    // theme toggle — mirrors the sibling KOLKLI component pages
+    (function(){
+      var root=document.documentElement, btn=document.getElementById('themeBtn');
+      try{ if(localStorage.getItem('kolkli-theme')==='dark') root.setAttribute('data-theme','dark'); }catch(e){}
+      btn.addEventListener('click',function(){
+        var dark=root.getAttribute('data-theme')==='dark';
+        if(dark){ root.removeAttribute('data-theme'); } else { root.setAttribute('data-theme','dark'); }
+        try{ localStorage.setItem('kolkli-theme',dark?'light':'dark'); }catch(e){}
+      });
+    })();
+
+    // Delivery status: reflects where the package is in the client→user flow.
+    // Colors mirror the received-files status palette (blue/amber/green).
+    var ORDER_STATUS={
+      uploading:{cls:'st-uploading', label:'העלאה מתבצעת'}, // client is uploading files
+      ready:    {cls:'st-ready',     label:'מוכן להורדה'},  // uploaded, not yet downloaded
+      done:     {cls:'st-done',      label:'הורדה הושלמה'}   // user downloaded successfully
+    };
+
+    // Fill the card from data. Call setOrderCard({...}) to update in place.
+    function setOrderCard(d){
+      d=d||{};
+      var q=function(sel){ return document.querySelector(sel); };
+      function initials(name){
+        var p=String(name||'').trim().split(/\s+/);
+        return ((p[0]||'').charAt(0)+(p[1]||'').charAt(0)).toUpperCase() || '?';
+      }
+      if('name'     in d){ q('[data-name]').textContent=d.name; q('[data-avatar]').textContent=initials(d.name); }
+      if('avatar'   in d && d.avatar){ q('[data-avatar]').innerHTML='<img src="'+d.avatar+'" alt="">'; }
+      if('email'    in d) q('[data-email]').textContent=d.email;
+      if('phone'    in d) q('[data-phone]').textContent=d.phone;
+      if('received' in d) q('[data-received]').textContent=d.received;
+      if('expiry'   in d) q('[data-expiry]').textContent=d.expiry;
+      if('files'    in d) q('[data-files]').textContent=d.files;
+      if('size'     in d) q('[data-size]').textContent=d.size;
+      if('downloads'in d) q('[data-downloads]').textContent=d.downloads;
+      if('order'    in d) q('[data-order]').textContent=String(d.order).replace(/^#?/,'#');
+      if('status'   in d){
+        var st=ORDER_STATUS[d.status]||ORDER_STATUS.ready, pill=q('[data-status]');
+        pill.className='bar-status '+st.cls;
+        pill.textContent=st.label;
+      }
+    }
+    // demo values (match the reference):
+    setOrderCard({ name:'טל זימר', email:'client@email.com', phone:'050-1234567',
+      received:'נוצר בתאריך: 10/7/2026', expiry:'עד 5 ימים', files:0, size:'0 B', downloads:0, order:'10002',
+      status:'ready' });  // 'uploading' | 'ready' | 'done'
+  </script>
+</body>
+</html>

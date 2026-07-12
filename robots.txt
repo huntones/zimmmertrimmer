@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Internal / session-specific pages are simply omitted from the sitemap
+# rather than blocked, so shared links keep working.
+
+Sitemap: https://kolkli.com/sitemap.xml

@@ -9,11 +9,14 @@
   'use strict';
   if (window.KolkliProjectNumbers) return;
 
+  // Every service shares the same 5-digit sequence base (10001) so that every
+  // allocated reference number renders as exactly five digits: RF-10001 /
+  // SF-10001 / RE-10001 / SE-10001. The prefix, not the range, marks the service.
   var SERVICES = {
-    select:  { start: 1001,   he: 'פרויקט לבחירה', en: 'Selection project', ru: 'Проект выбора' },
-    receive: { start: 10001,  he: 'פרויקט שהתקבל', en: 'Received project',  ru: 'Полученный проект' },
-    send:    { start: 100001, he: 'פרויקט שנשלח',  en: 'Sent project',      ru: 'Отправленный проект' },
-    review:  { start: 101,    he: 'פרויקט לאישור', en: 'Approval project',  ru: 'Проект на согласование' }
+    select:  { start: 10001, he: 'פרויקט לבחירה', en: 'Selection project', ru: 'Проект выбора' },
+    receive: { start: 10001, he: 'פרויקט שהתקבל', en: 'Received project',  ru: 'Полученный проект' },
+    send:    { start: 10001, he: 'פרויקט שנשלח',  en: 'Sent project',      ru: 'Отправленный проект' },
+    review:  { start: 10001, he: 'פרויקט לאישור', en: 'Approval project',  ru: 'Проект на согласование' }
   };
 
   var ALIASES = {
@@ -67,6 +70,15 @@
   function normalizeNumber(v) {
     var n = Number(v);
     return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+  }
+
+  // Reference numbers are always rendered with at least five digits so the
+  // public id keeps the RF-10001 / SE-10001 shape even for legacy low numbers.
+  function pad5(v) {
+    var n = normalizeNumber(v);
+    if (!n) return '';
+    var s = String(n);
+    return s.length >= 5 ? s : ('0000' + s).slice(-5);
   }
 
   function existingNumber(record) {
@@ -180,18 +192,19 @@
 
   function display(service, record, lang) {
     var n = existingNumber(record);
-    return n ? (label(service, lang) + ' · #' + n) : '';
+    return n ? (label(service, lang) + ' · #' + pad5(n)) : '';
   }
 
   function haystack(service, record) {
     var n = existingNumber(record);
-    return n ? [String(n), '#' + n, display(service, record, 'he'), display(service, record, 'en')] : [];
+    return n ? [String(n), pad5(n), '#' + n, '#' + pad5(n), display(service, record, 'he'), display(service, record, 'en')] : [];
   }
 
   window.KolkliProjectNumbers = {
     services: SERVICES,
     serviceOf: serviceOf,
     label: label,
+    pad5: pad5,
     assign: assign,
     ensure: ensure,
     ensureAll: ensureAll,

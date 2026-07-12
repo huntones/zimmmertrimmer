@@ -8,8 +8,8 @@
        which IS the full-page version). By the time a user can
        click, the modal is ready.
      - A single delegated click listener turns EVERY link to
-       auth.html into a popup: <a href="./auth.html"> opens the
-       "login" tab, <a href="./auth.html?mode=signup"> the "signup"
+       auth.html into a popup: <a href="./auth"> opens the
+       "login" tab, <a href="./auth?mode=signup"> the "signup"
        tab. If this script hasn't loaded yet, the link still works
        as a normal navigation to the full auth page — progressive
        enhancement, nothing breaks.
@@ -250,7 +250,7 @@
         '</form>' +
 
         '<div class="am-divider" id="amOr"></div>' +
-        '<a class="am-guest" href="./app.html">' +
+        '<a class="am-guest" href="./app">' +
           '<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>' +
           '<span id="amGuest"></span>' +
         '</a>' +
@@ -268,11 +268,11 @@
         '<h2 id="amSignedHi"></h2>' +
         '<div class="am-who" id="amSignedWho"></div>' +
         '<div class="am-actions">' +
-          '<a class="am-btn" id="amGoFiles" href="./dashboard.html" style="text-decoration:none">' +
+          '<a class="am-btn" id="amGoFiles" href="./dashboard" style="text-decoration:none">' +
             '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>' +
             '<span id="amGoFilesTx"></span>' +
           '</a>' +
-          '<a class="am-guest" id="amMyFiles" href="./files.html" style="text-decoration:none">' +
+          '<a class="am-guest" id="amMyFiles" href="./files" style="text-decoration:none">' +
             '<svg viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>' +
             '<span id="amMyFilesTx"></span>' +
           '</a>' +
@@ -596,7 +596,8 @@
     // ignore clicks that originate inside the modal itself
     if (overlay && overlay.contains(a)) return;
     var path = (a.pathname || '').toLowerCase();
-    if (path === 'auth.html' || path.slice(-9) === 'auth.html') {
+    var authSeg = path.replace(/\/+$/, '').split('/').pop();
+    if (authSeg === 'auth' || authSeg === 'auth.html') {
       e.preventDefault();
       open(modeFromHref(a));
     }

@@ -73,6 +73,7 @@
     (arr || []).forEach(function (r) { if (r && r.token) { r.ownerId = r.ownerId || owner; idx[r.token] = r.ownerId; } });
     writeRequests(owner, arr || []);
     saveIndex(idx);
+    if (KR.remotePush) (arr || []).forEach(function (r) { if (r && r.token) KR.remotePush(r); });
   };
   KR.getRequest = function (token) {
     var owner = ownerForToken(token);
@@ -82,7 +83,7 @@
     for (var j = 0; j < a.length; j++) if (a[j].token === token) return a[j];
     return null;
   };
-  KR.upsertRequest = function (req) {
+  KR.upsertRequestLocal = function (req) {
     var owner = req.ownerId || ownerForToken(req.token);
     req.ownerId = owner;
     var a = readRequests(owner), found = false;
@@ -90,6 +91,10 @@
     if (!found) a.push(req);
     writeRequests(owner, a);
     var idx = loadIndex(); idx[req.token] = owner; saveIndex(idx);
+  };
+  KR.upsertRequest = function (req) {
+    KR.upsertRequestLocal(req);
+    KR.remotePush(req);           // fire-and-forget mirror to Supabase (no-op when unconfigured)
   };
   KR.deleteRequest = function (token) {
     var req = KR.getRequest(token), owner = (req && req.ownerId) || ownerForToken(token), chain = Promise.resolve();
@@ -99,6 +104,8 @@
     return chain.then(function () {
       writeRequests(owner, readRequests(owner).filter(function (r) { return r.token !== token; }));
       var idx = loadIndex(); delete idx[token]; saveIndex(idx);
+      var d = (window.KolkliDB && KolkliDB.enabled()) ? KolkliDB : null;
+      if (d) { d.deleteProject('receive', token); if (req && req.files) req.files.forEach(function (f) { d.deleteBlob('receive', token, f.id); }); }
     });
   };
 
@@ -112,6 +119,23 @@
   KR.addFolder = function (name) {
     name = (name || '').trim(); if (!name) return;
     var a = KR.loadFolders(); if (a.indexOf(name) < 0) { a.push(name); KR.saveFolders(a); }
+  };
+
+  // ---------- sticky create-form defaults (per owner) ----------
+  // Remembers the settings the owner last used in request.html's "create link"
+  // form, so every new form opens pre-filled with their previous choices, until
+  // they change something again. Identity/content fields (name, instructions)
+  // and the password value are intentionally NOT stored here — only the reusable
+  // settings (folder, allowed types, size/count limits, expiry, password toggle,
+  // notify, thank-you message).
+  var PREFS_KEY = 'kr_create_prefs';
+  KR.loadCreateDefaults = function () {
+    try { var o = JSON.parse(KR.ls(scopedKey(PREFS_KEY)) || 'null'); if (o && typeof o === 'object') return o; }
+    catch (_) {}
+    return {};
+  };
+  KR.saveCreateDefaults = function (obj) {
+    KR.lsSet(scopedKey(PREFS_KEY), JSON.stringify(obj || {}));
   };
 
   // ---------- IndexedDB blob store ----------
@@ -245,6 +269,60 @@
     video: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>',
     audio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
     doc:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>'
+  };
+
+  // ---------- backend mirror (Supabase, optional; no-op when unconfigured) ----------
+  // Mirrors every request to a `projects` row (service 'receive') and its files
+  // to Storage, so received files survive across devices. Collapses to nothing
+  // when supabase-config.js is unconfigured — the local demo is unchanged.
+  KR.SERVICE = 'receive';
+  function db() { return (window.KolkliDB && KolkliDB.enabled()) ? KolkliDB : null; }
+
+  KR.remotePush = function (req) {
+    var d = db(); if (d && req && req.token) d.pushProject('receive', req.token, req, KR.statusOf(req));
+  };
+  // Owner: pull my requests from the server into the local mirror.
+  KR.pullMine = function () {
+    var d = db(); if (!d) return Promise.resolve(KR.loadRequests());
+    return d.pullService('receive').then(function (recs) {
+      (recs || []).forEach(function (r) { if (r && r.token) KR.upsertRequestLocal(r); });
+      return KR.loadRequests();
+    }).catch(function () { return KR.loadRequests(); });
+  };
+  // Any device / public upload link: pull ONE request by its token.
+  KR.pullToken = function (token) {
+    var d = db(); if (!d || !token) return Promise.resolve(KR.getRequest(token));
+    return d.pullToken('receive', token).then(function (rec) {
+      if (rec && rec.token) KR.upsertRequestLocal(rec);
+      return KR.getRequest(token);
+    }).catch(function () { return KR.getRequest(token); });
+  };
+  // Blob helpers that also mirror to / from Storage (token-scoped).
+  KR.saveFileBlob = function (token, id, blob) {
+    return KR.putBlob(id, blob).then(function () {
+      var d = db(); return (d && token) ? d.uploadBlob('receive', token, id, blob) : null;
+    });
+  };
+  KR.loadFileBlob = function (token, id) {
+    return KR.getBlob(id).then(function (b) {
+      if (b) return b;
+      var d = db(); if (!d || !token) return null;
+      return d.downloadBlob('receive', token, id).then(function (rb) { if (rb) KR.putBlob(id, rb); return rb || null; });
+    });
+  };
+  // Client (anonymous) upload: append a submission + its files, and mirror to the
+  // server through the token-gated RPC.
+  KR.clientAddSubmission = function (token, submission, files) {
+    var r = KR.getRequest(token);
+    if (r) { r.submissions = (r.submissions || []).concat([submission]); r.files = (r.files || []).concat(files || []); KR.upsertRequestLocal(r); }
+    var d = db(); return d ? d.addSubmission(token, submission, files || []) : Promise.resolve(null);
+  };
+  // Client on a fresh device: fetch just the public form fields of a request so
+  // the upload link renders (never other clients' submissions). null when the
+  // link is unknown or Supabase is unconfigured.
+  KR.pullPublicInfo = function (token) {
+    var d = db(); if (!d || !token) return Promise.resolve(null);
+    return d.requestInfo(token);
   };
 
   window.KR = KR;

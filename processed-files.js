@@ -19,20 +19,22 @@
   var MAX_FETCH_BYTES = 300 * 1024 * 1024;
   var savingUrls = Object.create(null);
 
+  // Keyed by extensionless page stem so the lookup works on clean URLs (/dashboard)
+  // and legacy .html URLs alike (currentFile() strips the extension before lookup).
   var TRACKABLE_SKIP = {
-    'dashboard.html': 1,
-    'download.html': 1,
-    'proof.html': 1,
-    'upload.html': 1,
-    'select.html': 1,
-    'send.html': 1,
-    'request.html': 1,
-    'review.html': 1,
-    'files.html': 1,
-    'auth.html': 1,
-    'admin.html': 1,
-    'checkout.html': 1,
-    'index.html': 1
+    'dashboard': 1,
+    'download': 1,
+    'proof': 1,
+    'upload': 1,
+    'select': 1,
+    'send': 1,
+    'request': 1,
+    'review': 1,
+    'files': 1,
+    'auth': 1,
+    'admin': 1,
+    'checkout': 1,
+    'index': 1
   };
 
   var ACTION_BY_PAGE = [
@@ -163,7 +165,9 @@
     return EXT_CATEGORY[extOf(name)] || 'documents';
   }
   function currentFile() {
-    return (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    // Extensionless page stem, so it matches on clean URLs (/compress-image) and
+    // legacy .html URLs alike. 'index' for the site root / directory index pages.
+    return (location.pathname.split('/').pop() || 'index').toLowerCase().replace(/\.html$/, '');
   }
   function toolNameFromPage(page) {
     return String(page || currentFile()).replace(/\.html$/i, '').replace(/[-_]+/g, ' ').replace(/\b\w/g, function (m) { return m.toUpperCase(); });
@@ -273,6 +277,16 @@
       setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
       return { ok: true };
     });
+  };
+  // Read the stored bytes without triggering a download. Used by the dashboard
+  // to decode audio and draw a real waveform. Resolves null when unavailable.
+  API.getBlob = function (recOrId) {
+    var rec = typeof recOrId === 'string'
+      ? API.list({ category: 'all' }).filter(function (r) { return r.id === recOrId; })[0]
+      : recOrId;
+    if (!rec) return Promise.resolve(null);
+    if (isExpired(rec)) return Promise.resolve(null);
+    return getBlob(rec.blobKey || rec.id).catch(function () { return null; });
   };
   API.remove = function (idValue) {
     var owner = currentOwnerId();

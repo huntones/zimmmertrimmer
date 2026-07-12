@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — שליחת קבצים גדולים</title>
+<link rel="canonical" href="https://kolkli.com/send">
 <meta name="description" content="Send large files with a shareable link — set an expiry, add a password and a message. Recipient gets a clean download page.">
 <style>
   :root {
-    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --bg:#fdf3e9; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
     --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
     --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
     --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
@@ -196,6 +197,7 @@
   .inp,.ta{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
     font-family:var(--sans);font-size:13.5px;padding:10px 12px;transition:border-color .12s,box-shadow .12s;}
   .inp:focus,.ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .inp:disabled,.inp[readonly]{cursor:not-allowed;color:var(--muted);background:var(--line-2);box-shadow:none;}
   .ta{resize:vertical;min-height:46px;}
   .inp[dir=ltr]{text-align:start;}
   select.inp{cursor:pointer;}
@@ -307,6 +309,79 @@
     background:var(--grad-btn);padding:9px 18px;border-radius:10px;box-shadow:0 4px 12px var(--grad-btn-glow);transition:filter .14s;}
   .brandlock-cta:hover{filter:brightness(1.06);}
 
+  /* advanced-settings: gear in the card header + summary bar that opens the popup */
+  .side-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;}
+  .side-head h3{margin:0;}
+  .gearbtn{width:34px;height:34px;flex:0 0 auto;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+    transition:border-color .12s,color .12s,background .12s;}
+  .gearbtn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+  .gearbtn svg{width:18px;height:18px;transition:transform .35s ease;}
+  .gearbtn:hover svg{transform:rotate(60deg);}
+
+  .advbar{display:flex;align-items:center;gap:11px;width:100%;text-align:start;cursor:pointer;margin:2px 0 10px;
+    padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);font-family:var(--sans);
+    transition:border-color .12s,background .12s;}
+  .advbar:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .advbar-ic{width:34px;height:34px;flex:0 0 auto;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent);transition:background .12s;}
+  .advbar:hover .advbar-ic{background:var(--panel);}
+  .advbar-ic svg{width:18px;height:18px;}
+  .advbar-txt{flex:1;min-width:0;}
+  .advbar-title{display:block;font-size:13px;font-weight:700;color:var(--ink-2);}
+  .advbar-sum{display:block;font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;}
+  .advbar-chev{flex:0 0 auto;color:var(--faint);display:flex;}
+  .advbar-chev svg{width:18px;height:18px;}
+
+  /* advanced-settings modal */
+  .adv-overlay{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:24px 16px;
+    background:rgba(18,20,34,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+    opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease;overflow:auto;}
+  .adv-overlay.open{opacity:1;visibility:visible;}
+  .adv-modal{position:relative;width:100%;max-width:480px;margin:auto;background:var(--panel);border:1px solid var(--line);
+    border-radius:22px;box-shadow:var(--shadow-lg);overflow:hidden;display:flex;flex-direction:column;max-height:calc(100dvh - 48px);
+    transform:translateY(14px) scale(.985);opacity:0;transition:transform .26s cubic-bezier(.2,.8,.25,1),opacity .26s;}
+  .adv-overlay.open .adv-modal{transform:none;opacity:1;}
+  @media (max-width:560px){ .adv-modal{border-radius:18px;} }
+  .adv-close{position:absolute;top:15px;inset-inline-start:15px;width:34px;height:34px;border-radius:10px;border:none;cursor:pointer;
+    background:var(--panel-2);color:var(--muted);display:flex;align-items:center;justify-content:center;z-index:3;transition:background .12s,color .12s;}
+  .adv-close:hover{background:var(--danger-soft);color:var(--danger);}
+  .adv-close svg{width:17px;height:17px;}
+  .adv-head{display:flex;align-items:flex-start;gap:13px;padding:22px 22px 15px;}
+  .adv-hico{width:48px;height:48px;flex:0 0 auto;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:var(--grad);color:#fff;box-shadow:0 6px 15px var(--grad-shadow);}
+  .adv-hico svg{width:24px;height:24px;}
+  .adv-head-txt{flex:1;min-width:0;padding-inline-end:30px;}
+  .adv-head-txt h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.02em;}
+  .adv-head-txt p{margin:4px 0 0;font-size:12.5px;color:var(--muted);line-height:1.5;}
+  .adv-body{padding:0 20px 18px;overflow:auto;display:flex;flex-direction:column;gap:11px;}
+  .adv-sec{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:14px 15px;}
+  .adv-sec-main{display:flex;align-items:center;gap:12px;margin:0;}
+  label.adv-sec-main{cursor:pointer;}
+  .adv-sec-txt{flex:1;min-width:0;}
+  .adv-sec-title{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--ink);}
+  .adv-sec-title svg{width:16px;height:16px;color:var(--accent);flex:0 0 auto;}
+  .adv-sec-sub{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.45;}
+  .adv-select{width:auto;min-width:106px;flex:0 0 auto;padding:8px 30px 8px 10px;}
+  html[dir=rtl] .adv-select{padding:8px 10px 8px 30px;}
+  .adv-foot{padding:14px 20px;border-top:1px solid var(--line-2);background:var(--panel-2);}
+  .adv-done{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;color:#fff;border:none;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    font-weight:600;font-size:14.5px;padding:12px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .adv-done:hover{filter:brightness(1.05);} .adv-done:active{transform:translateY(1px);}
+  /* branding section inside the modal drops its own top divider */
+  #brandSec.adv-sec{border-top:1px solid var(--line);margin-top:0;padding-top:14px;}
+
+  /* toggle switch (direction-aware: knob slides toward the inline-end) */
+  .switch{position:relative;display:inline-block;flex:0 0 auto;width:42px;height:25px;}
+  .switch input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer;z-index:1;}
+  .switch .track{position:absolute;inset:0;border-radius:999px;background:var(--line);transition:background .18s;pointer-events:none;}
+  .switch .track::after{content:'';position:absolute;top:3px;inset-inline-start:3px;width:19px;height:19px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:inset-inline-start .18s ease;}
+  .switch input:checked + .track{background:var(--accent);}
+  .switch input:checked + .track::after{inset-inline-start:20px;}
+
   footer{margin-top:6px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
     background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
@@ -319,6 +394,7 @@
 <div id="site-header"></div>
 <script src="./header.js"></script>
 <script src="./project-numbering.js"></script>
+<script src="./owner-migrate.js"></script>
 <div class="wrap">
 
   <div class="pagehead">
@@ -366,7 +442,12 @@
     <!-- side: options -->
     <div class="col">
       <div class="card side">
-        <h3 data-i18n="optTitle"></h3>
+        <div class="side-head">
+          <h3 data-i18n="optTitle"></h3>
+          <button class="gearbtn" id="advBtn" type="button" data-i18n-title="advBtnTitle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+        </div>
 
         <div class="opt">
           <label data-i18n="methodLbl"></label>
@@ -382,47 +463,105 @@
           </div>
         </div>
 
-        <div class="opt hidden" id="emailOpt">
+        <div class="opt email-only hidden" id="emailOpt">
           <label data-i18n="toLbl"></label>
           <input class="inp" id="recipients" type="text" dir="ltr" data-i18n-ph="toPh">
         </div>
 
-        <div class="two">
-          <div class="opt">
-            <label data-i18n="senderEmailLbl"></label>
-            <input class="inp" id="senderEmail" type="email" dir="ltr" autocomplete="email" data-i18n-ph="senderEmailPh">
-          </div>
-          <div class="opt">
-            <label data-i18n="recipientEmailLbl"></label>
-            <input class="inp" id="recipientEmail" type="email" dir="ltr" data-i18n-ph="recipientEmailPh">
-          </div>
+        <div class="opt" id="emailFields">
+          <label data-i18n="senderEmailLbl"></label>
+          <input class="inp" id="senderEmail" type="email" dir="ltr" autocomplete="email" data-i18n-ph="senderEmailPh">
         </div>
 
-        <div class="opt">
+        <div class="opt" id="subjectOpt">
+          <label data-i18n="subjectLbl"></label>
+          <input class="inp" id="subject" type="text" data-i18n-ph="subjectPh">
+        </div>
+
+        <div class="opt email-only hidden" id="msgOpt">
           <label data-i18n="msgLbl"></label>
           <textarea class="ta" id="message" data-i18n-ph="msgPh"></textarea>
         </div>
 
-        <div class="opt">
-          <label data-i18n="expiryLbl"></label>
-          <select class="inp" id="expiry">
-            <option value="1" data-i18n="exp1"></option>
-            <option value="3" data-i18n="exp3"></option>
-            <option value="7" selected data-i18n="exp7"></option>
-            <option value="30" data-i18n="exp30"></option>
-          </select>
-        </div>
+        <button class="sendbtn" id="sendBtn" type="button" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          <span data-i18n="sendBtn"></span>
+        </button>
+        <div class="opterr" id="optErr"></div>
+      </div>
+    </div>
+  </div>
 
-        <div class="opt">
-          <label class="chkline"><input type="checkbox" id="pwToggle"><span data-i18n="pwChk"></span></label>
-          <input class="inp hidden" id="password" type="text" dir="ltr" data-i18n-ph="pwPh">
-        </div>
+  <!-- advanced send settings (saved as defaults) -->
+  <div class="adv-overlay" id="advOverlay">
+    <div class="adv-modal" role="dialog" aria-modal="true" aria-labelledby="advTitle" id="advModal">
+      <button class="adv-close" id="advClose" type="button" data-i18n-title="advClose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
 
-        <div class="opt">
-          <label class="chkline"><input type="checkbox" id="notifyToggle"><span data-i18n="notifyChk"></span></label>
+      <div class="adv-head">
+        <div class="adv-hico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </div>
+        <div class="adv-head-txt">
+          <h2 id="advTitle" data-i18n="advTitle"></h2>
+          <p data-i18n="advSub"></p>
+        </div>
+      </div>
 
-        <div class="opt brandsec" id="brandSec">
+      <div class="adv-body">
+        <!-- link expiry -->
+        <section class="adv-sec">
+          <div class="adv-sec-main">
+            <div class="adv-sec-txt">
+              <div class="adv-sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span data-i18n="expiryLbl"></span></div>
+              <div class="adv-sec-sub" data-i18n="expirySub"></div>
+            </div>
+            <select class="inp adv-select" id="expiry">
+              <option value="3" data-i18n="exp3"></option>
+              <option value="7" selected data-i18n="exp7"></option>
+              <option value="14" data-i18n="exp14"></option>
+              <option value="30" data-i18n="exp30"></option>
+            </select>
+          </div>
+        </section>
+
+        <!-- password protection -->
+        <section class="adv-sec">
+          <label class="adv-sec-main">
+            <div class="adv-sec-txt">
+              <div class="adv-sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="pwChk"></span></div>
+              <div class="adv-sec-sub" data-i18n="pwSub"></div>
+            </div>
+            <span class="switch"><input type="checkbox" id="pwToggle"><span class="track"></span></span>
+          </label>
+          <input class="inp hidden" id="password" type="text" dir="ltr" data-i18n-ph="pwPh" style="margin-top:12px">
+        </section>
+
+        <!-- download notification -->
+        <section class="adv-sec">
+          <label class="adv-sec-main">
+            <div class="adv-sec-txt">
+              <div class="adv-sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span data-i18n="notifyChk"></span></div>
+              <div class="adv-sec-sub" data-i18n="notifySub"></div>
+            </div>
+            <span class="switch"><input type="checkbox" id="notifyToggle"><span class="track"></span></span>
+          </label>
+        </section>
+
+        <!-- send a copy to myself -->
+        <section class="adv-sec">
+          <label class="adv-sec-main">
+            <div class="adv-sec-txt">
+              <div class="adv-sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg><span data-i18n="copySelfChk"></span></div>
+              <div class="adv-sec-sub" data-i18n="copySelfSub"></div>
+            </div>
+            <span class="switch"><input type="checkbox" id="copySelfToggle"><span class="track"></span></span>
+          </label>
+        </section>
+
+        <!-- client branding -->
+        <section class="adv-sec" id="brandSec">
           <label class="brandhead" data-i18n="brandLbl"></label>
           <div class="brandlock" id="brandLock" hidden>
             <span class="brandlock-badge">CREATOR</span>
@@ -459,13 +598,11 @@
           </div>
           <div class="bprev-hint" data-i18n="brandPreviewHint"></div>
           </div>
-        </div>
+        </section>
+      </div>
 
-        <button class="sendbtn" id="sendBtn" type="button" disabled>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-          <span data-i18n="sendBtn"></span>
-        </button>
-        <div class="opterr" id="optErr"></div>
+      <div class="adv-foot">
+        <button class="adv-done" id="advDone" type="button" data-i18n="advDone"></button>
       </div>
     </div>
   </div>
@@ -530,6 +667,13 @@
 (function(){
   const el = id => document.getElementById(id);
 
+  // ---- diagnostics: trace every persistence step (upload -> save -> verify -> reload) ----
+  const SLOG="[KOLKLI send]";
+  function slog(step, data){ try{ if(data!==undefined) console.info(SLOG, step, data); else console.info(SLOG, step); }catch(_){} }
+  function serr(step, err){ try{ console.error(SLOG, step, err); }catch(_){} }
+  // Ask the browser to keep our IndexedDB blobs from being evicted under storage pressure.
+  try{ if(navigator.storage && navigator.storage.persist){ navigator.storage.persisted().then(function(p){ return p?true:navigator.storage.persist(); }).then(function(g){ slog("persistent-storage", !!g); }).catch(function(e){ serr("persistent-storage", e); }); } }catch(_){}
+
   const I18N = {
     he:{
       dir:'rtl', langIco:'EN',
@@ -543,13 +687,24 @@
       totalLbl:'סה״כ', optTitle:'הגדרות שליחה',
       methodLbl:'איך לשלוח', mLink:'קישור', mEmail:'אימייל',
       toLbl:'נמענים (מופרדים בפסיק)', toPh:'a@mail.com, b@mail.com',
-      senderEmailLbl:'אימייל השולח', senderEmailPh:'you@example.com',
-      recipientEmailLbl:'אימייל הנמען', recipientEmailPh:'client@example.com',
-      msgLbl:'הודעה אישית (לא חובה)', msgPh:'כמה מילים לנמען…',
+      senderEmailLbl:'המייל שלך', senderEmailPh:'you@example.com', subjectLbl:'נושא', subjectPh:'נושא ההודעה…',
+      msgLbl:'הודעה או טקסט חופשי', msgPh:'כמה מילים לנמען…',
       expiryLbl:'תוקף הקישור',
-      exp1:'יום אחד', exp3:'3 ימים', exp7:'7 ימים', exp30:'30 יום',
+      exp1:'יום אחד', exp3:'3 ימים', exp7:'7 ימים', exp14:'14 ימים', exp30:'30 יום',
       pwChk:'להגן בסיסמה', pwPh:'סיסמה לקישור',
+      advBtnTitle:'הגדרות מתקדמות',
+      advBarTitle:'הגדרות שליחה מתקדמות',
+      advTitle:'הגדרות שליחה מתקדמות', advSub:'ההגדרות כאן נשמרות כברירת מחדל לשליחות הבאות.',
+      advClose:'סגירה', advDone:'סיום',
+      expirySub:'משך הזמן שהקישור יישאר פעיל לנמען.',
+      pwSub:'הנמען יזין סיסמה כדי לגשת לקבצים.',
+      notifySub:'נודיע לכם כשקובץ או כל החבילה יורדו על ידי הנמען.',
+      copySelfChk:'שליחת עותק לעצמי', copySelfSub:'קבלת עותק של הודעת השליחה לכתובת הדוא״ל שלכם.',
+      sumPw:'מוגן בסיסמה', sumNotify:'התראה על הורדה', sumCopy:'עותק אליי', sumBrand:'מיתוג אישי',
       sendBtn:'צרו קישור שליחה',
+      editKick:'עריכת שליחת קבצים', editTitle:'עריכת שליחת הקבצים',
+      editSub:'עדכנו נמענים, הודעה, קבצים והגדרות — ושמרו את השינויים לאותו קישור.',
+      saveEditBtn:'שלח קבצים', editToast:'השליחה עודכנה ✓',
       uploading:'מעלה קבצים…',
       readyTitle:'הקישור מוכן!', readySub:'העתיקו ושלחו לנמען. אפשר גם לראות איך נראה עמוד ההורדה שלו.',
       copy:'העתקה', copied:'הקישור הועתק ✓',
@@ -583,13 +738,24 @@
       totalLbl:'Total', optTitle:'Send options',
       methodLbl:'How to send', mLink:'Link', mEmail:'Email',
       toLbl:'Recipients (comma separated)', toPh:'a@mail.com, b@mail.com',
-      senderEmailLbl:'Sender email', senderEmailPh:'you@example.com',
-      recipientEmailLbl:'Recipient email', recipientEmailPh:'client@example.com',
-      msgLbl:'Personal message (optional)', msgPh:'A few words for the recipient…',
+      senderEmailLbl:'Your email', senderEmailPh:'you@example.com', subjectLbl:'Subject', subjectPh:'Message subject…',
+      msgLbl:'Message or free text', msgPh:'A few words for the recipient…',
       expiryLbl:'Link expiry',
-      exp1:'1 day', exp3:'3 days', exp7:'7 days', exp30:'30 days',
+      exp1:'1 day', exp3:'3 days', exp7:'7 days', exp14:'14 days', exp30:'30 days',
       pwChk:'Protect with a password', pwPh:'Link password',
+      advBtnTitle:'Advanced settings',
+      advBarTitle:'Advanced send settings',
+      advTitle:'Advanced send settings', advSub:'These options are saved as your defaults for future sends.',
+      advClose:'Close', advDone:'Done',
+      expirySub:'How long the link stays active for the recipient.',
+      pwSub:'The recipient enters a password to reach the files.',
+      notifySub:'We’ll alert you when a file or the whole package is downloaded.',
+      copySelfChk:'Send a copy to myself', copySelfSub:'Get a copy of the send message to your own email.',
+      sumPw:'Password protected', sumNotify:'Download alerts', sumCopy:'Copy to me', sumBrand:'Custom branding',
       sendBtn:'Create share link',
+      editKick:'Edit file send', editTitle:'Edit your file send',
+      editSub:'Update recipients, message, files and settings — and save the changes to the same link.',
+      saveEditBtn:'Send files', editToast:'Send updated ✓',
       uploading:'Uploading files…',
       readyTitle:'Your link is ready!', readySub:'Copy and send it to your recipient. You can also preview their download page.',
       copy:'Copy', copied:'Link copied ✓',
@@ -623,13 +789,24 @@
       totalLbl:'Всего', optTitle:'Параметры отправки',
       methodLbl:'Как отправить', mLink:'Ссылка', mEmail:'Эл. почта',
       toLbl:'Получатели (через запятую)', toPh:'a@mail.com, b@mail.com',
-      senderEmailLbl:'Email отправителя', senderEmailPh:'you@example.com',
-      recipientEmailLbl:'Email получателя', recipientEmailPh:'client@example.com',
-      msgLbl:'Личное сообщение (необязательно)', msgPh:'Несколько слов для получателя…',
+      senderEmailLbl:'Ваш email', senderEmailPh:'you@example.com', subjectLbl:'Тема', subjectPh:'Тема сообщения…',
+      msgLbl:'Сообщение или произвольный текст', msgPh:'Несколько слов для получателя…',
       expiryLbl:'Срок действия ссылки',
-      exp1:'1 день', exp3:'3 дня', exp7:'7 дней', exp30:'30 дней',
+      exp1:'1 день', exp3:'3 дня', exp7:'7 дней', exp14:'14 дней', exp30:'30 дней',
       pwChk:'Защитить паролем', pwPh:'Пароль ссылки',
+      advBtnTitle:'Расширенные настройки',
+      advBarTitle:'Расширенные настройки отправки',
+      advTitle:'Расширенные настройки отправки', advSub:'Эти параметры сохраняются по умолчанию для будущих отправок.',
+      advClose:'Закрыть', advDone:'Готово',
+      expirySub:'Как долго ссылка будет активна для получателя.',
+      pwSub:'Получатель вводит пароль для доступа к файлам.',
+      notifySub:'Мы сообщим, когда файл или весь пакет будет скачан.',
+      copySelfChk:'Отправить копию себе', copySelfSub:'Получите копию сообщения об отправке на свою почту.',
+      sumPw:'Защита паролем', sumNotify:'Уведомления', sumCopy:'Копия мне', sumBrand:'Брендирование',
       sendBtn:'Создать ссылку',
+      editKick:'Редактирование отправки', editTitle:'Редактирование отправки файлов',
+      editSub:'Обновите получателей, сообщение, файлы и настройки — и сохраните изменения в той же ссылке.',
+      saveEditBtn:'Отправить файлы', editToast:'Отправка обновлена ✓',
       uploading:'Загрузка файлов…',
       readyTitle:'Ваша ссылка готова!', readySub:'Скопируйте и отправьте её получателю. Также можно посмотреть страницу его скачивания.',
       copy:'Копировать', copied:'Ссылка скопирована ✓',
@@ -670,6 +847,7 @@
 
   let lang='he', t=I18N.he;
   let files=[];   // {id,file,name,ext,kind,size,thumb}
+  let editToken=null, editBase=null;   // when set, the composer edits an existing send in place
   let method='link';
   let uid=1;
   let view=(function(){ try{ var v=localStorage.getItem('kolkli_send_view'); return (v==='gallery'||v==='list')?v:'list'; }catch(_){ return 'list'; } })();
@@ -685,6 +863,16 @@
     }catch(_){ return safeOwnerId(email); }
   }
   function scopedKey(base){ return base+'::'+currentOwnerId(); }
+
+  // logged-in email (empty string for guests)
+  function sessionEmail(){ try{ return (localStorage.getItem('ac_session')||'').trim().toLowerCase(); }catch(_){ return ''; } }
+  // when signed in, the sender is the account owner: prefill + lock the field so it can't be edited
+  function syncSenderEmail(){
+    const inp=el('senderEmail'); if(!inp) return;
+    const email=sessionEmail();
+    if(email){ inp.value=email; inp.disabled=true; inp.title=email; }
+    else { inp.disabled=false; inp.removeAttribute('title'); }
+  }
   function sendIndex(){
     try{ const a=JSON.parse(localStorage.getItem(scopedKey('kolkli_send_links'))||'[]'); return Array.isArray(a)?a:[]; }
     catch(_){ return []; }
@@ -695,7 +883,7 @@
     const bytes=(rec.files||[]).reduce((s,f)=>s+(f.size||0),0);
     const fileNames=(rec.files||[]).map(f=>f.name||'').filter(Boolean).slice(0,60);
     a.unshift({ token:rec.token, ownerId:rec.ownerId, createdAt:rec.createdAt, expiresAt:rec.expiresAt,
-      sender:rec.sender||'', recipient:rec.recipient||'', recipients:rec.recipients||'', message:rec.message||'',
+      sender:rec.sender||'', recipient:rec.recipient||'', recipients:rec.recipients||'', subject:rec.subject||'', message:rec.message||'',
       files:(rec.files||[]).length, bytes, downloads:rec.downloads||0, fileNames,
       projectNumber:rec.projectNumber, project_number:rec.project_number, projectService:rec.projectService, serviceType:rec.serviceType });
     saveSendIndex(a);
@@ -711,6 +899,38 @@
     try{ return Object.assign(d, JSON.parse(localStorage.getItem(scopedKey('kolkli_brand'))||'{}')); }catch(_){ return d; }
   }
   function saveBrand(){ try{ localStorage.setItem(scopedKey('kolkli_brand'), JSON.stringify(brand)); }catch(_){} }
+
+  // ---- advanced send options (saved as defaults, reused across sends) ----
+  const EXP_ALLOWED=['3','7','14','30'];
+  let sendDefaults=loadDefaults();
+  function loadDefaults(){
+    const d={expiry:'7', pw:false, pwVal:'', notify:false, copySelf:false};
+    try{ Object.assign(d, JSON.parse(localStorage.getItem(scopedKey('kolkli_send_defaults'))||'{}')); }catch(_){}
+    if(!EXP_ALLOWED.includes(String(d.expiry))) d.expiry='7';
+    return d;
+  }
+  function saveDefaults(){ try{ localStorage.setItem(scopedKey('kolkli_send_defaults'), JSON.stringify(sendDefaults)); }catch(_){} }
+  // push the saved defaults onto the popup controls (also used to restore state after "send another")
+  function applyDefaultsToUI(){
+    if(el('expiry')) el('expiry').value = EXP_ALLOWED.includes(String(sendDefaults.expiry))? String(sendDefaults.expiry) : '7';
+    if(el('pwToggle')) el('pwToggle').checked = !!sendDefaults.pw;
+    if(el('password')){ el('password').value = sendDefaults.pwVal||''; el('password').classList.toggle('hidden', !sendDefaults.pw); }
+    if(el('notifyToggle')) el('notifyToggle').checked = !!sendDefaults.notify;
+    if(el('copySelfToggle')) el('copySelfToggle').checked = !!sendDefaults.copySelf;
+    renderAdvSummary();
+  }
+  // one-line recap of the active defaults, shown on the summary bar in the options card
+  function renderAdvSummary(){
+    const sum=el('advSum'); if(!sum) return;
+    const parts=[];
+    const opt=el('expiry') && el('expiry').selectedOptions[0];
+    if(opt) parts.push(opt.textContent);
+    if(el('pwToggle') && el('pwToggle').checked) parts.push(t.sumPw);
+    if(el('notifyToggle') && el('notifyToggle').checked) parts.push(t.sumNotify);
+    if(el('copySelfToggle') && el('copySelfToggle').checked) parts.push(t.sumCopy);
+    if(canBrand() && brandForRecord()) parts.push(t.sumBrand);
+    sum.textContent = parts.filter(Boolean).join(' · ');
+  }
   // branding is a paid feature: Creator + Studio only (Free is locked out).
   // Legacy slugs (lite/pro/business) map onto the new tiers.
   function currentPlan(){
@@ -798,6 +1018,7 @@
     if(brand.logo){ el('bprevLogoImg').src=brand.logo; el('bprevLogo').classList.remove('hidden'); }
     else el('bprevLogo').classList.add('hidden');
     el('bprevName').textContent=brand.name||t.brandYou;
+    renderAdvSummary();
   }
 
   function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
@@ -834,6 +1055,7 @@
       files.push(rec);
     });
     renderFiles();
+    slog("intake", { staged: files.length, totalBytes: totalBytes() });
   }
 
   // walk dropped directories via the entries API so whole folders keep their tree
@@ -938,10 +1160,11 @@
     el('optErr').textContent='';
     if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
     const senderEmail=(el('senderEmail').value||'').trim();
-    const recipientEmail=(el('recipientEmail').value||'').trim();
-    if(method==='email' && !(recipientEmail || el('recipients').value.trim())){ el('optErr').textContent=t.errNoEmail; return; }
+    if(method==='email' && !el('recipients').value.trim()){ el('optErr').textContent=t.errNoEmail; return; }
     const pwOn=el('pwToggle').checked, pwVal=el('password').value;
-    if(pwOn && !pwVal){ el('optErr').textContent=t.errNoPw; return; }
+    // in edit mode a blank password field keeps the existing (hashed) password
+    const keepingPw = !!(editToken && editBase && editBase.password);
+    if(pwOn && !pwVal && !keepingPw){ el('optErr').textContent=t.errNoPw; return; }
     const notifyOn=el('notifyToggle').checked;
 
     const prog=el('progCard');
@@ -952,20 +1175,31 @@
         el('composer').style.display='none';
         prog.classList.add('show');
         const days=+el('expiry').value;
-        const token=randToken();
+        const editing=!!editToken;
+        const token = editing ? editToken : randToken();
+        const createdAt = (editing && editBase && editBase.createdAt) ? editBase.createdAt : Date.now();
+        // password: hash the newly typed value, else keep the existing hash on edit
+        const password = pwOn ? (pwVal ? await hashPass(pwVal) : (editing && editBase ? (editBase.password||null) : null)) : null;
         const record={
-          token, ownerId:currentOwnerId(), createdAt:Date.now(), expiresAt:Date.now()+days*86400000,
+          token, ownerId:currentOwnerId(), createdAt, expiresAt:Date.now()+days*86400000,
           sender:senderEmail,
-          recipient:recipientEmail,
+          recipient:method==='email'? el('recipients').value.trim() : '',
+          subject: el('subject') ? el('subject').value.trim() : '',
           message:el('message').value.trim(),
-          recipients:method==='email'? (recipientEmail || el('recipients').value.trim()) : recipientEmail,
-          password: pwOn? await hashPass(pwVal) : null,
+          recipients:method==='email'? el('recipients').value.trim() : '',
+          password,
           notify: notifyOn,
-          downloads:0,
+          downloads: (editing && editBase) ? (editBase.downloads||0) : 0,
           files: files.map(f=>({ name:(f.path||f.name), size:f.size, type:f.file.type||'', blob:f.file })),
         };
         record.brand = brandForRecord();
-        if(window.KolkliProjectNumbers) await KolkliProjectNumbers.assign('send', record);
+        // preserve the project number across edits; assign a fresh one only for new sends
+        if(editing && editBase && (editBase.projectNumber||editBase.project_number)){
+          record.projectNumber = editBase.projectNumber;
+          record.project_number = editBase.project_number;
+        } else if(window.KolkliProjectNumbers){
+          await KolkliProjectNumbers.assign('send', record);
+        }
 
         const total=Math.max(totalBytes(),1); let done=0;
         // animate progress proportional to file sizes (purely visual for the demo)
@@ -973,8 +1207,23 @@
           await new Promise(r=>setTimeout(r, 120));
           done+=files[i].size; setProg(Math.min(99, Math.round(done/total*100)));
         }
+        slog("save:begin", { token: token, files: record.files.length, bytes: totalBytes() });
+        // 1) write the file bytes to storage (IndexedDB in the local demo)
         await idbPut('t_'+token, record);
+        // 2) verify the bytes are actually persisted BEFORE creating the index record;
+        //    a failed/evicted write would otherwise leave a phantom card with no files
+        //    (exactly the "files vanished after refresh" symptom).
+        let verifyOk=false;
+        try{
+          const back=await idbGet('t_'+token);
+          const savedBlobs=(back && Array.isArray(back.files)) ? back.files.filter(f=>f && f.blob).length : 0;
+          verifyOk = !!back && savedBlobs===record.files.length;
+          slog("save:verify", { ok: verifyOk, expected: record.files.length, stored: savedBlobs });
+        }catch(e){ serr("save:verify", e); }
+        if(!verifyOk){ throw new Error("storage_verify_failed"); }
+        // 3) only now record the lightweight index entry the dashboard reads
         upsertSendIndex(record);
+        slog("save:indexed", { token: token, ownerId: record.ownerId });
         setProg(100);
         await new Promise(r=>setTimeout(r,200));
         return { token, days, record };
@@ -983,6 +1232,11 @@
       prog.classList.remove('show');
       el('composer').style.display='';
       if(err && err.usage) return;
+      if(err && err.message==="storage_verify_failed"){
+        serr("save:failed", err);
+        el("optErr").textContent = lang==="he" ? "שמירת הקבצים נכשלה (ייתכן שאין מספיק מקום פנוי). נסו שוב." : "Saving the files failed (storage may be full). Please try again.";
+        return;
+      }
       if(err && err.message==='project_number_allocation_failed'){
         el('optErr').textContent = lang==='he' ? 'לא ניתן להקצות מספר פרויקט כרגע. נסו שוב.' : 'Could not allocate a project number. Please try again.';
         return;
@@ -992,6 +1246,7 @@
 
     prog.classList.remove('show');
     showShare(result.token, result.days, pwOn, notifyOn, result.record);
+    if(editToken){ toast(t.editToast); editToken=null; editBase=null; syncSendChrome(); }
     if(method==='email' && result.record.recipients){ openMailto(); }
   }
   function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
@@ -999,7 +1254,7 @@
   let currentToken=null, currentUrl='', currentDays=7, statTimer=null, notifyEnabled=false, lastNotifiedCount=0, bc=null;
   function showShare(token, days, pwOn, notifyOn, record){
     currentToken=token; currentDays=days;
-    const url=new URL('download.html?t='+token, location.href).href;
+    const url=new URL('download?t='+token, location.href).href;
     currentUrl=url;
     el('shareLink').textContent=url;
     el('previewLink').href=url;
@@ -1010,7 +1265,7 @@
       `<span class="chip">${fileSvg()} ${t.chipFiles(files.length)}</span>`+
       (pwOn? `<span class="chip">${lockSvg()} ${t.chipPw}</span>` : '');
     renderQR(url);
-    el('emailBtn').classList.toggle('hidden', !(method==='email' && ((el('recipientEmail').value||'').trim() || el('recipients').value.trim())));
+    el('emailBtn').classList.toggle('hidden', !(method==='email' && el('recipients').value.trim()));
     lastNotifiedCount=0;
     updateStat(0);
     startStatWatch(notifyOn);
@@ -1036,11 +1291,15 @@
 
   // ---- email delivery (opens the sender's mail app, prefilled) ----
   function buildMailto(){
-    const to=encodeURIComponent((el('recipientEmail').value||'').trim() || el('recipients').value.trim());
+    const to=encodeURIComponent(el('recipients').value.trim());
     const msg=el('message').value.trim();
-    const subject=encodeURIComponent(t.emailSubject);
+    const subject=encodeURIComponent((el('subject')&&el('subject').value.trim())||t.emailSubject);
     const body=encodeURIComponent((msg? msg+'\n\n':'')+t.emailBodyLead+'\n'+currentUrl+'\n\n'+t.emailBodyExpiry(expiryText(currentDays)));
-    return 'mailto:'+to+'?subject='+subject+'&body='+body;
+    let url='mailto:'+to+'?subject='+subject+'&body='+body;
+    // "send a copy to myself" → blind-copy the sender's own address
+    const self=(el('senderEmail').value||'').trim();
+    if(sendDefaults.copySelf && self) url+='&bcc='+encodeURIComponent(self);
+    return url;
   }
   function openMailto(){ const a=document.createElement('a'); a.href=buildMailto(); a.style.display='none'; document.body.appendChild(a); a.click(); a.remove(); }
 
@@ -1081,15 +1340,79 @@
   function lockSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'; }
 
   function reset(){
-    files=[]; currentToken=null;
+    files=[]; currentToken=null; editToken=null; editBase=null;
     stopStatWatch(); notifyEnabled=false; lastNotifiedCount=0;
     el('shareCard').classList.remove('show');
-    el('message').value=''; el('recipients').value=''; el('password').value='';
-    el('senderEmail').value=''; el('recipientEmail').value='';
-    el('pwToggle').checked=false; el('password').classList.add('hidden');
-    el('notifyToggle').checked=false; el('emailBtn').classList.add('hidden');
-    el('composer').style.display=''; renderFiles();
+    el('message').value=''; el('recipients').value=''; if(el('subject')) el('subject').value='';
+    el('senderEmail').value=''; syncSenderEmail();
+    el('emailBtn').classList.add('hidden');
+    applyDefaultsToUI();   // restore saved defaults (expiry / password / notify / copy-to-self)
+    el('composer').style.display=''; renderFiles(); syncSendChrome();
     window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // Swap the composer's kicker / title / subtitle and the primary button between
+  // "new send" and "edit send" wording. Re-applied after every applyLang() (which
+  // repaints the default i18n text) so the edit chrome survives a language switch.
+  function syncSendChrome(){
+    const editing=!!editToken;
+    const head=document.querySelector('.pagehead');
+    if(head){
+      const k=head.querySelector('.kick'), h=head.querySelector('h2'), p=head.querySelector('p');
+      if(k) k.textContent = editing ? t.editKick  : t.kick;
+      if(h) h.textContent = editing ? t.editTitle : t.pageTitle;
+      if(p) p.textContent = editing ? t.editSub   : t.pageSub;
+    }
+    const sb=el('sendBtn') && el('sendBtn').querySelector('[data-i18n="sendBtn"]');
+    if(sb) sb.textContent = editing ? t.saveEditBtn : t.sendBtn;
+  }
+
+  // Load an existing send into the composer for editing. Pulls the full record
+  // (with file blobs) from IndexedDB, falling back to the lightweight index entry,
+  // and pre-fills recipients, message, expiry, password state, notify and files.
+  // createLink() then updates this token in place instead of minting a new one.
+  async function enterEditMode(token){
+    let rec=null, fromIdb=false;
+    try{ rec = await idbGet('t_'+token); fromIdb=!!rec; }catch(e){ serr("reopen:idbGet", e); }
+    if(!rec){ rec = sendIndex().find(x=>x.token===token) || null; }
+    slog("reopen", { token: token, found: !!rec, fromIndexedDB: fromIdb, hasBlobs: !!(rec && Array.isArray(rec.files) && rec.files.some(f=>f && f.blob)) });
+    if(!rec){ slog("reopen:miss", token); return; }   // unknown token -> stay on the new-send form
+    editToken=token; editBase=rec;
+
+    const to=(rec.recipient||rec.recipients||'').trim();
+    setMethod(to ? 'email' : 'link');
+    syncSenderEmail();
+    if(el('recipients')) el('recipients').value=to;
+    if(el('subject')) el('subject').value=rec.subject||'';
+    if(el('message')) el('message').value=rec.message||'';
+
+    // snap the saved lifespan to the closest expiry option the form offers
+    if(rec.expiresAt && rec.createdAt){
+      const savedDays=Math.round((rec.expiresAt-rec.createdAt)/86400000);
+      const allowed=EXP_ALLOWED.map(Number);
+      const snap=allowed.reduce((a,b)=>Math.abs(b-savedDays)<Math.abs(a-savedDays)?b:a, allowed[0]);
+      if(el('expiry')) el('expiry').value=String(snap);
+    }
+
+    // only the password hash is stored, so keep protection ON with a blank field —
+    // a blank field on save preserves the existing password (see createLink)
+    const hasPw=!!rec.password;
+    if(el('pwToggle')) el('pwToggle').checked=hasPw;
+    if(el('password')){ el('password').value=''; el('password').classList.toggle('hidden', !hasPw); }
+    if(el('notifyToggle')) el('notifyToggle').checked=!!rec.notify;
+
+    // rebuild the file picker from the stored blobs (index-only records carry none)
+    files=[];
+    const items=(Array.isArray(rec.files)?rec.files:[]).filter(f=>f && f.blob).map(f=>({
+      file:new File([f.blob], String(f.name||'file').split('/').pop()||'file', {type:f.type||''}),
+      path:f.name||''
+    }));
+    addFiles(items);   // renders the list + enables the save button
+    slog("reopen:rehydrated", { token: token, files: items.length });
+    if(!items.length){ slog("reopen:no-blobs", "index entry has no stored file bytes for token "+token+" (created without a completed upload, or on another browser?)"); }
+
+    renderAdvSummary();
+    syncSendChrome();
   }
 
   // ---- i18n + theme ----
@@ -1098,9 +1421,12 @@
     document.documentElement.lang=l; document.documentElement.dir=t.dir;
     document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
     document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
+    document.querySelectorAll('[data-i18n-title]').forEach(n=>{ const k=n.getAttribute('data-i18n-title'); if(typeof t[k]==='string'){ n.setAttribute('title',t[k]); n.setAttribute('aria-label',t[k]); } });
     try{ localStorage.setItem('ac_lang', l); }catch(_){}
     renderFiles();
     if(el('bprevName')) renderBrandUI();
+    renderAdvSummary();
+    syncSendChrome();
   }
   function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
   function detectLang(){
@@ -1133,10 +1459,25 @@
   el('flist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeFile(b.getAttribute('data-rm')); });
   el('vtoggle').addEventListener('click',e=>{ const b=e.target.closest('[data-view]'); if(!b) return; view=b.getAttribute('data-view'); try{ localStorage.setItem('kolkli_send_view',view); }catch(_){} renderFiles(); });
 
-  el('mLink').addEventListener('click',()=>{ method='link'; el('mLink').classList.add('on'); el('mEmail').classList.remove('on'); el('emailOpt').classList.add('hidden'); });
-  el('mEmail').addEventListener('click',()=>{ method='email'; el('mEmail').classList.add('on'); el('mLink').classList.remove('on'); el('emailOpt').classList.remove('hidden'); });
-  el('pwToggle').addEventListener('change',e=>{ el('password').classList.toggle('hidden', !e.target.checked); if(e.target.checked) el('password').focus(); });
+  function setMethod(m){
+    method=m;
+    const isEmail=(m==='email');
+    el('mEmail').classList.toggle('on', isEmail);
+    el('mLink').classList.toggle('on', !isEmail);
+    // the subject doubles as the title for the "email this link" button, so it stays on for links too;
+    // a link doesn't need recipient/personal-message fields — hide those for links
+    document.querySelectorAll('.email-only').forEach(node=>node.classList.toggle('hidden', !isEmail));
+  }
+  el('mLink').addEventListener('click',()=>setMethod('link'));
+  el('mEmail').addEventListener('click',()=>setMethod('email'));
+  el('pwToggle').addEventListener('change',e=>{
+    el('password').classList.toggle('hidden', !e.target.checked); if(e.target.checked) el('password').focus();
+    sendDefaults.pw=e.target.checked; saveDefaults(); renderAdvSummary();
+  });
+  el('password').addEventListener('input',()=>{ sendDefaults.pwVal=el('password').value; saveDefaults(); });
+  el('expiry').addEventListener('change',()=>{ sendDefaults.expiry=el('expiry').value; saveDefaults(); renderAdvSummary(); });
   el('notifyToggle').addEventListener('change',e=>{
+    sendDefaults.notify=e.target.checked; saveDefaults(); renderAdvSummary();
     if(!e.target.checked) return;
     if('Notification'in window){
       if(Notification.permission==='granted') toast(t.notifOn);
@@ -1144,6 +1485,17 @@
       else Notification.requestPermission().then(p=>{ toast(p==='granted'? t.notifOn : t.notifBlocked); });
     } else { toast(t.notifOn); }
   });
+  el('copySelfToggle').addEventListener('change',e=>{ sendDefaults.copySelf=e.target.checked; saveDefaults(); renderAdvSummary(); });
+
+  // ---- advanced-settings popup ----
+  const advOverlay=el('advOverlay');
+  function openAdv(){ advOverlay.classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeAdv(){ advOverlay.classList.remove('open'); document.body.style.overflow=''; renderAdvSummary(); }
+  el('advBtn').addEventListener('click',openAdv);
+  el('advClose').addEventListener('click',closeAdv);
+  el('advDone').addEventListener('click',closeAdv);
+  advOverlay.addEventListener('mousedown',e=>{ if(e.target===advOverlay) closeAdv(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && advOverlay.classList.contains('open')) closeAdv(); });
   el('qrDlBtn').addEventListener('click',downloadQR);
   el('emailBtn').addEventListener('click',openMailto);
 
@@ -1170,15 +1522,21 @@
 
   window.__setLang=applyLang;
   el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
-  // keep the branding gate in sync when the user logs in/out or switches plan
-  window.addEventListener('kolkli:auth',applyBrandGate);
-  window.addEventListener('storage',e=>{ if(!e.key||e.key==='ac_session'||e.key==='ac_plan'||e.key==='ac_users') applyBrandGate(); });
+  // keep the branding gate + locked sender email in sync when the user logs in/out or switches plan
+  window.addEventListener('kolkli:auth',()=>{ applyBrandGate(); syncSenderEmail(); });
+  window.addEventListener('storage',e=>{ if(!e.key||e.key==='ac_session'||e.key==='ac_plan'||e.key==='ac_users'){ applyBrandGate(); syncSenderEmail(); } });
 
   // ---- init ----
+  try{ if(window.KolkliOwnerMigrate) window.KolkliOwnerMigrate.run(); }catch(_){}
   applyTheme(ls('theme')||'light');
   applyLang(detectLang());
   renderFiles();
   applyBrandGate();
+  syncSenderEmail();
+  applyDefaultsToUI();
+  // reopen an existing send for editing when arrived via the dashboard's "ערוך שליחת קבצים"
+  const _editParam = new URLSearchParams(location.search).get('edit');
+  if(_editParam){ enterEditMode(_editParam); }
 })();
 </script>
 </body>

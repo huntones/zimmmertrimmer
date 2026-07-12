@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — עמוד ההורדה של הנמען</title>
+<link rel="canonical" href="https://kolkli.com/download-landing">
+<meta name="description" content="Branded recipient download landing: personal hero (logo + custom background), download-all, list/grid file views and a security trust strip — KOLKLI style.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6; --sep:#e7eaf2;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#2f7de0; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-dim:#cf3b40; --danger-soft:#fdecec;
+    --violet:#7c3aed; --violet-soft:#efe9fe;
+    --indigo:#5b60e6; --indigo-soft:#e9eafe;
+    --amber:#c88a04; --amber-soft:#fff5da;
+    --teal:#0891b2; --teal-soft:#e2f6fa;
+    /* send / delivery service = warm orange (the brand accent of this page) */
+    --send:#f97316; --send-dim:#ea580c; --send-ink:#c2410c; --send-soft:#fff1e6; --send-line:#fbd6b0;
+    --send-grad:linear-gradient(105deg,#fb8b3c 0%,#f4700f 100%);
+    --send-glow:rgba(234,88,12,0.34);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 22px 55px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --sans:'Heebo','Space Grotesk',system-ui,'Segoe UI',sans-serif;
+    --mono:'Space Grotesk',ui-monospace,'SFMono-Regular',Menlo,monospace;
+
+    /* === personal background of the hero ===
+       Swap --hero-photo for the sender's own image, e.g.
+         --hero-photo:url("https://.../studio-bg.jpg");
+       The orange brand scrim sits on top so any photo stays legible. */
+    --hero-photo:
+      radial-gradient(120% 140% at 88% -10%, #ffe7cb 0%, transparent 45%),
+      radial-gradient(90% 120% at 6% 120%, #9c74ff 0%, transparent 40%),
+      radial-gradient(70% 90% at 50% 40%, #ffb884 0%, transparent 60%),
+      linear-gradient(135deg,#ffb572,#f3893f 60%,#e6742a);
+    --hero-scrim:linear-gradient(115deg,rgba(244,132,58,0.80) 0%,rgba(250,160,88,0.58) 52%,rgba(253,198,152,0.40) 100%);
+  }
+  html[data-theme="dark"]{
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833; --sep:#2a303c;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --success:#37c26a; --success-dim:#4ec98a; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#7aabff; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-dim:#ff8585; --danger-soft:#2a1719;
+    --violet:#a06bff; --violet-soft:#241a3a;
+    --indigo:#8b8ff5; --indigo-soft:#20233a;
+    --amber:#e8b84b; --amber-soft:#2c2718;
+    --teal:#22c3d6; --teal-soft:#0f2a30;
+    --send:#fb923c; --send-dim:#fdba74; --send-ink:#fdba74; --send-soft:#2c2012; --send-line:#573a1c;
+    --send-grad:linear-gradient(105deg,#fb923c 0%,#f97316 100%);
+    --send-glow:rgba(251,146,60,0.42);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+    --hero-scrim:linear-gradient(115deg,rgba(140,45,8,0.92) 0%,rgba(200,80,20,0.78) 52%,rgba(180,70,30,0.62) 100%);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:radial-gradient(56% 38% at 14% 2%,rgba(249,115,22,0.10),transparent 60%),
+               radial-gradient(50% 38% at 90% 0%,rgba(59,111,246,0.06),transparent 60%);}
+  a{color:inherit;text-decoration:none;}
+  button,select,input{font-family:inherit;}
+  svg{display:block;}
+
+  .page{width:70%;max-width:none;margin:0 auto;padding:34px 18px 70px;
+    display:flex;flex-direction:column;gap:18px;}
+
+  /* ============ THEME TOGGLE ============ */
+  .themebtn{position:fixed;inset-block-start:16px;inset-inline-start:16px;width:40px;height:40px;border-radius:12px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;box-shadow:var(--shadow-sm);
+    display:flex;align-items:center;justify-content:center;z-index:50;transition:border-color .12s;}
+  .themebtn:hover{border-color:var(--send);}
+  .themebtn svg{width:19px;height:19px;}
+
+  /* ============ TOP NAV (guest header: system logo + log in / sign up) ============ */
+  .nav{position:sticky;inset-block-start:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line);}
+  .nav-in{width:70%;max-width:none;margin:0 auto;height:62px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .brand{display:flex;align-items:center;gap:9px;}
+  .brand .wm{font-size:21px;font-weight:900;letter-spacing:-0.02em;color:var(--ink);}
+  .brand .kbox{width:31px;height:31px;border-radius:9px;background:var(--send-grad);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;box-shadow:0 5px 12px var(--send-glow);}
+  .nav-end{display:flex;align-items:center;gap:8px;}
+  .nav-ico{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:border-color .12s,color .12s;}
+  .nav-ico:hover{border-color:var(--send);color:var(--send-dim);}
+  .nav-ico svg{width:18px;height:18px;}
+  .nav-login{display:inline-flex;align-items:center;height:38px;padding:0 15px;border-radius:10px;
+    background:transparent;border:1px solid var(--line);color:var(--ink-2);font-size:13.5px;font-weight:700;
+    white-space:nowrap;cursor:pointer;transition:border-color .12s,color .12s;}
+  .nav-login:hover{border-color:var(--send);color:var(--send-dim);}
+  .nav-signup{display:inline-flex;align-items:center;height:38px;padding:0 16px;border-radius:10px;color:#fff;
+    font-size:13.5px;font-weight:800;white-space:nowrap;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--send-grad);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 14px var(--send-glow);transition:filter .14s,transform .08s;}
+  .nav-signup:hover{filter:brightness(1.05);} .nav-signup:active{transform:translateY(1px);}
+  @media (max-width:440px){ .brand .wm{display:none;} }
+
+  /* ================= HERO (branded, personal) ================= */
+  .hero{position:relative;border-radius:26px;overflow:hidden;box-shadow:var(--shadow-lg);
+    background:var(--hero-scrim),var(--hero-photo);background-size:cover;background-position:center;isolation:isolate;}
+  .hero::after{content:'';position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(120% 80% at 80% 120%,rgba(0,0,0,.18),transparent 60%);}
+  .hero-in{position:relative;z-index:1;padding:26px 30px 30px;display:flex;align-items:center;gap:22px;}
+  .hero-copy{flex:1;min-width:0;color:#fff;}
+
+  /* sender brand lockup — logo chip + name (this is the “מקום ללוגו”) */
+  .brand{display:inline-flex;align-items:center;gap:12px;margin-bottom:16px;}
+  .brand .logo{background:#fff;border-radius:13px;padding:8px 12px;box-shadow:0 8px 22px rgba(0,0,0,.22);
+    display:flex;align-items:center;gap:9px;min-height:44px;}
+  .brand .logo img{display:block;max-height:30px;max-width:150px;object-fit:contain;}
+  .brand .who{color:rgba(255,255,255,.94);font-size:13px;line-height:1.35;text-shadow:0 1px 8px rgba(0,0,0,.28);}
+  .brand .who b{display:block;font-size:15px;font-weight:800;color:#fff;}
+
+  .hero h1{margin:0 0 8px;font-size:clamp(24px,3.6vw,34px);font-weight:900;letter-spacing:-0.02em;
+    text-shadow:0 2px 14px rgba(0,0,0,.24);}
+  .hero .sub{margin:0 0 20px;font-size:15px;max-width:52ch;color:rgba(255,255,255,.92);
+    text-shadow:0 1px 8px rgba(0,0,0,.22);}
+
+  .hchips{display:flex;flex-wrap:wrap;gap:10px;}
+  .hchip{display:inline-flex;align-items:center;gap:11px;padding:10px 14px;border-radius:14px;
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);color:#fff;}
+  .hchip .ic{width:34px;height:34px;flex-shrink:0;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.22);}
+  .hchip .ic svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;}
+  .hchip .tx{line-height:1.2;}
+  .hchip .tx .k{font-size:11.5px;color:rgba(255,255,255,.85);}
+  .hchip .tx .v{font-size:15px;font-weight:800;}
+
+  .hero-art{flex-shrink:0;width:190px;filter:drop-shadow(0 18px 30px rgba(0,0,0,.28));}
+  .hero-art svg{width:100%;height:auto;}
+
+  /* ============ DOWNLOAD-ALL BAR ============ */
+  .dlbar{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:2px;}
+  .dlall{display:inline-flex;align-items:center;justify-content:center;gap:11px;min-width:min(420px,86vw);
+    height:58px;padding:0 30px;border-radius:16px;border:none;cursor:pointer;color:#fff;font-size:16.5px;font-weight:800;
+    text-shadow:0 1px 2px rgba(0,0,0,.18);
+    background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,0) 55%),var(--send-grad);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.42),0 12px 26px var(--send-glow);
+    transition:filter .14s,transform .08s;}
+  .dlall:hover{filter:brightness(1.05);} .dlall:active{transform:translateY(1px);}
+  .dlall svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.1;}
+  .dlnote{font-size:12.5px;color:var(--muted);font-family:var(--mono);letter-spacing:.01em;}
+  .dlnote b{color:var(--send-dim);font-weight:700;}
+
+  /* ================= FILES CARD ================= */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;}
+
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+    padding:16px 20px;border-bottom:1px solid var(--line-2);}
+  .search{position:relative;flex:1;min-width:220px;max-width:340px;}
+  .search svg{position:absolute;inset-block-start:50%;inset-inline-start:13px;transform:translateY(-50%);
+    width:17px;height:17px;stroke:var(--faint);fill:none;stroke-width:2;pointer-events:none;}
+  .search input{width:100%;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);
+    color:var(--ink);font-size:14px;padding:0 16px 0 40px;transition:border-color .12s,box-shadow .12s;}
+  .search input::placeholder{color:var(--faint);}
+  .search input:focus{outline:none;border-color:var(--send);box-shadow:0 0 0 3px var(--send-soft);}
+
+  .tb-end{display:flex;align-items:center;gap:10px;}
+  .sortwrap{position:relative;display:flex;align-items:center;}
+  .sortwrap .lbl{font-size:12.5px;color:var(--muted);margin-inline-end:8px;white-space:nowrap;}
+  .sortwrap select{appearance:none;-webkit-appearance:none;height:42px;border-radius:12px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink);font-size:13.5px;font-weight:600;padding:0 34px 0 14px;cursor:pointer;}
+  .sortwrap select:focus{outline:none;border-color:var(--send);}
+  .sortwrap .chev{position:absolute;inset-inline-start:12px;inset-block-start:50%;transform:translateY(-50%);
+    width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;pointer-events:none;}
+
+  .viewtoggle{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px;}
+  .viewtoggle button{width:38px;height:36px;border:none;border-radius:9px;background:transparent;color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;}
+  .viewtoggle button svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+  .viewtoggle button.active{background:var(--send-grad);color:#fff;box-shadow:0 4px 10px var(--send-glow);}
+
+  .section-lbl{display:flex;align-items:center;gap:9px;padding:15px 20px 4px;font-size:13px;font-weight:800;color:var(--ink-2);}
+  .section-lbl svg{width:16px;height:16px;stroke:var(--send);fill:none;stroke-width:2;}
+
+  /* ---- LIST VIEW ---- */
+  .list{padding:8px 12px 14px;}
+  .list-head{display:grid;grid-template-columns:1fr 96px 96px 150px 120px;gap:10px;align-items:center;
+    padding:8px 14px;font-size:12px;color:var(--muted);font-weight:700;}
+  .list-head .c-act{text-align:start;}
+  .frow{display:grid;grid-template-columns:1fr 96px 96px 150px 120px;gap:10px;align-items:center;
+    padding:11px 14px;border-radius:14px;transition:background .12s;}
+  .frow:hover{background:var(--panel-2);}
+  .frow.is-hidden{display:none;}
+  .fmain{display:flex;align-items:center;gap:13px;min-width:0;}
+  .fico{width:44px;height:44px;flex-shrink:0;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:var(--k-soft,var(--panel-2));color:var(--k-ink,var(--muted));position:relative;}
+  .fico svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.9;}
+  .fname{min-width:0;}
+  .fname .nm{font-size:14.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fname .mob{display:none;font-size:11.5px;color:var(--faint);font-family:var(--mono);margin-top:2px;}
+  .ftype{display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:8px;
+    font-size:11.5px;font-weight:800;letter-spacing:.02em;background:var(--k-soft,var(--panel-2));color:var(--k-ink,var(--muted));}
+  .fsize,.fdate{font-size:13px;color:var(--muted);font-family:var(--mono);}
+  .fdate{font-size:12.5px;}
+  .frow .c-act{display:flex;align-items:center;gap:8px;justify-content:flex-start;}
+
+  .dlbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:11px;border:none;cursor:pointer;
+    color:#fff;font-size:13px;font-weight:800;background:var(--send-grad);box-shadow:0 5px 13px var(--send-glow);
+    transition:filter .14s,transform .08s;white-space:nowrap;}
+  .dlbtn:hover{filter:brightness(1.05);} .dlbtn:active{transform:translateY(1px);}
+  .dlbtn svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2.2;}
+  .kebab{width:34px;height:34px;flex-shrink:0;border:1px solid var(--line);border-radius:10px;background:var(--panel);
+    color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .12s,color .12s;}
+  .kebab:hover{border-color:var(--send);color:var(--send-dim);}
+  .kebab svg{width:17px;height:17px;fill:currentColor;}
+
+  /* ---- GRID VIEW ---- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:14px;padding:16px 20px 20px;}
+  .gcard{border:1px solid var(--line-2);border-radius:16px;background:var(--panel);padding:16px 14px 14px;
+    display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;position:relative;
+    transition:border-color .14s,box-shadow .14s,transform .1s;}
+  .gcard:hover{border-color:var(--send-line);box-shadow:var(--shadow);transform:translateY(-2px);}
+  .gcard.is-hidden{display:none;}
+  .gcard .gkebab{position:absolute;inset-block-start:8px;inset-inline-start:8px;width:28px;height:28px;border:none;border-radius:8px;
+    background:transparent;color:var(--faint);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .gcard .gkebab:hover{background:var(--panel-2);color:var(--muted);}
+  .gcard .gkebab svg{width:16px;height:16px;fill:currentColor;}
+  .gico{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-top:4px;
+    background:var(--k-soft,var(--panel-2));color:var(--k-ink,var(--muted));}
+  .gico svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:1.8;}
+  .gcard .badge{font-size:10.5px;font-weight:800;letter-spacing:.03em;padding:3px 9px;border-radius:7px;
+    background:var(--k-soft,var(--panel-2));color:var(--k-ink,var(--muted));}
+  .gcard .gnm{font-size:13px;font-weight:700;color:var(--ink);line-height:1.35;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:35px;}
+  .gcard .gsz{font-size:11.5px;color:var(--faint);font-family:var(--mono);}
+  .gdl{width:100%;margin-top:2px;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;border-radius:11px;
+    border:1px solid var(--send-line);background:var(--send-soft);color:var(--send-dim);font-size:13px;font-weight:800;cursor:pointer;
+    transition:background .12s,color .12s;}
+  .gdl:hover{background:var(--send-grad);color:#fff;border-color:transparent;}
+  .gdl svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;}
+
+  /* file-type accents */
+  .k-pdf{--k-soft:var(--danger-soft);--k-ink:var(--danger-dim);}
+  .k-xls{--k-soft:var(--success-soft);--k-ink:var(--success-dim);}
+  .k-csv{--k-soft:var(--success-soft);--k-ink:var(--success-dim);}
+  .k-img{--k-soft:var(--info-soft);--k-ink:var(--info-dim);}
+  .k-ppt{--k-soft:var(--send-soft);--k-ink:var(--send-dim);}
+  .k-doc{--k-soft:var(--indigo-soft);--k-ink:var(--indigo);}
+  .k-vid{--k-soft:var(--danger-soft);--k-ink:var(--danger-dim);}
+  .k-zip{--k-soft:var(--amber-soft);--k-ink:var(--amber);}
+  .k-txt{--k-soft:var(--panel-2);--k-ink:var(--muted);}
+
+  .emptymsg{display:none;text-align:center;padding:34px 20px;color:var(--muted);font-size:14px;}
+  .emptymsg.show{display:block;}
+
+  /* show more */
+  .morewrap{display:flex;justify-content:center;padding:4px 20px 20px;}
+  .morebtn{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 20px;border-radius:12px;
+    background:var(--panel-2);border:1px solid var(--line);color:var(--ink-2);font-size:13.5px;font-weight:700;cursor:pointer;
+    transition:border-color .12s,color .12s;}
+  .morebtn:hover{border-color:var(--send);color:var(--send-dim);}
+  .morebtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .2s;}
+  .morebtn.open svg{transform:rotate(180deg);}
+
+  /* ================= SECURITY / TRUST ================= */
+  .secure{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;}
+  .secure-top{display:flex;align-items:center;gap:18px;padding:22px 26px;
+    background:linear-gradient(120deg,var(--send-soft),transparent 70%);}
+  .secure-shield{width:60px;height:60px;flex-shrink:0;border-radius:17px;display:flex;align-items:center;justify-content:center;
+    background:var(--send-grad);color:#fff;box-shadow:0 10px 24px var(--send-glow);}
+  .secure-shield svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:2;}
+  .secure-top h2{margin:0 0 3px;font-size:18px;font-weight:900;letter-spacing:-0.01em;}
+  .secure-top p{margin:0;font-size:13.5px;color:var(--muted);max-width:60ch;}
+  .badges{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line-2);}
+  .badge-i{display:flex;align-items:center;gap:12px;padding:18px 20px;position:relative;}
+  .badge-i + .badge-i::before{content:'';position:absolute;inset-inline-start:0;inset-block:16px;width:1px;background:var(--line-2);}
+  .badge-i .bi{width:40px;height:40px;flex-shrink:0;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:var(--panel-2);border:1px solid var(--line-2);color:var(--send-dim);}
+  .badge-i .bi svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
+  .badge-i .bt{min-width:0;}
+  .badge-i .bt .bk{font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.2;}
+  .badge-i .bt .bs{font-size:11.5px;color:var(--muted);margin-top:2px;}
+
+  /* powered by */
+  .poweredby{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;color:var(--faint);
+    font-size:12px;font-family:var(--mono);}
+  .poweredby .mark{width:20px;height:20px;border-radius:6px;background:var(--send-grad);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;}
+
+  /* toast */
+  .toast{position:fixed;inset-block-end:24px;inset-inline-start:50%;transform:translateX(-50%) translateY(20px);opacity:0;
+    pointer-events:none;background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 20px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;white-space:nowrap;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:760px){
+    .page,.nav-in{width:90%;}
+    .hero-art{display:none;}
+    .list-head{display:none;}
+    .frow{grid-template-columns:1fr auto;gap:10px;}
+    .frow .ftype,.frow .fsize,.frow .fdate{display:none;}
+    .fname .mob{display:block;}
+    .badges{grid-template-columns:repeat(2,1fr);}
+    .badge-i:nth-child(3)::before,.badge-i:nth-child(1)::before{content:none;}
+    .badge-i:nth-child(n+3){border-top:1px solid var(--line-2);}
+  }
+  @media (max-width:520px){
+    .page,.nav-in{width:94%;}
+    .hero-in{padding:22px;}
+    .toolbar{flex-direction:column;align-items:stretch;}
+    .search{max-width:none;}
+    .tb-end{justify-content:space-between;}
+    .badges{grid-template-columns:1fr;}
+    .badge-i + .badge-i::before{content:none;}
+    .badge-i:nth-child(n+2){border-top:1px solid var(--line-2);}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= TOP NAV (guest header) ================= -->
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="./" aria-label="KOLKLI">
+      <span class="wm">KOLKLI</span>
+      <span class="kbox">K</span>
+    </a>
+    <div class="nav-end">
+      <button class="nav-ico" id="themeBtn" type="button" aria-label="החלפת מצב תצוגה" title="מצב כהה / בהיר">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <a class="nav-login" href="./auth">התחברות</a>
+      <a class="nav-signup" href="./auth?mode=signup">הרשמה</a>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- ================= HERO (personal background + logo) ================= -->
+  <header class="hero">
+    <div class="hero-in">
+      <div class="hero-copy">
+
+        <!-- brand lockup: replace the <img> src with the sender's real logo -->
+        <div class="brand">
+          <span class="logo">
+            <img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 30'%3E%3Cg fill='%23f4700f'%3E%3Crect x='2' y='5' width='20' height='20' rx='6'/%3E%3C/g%3E%3Ctext x='30' y='21' font-family='Arial,sans-serif' font-size='17' font-weight='800' fill='%231c2030'%3ESTUDIO%3C/text%3E%3Ctext x='9' y='20' font-family='Arial' font-size='13' font-weight='900' fill='%23fff'%3ES%3C/text%3E%3C/svg%3E" alt="לוגו השולח">
+          </span>
+          <span class="who">שותף איתך<b>סטודיו לעיצוב · טל זימר</b></span>
+        </div>
+
+        <h1>הקבצים שלך מוכנים להורדה!</h1>
+        <p class="sub">שלחנו לך את הקבצים שהזמנת. אפשר להוריד כל קובץ בנפרד או להוריד את הכל בקובץ ZIP אחד.</p>
+
+        <div class="hchips">
+          <div class="hchip">
+            <span class="ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+            <span class="tx"><span class="k">תוקף הורדה</span><span class="v">7 ימים</span></span>
+          </div>
+          <div class="hchip">
+            <span class="ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+            <span class="tx"><span class="k">תאריך העלאה</span><span class="v">19.05.2024</span></span>
+          </div>
+          <div class="hchip">
+            <span class="ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6l2 3h8a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/></svg></span>
+            <span class="tx"><span class="k">סה״כ קבצים</span><span class="v" id="heroCount">12 קבצים</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- decorative illustration (self-contained SVG) -->
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 200 180" fill="none">
+          <ellipse cx="100" cy="160" rx="78" ry="12" fill="rgba(0,0,0,.16)"/>
+          <path d="M28 58c0-5 4-9 9-9h34l10 12h62c5 0 9 4 9 9v66c0 5-4 9-9 9H37c-5 0-9-4-9-9V58Z" fill="#fff2df"/>
+          <rect x="52" y="40" width="96" height="70" rx="9" fill="#fff"/>
+          <rect x="64" y="54" width="52" height="7" rx="3.5" fill="#ffd3a6"/>
+          <rect x="64" y="68" width="72" height="6" rx="3" fill="#ffe4c6"/>
+          <rect x="64" y="80" width="40" height="6" rx="3" fill="#ffe4c6"/>
+          <path d="M28 74c0-5 4-9 9-9h126c5 0 9 4 9 9l-10 58c-1 5-5 8-10 8H40c-5 0-9-3-10-8L20 74" fill="#ffb066"/>
+          <path d="M28 74c0-5 4-9 9-9h126c5 0 9 4 9 9l-10 58c-1 5-5 8-10 8H40c-5 0-9-3-10-8L20 74Z" fill="url(#fg)"/>
+          <circle cx="150" cy="46" r="24" fill="#fff"/>
+          <path d="M150 34v18M142 45l8 8 8-8" stroke="#f4700f" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="fg" x1="20" y1="65" x2="180" y2="140" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#ffc98a"/><stop offset="1" stop-color="#fb9a4b"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= DOWNLOAD ALL ================= -->
+  <div class="dlbar">
+    <button class="dlall" id="dlAll">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+      הורד הכל (ZIP)
+    </button>
+    <div class="dlnote">‏12 קבצים · <b id="totalSize">84.2MB</b> · קובץ ZIP אחד</div>
+  </div>
+
+  <!-- ================= FILES ================= -->
+  <section class="card">
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="searchInput" placeholder="חיפוש קובץ…" aria-label="חיפוש קובץ">
+      </div>
+      <div class="tb-end">
+        <div class="sortwrap">
+          <span class="lbl">מיין לפי</span>
+          <select id="sortSel" aria-label="מיין לפי">
+            <option value="name">שם (א‑ת)</option>
+            <option value="name-desc">שם (ת‑א)</option>
+            <option value="date">תאריך (חדש→ישן)</option>
+            <option value="size">גודל (גדול→קטן)</option>
+          </select>
+          <svg class="chev" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="viewtoggle" role="tablist" aria-label="תצוגה">
+          <button id="viewList" class="active" aria-label="תצוגת רשימה" title="תצוגת רשימה">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          </button>
+          <button id="viewGrid" aria-label="תצוגת תמונות" title="תצוגת תמונות">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-lbl" id="viewLabel">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      <span>תצוגת רשימה</span>
+    </div>
+
+    <!-- LIST -->
+    <div id="listView">
+      <div class="list">
+        <div class="list-head">
+          <div class="c-name">שם הקובץ</div>
+          <div class="c-type">סוג</div>
+          <div class="c-size">גודל</div>
+          <div class="c-date">תאריך שינוי</div>
+          <div class="c-act">פעולה</div>
+        </div>
+        <div id="listBody"></div>
+      </div>
+    </div>
+
+    <!-- GRID -->
+    <div id="gridView" style="display:none">
+      <div class="grid" id="gridBody"></div>
+    </div>
+
+    <div class="emptymsg" id="emptyMsg">לא נמצאו קבצים התואמים לחיפוש.</div>
+
+    <div class="morewrap" id="moreWrap">
+      <button class="morebtn" id="moreBtn">
+        <span id="moreLbl">הצג עוד קבצים</span>
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= SECURITY / TRUST ================= -->
+  <section class="secure">
+    <div class="secure-top">
+      <div class="secure-shield">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.4-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.4 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1Z"/><path d="m9 12 2 2 4-4"/></svg>
+      </div>
+      <div>
+        <h2>הקבצים מאובטחים</h2>
+        <p>הקבצים שלך מאוחסנים בשרתים מאובטחים. הקישור להורדה הוא אישי ופרטי — רק מי שקיבל אותו יכול לגשת אליו.</p>
+      </div>
+    </div>
+    <div class="badges">
+      <div class="badge-i">
+        <span class="bi"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg></span>
+        <span class="bt"><span class="bk">איכות ללא פשרה</span><span class="bs">הקבצים במלוא איכותם</span></span>
+      </div>
+      <div class="badge-i">
+        <span class="bi"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/></svg></span>
+        <span class="bt"><span class="bk">מהיר ויעיל</span><span class="bs">הורדה בלחיצה אחת</span></span>
+      </div>
+      <div class="badge-i">
+        <span class="bi"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <span class="bt"><span class="bk">העברה מאובטחת</span><span class="bs">הצפנת SSL מלאה</span></span>
+      </div>
+      <div class="badge-i">
+        <span class="bi"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span>
+        <span class="bt"><span class="bk">שירות לקוחות זמין</span><span class="bs">כאן בשבילך בכל שאלה</span></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="poweredby">
+    <span class="mark">K</span>
+    <span>מופעל על ידי KOLKLI</span>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  /* ---------- theme ---------- */
+  const root = document.documentElement;
+  try{ if(localStorage.getItem('kolkli-theme')==='dark') root.setAttribute('data-theme','dark'); }catch(_){}
+  $('themeBtn').addEventListener('click',()=>{
+    const dark = root.getAttribute('data-theme')==='dark';
+    if(dark) root.removeAttribute('data-theme'); else root.setAttribute('data-theme','dark');
+    try{ localStorage.setItem('kolkli-theme', dark?'light':'dark'); }catch(_){}
+  });
+
+  /* ---------- toast ---------- */
+  let toastT; const toastEl = $('toast');
+  function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show');
+    clearTimeout(toastT); toastT=setTimeout(()=>toastEl.classList.remove('show'),1900); }
+
+  /* ---------- demo file data ---------- */
+  const FILES = [
+    {name:'הצעת מחיר – פרויקט אלפא.pdf',      type:'PDF',  kind:'pdf', size:'1.2 MB',  bytes:1258291,  date:'19.05.2024 14:30', ts:1430},
+    {name:'תכנית עבודה – גרסה אלפא.xlsx',     type:'XLSX', kind:'xls', size:'856 KB',  bytes:876544,   date:'19.05.2024 14:25', ts:1425},
+    {name:'עיצוב לוגו – סקיצה סופית.png',      type:'PNG',  kind:'img', size:'2.4 MB',  bytes:2516582,  date:'19.05.2024 14:20', ts:1420},
+    {name:'מצגת מרוכזת – אלפא.pptx',           type:'PPTX', kind:'ppt', size:'5.7 MB',  bytes:5976883,  date:'19.05.2024 14:15', ts:1415},
+    {name:'קובץ נתונים גולמי.csv',             type:'CSV',  kind:'csv', size:'320 KB',  bytes:327680,   date:'19.05.2024 14:10', ts:1410},
+    {name:'חוזה התקשרות חתום.pdf',             type:'PDF',  kind:'pdf', size:'480 KB',  bytes:491520,   date:'19.05.2024 14:05', ts:1405},
+    {name:'תמונת רקע – באנר ראשי.jpg',         type:'JPG',  kind:'img', size:'3.1 MB',  bytes:3250585,  date:'19.05.2024 14:00', ts:1400},
+    {name:'מפרט טכני מלא.docx',                type:'DOCX', kind:'doc', size:'210 KB',  bytes:215040,   date:'19.05.2024 13:55', ts:1355},
+    {name:'גיליון תמחור מעודכן.xlsx',          type:'XLSX', kind:'xls', size:'640 KB',  bytes:655360,   date:'19.05.2024 13:50', ts:1350},
+    {name:'סרטון הדגמה קצר.mp4',               type:'MP4',  kind:'vid', size:'18.4 MB', bytes:19293798, date:'19.05.2024 13:45', ts:1345},
+    {name:'ארכיון נכסי המותג.zip',             type:'ZIP',  kind:'zip', size:'42.6 MB', bytes:44669747, date:'19.05.2024 13:40', ts:1340},
+    {name:'הערות ומשוב.txt',                   type:'TXT',  kind:'txt', size:'12 KB',   bytes:12288,    date:'19.05.2024 13:35', ts:1335},
+  ];
+  const INITIAL = 5;              // shown before “הצג עוד”
+  let expanded = false;
+
+  const ICON = {
+    pdf:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M8 15h1.5a1.5 1.5 0 0 0 0-3H8v5"/></svg>',
+    xls:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="m8 12 4 6M12 12l-4 6"/></svg>',
+    csv:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M8 13h3M8 17h5"/></svg>',
+    img:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>',
+    ppt:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M8 12h3a1.5 1.5 0 0 1 0 3H8v3"/></svg>',
+    doc:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M8 13h8M8 17h8M8 9h2"/></svg>',
+    vid:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="16" rx="2"/><path d="m22 8-6 4 6 4V8Z"/><path d="m8 9 4 3-4 3V9Z" fill="currentColor" stroke="none"/></svg>',
+    zip:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M11 6h1M11 9h1M11 12h1M11 15h1"/></svg>',
+    txt:'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M8 13h8M8 17h6M8 9h3"/></svg>',
+  };
+  const DL_ICON = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>';
+  const KEBAB = '<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>';
+  const kClass = k => 'k-'+k;
+
+  function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  /* ---------- current sort + search state ---------- */
+  let sortMode = 'name', query = '';
+
+  function currentFiles(){
+    let list = FILES.map((f,i)=>({...f,i}));
+    if(query){ const q=query.toLowerCase(); list = list.filter(f=>f.name.toLowerCase().includes(q)); }
+    const coll = new Intl.Collator('he');
+    list.sort((a,b)=>{
+      if(sortMode==='name')      return coll.compare(a.name,b.name);
+      if(sortMode==='name-desc') return coll.compare(b.name,a.name);
+      if(sortMode==='date')      return b.ts-a.ts;
+      if(sortMode==='size')      return b.bytes-a.bytes;
+      return 0;
+    });
+    return list;
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    const list = currentFiles();
+    const searching = !!query;
+    const cut = (searching||expanded) ? list.length : INITIAL;
+
+    // LIST
+    $('listBody').innerHTML = list.map((f,idx)=>`
+      <div class="frow ${idx>=cut?'is-hidden':''}">
+        <div class="fmain">
+          <span class="fico ${kClass(f.kind)}">${ICON[f.kind]}</span>
+          <span class="fname">
+            <span class="nm" title="${esc(f.name)}">${esc(f.name)}</span>
+            <span class="mob">${f.type} · ${f.size} · ${f.date}</span>
+          </span>
+        </div>
+        <div><span class="ftype ${kClass(f.kind)}">${f.type}</span></div>
+        <div class="fsize">${f.size}</div>
+        <div class="fdate">${f.date}</div>
+        <div class="c-act">
+          <button class="dlbtn" data-dl="${f.i}">${DL_ICON}הורדה</button>
+          <button class="kebab" data-more="${f.i}" aria-label="עוד">${KEBAB}</button>
+        </div>
+      </div>`).join('');
+
+    // GRID
+    $('gridBody').innerHTML = list.map((f,idx)=>`
+      <div class="gcard ${kClass(f.kind)} ${idx>=cut?'is-hidden':''}">
+        <button class="gkebab" data-more="${f.i}" aria-label="עוד">${KEBAB}</button>
+        <span class="gico">${ICON[f.kind]}</span>
+        <span class="badge">${f.type}</span>
+        <span class="gnm" title="${esc(f.name)}">${esc(f.name)}</span>
+        <span class="gsz">${f.size}</span>
+        <button class="gdl" data-dl="${f.i}">${DL_ICON}הורדה</button>
+      </div>`).join('');
+
+    // empty + show-more visibility
+    $('emptyMsg').classList.toggle('show', list.length===0);
+    const hasHidden = !searching && list.length>INITIAL;
+    $('moreWrap').style.display = hasHidden ? '' : 'none';
+    $('moreBtn').classList.toggle('open', expanded);
+    $('moreLbl').textContent = expanded ? 'הצג פחות' : `הצג עוד קבצים (${list.length-INITIAL})`;
+  }
+
+  /* ---------- view toggle ---------- */
+  function setView(v){
+    const list = v==='list';
+    $('viewList').classList.toggle('active', list);
+    $('viewGrid').classList.toggle('active', !list);
+    $('listView').style.display = list ? '' : 'none';
+    $('gridView').style.display = list ? 'none' : '';
+    $('viewLabel').querySelector('span').textContent = list ? 'תצוגת רשימה' : 'תצוגת תמונות';
+    $('viewLabel').querySelector('svg').innerHTML = list
+      ? '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'
+      : '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>';
+  }
+  $('viewList').addEventListener('click',()=>setView('list'));
+  $('viewGrid').addEventListener('click',()=>setView('grid'));
+
+  /* ---------- controls ---------- */
+  $('sortSel').addEventListener('change',e=>{ sortMode=e.target.value; render(); });
+  $('searchInput').addEventListener('input',e=>{ query=e.target.value.trim(); render(); });
+  $('moreBtn').addEventListener('click',()=>{ expanded=!expanded; render(); });
+
+  /* ---------- download actions (demo) ---------- */
+  document.addEventListener('click',e=>{
+    const dl=e.target.closest('[data-dl]');
+    if(dl){ const f=FILES[+dl.getAttribute('data-dl')]; toast('מוריד: '+f.name); return; }
+    const more=e.target.closest('[data-more]');
+    if(more){ toast('עוד פעולות'); }
+  });
+  $('dlAll').addEventListener('click',()=>toast('מכין קובץ ZIP עם כל הקבצים…'));
+
+  /* ---------- init ---------- */
+  $('heroCount').textContent = FILES.length + ' קבצים';
+  render();
+})();
+</script>
+</body>
+</html>

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AudioCut — בחירת קבצים</title>
+<link rel="canonical" href="https://kolkli.com/files">
 <meta name="description" content="Organize, sort and tag your media files. Images, video, audio and documents. Fast, simple and professional-quality.">
 <style>
   :root {
@@ -56,12 +57,12 @@
   body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
   a{color:inherit;text-decoration:none;}
   button{font-family:var(--sans);}
-  .wrap{width:100%;max-width:none;margin:0 auto;padding:26px 0 60px;zoom:.95;} /* shrink inner display only to 95% (header is a sibling, unaffected) */
+  .wrap{width:95%;max-width:none;margin:0 auto;padding:26px 0 60px;zoom:.95;} /* 95% width centered + shrink inner display to 95% (header is a sibling, unaffected) */
   @media (max-width:1560px){ .wrap{width:100%;} }
   @media (max-width:640px){ .wrap{width:100%;padding:18px 14px 52px;} }
 
   /* ---------- header ---------- */
-  .topbar{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+  .topbar{position:relative;display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
   .brand{display:flex;align-items:center;gap:12px;}
   .brand .logo{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;
     background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);flex-shrink:0;}
@@ -83,6 +84,38 @@
     transition:filter .14s,transform .08s;}
   .cta:hover{filter:brightness(1.05);} .cta:active{transform:translateY(1px);}
   .cta svg{width:15px;height:15px;}
+  /* ---------- preview-mode toggle (owner ⇄ client) ---------- */
+  .viewseg{display:inline-flex;align-items:center;gap:3px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--panel-2);
+    border:1px solid var(--line);border-radius:999px;padding:3px;box-shadow:var(--shadow-sm);}
+  .viewseg .vseg{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 14px;border:none;border-radius:999px;
+    background:none;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;white-space:nowrap;
+    transition:background .14s,color .14s,box-shadow .14s;}
+  .viewseg .vseg svg{width:15px;height:15px;}
+  .viewseg .vseg:hover{color:var(--accent);}
+  .viewseg .vseg.on{background:var(--panel);color:var(--accent);box-shadow:var(--shadow-sm);}
+  @media (max-width:640px){ .viewseg{position:static;transform:none;margin-inline-end:0;} .viewseg .vseg{padding:0 11px;font-size:12px;} }
+  /* client preview: owner-only chrome is always hidden so the page reads exactly as the client sees it.
+     .pick is the owner's batch-select toggle; the client's own move dropdown lives in the same .facts row. */
+  body.clientview #shareBtn,
+  body.clientview #albumMgrBtn,
+  body.clientview .toolchk,
+  body.clientview .selbar,
+  body.clientview .fcard .facts .pick{display:none !important;}
+  /* permission-gated client tools: hidden unless the owner granted the matching permission.
+     the perm-* classes are toggled onto <body> in applyPreviewMode() from the saved client perms. */
+  body.clientview:not(.perm-upload) .drop,
+  body.clientview:not(.perm-folderCreate) #addFolderBtn,
+  body.clientview:not(.perm-folderCreate) .cardmove-menu .fs-newbtn,
+  body.clientview:not(.perm-delete) .fcard .fdel-x,
+  body.clientview:not(.perm-folderMove) .fcard .facts,
+  body.clientview:not(.perm-folderMove) .fcard .movemain,
+  body.clientview:not(.perm-folderManage) .fi-grip,
+  body.clientview:not(.perm-folderManage) .fi-act,
+  body.clientview:not(.perm-selection) .fcard .fcheck{display:none !important;}
+  body:not(.clientview) #clientSelectAllBtn,
+  body.clientview:not(.perm-selectAll) #clientSelectAllBtn{display:none !important;}
+  /* captions are read-only (still legible) unless text editing is allowed */
+  body.clientview:not(.perm-editText) .fcard .fcap{pointer-events:none;}
 
   /* ---------- page intro ---------- */
   .pagehead{margin:4px 0 18px;}
@@ -180,12 +213,15 @@
   .bottombar{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:34px;}
   .btnline.dlbtn.dlbtn-lg{height:48px;padding:0 28px;font-size:15px;}
   .btnline.dlbtn-lg svg{width:17px;height:17px;}
-  /* ---------- client "finish selecting" button (bottom bar; only when the gallery was opened via a share link) ---------- */
+  /* ---------- client "finish selecting" button (right rail, under the main folder; only when the gallery was opened via a share link) ---------- */
   .btnline.dlbtn.finishbtn{
     background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),linear-gradient(105deg,var(--success) 0%,var(--success-dim) 100%);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px rgba(34,176,75,.32);}
   .btnline.dlbtn.finishbtn:disabled,.btnline.dlbtn.finishbtn.done{opacity:.6;cursor:default;filter:none;}
   .btnline.dlbtn.finishbtn:disabled:hover,.btnline.dlbtn.finishbtn.done:hover{filter:none;}
+  /* sits in the folders rail, separated from the folder list above it; hugs its content and stays centered */
+  .btnline.dlbtn.finishbtn.side-finish{display:flex;width:fit-content;max-width:100%;height:42px;padding:0 22px;margin:12px auto 0;border-radius:12px;font-size:14px;}
+  .btnline.dlbtn.finishbtn.side-finish svg{width:16px;height:16px;}
 
   /* ---------- layout ---------- */
   /* folders column matches one stat-card width so it sits exactly under the "gallery total" card
@@ -195,9 +231,19 @@
   @media (max-width:820px){ .organizer{grid-template-columns:1fr;} }
 
   /* ---------- sidebar / folders ---------- */
-  .side{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow);position:sticky;top:16px;min-height:184px;}
-  .side .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .side{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow);
+    position:sticky;top:80px;align-self:start;z-index:30;min-height:184px;max-height:calc(100vh - 96px);overflow-y:auto;}
+  /* top:80px on .side (above) clears the sticky KOLKLI site-header (72px tall, z-index 60) that used to
+     cover the rail's own header once the page scrolled — leaving the empty strip where title +
+     "selected total" + add-folder icon should be. .sh is also sticky inside the scrollable rail so that
+     header keeps pinned above a long folder list; its --panel background hides rows scrolling under it. */
+  .side .sh{position:sticky;top:0;z-index:3;background:var(--panel);
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
   .side .sh b{font-size:13px;}
+  .side .sh-total{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;}
+  .side .sh-total-label{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;white-space:nowrap;}
+  .side .sh-total-value{direction:ltr;display:flex;align-items:baseline;gap:7px;font-size:18px;font-weight:800;color:var(--ink);}
+  .side .sh-total-value .sep{color:var(--faint);font-weight:700;}
   .side .addf{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--accent);
     cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
   .side .addf:hover{border-color:var(--accent);background:var(--accent-soft);}
@@ -313,34 +359,12 @@
   .statcard.total .st-label{color:var(--accent-dim);}
   .statcard.total .st-val{color:var(--accent-dim);}
   .statcard.total .st-ic{background:var(--panel);color:var(--accent);box-shadow:var(--shadow-sm);}
-  /* selection-status card (replaces the storage stat) */
-  .statcard.status{position:relative;cursor:pointer;--st-c:var(--muted);z-index:1;}
-  .statcard.status.open{z-index:30;}
-  .statcard.status:hover{border-color:color-mix(in srgb,var(--st-c) 45%,var(--line));box-shadow:var(--shadow);}
-  .statcard.status:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-  .statcard.status .st-val{direction:unset;line-height:1;}
-  .statcard.status .st-ic.st{background:color-mix(in srgb,var(--st-c) 15%,transparent);color:var(--st-c);}
-  .statusbadge{display:inline-flex;align-items:center;gap:7px;max-width:100%;padding:4px 10px;border-radius:999px;
-    font-size:13px;font-weight:700;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    color:var(--st-c);background:color-mix(in srgb,var(--st-c) 14%,transparent);
-    border:1px solid color-mix(in srgb,var(--st-c) 30%,transparent);}
-  .statusbadge .dot{width:8px;height:8px;border-radius:50%;background:var(--st-c);flex-shrink:0;}
-  /* "live" pulse for the in-progress state — matches the dashboard's active status pill */
-  .statusbadge.live .dot{box-shadow:0 0 0 3px color-mix(in srgb,var(--st-c) 24%,transparent);animation:stpulse 1.8s ease-in-out infinite;}
-  @keyframes stpulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-  .st-sub{margin-top:11px;font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .st-sub b{color:var(--ink);font-weight:800;}
-  .statusmenu{position:absolute;inset-inline:12px;top:calc(100% + 8px);display:none;gap:4px;padding:6px;
-    background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);cursor:default;}
-  .statcard.status.open .statusmenu{display:grid;}
-  .statusmenu button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;color:var(--ink);
-    padding:9px 10px;border-radius:8px;font-size:13px;font-weight:700;text-align:start;cursor:pointer;}
-  .statusmenu button:hover,.statusmenu button:focus-visible{background:var(--panel-2);outline:none;}
-  .statusmenu button.on{color:var(--item-c);background:color-mix(in srgb,var(--item-c) 12%,transparent);}
-  .statusmenu .dot{width:8px;height:8px;border-radius:50%;background:var(--item-c);flex-shrink:0;}
+  /* "אחר" (Other) category card — icon tint (documents / archives / design files) */
+  .st-ic.o{background:var(--warm-soft);color:var(--warn);}
   /* compact quota strip */
-  /* auto-fit so the five tiles (incl. the selection-status card) wrap cleanly at any width */
-  .statrow{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;background:transparent;border:0;
+  /* gallery-total tile is pinned to the folders-rail width (same calc + gap as .organizer below),
+     so it sits directly above the folders panel; the three category tiles share the rest as equal 1fr columns */
+  .statrow{grid-template-columns:calc((100% - 56px) / 5) 1fr 1fr 1fr;gap:22px;background:transparent;border:0;
     border-radius:0;box-shadow:none;overflow:visible;}
   html[data-theme="dark"] .statrow{box-shadow:none;}
   .statrow .statcard,.statrow .statcard.total{position:relative;min-width:0;min-height:78px;padding:17px 24px 15px;
@@ -359,10 +383,13 @@
   .statrow .statcard.total .cur,
   .statrow .statcard.videos .cur,
   .statrow .statcard.images .cur{color:var(--ink);}
-  .statrow .statcard.no-videos .cur{color:var(--muted);}
+  .statrow .statcard.no-videos .cur,
+  .statrow .statcard.no-other .cur{color:var(--muted);}
   .statrow .statcard.no-videos .sep,
   .statrow .statcard.no-videos .max,
-  .statrow .statcard.no-videos .st-bar{display:none;}
+  .statrow .statcard.no-videos .st-bar,
+  .statrow .statcard.no-other .sep,
+  .statrow .statcard.no-other .max{display:none;}
   .statrow .st-val .sep{color:var(--faint);font-size:22px;font-weight:700;}
   .statrow .st-val .max{color:var(--ink-2);font-size:22px;font-weight:800;}
   .statrow .st-ic{width:40px;height:40px;border-radius:12px;flex:0 0 auto;border:1px solid var(--line);}
@@ -374,6 +401,10 @@
   .statrow .st-bar.i span{background:linear-gradient(90deg,var(--success),var(--success-dim));}
   .statrow .st-bar.near span{background:linear-gradient(90deg,var(--warn),#f0b429);}
   .statrow .st-bar.full span{background:linear-gradient(90deg,var(--danger),#ff8a8a);}
+  /* keep the gallery tile matched to the folders rail as it switches to a fixed width */
+  @media (max-width:980px){
+    .statrow{grid-template-columns:286px 1fr 1fr 1fr;gap:16px;}
+  }
   @media (max-width:760px){
     .statrow{grid-template-columns:repeat(2,minmax(0,1fr));}
     .statrow .statcard{min-height:86px;padding:16px 18px;}
@@ -397,11 +428,13 @@
   .fcard.picked:not(.sel) .fthumb::after{content:'';position:absolute;inset:0;background:rgba(6,8,16,.30);z-index:1;pointer-events:none;}
   .fthumb{position:relative;aspect-ratio:1/1;background:var(--panel-2);display:flex;align-items:center;justify-content:center;
     overflow:hidden;cursor:pointer;}
+  /* placeholder thumbs (audio/doc/pdf/video-fallback) get the audio lavender background */
+  .fthumb:has(.ph){background:var(--grad-soft);}
   .fthumb img,.fthumb video{width:100%;height:100%;object-fit:cover;display:block;}
   .fthumb .ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--accent);}
   .fthumb .ph svg{width:34%;height:34%;max-width:56px;max-height:56px;opacity:.85;}
-  .fthumb .ph.img{color:var(--info);} .fthumb .ph.video{color:#e5484d;}
-  .fthumb .ph.audio{color:var(--accent);} .fthumb .ph.pdf{color:#e5484d;} .fthumb .ph.doc{color:var(--info-dim);}
+  /* every file-type placeholder uses the audio treatment: purple glyph on lavender */
+  .fthumb .ph.img,.fthumb .ph.video,.fthumb .ph.audio,.fthumb .ph.pdf,.fthumb .ph.doc{color:var(--accent);}
   .fthumb .ph .pext{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.05em;}
   /* video film-strip: dark perforated rails down both sides mark the thumb as a video — no play button needed */
   .fthumb .filmstrip{position:absolute;inset:0;z-index:3;pointer-events:none;}
@@ -430,17 +463,21 @@
     text-shadow:0 1px 3px rgba(0,0,0,.7);opacity:0;transform:translateY(5px);transition:opacity .16s,transform .16s;}
   .fthumb:hover .fname-ov{opacity:1;transform:none;}
   /* ---------- order number + drag-to-reorder ---------- */
+  /* order number pinned to the top corner where reading starts
+     (top-right in RTL, top-left in LTR); the × sits in the opposite corner */
   .fnum{position:absolute;top:9px;left:9px;z-index:4;height:28px;min-width:42px;padding:0 10px;
     display:flex;align-items:center;justify-content:center;border-radius:8px;font-family:var(--mono);
     font-size:12px;font-weight:800;letter-spacing:.04em;color:#fff;cursor:grab;direction:ltr;unicode-bidi:isolate;
     background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,0) 62%),var(--grad-btn);
     box-shadow:0 4px 12px rgba(80,54,210,.28),inset 0 1px 0 rgba(255,255,255,.45);}
-  .fcard.locked .fnum{left:9px;cursor:default;filter:saturate(.55) brightness(.9);}
-  /* small black × delete affordance, pinned to the top-right corner of the thumbnail */
+  .fcard.locked .fnum{cursor:default;filter:saturate(.55) brightness(.9);}
+  html[dir="rtl"] .fnum{left:auto;right:9px;}
+  /* small black × delete affordance, pinned to the corner opposite the order number */
   .fdel-x{position:absolute;top:8px;right:8px;z-index:5;width:22px;height:22px;padding:0;border:none;
     border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;
     background:rgba(255,255,255,.85);color:#11141c;box-shadow:0 1px 5px rgba(0,0,0,.35);
     opacity:.9;transition:background .12s,color .12s,transform .12s,opacity .12s;}
+  html[dir="rtl"] .fdel-x{right:auto;left:8px;}
   .fdel-x svg{width:13px;height:13px;}
   .fthumb:hover .fdel-x{opacity:1;}
   .fdel-x:hover{background:var(--danger);color:#fff;transform:scale(1.12);opacity:1;}
@@ -566,10 +603,23 @@
   .pvbar button{background:rgba(255,255,255,.12);border:none;color:#fff;cursor:pointer;border-radius:10px;padding:9px 14px;
     font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px;transition:background .12s;}
   .pvbar button:hover{background:rgba(255,255,255,.22);}
+  /* pick / deselect toggle inside the enlarged preview — lets the client choose a file
+     straight from the full view, mirroring the gallery card's ✓ checkbox */
+  .pvbar .pvpick{background:var(--grad-btn);color:#fff;font-weight:700;border-radius:999px;padding:9px 15px;
+    box-shadow:0 4px 14px var(--grad-btn-glow);text-shadow:0 1px 2px rgba(0,0,0,.18);}
+  .pvbar .pvpick:hover{background:var(--grad-btn);filter:brightness(1.06);}
+  .pvbar .pvpick.on{background:var(--success);box-shadow:0 4px 14px rgba(34,176,75,.4);}
+  .pvbar .pvpick.on:hover{background:var(--success);filter:brightness(1.04);}
+  .pvbar .pvpick svg{width:16px;height:16px;}
   .pvbar button svg{width:15px;height:15px;}
   .pvbody{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 20px 26px;min-height:0;}
   .pvbody img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,.5);}
   .pvbody video{max-width:100%;max-height:100%;border-radius:8px;background:#000;}
+  /* enlarged preview: shrink-wrap the media so the same .fwm watermark overlay (reused from the grid) aligns to the image corners */
+  .pvbody .pvstage{position:relative;display:inline-flex;line-height:0;max-width:100%;max-height:100%;}
+  .pvbody .pvstage img,.pvbody .pvstage video{display:block;max-width:92vw;max-height:80vh;object-fit:contain;}
+  .pvbody .pvstage .fwm-tx{font-size:clamp(16px,2.4vw,30px);}
+  .pvbody .pvstage .fwm.pos-c .fwm-tx{font-size:clamp(22px,3.8vw,46px);}
   .pvbody iframe{width:min(920px,100%);height:100%;border:none;border-radius:8px;background:#fff;}
   .pvbody .pvaudio{width:min(560px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:30px;text-align:center;}
   .pvbody .pvaudio .aic{width:76px;height:76px;margin:0 auto 18px;border-radius:20px;background:var(--grad-soft);color:var(--accent);
@@ -597,6 +647,9 @@
     letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:13px;}
   .csec-h::after{content:'';flex:1;height:1px;background:var(--line);}
   .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px 14px;}
+  /* per-type quotas: keep all three (photos / videos / other) on a single row */
+  #amSplitFields{grid-template-columns:1fr 1fr 1fr;}
+  @media (max-width:560px){ #amSplitFields{grid-template-columns:1fr;} }
   .cfield{display:flex;flex-direction:column;gap:6px;min-width:0;}
   .cfield.full{grid-column:1 / -1;}
   .cfield label{font-size:12px;color:var(--muted);font-weight:600;}
@@ -696,10 +749,6 @@
   .rangewrap{display:flex;align-items:center;gap:10px;}
   .rangewrap input[type=range]{accent-color:var(--accent);flex:1;cursor:pointer;}
   .rangeval{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:42px;text-align:end;}
-  /* storage meter */
-  .storbar{height:9px;border-radius:999px;background:var(--line);overflow:hidden;margin:6px 0;}
-  .storbar span{display:block;height:100%;border-radius:999px;background:var(--grad);transition:width .3s ease;}
-  .storrow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:11px;}
   /* inline action buttons + danger zone */
   .setact{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;cursor:pointer;
     font-size:12.5px;font-weight:600;background:var(--panel);border:1px solid var(--line);color:var(--ink-2);
@@ -825,6 +874,16 @@
 
   <!-- ============ header ============ -->
   <div class="topbar">
+    <div class="viewseg" id="viewSeg" role="tablist" aria-label="preview mode">
+      <button class="vseg on" id="vsUser" type="button" role="tab" aria-selected="true" data-mode="user">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span data-i18n="viewUser"></span>
+      </button>
+      <button class="vseg" id="vsClient" type="button" role="tab" aria-selected="false" data-mode="client">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span data-i18n="viewClient"></span>
+      </button>
+    </div>
     <div class="toolbtns">
       <button class="pillbtn sharebtn" id="shareBtn" type="button" data-i18n-title="shareTitle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -839,7 +898,7 @@
 
   <!-- ============ page intro ============ -->
   <div class="pagehead">
-    <h2 data-i18n="pageTitle"></h2>
+    <h2 id="pageTitle" data-i18n="pageTitle"></h2>
     <p data-i18n="pageSub"></p>
   </div>
 
@@ -874,24 +933,14 @@
       </div>
       <div class="st-bar v"><span id="stVideosBar" style="width:0%"></span></div>
     </div>
-    <div class="statcard total">
+    <div class="statcard other">
       <div class="st-top">
         <div class="st-tx">
-          <div class="st-label" data-i18n="statSelectedTotal"></div>
-          <div class="st-val"><span class="cur" id="stSelectedCur">0</span><span class="sep">/</span><span class="max" id="stSelectedMax">55</span></div>
+          <div class="st-label" data-i18n="statOther"></div>
+          <div class="st-val"><span class="cur" id="stOtherCount">0</span><span class="sep">/</span><span class="max" id="stOtherTotal">0</span></div>
         </div>
+        <div class="st-ic o"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
       </div>
-    </div>
-    <div class="statcard status" id="statStatusCard" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" data-i18n-title="statStatusHint">
-      <div class="st-top">
-        <div class="st-tx">
-          <div class="st-label" data-i18n="statStatus"></div>
-          <div class="st-val"><span class="statusbadge" id="stStatusBadge"><span class="dot"></span><span id="stStatusText">—</span></span></div>
-        </div>
-        <div class="st-ic st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L20 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
-      </div>
-      <div class="st-sub" id="stStatusCounter"></div>
-      <div class="statusmenu" id="statusMenu" role="listbox"></div>
     </div>
   </div>
 
@@ -912,6 +961,7 @@
       <span data-i18n="showMovedInMain"></span>
     </label>
     <div class="selbar">
+      <button class="btnline" id="clientSelectAllBtn" type="button"><span data-i18n="selectAll"></span></button>
       <button class="btnline gearbtn" id="clientBtn" type="button" data-i18n-title="setTitle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         <span data-i18n="setBtn"></span>
@@ -941,6 +991,10 @@
     <aside class="side">
       <div class="sh">
         <b data-i18n="foldersTitle"></b>
+        <div class="sh-total" aria-live="polite">
+          <span class="sh-total-label" data-i18n="statSelectedTotal"></span>
+          <span class="sh-total-value"><span id="sideSelectedCur">0</span><span class="sep">/</span><span id="sideSelectedMax">0</span></span>
+        </div>
         <button class="addf" id="addFolderBtn" type="button" title="" aria-label="new folder">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 10v6"/><path d="M9 13h6"/></svg>
         </button>
@@ -950,6 +1004,11 @@
         <input type="text" id="folderSearch" data-i18n-ph="folderSearchPh">
       </label>
       <div class="folders" id="folderList"></div>
+      <!-- client "finish selecting": sits at the bottom of the right rail, under the main folder (shown only when the gallery was opened via a share link) -->
+      <button class="btnline dlbtn finishbtn side-finish" id="finishSelBtn" type="button" hidden data-i18n-title="finishSelTitle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L20 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span data-i18n="finishSelBtn"></span>
+      </button>
     </aside>
 
     <!-- main -->
@@ -981,19 +1040,6 @@
         <p data-i18n="emptySub"></p>
       </div>
     </div>
-  </div>
-
-  <!-- ============ bottom download bar ============ -->
-  <div class="bottombar">
-    <!-- shown only to a client who opened the shareable ?g=<id> link (hidden for the owner) -->
-    <button class="btnline dlbtn finishbtn dlbtn-lg" id="finishSelBtn" type="button" hidden data-i18n-title="finishSelTitle">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L20 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <span></span>
-    </button>
-    <button class="btnline dlbtn dlbtn-lg" id="downloadZipBtn" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      <span data-i18n="downloadZip"></span>
-    </button>
   </div>
 
   <footer data-i18n="footer"></footer>
@@ -1184,15 +1230,6 @@
               <label data-i18n="cDeadline"></label>
               <input id="cDeadline" type="date">
             </div>
-            <div class="cfield full">
-              <label data-i18n="cStatus"></label>
-              <select id="cStatus">
-                <option value="draft" data-i18n="statusDraft"></option>
-                <option value="awaiting" data-i18n="statusAwaiting"></option>
-                <option value="selecting" data-i18n="statusSelecting"></option>
-                <option value="completed" data-i18n="statusCompleted"></option>
-              </select>
-            </div>
           </div>
         </div>
       </section>
@@ -1270,46 +1307,26 @@
               <span class="pl"><b data-i18n="permSelection"></b><small data-i18n="permSelectionD"></small></span>
               <span class="switch"><input type="checkbox" id="perm_selection"><span class="track"></span></span>
             </label>
+            <label class="permrow">
+              <span class="pl"><b data-i18n="permSelectAll"></b><small data-i18n="permSelectAllD"></small></span>
+              <span class="switch"><input type="checkbox" id="perm_selectAll"><span class="track"></span></span>
+            </label>
+            <label class="permrow">
+              <span class="pl"><b data-i18n="permFolderCreate"></b><small data-i18n="permFolderCreateD"></small></span>
+              <span class="switch"><input type="checkbox" id="perm_folderCreate"><span class="track"></span></span>
+            </label>
+            <label class="permrow">
+              <span class="pl"><b data-i18n="permFolderManage"></b><small data-i18n="permFolderManageD"></small></span>
+              <span class="switch"><input type="checkbox" id="perm_folderManage"><span class="track"></span></span>
+            </label>
+            <label class="permrow">
+              <span class="pl"><b data-i18n="permFolderMove"></b><small data-i18n="permFolderMoveD"></small></span>
+              <span class="switch"><input type="checkbox" id="perm_folderMove"><span class="track"></span></span>
+            </label>
             <label class="permrow viewonly">
               <span class="pl"><b data-i18n="permViewOnly"></b><small data-i18n="permViewOnlyD"></small></span>
               <span class="switch"><input type="checkbox" id="perm_viewOnly"><span class="track"></span></span>
             </label>
-          </div>
-        </div>
-
-        <div class="csec">
-          <div class="csec-h"><span data-i18n="secDownloads"></span></div>
-          <div class="permlist">
-            <label class="permrow">
-              <span class="pl"><b data-i18n="alDlPhotosL"></b><small data-i18n="alDlPhotosD"></small></span>
-              <span class="switch"><input type="checkbox" id="alDlPhotos"><span class="track"></span></span>
-            </label>
-            <label class="permrow">
-              <span class="pl"><b data-i18n="alDlVideosL"></b><small data-i18n="alDlVideosD"></small></span>
-              <span class="switch"><input type="checkbox" id="alDlVideos"><span class="track"></span></span>
-            </label>
-            <label class="permrow">
-              <span class="pl"><b data-i18n="alDlZipL"></b><small data-i18n="alDlZipD"></small></span>
-              <span class="switch"><input type="checkbox" id="alDlZip"><span class="track"></span></span>
-            </label>
-            <label class="permrow">
-              <span class="pl"><b data-i18n="alDlOriginalL"></b><small data-i18n="alDlOriginalD"></small></span>
-              <span class="switch"><input type="checkbox" id="alDlOriginal"><span class="track"></span></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="csec">
-          <div class="csec-h"><span data-i18n="secQuality"></span></div>
-          <div class="cgrid">
-            <div class="cfield full">
-              <label data-i18n="alQualityL"></label>
-              <select id="alQuality">
-                <option value="full" data-i18n="qFull"></option>
-                <option value="preview" data-i18n="qPreview"></option>
-                <option value="request" data-i18n="qRequest"></option>
-              </select>
-            </div>
           </div>
         </div>
       </section>
@@ -1336,24 +1353,6 @@
             <label class="permrow">
               <span class="pl"><b data-i18n="alApprovalL"></b><small data-i18n="alApprovalD"></small></span>
               <span class="switch"><input type="checkbox" id="alApproval"><span class="track"></span></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="csec">
-          <div class="csec-h"><span data-i18n="secComments"></span></div>
-          <div class="permlist">
-            <label class="permrow">
-              <span class="pl"><b data-i18n="alCommentsL"></b><small data-i18n="alCommentsD"></small></span>
-              <span class="switch"><input type="checkbox" id="alComments"><span class="track"></span></span>
-            </label>
-            <label class="permrow">
-              <span class="pl"><b data-i18n="alCommentsGuestsL"></b><small data-i18n="alCommentsGuestsD"></small></span>
-              <span class="switch"><input type="checkbox" id="alCommentsGuests"><span class="track"></span></span>
-            </label>
-            <label class="permrow">
-              <span class="pl"><b data-i18n="alLikesL"></b><small data-i18n="alLikesD"></small></span>
-              <span class="switch"><input type="checkbox" id="alLikes"><span class="track"></span></span>
             </label>
           </div>
         </div>
@@ -1487,16 +1486,8 @@
               <span class="switch"><input type="checkbox" id="alNotifNewFiles"><span class="track"></span></span>
             </label>
             <label class="permrow">
-              <span class="pl"><b data-i18n="alNotifGuestUploadL"></b></span>
-              <span class="switch"><input type="checkbox" id="alNotifGuestUpload"><span class="track"></span></span>
-            </label>
-            <label class="permrow">
               <span class="pl"><b data-i18n="alNotifFavoritesL"></b></span>
               <span class="switch"><input type="checkbox" id="alNotifFavorites"><span class="track"></span></span>
-            </label>
-            <label class="permrow">
-              <span class="pl"><b data-i18n="alNotifCommentsL"></b></span>
-              <span class="switch"><input type="checkbox" id="alNotifComments"><span class="track"></span></span>
             </label>
             <label class="permrow">
               <span class="pl"><b data-i18n="alNotifExpiryL"></b></span>
@@ -1525,32 +1516,6 @@
                 <option value="delete" data-i18n="expDelete"></option>
               </select>
             </div>
-          </div>
-        </div>
-
-        <div class="csec">
-          <div class="csec-h"><span data-i18n="secStorage"></span></div>
-          <div class="storbar"><span id="alStorFill" style="width:8%"></span></div>
-          <div class="storrow"><span id="alStorUsed"></span><span data-i18n="storOf"></span></div>
-          <div class="setactrow">
-            <button class="setact" id="alUpgradeBtn" type="button">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
-              <span data-i18n="storUpgrade"></span>
-            </button>
-          </div>
-        </div>
-
-        <div class="csec">
-          <div class="csec-h"><span data-i18n="secBackup"></span></div>
-          <div class="setactrow">
-            <button class="setact" id="alBackupBtn" type="button">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span data-i18n="backupBtn"></span>
-            </button>
-            <button class="setact" id="alArchiveBtn" type="button">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><path d="M10 12h4"/></svg>
-              <span data-i18n="archiveBtn"></span>
-            </button>
           </div>
         </div>
 
@@ -1662,6 +1627,10 @@
               <label data-i18n="amMaxVideosL"></label>
               <input id="amMaxVideos" type="number" min="0" max="9999" step="1" inputmode="numeric" dir="ltr">
             </div>
+            <div class="cfield">
+              <label data-i18n="amMaxOtherL"></label>
+              <input id="amMaxOther" type="number" min="0" max="9999" step="1" inputmode="numeric" dir="ltr">
+            </div>
           </div>
         </div>
       </div>
@@ -1760,6 +1729,7 @@
       <div class="pvt" id="pvTitle"></div>
       <div class="pvsub2" id="pvSub"></div>
     </div>
+    <button class="pvpick" id="pvPick" type="button" aria-pressed="false"></button>
     <button id="pvClose" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
       <span data-i18n="close"></span>
@@ -1778,24 +1748,28 @@
       toEditor:'לעורך', help:'עזרה', signin:'התחברות', send:'שליחת קבצים',
       kick:'מסך העבודה המרכזי',
       pageTitle:'בחירת קבצים',
-      pageSub:'ארגנו, מיינו ותייגו את קבצי המדיה שלכם — תמונות, וידאו, אודיו ומסמכים. מהיר, פשוט ובאיכות מקצועית.',
+      pageSub:'ארגנו, מיינו ובחרו את קבצי המדיה שלכם — תמונות, וידאו, אודיו ומסמכים. מהיר, פשוט ובאיכות מקצועית.',
       searchPh:'חיפוש קבצים…', gridSize:'גודל תצוגה',
       showMovedInMain:'הצג קבצים שהועברו בתיקייה הראשית',
-      selCount:(n,tot)=>`<b>${n}</b>/${tot} נבחרו`, selectHint:'סמן / בטל בחירה', selectAll:'בחר הכל', deselectAll:'נקה בחירה',
+      selCount:(n,tot)=>`<b>${n}</b>/${tot} נבחרו`, selectHint:'סמן / בטל בחירה', selectItem:'בחר', deselectItem:'בטל בחירה', selectAll:'בחר הכל', deselectAll:'נקה בחירה',
       selCountFree:(n)=>`<b>${n}</b> נבחרו`, selCountLimit:(n,max)=>`נבחרו <b>${n}</b> מתוך ${max}`,
       selCountPhotos:(n,max)=>`תמונות <b>${n}</b>/${max}`, selCountVideos:(n,max)=>`סרטונים <b>${n}</b>/${max}`,
       limitPhotos:(max)=>`ניתן לבחור עד ${max} תמונות`, limitVideos:(max)=>`ניתן לבחור עד ${max} סרטונים`,
+      limitOther:(max)=>`ניתן לבחור עד ${max} קבצים נוספים`,
       limitTotal:(max)=>`ניתן לבחור עד ${max} קבצים`, limitFull:'הגעת למכסת הבחירה',
       limitPopPhotos:(max)=>`ניתן לבחור ${max} תמונות בלבד.`, limitPopVideos:(max)=>`ניתן לבחור ${max} סרטונים בלבד.`,
+      limitPopOther:(max)=>`ניתן לבחור ${max} קבצים נוספים בלבד.`,
       limitPopFiles:(max)=>`ניתן לבחור ${max} קבצים בלבד.`, limitPopBody:'כדי לבחור את הקובץ הזה, יש להסיר בחירה מקובץ אחר.',
       selDoneTitle:'האם אתם בטוחים שסיימתם לבחור?',
       selDoneCount:(n,max)=>`בחרתם ${n} מתוך ${max} קבצים.`,
       selDoneCountSep:(p,pm,v,vm)=>`בחרתם ${p} מתוך ${pm} תמונות ו-${v} מתוך ${vm} סרטונים.`,
+      selDoneLead:'בחרתם ', selDoneItem:(n,max,unit)=>`${n} מתוך ${max} ${unit}`,
       selDoneNote:'לאחר אישור הבחירה, לא ניתן יהיה לבחור קבצים נוספים או לבצע שינויים בבחירה הקיימת.',
       selDoneConfirm:'אישור הבחירה', selLockedBadge:'הבחירה ננעלה',
       selLockedToast:'הבחירה שלכם אושרה וננעלה — לא ניתן לשנות אותה.',
       selDoneCountAny:(n)=>`בחרתם ${n} קבצים.`,
-      finishSelBtn:'סיום בחירות', finishSelTitle:'סיימתי לבחור — נעילת הבחירה ושליחתה',
+      finishSelBtn:'סיימתי לבחור', finishSelTitle:'סיימתי לבחור — נעילת הבחירה ושליחתה',
+      viewUser:'תצוגת מנהל', viewClient:'תצוגת לקוח',
       finishNoneToast:'עדיין לא בחרתם קבצים.',
       pickHint:'סמן / בטל סימון', msCount:n=>`<b>${n}</b> סומנו`, msPh:'העבר לתיקייה…', msMoveTitle:'העבר את המסומנים לתיקייה',
       delSelected:'מחק נבחרים',
@@ -1808,7 +1782,7 @@
       fmts:'תמונות · וידאו · אודיו · מסמכים',
       sizeNote:'ניתן להעלות עד 2GB בכל פעם',
       emptyTitle:'אין כאן קבצים עדיין', emptySub:'גררו קבצים לכאן כדי להתחיל לארגן',
-      addNote:'כיתוב לתמונה…', preview:'תצוגה מקדימה', del:'מחק', moveTo:'העבר ל...', close:'סגור', orderTitle:'מיקום בסדר — גררו לשינוי',
+      addNote:'הוסף כיתוב…', preview:'תצוגה מקדימה', del:'מחק', moveTo:'העבר ל...', close:'סגור', orderTitle:'מיקום בסדר — גררו לשינוי',
       lockedTag:'הועבר לתיקייה', lockedHint:name=>`הקובץ שויך לתיקייה "${name}" וזמין לשימוש רק מתוכה`,
       countFiles:n=>`${n}`,
       footer:'כל הקבצים נשארים במחשב שלך. מהיר, פשוט ובאיכות מקצועית.',
@@ -1817,7 +1791,7 @@
       blockedTitle:'קובץ לא נתמך',
       blockedBody:names=>`הקבצים הבאים נחסמו: ${names}. אפשר להעלות תמונות, וידאו, אודיו ומסמכים בלבד — קבצי הרצה (EXE, DMG וכו׳) חסומים.`,
       dupTitle:'קובץ כפול', dupBody:name=>`הקובץ "${name}" כבר קיים בתיקייה. מה לעשות?`,
-      dupKeep:'שמור את שניהם', dupReplace:'החלף', dupSkip:'דלג', dupApplyAll:'החל על שאר הכפולים',
+      dupKeep:'שמור את שניהם', dupReplace:'החלף קובץ', dupSkip:'השאר את הקיים', dupApplyAll:'החל על שאר הכפולים',
       confirmDelTitle:'למחוק קבצים?', confirmDelBody:n=>`${n} קבצים יוסרו מהרשימה. לא ניתן לבטל.`,
       confirmDelFolderTitle:'למחוק תיקייה?', confirmDelFolderBody:name=>`התיקייה "${name}" תימחק. הקבצים ותתי־התיקיות שבתוכה יועברו רמה אחת מעלה.`,
       confirmYes:'כן, מחק',
@@ -1843,7 +1817,7 @@
       cEvent:'תאריך האירוע', cDeadline:'מועד אחרון לבחירת קבצים', cStatus:'סטטוס הפרויקט',
       statusDraft:'טיוטה', statusReady:'ממתין לשליחה', statusSent:'נשלח ללקוח', statusAwaiting:'ממתין לבחירה',
       statusSelecting:'בחירה בתהליך', statusCompleted:'הושלם', statusRevision:'נדרש תיקון', statusExpired:'פג תוקף', statusClosed:'נסגר / הושלם',
-      statStatus:'סטטוס בחירה', statStatusHint:'לחצו לעדכון סטטוס הבחירה', statSelLine:(n,tot)=>`<b>${n}</b> מתוך <b>${tot}</b> קבצים נבחרו`,
+      statOther:'אחר',
       permDownload:'הורדת תמונות וקבצים', permDownloadD:'הלקוח יכול להוריד קבצים בודדים',
       permZip:'הורדת כל הגלריה (ZIP)', permZipD:'הורדת כל הקבצים כארכיון אחד',
       permEditText:'עריכת טקסטים וכיתובים', permEditTextD:'שינוי כיתובים ופתקים לתמונות',
@@ -1851,6 +1825,10 @@
       permDelete:'מחיקת תמונות', permDeleteD:'הסרת קבצים מהגלריה',
       permUpload:'העלאת קבצים נוספים', permUploadD:'הוספת תמונות או קבצים לגלריה',
       permSelection:'שינוי בחירת התמונות', permSelectionD:'סימון וביטול בחירה של קבצים',
+      permSelectAll:'סמן / בטל סימון הכול', permSelectAllD:'הלקוח יכול לסמן או לבטל סימון של כל הקבצים המוצגים בלחיצה אחת',
+      permFolderCreate:'יצירת תיקיות חדשות', permFolderCreateD:'הלקוח יכול ליצור תיקיות חדשות בגלריה',
+      permFolderManage:'ניהול מבנה התיקיות', permFolderManageD:'שינוי שם, סדר, קינון ומחיקה של תיקיות',
+      permFolderMove:'העברת קבצים בין תיקיות', permFolderMoveD:'העברת קבצים מתיקייה לתיקייה',
       permViewOnly:'צפייה בלבד', permViewOnlyD:'ללא אפשרות לבצע שינויים — מבטל את כל שאר ההרשאות',
       setBtn:'הגדרות', setTitle:'הגדרות הפרויקט',
       setSub:'נהלו את פרטי הפרויקט, השיתוף, ההרשאות והעיצוב. ההגדרות נשמרות במכשיר זה בלבד.',
@@ -1864,21 +1842,10 @@
       visPrivate:'פרטי — רק אני', visLink:'כל מי שיש לו קישור', visPassword:'מוגן בסיסמה',
       alShareLinkL:'קישור לשיתוף', alPrivateNote:'הפרויקט פרטי — רק אתם רואים אותו. בחרו ב"כל מי שיש לו קישור" כדי לקבל קישור לשיתוף ולהגדיר הגנות.',
       secPassword:'סיסמת גישה', alPwOnL:'הפעל סיסמה', alPwOnD:'האורחים יתבקשו להזין סיסמה כדי לצפות', alPwPh:'בחר סיסמה',
-      secDownloads:'הרשאות אורחים',
-      alDlPhotosL:'הורדת תמונות', alDlPhotosD:'אורחים יכולים להוריד תמונות בודדות',
-      alDlVideosL:'הורדת וידאו', alDlVideosD:'אורחים יכולים להוריד סרטונים',
-      alDlZipL:'הורדת כל הפרויקט (ZIP)', alDlZipD:'הורדת כל הקבצים כארכיון אחד',
-      alDlOriginalL:'הורדה באיכות מקור', alDlOriginalD:'לאפשר הורדת הקובץ המקורי באיכות מלאה',
-      secQuality:'איכות קבצים', alQualityL:'איכות התצוגה לאורחים',
-      qFull:'איכות מלאה', qPreview:'תצוגה מוקטנת בלבד', qRequest:'מוקטנת + אפשרות לבקש מקור',
       secGuest:'העלאות מצד אורחים',
       alGuestUploadL:'אפשר לאורחים להעלות', alGuestUploadD:'אורחים יכולים להוסיף תמונות וסרטונים לפרויקט',
       alGuestApprovalL:'דרוש אישור לפני פרסום', alGuestApprovalD:'קבצים מאורחים ימתינו לאישור שלך',
       secApproval:'אישור קבצים', alApprovalL:'כל קובץ חדש ממתין לאישור', alApprovalD:'קבצים מופיעים בפרויקט רק לאחר אישור',
-      secComments:'תגובות ולייקים',
-      alCommentsL:'אפשר תגובות', alCommentsD:'אורחים יכולים להגיב על תמונות',
-      alCommentsGuestsL:'רק למוזמנים', alCommentsGuestsD:'רק אנשים עם קישור יכולים להגיב',
-      alLikesL:'אפשר לייקים', alLikesD:'אורחים יכולים לסמן לייק לתמונות',
       secSort:'מיון ותצוגה', alSortL:'מיון קבצים',
       sortManual:'סדר ידני', sortUpload:'תאריך העלאה', sortTaken:'תאריך צילום', sortName:'שם קובץ',
       alViewL:'תצוגה', viewGrid:'רשת', viewList:'רשימה', viewSlideshow:'מצגת',
@@ -1895,11 +1862,9 @@
       alWmPosL:'מיקום', posTl:'למעלה משמאל', posTr:'למעלה מימין', posC:'מרכז', posBl:'למטה משמאל', posBr:'למטה מימין',
       alWmOpacityL:'שקיפות',
       secNotif:'התראות',
-      alNotifNewFilesL:'קבצים נוספו לפרויקט', alNotifGuestUploadL:'אורח העלה קובץ', alNotifFavoritesL:'נבחרו מועדפים',
-      alNotifCommentsL:'התקבלה תגובה', alNotifExpiryL:'הפרויקט עומד לפוג',
+      alNotifNewFilesL:'קבצים נוספו לפרויקט', alNotifFavoritesL:'נבחרו מועדפים', alNotifExpiryL:'הפרויקט עומד לפוג',
       secExpiry:'תאריך תפוגה', alExpiryOnL:'הפעל תפוגה', alExpiryOnD:'הפרויקט ייסגר אוטומטית בתאריך שנקבע',
       alExpiryDateL:'תאריך', alExpiryActionL:'בתפוגה', expReadonly:'הפוך לצפייה בלבד', expDelete:'מחק את הפרויקט',
-      secStorage:'ניהול אחסון', storOf:'מתוך 15GB', storUsed:n=>`${n} בשימוש`, storUpgrade:'שדרג אחסון',
       secBackup:'גיבוי וארכיון', backupBtn:'הורד גיבוי מלא', archiveBtn:'העבר לארכיון', archivedMsg:'הועבר לארכיון',
       secDelete:'מחיקת פרויקט', delZoneTitle:'מחיקת הפרויקט',
       delZoneDesc:'הפעולה תסיר את כל הקבצים והתיקיות מהפרויקט. ניתן לשחזר לזמן מוגבל.', delAlbumBtn:'מחק פרויקט',
@@ -1927,12 +1892,14 @@
       amPresetNameL:'שם הבחירה', amPresetNamePh:'למשל: אלבום חתונה',
       amPresetNewL:'בחירה חדשה', amPresetNewD:'שמירת ההגדרות הנוכחיות',
       amPresetDel:'מחיקת פריסט', amPresetNoName:'תנו שם לפריסט לפני היצירה',
-      amUpTo:'עד', amNoLimit:'ללא הגבלה', amUnitPhotos:'תמונות', amUnitVideos:'סרטונים',
+      amUpTo:'עד', amNoLimit:'ללא הגבלה', amUnitPhotos:'תמונות', amUnitVideos:'סרטונים', amUnitOther:'קבצים נוספים', amUnitFiles:'קבצים',
+      // dynamic client-message pieces: "ניתן לבחור עד 40 תמונות, עד 5 סרטונים ועד 3 קבצים נוספים."
+      amMsgLead:'ניתן לבחור ', amMsgSep:', ', amMsgAnd:' ו', amUpToItem:(n,unit)=>`עד ${n} ${unit}`,
       amLimitTitle:'הגבלת בחירה',
       amLimitOnL:'הגבל מספר קבצים', amLimitOnD:'קבעו כמה קבצים הלקוח רשאי לבחור מתוך הגלריה',
-      amSeparateL:'מכסה נפרדת לתמונות ולסרטונים', amSeparateD:'קבעו מגבלה שונה לתמונות ולסרטונים במקום מכסה כוללת אחת',
+      amSeparateL:'מכסה נפרדת לפי סוג קובץ', amSeparateD:'קבעו מגבלה שונה לתמונות, לסרטונים ולקבצים נוספים במקום מכסה כוללת אחת',
       amMaxTotalL:'מספר קבצים מקסימלי לבחירה',
-      amMaxPhotosL:'מקסימום תמונות', amMaxVideosL:'מקסימום סרטונים',
+      amMaxPhotosL:'מקסימום תמונות', amMaxVideosL:'מקסימום סרטונים', amMaxOtherL:'מקסימום קבצים נוספים',
       amMsgTitle:'הודעה ללקוח', amMessageL:'הודעה שתוצג לפני תחילת הבחירה',
       amMessagePh:'לדוגמה: בחרו עד 40 מהתמונות האהובות עליכם ואנו נערוך אותן לאלבום.',
       amSaved:'נשמר',
@@ -1942,24 +1909,28 @@
       toEditor:'Editor', help:'Help', signin:'Sign in', send:'Send files',
       kick:'The main workspace',
       pageTitle:'Organize files',
-      pageSub:'Organize, sort and tag your media — images, video, audio and documents. Fast, simple and professional-quality.',
+      pageSub:'Organize, sort and select your media — images, video, audio and documents. Fast, simple and professional-quality.',
       searchPh:'Search files…', gridSize:'Grid size',
       showMovedInMain:'Show moved files in main folder',
-      selCount:(n,tot)=>`<b>${n}</b>/${tot} selected`, selectHint:'Select / deselect', selectAll:'Select all', deselectAll:'Clear selection',
+      selCount:(n,tot)=>`<b>${n}</b>/${tot} selected`, selectHint:'Select / deselect', selectItem:'Select', deselectItem:'Deselect', selectAll:'Select all', deselectAll:'Clear selection',
       selCountFree:(n)=>`<b>${n}</b> selected`, selCountLimit:(n,max)=>`<b>${n}</b> of ${max} selected`,
       selCountPhotos:(n,max)=>`Photos <b>${n}</b>/${max}`, selCountVideos:(n,max)=>`Videos <b>${n}</b>/${max}`,
       limitPhotos:(max)=>`You can select up to ${max} photos`, limitVideos:(max)=>`You can select up to ${max} videos`,
+      limitOther:(max)=>`You can select up to ${max} other files`,
       limitTotal:(max)=>`You can select up to ${max} files`, limitFull:"You've reached your selection limit",
       limitPopPhotos:(max)=>`You can select ${max} photos only.`, limitPopVideos:(max)=>`You can select ${max} videos only.`,
+      limitPopOther:(max)=>`You can select ${max} other files only.`,
       limitPopFiles:(max)=>`You can select ${max} files only.`, limitPopBody:'To select this file, deselect another file first.',
       selDoneTitle:"Are you sure you're done selecting?",
       selDoneCount:(n,max)=>`You selected ${n} of ${max} files.`,
       selDoneCountSep:(p,pm,v,vm)=>`You selected ${p} of ${pm} photos and ${v} of ${vm} videos.`,
+      selDoneLead:'You selected ', selDoneItem:(n,max,unit)=>`${n} of ${max} ${unit}`,
       selDoneNote:"After you confirm, you won't be able to select more files or change your current selection.",
       selDoneConfirm:'Confirm selection', selLockedBadge:'Selection locked',
       selLockedToast:'Your selection is confirmed and locked — it can no longer be changed.',
       selDoneCountAny:(n)=>`You selected ${n} files.`,
       finishSelBtn:'Finish selecting', finishSelTitle:"I'm done selecting — lock and submit my picks",
+      viewUser:'Manager view', viewClient:'Client view',
       finishNoneToast:"You haven't selected any files yet.",
       pickHint:'Mark / unmark', msCount:n=>`<b>${n}</b> marked`, msPh:'Move to folder…', msMoveTitle:'Move marked to folder',
       delSelected:'Delete',
@@ -2007,7 +1978,7 @@
       cEvent:'Event date', cDeadline:'Selection deadline', cStatus:'Project status',
       statusDraft:'Draft', statusReady:'Ready to send', statusSent:'Sent to client', statusAwaiting:'Awaiting selection',
       statusSelecting:'Selection in progress', statusCompleted:'Completed', statusRevision:'Needs revision', statusExpired:'Expired', statusClosed:'Closed',
-      statStatus:'Selection status', statStatusHint:'Click to update the selection status', statSelLine:(n,tot)=>`<b>${n}</b> of <b>${tot}</b> files selected`,
+      statOther:'Other',
       permDownload:'Download images & files', permDownloadD:'Client can download individual files',
       permZip:'Download whole gallery (ZIP)', permZipD:'Download all files as one archive',
       permEditText:'Edit texts & captions', permEditTextD:'Change captions and notes on images',
@@ -2015,6 +1986,10 @@
       permDelete:'Delete images', permDeleteD:'Remove files from the gallery',
       permUpload:'Upload more files', permUploadD:'Add extra images or files',
       permSelection:'Change image selection', permSelectionD:'Select and deselect files',
+      permSelectAll:'Select / deselect all', permSelectAllD:'The client can select or deselect all displayed files with one click',
+      permFolderCreate:'Create new folders', permFolderCreateD:'Client can create new folders in the gallery',
+      permFolderManage:'Manage folder structure', permFolderManageD:'Rename, reorder, nest and delete folders',
+      permFolderMove:'Move files between folders', permFolderMoveD:'Move files from one folder to another',
       permViewOnly:'View only', permViewOnlyD:'No changes allowed — overrides all other permissions',
       setBtn:'Settings', setTitle:'Project settings',
       setSub:'Manage project details, sharing, permissions and design. Settings are stored on this device only.',
@@ -2028,21 +2003,10 @@
       visPrivate:'Private — only me', visLink:'Anyone with the link', visPassword:'Password protected',
       alShareLinkL:'Share link', alPrivateNote:'This project is private — only you can see it. Choose "Anyone with the link" to get a shareable link and set protections.',
       secPassword:'Access password', alPwOnL:'Enable password', alPwOnD:'Guests must enter a password to view', alPwPh:'Choose a password',
-      secDownloads:'Guest permissions',
-      alDlPhotosL:'Download photos', alDlPhotosD:'Guests can download individual photos',
-      alDlVideosL:'Download video', alDlVideosD:'Guests can download videos',
-      alDlZipL:'Download whole project (ZIP)', alDlZipD:'Download every file as one archive',
-      alDlOriginalL:'Original-quality download', alDlOriginalD:'Allow downloading the full-resolution original',
-      secQuality:'File quality', alQualityL:'Quality shown to guests',
-      qFull:'Full quality', qPreview:'Preview only', qRequest:'Preview + request original',
       secGuest:'Guest uploads',
       alGuestUploadL:'Allow guest uploads', alGuestUploadD:'Guests can add photos and videos to the project',
       alGuestApprovalL:'Require approval before publishing', alGuestApprovalD:'Guest files wait for your approval',
       secApproval:'File approval', alApprovalL:'Every new file awaits approval', alApprovalD:'Files appear in the project only after approval',
-      secComments:'Comments & likes',
-      alCommentsL:'Allow comments', alCommentsD:'Guests can comment on photos',
-      alCommentsGuestsL:'Invited only', alCommentsGuestsD:'Only people with the link can comment',
-      alLikesL:'Allow likes', alLikesD:'Guests can like photos',
       secSort:'Sort & display', alSortL:'Sort files',
       sortManual:'Manual order', sortUpload:'Upload date', sortTaken:'Date taken', sortName:'File name',
       alViewL:'Display', viewGrid:'Grid', viewList:'List', viewSlideshow:'Slideshow',
@@ -2059,11 +2023,9 @@
       alWmPosL:'Position', posTl:'Top left', posTr:'Top right', posC:'Center', posBl:'Bottom left', posBr:'Bottom right',
       alWmOpacityL:'Opacity',
       secNotif:'Notifications',
-      alNotifNewFilesL:'Files added to the project', alNotifGuestUploadL:'A guest uploaded a file', alNotifFavoritesL:'Favorites were picked',
-      alNotifCommentsL:'A comment was received', alNotifExpiryL:'The project is about to expire',
+      alNotifNewFilesL:'Files added to the project', alNotifFavoritesL:'Favorites were picked', alNotifExpiryL:'The project is about to expire',
       secExpiry:'Expiration date', alExpiryOnL:'Enable expiration', alExpiryOnD:'The project closes automatically on the set date',
       alExpiryDateL:'Date', alExpiryActionL:'On expiry', expReadonly:'Make view-only', expDelete:'Delete the project',
-      secStorage:'Storage', storOf:'of 15GB', storUsed:n=>`${n} used`, storUpgrade:'Upgrade storage',
       secBackup:'Backup & archive', backupBtn:'Download full backup', archiveBtn:'Move to archive', archivedMsg:'Archived',
       secDelete:'Delete project', delZoneTitle:'Delete the project',
       delZoneDesc:'This removes every file and folder from the project. Recoverable for a limited time.', delAlbumBtn:'Delete project',
@@ -2091,12 +2053,14 @@
       amPresetNameL:'Preset name', amPresetNamePh:'e.g. Wedding album',
       amPresetNewL:'New preset', amPresetNewD:'Save the current settings',
       amPresetDel:'Delete preset', amPresetNoName:'Name the preset before creating it',
-      amUpTo:'Up to', amNoLimit:'No limit', amUnitPhotos:'photos', amUnitVideos:'videos',
+      amUpTo:'Up to', amNoLimit:'No limit', amUnitPhotos:'photos', amUnitVideos:'videos', amUnitOther:'other files', amUnitFiles:'files',
+      // dynamic client-message pieces: "You can select up to 40 photos, up to 5 videos and up to 3 other files."
+      amMsgLead:'You can select ', amMsgSep:', ', amMsgAnd:' and ', amUpToItem:(n,unit)=>`up to ${n} ${unit}`,
       amLimitTitle:'Selection limit',
       amLimitOnL:'Limit number of files', amLimitOnD:'Set how many files the client may pick from the gallery',
-      amSeparateL:'Separate photo & video quotas', amSeparateD:'Set a different limit for photos and videos instead of one combined quota',
+      amSeparateL:'Separate quota per file type', amSeparateD:'Set a different limit for photos, videos and other files instead of one combined quota',
       amMaxTotalL:'Maximum files to select',
-      amMaxPhotosL:'Max photos', amMaxVideosL:'Max videos',
+      amMaxPhotosL:'Max photos', amMaxVideosL:'Max videos', amMaxOtherL:'Max other files',
       amMsgTitle:'Client message', amMessageL:'Message shown before selection begins',
       amMessagePh:'e.g. Pick up to 40 of your favorite photos and we will edit them into an album.',
       amSaved:'Saved',
@@ -2106,24 +2070,28 @@
       toEditor:'Редактор', help:'Помощь', signin:'Вход', send:'Отправить файлы',
       kick:'Основное рабочее пространство',
       pageTitle:'Упорядочить файлы',
-      pageSub:'Упорядочивайте, сортируйте и помечайте медиа — изображения, видео, аудио и документы. Быстро, просто и профессионального качества.',
+      pageSub:'Упорядочивайте, сортируйте и выбирайте медиа — изображения, видео, аудио и документы. Быстро, просто и профессионального качества.',
       searchPh:'Поиск файлов…', gridSize:'Размер сетки',
       showMovedInMain:'Показывать перемещённые файлы в основной папке',
-      selCount:(n,tot)=>`Выбрано: <b>${n}</b>/${tot}`, selectHint:'Выбрать / снять', selectAll:'Выбрать всё', deselectAll:'Снять выделение',
+      selCount:(n,tot)=>`Выбрано: <b>${n}</b>/${tot}`, selectHint:'Выбрать / снять', selectItem:'Выбрать', deselectItem:'Снять выбор', selectAll:'Выбрать всё', deselectAll:'Снять выделение',
       selCountFree:(n)=>`Выбрано: <b>${n}</b>`, selCountLimit:(n,max)=>`Выбрано <b>${n}</b> из ${max}`,
       selCountPhotos:(n,max)=>`Фото <b>${n}</b>/${max}`, selCountVideos:(n,max)=>`Видео <b>${n}</b>/${max}`,
       limitPhotos:(max)=>`Можно выбрать не более ${max} фото`, limitVideos:(max)=>`Можно выбрать не более ${max} видео`,
+      limitOther:(max)=>`Можно выбрать не более ${max} других файлов`,
       limitTotal:(max)=>`Можно выбрать не более ${max} файлов`, limitFull:'Достигнут лимит выбора',
       limitPopPhotos:(max)=>`Можно выбрать только ${max} фото.`, limitPopVideos:(max)=>`Можно выбрать только ${max} видео.`,
+      limitPopOther:(max)=>`Можно выбрать только ${max} других файлов.`,
       limitPopFiles:(max)=>`Можно выбрать только ${max} файлов.`, limitPopBody:'Чтобы выбрать этот файл, снимите выбор с другого файла.',
       selDoneTitle:'Вы уверены, что закончили выбор?',
       selDoneCount:(n,max)=>`Вы выбрали ${n} из ${max} файлов.`,
       selDoneCountSep:(p,pm,v,vm)=>`Вы выбрали ${p} из ${pm} фото и ${v} из ${vm} видео.`,
+      selDoneLead:'Вы выбрали ', selDoneItem:(n,max,unit)=>`${n} из ${max} ${unit}`,
       selDoneNote:'После подтверждения нельзя будет выбрать другие файлы или изменить текущий выбор.',
       selDoneConfirm:'Подтвердить выбор', selLockedBadge:'Выбор зафиксирован',
       selLockedToast:'Ваш выбор подтверждён и зафиксирован — изменить его нельзя.',
       selDoneCountAny:(n)=>`Вы выбрали ${n} файлов.`,
       finishSelBtn:'Завершить выбор', finishSelTitle:'Я закончил выбор — зафиксировать и отправить',
+      viewUser:'Вид менеджера', viewClient:'Вид клиента',
       finishNoneToast:'Вы ещё не выбрали файлы.',
       pickHint:'Отметить / снять', msCount:n=>`Отмечено: <b>${n}</b>`, msPh:'В папку…', msMoveTitle:'Переместить отмеченные в папку',
       delSelected:'Удалить',
@@ -2171,7 +2139,7 @@
       cEvent:'Дата события', cDeadline:'Крайний срок выбора', cStatus:'Статус проекта',
       statusDraft:'Черновик', statusReady:'Готов к отправке', statusSent:'Отправлено клиенту', statusAwaiting:'Ожидает выбора',
       statusSelecting:'Выбор в процессе', statusCompleted:'Завершено', statusRevision:'Нужна правка', statusExpired:'Истёк срок', statusClosed:'Закрыт',
-      statStatus:'Статус выбора', statStatusHint:'Нажмите, чтобы изменить статус', statSelLine:(n,tot)=>`Выбрано <b>${n}</b> из <b>${tot}</b>`,
+      statOther:'Другое',
       permDownload:'Скачивание изображений и файлов', permDownloadD:'Клиент может скачивать отдельные файлы',
       permZip:'Скачать всю галерею (ZIP)', permZipD:'Скачать все файлы одним архивом',
       permEditText:'Редактирование текстов и подписей', permEditTextD:'Изменение подписей и заметок',
@@ -2179,6 +2147,10 @@
       permDelete:'Удаление изображений', permDeleteD:'Удаление файлов из галереи',
       permUpload:'Загрузка дополнительных файлов', permUploadD:'Добавление изображений или файлов',
       permSelection:'Изменение выбора изображений', permSelectionD:'Выбор и отмена выбора файлов',
+      permSelectAll:'Выбрать / снять всё', permSelectAllD:'Клиент может выбрать или снять выбор со всех показанных файлов одним нажатием',
+      permFolderCreate:'Создание новых папок', permFolderCreateD:'Клиент может создавать папки в галерее',
+      permFolderManage:'Управление структурой папок', permFolderManageD:'Переименование, порядок, вложение и удаление папок',
+      permFolderMove:'Перемещение файлов между папками', permFolderMoveD:'Перемещение файлов из одной папки в другую',
       permViewOnly:'Только просмотр', permViewOnlyD:'Изменения запрещены — отменяет все остальные права',
       setBtn:'Настройки', setTitle:'Настройки проекта',
       setSub:'Управляйте данными проекта, доступом, правами и оформлением. Настройки хранятся только на этом устройстве.',
@@ -2192,21 +2164,10 @@
       visPrivate:'Приватный — только я', visLink:'Любой, у кого есть ссылка', visPassword:'Защищён паролем',
       alShareLinkL:'Ссылка для доступа', alPrivateNote:'Проект приватный — виден только вам. Выберите «Любой, у кого есть ссылка», чтобы получить ссылку и настроить защиту.',
       secPassword:'Пароль доступа', alPwOnL:'Включить пароль', alPwOnD:'Гости должны ввести пароль для просмотра', alPwPh:'Придумайте пароль',
-      secDownloads:'Разрешения для гостей',
-      alDlPhotosL:'Скачивание фото', alDlPhotosD:'Гости могут скачивать отдельные фото',
-      alDlVideosL:'Скачивание видео', alDlVideosD:'Гости могут скачивать видео',
-      alDlZipL:'Скачать весь проект (ZIP)', alDlZipD:'Скачать все файлы одним архивом',
-      alDlOriginalL:'Скачивание в оригинале', alDlOriginalD:'Разрешить скачивание оригинала в полном качестве',
-      secQuality:'Качество файлов', alQualityL:'Качество для гостей',
-      qFull:'Полное качество', qPreview:'Только превью', qRequest:'Превью + запрос оригинала',
       secGuest:'Загрузки гостей',
       alGuestUploadL:'Разрешить загрузку гостям', alGuestUploadD:'Гости могут добавлять фото и видео в проект',
       alGuestApprovalL:'Требовать одобрения', alGuestApprovalD:'Файлы гостей ждут вашего одобрения',
       secApproval:'Одобрение файлов', alApprovalL:'Каждый новый файл ждёт одобрения', alApprovalD:'Файлы появляются в проекте только после одобрения',
-      secComments:'Комментарии и лайки',
-      alCommentsL:'Разрешить комментарии', alCommentsD:'Гости могут комментировать фото',
-      alCommentsGuestsL:'Только приглашённым', alCommentsGuestsD:'Комментировать могут только люди со ссылкой',
-      alLikesL:'Разрешить лайки', alLikesD:'Гости могут ставить лайки фото',
       secSort:'Сортировка и вид', alSortL:'Сортировка файлов',
       sortManual:'Вручную', sortUpload:'Дата загрузки', sortTaken:'Дата съёмки', sortName:'Имя файла',
       alViewL:'Вид', viewGrid:'Сетка', viewList:'Список', viewSlideshow:'Слайд-шоу',
@@ -2223,11 +2184,9 @@
       alWmPosL:'Положение', posTl:'Сверху слева', posTr:'Сверху справа', posC:'По центру', posBl:'Снизу слева', posBr:'Снизу справа',
       alWmOpacityL:'Прозрачность',
       secNotif:'Уведомления',
-      alNotifNewFilesL:'Файлы добавлены в проект', alNotifGuestUploadL:'Гость загрузил файл', alNotifFavoritesL:'Выбрано избранное',
-      alNotifCommentsL:'Получен комментарий', alNotifExpiryL:'Проект скоро истекает',
+      alNotifNewFilesL:'Файлы добавлены в проект', alNotifFavoritesL:'Выбрано избранное', alNotifExpiryL:'Проект скоро истекает',
       secExpiry:'Срок действия', alExpiryOnL:'Включить срок', alExpiryOnD:'Проект закроется автоматически в заданную дату',
       alExpiryDateL:'Дата', alExpiryActionL:'По истечении', expReadonly:'Только просмотр', expDelete:'Удалить проект',
-      secStorage:'Хранилище', storOf:'из 15 ГБ', storUsed:n=>`${n} занято`, storUpgrade:'Расширить хранилище',
       secBackup:'Резервная копия и архив', backupBtn:'Скачать полную копию', archiveBtn:'В архив', archivedMsg:'В архиве',
       secDelete:'Удаление проекта', delZoneTitle:'Удалить проект',
       delZoneDesc:'Действие удалит все файлы и папки из проекта. Восстановление доступно ограниченное время.', delAlbumBtn:'Удалить проект',
@@ -2255,12 +2214,14 @@
       amPresetNameL:'Название пресета', amPresetNamePh:'напр.: Свадебный альбом',
       amPresetNewL:'Новый пресет', amPresetNewD:'Сохранить текущие настройки',
       amPresetDel:'Удалить пресет', amPresetNoName:'Назовите пресет перед созданием',
-      amUpTo:'До', amNoLimit:'Без ограничений', amUnitPhotos:'фото', amUnitVideos:'видео',
+      amUpTo:'До', amNoLimit:'Без ограничений', amUnitPhotos:'фото', amUnitVideos:'видео', amUnitOther:'других файлов', amUnitFiles:'файлов',
+      // dynamic client-message pieces: "Можно выбрать до 40 фото, до 5 видео и до 3 других файлов."
+      amMsgLead:'Можно выбрать ', amMsgSep:', ', amMsgAnd:' и ', amUpToItem:(n,unit)=>`до ${n} ${unit}`,
       amLimitTitle:'Ограничение выбора',
       amLimitOnL:'Ограничить число файлов', amLimitOnD:'Задайте, сколько файлов клиент может выбрать из галереи',
-      amSeparateL:'Отдельные квоты для фото и видео', amSeparateD:'Задайте разные лимиты для фото и видео вместо одной общей квоты',
+      amSeparateL:'Отдельные квоты по типу файла', amSeparateD:'Задайте разные лимиты для фото, видео и других файлов вместо одной общей квоты',
       amMaxTotalL:'Максимум файлов для выбора',
-      amMaxPhotosL:'Максимум фото', amMaxVideosL:'Максимум видео',
+      amMaxPhotosL:'Максимум фото', amMaxVideosL:'Максимум видео', amMaxOtherL:'Максимум других файлов',
       amMsgTitle:'Сообщение клиенту', amMessageL:'Сообщение перед началом выбора',
       amMessagePh:'напр.: Выберите до 40 любимых фотографий, и мы соберём из них альбом.',
       amSaved:'Сохранено',
@@ -2269,13 +2230,21 @@
 
   // ---- supported types ----
   const TYPES = {
-    image:['jpg','jpeg','png','gif','heic','heif','webp','bmp','svg','avif'],
+    image:['jpg','jpeg','png','gif','heic','heif','webp','bmp','avif'],
     video:['mp4','mov','avi','webm','mkv','m4v'],
     audio:['mp3','wav','aac','m4a','flac','ogg','oga','opus'],
-    doc:['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','rtf'],
+    // "אחר" — everything that isn't image / video / audio: documents, spreadsheets,
+    // slides, archives, and design source files (incl. svg/psd/ai/eps). Executables
+    // never reach here — they're caught by EXEC_BLOCK below and rejected on upload.
+    other:['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','rtf',
+           'zip','rar','7z','tar','gz','svg','psd','ai','eps','indd','sketch','fig'],
   };
+  // Hard-blocked no matter what: executables & installers are never uploadable.
+  const EXEC_BLOCK=['exe','msi','bat','cmd','com','scr','cpl','vbs','ps1',
+                    'dmg','pkg','app','apk','deb','rpm','sh','jar'];
   function kindOf(ext){
     ext=(ext||'').toLowerCase();
+    if(EXEC_BLOCK.includes(ext)) return null; // executable -> always blocked
     for(const k in TYPES){ if(TYPES[k].includes(ext)) return k; }
     return null; // unsupported -> blocked
   }
@@ -2296,6 +2265,9 @@
   let selPromptShown=false;       // the "are you finished?" dialog was already offered for the current full-cap state
   let organizerUsageStarted=false;
   let settingsIsNewProject=false;
+  // project status is no longer edited from the settings popup — preserve the
+  // loaded value so saving the form doesn't drop/reset it.
+  let settingsStatus='draft';
 
   // ---- helpers ----
   function organizerPayloadError(payload){
@@ -2734,7 +2706,6 @@
     const vis=visibleFiles();
     const total=vis.length;
     document.body.classList.toggle('sel-locked', selConfirmed);
-    el('downloadZipBtn').disabled = files.length===0 || zipBusy;
     // purple multi-select group - shown only when at least one file is picked
     const nPick=files.filter(f=>f.picked).length;
     el('msGroup').hidden = nPick===0;
@@ -2746,6 +2717,13 @@
       el('msPickAllBtn').querySelector('span').textContent = allPick? t.deselectAll : t.selectAll;
       refreshMsMove();
     }
+    const clientAll=el('clientSelectAllBtn');
+    if(clientAll){
+      const selectable=vis.filter(f=>!isLocked(f));
+      const allSelected=selectable.length>0 && selectable.every(f=>f.selected);
+      clientAll.querySelector('span').textContent=allSelected?t.deselectAll:t.selectAll;
+      clientAll.disabled=selConfirmed || !selectable.length;
+    }
   }
 
   function renderAll(){ renderFolders(); renderGrid(); renderStats(); }
@@ -2755,16 +2733,23 @@
     if(!m || !m.limitOn) return true;
     return !(m.maxVideos===0 || m.preset==='album' || m.preset==='prints');
   }
+  // "other" files (audio / documents) get their own cap only in split mode; a combined pool
+  // lets any file type fill maxTotal, so there's no separate "other" restriction there.
+  function otherEnabled(m){
+    if(!m || !m.limitOn || !m.separate) return true;
+    return (m.maxOther||0) > 0;
+  }
   function statQuota(){
     const m = albumMgr && albumMgr.limitOn ? albumMgr : null;
     if(!m) return { photos:50, videos:5, total:55 };
-    if(!videosEnabled(m)){
-      const photoCap = m.separate ? m.maxPhotos : m.maxTotal;
-      return { photos:photoCap, videos:null, total:photoCap };
+    if(m.separate){
+      const videos = videosEnabled(m) ? m.maxVideos : null;
+      const other  = otherEnabled(m)  ? m.maxOther : 0;
+      return { photos:m.maxPhotos, videos, other:otherEnabled(m)?m.maxOther:null,
+               total:m.maxPhotos + (videos||0) + other };
     }
-    if(m.separate) return { photos:m.maxPhotos, videos:m.maxVideos, total:m.maxPhotos + m.maxVideos };
-    // one combined pool (no separate video quota) -> no dedicated video number to show (em dash)
-    return { photos:m.maxTotal, videos:null, total:m.maxTotal };
+    // one combined pool (no separate video/other quota) -> no dedicated numbers to show (em dash)
+    return { photos:m.maxTotal, videos:null, other:null, total:m.maxTotal };
   }
   function setStatBar(id, cur, max){
     const span=el(id); if(!span) return;
@@ -2779,32 +2764,30 @@
     const nf=n=>{ try{ return Number(n).toLocaleString('en-US'); }catch(_){ return ''+n; } };
     const c=selCounts();
     const q=statQuota();
-    const m=albumMgr && albumMgr.limitOn ? albumMgr : null;
-    // videos truly disallowed (photo-only package: album/prints/maxVideos=0) -> the total counts photos only.
-    // a combined pool still ALLOWS videos, so they keep counting toward the total there.
-    const vidBlocked=m ? !videosEnabled(m) : false;
     el('stGalleryTotal').textContent = nf(files.length);
     el('stImagesCur').textContent = nf(c.photos);
     el('stImagesMax').textContent = nf(q.photos);
-    // no dedicated video quota (photo-only package OR one combined pool) -> show an em dash, not a count
+    // no dedicated video quota (photo-only package OR one combined pool) -> show "N/A", not a count
     const noVideos = q.videos == null;
     const videoCard = el('stVideosCur').closest('.statcard');
     if(videoCard) videoCard.classList.toggle('no-videos', noVideos);
-    el('stVideosCur').textContent = noVideos ? '—' : nf(c.videos);
+    el('stVideosCur').textContent = noVideos ? 'N/A' : nf(c.videos);
     el('stVideosMax').textContent = noVideos ? '' : nf(q.videos);
-    el('stSelectedCur').textContent = nf(vidBlocked ? c.photos : c.total);
-    el('stSelectedMax').textContent = nf(q.total);
+    // disallowed types can't be selected, so the honest "selected total" is simply every picked file
+    el('sideSelectedCur').textContent = nf(c.total);
+    el('sideSelectedMax').textContent = nf(q.total);
     setStatBar('stImagesBar', c.photos, q.photos);
     setStatBar('stVideosBar', noVideos ? 0 : c.videos, noVideos ? 0 : q.videos);
-    renderStatusCard();
+    renderOtherCard();
     updateFinishBtn();
   }
 
-  // ---- selection-status card: direct four-state selector ----
-  const STATUS_ORDER=['draft','awaiting','selecting','completed'];
-  // Colors reference the theme-aware CSS vars (same palette as the dashboard status
-  // pills) so they shift correctly between light and dark instead of staying on the
-  // light-mode hex. Setting a custom property to "var(--x)" resolves at use time.
+  // ---- project-status normalizer ----
+  // The status strip card was replaced by the "אחר" (Other) category card; the
+  // project-status dropdown was later removed from the settings popup, so status is
+  // no longer edited from this screen — it's preserved (settingsStatus) across saves.
+  // STATUS_META is kept as the set of valid states normStatus() validates against;
+  // STATUS_LEGACY folds older status ids onto the current four.
   const STATUS_META={
     draft:    {c:'var(--faint)'},
     awaiting: {c:'var(--info)'},
@@ -2820,46 +2803,26 @@
     closed:'completed',
   };
   function normStatus(s){ s=STATUS_LEGACY[s]||s; return STATUS_META[s]?s:'draft'; }
-  function statusText(s){
-    s=normStatus(s);
-    const key='status'+s.charAt(0).toUpperCase()+s.slice(1);
-    return t[key]||s;
-  }
-  function renderStatusCard(){
-    const card=el('statStatusCard'); if(!card) return;
-    const s=normStatus(loadClient().status);
-    card.style.setProperty('--st-c', STATUS_META[s].c);
-    const badge=el('stStatusBadge'); if(badge) badge.classList.toggle('live', s==='selecting');
-    el('stStatusText').textContent = statusText(s);
-    el('stStatusCounter').innerHTML = t.statSelLine(selCounts().total, files.length);
-    renderStatusMenu(s);
-  }
-  function renderStatusMenu(current){
-    const menu=el('statusMenu'); if(!menu) return;
-    const active=normStatus(current);
-    menu.innerHTML=STATUS_ORDER.map(s=>{
-      const on=s===active;
-      return `<button type="button" role="option" data-status="${s}" aria-selected="${on?'true':'false'}" class="${on?'on':''}" style="--item-c:${STATUS_META[s].c}">
-        <span class="dot"></span><span>${escapeHtml(statusText(s))}</span>
-      </button>`;
-    }).join('');
-  }
-  function setStatusCardOpen(open){
-    const card=el('statStatusCard'); if(!card) return;
-    card.classList.toggle('open', !!open);
-    card.setAttribute('aria-expanded', open?'true':'false');
-    if(open) renderStatusMenu(loadClient().status);
-  }
-  function toggleStatusMenu(){
-    const card=el('statStatusCard'); if(card) setStatusCardOpen(!card.classList.contains('open'));
-  }
-  function saveSelectionStatus(status){
-    const c=loadClient();
-    c.status=normStatus(status);
-    try{ localStorage.setItem(scopedKey('ac_client'), JSON.stringify(c)); }catch(_){}
-    const sel=el('cStatus'); if(sel) sel.value=c.status;
-    renderStatusCard();
-    setStatusCardOpen(false);
+
+  // ---- "אחר" (Other) category card: live count of non-media files ----
+  // Everything classified as kind==='other' (docs, spreadsheets, slides, archives,
+  // design files) — see TYPES. Images / video / audio have their own cards.
+  function renderOtherCard(){
+    const n=el('stOtherCount'); if(!n) return;
+    // nf() is local to renderStats; format inline so this stays callable on its own.
+    const nf=x=>{ try{ return Number(x).toLocaleString('en-US'); }catch(_){ return ''+x; } };
+    const q=statQuota();
+    const tot=el('stOtherTotal');
+    const card=n.closest('.statcard');
+    // Mirror the images/videos cards: max = the album-manager "max additional files"
+    // quota (מקסימום קבצים נוספים), NOT the count of uploaded files. When there's no
+    // dedicated "other" quota (combined pool, or the quota is 0) -> "N/A", like videos.
+    const noOther = q.other == null;
+    if(card) card.classList.toggle('no-other', noOther);
+    if(noOther){ n.textContent='N/A'; if(tot) tot.textContent=''; return; }
+    // selected "other" files / the "max additional files" quota (e.g. "0/10")
+    n.textContent = nf(selCounts().other);
+    if(tot) tot.textContent = nf(q.other);
   }
 
   function closeAllCardMenus(){ document.querySelectorAll('.fcard.menuopen').forEach(c=>c.classList.remove('menuopen')); }
@@ -2887,12 +2850,14 @@
   // entry point for a plain FileList (file <input>; the folder <input webkitdirectory> also
   // lands here — its files carry a webkitRelativePath that rebuilds the tree).
   function addFiles(fileList){
+    if(!clientCan('upload')) return;
     intake(Array.from(fileList||[]).map(f=>({file:f, path:f.webkitRelativePath || f.name}))).catch(err=>console.error(err));
   }
 
   // entry point for a drag-drop — walks any dropped directories via the entries API so folders
   // keep their full structure (subfolders + names). Falls back to a flat file list if unsupported.
   async function addFromDataTransfer(dt){
+    if(!clientCan('upload')) return;
     let items;
     try{ items = await filesFromDataTransfer(dt); }
     catch(_){ items = Array.from(dt.files||[]).map(f=>({file:f, path:f.webkitRelativePath||f.name})); }
@@ -3013,12 +2978,28 @@
     el('pvTitle').textContent=f.name;
     el('pvSub').textContent=`${f.ext.toUpperCase()} · ${fmtBytes(f.size)} · ${folderName(f.folderId)}`;
     const body=el('pvBody'); const url=urlFor(f);
-    if(f.kind==='image'){ body.innerHTML=`<img src="${url}" alt="">`; }
-    else if(f.kind==='video'){ body.innerHTML=`<video src="${url}" controls autoplay playsinline></video>`; }
-    else if(f.kind==='audio'){ body.innerHTML=`<div class="pvaudio"><div class="aic">${ICON.audio}</div><div style="font-weight:600;margin-bottom:4px;color:var(--ink)">${escapeHtml(f.name)}</div><audio src="${url}" controls autoplay></audio></div>`; }
+    wmState=computeWm();   // refresh the watermark snapshot so the enlarged view matches the saved album settings
+    if(f.kind==='image'){ body.innerHTML=`<div class="pvstage"><img src="${url}" alt="">${wmOverlayHtml(f)}</div>`; }
+    else if(f.kind==='video'){ body.innerHTML=`<div class="pvstage"><video src="${url}" controls autoplay playsinline></video>${wmOverlayHtml(f)}</div>`; }
+    else if(f.kind==='audio'){ body.innerHTML=`<div class="pvaudio"><div class="aic">${ICON.audio}</div><div style="font-weight:600;margin-bottom:4px;color:var(--ink)">${escapeHtml(f.name)}</div><audio src="${url}" controls controlsList="nodownload noplaybackrate" autoplay></audio></div>`; }
     else if(f.ext==='pdf'){ body.innerHTML=`<iframe src="${url}"></iframe>`; }
     else { body.innerHTML=`<div class="pvnone"><div class="ni">${ICON.doc}</div><div style="font-weight:600;font-size:15px;margin-bottom:6px">${escapeHtml(t.noPreviewTitle)}</div><p>${escapeHtml(t.noPreviewBody)}</p></div>`; }
+    syncPvPick();
     el('pvOverlay').classList.add('show');
+  }
+  // paint the enlarged-view ✓ toggle to match the previewed file's selection state, so the
+  // client can pick / unpick without returning to the gallery. Delegates to toggleSel(), so
+  // quotas, the per-type caps and the post-confirm lock all behave exactly as on the cards.
+  function syncPvPick(){
+    const btn=el('pvPick'); if(!btn||!pvFile) return;
+    const sel=!!pvFile.selected;
+    btn.classList.toggle('on',sel);
+    btn.setAttribute('aria-pressed',String(sel));
+    if(sel){
+      btn.innerHTML = ICON.check + '<span>' + escapeHtml(t.deselectItem) + '</span>';
+    } else {
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg><span>' + escapeHtml(t.selectItem) + '</span>';
+    }
   }
   function closePreview(){
     el('pvOverlay').classList.remove('show');
@@ -3033,6 +3014,7 @@
   let folderCreateMovePicked=false;   // when true, the marked files move into the folder created by the modal
   let folderCreateMoveFileId=null;    // when set, this single file moves into the folder created by the modal
   function openFolderModal(editId,opts){
+    if(editId ? !clientCan('folderManage') : !clientCan('folderCreate')) return;  // rename = manage, new = create
     folderEditId=editId||null;
     folderCreateMovePicked = !folderEditId && !!(opts && opts.movePicked);
     folderCreateMoveFileId = (!folderEditId && opts && opts.moveFileId) ? opts.moveFileId : null;
@@ -3079,6 +3061,7 @@
     return true;
   }
   function reparentFolder(dragId, newParentId){
+    if(!clientCan('folderManage')) return;
     const f=folders.find(x=>x.id===dragId); if(!f) return;
     f.parentId=newParentId;
     if(newParentId){ const p=folders.find(x=>x.id===newParentId); if(p) p.open=true; }
@@ -3086,6 +3069,7 @@
   // reorder a folder among its siblings by moving it just before/after another sibling in the
   // `folders` array (sibling order = array order within each parent group). Numbering re-derives on render.
   function reorderFolder(dragId, targetId, placeAfter){
+    if(!clientCan('folderManage')) return;
     if(dragId===targetId) return;
     const from=folders.findIndex(f=>f.id===dragId); if(from<0) return;
     const moved=folders.splice(from,1)[0];
@@ -3101,6 +3085,7 @@
     document.querySelectorAll('#folderList .drop-before,#folderList .drop-after').forEach(n=>n.classList.remove('drop-before','drop-after'));
   }
   function deleteFolder(id){
+    if(!clientCan('folderManage')) return;
     const fo=folders.find(f=>f.id===id); if(!fo) return;
     confirmAsk(t.confirmDelFolderTitle, t.confirmDelFolderBody(fo.name), ()=>{
       const up=fo.parentId||null;                            // promote contents one level up
@@ -3139,6 +3124,7 @@
   }
 
   function unassignFile(f){
+    if(!clientCan('folderMove')) return;
     if(!f || f.folderId==null) return;
     const doMove=()=>{ f.folderId=null; renderAll(); showToast(t.unassignDone); };
     let skip=false; try{ skip=localStorage.getItem('ac_skipmovemain')==='1'; }catch(_){}
@@ -3169,9 +3155,9 @@
   // =====================================================
   //  CLIENT SETTINGS  (per-gallery client details + permissions)
   // =====================================================
-  const PERM_KEYS=['download','zip','editText','reorder','delete','upload','selection','viewOnly'];
+  const PERM_KEYS=['download','zip','editText','reorder','delete','upload','selection','selectAll','folderCreate','folderManage','folderMove','viewOnly'];
   const CLIENT_DEFAULT={ name:'', email:'', phone:'', event:'', deadline:'', status:'draft',
-    perms:{ download:true, zip:true, editText:false, reorder:true, delete:false, upload:false, selection:true, viewOnly:false } };
+    perms:{ download:true, zip:true, editText:false, reorder:true, delete:false, upload:false, selection:true, selectAll:true, folderCreate:false, folderManage:false, folderMove:false, viewOnly:false } };
   function loadClient(){
     try{
       const raw=localStorage.getItem(scopedKey('ac_client'));
@@ -3187,15 +3173,11 @@
   const ALBUM_FIELDS=[
     ['alTitle','text',''],['alDesc','text',''],
     ['alVisibility','sel','link'],['alPwOn','chk',false],['alPw','text',''],
-    ['alDlPhotos','chk',true],['alDlVideos','chk',true],['alDlZip','chk',true],['alDlOriginal','chk',false],
-    ['alQuality','sel','full'],
     ['alGuestUpload','chk',false],['alGuestApproval','chk',true],['alApproval','chk',false],
-    ['alComments','chk',true],['alCommentsGuests','chk',false],['alLikes','chk',true],
     ['alSort','sel','name'],['alView','sel','grid'],['alFavorites','chk',true],['alEditRequests','chk',false],
     ['alBrandName','text',''],['alBrandColor','text','#7c3aed'],['alBrandLogo','text',''],['alWelcome','text',''],['alFooter','text',''],
     ['alWmOn','chk',false],['alWmType','sel','logo'],['alWmText','text',''],['alWmPos','sel','br'],['alWmOpacity','rng',35],
-    ['alNotifNewFiles','chk',true],['alNotifGuestUpload','chk',true],['alNotifFavorites','chk',true],
-    ['alNotifComments','chk',false],['alNotifExpiry','chk',true],
+    ['alNotifNewFiles','chk',true],['alNotifFavorites','chk',true],['alNotifExpiry','chk',true],
     ['alExpiryOn','chk',false],['alExpiryDate','date',''],['alExpiryAction','sel','readonly'],
     ['alSelectionMode','chk',false],
   ];
@@ -3246,11 +3228,11 @@
     const c = isNew ? JSON.parse(JSON.stringify(CLIENT_DEFAULT)) : loadClient();
     const a = isNew ? (function(){ const d={}; ALBUM_FIELDS.forEach(([id,,def])=>d[id]=def); return d; })() : loadAlbum();
     el('cName').value=c.name||''; el('cEmail').value=c.email||''; el('cPhone').value=c.phone||'';
-    el('cEvent').value=c.event||''; el('cDeadline').value=c.deadline||''; el('cStatus').value=normStatus(c.status);
+    el('cEvent').value=c.event||''; el('cDeadline').value=c.deadline||''; settingsStatus=normStatus(c.status);
     PERM_KEYS.forEach(k=>{ const box=el('perm_'+k); if(box) box.checked=!!c.perms[k]; });
     ALBUM_FIELDS.forEach(([id,kind])=>setField(id,kind,a[id]));
     renderLogoPreview();
-    applyViewOnlyLock(); applySettingsDeps(); refreshStorage(); setActiveTab('general');
+    applyViewOnlyLock(); applySettingsDeps(); setActiveTab('general');
     el('settingsOverlay').classList.add('show');
   }
   // "view only" is an override: when on, every other permission is forced off + disabled
@@ -3283,13 +3265,12 @@
     if(shared) el('alShareLink').value=shareLinkFor(shareState().id);
     const gu=el('alGuestUpload').checked, ga=el('alGuestApproval');
     ga.disabled=!gu; ga.closest('.permrow').classList.toggle('disabled', !gu);
-    const cm=el('alComments').checked, cg=el('alCommentsGuests');
-    cg.disabled=!cm; cg.closest('.permrow').classList.toggle('disabled', !cm);
   }
   // selection-album preset: view + favorite + note, but no delete / reorder / upload
   function applySelectionMode(){
     if(!el('alSelectionMode').checked) return;
     el('perm_delete').checked=false; el('perm_reorder').checked=false; el('perm_upload').checked=false;
+    el('perm_folderCreate').checked=false; el('perm_folderManage').checked=false; el('perm_folderMove').checked=false;
     el('alFavorites').checked=true; el('alEditRequests').checked=true;
     applyViewOnlyLock(); applySettingsDeps();
   }
@@ -3297,13 +3278,6 @@
     document.querySelectorAll('#setTabs .settab').forEach(b=>b.classList.toggle('on', b.getAttribute('data-tab')===name));
     document.querySelectorAll('.settingsmodal .setpane').forEach(p=>p.classList.toggle('on', p.getAttribute('data-pane')===name));
     const body=document.querySelector('.settingsmodal .setbody'); if(body) body.scrollTop=0;
-  }
-  function refreshStorage(){
-    const used=files.reduce((s,f)=>s+(f.size||0),0);
-    const cap=15*1024*1024*1024; // 15GB demo cap
-    const pct=Math.max(3, Math.min(100, Math.round(used/cap*100)));
-    el('alStorFill').style.width=pct+'%';
-    el('alStorUsed').textContent=t.storUsed(fmtBytes(used));
   }
   function flashActBtn(btn, msg){
     const span=btn.querySelector('span'); if(!span) return;
@@ -3322,7 +3296,7 @@
   async function saveSettings(){
     const perms={}; PERM_KEYS.forEach(k=>{ const box=el('perm_'+k); perms[k]=!!(box&&box.checked); });
     const c={ name:el('cName').value.trim(), email:el('cEmail').value.trim(), phone:el('cPhone').value.trim(),
-      event:el('cEvent').value, deadline:el('cDeadline').value, status:normStatus(el('cStatus').value), perms };
+      event:el('cEvent').value, deadline:el('cDeadline').value, status:normStatus(settingsStatus), perms };
     try{ localStorage.setItem(scopedKey('ac_client'), JSON.stringify(c)); }catch(_){}
     const a={}; ALBUM_FIELDS.forEach(([id,kind])=>a[id]=getField(id,kind));
     try{ localStorage.setItem(scopedKey('ac_album'), JSON.stringify(a)); }catch(_){}
@@ -3338,21 +3312,24 @@
       settingsIsNewProject=false;
     }
     el('settingsOverlay').classList.remove('show');
-    renderStatusCard(); // reflect the new status on the strip immediately
+    renderOtherCard();  // refresh the "אחר" count in case classification changed
     renderGrid();       // repaint thumbnails so watermark / brand changes show at once
+    applyPreviewMode(); // if we're in the live client preview, re-apply the freshly saved permissions
   }
 
   // =====================================================
   //  ALBUM MANAGER  (client selection limits + presets)
   // =====================================================
-  const AM_DEFAULT={ limitOn:false, separate:false, maxTotal:40, maxPhotos:40, maxVideos:5, message:'', preset:'' };
-  // built-in presets: quick starting points for common album / collection selections
+  const AM_DEFAULT={ limitOn:false, separate:false, maxTotal:40, maxPhotos:40, maxVideos:5, maxOther:0, message:'', preset:'' };
+  // built-in presets: quick starting points for common album / collection selections.
+  // The client message is generated dynamically from these caps (see buildAmMessage), so
+  // presets no longer carry a fixed message string — the numbers always reflect the real quota.
   const AM_PRESETS={
-    album:      { limitOn:true,  separate:false, maxTotal:40, maxPhotos:40, maxVideos:0, msg:'amPresetAlbumMsg' },
-    prints:     { limitOn:true,  separate:false, maxTotal:25, maxPhotos:25, maxVideos:0, msg:'amPresetPrintsMsg' },
-    mix:        { limitOn:true,  separate:true,  maxTotal:55, maxPhotos:50, maxVideos:5, msg:'amPresetMixMsg' },
-    highlights: { limitOn:true,  separate:false, maxTotal:15, maxPhotos:15, maxVideos:3, msg:'amPresetHighlightsMsg' },
-    free:       { limitOn:false, separate:false, maxTotal:40, maxPhotos:40, maxVideos:5, msg:'amPresetFreeMsg' },
+    album:      { limitOn:true,  separate:false, maxTotal:40, maxPhotos:40, maxVideos:0, maxOther:0 },
+    prints:     { limitOn:true,  separate:false, maxTotal:25, maxPhotos:25, maxVideos:0, maxOther:0 },
+    mix:        { limitOn:true,  separate:true,  maxTotal:55, maxPhotos:50, maxVideos:5, maxOther:0 },
+    highlights: { limitOn:true,  separate:false, maxTotal:15, maxPhotos:15, maxVideos:3, maxOther:0 },
+    free:       { limitOn:false, separate:false, maxTotal:40, maxPhotos:40, maxVideos:5, maxOther:0 },
   };
   // label key for each built-in preset, so the name field can mirror the chosen card
   const AM_PRESET_LABELS={ album:'amPresetAlbumL', prints:'amPresetPrintsL', mix:'amPresetMixL', highlights:'amPresetHighlightsL', free:'amPresetFreeL' };
@@ -3385,8 +3362,56 @@
   // short quota summary shown under a custom preset card
   function presetDesc(p){
     if(!p.limitOn) return t.amNoLimit;
-    if(p.separate) return p.maxPhotos+' '+t.amUnitPhotos+' · '+p.maxVideos+' '+t.amUnitVideos;
+    if(p.separate){
+      let s=p.maxPhotos+' '+t.amUnitPhotos+' · '+p.maxVideos+' '+t.amUnitVideos;
+      if((p.maxOther||0)>0) s+=' · '+p.maxOther+' '+t.amUnitOther;
+      return s;
+    }
     return t.amUpTo+' '+p.maxTotal+' '+t.amUnitPhotos;
+  }
+  // the client message the owner has NOT hand-edited; tracked so quota changes can keep it in sync
+  let amAutoMsg='';
+  // join localized clauses as "A", "A and B", or "A, B and C" (RTL "ו" prefixes correctly)
+  function joinAmList(parts){
+    if(parts.length<=1) return parts[0]||'';
+    return parts.slice(0,-1).join(t.amMsgSep)+t.amMsgAnd+parts[parts.length-1];
+  }
+  // compose the "message shown before selection" purely from the configured quota, so it always
+  // states the real numbers the owner set for photos / videos / other files.
+  function buildAmMessage(m){
+    if(!m || !m.limitOn) return '';
+    const parts=[];
+    if(m.separate){
+      parts.push(t.amUpToItem(m.maxPhotos, t.amUnitPhotos));
+      if(videosEnabled(m)) parts.push(t.amUpToItem(m.maxVideos, t.amUnitVideos));
+      if(otherEnabled(m))  parts.push(t.amUpToItem(m.maxOther, t.amUnitOther));
+    } else {
+      // one combined pool: a photo-only package reads better as "photos" than the generic "files"
+      const unit = videosEnabled(m) ? t.amUnitFiles : t.amUnitPhotos;
+      parts.push(t.amUpToItem(m.maxTotal, unit));
+    }
+    if(!parts.length) return '';
+    return t.amMsgLead+joinAmList(parts)+'.';
+  }
+  // read the album-manager form into a plain quota object (used to regenerate the live message)
+  function currentAmFields(){
+    return {
+      limitOn:  el('amLimitOn').checked,
+      separate: el('amSeparate').checked,
+      maxTotal: parseInt(el('amMaxTotal').value,10)||0,
+      maxPhotos:parseInt(el('amMaxPhotos').value,10)||0,
+      maxVideos:parseInt(el('amMaxVideos').value,10)||0,
+      maxOther: parseInt(el('amMaxOther').value,10)||0,
+    };
+  }
+  // refresh the message from the current caps, but only while it still matches the auto text
+  // (i.e. the owner hasn't typed their own wording) so custom messages are never clobbered
+  function syncAmMessage(){
+    const gen=buildAmMessage(currentAmFields());
+    const box=el('amMessage');
+    if(box.value.trim()==='' || box.value===amAutoMsg){
+      box.value=gen; amAutoMsg=gen;
+    }
   }
   function loadAlbumMgr(){
     const d=Object.assign({}, AM_DEFAULT);
@@ -3402,7 +3427,11 @@
     el('amMaxTotal').value=(m.maxTotal!=null?m.maxTotal:AM_DEFAULT.maxTotal);
     el('amMaxPhotos').value=(m.maxPhotos!=null?m.maxPhotos:AM_DEFAULT.maxPhotos);
     el('amMaxVideos').value=(m.maxVideos!=null?m.maxVideos:AM_DEFAULT.maxVideos);
-    el('amMessage').value=m.message||'';
+    el('amMaxOther').value=(m.maxOther!=null?m.maxOther:AM_DEFAULT.maxOther);
+    // fall back to the auto-generated message when none was saved; remember it so later
+    // quota edits keep a still-default message in sync (see syncAmMessage)
+    amAutoMsg=buildAmMessage(m);
+    el('amMessage').value=m.message||amAutoMsg;
     markPreset(m.preset||'');
     el('amPresetName').value = m.preset ? presetName(m.preset) : '';
   }
@@ -3437,13 +3466,16 @@
       grid.insertBefore(b,anchor);
     });
   }
-  // apply a preset to every field; built-ins carry a message key, custom presets carry raw text
+  // apply a preset to every field; the message is generated from the preset's caps so the numbers
+  // are always accurate. A custom preset that carries hand-written text keeps that text instead.
   function applyPreset(id){
     const p=findPreset(id); if(!p) return;
     el('amLimitOn').checked=p.limitOn;
     el('amSeparate').checked=p.separate;
     el('amMaxTotal').value=p.maxTotal; el('amMaxPhotos').value=p.maxPhotos; el('amMaxVideos').value=p.maxVideos;
-    el('amMessage').value = ('msg' in p) ? (p.msg ? (t[p.msg]||'') : '') : (p.message||'');
+    el('amMaxOther').value=(p.maxOther!=null?p.maxOther:0);
+    amAutoMsg=buildAmMessage(p);
+    el('amMessage').value = (!AM_PRESETS[id] && p.message) ? p.message : amAutoMsg;
     el('amPresetName').value = presetName(id); // mirror the chosen card's name into the field
     markPreset(id); applyAlbumMgrDeps();
   }
@@ -3458,6 +3490,7 @@
       maxTotal:clampNum(el('amMaxTotal'), AM_DEFAULT.maxTotal),
       maxPhotos:clampNum(el('amMaxPhotos'), AM_DEFAULT.maxPhotos),
       maxVideos:clampNum(el('amMaxVideos'), AM_DEFAULT.maxVideos),
+      maxOther:clampNum(el('amMaxOther'), AM_DEFAULT.maxOther),
       message:el('amMessage').value.trim(),
     };
     customPresets.push(p); saveCustomPresets();
@@ -3499,6 +3532,7 @@
       maxTotal:clampNum(el('amMaxTotal'), AM_DEFAULT.maxTotal),
       maxPhotos:clampNum(el('amMaxPhotos'), AM_DEFAULT.maxPhotos),
       maxVideos:clampNum(el('amMaxVideos'), AM_DEFAULT.maxVideos),
+      maxOther:clampNum(el('amMaxOther'), AM_DEFAULT.maxOther),
       message:el('amMessage').value.trim(),
       preset:pid,
     };
@@ -3511,7 +3545,7 @@
       // (built-in labels are localized per language, so they can't be renamed in place)
       const p={ id:'c'+genId(), name:nm,
         limitOn:m.limitOn, separate:m.separate,
-        maxTotal:m.maxTotal, maxPhotos:m.maxPhotos, maxVideos:m.maxVideos,
+        maxTotal:m.maxTotal, maxPhotos:m.maxPhotos, maxVideos:m.maxVideos, maxOther:m.maxOther,
         message:m.message };
       customPresets.push(p); saveCustomPresets();
       m.preset=p.id; // the forked preset becomes the active one
@@ -3675,6 +3709,71 @@
   }
 
   // =====================================================
+  //  GRID SIZING  (helpers used by both init() and the zoom controls in bindStatic)
+  // =====================================================
+  function applyGrid(v){
+    const r=el('zoomRange');
+    v=Math.max(+r.min, Math.min(+r.max, v));
+    const changed = v !== +r.value;
+    const before = changed ? new Map([...document.querySelectorAll('.filegrid .fcard')].map(card=>[card.dataset.id, card.getBoundingClientRect()])) : null;
+    r.value=v;
+    document.documentElement.style.setProperty('--card-size', v+'px');
+    if(before){
+      requestAnimationFrame(()=>{
+        document.querySelectorAll('.filegrid .fcard').forEach(card=>{
+          const first=before.get(card.dataset.id);
+          if(!first) return;
+          const last=card.getBoundingClientRect();
+          if(!last.width || !last.height) return;
+          const dx=first.left-last.left, dy=first.top-last.top;
+          const sx=first.width/last.width, sy=first.height/last.height;
+          if(Math.abs(dx)<.5 && Math.abs(dy)<.5 && Math.abs(sx-1)<.01 && Math.abs(sy-1)<.01) return;
+          card.animate([
+            {transform:`translate(${dx}px,${dy}px) scale(${sx},${sy})`,transformOrigin:'top left'},
+            {transform:'translate(0,0) scale(1,1)',transformOrigin:'top left'}
+          ],{duration:180,easing:'cubic-bezier(.2,.8,.2,1)'});
+        });
+      });
+    }
+    try{ localStorage.setItem('ac_grid', String(v)); }catch(_){}
+    el('zoomMinus').disabled = v<=+r.min;
+    el('zoomPlus').disabled  = v>=+r.max;
+  }
+  // The grid stretches its columns to fill the row (auto-fill + 1fr), so nudging
+  // --card-size by a single 10px step usually lands inside the same column count and
+  // looks identical — which felt like "nothing happens until the 2nd click". Instead,
+  // +/- jump straight to the size that removes/adds one whole column, so every single
+  // click visibly resizes the cards. (Drag on the slider keeps its raw px behaviour.)
+  function gridColMetrics(){
+    const grid=el('fileGrid');
+    if(!grid || !grid.children.length || !grid.clientWidth) return null;
+    const cs=getComputedStyle(grid);
+    const cols=cs.gridTemplateColumns.split(/\s+/).filter(t=>t && t!=='none').length;
+    if(!cols) return null;
+    const gap=parseFloat(cs.columnGap)||parseFloat(cs.gap)||0;
+    return {cols, gap, w:grid.clientWidth};
+  }
+  // Exact per-column width for n columns — slightly floored so auto-fill fits exactly n.
+  const sizeForCols=(n,m)=>Math.floor((m.w-(n-1)*m.gap)/n);
+  function stepGrid(bigger){
+    const r=el('zoomRange'), step=+r.step||10, m=gridColMetrics();
+    if(!m){ applyGrid(+r.value + (bigger?step:-step)); return; }   // empty grid: fall back to px step
+    const target = bigger ? m.cols-1 : m.cols+1;
+    applyGrid(target<1 ? +r.max : sizeForCols(target,m));
+  }
+  // Default grid density for a fresh project: exactly 6 cards per row on desktop.
+  // Derived from the live grid width (works even while empty) so the row fills
+  // precisely; on narrow layouts (organizer collapses at ≤820px) we keep the
+  // neutral 170px so cards don't get tiny.
+  function defaultGridSize(){
+    const grid=el('fileGrid');
+    if(window.innerWidth<=820 || !grid || !grid.clientWidth) return 170;
+    const cs=getComputedStyle(grid);
+    const gap=parseFloat(cs.columnGap)||parseFloat(cs.gap)||14;
+    return Math.floor((grid.clientWidth-5*gap)/6);   // 6 columns, 5 inner gaps
+  }
+
+  // =====================================================
   //  EVENTS
   // =====================================================
   function bindStatic(){
@@ -3703,37 +3802,9 @@
       if(query) currentFolder='all';
       renderAll();
     });
-    function applyGrid(v){
-      const r=el('zoomRange');
-      v=Math.max(+r.min, Math.min(+r.max, v));
-      const changed = v !== +r.value;
-      const before = changed ? new Map([...document.querySelectorAll('.filegrid .fcard')].map(card=>[card.dataset.id, card.getBoundingClientRect()])) : null;
-      r.value=v;
-      document.documentElement.style.setProperty('--card-size', v+'px');
-      if(before){
-        requestAnimationFrame(()=>{
-          document.querySelectorAll('.filegrid .fcard').forEach(card=>{
-            const first=before.get(card.dataset.id);
-            if(!first) return;
-            const last=card.getBoundingClientRect();
-            if(!last.width || !last.height) return;
-            const dx=first.left-last.left, dy=first.top-last.top;
-            const sx=first.width/last.width, sy=first.height/last.height;
-            if(Math.abs(dx)<.5 && Math.abs(dy)<.5 && Math.abs(sx-1)<.01 && Math.abs(sy-1)<.01) return;
-            card.animate([
-              {transform:`translate(${dx}px,${dy}px) scale(${sx},${sy})`,transformOrigin:'top left'},
-              {transform:'translate(0,0) scale(1,1)',transformOrigin:'top left'}
-            ],{duration:180,easing:'cubic-bezier(.2,.8,.2,1)'});
-          });
-        });
-      }
-      try{ localStorage.setItem('ac_grid', String(v)); }catch(_){}
-      el('zoomMinus').disabled = v<=+r.min;
-      el('zoomPlus').disabled  = v>=+r.max;
-    }
     el('zoomRange').addEventListener('input',e=>applyGrid(+e.target.value));
-    el('zoomMinus').addEventListener('click',()=>applyGrid(+el('zoomRange').value - (+el('zoomRange').step||10)));
-    el('zoomPlus').addEventListener('click',()=>applyGrid(+el('zoomRange').value + (+el('zoomRange').step||10)));
+    el('zoomMinus').addEventListener('click',()=>stepGrid(false)); // − → smaller cards, one more column
+    el('zoomPlus').addEventListener('click',()=>stepGrid(true));   // + → bigger cards, one fewer column
     el('showMovedChk').addEventListener('change',e=>{
       showMovedInMain=e.target.checked;
       try{ localStorage.setItem('ac_showmoved', showMovedInMain?'1':'0'); }catch(_){}
@@ -3744,6 +3815,14 @@
     el('msPickAllBtn').addEventListener('click',()=>{
       const vis=visibleFiles().filter(f=>!isLocked(f)); const allPick=vis.length>0 && vis.every(f=>f.picked);
       vis.forEach(f=>f.picked=!allPick); renderGrid();
+    });
+    el('clientSelectAllBtn').addEventListener('click',()=>{
+      if(!clientCan('selection') || !clientCan('selectAll') || selConfirmed) return;
+      const vis=visibleFiles().filter(f=>!isLocked(f));
+      const allSelected=vis.length>0 && vis.every(f=>f.selected);
+      if(allSelected){ vis.forEach(f=>f.selected=false); selPromptShown=false; }
+      else for(const f of vis){ if(!f.selected && selBlocked(f)) break; f.selected=true; }
+      renderGrid(); renderStats(); maybePromptSelConfirm();
     });
     el('msDelBtn').addEventListener('click',()=>{
       const picked=files.filter(f=>f.picked); if(!picked.length) return;
@@ -3779,11 +3858,11 @@
     el('folderList').addEventListener('click',e=>{
       if(e.target.closest('[data-fgrip]')){ e.stopPropagation(); return; }   // grip is drag-only, never selects
       const tw=e.target.closest('[data-ftoggle]'); if(tw){ e.stopPropagation(); const f=folders.find(x=>x.id===tw.getAttribute('data-ftoggle')); if(f){ f.open=(f.open===false); renderFolders(); } return; }
-      const editBtn=e.target.closest('[data-fedit]'); if(editBtn){ e.stopPropagation(); openFolderModal(editBtn.getAttribute('data-fedit')); return; }
-      const delBtn=e.target.closest('[data-fdel]'); if(delBtn){ e.stopPropagation(); deleteFolder(delBtn.getAttribute('data-fdel')); return; }
+      const editBtn=e.target.closest('[data-fedit]'); if(editBtn){ e.stopPropagation(); if(!clientCan('folderManage')) return; openFolderModal(editBtn.getAttribute('data-fedit')); return; }
+      const delBtn=e.target.closest('[data-fdel]'); if(delBtn){ e.stopPropagation(); if(!clientCan('folderManage')) return; deleteFolder(delBtn.getAttribute('data-fdel')); return; }
       const item=e.target.closest('.fitem'); if(item){ const fid=item.getAttribute('data-folder'); currentFolder = fid==='all'?'all':fid; renderAll(); }
     });
-    el('addFolderBtn').addEventListener('click',()=>openFolderModal(null));
+    el('addFolderBtn').addEventListener('click',()=>{ if(!clientCan('folderCreate')) return; openFolderModal(null); });
 
     // folder drag-drop targets — three gestures:
     //   • drag a file card onto a folder     → assign the file (draggingId)
@@ -3792,6 +3871,7 @@
     el('folderList').addEventListener('pointerdown',e=>{ folderGripArmed=!!e.target.closest('[data-fgrip]'); });
     el('folderList').addEventListener('dragstart',e=>{
       const row=e.target.closest('.fitem[data-folder]'); if(!row) return;
+      if(!clientCan('folderManage')){ e.preventDefault(); return; }   // reorder / nest a folder = folder management
       const fid=row.getAttribute('data-folder');
       if(fid==='all'){ e.preventDefault(); return; }
       if(folderGripArmed){                                    // grip drag = reorder among siblings
@@ -3822,7 +3902,7 @@
       }
       const item=e.target.closest('[data-drop]'); if(!item) return;
       const target=item.getAttribute('data-drop');
-      if(draggingId){ e.preventDefault(); item.classList.add('dragover'); }
+      if(draggingId){ if(!clientCan('folderMove')) return; e.preventDefault(); item.classList.add('dragover'); }
       else if(draggingFolderId && canDropFolder(draggingFolderId,target)){ e.preventDefault(); item.classList.add('dragover'); }
     });
     el('folderList').addEventListener('dragleave',e=>{ const item=e.target.closest('[data-drop]'); if(item) item.classList.remove('dragover'); });
@@ -3845,6 +3925,7 @@
       const target=item.getAttribute('data-drop');
       if(draggingId){
         e.preventDefault(); item.classList.remove('dragover');
+        if(!clientCan('folderMove')) return;
         const moving=dragTargets(); if(!moving.length) return;
         moving.forEach(f=>{ f.folderId = target==='all'?null:target; f.picked=false; });
         renderAll();
@@ -3870,15 +3951,19 @@
       const cmOpt=e.target.closest('.cardmove-menu .fs-item'); if(cmOpt){ e.stopPropagation(); cardMoveApply(cmOpt); return; }
       const cm=e.target.closest('.cardmove'); if(cm){ e.stopPropagation(); toggleCardMove(cm); return; }
       const unassign=e.target.closest('[data-unassign]'); if(unassign){ e.stopPropagation(); const f=fileById(unassign.getAttribute('data-unassign')); if(f) unassignFile(f); return; }
-      const del=e.target.closest('[data-del]'); if(del){ e.stopPropagation(); const f=fileById(del.getAttribute('data-del')); if(f){ confirmAsk(t.confirmDelTitle,t.confirmDelBody(1),()=>{ revoke(f); files=files.filter(x=>x.id!==f.id); renderAll(); }); } return; }
+      const del=e.target.closest('[data-del]'); if(del){ e.stopPropagation(); if(!clientCan('delete')) return; const f=fileById(del.getAttribute('data-del')); if(f){ confirmAsk(t.confirmDelTitle,t.confirmDelBody(1),()=>{ revoke(f); files=files.filter(x=>x.id!==f.id); renderAll(); }); } return; }
       const pv=e.target.closest('[data-preview]'); if(pv){ const f=fileById(pv.getAttribute('data-preview')); if(f) openPreview(f); return; }
     });
     grid.addEventListener('input',e=>{
-      const note=e.target.closest('[data-note]'); if(note){ const f=fileById(note.getAttribute('data-note')); if(f) f.note=note.value; }
+      const note=e.target.closest('[data-note]'); if(!note) return;
+      const f=fileById(note.getAttribute('data-note')); if(!f) return;
+      if(!clientCan('editText')){ note.value=f.note||''; return; }  // captions locked → revert any keyboard edit
+      f.note=note.value;
     });
     // drag files to folders
     grid.addEventListener('dragstart',e=>{
       const card=e.target.closest('.fcard'); if(!card) return;
+      if(!clientCan('reorder') && !clientCan('folderMove')){ e.preventDefault(); return; } // dragging a card drives both reorder and move-to-folder
       if(e.target.closest('.fcap')||e.target.closest('.cardmove')||e.target.closest('.fdel-x')||e.target.closest('.cardmenu')||e.target.closest('[data-kebab]')){ e.preventDefault(); return; } // don't drag from controls inside the card
       draggingId=card.getAttribute('data-id');
       const d=fileById(draggingId);
@@ -3890,6 +3975,7 @@
     // reorder within the grid: drag a card onto another to change its position
     grid.addEventListener('dragover',e=>{
       if(!draggingId) return;
+      if(!clientCan('reorder')){ clearReorderMarks(); return; }   // reorder-within-grid not permitted
       const card=e.target.closest('.fcard');
       if(!card || card.classList.contains('locked') || card.getAttribute('data-id')===draggingId){ clearReorderMarks(); return; }
       e.preventDefault(); e.dataTransfer.dropEffect='move';
@@ -3897,6 +3983,7 @@
     });
     grid.addEventListener('drop',e=>{
       if(!draggingId) return;
+      if(!clientCan('reorder')){ clearReorderMarks(); return; }
       const card=e.target.closest('.fcard');
       if(!card || card.classList.contains('locked') || card.getAttribute('data-id')===draggingId){ clearReorderMarks(); return; }
       e.preventDefault();
@@ -3912,6 +3999,16 @@
     el('selDoneConfirm').addEventListener('click',confirmSelection);
     el('selDoneCancel').addEventListener('click',()=>el('selDoneOverlay').classList.remove('show'));
     el('finishSelBtn').addEventListener('click',onFinishSel);
+    // preview-mode toggle: owner flips between their own view and a live client preview (no reload)
+    (function(){
+      const seg=el('viewSeg'); if(!seg) return;
+      if(isClientView()){ seg.hidden=true; return; }   // a real client never sees the owner's preview switch
+      seg.addEventListener('click',ev=>{
+        const b=ev.target.closest('[data-mode]'); if(!b) return;
+        clientPreview=(b.getAttribute('data-mode')==='client');
+        applyPreviewMode();
+      });
+    })();
     el('folderSave').addEventListener('click',saveFolder);
     el('folderCancel').addEventListener('click',()=>el('folderOverlay').classList.remove('show'));
     el('folderNameInput').addEventListener('keydown',e=>{ if(e.key==='Enter') saveFolder(); if(e.key==='Escape') el('folderOverlay').classList.remove('show'); });
@@ -3925,29 +4022,14 @@
     el('moveClose').addEventListener('click',closeMoveChoice);
     el('moveCancel').addEventListener('click',closeMoveChoice);
     el('pvClose').addEventListener('click',closePreview);
-    // download all as ZIP
-    el('downloadZipBtn').addEventListener('click',downloadAllZip);
     // album settings
     el('clientBtn').addEventListener('click',openSettings);
-    // status card -> choose one of the four selection states directly
-    el('statStatusCard').addEventListener('click',e=>{
-      const opt=e.target.closest('[data-status]');
-      if(opt){ saveSelectionStatus(opt.getAttribute('data-status')); return; }
-      toggleStatusMenu();
-    });
-    el('statStatusCard').addEventListener('keydown',e=>{
-      const opt=e.target.closest('[data-status]');
-      if(opt && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); saveSelectionStatus(opt.getAttribute('data-status')); return; }
-      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleStatusMenu(); }
-      if(e.key==='Escape') setStatusCardOpen(false);
-    });
-    document.addEventListener('click',e=>{ const c=el('statStatusCard'); if(c&&!c.contains(e.target)) setStatusCardOpen(false); });
     el('settingsSave').addEventListener('click',saveSettings);
     el('settingsCancel').addEventListener('click',()=>el('settingsOverlay').classList.remove('show'));
     el('settingsClose').addEventListener('click',()=>el('settingsOverlay').classList.remove('show'));
     el('perm_viewOnly').addEventListener('change',applyViewOnlyLock);
     el('setTabs').addEventListener('click',e=>{ const b=e.target.closest('.settab'); if(b) setActiveTab(b.getAttribute('data-tab')); });
-    ['alPwOn','alWmOn','alWmType','alExpiryOn','alGuestUpload','alComments','alVisibility'].forEach(id=>el(id).addEventListener('change',applySettingsDeps));
+    ['alPwOn','alWmOn','alWmType','alExpiryOn','alGuestUpload','alVisibility'].forEach(id=>el(id).addEventListener('change',applySettingsDeps));
     el('alLogoPick').addEventListener('click',()=>el('alLogoFile').click());
     el('alLogoFile').addEventListener('change',onLogoFile);
     el('alLogoRm').addEventListener('click',()=>{ el('alBrandLogo').value=''; renderLogoPreview(); });
@@ -3955,9 +4037,6 @@
     el('alWmOpacity').addEventListener('input',()=>{ el('alWmOpacityVal').textContent=el('alWmOpacity').value+'%'; });
     el('alSelectionMode').addEventListener('change',applySelectionMode);
     el('alDeleteBtn').addEventListener('click',deleteAlbum);
-    el('alBackupBtn').addEventListener('click',downloadAllZip);
-    el('alArchiveBtn').addEventListener('click',()=>flashActBtn(el('alArchiveBtn'), t.archivedMsg));
-    el('alUpgradeBtn').addEventListener('click',()=>{ location.href='./pricing/'; });
     el('alCoverBtn').addEventListener('click',()=>el('fileInput').click());
     // album manager
     el('albumMgrBtn').addEventListener('click',openAlbumMgr);
@@ -3970,9 +4049,11 @@
       if(e.target.closest('#amPresetNew')){ createPreset(); return; }
       const b=e.target.closest('.preset'); if(b) applyPreset(b.getAttribute('data-preset'));
     });
-    el('amLimitOn').addEventListener('change',applyAlbumMgrDeps);
-    el('amSeparate').addEventListener('change',()=>{ applyAlbumMgrDeps(); clearPresetMark(); });
-    ['amMaxTotal','amMaxPhotos','amMaxVideos','amMessage'].forEach(id=>el(id).addEventListener('input',clearPresetMark));
+    el('amLimitOn').addEventListener('change',()=>{ applyAlbumMgrDeps(); syncAmMessage(); });
+    el('amSeparate').addEventListener('change',()=>{ applyAlbumMgrDeps(); clearPresetMark(); syncAmMessage(); });
+    // editing a cap keeps a still-default client message in sync with the real numbers
+    ['amMaxTotal','amMaxPhotos','amMaxVideos','amMaxOther'].forEach(id=>el(id).addEventListener('input',()=>{ clearPresetMark(); syncAmMessage(); }));
+    el('amMessage').addEventListener('input',clearPresetMark);
     // share gallery
     el('shareBtn').addEventListener('click',openShare);
     el('shareClose').addEventListener('click',()=>{ saveShareState(); el('shareOverlay').classList.remove('show'); });
@@ -3989,6 +4070,7 @@
     ['helpOverlay','blockedOverlay','limitOverlay','selDoneOverlay','folderOverlay','settingsOverlay','shareOverlay','albumMgrOverlay'].forEach(idn=>{ el(idn).addEventListener('click',e=>{ if(e.target===el(idn)) el(idn).classList.remove('show'); }); });
     el('moveOverlay').addEventListener('click',e=>{ if(e.target===el('moveOverlay')) closeMoveChoice(); });
     el('pvOverlay').addEventListener('click',e=>{ if(e.target===el('pvOverlay')) closePreview(); });
+    el('pvPick').addEventListener('click',function(){ if(pvFile){ toggleSel(pvFile.id); syncPvPick(); } });
 
     // lang + theme
     window.__setLang=applyLang;
@@ -3997,24 +4079,28 @@
 
   let draggingId=null, draggingFolderId=null, reorderFolderId=null, folderGripArmed=false;
   function fileById(id){ return files.find(f=>f.id===id); }
-  // ---- album-selection quota (the GREEN check): count photos / videos across the WHOLE album ----
-  function quotaKind(f){ return f.kind==='image'?'photo':(f.kind==='video'?'video':null); }
+  // ---- album-selection quota (the GREEN check): count photos / videos / other across the WHOLE album ----
+  // audio + documents (anything that isn't an image or video) fall into the "other" bucket
+  function quotaKind(f){ return f.kind==='image'?'photo':(f.kind==='video'?'video':'other'); }
   function selLimit(){ const m=albumMgr||loadAlbumMgr(); return m&&m.limitOn?m:null; }
   function selCounts(){
-    let photos=0,videos=0,total=0;
+    let photos=0,videos=0,other=0,total=0;
     files.forEach(f=>{ if(!f.selected) return; total++; const k=quotaKind(f);
-      if(k==='photo') photos++; else if(k==='video') videos++; });
-    return {photos,videos,total};
+      if(k==='photo') photos++; else if(k==='video') videos++; else other++; });
+    return {photos,videos,other,total};
   }
   function computeQuota(){ return { m:selLimit(), c:selCounts() }; }
   // can this (currently unselected) file still be added under the active limit? uses the per-render snapshot
   function selAtCap(f){
     if(f.selected) return false;
     const q=quotaState; if(!q||!q.m) return false;
-    if(quotaKind(f)==='video' && !videosEnabled(q.m)) return true;
-    if(q.m.separate){ const k=quotaKind(f);
+    const k=quotaKind(f);
+    if(k==='video' && !videosEnabled(q.m)) return true;
+    if(k==='other' && !otherEnabled(q.m)) return true;
+    if(q.m.separate){
       if(k==='photo') return q.c.photos>=q.m.maxPhotos;
       if(k==='video') return q.c.videos>=q.m.maxVideos;
+      if(k==='other') return q.c.other>=q.m.maxOther;
       return false; }
     return q.c.total>=q.m.maxTotal;
   }
@@ -4022,10 +4108,13 @@
   function selBlocked(f){
     const m=selLimit(); if(!m) return 0;
     const c=selCounts();
-    if(quotaKind(f)==='video' && !videosEnabled(m)) return -1;
-    if(m.separate){ const k=quotaKind(f);
+    const k=quotaKind(f);
+    if(k==='video' && !videosEnabled(m)) return -1;
+    if(k==='other' && !otherEnabled(m)) return -1;
+    if(m.separate){
       if(k==='photo') return c.photos>=m.maxPhotos?m.maxPhotos:0;
       if(k==='video') return c.videos>=m.maxVideos?m.maxVideos:0;
+      if(k==='other') return c.other>=m.maxOther?m.maxOther:0;
       return 0; }
     return c.total>=m.maxTotal?m.maxTotal:0;
   }
@@ -4037,17 +4126,25 @@
   }
   function selLimitMsg(f){
     const m=selLimit(); if(!m) return '';
-    if(quotaKind(f)==='video' && !videosEnabled(m)) return t.limitVideos(0);
-    if(m.separate){ const k=quotaKind(f);
-      return k==='video'?t.limitVideos(m.maxVideos):t.limitPhotos(m.maxPhotos); }
+    const k=quotaKind(f);
+    if(k==='video' && !videosEnabled(m)) return t.limitVideos(0);
+    if(k==='other' && !otherEnabled(m)) return t.limitOther(0);
+    if(m.separate){
+      if(k==='video') return t.limitVideos(m.maxVideos);
+      if(k==='other') return t.limitOther(m.maxOther);
+      return t.limitPhotos(m.maxPhotos); }
     return t.limitTotal(m.maxTotal);
   }
-  // popup title for the "you hit the quota" dialog (photos / videos / total, per active limit)
+  // popup title for the "you hit the quota" dialog (photos / videos / other / total, per active limit)
   function selLimitTitle(f){
     const m=selLimit(); if(!m) return '';
-    if(quotaKind(f)==='video' && !videosEnabled(m)) return t.limitPopVideos(0);
-    if(m.separate){ const k=quotaKind(f);
-      return k==='video'?t.limitPopVideos(m.maxVideos):t.limitPopPhotos(m.maxPhotos); }
+    const k=quotaKind(f);
+    if(k==='video' && !videosEnabled(m)) return t.limitPopVideos(0);
+    if(k==='other' && !otherEnabled(m)) return t.limitPopOther(0);
+    if(m.separate){
+      if(k==='video') return t.limitPopVideos(m.maxVideos);
+      if(k==='other') return t.limitPopOther(m.maxOther);
+      return t.limitPopPhotos(m.maxPhotos); }
     return t.limitPopFiles(m.maxTotal);
   }
   function openLimitPop(f){
@@ -4058,16 +4155,22 @@
   function selQuotaFull(){
     const m=selLimit(); if(!m) return false;
     const c=selCounts();
-    if(!videosEnabled(m)) return c.photos >= (m.separate ? m.maxPhotos : m.maxTotal);
-    return m.separate ? (c.photos>=m.maxPhotos && c.videos>=m.maxVideos) : (c.total>=m.maxTotal);
+    if(!m.separate) return c.total>=m.maxTotal;
+    const photoFull = c.photos>=m.maxPhotos;
+    const videoFull = !videosEnabled(m) || c.videos>=m.maxVideos;
+    const otherFull = !otherEnabled(m)  || c.other>=m.maxOther;
+    return photoFull && videoFull && otherFull;
   }
   function selDoneCountMsg(){
     const m=selLimit();
     const c=selCounts();
     if(!m) return t.selDoneCountAny(c.total);   // no quota configured -> show a plain selected-files count
-    if(!videosEnabled(m)) return t.selDoneCount(c.photos, m.separate ? m.maxPhotos : m.maxTotal);
-    return m.separate ? t.selDoneCountSep(c.photos,m.maxPhotos,c.videos,m.maxVideos)
-                      : t.selDoneCount(c.total,m.maxTotal);
+    if(!m.separate) return t.selDoneCount(c.total, m.maxTotal);
+    // split mode -> spell out each enabled category with its own count/cap
+    const items=[ t.selDoneItem(c.photos, m.maxPhotos, t.amUnitPhotos) ];
+    if(videosEnabled(m)) items.push(t.selDoneItem(c.videos, m.maxVideos, t.amUnitVideos));
+    if(otherEnabled(m))  items.push(t.selDoneItem(c.other,  m.maxOther,  t.amUnitOther));
+    return t.selDoneLead+joinAmList(items)+'.';
   }
   function renderSelDone(){
     el('selDoneTitle').textContent=t.selDoneTitle;
@@ -4091,11 +4194,57 @@
   // The owner edits the gallery at its plain URL; a client arrives via the shareable
   // "?g=<id>" link (see shareLinkFor). So the button is shown only when that param is present.
   function isClientView(){ try{ return new URLSearchParams(location.search).has('g'); }catch(_){ return false; } }
+  // Owner-side "preview as client" toggle (top of the page). A real client always arrives
+  // via the ?g share link, so they stay in client view; the owner can flip in and out with
+  // no reload to preview exactly what the client sees.
+  let clientPreview=false;
+  function effectiveClientView(){ return isClientView() || clientPreview; }
+  // Snapshot of what the client may do in client view. In the owner's own view it's null,
+  // which clientCan() reads as "everything allowed" so the owner is never restricted.
+  let viewPerms=null;
+  function computeViewPerms(){
+    if(!effectiveClientView()) return null;
+    const p=Object.assign({}, CLIENT_DEFAULT.perms, (loadClient().perms||{}));
+    if(p.viewOnly){ PERM_KEYS.forEach(k=>{ if(k!=='viewOnly') p[k]=false; }); }  // view-only overrides every other permission
+    return p;
+  }
+  // Capability gate for every client-side mutation. Owner (viewPerms===null) always passes.
+  function clientCan(cap){ return !viewPerms || !!viewPerms[cap]; }
+  function applyPreviewMode(){
+    const client=effectiveClientView();
+    document.body.classList.toggle('clientview', client);
+    viewPerms=computeViewPerms();
+    // mirror each granted permission onto <body> so the permission-gated CSS can reveal its control
+    PERM_KEYS.forEach(k=>{ document.body.classList.toggle('perm-'+k, !!(viewPerms && viewPerms[k])); });
+    const u=el('vsUser'), c=el('vsClient');
+    if(u){ u.classList.toggle('on', !client); u.setAttribute('aria-selected', String(!client)); }
+    if(c){ c.classList.toggle('on', client); c.setAttribute('aria-selected', String(client)); }
+    applyPageTitle();
+    updateFinishBtn();
+  }
+  // The client sees the project's own name (set in settings → "שם הפרויקט") as the page
+  // heading; the owner's manager view keeps the generic "בחירת קבצים" title. Falls back to
+  // the generic title whenever no project name has been entered yet.
+  function applyPageTitle(){
+    const h=el('pageTitle'); if(!h) return;
+    let title=t.pageTitle;
+    if(effectiveClientView()){
+      try{
+        const a=loadAlbum(), c=loadClient();
+        const name=(a.alTitle||'').trim() || (c.name||'').trim();
+        if(name) title=name;
+      }catch(_){}
+    }
+    h.textContent=title;
+  }
   function updateFinishBtn(){
     const b=el('finishSelBtn'); if(!b) return;
-    if(!isClientView()){ b.hidden=true; return; }
+    const client=effectiveClientView();
+    if(client && !clientCan('selection')){ b.hidden=true; return; }  // no selection permission → the finish flow doesn't apply
     b.hidden=false;
-    b.disabled=selConfirmed;
+    // Only a client may lock & submit the selection. In the owner's "user view" the button
+    // is shown but disabled, so the owner sees it exactly where the client would press it.
+    b.disabled = !client || selConfirmed;
     b.classList.toggle('done',selConfirmed);
     const lbl=b.querySelector('span');
     if(lbl) lbl.textContent = selConfirmed ? t.selLockedBadge : t.finishSelBtn;
@@ -4106,6 +4255,7 @@
     openSelDone();
   }
   function toggleSel(id){
+    if(!clientCan('selection')) return;                            // client not allowed to change the selection
     if(selConfirmed){ showToast(t.selLockedToast); return; }        // selection frozen after the client confirmed
     const f=fileById(id); if(!f) return;
     if(!f.selected && selBlocked(f)){ openLimitPop(f); return; }    // at the client's quota -> popup, ask to deselect first
@@ -4193,13 +4343,14 @@
     const wrap=itemEl.closest('.cardmovewrap'); const trigger=wrap?wrap.querySelector('.cardmove'):null;
     const f=trigger?fileById(trigger.getAttribute('data-move')):null;
     closeAllCardMenus();
-    if(!f) return;
+    if(!f || !clientCan('folderMove')) return;
     const val=itemEl.getAttribute('data-val'); const target=val===''?null:val;
     const picked=files.filter(x=>x.picked);
     if(picked.length>=2){ askMoveChoice(target,f,picked.length); return; }  // honor the purple multi-select "move all / just this one" prompt
     f.folderId=target; renderAll();
   }
   function cardMoveNewFolder(itemEl){
+    if(!clientCan('folderCreate')) return;
     const wrap=itemEl.closest('.cardmovewrap'); const trigger=wrap?wrap.querySelector('.cardmove'):null;
     const f=trigger?fileById(trigger.getAttribute('data-move')):null;
     closeAllCardMenus();
@@ -4226,6 +4377,7 @@
 
   // move a file to a new position in the master order (relative to a target card)
   function reorderFiles(dragId, targetId, placeAfter){
+    if(!clientCan('reorder')) return;
     const from=files.findIndex(f=>f.id===dragId); if(from<0) return;
     const [moved]=files.splice(from,1);
     let to=files.findIndex(f=>f.id===targetId);
@@ -4257,6 +4409,7 @@
     document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
     document.querySelectorAll('[data-i18n-title]').forEach(n=>{ const k=n.getAttribute('data-i18n-title'); if(typeof t[k]==='string') n.setAttribute('title',t[k]); });
     document.querySelectorAll('[data-i18n-aria]').forEach(n=>{ const k=n.getAttribute('data-i18n-aria'); if(typeof t[k]==='string') n.setAttribute('aria-label',t[k]); });
+    applyPageTitle();  // client view keeps the project name after the generic i18n pass resets the heading
     try{ localStorage.setItem('ac_lang', l); }catch(_){}
     renderAll();
     if(el('selDoneOverlay').classList.contains('show')) renderSelDone();
@@ -4275,15 +4428,25 @@
     let th='light'; try{ th=localStorage.getItem('theme')||'light'; }catch(_){}
     applyTheme(th);
     albumMgr = loadAlbumMgr(); // safe here: AM_DEFAULT const is initialized by now
-    let gz='170'; try{ gz=localStorage.getItem('ac_grid')||'170'; }catch(_){}
-    el('zoomRange').value=gz; document.documentElement.style.setProperty('--card-size', gz+'px');
-    el('zoomMinus').disabled=(+gz<=+el('zoomRange').min); el('zoomPlus').disabled=(+gz>=+el('zoomRange').max);
+    const isNewProject=/[?&]new=1/.test(location.search);
+    let gz=null; try{ gz=localStorage.getItem('ac_grid'); }catch(_){}
+    // Fresh project (arriving via "+ New project"), or first-ever visit with no
+    // saved preference → default to 6 cards per row on desktop. Otherwise honour
+    // the size the user last dialled in.
+    if(isNewProject || !gz){
+      const d=defaultGridSize();
+      if(d>+el('zoomRange').max) el('zoomRange').max=String(d); // ultra-wide: let the slider reach the 6-col size
+      applyGrid(d);   // sets slider value, --card-size, persists ac_grid and +/- disabled state
+    } else {
+      applyGrid(+gz);
+    }
     let sm=null; try{ sm=localStorage.getItem('ac_showmoved'); }catch(_){}
     showMovedInMain=(sm!=='0');
     el('showMovedChk').checked=showMovedInMain;
     bindStatic();
     let sl='he'; try{ sl=localStorage.getItem('ac_lang')||'he'; }catch(_){}
     applyLang(sl);
+    applyPreviewMode();
     // Arriving from the dashboard "+ New project" — open album settings on a blank
     // form and strip the flag so a refresh doesn't reopen it.
     if(/[?&]new=1/.test(location.search)){

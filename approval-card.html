@@ -216,7 +216,7 @@
   <div class="topbar">
     <span class="approve-badge">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-      אישור למסירה
+      קבצים לאישור
     </span>
     <button class="closebtn" id="closeBtn" type="button" aria-label="סגירה">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -351,7 +351,7 @@
     </button>
     <button class="abtn primary" id="openBtn" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
-      פתיחת אישור
+      הצג קבצים לאישור
     </button>
   </div>
 
@@ -397,7 +397,7 @@
 
   /* copy share link */
   $('#linkBtn').addEventListener('click', async () => {
-    if (await copy('https://kolkli.com/a/100001')) showToast('הקישור הועתק ✓');
+    if (await copy('https://kolkli.com/a/10001')) showToast('הקישור הועתק ✓');
   });
 
   /* close / dismiss */
