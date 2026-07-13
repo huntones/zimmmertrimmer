@@ -225,6 +225,25 @@
     return res.error ? { ok: false, message: res.error.message } : { ok: true };
   }
 
+  // Social sign-in (Google / Facebook / Apple). Supabase redirects the browser
+  // to the provider; on return, onAuthStateChange fires and syncFromSession
+  // mirrors the user into ac_session / ac_users exactly like a password login,
+  // so header.js, dashboard.html etc. need no changes. Each provider must be
+  // enabled in the Supabase dashboard (Authentication → Providers) with its
+  // OAuth client id/secret. A resolved {ok:true} just means the redirect was
+  // kicked off — the page navigates away right after.
+  async function signInWithProvider(provider) {
+    if (!CONFIGURED) return { ok: false, code: 'not_configured' };
+    await whenReady();
+    if (!client) return { ok: false, code: 'not_configured' };
+    var redirect = location.origin + location.pathname.replace(/[^/]*$/, '') + 'dashboard';
+    try {
+      var res = await client.auth.signInWithOAuth({ provider: provider, options: { redirectTo: redirect } });
+      if (res.error) return { ok: false, code: 'error', message: res.error.message };
+      return { ok: true };
+    } catch (e) { return { ok: false, code: 'error', message: e && e.message }; }
+  }
+
   // Hand the initialized Supabase client to feature code (e.g. the team
   // screen in dashboard.html) so it can query org tables / call RPCs.
   // Resolves to null when not configured or the lib failed to load.
@@ -275,6 +294,7 @@
     signIn: signIn,
     signOut: signOut,
     resetPassword: resetPassword,
+    signInWithProvider: signInWithProvider,
     startTrial: startTrial,
     getClient: getClient,
     userId: userId,

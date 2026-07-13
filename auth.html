@@ -79,28 +79,57 @@
 
   /* ---------- centered auth card ---------- */
   .stage{position:relative;z-index:2;flex:1;display:flex;align-items:center;justify-content:center;padding:24px 20px 48px;}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-lg);
-    width:100%;max-width:428px;padding:30px 30px 26px;}
-  .card .head{text-align:center;margin-bottom:22px;}
-  .card .head .biglogo{width:52px;height:52px;margin:0 auto 14px;border-radius:15px;display:flex;align-items:center;justify-content:center;
-    background:var(--grad);color:#fff;box-shadow:0 6px 18px var(--grad-shadow);}
-  .card .head .biglogo svg{width:27px;height:27px;}
-  .card .head h1{font-size:22px;font-weight:700;letter-spacing:-0.02em;margin:0 0 5px;}
-  .card .head p{font-size:13.5px;color:var(--muted);margin:0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);
+    width:100%;max-width:768px;overflow:hidden;}
+  /* horizontal (two-column) auth: brand panel + form panel side by side */
+  .split{display:flex;align-items:stretch;}
+  .brandside{flex:0 0 41%;position:relative;overflow:hidden;color:#fff;background:var(--grad);
+    padding:36px 30px;display:flex;flex-direction:column;justify-content:center;gap:22px;}
+  .brandside .borb{position:absolute;border-radius:50%;filter:blur(48px);pointer-events:none;}
+  .brandside .borb.x{width:220px;height:220px;background:rgba(255,255,255,.34);top:-72px;inset-inline-start:-60px;}
+  .brandside .borb.y{width:240px;height:240px;background:rgba(0,0,0,.16);bottom:-90px;inset-inline-end:-70px;}
+  .brandside h2{position:relative;font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.28;margin:0;
+    text-shadow:0 1px 3px rgba(0,0,0,.16);}
+  .brandside ul{position:relative;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;}
+  .brandside li{display:flex;align-items:flex-start;gap:11px;font-size:13.5px;line-height:1.45;color:rgba(255,255,255,.95);}
+  .brandside li svg{width:22px;height:22px;flex-shrink:0;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
+    background:rgba(255,255,255,.2);border-radius:50%;padding:4px;box-sizing:border-box;}
+  .formside{flex:1;min-width:0;padding:26px 30px 22px;}
+  .card .head{text-align:center;margin-bottom:16px;}
+  .card .head .biglogo-img{height:34px;width:auto;display:block;margin:0 auto 12px;}
+  .card .head h1{font-size:20px;font-weight:700;letter-spacing:-0.02em;margin:0 0 4px;}
+  .card .head p{font-size:13px;color:var(--muted);margin:0;}
+
+  /* social sign-in buttons (Google / Facebook / Apple) */
+  .social{display:flex;gap:9px;margin-bottom:14px;}
+  .sbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;height:44px;cursor:pointer;
+    border:1px solid var(--line);border-radius:11px;background:var(--panel);color:var(--ink-2);
+    box-shadow:var(--shadow-sm);transition:border-color .12s,background .12s,transform .08s;}
+  .sbtn:hover{border-color:var(--accent);background:var(--panel-2);}
+  .sbtn:active{transform:translateY(1px);}
+  .sbtn:disabled{opacity:.55;cursor:default;transform:none;}
+  .sbtn svg{width:21px;height:21px;flex-shrink:0;display:block;}
+
+  @media (max-width:700px){
+    .card{max-width:400px;}
+    .split{flex-direction:column;}
+    .brandside{display:none;}
+    .formside{padding:24px 26px 22px;}
+  }
 
   /* segmented control */
-  .seg{display:flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:22px;}
-  .segbtn{flex:1;height:38px;border:none;border-radius:9px;background:transparent;color:var(--muted);cursor:pointer;
+  .seg{display:flex;gap:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:16px;}
+  .segbtn{flex:1;height:36px;border:none;border-radius:9px;background:transparent;color:var(--muted);cursor:pointer;
     font-size:14px;font-weight:600;transition:color .14s,background .14s,box-shadow .14s;}
   .segbtn.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
 
   /* fields */
-  .field{margin-bottom:14px;}
+  .field{margin-bottom:11px;}
   .field.hidden{display:none;}
   .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:6px;}
   .inwrap{position:relative;display:flex;align-items:center;}
   .field input{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
-    font-family:var(--sans);font-size:14px;padding:12px 13px;transition:border-color .12s,box-shadow .12s;}
+    font-family:var(--sans);font-size:14px;padding:11px 12px;transition:border-color .12s,box-shadow .12s;}
   .field input::placeholder{color:var(--faint);}
   .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
   .field input[dir="ltr"]{text-align:start;}
@@ -123,7 +152,7 @@
 
   .authbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
-    font-weight:600;font-size:15px;padding:13px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:6px;
+    font-weight:600;font-size:14.5px;padding:12px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:6px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
     transition:filter .14s,transform .08s;}
   .authbtn:hover{filter:brightness(1.05);} .authbtn:active{transform:translateY(1px);}
@@ -137,30 +166,30 @@
   .formmsg.info{background:var(--info-soft);color:var(--info-dim);}
 
   /* divider + guest */
-  .divider{display:flex;align-items:center;gap:12px;margin:20px 0 16px;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .divider{display:flex;align-items:center;gap:12px;margin:16px 0 14px;color:var(--faint);font-size:12px;font-family:var(--mono);}
   .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--line);}
-  .guest{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:999px;
+  .guest{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:999px;
     font-size:14px;font-weight:600;background:var(--panel);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;
     box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s;}
   .guest:hover{border-color:var(--accent);} .guest:active{transform:translateY(1px);}
   .guest svg{width:16px;height:16px;color:var(--muted);}
 
-  .switchrow{text-align:center;font-size:13.5px;color:var(--muted);margin-top:20px;}
+  .switchrow{text-align:center;font-size:13.5px;color:var(--muted);margin-top:16px;}
   .switchrow a{color:var(--accent-dim);font-weight:600;cursor:pointer;}
   .switchrow a:hover{text-decoration:underline;}
 
-  .note{display:flex;align-items:flex-start;gap:8px;margin-top:20px;padding:11px 13px;border-radius:11px;
+  .note{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:11px 13px;border-radius:11px;
     background:var(--panel-2);border:1px solid var(--line-2);font-size:11.5px;color:var(--muted);line-height:1.55;}
   .note svg{width:15px;height:15px;color:var(--success);flex-shrink:0;margin-top:1px;}
 
   /* logged-in state */
-  .signed{text-align:center;display:none;}
+  .signed{text-align:center;display:none;padding:38px 30px;}
   .signed.show{display:block;}
   .signed .avatar{width:64px;height:64px;margin:0 auto 16px;border-radius:50%;display:flex;align-items:center;justify-content:center;
     background:var(--grad);color:#fff;font-size:26px;font-weight:700;box-shadow:0 6px 18px var(--grad-shadow);}
   .signed h2{font-size:20px;margin:0 0 4px;font-weight:700;}
   .signed .who{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-bottom:22px;direction:ltr;}
-  .signed .actions{display:flex;flex-direction:column;gap:10px;}
+  .signed .actions{display:flex;flex-direction:column;gap:10px;max-width:330px;margin:0 auto;}
   .authhidden{display:none !important;}
 
   footer{position:relative;z-index:2;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);padding:18px;}
@@ -177,9 +206,20 @@
   <div class="card">
 
     <!-- form view -->
-    <div id="formView">
+    <div id="formView" class="split">
+      <aside class="brandside">
+        <span class="borb x"></span><span class="borb y"></span>
+        <h2 id="brandHead" data-i18n="brandHead"></h2>
+        <ul>
+          <li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="brandB1"></span></li>
+          <li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="brandB2"></span></li>
+          <li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="brandB3"></span></li>
+        </ul>
+      </aside>
+
+      <div class="formside">
       <div class="head">
-        <div class="biglogo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M9 18V5l12-2v11"/></svg></div>
+        <img class="biglogo-img" src="./assets/logo.png" alt="KOLKLI" width="139" height="34" decoding="async">
         <h1 id="cardTitle"></h1>
         <p id="cardSub"></p>
       </div>
@@ -191,13 +231,21 @@
 
       <div class="formmsg" id="formMsg"></div>
 
-      <form id="authForm" novalidate autocomplete="on">
-        <div class="field hidden" id="nameField">
-          <label for="nameInput" data-i18n="nameLabel"></label>
-          <div class="inwrap"><input id="nameInput" type="text" autocomplete="name" data-i18n-ph="namePh"></div>
-          <div class="err" id="nameErr"></div>
-        </div>
+      <div class="social">
+        <button class="sbtn" id="btnGoogle" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1Z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.24 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1-.34-2.1c0-.73.13-1.44.34-2.1V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38Z"/></svg>
+        </button>
+        <button class="sbtn" id="btnFacebook" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#1877F2" d="M24 12a12 12 0 1 0-13.88 11.85v-8.38H7.08V12h3.04V9.36c0-3 1.79-4.66 4.53-4.66 1.31 0 2.68.23 2.68.23v2.95h-1.5c-1.49 0-1.96.93-1.96 1.87V12h3.33l-.53 3.47h-2.8v8.38A12 12 0 0 0 24 12Z"/></svg>
+        </button>
+        <button class="sbtn" id="btnApple" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.05 12.72c-.03-2.6 2.12-3.84 2.22-3.91-1.21-1.77-3.09-2.01-3.76-2.04-1.6-.16-3.12.94-3.93.94-.81 0-1.83-.92-3.01-.9-1.55.02-2.98.9-3.78 2.29-1.61 2.8-.41 6.94 1.16 9.21.76 1.11 1.67 2.36 2.86 2.31 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.77.74 2.98.72 1.23-.02 2.01-1.13 2.76-2.24.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.4-.92-2.42-3.65-.02-2.28 1.86-3.37 1.95-3.42-1.07-1.56-2.72-1.73-3.3-1.77ZM14.5 5.15c.64-.78 1.07-1.86.95-2.94-.92.04-2.04.61-2.7 1.39-.59.69-1.11 1.79-.97 2.85 1.03.08 2.08-.52 2.72-1.3Z"/></svg>
+        </button>
+      </div>
 
+      <div class="divider" data-i18n="orEmail"></div>
+
+      <form id="authForm" novalidate autocomplete="on">
         <div class="field" id="emailField">
           <label for="emailInput" data-i18n="emailLabel"></label>
           <div class="inwrap"><input id="emailInput" type="email" dir="ltr" autocomplete="email" data-i18n-ph="emailPh"></div>
@@ -227,20 +275,18 @@
         <button class="authbtn" id="submitBtn" type="submit"></button>
       </form>
 
-      <div class="divider" data-i18n="or"></div>
-
-      <a class="guest" href="./app">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        <span data-i18n="guest"></span>
-      </a>
-
       <div class="switchrow">
         <span id="switchText"></span> <a id="switchLink"></a>
       </div>
 
+      <a class="guest" href="./app">
+        <span data-i18n="guest"></span>
+      </a>
+
       <div class="note">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
         <span data-i18n="privacy"></span>
+      </div>
       </div>
     </div>
 
@@ -277,7 +323,7 @@
   const I18N = {
     he:{
       dir:'rtl', langIco:'EN',
-      loginTitle:'ברוכים השובים', loginSub:'התחברו כדי לגשת לקבצים ולקישורים שלכם.',
+      loginTitle:'ברוכים השבים', loginSub:'התחברו כדי לגשת לקבצים ולקישורים שלכם.',
       signupTitle:'יצירת חשבון', signupSub:'הירשמו כדי לשמור קבצים, קישורים והיסטוריה.',
       tabLogin:'התחברות', tabSignup:'הרשמה',
       nameLabel:'שם מלא', namePh:'איך לקרוא לכם?',
@@ -286,7 +332,14 @@
       confirmLabel:'אימות סיסמה', confirmPh:'הקלידו שוב את הסיסמה',
       forgot:'שכחתם סיסמה?',
       submitLogin:'התחברות', submitSignup:'יצירת חשבון',
-      or:'או', guest:'המשך כאורח, בלי חשבון',
+      or:'או', orEmail:'או המשך עם אימייל', guest:'המשך כאורח, בלי חשבון',
+      oauthGoogle:'התחברות עם Google', oauthFacebook:'התחברות עם Facebook', oauthApple:'התחברות עם Apple',
+      oauthSoon:'התחברות עם רשת חברתית תעבוד כשנחבר את השרת. בינתיים אפשר להתחבר עם אימייל.',
+      oauthErr:'ההתחברות נכשלה, נסו שוב.',
+      brandHead:'כל כלי האודיו במקום אחד',
+      brandB1:'חיתוך, המרה ונרמול ישירות בדפדפן',
+      brandB2:'שמירת קבצים וקישורי שיתוף אישיים',
+      brandB3:'התחברות מהירה עם Google, Facebook או Apple',
       switchToSignupText:'אין לכם חשבון עדיין?', switchToSignupLink:'הרשמה',
       switchToLoginText:'כבר יש לכם חשבון?', switchToLoginLink:'התחברות',
       privacy:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
@@ -312,7 +365,14 @@
       confirmLabel:'Confirm password', confirmPh:'Type the password again',
       forgot:'Forgot password?',
       submitLogin:'Sign in', submitSignup:'Create account',
-      or:'or', guest:'Continue as guest, no account',
+      or:'or', orEmail:'or continue with email', guest:'Continue as guest, no account',
+      oauthGoogle:'Continue with Google', oauthFacebook:'Continue with Facebook', oauthApple:'Continue with Apple',
+      oauthSoon:'Social sign-in will work once the server is connected. For now you can sign in with email.',
+      oauthErr:'Sign-in failed, please try again.',
+      brandHead:'All your audio tools in one place',
+      brandB1:'Trim, convert & normalize right in your browser',
+      brandB2:'Save your files and personal share links',
+      brandB3:'Fast sign-in with Google, Facebook or Apple',
       switchToSignupText:"Don't have an account?", switchToSignupLink:'Sign up',
       switchToLoginText:'Already have an account?', switchToLoginLink:'Sign in',
       privacy:'Fast and simple: upload and get a professional-quality result in seconds — no installs, no hassle.',
@@ -338,7 +398,14 @@
       confirmLabel:'Подтвердите пароль', confirmPh:'Введите пароль ещё раз',
       forgot:'Забыли пароль?',
       submitLogin:'Войти', submitSignup:'Создать аккаунт',
-      or:'или', guest:'Продолжить как гость, без аккаунта',
+      or:'или', orEmail:'или по электронной почте', guest:'Продолжить как гость, без аккаунта',
+      oauthGoogle:'Войти через Google', oauthFacebook:'Войти через Facebook', oauthApple:'Войти через Apple',
+      oauthSoon:'Вход через соцсети заработает после подключения сервера. Пока можно войти по эл. почте.',
+      oauthErr:'Не удалось войти, попробуйте ещё раз.',
+      brandHead:'Все аудиоинструменты в одном месте',
+      brandB1:'Обрезка, конвертация и нормализация прямо в браузере',
+      brandB2:'Сохраняйте файлы и личные ссылки для обмена',
+      brandB3:'Быстрый вход через Google, Facebook или Apple',
       switchToSignupText:'Нет аккаунта?', switchToSignupLink:'Зарегистрироваться',
       switchToLoginText:'Уже есть аккаунт?', switchToLoginLink:'Войти',
       privacy:'Быстро и просто: загрузите и получите результат профессионального качества за секунды — без установок и лишних действий.',
@@ -375,6 +442,11 @@
     try{ return (window.KolkliTrial && KolkliTrial.grantOnSignup) ? KolkliTrial.grantOnSignup(email) : Promise.resolve(); }
     catch(_){ return Promise.resolve(); }
   }
+  // Email-confirmation flow: no session yet, so remember to grant the trial the
+  // moment this verified account signs in (trial.js autoClaim picks it up).
+  function pendTrial(email){
+    try{ if(window.KolkliTrial && KolkliTrial.markPending) KolkliTrial.markPending(email); }catch(_){}
+  }
   function clearSession(){ try{ localStorage.removeItem(SESSION_KEY); }catch(_){} }
   function currentSession(){ try{ return localStorage.getItem(SESSION_KEY); }catch(_){ return null; } }
 
@@ -398,8 +470,8 @@
     el(errId).textContent = msg||'';
   }
   function clearErrors(){
-    ['nameField','emailField','passField','confirmField'].forEach(f=>el(f).classList.remove('bad'));
-    ['nameErr','emailErr','passErr','confirmErr'].forEach(e=>el(e).textContent='');
+    ['emailField','passField','confirmField'].forEach(f=>el(f).classList.remove('bad'));
+    ['emailErr','passErr','confirmErr'].forEach(e=>el(e).textContent='');
     showMsg('');
   }
   function showMsg(text, kind){
@@ -414,15 +486,15 @@
   async function onSubmit(e){
     e.preventDefault();
     clearErrors();
-    const name=el('nameInput').value.trim();
     const email=el('emailInput').value.trim().toLowerCase();
+    const name=email? email.split('@')[0] : '';   // display name derived from email (no name field)
     const pass=el('passInput').value;
     const confirm=el('confirmInput').value;
 
     let ok=true;
-    if(mode==='signup' && !name){ setErr('nameField','nameErr',t.errRequired); ok=false; }
     if(!email){ setErr('emailField','emailErr',t.errRequired); ok=false; }
     else if(!EMAIL_RE.test(email)){ setErr('emailField','emailErr',t.errEmail); ok=false; }
+    else if(mode==='signup' && window.KolkliTrial && KolkliTrial.isDisposableEmail && KolkliTrial.isDisposableEmail(email)){ setErr('emailField','emailErr',(KolkliTrial.disposableMsg&&KolkliTrial.disposableMsg())||t.errEmail); ok=false; }
     if(!pass){ setErr('passField','passErr',t.errRequired); ok=false; }
     else if(pass.length<6){ setErr('passField','passErr',t.errPassShort); ok=false; }
     if(mode==='signup'){
@@ -437,7 +509,7 @@
       if(window.KolkliAuth && window.KolkliAuth.configured()){
         if(mode==='signup'){
           const r=await window.KolkliAuth.signUp({ name, email, password:pass });
-          if(r.ok){ if(r.code==='confirm'){ showMsg(t.checkEmail,'info'); } else { await grantTrial(email); showSigned(name, email, t.accountCreated); } }
+          if(r.ok){ if(r.code==='confirm'){ pendTrial(email); showMsg(t.checkEmail,'info'); } else { await grantTrial(email); showSigned(name, email, t.accountCreated); } }
           else if(r.code==='taken'){ setErr('emailField','emailErr',t.errTaken); }
           else if(r.code==='weak'){ setErr('passField','passErr',t.errPassShort); }
           else { showMsg(r.message||t.errRequired,'err'); }
@@ -475,7 +547,6 @@
     mode=m;
     el('tabLogin').classList.toggle('on', m==='login');
     el('tabSignup').classList.toggle('on', m==='signup');
-    el('nameField').classList.toggle('hidden', m!=='signup');
     el('confirmField').classList.toggle('hidden', m!=='signup');
     el('forgotLink').classList.toggle('hidden', m!=='login');
     el('passInput').setAttribute('autocomplete', m==='signup'?'new-password':'current-password');
@@ -508,6 +579,7 @@
     document.documentElement.lang=l; document.documentElement.dir=t.dir;
     document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
     document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
+    [['btnGoogle',t.oauthGoogle],['btnFacebook',t.oauthFacebook],['btnApple',t.oauthApple]].forEach(p=>{ const b=el(p[0]); if(b){ b.setAttribute('aria-label',p[1]); b.title=p[1]; } });
     try{ localStorage.setItem('ac_lang', l); }catch(_){}
     setMode(mode);                          // re-label mode-specific strings
     const sess=currentSession();            // re-label signed-in view if visible
@@ -531,6 +603,24 @@
   // =====================================================
   //  EVENTS + INIT
   // =====================================================
+  // Social sign-in: real OAuth via Supabase (redirects away); demo fallback msg.
+  function onSocial(provider){
+    clearErrors();
+    if(window.KolkliAuth && window.KolkliAuth.configured()){
+      const btns=document.querySelectorAll('.social .sbtn');
+      btns.forEach(b=>{ b.disabled=true; });
+      window.KolkliAuth.signInWithProvider(provider).then(r=>{
+        if(!r || !r.ok){ showMsg((r&&r.message)||t.oauthErr,'err'); btns.forEach(b=>{ b.disabled=false; }); }
+        // on success the browser redirects to the provider — nothing more to do
+      });
+    } else {
+      showMsg(t.oauthSoon,'info');
+    }
+  }
+  el('btnGoogle').addEventListener('click',()=>onSocial('google'));
+  el('btnFacebook').addEventListener('click',()=>onSocial('facebook'));
+  el('btnApple').addEventListener('click',()=>onSocial('apple'));
+
   el('tabLogin').addEventListener('click',()=>setMode('login'));
   el('tabSignup').addEventListener('click',()=>setMode('signup'));
   el('switchLink').addEventListener('click',()=>setMode(mode==='login'?'signup':'login'));
