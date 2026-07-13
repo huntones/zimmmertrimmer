@@ -11,10 +11,10 @@ SUPABASE_URL      = "https://YOUR-PROJECT.supabase.co"
 SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY"
 # Lock to your site origin in production (used for redirects + CORS).
 ALLOWED_ORIGIN    = "https://kolkli.com"
-SUCCESS_URL       = "https://kolkli.com/dashboard.html#team"
+SUCCESS_URL       = "https://kolkli.com/dashboard/team"
 CANCEL_URL        = "https://kolkli.com/pricing/"
 # Map each plan name to its Stripe recurring (per-seat) Price id:
-PLAN_PRICES       = '{"lite":"price_XXX","pro":"price_YYY","business":"price_ZZZ"}'
+PLAN_PRICES       = '{"creator":"price_XXX","studio":"price_YYY"}'
 
 # --- Secrets (set with `wrangler secret put NAME`; never commit) ------
 #   STRIPE_SECRET_KEY            ← Stripe → Developers → API keys

@@ -2,6 +2,10 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<!-- Section is addressed by path (/dashboard/project-send), so this page is
+     served at deeper URLs too. Pin the base to the site root so relative asset
+     and link references keep resolving from root, not from the current segment. -->
+<base href="/">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — דשבורד</title>
 <link rel="canonical" href="https://kolkli.com/dashboard">
@@ -467,6 +471,14 @@
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);}
   .btn.primary:hover{filter:brightness(1.05);}
+  /* Creation buttons wear their service "family" color (--svc, set by the
+     .mp-tone-* class on the button itself) instead of the generic purple. */
+  .btn.primary.mp-tone-select,
+  .btn.primary.mp-tone-receive,
+  .btn.primary.mp-tone-send,
+  .btn.primary.mp-tone-review{
+    background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 55%),var(--svc);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--svc-shadow);}
   .btn.ghost{background:var(--panel);border:1px solid var(--line);color:var(--ink-2);box-shadow:var(--shadow-sm);}
   .btn.ghost:hover{border-color:var(--accent);}
   .btn.danger{background:var(--panel);border:1px solid var(--danger);color:var(--danger);}
@@ -551,6 +563,10 @@
   .empty .ei{width:66px;height:66px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;
     background:var(--grad-soft);color:var(--accent);}
   .empty .ei svg{width:32px;height:32px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .pf-empty-documents .ei{background:var(--danger-soft);color:var(--danger);}
+  .pf-empty-video .ei{background:var(--info-soft);color:var(--info);}
+  .pf-empty-images .ei{background:var(--warm-soft);color:var(--warn);}
+  .pf-empty-audio .ei{background:rgba(192,38,211,.12);color:#c026d3;}
   .empty h3{margin:0 0 6px;font-size:17px;}
   .empty p{margin:0 auto 20px;font-size:13.5px;color:var(--muted);max-width:44ch;}
   .toolrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
@@ -708,6 +724,20 @@
   .mpr-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
   /* Inline empty state shown when the live dashboard search matches no card. */
   .mpr-empty{grid-column:1/-1;padding:34px 18px;text-align:center;color:var(--faint);font-weight:600;font-size:14px;border:1px dashed var(--line);border-radius:16px;background:var(--panel);}
+  /* Empty state shown when a "My Projects" service has no cards yet (e.g. no files for approval). */
+  .mpr-empty-state{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;padding:48px 22px;border:1px dashed var(--line);border-radius:16px;background:var(--panel);}
+  .mpr-empty-state .ei{width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent-dim);margin-bottom:2px;}
+  .mpr-empty-state .ei svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .mpr-empty-state h3{margin:0;font-size:17px;font-weight:800;color:var(--ink);}
+  .mpr-empty-state p{margin:0;font-size:13.5px;color:var(--muted);max-width:44ch;}
+  html[data-theme="dark"] .mpr-empty-state .ei{color:var(--accent);}
+  /* Send empty state: only the paper-plane strokes go orange (the send tone) */
+  .mpr-empty-state.mp-tone-send .ei{background:var(--svc-bg);color:var(--svc);}
+  html[data-theme="dark"] .mpr-empty-state.mp-tone-send .ei{color:var(--svc);}
+  /* Received-files empty state: teal on the inbox strokes (the receive tone) —
+     saturated color on the outline, soft teal wash on the tile (var(--svc)). */
+  .mpr-empty-state.mp-tone-receive .ei{background:var(--svc-bg);color:var(--svc);}
+  html[data-theme="dark"] .mpr-empty-state.mp-tone-receive .ei{color:var(--svc);}
   .mpr-card{--recv-sel:#0891b2;--recv-sel-bg:#eaf6f9;container-type:inline-size;overflow:hidden;border:1px solid var(--line);border-radius:20px;background:var(--panel);box-shadow:var(--shadow);display:flex;flex-direction:column}
   html[data-theme="dark"] .mpr-card{--recv-sel:#22c3d6;--recv-sel-bg:#14282e}
 
@@ -852,6 +882,37 @@
   .mpr-card.mp-tone-send .mpr-avatar{background:linear-gradient(135deg,#ffe3cc,#ffd0a8);color:#c2410c;
     box-shadow:0 0 0 1.5px var(--panel),0 0 0 3px var(--svc)}
   html[data-theme="dark"] .mpr-card.mp-tone-send .mpr-avatar{background:linear-gradient(135deg,#3a260f,#2c1c0c);color:#fdba74}
+  /* Sent-files (send tone) action row + link pill — warm-orange restyle of the
+     shared buttons, per request: the primary "הצג קבצים שנשלחו" CTA gets an orange
+     fill with white text; "שיתוף" turns orange-on-white; the "בטל שמירה" saved
+     state goes gentle orange (text + soft wash + orange frame); and the active
+     "קישור פעיל" pill gains a green frame. Scoped to .mp-tone-send so the teal
+     receive / green review cards keep their own look. */
+  .mpr-card.mp-tone-send .mpr-action.primary{background:linear-gradient(105deg,#fb923c 0%,#f97316 100%);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(249,115,22,.28)}
+  .mpr-card.mp-tone-send .mpr-action.share{color:var(--svc);border-color:var(--svc-line);background:var(--panel)}
+  /* Selection card: blue restyle of the primary CTA + "שיתוף", matching the card's
+     service tone (--svc:#2563eb) — the same blue worn by the "ערוך גלריית בחירה"
+     button — so the "הצג קבצים שנבחרו" CTA reads blue-on-white instead of the
+     shared purple gradient, mirroring the send (orange) / review (green) cards. */
+  .mpr-card.mp-tone-select .mpr-action.primary{background:linear-gradient(105deg,#3b82f6 0%,#2563eb 100%);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(37,99,235,.28)}
+  .mpr-card.mp-tone-select .mpr-action.share{color:var(--svc);border-color:var(--svc-line);background:var(--panel)}
+  /* Review (approval) card: green restyle of the same two buttons, per request —
+     the primary "הצג קבצים לאישור" CTA gets a green fill with white text and the
+     "שיתוף" button turns green-on-white. Scoped to .mp-tone-review only, so the
+     other cards' shared .mpr-action.primary / .share buttons keep their look. */
+  .mpr-card.mp-tone-review .mpr-action.primary{background:linear-gradient(105deg,#22c55e 0%,#16a34a 100%);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(22,163,74,.28)}
+  .mpr-card.mp-tone-review .mpr-action.share{color:var(--svc);border-color:var(--svc-line);background:var(--panel)}
+  /* Received-files card: teal restyle of the primary CTA + share, matching the
+     card's own service tone (--svc:#0891b2) instead of the shared purple gradient,
+     so the "show received files" button reads teal-on-white like the send (orange)
+     / select (blue) / review (green) cards do for theirs. */
+  .mpr-card.mp-tone-receive .mpr-action.primary{background:linear-gradient(105deg,#06b6d4 0%,#0891b2 100%);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(8,145,178,.28)}
+  .mpr-card.mp-tone-receive .mpr-action.share{color:var(--svc);border-color:var(--svc-line);background:var(--panel)}
+  .mpr-card.mp-tone-send .mpr-action.is-saved{color:var(--svc);border-color:var(--svc);background:var(--svc-bg)}
+  /* Selection card: "בטל שמירה" saved state goes blue (matching --svc:#2563eb),
+     mirroring the send card's orange saved state, instead of the shared green. */
+  .mpr-card.mp-tone-select .mpr-action.is-saved{color:var(--svc);border-color:var(--svc);background:var(--svc-bg)}
+  .mpr-card.mp-tone-send .mpr-link.on{border-color:var(--success)}
   /* Stat font sizes intentionally left to the shared base .mpr-stat rules so the
      select / review / send cards read exactly like the received-files cards:
      first stat 12.5px, the rest 16px, labels 10.5px. */
@@ -1056,6 +1117,80 @@
   .pf-sh-ic.em{background:#5b7cfa;}
   .pf-sh-ic.tg{background:#2aabee;}
   .pf-sh-ic.nt{background:var(--accent);}
+
+  /* ===== Rich share dialog (project cards: receive · select · review · send) ===== */
+  .ps-overlay{z-index:135;}
+  .ps-sheet{position:relative;width:min(500px,100%);background:var(--panel);border:1px solid var(--line);border-radius:24px;
+    box-shadow:0 28px 70px rgba(17,20,32,.34);padding:24px 24px 26px;transform:translateY(10px) scale(.97);
+    transition:transform .24s cubic-bezier(.22,1,.36,1);}
+  .kc-overlay.show .ps-sheet{transform:none;}
+  .ps-top{display:flex;align-items:center;gap:12px;}
+  .ps-search{flex:1;position:relative;}
+  .ps-search .mag{position:absolute;inset-inline-start:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;
+    color:var(--faint);pointer-events:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .ps-search input{width:100%;height:45px;border:1px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding-inline-start:40px;padding-inline-end:13px;font-family:var(--sans);font-size:14.5px;color:var(--ink);
+    transition:border-color .12s,box-shadow .12s,background .12s;}
+  .ps-search input::placeholder{color:var(--faint);}
+  .ps-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);background:var(--panel);}
+  .ps-x{flex-shrink:0;width:41px;height:41px;border:none;border-radius:12px;background:transparent;color:var(--muted);
+    cursor:pointer;display:grid;place-items:center;transition:background .12s,color .12s;}
+  .ps-x:hover{background:var(--panel-2);color:var(--ink);}
+  .ps-x svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .ps-rule{height:1px;background:var(--line-2);margin:20px -24px 0;}
+  .ps-h{font-size:16px;font-weight:800;color:var(--ink);margin:20px 0 14px;letter-spacing:-.01em;}
+  .ps-people{display:flex;gap:13px;flex-wrap:wrap;}
+  .ps-person{width:54px;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;padding:0;
+    cursor:pointer;font-family:var(--sans);}
+  .ps-av{position:relative;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;
+    font-size:18px;outline:2px solid transparent;outline-offset:2px;transition:transform .14s,box-shadow .14s;box-shadow:var(--shadow-sm);}
+  .ps-person:hover .ps-av{transform:translateY(-2px);}
+  .ps-person[aria-pressed="true"] .ps-av{outline-color:var(--accent);}
+  .ps-av .tick{position:absolute;inset-block-end:-2px;inset-inline-end:-2px;width:19px;height:19px;border-radius:50%;
+    background:var(--accent);border:2px solid var(--panel);display:grid;place-items:center;color:#fff;
+    transform:scale(0);transition:transform .16s cubic-bezier(.22,1.4,.4,1);}
+  .ps-person[aria-pressed="true"] .ps-av .tick{transform:scale(1);}
+  .ps-av .tick svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;}
+  .ps-nm{font-size:11.5px;color:var(--muted);max-width:54px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ps-person[aria-pressed="true"] .ps-nm{color:var(--accent);font-weight:600;}
+  .ps-empty{font-size:13px;color:var(--faint);padding:6px 2px;}
+  .ps-g1{background:linear-gradient(135deg,#a78bfa,#6366f1);}
+  .ps-g2{background:linear-gradient(135deg,#5eead4,#3b82f6);}
+  .ps-g3{background:linear-gradient(135deg,#fca5a5,#f43f5e);}
+  .ps-g4{background:linear-gradient(135deg,#fdba74,#f97316);}
+  .ps-g5{background:linear-gradient(135deg,#7dd3fc,#2563eb);}
+  .ps-g6{background:linear-gradient(135deg,#86efac,#16a34a);}
+  .ps-linkfield{display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--panel-2);border-radius:14px;
+    padding:7px;padding-inline-start:15px;margin-top:20px;transition:border-color .12s,box-shadow .12s;}
+  .ps-linkfield:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .ps-linkfield input{flex:1;min-width:0;border:none;background:transparent;color:var(--ink-2);font-family:var(--mono);font-size:13px;
+    outline:none;direction:ltr;text-align:left;}
+  .ps-copy{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 20px;border:none;border-radius:10px;
+    background:var(--grad-btn);color:#fff;font-family:var(--sans);font-size:13.5px;font-weight:750;cursor:pointer;
+    box-shadow:0 6px 14px var(--grad-btn-glow);white-space:nowrap;transition:filter .12s,transform .08s,background .2s;}
+  .ps-copy:hover{filter:brightness(1.05);} .ps-copy:active{transform:translateY(1px);}
+  .ps-copy svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .ps-copy.done{background:var(--success);box-shadow:none;}
+  .ps-links{display:flex;gap:6px;justify-content:space-between;}
+  .ps-l{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;padding:4px 0;
+    cursor:pointer;color:var(--muted);font-family:var(--sans);font-size:12px;font-weight:650;transition:color .12s;}
+  .ps-l:hover{color:var(--ink);}
+  .ps-l .ci{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--ink-2);transition:transform .14s,box-shadow .14s,border-color .14s;}
+  .ps-l:hover .ci{transform:translateY(-3px);box-shadow:var(--shadow);border-color:transparent;}
+  .ps-l .ci svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .ps-l .ci.br{border-color:transparent;color:#fff;}
+  .ps-l .ci.br svg{stroke:none;fill:currentColor;}
+  .ci.fb{background:#1877f2;} .ci.wa{background:#25d366;} .ci.xx{background:#000;} .ci.dc{background:#5865f2;}
+  html[data-theme="dark"] .ci.xx{background:#fff;color:#000;}
+  @media(max-width:480px){
+    .ps-sheet{padding:20px 16px 22px;border-radius:20px;}
+    .ps-rule{margin-inline:-16px;}
+    .ps-l{font-size:10.5px;}
+    .ps-l .ci{width:48px;height:48px;}
+    .ps-l .ci svg{width:22px;height:22px;}
+  }
+
   @media(max-width:1150px){.pf-list,.mpr-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
   footer.dfoot{text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);margin-top:30px;}
@@ -1380,8 +1515,9 @@
   var el = function(id){ return document.getElementById(id); };
   function isDashboardPage(){
     var path = location.pathname.toLowerCase().replace(/\/+$/, '');
-    var file = path.split('/').pop() || '';
-    return file === 'dashboard.html' || file === 'dashboard';
+    // Sections are path-routed (…/dashboard/project-send), so the final segment
+    // can be a view — match "dashboard" as any path segment, not just the last.
+    return /(^|\/)dashboard(\.html)?(\/|$)/.test(path);
   }
   if(!isDashboardPage()){
     var dashWrap = document.querySelector('.dash-wrap');
@@ -2118,7 +2254,6 @@
         '<div class="dash-acct-sep"></div>'+
         '<button class="dash-acct-item" type="button" role="menuitem" data-dash-view="account">'+s(ICON.grid)+'<span>'+esc(({he:'דשבורד',en:'Dashboard',ru:'Дашборд'})[lang]||'Dashboard')+'</span></button>'+
         '<a class="dash-acct-item" role="menuitem" href="account-settings">'+s(ICON.gear)+'<span>'+esc(dashTopLabel('settings',t.settingsTitle))+'</span></a>'+
-        '<button class="dash-acct-item" type="button" role="menuitem" data-dash-view="payments">'+s(ICON.card)+'<span>'+esc(dashTopLabel('payments','Payments'))+'</span></button>'+
         acctLangSwitchHtml()+
         '<div class="dash-acct-sep"></div>'+
         '<button class="dash-acct-item danger" type="button" role="menuitem" data-side-logout>'+s(ICON.logout)+'<span>'+esc(t.logout)+'</span></button>'+
@@ -3141,6 +3276,7 @@
         var files=(r.files||[]);
         var bytes=window.KR ? KR.reqBytes(r) : (r.files||[]).reduce(function(a,f){ return a+(Number(f.size)||0); },0);
         return { client:sub.name||r.client||r.name||'Client', email:sub.email||'', phone:sub.phone||r.phone||'', title:r.name||'File request',
+          link:'upload?req='+encodeURIComponent(r.token),
           f1:files.length+' files', l1:'Received', f2:(window.KR?KR.fmtBytes(bytes):fmtDashBytes(bytes)), l2:'Total size',
           f3:riExpiry(r)||projectDate(r.createdAt), l3:r.expiresAt?'Expires':'Created', note:r.desc||sub.note||'Files received from the client through a request link.',
           status:riStatusLabel(riStatus(r)), linkStatus:riStatus(r), fileStage:riFileStage(r), filesCount:files.length, filesHref:'request?tab=manage&files='+encodeURIComponent(r.token), editHref:'request?edit='+encodeURIComponent(r.token),
@@ -3150,7 +3286,7 @@
     } else if(key==='send'){
       var sends=ensureProjectNumbers('send', readOwnArray('kolkli_send_links'), function(list){ lsSetOwn('kolkli_send_links', JSON.stringify((list||[]).slice(0,100))); });
       cards=sends.slice(0,3).map(function(x,i){
-        return { client:x.client||('Client '+(i+1)), email:x.email||'', phone:x.phone||'', link:x.url||x.link||(x.token?('https://kolkli.com/d/'+x.token):''), title:x.name||('Sent package '+(i+1)),
+        return { client:x.client||('Client '+(i+1)), email:x.email||'', phone:x.phone||'', link:x.url||x.link||(x.token?('download?t='+encodeURIComponent(x.token)):''), title:x.name||('Sent package '+(i+1)),
           f1:(x.files||0)+' files', l1:'Sent', f2:(x.downloads||0)+' downloads', l2:'Activity',
           f3:(window.KR?KR.fmtBytes(x.bytes):fmtDashBytes(x.bytes)), l3:'Total size', note:'Files sent from your workspace to the client.', status:x.downloads?'Downloaded':'Link active',
           avatar:x.clientAvatar||x.avatar||'', token:x.token, _ts:Number(x.createdAt)||0, _new:true,
@@ -3160,7 +3296,7 @@
       var reviews=(window.RV&&RV.loadProjects) ? ensureProjectNumbers('review', RV.loadProjects(), RV.saveProjects) : readOwnArray('rv_projects');
       cards=reviews.slice(0,3).map(function(p,i){
         var rvBytes=(p.items||[]).reduce(function(a,f){ return a+(Number(f.size)||0); },0);
-        return { client:p.client||('Client '+(i+1)), email:p.email||'', phone:p.phone||'', link:p.link||p.url||(p.token?('https://kolkli.com/v/'+p.token):''), title:p.name||'Review project',
+        return { client:p.client||('Client '+(i+1)), email:p.email||'', phone:p.phone||'', link:p.link||p.url||(p.token?('proof?p='+encodeURIComponent(p.token)):''), title:p.name||'Review project',
           f1:(p.items||[]).length+' files', l1:'Materials', f2:(p.comments||[]).length+' comments', l2:'Feedback',
           f3:(window.RV&&RV.fmtBytes)?RV.fmtBytes(rvBytes):fmtDashBytes(rvBytes), l3:'Total size', note:p.message||'Materials sent to the client for review and approval.', status:(window.RV&&RV.statusOf)?RV.statusOf(p):(p.status||'In review'),
           avatar:p.clientAvatar||p.avatar||'', token:p.token, _ts:Number(p.createdAt)||0, _new:true,
@@ -3299,7 +3435,7 @@
     var linkPill='<span class="mpr-link '+(linkActive?'on':'off')+'">'+(linkActive?'קישור פעיל':'קישור לא פעיל')+'</span>';
     var idText='RF-'+projNum5(card.projectNumber||'10002');
     var rk=projReadKey(card, 'receive'), newCls=(card._new && !projIsProjRead(rk))?' is-new':'';
-    return '<article class="mpr-card'+newCls+'" data-proj-key="'+esc(pkey||'')+'" data-read-key="'+esc(rk)+'" data-search="'+esc(projCardHay(card, idText))+'">'+
+    return '<article class="mpr-card mp-tone-receive'+newCls+'" data-proj-key="'+esc(pkey||'')+'" data-read-key="'+esc(rk)+'" data-search="'+esc(projCardHay(card, idText))+'">'+
       '<header class="mpr-bar">'+
         '<a class="mpr-receive" href="'+esc(editHref)+'">'+s(ICON.filepen)+'<span>ערוך טופס העלאה</span></a>'+
         '<div class="mpr-idwrap">'+
@@ -3330,7 +3466,7 @@
         (n>0
         ? '<a class="mpr-action primary" href="'+esc(href)+'">'+s(ICON.folder)+'הצג קבצים שהתקבלו</a>'
         : '<button class="mpr-action primary is-disabled" type="button" disabled aria-disabled="true">'+s(ICON.folder)+'הצג קבצים שהתקבלו</button>')+
-        '<button class="mpr-action share" type="button" data-copy-link="'+esc(card.link||href)+'">'+s(ICON.share)+'שיתוף</button>'+
+        '<button class="mpr-action share" type="button" data-proj-share="'+esc(card.link||href)+'" data-proj-name="'+esc(card.client||'')+'">'+s(ICON.share)+'שיתוף</button>'+
         '<button class="mpr-action" type="button" data-save-project>'+s(ICON.save)+'שמירה</button>'+
       '</div>'+
     '</article>';
@@ -3358,7 +3494,7 @@
       '<span class="mpr-crow">'+s(ICON.phone)+'<a class="v" href="tel:'+esc(phone.replace(/[^\d+]/g,''))+'">'+esc(phone)+'</a></span>'+
       '<span class="mpr-crow he">'+s(ICON.calendar)+'<span class="v">'+esc(received)+'</span></span>';
     var copyBtn = card.link
-      ? '<button class="mpr-action share" type="button" data-copy-link="'+esc(card.link)+'">'+s(ICON.share)+'שיתוף</button>'
+      ? '<button class="mpr-action share" type="button" data-proj-share="'+esc(card.link)+'" data-proj-name="'+esc(card.client||'')+'">'+s(ICON.share)+'שיתוף</button>'
       : '';
     // "פתיחת אישור" opens the client's specific review project inside review.html,
     // keyed by its project token (?p=…) — the same routing review.html uses to
@@ -3367,16 +3503,16 @@
     // manage view when the card has no token (demo data).
     // "פתיחת העברה" opens the recipient's branded download landing page exactly as
     // the client sees it when opening the share link — a full preview of the
-    // delivery experience (download-landing.html). Other services keep their own
+    // delivery experience via the package token (download.html?t=<token>). Other services keep their own
     // service page.
     // Selection service: the "show selections" CTA opens the client's own
     // gallery in manager (read-only) view via select.html?view=manager.
     var primaryHref = tone==='review'
       ? (card.token ? 'review?p='+encodeURIComponent(card.token) : svc.href)
       : tone==='send'
-      ? 'download-landing'
+      ? (card.token ? 'download?t='+encodeURIComponent(card.token) : svc.href)
       : tone==='select'
-      ? 'select?view=manager'
+      ? (card.link || 'select?view=manager')
       : svc.href;
     var rk=projReadKey(card, tone), newCls=(card._new && !projIsProjRead(rk))?' is-new':'';
     // The send card's service link doubles as an "edit" entry point (mirrors the
@@ -3531,6 +3667,43 @@
     var tone = svcKey==='receive' ? 'receive' : ((PROJECT_SERVICES[svcKey]||{}).tone || svcKey);
     return projReadKey(card, tone);
   }
+  // Empty state for "My Projects" when a service has no cards yet. Mirrors the
+  // per-service naming so Review Files reads "אין עדיין קבצים לאישור", etc.
+  var PROJ_EMPTY_ICON = { all:'layers', select:'pick', receive:'inbox', send:'send', review:'filepen' };
+  function projEmptyText(key){
+    var L={
+      he:{
+        all:    { t:'עדיין אין פרויקטים',        p:'צרו פרויקט חדש כדי להתחיל לארגן קבצים לפי לקוח.' },
+        select: { t:'אין עדיין קבצים לבחירה',     p:'שלחו ללקוח גלריית בחירה והפרויקטים יופיעו כאן.' },
+        receive:{ t:'אין עדיין קבצים שהתקבלו',    p:'פתחו בקשת קבצים והעלאות הלקוחות יופיעו כאן.' },
+        send:   { t:'אין עדיין קבצים שנשלחו',      p:'שלחו קבצים ללקוח והמשלוחים יופיעו כאן.' },
+        review: { t:'אין עדיין קבצים לאישור',      p:'שלחו חומרים ללקוח לצפייה ואישור והם יופיעו כאן.' }
+      },
+      en:{
+        all:    { t:'No projects yet',           p:'Create a new project to start organizing files by client.' },
+        select: { t:'No selection files yet',    p:'Send a client a selection gallery and projects will appear here.' },
+        receive:{ t:'No received files yet',     p:'Open a file request and client uploads will appear here.' },
+        send:   { t:'No sent files yet',         p:'Send files to a client and deliveries will appear here.' },
+        review: { t:'No files for approval yet', p:'Send materials to a client to review and approve, and they will appear here.' }
+      },
+      ru:{
+        all:    { t:'Проектов пока нет',            p:'Создайте новый проект, чтобы упорядочить файлы по клиентам.' },
+        select: { t:'Файлов для выбора пока нет',   p:'Отправьте клиенту галерею выбора — проекты появятся здесь.' },
+        receive:{ t:'Полученных файлов пока нет',   p:'Откройте запрос файлов — загрузки клиентов появятся здесь.' },
+        send:   { t:'Отправленных файлов пока нет', p:'Отправьте файлы клиенту — доставки появятся здесь.' },
+        review: { t:'Файлов на согласование пока нет', p:'Отправьте материалы клиенту для просмотра и согласования — они появятся здесь.' }
+      }
+    };
+    var set=L[lang]||L.en; return set[key]||set.all;
+  }
+  function projEmptyHtml(key){
+    var e=projEmptyText(key), ic=PROJ_EMPTY_ICON[key]||'folder';
+    return '<div class="mpr-empty-state mp-tone-'+key+'">'+
+      '<span class="ei">'+s(ICON[ic]||ICON.folder)+'</span>'+
+      '<h3>'+esc(e.t)+'</h3>'+
+      '<p>'+esc(e.p)+'</p>'+
+    '</div>';
+  }
   function viewProjects(){
     var key=projectServiceKey();
     var cards=projectCardsFor(key).filter(function(c){
@@ -3539,25 +3712,25 @@
       return !projIsProjDeleted(projCardReadKey(ck, c));
     });
     var action = key==='receive'
-      ? '<a class="btn primary mp-new-request" href="request">'+s(ICON.plus)+esc(t.reqNew)+'</a>'
+      ? '<a class="btn primary mp-new-request mp-tone-receive" href="request">'+s(ICON.plus)+esc(t.reqNew)+'</a>'
       : key==='select'
-      ? '<a class="btn primary mp-new-request" href="files?new=1">'+s(ICON.plus)+esc(t.selNew)+'</a>'
+      ? '<a class="btn primary mp-new-request mp-tone-select" href="files?new=1">'+s(ICON.plus)+esc(t.selNew)+'</a>'
       : key==='send'
-      ? '<a class="btn primary mp-new-request" href="send">'+s(ICON.plus)+esc(t.sendNew)+'</a>'
+      ? '<a class="btn primary mp-new-request mp-tone-send" href="send">'+s(ICON.plus)+esc(t.sendNew)+'</a>'
       : key==='review'
-      ? '<a class="btn primary mp-new-request" href="review">'+s(ICON.plus)+esc(t.reviewNew)+'</a>'
+      ? '<a class="btn primary mp-new-request mp-tone-review" href="review">'+s(ICON.plus)+esc(t.reviewNew)+'</a>'
       : '';
     return '<section class="mp-shell">'+
       '<div class="mp-head"><div><h2>'+esc(projMyProjectsText())+'</h2></div>'+action+'</div>'+
       '<div class="mp-tools mp-tools-4">'+projectToolHtml(key)+'</div>'+
       '<div class="mp-section-title"><h3>'+esc(svcText(key,'section'))+'</h3><span>'+esc(projCardsCountText(cards.length))+'</span></div>'+
-      '<div class="mpr-list">'+cards.map(function(c,i){
+      '<div class="mpr-list">'+(cards.length ? cards.map(function(c,i){
         // In the combined "all" view each card carries its own service (c._svc);
         // otherwise every card belongs to the active service.
         var ck=(key==='all' && c._svc) ? c._svc : key, csvc=PROJECT_SERVICES[ck];
         var pkey=projectCardKey(ck,c,i);
         return ck==='receive' ? projectReceiveHtml(c, pkey) : projectWideCardHtml(c, csvc, pkey);
-      }).join('')+'</div>'+
+      }).join('') : projEmptyHtml(key))+'</div>'+
     '</section>';
   }
 
@@ -4227,6 +4400,124 @@
     document.addEventListener('keydown', onKey);
     requestAnimationFrame(function(){ wrap.classList.add('show'); copyBtn.focus(); });
   }
+  // Rich share window used by the project cards (receive · select · review · send):
+  // pick recent contacts to share with, copy the link, or push it to a social target.
+  // Demo behaviour — links are placeholder URLs (no public backend yet).
+  function projShareDialog(opts){
+    opts=opts||{};
+    var link=opts.link||'https://kolkli.com/s/link', name=(opts.name||'').trim(), isHe=lang==='he';
+    var prev=el('projShare'); if(prev) prev.remove();
+    var T = (lang==='he')
+      ? { search:'חיפוש איש קשר…', shareWith:'שיתוף עם', links:'קישורי שיתוף', copy:'העתק', copied:'הועתק ✓', copiedToast:'הקישור הועתק ✓', close:'סגירה', noone:'לא נמצאו אנשי קשר', embed:'הטמעה', fb:'פייסבוק', wa:'וואטסאפ', copylink:'העתק קישור', xx:'אקס', dc:'דיסקורד', discordToast:'הקישור הועתק — הדבק בדיסקורד ✓', embedToast:'קוד ההטמעה הועתק ✓', shareMsg:'הנה הקבצים ששלחתי לך דרך KOLKLI:' }
+      : (lang==='ru')
+      ? { search:'Поиск контакта…', shareWith:'Поделиться с', links:'Поделиться через', copy:'Копировать', copied:'Скопировано ✓', copiedToast:'Ссылка скопирована ✓', close:'Закрыть', noone:'Контакты не найдены', embed:'Встроить', fb:'Facebook', wa:'WhatsApp', copylink:'Копировать', xx:'X', dc:'Discord', discordToast:'Ссылка скопирована — вставьте в Discord ✓', embedToast:'Код встраивания скопирован ✓', shareMsg:'Файлы, отправленные через KOLKLI:' }
+      : { search:'Search contact…', shareWith:'Share with', links:'Share links', copy:'Copy', copied:'Copied ✓', copiedToast:'Link copied ✓', close:'Close', noone:'No contacts found', embed:'Embed', fb:'Facebook', wa:'WhatsApp', copylink:'Copy Link', xx:'X', dc:'Discord', discordToast:'Link copied — paste it in Discord ✓', embedToast:'Embed code copied ✓', shareMsg:'Files I sent you via KOLKLI:' };
+
+    // "Share with" avatars — the card's own client first, then a few recent contacts (demo).
+    var people=[];
+    if(name) people.push({ n:name, g:'ps-g1' });
+    var demo=[{n:'דנה כהן',g:'ps-g2'},{n:'יוסי לוי',g:'ps-g3'},{n:'מאיה בר',g:'ps-g4'},{n:'עומר אדרי',g:'ps-g5'},{n:'נועה שגב',g:'ps-g6'}];
+    for(var di=0; di<demo.length && people.length<6; di++){ if(demo[di].n!==name) people.push(demo[di]); }
+    var tick='<span class="tick"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>';
+    var peopleHtml=people.map(function(p){
+      return '<button class="ps-person" type="button" aria-pressed="false" data-name="'+esc(p.n)+'">'+
+        '<span class="ps-av '+p.g+'">'+esc(projectInitials(p.n))+tick+'</span>'+
+        '<span class="ps-nm" dir="auto">'+esc(String(p.n).split(/\s+/)[0])+'</span>'+
+      '</button>';
+    }).join('');
+
+    // Brand glyphs (fill-based) inlined here; neutral targets reuse the shared line icons.
+    var fbSvg='<svg viewBox="0 0 24 24"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.13 11.93v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.49 0-1.96.93-1.96 1.87v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.07 24 18.09 24 12.07"/></svg>';
+    var waSvg='<svg viewBox="0 0 24 24"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.14-.14.3-.35.44-.53.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.06 2.88 1.21 3.07.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.34M12.05 21.79h-.01a9.9 9.9 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37A9.86 9.86 0 0 1 2.1 11.9C2.1 6.45 6.54 2.01 12 2.01c2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.44 9.89-9.83 9.89M20.52 3.45A11.82 11.82 0 0 0 12.05 0C5.46 0 .1 5.36.1 11.95c0 2.1.55 4.14 1.6 5.95L0 24l6.34-1.66a11.93 11.93 0 0 0 5.7 1.45h.01c6.58 0 11.94-5.36 11.95-11.95a11.86 11.86 0 0 0-3.48-8.4"/></svg>';
+    var xSvg='<svg viewBox="0 0 24 24"><path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.46l8.6-9.83L0 1.15h7.6l5.24 6.93zm-1.29 19.5h2.04L6.49 3.24H4.3z"/></svg>';
+    var dcSvg='<svg viewBox="0 0 24 24"><path d="M20.32 4.37A19.8 19.8 0 0 0 15.42 3c-.2.36-.44.85-.6 1.23a18.3 18.3 0 0 0-5.64 0A12.4 12.4 0 0 0 8.57 3a19.7 19.7 0 0 0-4.9 1.37C.55 8.98-.3 13.48.12 17.9a19.9 19.9 0 0 0 6.07 3.08c.49-.67.93-1.38 1.3-2.13-.71-.27-1.4-.6-2.04-.99.17-.13.34-.26.5-.4a14.2 14.2 0 0 0 12.1 0c.17.14.34.27.5.4-.65.39-1.34.72-2.05.99.38.75.82 1.46 1.3 2.13a19.8 19.8 0 0 0 6.07-3.08c.5-5.12-.84-9.58-3.55-13.53M8.02 15.19c-1.18 0-2.15-1.08-2.15-2.4 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.09 2.15 2.42 0 1.32-.95 2.4-2.15 2.4m7.96 0c-1.18 0-2.15-1.08-2.15-2.4 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.09 2.15 2.42 0 1.32-.95 2.4-2.15 2.4"/></svg>';
+
+    var wrap=document.createElement('div');
+    wrap.id='projShare'; wrap.className='kc-overlay ps-overlay';
+    wrap.setAttribute('dir', isHe?'rtl':'ltr');
+    wrap.innerHTML=
+      '<div class="ps-sheet" role="dialog" aria-modal="true" aria-labelledby="psTitle">'+
+        '<div class="ps-top">'+
+          '<div class="ps-search">'+
+            '<svg class="mag" viewBox="0 0 24 24">'+ICON.search+'</svg>'+
+            '<input type="text" id="psSearch" autocomplete="off" placeholder="'+esc(T.search)+'" aria-label="'+esc(T.search)+'">'+
+          '</div>'+
+          '<button class="ps-x" type="button" aria-label="'+esc(T.close)+'">'+s(ICON.x)+'</button>'+
+        '</div>'+
+        '<div class="ps-rule"></div>'+
+        '<h3 class="ps-h" id="psTitle">'+esc(T.shareWith)+'</h3>'+
+        '<div class="ps-people" id="psPeople">'+peopleHtml+'</div>'+
+        '<div class="ps-linkfield">'+
+          '<input type="text" id="psLink" readonly value="'+esc(link)+'" aria-label="'+esc(T.copylink)+'">'+
+          '<button class="ps-copy" id="psCopy" type="button">'+s(ICON.copy)+'<span>'+esc(T.copy)+'</span></button>'+
+        '</div>'+
+        '<div class="ps-rule"></div>'+
+        '<h3 class="ps-h">'+esc(T.links)+'</h3>'+
+        '<div class="ps-links">'+
+          '<button class="ps-l" type="button" data-sh="embed"><span class="ci">'+s(ICON.code)+'</span>'+esc(T.embed)+'</button>'+
+          '<button class="ps-l" type="button" data-sh="facebook"><span class="ci br fb">'+fbSvg+'</span>'+esc(T.fb)+'</button>'+
+          '<button class="ps-l" type="button" data-sh="whatsapp"><span class="ci br wa">'+waSvg+'</span>'+esc(T.wa)+'</button>'+
+          '<button class="ps-l" type="button" data-sh="copy"><span class="ci">'+s(ICON.link)+'</span>'+esc(T.copylink)+'</button>'+
+          '<button class="ps-l" type="button" data-sh="x"><span class="ci br xx">'+xSvg+'</span>'+esc(T.xx)+'</button>'+
+          '<button class="ps-l" type="button" data-sh="discord"><span class="ci br dc">'+dcSvg+'</span>'+esc(T.dc)+'</button>'+
+        '</div>'+
+      '</div>';
+    document.body.appendChild(wrap);
+
+    function copyRaw(text){
+      try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(text); return; } }catch(e){}
+      var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); }catch(_){ } ta.remove();
+    }
+    function close(){ document.removeEventListener('keydown', onKey); wrap.classList.remove('show'); setTimeout(function(){ wrap.remove(); }, 200); }
+    function onKey(e){ if(e.key==='Escape') close(); }
+    wrap.addEventListener('mousedown', function(e){ if(e.target===wrap) close(); });
+    wrap.querySelector('.ps-x').addEventListener('click', close);
+    document.addEventListener('keydown', onKey);
+
+    // copy field
+    var copyBtn=wrap.querySelector('#psCopy');
+    copyBtn.addEventListener('click', function(){
+      copyRaw(link);
+      var sp=copyBtn.querySelector('span'); if(sp) sp.textContent=T.copied;
+      copyBtn.classList.add('done');
+      riToast(T.copiedToast);
+    });
+
+    // people: select + live search filter
+    var peopleBox=wrap.querySelector('#psPeople');
+    var cards=Array.prototype.slice.call(peopleBox.querySelectorAll('.ps-person'));
+    cards.forEach(function(c){ c.addEventListener('click', function(){
+      c.setAttribute('aria-pressed', c.getAttribute('aria-pressed')==='true' ? 'false' : 'true');
+    }); });
+    var search=wrap.querySelector('#psSearch');
+    search.addEventListener('input', function(){
+      var q=search.value.trim().toLowerCase(), shown=0;
+      cards.forEach(function(c){
+        var hit=c.getAttribute('data-name').toLowerCase().indexOf(q)>-1;
+        c.style.display=hit?'':'none'; if(hit) shown++;
+      });
+      var empty=peopleBox.querySelector('.ps-empty');
+      if(!shown){ if(!empty){ empty=document.createElement('div'); empty.className='ps-empty'; empty.textContent=T.noone; peopleBox.appendChild(empty); } }
+      else if(empty){ empty.remove(); }
+    });
+
+    // social share targets
+    var shareMsg=encodeURIComponent(T.shareMsg), u=encodeURIComponent(link);
+    wrap.querySelectorAll('.ps-l').forEach(function(b){
+      b.addEventListener('click', function(){
+        var target=b.getAttribute('data-sh');
+        if(target==='facebook') window.open('https://www.facebook.com/sharer/sharer.php?u='+u,'_blank','noopener');
+        else if(target==='whatsapp') window.open('https://wa.me/?text='+shareMsg+'%20'+u,'_blank','noopener');
+        else if(target==='x') window.open('https://twitter.com/intent/tweet?url='+u+'&text='+shareMsg,'_blank','noopener');
+        else if(target==='discord'){ copyRaw(link); riToast(T.discordToast); window.open('https://discord.com/channels/@me','_blank','noopener'); }
+        else if(target==='copy'){ copyRaw(link); riToast(T.copiedToast); }
+        else if(target==='embed'){ copyRaw('<iframe src="'+link+'" width="640" height="480" frameborder="0" allowfullscreen></iframe>'); riToast(T.embedToast); }
+      });
+    });
+
+    requestAnimationFrame(function(){ wrap.classList.add('show'); search.focus(); });
+  }
   function processedToolsHtml(cfg){
     return (cfg.tools||[]).map(function(x){ return '<a href="'+esc(x.href)+'">'+s(ICON[x.ic])+esc(x.label)+'</a>'; }).join('');
   }
@@ -4279,7 +4570,7 @@
     } else if(rows.length){
       body=pfBulkHtml(kind,rows)+'<div class="pf-list">'+rows.map(function(r){ return processedItemHtml(r,cfg,kind); }).join('')+'</div>';
     } else {
-      body='<div class="pf-empty empty"><div class="ei">'+s(ICON[cfg.icon])+'</div><h3>'+esc(cfg.emptyT||pfText('emptyT'))+'</h3><p>'+esc(pfText('emptyP'))+'</p></div>';
+      body='<div class="pf-empty empty pf-empty-'+esc(cfg.category)+'"><div class="ei">'+s(ICON[cfg.icon])+'</div><h3>'+esc(cfg.emptyT||pfText('emptyT'))+'</h3><p>'+esc(pfText('emptyP'))+'</p></div>';
     }
     var toggleBtn = canSelect
       ? '<button class="btn ghost pf-mode-btn'+(selMode?' on':'')+'" type="button" data-pf-toggle-mode="'+esc(kind)+'" aria-pressed="'+(selMode?'true':'false')+'">'+s(selMode?ICON.x:ICON.pick)+esc(pfMultiText(selMode?'exit':'enter'))+'</button>'
@@ -4332,8 +4623,7 @@
   function roleName(r){ var x=tt(); return r==='owner'?x.roleOwner:r==='admin'?x.roleAdmin:x.roleMember; }
   var EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   function inviteLink(token){
-    var base=location.href.replace(/#.*$/,'').replace(/[?].*$/,'');
-    return base+'#join='+token;
+    return location.origin+dashBase()+'/join/'+token;
   }
 
   var Team = (function(){
@@ -4597,7 +4887,7 @@
     }).join('');
     return '<div class="card ri-card">'+
       '<div class="ri-head"><div><h2>'+esc(t.reqTitle)+'</h2><p class="csub">'+esc(t.reqSub)+'</p></div>'+
-        '<a class="btn primary ri-newbtn" href="request" style="text-decoration:none">'+s(ICON.plus)+esc(t.reqNew)+'</a></div>'+
+        '<a class="btn primary ri-newbtn mp-tone-receive" href="request" style="text-decoration:none">'+s(ICON.plus)+esc(t.reqNew)+'</a></div>'+
       '<div class="ri-toolbar">'+
         '<div class="ri-search">'+s(ICON.search)+'<input type="text" id="riSearch" placeholder="'+esc(t.ri.searchPh)+'" value="'+esc(reqState.q)+'"></div>'+
         '<select class="ri-sort" id="riSort" aria-label="'+esc(t.ri.sort_new)+'">'+sortOpts+'</select>'+
@@ -4958,13 +5248,13 @@
       clientMap[key]=dsPush(out,{
         type:'client', icon:'user', title:title,
         meta:[email, phone, source],
-        href:href || 'dashboard#project-select',
+        href:href || 'dashboard/project-select',
         hay:[email, phone, source, hay]
       });
     }
 
     ensureProjectNumbers('select', loadProjects(), saveProjects).forEach(function(p){
-      var href='dashboard#project-select';
+      var href='dashboard/project-select';
       var numText=projectNumberText('select',p);
       dsPush(out,{
         type:'project', icon:'folder', title:p.name || p.id || dsType('project'),
@@ -5059,7 +5349,7 @@
         dsPush(out,{
           type:'processed', icon:dsFileIcon(rec.category), title:rec.name || dsText('processedFile'),
           meta:[pfAction(rec.action), rec.tool, fmtDashBytes(rec.size), processedDate(rec.createdAt)],
-          href:'dashboard#'+(map[rec.category]||'my-audio'),
+          href:'dashboard/'+(map[rec.category]||'my-audio'),
           hay:[rec.id, rec.name, rec.action, pfAction(rec.action), rec.tool, rec.sourcePage, rec.category, rec.type],
           downloadType:'processed',
           downloadId:rec.id,
@@ -5130,7 +5420,7 @@
         if(countEl) countEl.textContent=projCardsCountText(words.length?shown:cards.length);
       }
       var empty=list.querySelector('.mpr-empty');
-      if(words.length && shown===0){
+      if(words.length && shown===0 && cards.length>0){
         if(!empty){ empty=document.createElement('div'); empty.className='mpr-empty'; list.appendChild(empty); }
         empty.textContent=dsText('noResults');
         empty.style.display='';
@@ -5224,8 +5514,9 @@
     view=id;
     if(id!=='my-files') activeProjectId=null;
     try{
-      if(location.hash.replace(/^#/,'')!==id){
-        history.replaceState(null,'',location.pathname+location.search+'#'+id);
+      var want=dashBase()+'/'+id;
+      if(location.pathname.replace(/\/+$/,'')!==want){
+        history.replaceState(null,'',want+location.search);
       }
     }catch(e){}
     // keep the owning category open
@@ -5413,6 +5704,12 @@
         try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(link).then(done,done); return; } }catch(e){}
         var ta=document.createElement('textarea'); ta.value=link; document.body.appendChild(ta); ta.select();
         try{ document.execCommand('copy'); }catch(_){ } ta.remove(); done();
+      });
+    });
+    // Project cards' "שיתוף" button → rich share window (people · copy · social).
+    host.querySelectorAll('[data-proj-share]').forEach(function(b){
+      b.addEventListener('click', function(){
+        projShareDialog({ link:b.getAttribute('data-proj-share')||'', name:b.getAttribute('data-proj-name')||'' });
       });
     });
     host.querySelectorAll('[data-save-project]').forEach(function(b){
@@ -5656,15 +5953,38 @@
      ===================================================== */
   // Deep-links open dashboard views; legacy #settings redirects to the standalone
   // account-settings page so settings stay separate from the file workspace.
-  function viewFromHash(){
-    var h=(location.hash||'').replace(/^#/,'');
-    if(!h) return null;
-    if(PROJECT_VIEW[h]) return h;
-    if(VIEWS[h]) return h;
-    return NAV.some(function(c){ return c.items.some(function(it){ return it.id===h; }); }) ? h : null;
+  // Path router: in-app sections live in the URL path (/dashboard/project-send)
+  // rather than a #hash. dashBase() is the page's own root (/dashboard, minus any
+  // .html or trailing view); segFromPath() is the current view segment.
+  function dashBase(){
+    var p=location.pathname.replace(/[?#].*$/,'').replace(/\/+$/,'');
+    var i=p.toLowerCase().indexOf('/dashboard');
+    return (i<0?'':p.slice(0,i))+'/dashboard';
+  }
+  function segFromPath(){
+    var m=location.pathname.replace(/[?#].*$/,'').match(/\/dashboard(?:\.html)?\/([^/]+)/i);
+    return m&&m[1]?decodeURIComponent(m[1]):'';
+  }
+  function isView(h){
+    if(!h) return false;
+    return !!(PROJECT_VIEW[h]||VIEWS[h]) || NAV.some(function(c){ return c.items.some(function(it){ return it.id===h; }); });
+  }
+  function viewFromPath(){
+    var h=segFromPath();
+    return isView(h) ? h : null;
   }
 
-  if((location.hash||'').replace(/^#/,'')==='settings'){
+  // Legacy #hash deep-links (old bookmarks / shared URLs) still resolve: fold a
+  // recognised #view onto the path form so the router below picks it up.
+  (function migrateLegacyHash(){
+    var h=(location.hash||'').replace(/^#/,'');
+    if(!h || /^join=/.test(h) || h==='settings') return;   // join + settings handled separately
+    if(!segFromPath() && isView(h)){
+      try{ history.replaceState(null,'',dashBase()+'/'+h+location.search); }catch(e){}
+    }
+  })();
+
+  if(segFromPath()==='settings' || (location.hash||'').replace(/^#/,'')==='settings'){
     location.replace('account-settings');
     return;
   }
@@ -5686,12 +6006,17 @@
 
   applyTheme(lsGet('theme')||'light');
   loadUser();
-  // Invite deep-link: dashboard.html#join=TOKEN → accept it, then open Team.
+  // Invite deep-link: /dashboard/join/TOKEN (or legacy #join=TOKEN) → accept, open Team.
   (function handleJoin(){
+    var token=null;
     var m=(location.hash||'').match(/^#join=([A-Za-z0-9\-]+)/);
-    if(!m) return;
-    var token=m[1];
-    try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+    if(m){ token=m[1]; }
+    else if(segFromPath()==='join'){
+      var mp=location.pathname.match(/\/dashboard(?:\.html)?\/join\/([A-Za-z0-9\-]+)/i);
+      if(mp) token=mp[1];
+    }
+    if(!token) return;
+    try{ history.replaceState(null,'',dashBase()+location.search); }catch(e){}
     if(window.KolkliAuth && window.KolkliAuth.configured()){
       Team.acceptInvite(token).then(function(r){
         if(r.ok){ selectView('team'); }
@@ -5701,8 +6026,22 @@
       alert(tt().joinDemo);
     }
   })();
-  var hv=viewFromHash(); if(hv) view=hv;
-  window.addEventListener('hashchange', function(){ var v=viewFromHash(); if(v) selectView(v); });
+  var hv=viewFromPath(); if(hv) view=hv;
+  window.addEventListener('popstate', function(){ var v=viewFromPath(); if(v) selectView(v); });
+  // Route same-page links to /dashboard/<view> in-app (no reload), so anchors
+  // built with a real href behave like the sidebar's data-dash-view buttons.
+  document.addEventListener('click', function(e){
+    var a=e.target.closest && e.target.closest('a[href]');
+    if(!a || a.target==='_blank' || a.hasAttribute('download')) return;
+    var u; try{ u=new URL(a.href, location.href); }catch(_){ return; }
+    if(u.origin!==location.origin) return;
+    var mm=u.pathname.replace(/\/+$/,'').match(/\/dashboard(?:\.html)?\/([^/]+)$/i);
+    if(!mm) return;
+    var v=mm[1];
+    if(v==='join' || !isView(v)) return;
+    e.preventDefault();
+    selectView(v);
+  });
   // auth-store.js loads async and fires kolkli:auth once the Supabase session
   // is synced. Re-render then so the account + billing buttons reflect the
   // real signed-in state (guarded to the session actually changing, so a

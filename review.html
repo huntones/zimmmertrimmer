@@ -396,6 +396,8 @@
   .decisionbox.changes{border-color:var(--warm-line);background:var(--warm-soft);}
   .decisionbox.changes .di{background:var(--warn);color:#fff;}
   .decisionbox.pending .di{background:var(--accent-soft);color:var(--accent);}
+  .decisionbox.rejected{border-color:color-mix(in srgb,var(--danger) 45%,var(--line));background:var(--danger-soft);}
+  .decisionbox.rejected .di{background:var(--danger);color:#fff;}
 
   .dsec{margin-bottom:20px;}
   .dsec .dsh{font-size:14.5px;font-weight:700;color:var(--ink-2);margin:0 0 11px;display:flex;align-items:center;gap:8px;}
@@ -550,7 +552,7 @@
   .rv-hero{position:relative;isolation:isolate;text-align:center;overflow:hidden;
     padding:54px 20px 172px;background:linear-gradient(160deg,#e8f5df 0%,#dcefcf 58%,#e8f5df 100%);}
   .rv-hero-bg{position:absolute;inset:0;z-index:-2;
-    background:url('assets/review-hero-bg.jpg') center top/cover no-repeat;}
+    background:url('assets/hero-bg.jpg') center top/cover no-repeat;}
   .rv-hero::after{content:'';position:absolute;inset:0;z-index:-1;
     background:radial-gradient(125% 92% at 50% 32%,rgba(255,255,255,.66),rgba(255,255,255,0) 60%);}
   html[data-theme="dark"] .rv-hero{background:#101a0f;}
@@ -1233,14 +1235,14 @@
       back:'חזרה',
       dItems:'חומרים', dFeedback:'הערות ופידבק', dNoComments:'עדיין אין הערות מהלקוח.',
       decApprovedT:'הפרויקט אושר', decApprovedS:(who,d)=>`${who} · ${d}`,
-      decChangesT:'הלקוח ביקש תיקונים', decChangesS:(who,d)=>`${who} · ${d}`,
+      decChangesT:'הלקוח ביקש תיקונים', decRejectedT:'הלקוח דחה את הפרויקט', decChangesS:(who,d)=>`${who} · ${d}`,
       decPendingT:'ממתין ללקוח', decPendingS:'עדיין לא התקבלה החלטה סופית',
       resolve:'סימון כטופל', resolved:'טופל',
       posTime:s=>`בזמן ${s}`, posPage:n=>`עמוד ${n}`, anonymous:'הלקוח',
       close:'סגור', filePreview:'תצוגה',
       errName:'צריך לתת שם לפרויקט', errNoFiles:'הוסיפו לפחות קובץ אחד', errPw:'הזינו סיסמה או בטלו את ההגנה',
       notifTitle:'פעילות בפרויקט', actViewed:who=>`${who} צפה בפרויקט`, actCommented:who=>`${who} הוסיף הערה`,
-      actApproved:who=>`${who} אישר את הפרויקט`, actChanges:who=>`${who} ביקש תיקונים`,
+      actApproved:who=>`${who} אישר את הפרויקט`, actChanges:who=>`${who} ביקש תיקונים`, actRejected:who=>`${who} דחה את הפרויקט`,
       emailSubject:n=>`לאישור: ${n}`, emailBody:(n,url,m)=>`שלום,\nמצורף קישור לצפייה ואישור:\n${url}\n\nפרויקט: ${n}${m?'\n'+m:''}`,
       waText:(n,url)=>`לצפייה ואישור "${n}": ${url}`,
       today:'היום', yesterday:'אתמול', dayU:'יום', daysU:d=>`${d} ימים`,
@@ -1290,14 +1292,14 @@
       back:'Back',
       dItems:'Materials', dFeedback:'Feedback', dNoComments:'No feedback from the client yet.',
       decApprovedT:'Project approved', decApprovedS:(who,d)=>`${who} · ${d}`,
-      decChangesT:'Client requested changes', decChangesS:(who,d)=>`${who} · ${d}`,
+      decChangesT:'Client requested changes', decChangesS:(who,d)=>`${who} · ${d}`, decRejectedT:'Client rejected the project',
       decPendingT:'Awaiting the client', decPendingS:'No final decision yet',
       resolve:'Mark resolved', resolved:'Resolved',
       posTime:s=>`at ${s}`, posPage:n=>`page ${n}`, anonymous:'The client',
       close:'Close', filePreview:'Preview',
       errName:'Give the project a name', errNoFiles:'Add at least one file', errPw:'Enter a password or turn protection off',
       notifTitle:'Project activity', actViewed:who=>`${who} viewed the project`, actCommented:who=>`${who} left a comment`,
-      actApproved:who=>`${who} approved the project`, actChanges:who=>`${who} requested changes`,
+      actApproved:who=>`${who} approved the project`, actChanges:who=>`${who} requested changes`, actRejected:who=>`${who} rejected the project`,
       emailSubject:n=>`For review: ${n}`, emailBody:(n,url,m)=>`Hi,\nHere's a link to view and approve:\n${url}\n\nProject: ${n}${m?'\n'+m:''}`,
       waText:(n,url)=>`Review & approve "${n}": ${url}`,
       today:'today', yesterday:'yesterday', dayU:'1 day', daysU:d=>`${d} days`,
@@ -1347,14 +1349,14 @@
       back:'Назад',
       dItems:'Материалы', dFeedback:'Обратная связь', dNoComments:'Пока нет комментариев от клиента.',
       decApprovedT:'Проект одобрен', decApprovedS:(who,d)=>`${who} · ${d}`,
-      decChangesT:'Клиент запросил правки', decChangesS:(who,d)=>`${who} · ${d}`,
+      decChangesT:'Клиент запросил правки', decRejectedT:'Клиент отклонил проект', decChangesS:(who,d)=>`${who} · ${d}`,
       decPendingT:'Ожидание клиента', decPendingS:'Окончательного решения пока нет',
       resolve:'Отметить решённым', resolved:'Решено',
       posTime:s=>`на ${s}`, posPage:n=>`стр. ${n}`, anonymous:'Клиент',
       close:'Закрыть', filePreview:'Просмотр',
       errName:'Дайте проекту название', errNoFiles:'Добавьте хотя бы один файл', errPw:'Введите пароль или отключите защиту',
       notifTitle:'Активность в проекте', actViewed:who=>`${who} просмотрел проект`, actCommented:who=>`${who} оставил комментарий`,
-      actApproved:who=>`${who} одобрил проект`, actChanges:who=>`${who} запросил правки`,
+      actApproved:who=>`${who} одобрил проект`, actChanges:who=>`${who} запросил правки`, actRejected:who=>`${who} отклонил проект`,
       emailSubject:n=>`На согласование: ${n}`, emailBody:(n,url,m)=>`Здравствуйте,\nВот ссылка для просмотра и одобрения:\n${url}\n\nПроект: ${n}${m?'\n'+m:''}`,
       waText:(n,url)=>`Просмотр и одобрение «${n}»: ${url}`,
       today:'сегодня', yesterday:'вчера', dayU:'1 день', daysU:d=>`${d} дн.`,
@@ -1853,6 +1855,8 @@
       box.innerHTML=`<div class="decisionbox approved"><div class="di">${checkSvg()}</div><div class="dt"><b>${t.decApprovedT}</b><span>${t.decApprovedS(RV.escapeHtml(p.decision.by||t.anonymous), fmtDateTime(p.decision.at))}</span></div></div>`;
     } else if(p.decision && p.decision.state==='changes'){
       box.innerHTML=`<div class="decisionbox changes"><div class="di">${refreshSvg()}</div><div class="dt"><b>${t.decChangesT}</b><span>${t.decChangesS(RV.escapeHtml(p.decision.by||t.anonymous), fmtDateTime(p.decision.at))}</span></div></div>`;
+    } else if(p.decision && p.decision.state==='rejected'){
+      box.innerHTML=`<div class="decisionbox rejected"><div class="di">${xSvg()}</div><div class="dt"><b>${t.decRejectedT}</b><span>${t.decChangesS(RV.escapeHtml(p.decision.by||t.anonymous), fmtDateTime(p.decision.at))}</span></div></div>`;
     } else {
       box.innerHTML=`<div class="decisionbox pending"><div class="di">${clockSvg()}</div><div class="dt"><b>${t.decPendingT}</b><span>${t.decPendingS}</span></div></div>`;
     }
@@ -1980,6 +1984,7 @@
     else if(d.type==='commented') msg=t.actCommented(who);
     else if(d.type==='approved') msg=t.actApproved(who);
     else if(d.type==='changes') msg=t.actChanges(who);
+    else if(d.type==='rejected') msg=t.actRejected(who);
     if(msg){
       toast(msg);
       if(p.notify){ try{ if('Notification'in window && Notification.permission==='granted') new Notification(t.notifTitle,{body:msg}); }catch(_){} }

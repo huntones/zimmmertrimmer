@@ -28,6 +28,8 @@
   var TRIAL_PLAN = 'creator';
   var DAY_MS = 24 * 60 * 60 * 1000;
   var LEDGER_KEY = 'kolkli_trial_fp';   // ids that have already claimed a trial
+  var PENDING_KEY = 'kolkli_trial_pending';  // email awaiting confirmation before its trial is granted
+  var PENDING_TTL = 14 * DAY_MS;        // how long a pending-trial intent stays valid
   var USERS_KEY = 'ac_users';
   var SESSION_KEY = 'ac_session';
   var PLAN_KEY = 'ac_plan';
@@ -73,6 +75,92 @@
 
   function workerConfigured() { return !!(window.KolkliUsage && KolkliUsage.configured && KolkliUsage.configured()); }
   function authConfigured() { return !!(window.KolkliAuth && window.KolkliAuth.configured && window.KolkliAuth.configured()); }
+
+  // ---- disposable / throwaway email block (an extra anti-farm signal) ----
+  // Trials are the classic target of one-shot inboxes, so reject the well-known
+  // temporary-mail providers at sign-up. This is a cheap first gate; the
+  // fingerprint + IP + one-per-account checks remain the real enforcement.
+  var DISPOSABLE_DOMAINS = {
+    'mailinator.com': 1, 'guerrillamail.com': 1, 'guerrillamailblock.com': 1, 'sharklasers.com': 1,
+    'grr.la': 1, 'spam4.me': 1, '10minutemail.com': 1, '10minutemail.net': 1, 'tempmail.com': 1,
+    'temp-mail.org': 1, 'tempmail.dev': 1, 'tempmailo.com': 1, 'trashmail.com': 1, 'trashmail.de': 1,
+    'yopmail.com': 1, 'yopmail.net': 1, 'yopmail.fr': 1, 'getnada.com': 1, 'nada.email': 1,
+    'throwawaymail.com': 1, 'maildrop.cc': 1, 'dispostable.com': 1, 'fakeinbox.com': 1, 'fakemail.net': 1,
+    'mailnesia.com': 1, 'mohmal.com': 1, 'moakt.com': 1, 'emailondeck.com': 1, 'mintemail.com': 1,
+    'spamgourmet.com': 1, 'tempinbox.com': 1, 'mytemp.email': 1, 'tempr.email': 1, 'discard.email': 1,
+    'discardmail.com': 1, '1secmail.com': 1, '1secmail.org': 1, '1secmail.net': 1, 'dropmail.me': 1,
+    'mailcatch.com': 1, 'burnermail.io': 1, 'tmpmail.org': 1, 'tmpmail.net': 1, 'tmail.ws': 1,
+    'inboxkitten.com': 1, 'mailpoof.com': 1, 'wegwerfmail.de': 1, 'einrot.com': 1, 'luxusmail.org': 1
+  };
+  // Catch look-alikes / new subdomains of the same families by keyword.
+  var DISPOSABLE_RE = /(?:^|\.)(?:mailinator|guerrilla|tempmail|temp-mail|tempmailo|10minute|tenminute|minutemail|throwaway|throw-away|trashmail|trash-mail|yopmail|getnada|sharklasers|discardmail|discard\b|1secmail|secmail|moakt|mohmal|maildrop|dispostable|fakeinbox|fakemail|mintemail|tempinbox|emailondeck|spamgourmet|spam4|dropmail|mailnesia|mailcatch|mvrht|burnermail|incognitomail|tmpmail|tmail|wegwerf|throwam|mailpoof|inboxkitten)/i;
+  function emailDomain(email) {
+    var m = String(email || '').toLowerCase().trim().match(/@([^@\s]+)$/);
+    return m ? m[1] : '';
+  }
+  function isDisposableEmail(email) {
+    var d = emailDomain(email);
+    if (!d) return false;
+    if (DISPOSABLE_DOMAINS[d]) return true;
+    return DISPOSABLE_RE.test(d);
+  }
+
+  // ---- localized copy (shared with the sign-up forms) ----
+  function uiLang() {
+    var l = document.documentElement.getAttribute('lang');
+    if (l === 'he' || l === 'en' || l === 'ru') return l;
+    try { l = localStorage.getItem('ac_lang'); } catch (_) {}
+    return (l === 'en' || l === 'ru') ? l : 'he';
+  }
+  var DISPOSABLE_MSG = {
+    he: 'לא ניתן להשתמש בכתובת אימייל זמנית או חד-פעמית. נא להזין אימייל קבוע.',
+    en: 'Temporary or disposable email addresses aren’t allowed. Please use a permanent email.',
+    ru: 'Временные или одноразовые адреса почты не разрешены. Используйте постоянный email.'
+  };
+  function disposableMsg() { return DISPOSABLE_MSG[uiLang()] || DISPOSABLE_MSG.he; }
+
+  // ---- pending-trial intent (email-confirmation flow) ----
+  // When the backend requires email confirmation, sign-up returns before a
+  // session exists, so the trial can't be granted yet. We stash the intent and
+  // grant it the moment that verified account signs in (see autoClaim). This is
+  // what makes "trial only after a verified email" work end to end.
+  function markPending(email) {
+    email = String(email || '').toLowerCase();
+    if (!email) return;
+    try { lsSet(PENDING_KEY, JSON.stringify({ email: email, at: now() })); } catch (_) {}
+  }
+  function readPending() {
+    try {
+      var p = JSON.parse(lsGet(PENDING_KEY) || 'null');
+      if (p && p.email && (now() - (+p.at || 0)) < PENDING_TTL) return p;
+    } catch (_) {}
+    return null;
+  }
+  function clearPending() { try { localStorage.removeItem(PENDING_KEY); } catch (_) {} }
+
+  // Grant a pending trial once the confirmed user is actually signed in. Safe to
+  // call repeatedly (grantOnSignup is idempotent + fingerprint-gated); guarded so
+  // the kolkli:auth it fires can't re-enter it.
+  var autoClaimBusy = false, autoClaimDone = false;
+  async function autoClaim() {
+    if (autoClaimBusy || autoClaimDone) return;
+    var pending = readPending();
+    if (!pending) return;
+    var email = sessionEmail();
+    if (!email || email !== pending.email) return;   // wait for the verified account to sign in
+    autoClaimBusy = true;
+    try {
+      var res = await grantOnSignup(email);
+      // Resolved one way or another → stop retrying (granted, already used, on a
+      // paid plan, or blocked by the fingerprint/IP gate).
+      if (res && (res.granted || res.reason === 'trial_used' || res.reason === 'has_plan' || res.reason === 'fingerprint')) {
+        clearPending();
+        autoClaimDone = true;
+      }
+    } catch (_) {} finally {
+      autoClaimBusy = false;
+    }
+  }
 
   // ---- users ----
   function findIndex(users, email) {
@@ -192,8 +280,15 @@
     PLAN: TRIAL_PLAN,
     grantOnSignup: grantOnSignup,
     status: status,
-    sweep: sweep
+    sweep: sweep,
+    isDisposableEmail: isDisposableEmail,
+    disposableMsg: disposableMsg,
+    markPending: markPending,
+    autoClaim: autoClaim
   };
 
-  sweep();   // run once on load so expired trials revert before the plan is read
+  sweep();      // run once on load so expired trials revert before the plan is read
+  autoClaim();  // grant a pending (email-confirmed) trial if that account is now signed in
+  // Re-check whenever auth state changes (sign-in after confirming the email).
+  try { window.addEventListener('kolkli:auth', function () { autoClaim(); }); } catch (_) {}
 })();

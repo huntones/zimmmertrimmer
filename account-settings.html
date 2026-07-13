@@ -2,6 +2,10 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<!-- Section tabs are addressed by path (/account-settings/security), so this
+     page is served at deeper URLs too. Pin the base to the site root so relative
+     asset/link references keep resolving from root, not the current segment. -->
+<base href="/">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI - הגדרות חשבון</title>
 <link rel="canonical" href="https://kolkli.com/account-settings">
@@ -116,6 +120,11 @@
   .warn{border:1px solid rgba(229,72,77,.35);background:var(--danger-soft);color:var(--danger);border-radius:13px;padding:12px 14px;font-size:13.5px;font-weight:750;margin-bottom:14px;}
   .saved{display:none;color:var(--success);font-size:13px;font-weight:850;margin-inline-start:8px;}
   .saved.show{display:inline;}
+  /* 7-day free-trial pill on the billing panel (mirrors the dashboard .sc-trial) */
+  .ac-trial{display:inline-flex;align-items:center;gap:7px;margin-top:12px;font-size:12.7px;font-weight:800;
+    color:var(--accent-dim);background:var(--accent-soft);border:1px solid var(--accent);border-radius:999px;padding:6px 13px;}
+  .ac-trial svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .ac-trial[hidden]{display:none;}
   @media (max-width:900px){
     .settings-layout{grid-template-columns:1fr;}
     .settings-nav{position:relative;top:auto;display:flex;overflow:auto;gap:6px;}
@@ -154,14 +163,14 @@
   <div class="settings-layout">
     <nav class="settings-nav" aria-label="ניווט הגדרות">
       <div class="nav-title" data-i="navTitle">הגדרות</div>
-      <a href="#overview" class="active" data-nav><svg viewBox="0 0 24 24"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/></svg><span data-i="navOverview">החשבון שלי</span></a>
-      <a href="#details" data-nav><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span data-i="navDetails">פרטי חשבון</span></a>
-      <a href="#preferences" data-nav><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33"/></svg><span data-i="navPrefs">הגדרות חשבון</span></a>
-      <a href="#billing" data-nav><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span data-i="navBilling">תשלומים וחבילה</span></a>
-      <a href="#security" data-nav><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg><span data-i="navSecurity">אבטחה וסיסמה</span></a>
-      <a href="#notifications" data-nav><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span data-i="navNotifications">התראות</span></a>
-      <a href="#team" data-nav><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><span data-i="navTeam">צוות והרשאות</span></a>
-      <a href="#delete" data-nav><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg><span data-i="navDelete">מחיקת חשבון</span></a>
+      <a href="account-settings/overview" class="active" data-nav><svg viewBox="0 0 24 24"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/></svg><span data-i="navOverview">החשבון שלי</span></a>
+      <a href="account-settings/details" data-nav><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span data-i="navDetails">פרטי חשבון</span></a>
+      <a href="account-settings/preferences" data-nav><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33"/></svg><span data-i="navPrefs">הגדרות חשבון</span></a>
+      <a href="account-settings/billing" data-nav><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span data-i="navBilling">תשלומים וחבילה</span></a>
+      <a href="account-settings/security" data-nav><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg><span data-i="navSecurity">אבטחה וסיסמה</span></a>
+      <a href="account-settings/notifications" data-nav><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span data-i="navNotifications">התראות</span></a>
+      <a href="account-settings/team" data-nav><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><span data-i="navTeam">צוות והרשאות</span></a>
+      <a href="account-settings/delete" data-nav><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg><span data-i="navDelete">מחיקת חשבון</span></a>
     </nav>
 
     <div class="settings-main">
@@ -212,6 +221,7 @@
           </div>
           <a class="btn" id="billManage" href="pricing/"></a>
         </div>
+        <div class="ac-trial" id="billTrial" hidden></div>
         <div class="pm-block">
           <div class="pm-title" data-i="paymentMethod">אמצעי תשלום</div>
           <div class="pm-empty">
@@ -259,7 +269,7 @@
 
       <section class="panel" id="team">
         <div class="panel-head"><div><h2 data-i="teamTitle">צוות והרשאות</h2><p data-i="teamSub">זמין למשתמשים בעלי חבילה הכוללת ניהול צוות.</p></div><span class="tag" data-i="teamBadge">Studio</span></div>
-        <div class="mini-card"><h3 data-i="teamManage">ניהול צוות</h3><p data-i="teamText">הזמינו חברי צוות, הגדירו תפקידים והרשאות, ועקבו אחרי מושבים זמינים.</p><div class="actions"><a class="btn" href="dashboard#team" data-i="openTeam">פתיחת ניהול צוות</a></div></div>
+        <div class="mini-card"><h3 data-i="teamManage">ניהול צוות</h3><p data-i="teamText">הזמינו חברי צוות, הגדירו תפקידים והרשאות, ועקבו אחרי מושבים זמינים.</p><div class="actions"><a class="btn" href="dashboard/team" data-i="openTeam">פתיחת ניהול צוות</a></div></div>
       </section>
 
       <section class="panel danger-panel" id="delete">
@@ -321,19 +331,52 @@
   function billMoney(p){ var c=billCur(); return (+p||0)===0 ? billTxt().free : c.sym+(+p).toFixed(c.dec); }
   function billPlanKey(){ var p=String(user.plan||'free').toLowerCase(); return BILL_PLANS[p]?p:'free'; }
   function billFmt(d,opts){ try{ return d.toLocaleDateString(lang()==='he'?'he-IL':'en-US',opts); }catch(e){ return d.toISOString().slice(0,10); } }
+  // 7-day free trial: prefer trial.js (the single source of truth), fall back to
+  // the trial record mirrored onto the user by auth-store.js.
+  function trialStatus(){
+    try{ if(window.KolkliTrial && KolkliTrial.status){ var s=KolkliTrial.status(user); if(s) return s; } }catch(e){}
+    var tr=user&&user.trial;
+    if(tr&&tr.active&&Date.now()<tr.endsAt&&String(user.plan||'').toLowerCase()===tr.plan){
+      return {active:true,plan:tr.plan,endsAt:tr.endsAt,daysLeft:Math.max(1,Math.ceil((tr.endsAt-Date.now())/86400000))};
+    }
+    return null;
+  }
+  function trialPillText(st){
+    var d=st.daysLeft;
+    return ({ he:'תקופת ניסיון פעילה · נותרו '+d+' ימים · ללא כרטיס אשראי',
+              en:'Free trial active · '+d+' day'+(d===1?'':'s')+' left · no card required',
+              ru:'Пробный период · осталось '+d+' дн. · без карты' })[lang()] || '';
+  }
+  function trialEndsText(st){
+    var ds; try{ ds=new Date(st.endsAt).toLocaleDateString(lang()==='he'?'he-IL':lang()==='ru'?'ru-RU':'en-US',{year:'numeric',month:'long',day:'numeric'}); }catch(e){ ds=''; }
+    return ({ he:'הניסיון מסתיים ב־'+ds+' · ללא כרטיס אשראי',
+              en:'Trial ends '+ds+' · no card on file',
+              ru:'Пробный период заканчивается '+ds+' · без карты' })[lang()] || '';
+  }
+  function renderTrial(st){
+    var box=el('billTrial'); if(!box) return;
+    if(st===undefined) st=trialStatus();
+    if(!st || !st.active){ box.hidden=true; box.innerHTML=''; return; }
+    var bolt='<svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+    box.innerHTML=bolt+'<span></span>';
+    box.querySelector('span').textContent=trialPillText(st);
+    box.hidden=false;
+  }
   function renderBilling(){
     if(!el('billPlanLine')) return;
     var d=billTxt(), key=billPlanKey(), P=BILL_PLANS[key], price=P.price[billCur().field]||0;
     el('billPlanLine').innerHTML='<b>'+P.name+'</b> · '+billMoney(price)+(price>0?(' '+d.perMonth):'');
+    var st=trialStatus();
     var next=new Date(); next.setMonth(next.getMonth()+1);
-    el('billNextLine').textContent=price===0 ? d.freeNoBill : (d.nextBill+': '+billFmt(next,{year:'numeric',month:'long',day:'numeric'}));
+    if(st && st.active){ el('billNextLine').textContent=trialEndsText(st); }
+    else { el('billNextLine').textContent=price===0 ? d.freeNoBill : (d.nextBill+': '+billFmt(next,{year:'numeric',month:'long',day:'numeric'})); }
     var mg=el('billManage');
     if(key==='free'){ mg.textContent=d.upgrade; mg.className='btn primary'; }
     else { mg.textContent=d.manage; mg.className='btn'; }
     var plus='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>';
     el('billAddCard').innerHTML=plus+'<span>'+d.addPayment+'</span>';
     var rows='';
-    if(price===0){
+    if(price===0 || (st && st.active)){
       rows='<tr><td>-</td><td>'+d.noBilling+'</td><td>-</td><td>-</td><td>-</td></tr>';
     } else {
       var now=new Date();
@@ -346,6 +389,7 @@
       }
     }
     el('billHistBody').innerHTML=rows;
+    renderTrial(st);
   }
   function avatarHtml(){
     if(user.avatar) return '<img src="'+user.avatar+'" alt="">';
@@ -387,8 +431,48 @@
     reader.readAsDataURL(file);
   });
   el('deleteAccount').addEventListener('click', function(){ if(confirm((T[lang()]||T.he).deleteConfirm)){ var users=loadUsers().filter(function(x){ return (x.email||'').toLowerCase()!==(user.email||'').toLowerCase(); }); saveUsers(users); lsDel(SESSION_KEY); location.href='./'; } });
-  document.querySelectorAll('[data-nav]').forEach(function(a){ a.addEventListener('click', function(){ document.querySelectorAll('[data-nav]').forEach(function(x){ x.classList.remove('active'); }); a.classList.add('active'); }); });
+  // Section tabs are path-routed (/account-settings/security) instead of #hash.
+  // Clicks scroll in-app (no reload); a direct link / refresh resolves via the
+  // server serving this page, then the initial scroll below. Legacy #hash links
+  // still work and are folded onto the path form.
+  function asBase(){
+    var p=location.pathname.replace(/[?#].*$/,'').replace(/\/+$/,'');
+    var i=p.toLowerCase().indexOf('/account-settings');
+    return (i<0?'':p.slice(0,i))+'/account-settings';
+  }
+  function asSection(){
+    var m=location.pathname.replace(/[?#].*$/,'').match(/\/account-settings(?:\.html)?\/([^/]+)/i);
+    if(m&&m[1]) return decodeURIComponent(m[1]);
+    return (location.hash||'').replace(/^#/,'');   // legacy #section
+  }
+  function navSection(a){ return (a.getAttribute('href')||'').replace(/.*\//,'').replace(/^#/,''); }
+  function setActiveNav(sec){
+    document.querySelectorAll('[data-nav]').forEach(function(x){ x.classList.toggle('active', navSection(x)===sec); });
+  }
+  function scrollToSection(sec){ var t=sec&&document.getElementById(sec); if(t){ try{ t.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){ t.scrollIntoView(); } } }
+  document.querySelectorAll('[data-nav]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var sec=navSection(a);
+      if(!document.getElementById(sec)) return;         // unknown target: leave default
+      e.preventDefault();
+      try{ history.pushState(null,'',asBase()+'/'+sec); }catch(_){}
+      setActiveNav(sec); scrollToSection(sec);
+    });
+  });
+  window.addEventListener('popstate', function(){ var s=asSection(); if(s){ setActiveNav(s); scrollToSection(s); } });
+  (function initSection(){
+    var s=asSection(); if(!s || !document.getElementById(s)) return;
+    // migrate a legacy #hash deep-link to the clean path form
+    if(!/\/account-settings(?:\.html)?\/[^/]/i.test(location.pathname)){
+      try{ history.replaceState(null,'',asBase()+'/'+s); }catch(_){}
+    }
+    setActiveNav(s);
+    setTimeout(function(){ var t=document.getElementById(s); if(t){ try{ t.scrollIntoView(); }catch(e){} } }, 0);
+  })();
   applyText(); renderUser();
+  // Re-render when auth/plan/trial state changes — e.g. trial.js autoClaim grants
+  // the trial after email confirmation — so the billing panel stays in sync.
+  try{ window.addEventListener('kolkli:auth', function(){ user=currentUser(); renderUser(); renderBilling(); }); }catch(e){}
 })();
 </script>
 </body>

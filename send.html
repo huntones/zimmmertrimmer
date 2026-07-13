@@ -10,18 +10,18 @@
   :root {
     --bg:#fdf3e9; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
     --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
-    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --accent:#f97316; --accent-dim:#ea580c; --accent-ink:#ffffff; --accent-soft:#fff1e6;
     --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
     --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
     --danger:#e5484d; --danger-soft:#fdecec;
     --warm-soft:#fff5da; --warm-line:#f2d98a;
     --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
-    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
-    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
-    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
-    --grad-shadow:rgba(93,79,240,0.30);
-    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
-    --grad-btn-glow:rgba(59,111,246,0.38);
+    --grad:linear-gradient(105deg,#fb8b3c 0%,#f4700f 100%);
+    --grad-h:linear-gradient(105deg,#f4700f 0%,#dd5f08 100%);
+    --grad-soft:linear-gradient(120deg,#fff1e6,#ffe7d1);
+    --grad-shadow:rgba(234,88,12,0.30);
+    --grad-btn:linear-gradient(105deg,#fb8b3c 0%,#f4700f 100%);
+    --grad-btn-glow:rgba(234,88,12,0.34);
     --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
@@ -31,18 +31,18 @@
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
     --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
-    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --accent:#fb923c; --accent-dim:#f97316; --accent-ink:#ffffff; --accent-soft:#2c2012;
     --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
     --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
     --danger:#ff6b6b; --danger-soft:#2a1719;
     --warm-soft:#2c2718; --warm-line:#5a4d24;
     --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
-    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
-    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
-    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
-    --grad-shadow:rgba(77,123,255,0.42);
-    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
-    --grad-btn-glow:rgba(77,123,255,0.45);
+    --grad:linear-gradient(105deg,#fb923c 0%,#f97316 100%);
+    --grad-h:linear-gradient(105deg,#fdaa5e 0%,#fb923c 100%);
+    --grad-soft:linear-gradient(120deg,#2c2012,#241a10);
+    --grad-shadow:rgba(251,146,60,0.42);
+    --grad-btn:linear-gradient(105deg,#fb923c 0%,#f97316 100%);
+    --grad-btn-glow:rgba(251,146,60,0.45);
     --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
     --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
     --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
@@ -395,6 +395,9 @@
 <script src="./header.js"></script>
 <script src="./project-numbering.js"></script>
 <script src="./owner-migrate.js"></script>
+<script src="./supabase-config.js"></script>
+<script src="./auth-store.js"></script>
+<script src="./kolkli-db.js"></script>
 <div class="wrap">
 
   <div class="pagehead">
@@ -701,11 +704,11 @@
       notifySub:'נודיע לכם כשקובץ או כל החבילה יורדו על ידי הנמען.',
       copySelfChk:'שליחת עותק לעצמי', copySelfSub:'קבלת עותק של הודעת השליחה לכתובת הדוא״ל שלכם.',
       sumPw:'מוגן בסיסמה', sumNotify:'התראה על הורדה', sumCopy:'עותק אליי', sumBrand:'מיתוג אישי',
-      sendBtn:'צרו קישור שליחה',
+      sendBtn:'שליחה',
       editKick:'עריכת שליחת קבצים', editTitle:'עריכת שליחת הקבצים',
       editSub:'עדכנו נמענים, הודעה, קבצים והגדרות — ושמרו את השינויים לאותו קישור.',
       saveEditBtn:'שלח קבצים', editToast:'השליחה עודכנה ✓',
-      uploading:'מעלה קבצים…',
+      uploading:'שולח קבצים…',
       readyTitle:'הקישור מוכן!', readySub:'העתיקו ושלחו לנמען. אפשר גם לראות איך נראה עמוד ההורדה שלו.',
       copy:'העתקה', copied:'הקישור הועתק ✓',
       previewBtn:'עמוד ההורדה של הנמען', againBtn:'שליחה נוספת', delBtn:'מחיקת הקישור', emailBtn:'פתיחת אימייל',
@@ -1156,6 +1159,30 @@
   }
 
   // ---- create link ----
+
+  // Mirror a just-saved package to the server (Supabase). No-op until configured.
+  function mirrorSendRemote(record){
+    try{
+      if(!(window.KolkliDB && KolkliDB.enabled())) return;
+      var token=record.token;
+      var meta=Object.assign({}, record);
+      meta.files=(record.files||[]).map(function(f,i){ var id=f.id||('sf'+i); return { id:id, name:f.name, size:f.size, type:f.type||'', storagePath:'send/'+token+'/'+id }; });
+      KolkliDB.pushProject('send', token, meta, 'active');
+      (record.files||[]).forEach(function(f,i){ var id=f.id||('sf'+i); if(f.blob) KolkliDB.uploadBlob('send', token, id, f.blob); });
+    }catch(_){}
+  }
+  // Cross-device reopen: pull a package (and its bytes) from the server when it isn't local.
+  async function loadSendRemote(token){
+    try{
+      if(!(window.KolkliDB && KolkliDB.enabled())) return null;
+      var meta=await KolkliDB.pullToken('send', token);
+      if(!meta || !Array.isArray(meta.files)) return null;
+      for(var i=0;i<meta.files.length;i++){ var f=meta.files[i]; try{ var b=await KolkliDB.downloadBlob('send', token, f.id); if(b) f.blob=b; }catch(_){} }
+      try{ await idbPut('t_'+token, meta); }catch(_){}
+      return meta;
+    }catch(_){ return null; }
+  }
+
   async function createLink(){
     el('optErr').textContent='';
     if(!files.length){ el('optErr').textContent=t.errNoFiles; return; }
@@ -1190,7 +1217,7 @@
           password,
           notify: notifyOn,
           downloads: (editing && editBase) ? (editBase.downloads||0) : 0,
-          files: files.map(f=>({ name:(f.path||f.name), size:f.size, type:f.file.type||'', blob:f.file })),
+          files: files.map((f,i)=>({ id:'sf'+i, name:(f.path||f.name), size:f.size, type:f.file.type||'', blob:f.file })),
         };
         record.brand = brandForRecord();
         // preserve the project number across edits; assign a fresh one only for new sends
@@ -1223,6 +1250,7 @@
         if(!verifyOk){ throw new Error("storage_verify_failed"); }
         // 3) only now record the lightweight index entry the dashboard reads
         upsertSendIndex(record);
+        mirrorSendRemote(record);
         slog("save:indexed", { token: token, ownerId: record.ownerId });
         setProg(100);
         await new Promise(r=>setTimeout(r,200));
@@ -1375,6 +1403,7 @@
     let rec=null, fromIdb=false;
     try{ rec = await idbGet('t_'+token); fromIdb=!!rec; }catch(e){ serr("reopen:idbGet", e); }
     if(!rec){ rec = sendIndex().find(x=>x.token===token) || null; }
+    if(!rec){ rec = await loadSendRemote(token); }
     slog("reopen", { token: token, found: !!rec, fromIndexedDB: fromIdb, hasBlobs: !!(rec && Array.isArray(rec.files) && rec.files.some(f=>f && f.blob)) });
     if(!rec){ slog("reopen:miss", token); return; }   // unknown token -> stay on the new-send form
     editToken=token; editBase=rec;
@@ -1511,7 +1540,7 @@
 
   el('sendBtn').addEventListener('click',createLink);
   el('againBtn').addEventListener('click',reset);
-  el('delBtn').addEventListener('click',async()=>{ if(currentToken){ await idbDel('t_'+currentToken); deleteSendIndex(currentToken); } reset(); });
+  el('delBtn').addEventListener('click',async()=>{ if(currentToken){ await idbDel('t_'+currentToken); deleteSendIndex(currentToken); if(window.KolkliDB && KolkliDB.enabled()) KolkliDB.deleteProject('send', currentToken); } reset(); });
   el('copyBtn').addEventListener('click',()=>{
     const url=el('shareLink').textContent;
     const done=()=>toast(t.copied);

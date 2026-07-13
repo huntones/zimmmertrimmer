@@ -28,6 +28,18 @@ PORT = 7000
 ROOT = os.path.dirname(os.path.abspath(__file__))
 LOGFILE = os.path.join(ROOT, "server.log")
 
+# Single-page pages whose in-app sections are addressed by a path segment
+# (clean routing, e.g. /dashboard/project-send) instead of a URL hash.
+# Any /<stem>/<sub> under one of these is served from <stem>.html so a direct
+# link or refresh resolves — the page's JS then routes on location.pathname.
+# Mirrors the "/<stem>/* 200" rewrites in _redirects (keep the two in sync).
+SPA_PAGES = {
+    "dashboard",
+    "account-settings",
+    "text-tools",
+    "css-tools",
+}
+
 # errors that just mean "the browser hung up" — expected, never fatal
 _HANGUP = (ConnectionAbortedError, ConnectionResetError, BrokenPipeError)
 
@@ -99,12 +111,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if p.endswith("/"):
             return
         last = p.rsplit("/", 1)[-1]
-        if "." in last:
-            return                                  # an asset (.js/.css/.wasm/…)
-        if os.path.isdir(self.translate_path(p)):
-            return                                  # a real dir -> base adds the slash
-        if os.path.isfile(self.translate_path(p + ".html")):
-            self.path = p + ".html" + q
+        if "." not in last:
+            if os.path.isdir(self.translate_path(p)):
+                return                              # a real dir -> base adds the slash
+            if os.path.isfile(self.translate_path(p + ".html")):
+                self.path = p + ".html" + q
+                return
+        # SPA sub-paths: "/dashboard/project-send" (or deeper, "/dashboard/join/TOK")
+        # is served from dashboard.html so the app's path router can pick it up.
+        segs = [s for s in p.split("/") if s]
+        if len(segs) >= 2:
+            stem = segs[0]
+            if stem.lower().endswith(".html"):
+                stem = stem[:-5]
+            if stem in SPA_PAGES and os.path.isfile(self.translate_path("/" + stem + ".html")):
+                # only when the literal URL isn't itself a real file/dir
+                if not os.path.exists(self.translate_path(p)):
+                    self.path = "/" + stem + ".html" + q
 
     # --- HTTP Range support (stdlib SimpleHTTPRequestHandler lacks it) -----
     def send_head(self):

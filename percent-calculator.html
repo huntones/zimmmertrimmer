@@ -72,8 +72,8 @@
         <div class="field"><label data-i18n="asPct"></label><div class="addon"><input class="inp" id="as_pct" type="number" value="18"><span class="unit">%</span></div></div>
       </div>
       <div class="preset" id="asPreset">
-        <button data-p="17">מע״מ 17%</button>
-        <button data-p="18" class="on">מע״מ 18%</button>
+        <button data-p="17" data-i18n="vat17">מע״מ 17%</button>
+        <button data-p="18" class="on" data-i18n="vat18">מע״מ 18%</button>
         <button data-p="10">10%</button>
         <button data-p="25">25%</button>
         <button data-p="50">50%</button>
@@ -106,7 +106,7 @@
 (function(){
   const el = id => document.getElementById(id);
   const I18N = {
-    he:{ dir:'rtl',
+    he:{ dir:'rtl', vat17:'מע״מ 17%', vat18:'מע״מ 18%',
       kick:'חישובים והמרות · אחוזים',
       title:'מחשבון אחוזים',
       sub:'חשבו הנחות, מע״מ, תוספות, שינוי באחוזים, טיפ וחלוקה — התוצאה מתעדכנת מיד תוך כדי הקלדה.',
@@ -119,7 +119,7 @@
       tipBill:'סכום החשבון', tipPct:'טיפ', tipPpl:'מספר אנשים', tipLabel:'טיפ',
       sOf:'חישוב', sDelta:'הפרש', sBase:'בסיס', sTotal:'סה״כ', sTip:'טיפ', sPer:'לאדם', sFinal:'סופי',
       foot:'KOLKLI · מחשבון אחוזים · מהיר, פשוט ובאיכות מקצועית' },
-    en:{ dir:'ltr',
+    en:{ dir:'ltr', vat17:'VAT 17%', vat18:'VAT 18%',
       kick:'Calc & Convert · Percentages',
       title:'Percentage Calculator',
       sub:'Work out discounts, VAT, markups, percent change, tips and splitting — the result updates live as you type.',
@@ -132,7 +132,7 @@
       tipBill:'Bill amount', tipPct:'Tip', tipPpl:'People', tipLabel:'Tip',
       sOf:'Result', sDelta:'Difference', sBase:'Base', sTotal:'Total', sTip:'Tip', sPer:'Per person', sFinal:'Final',
       foot:'KOLKLI · Percentage Calculator · Fast, simple and professional quality' },
-    ru:{ dir:'ltr',
+    ru:{ dir:'ltr', vat17:'НДС 17%', vat18:'НДС 18%',
       kick:'Расчёты · Проценты',
       title:'Калькулятор процентов',
       sub:'Считайте скидки, НДС, наценки, изменение в процентах, чаевые и деление счёта — результат обновляется на лету.',

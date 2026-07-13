@@ -268,7 +268,7 @@
       { he:'כיווץ CSS / JS', en:'Minify CSS / JS', ru:'Минификация CSS/JS', dhe:'הקטנת קוד', den:'Shrink your code', dru:'Уменьшить код', ic:'minify', page:'./minify' },
       { he:'JSON Formatter', en:'JSON Formatter', ru:'JSON-форматтер', dhe:'סידור ובדיקת JSON', den:'Prettify & validate', dru:'Форматирование JSON', ic:'braces', page:'./json-formatter' },
       { he:'URL Encoder / Decoder', en:'URL Encoder / Decoder', ru:'URL-кодировщик', dhe:'קידוד ופענוח כתובות', den:'Encode & decode URLs', dru:'Кодирование URL', ic:'link', page:'./url-encode' },
-      { he:'היפוך טקסט', en:'KolKli Reverse', ru:'Обратный текст', dhe:'היפוך חכם עם פיסוק וסוגריים', den:'Smart reverse with punctuation', dru:'Умный переворот текста', ic:'flip', page:'./text-tools#reverse' },
+      { he:'היפוך טקסט', en:'KolKli Reverse', ru:'Обратный текст', dhe:'היפוך חכם עם פיסוק וסוגריים', den:'Smart reverse with punctuation', dru:'Умный переворот текста', ic:'flip', page:'./text-tools/reverse' },
       { he:'מנקה HTML', en:'HTML Cleaner', ru:'Очистка HTML', dhe:'הסרת תגיות מיותרות', den:'Strip junk tags', dru:'Убрать лишние теги', ic:'eraser', page:'./html-cleaner' }
     ]},
     { c:'seo', i:'🔎', he:'SEO ו-Meta', en:'SEO & Meta', ru:'SEO и Meta', items:[
@@ -351,7 +351,7 @@
     var hub = link('text-tools');
     var cols = TEXT_GROUPS.map(function (c) {
       var items = c.items.map(function (t) {
-        return '<a class="sh-item" href="' + link('text-tools#' + t.slug) + '" role="menuitem">' +
+        return '<a class="sh-item" href="' + link('text-tools/' + t.slug) + '" role="menuitem">' +
           '<span class="it-ic">' + svg(t.ic) + '</span>' +
           '<span class="it-tx"><span class="it-t">' + t[lang] + '</span>' +
           '<span class="it-d">' + t['d' + lang] + '</span></span></a>';
@@ -1038,5 +1038,21 @@
     ax.src = link('accessibility.js');
     ax.async = true;
     document.head.appendChild(ax);
+  }
+
+  // Site-wide cookie-consent banner: self-contained, depth-aware, GDPR-first
+  // (no external calls; the visitor's choice is stored only in their own
+  // browser + a first-party cookie). Shows Accept all / Reject all / Customize
+  // on first visit, remembers the choice, and gates any non-essential
+  // <script type="text/plain" data-cc="…"> until the matching category is
+  // granted. Loaded on every header page from here; the standalone client
+  // pages (download / proof / select / upload / privacy / terms) include
+  // cookie-consent.js directly. Self-guards against a double include.
+  if (!document.getElementById('cc-loader')) {
+    var cc = document.createElement('script');
+    cc.id = 'cc-loader';
+    cc.src = link('cookie-consent.js');
+    cc.async = true;
+    document.head.appendChild(cc);
   }
 })();

@@ -10,16 +10,16 @@
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
     --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
-    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --accent:#2563eb; --accent-dim:#1d4ed8; --accent-ink:#ffffff; --accent-soft:#e8f0fe;
     --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
     --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
     --danger:#e5484d; --danger-soft:#fdecec;
     --warm:#c88a04; --warm-soft:#fff5da; --warm-line:#f2d98a;
-    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
-    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
-    --grad-shadow:rgba(93,79,240,0.30);
-    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
-    --grad-btn-glow:rgba(59,111,246,0.38);
+    --grad:linear-gradient(105deg,#3b82f6 0%,#1d4ed8 100%);
+    --grad-soft:linear-gradient(120deg,#e8f0fe,#dbeafe);
+    --grad-shadow:rgba(29,78,216,0.30);
+    --grad-btn:linear-gradient(105deg,#3b82f6 0%,#1d4ed8 100%);
+    --grad-btn-glow:rgba(37,99,235,0.38);
     --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
@@ -30,16 +30,16 @@
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
     --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
-    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --accent:#60a5fa; --accent-dim:#2563eb; --accent-ink:#ffffff; --accent-soft:#13233d;
     --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
     --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
     --danger:#ff6b6b; --danger-soft:#2a1719;
     --warm:#e8b84b; --warm-soft:#2c2718; --warm-line:#5a4d24;
-    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
-    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
-    --grad-shadow:rgba(77,123,255,0.42);
-    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
-    --grad-btn-glow:rgba(77,123,255,0.45);
+    --grad:linear-gradient(105deg,#60a5fa 0%,#2563eb 100%);
+    --grad-soft:linear-gradient(120deg,#13233d,#101d33);
+    --grad-shadow:rgba(96,165,250,0.42);
+    --grad-btn:linear-gradient(105deg,#60a5fa 0%,#2563eb 100%);
+    --grad-btn-glow:rgba(96,165,250,0.45);
     --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
     --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
     --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
@@ -371,6 +371,17 @@
   .bb-save{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--success-dim);}
   html[data-theme="dark"] .bb-save{color:var(--success);}
   .bb-save svg{width:16px;height:16px;}
+  .bb-actions{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .finishbtn:not(:disabled){color:var(--success-dim);border-color:color-mix(in srgb,var(--success) 45%,var(--line));}
+  .finishbtn:not(:disabled):hover{background:var(--success-soft);border-color:var(--success);color:var(--success-dim);}
+  html[data-theme="dark"] .finishbtn:not(:disabled){color:var(--success);}
+  .finishbtn.is-edit:not(:disabled){color:var(--muted);border-color:var(--line);}
+  .finishbtn.is-edit:not(:disabled):hover{background:var(--panel-2);color:var(--accent-dim);border-color:var(--accent);}
+  .finishbtn svg{width:16px;height:16px;}
+  .dlzip{background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 55%),linear-gradient(120deg,var(--success),var(--success-dim));box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px rgba(34,176,75,.30);}
+  .dlzip svg{width:16px;height:16px;}
+  .dlzip:disabled{opacity:.4;box-shadow:none;text-shadow:none;cursor:not-allowed;filter:saturate(.55);}
+  .dlzip:disabled:hover{filter:saturate(.55);transform:none;}
   @media (max-width:680px){ .bb-limit{order:3;flex-basis:100%;text-align:start;} }
 
   /* ---------- modal / overlay ---------- */
@@ -413,6 +424,29 @@
   .mbtn.ghost:hover{background:var(--panel-2);}
   .mactions{display:flex;gap:10px;margin-top:20px;}
   .mactions .mbtn{flex:1;}
+  /* ---- people (face recognition) filter row + chips ---- */
+  .peoplebar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 14px;}
+  .peoplebar .chips{gap:8px;}
+  .btnline.faceorg{color:var(--accent-dim);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));font-weight:700;}
+  .btnline.faceorg:hover{background:var(--accent-soft);border-color:var(--accent);}
+  html[data-theme="dark"] .btnline.faceorg{color:var(--accent);}
+  .pchipwrap{display:inline-flex;align-items:center;}
+  .pchip{padding-inline-start:5px;}
+  .pchip .pav{width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--panel-2);}
+  .pchip .pav.ph{display:inline-flex;align-items:center;justify-content:center;background:var(--grad);color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;}
+  .pchip .pcount{font-style:normal;font-size:11px;color:var(--faint);font-family:var(--mono);margin-inline-start:2px;}
+  .pchip.on .pcount{color:var(--accent-dim);}
+  .pedit{width:26px;height:26px;margin-inline-start:-2px;padding:0;border:none;background:transparent;color:var(--faint);
+    cursor:pointer;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;opacity:.7;transition:opacity .12s,color .12s,background .12s;}
+  .pedit:hover{opacity:1;color:var(--accent);background:var(--accent-soft);}
+  .pedit svg{width:13px;height:13px;}
+  body.manager .pedit,body.manager .pclear{display:none;}
+  .pclear{height:30px;padding:0 12px;border-radius:999px;border:1px dashed var(--line);background:transparent;color:var(--muted);
+    font-family:inherit;font-size:12px;cursor:pointer;transition:color .12s,border-color .12s;}
+  .pclear:hover{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 45%,var(--line));}
+  .fprog{height:10px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);overflow:hidden;margin:6px 0 8px;}
+  .fprog span{display:block;height:100%;width:0;background:var(--grad);transition:width .2s ease;}
+  .fprogtxt{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;}
 
   /* ---------- lightbox ---------- */
   .lightbox{position:fixed;inset:0;background:rgba(6,8,16,0.9);display:none;flex-direction:column;z-index:90;}
@@ -583,6 +617,15 @@
     </div>
   </div>
 
+  <!-- ============ people (face recognition) filter row ============ -->
+  <div class="peoplebar" id="peopleRow" style="display:none;">
+    <span class="filterlabel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span data-i18n="filterByPerson"></span>
+    </span>
+    <div class="chips" id="peopleChips"></div>
+  </div>
+
   <!-- ============ toolbar ============ -->
   <div class="toolbar">
     <div class="filterset">
@@ -600,6 +643,10 @@
       <button class="btnline addfiles" id="addFilesBtn" type="button" data-i18n-title="addFilesTitle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M12 3v13"/><path d="m7 8 5-5 5 5"/></svg>
         <span data-i18n="addFiles"></span>
+      </button>
+      <button class="btnline faceorg" id="organizeBtn" type="button" data-i18n-title="faceBtnTitle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17.5" cy="9.5" r="2.6"/><path d="M15.5 20a5 5 0 0 1 6.5-4.78"/></svg>
+        <span data-i18n="faceBtn"></span>
       </button>
       <button class="btnline" id="selectAllBtn" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
@@ -674,6 +721,16 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
       <span id="autosaveTxt" data-i18n="autosave"></span>
     </div>
+    <div class="bb-actions">
+      <button class="btnline finishbtn" id="finishBtn" type="button" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span id="finishLbl" data-i18n="finishSelect"></span>
+      </button>
+      <button class="cta dlzip" id="dlZipBtn" type="button" disabled aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        <span id="dlZipLbl" data-i18n="downloadZip"></span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -706,6 +763,7 @@
 <input type="file" id="fileInput" accept="image/*,video/*,.pdf" multiple hidden>
 <input type="file" id="folderInput" webkitdirectory directory multiple hidden>
 
+<script src="./vendor/jszip.min.js"></script>
 <script>
 (function(){
   const el = id => document.getElementById(id);
@@ -727,7 +785,7 @@
 
   /* ---------------- i18n ---------------- */
   const I18N = {
-    he:{ dir:'rtl', mgrBadge:'תצוגת מנהל', mgrTitle:'צפייה בבחירות הלקוח בזמן אמת', mgrDesc:'זוהי בדיוק התצוגה שהלקוח רואה. הקבצים, הנתונים והבחירות מתעדכנים בזמן אמת — אך במצב צפייה בלבד, ללא אפשרות לבחור או לערוך בחירות בשם הלקוח.', mgrReadonly:'תצוגת מנהל · צפייה בלבד — הבחירות מתעדכנות בזמן אמת', langIco:'עב',
+    he:{ dir:'rtl', finishSelect:'סיימתי לבחור', editSelect:'עריכת הבחירה', downloadZip:'הורדת הבחירה (ZIP)', zipping:'אורז קבצים…', selDone:'הבחירה הסתיימה — אפשר להוריד', needPick:'יש לבחור לפחות קובץ אחד', dlDone:'ההורדה החלה ✓', dlFail:'ההורדה נכשלה, נסו שוב', finishFirst:'סיימו לבחור כדי להוריד', mgrBadge:'תצוגת מנהל', mgrTitle:'צפייה בבחירות הלקוח בזמן אמת', mgrDesc:'זוהי בדיוק התצוגה שהלקוח רואה. הקבצים, הנתונים והבחירות מתעדכנים בזמן אמת — אך במצב צפייה בלבד, ללא אפשרות לבחור או לערוך בחירות בשם הלקוח.', mgrReadonly:'תצוגת מנהל · צפייה בלבד — הבחירות מתעדכנות בזמן אמת', langIco:'עב',
       pageTitle:'בחירת חומרים ללקוח',
       pageSub:'הלקוח יכול לבחור עד 50 תמונות ו-5 סרטונים מתוך כלל הקבצים בגלריה. המערכת מציגה בזמן אמת כמה קבצים נבחרו מכל סוג ומונעת בחירה מעבר למכסה שהוגדרה.',
       share:'שיתוף', help:'עזרה',
@@ -756,7 +814,7 @@
       shareTitle:'שיתוף הגלריה עם הלקוח', shareSub:'שלחו את הקישור ללקוח — הוא יוכל לבחור חומרים ללא צורך בחשבון.', shareCopy:'העתקה', shareCopied:'הועתק',
       delTitle:'למחוק את הקבצים שנבחרו?', delSub:n=>`${n} קבצים יוסרו מהגלריה. לא ניתן לשחזר את הפעולה בהדגמה.`, delCancel:'ביטול', delConfirm:'מחק',
     },
-    en:{ dir:'ltr', mgrBadge:'Manager view', mgrTitle:'Tracking the client’s selection live', mgrDesc:'This is exactly what the client sees. Files, stats and picks update in real time — but in view-only mode, with no way to select or edit the selection on the client’s behalf.', mgrReadonly:'Manager view · read-only — selections update in real time', langIco:'EN',
+    en:{ dir:'ltr', finishSelect:'Finish selecting', editSelect:'Edit selection', downloadZip:'Download selection (ZIP)', zipping:'Zipping…', selDone:'Selection confirmed — ready to download', needPick:'Pick at least one file first', dlDone:'Download started ✓', dlFail:'Download failed, try again', finishFirst:'Finish selecting to download', mgrBadge:'Manager view', mgrTitle:'Tracking the client’s selection live', mgrDesc:'This is exactly what the client sees. Files, stats and picks update in real time — but in view-only mode, with no way to select or edit the selection on the client’s behalf.', mgrReadonly:'Manager view · read-only — selections update in real time', langIco:'EN',
       pageTitle:'Client material selection',
       pageSub:'Your client can pick up to 50 photos and 5 videos out of the whole gallery. Counts update live per file type, and selecting beyond the defined quota is blocked automatically.',
       share:'Share', help:'Help',
@@ -784,7 +842,7 @@
       shareTitle:'Share the gallery with your client', shareSub:'Send the link to your client — they can pick materials without an account.', shareCopy:'Copy', shareCopied:'Copied',
       delTitle:'Delete the selected files?', delSub:n=>`${n} files will be removed from the gallery. This can’t be undone in the demo.`, delCancel:'Cancel', delConfirm:'Delete',
     },
-    ru:{ dir:'ltr', mgrBadge:'Режим менеджера', mgrTitle:'Отслеживание выбора клиента в реальном времени', mgrDesc:'Это именно то, что видит клиент. Файлы, статистика и выбор обновляются в реальном времени — но только для просмотра, без возможности выбирать или изменять выбор за клиента.', mgrReadonly:'Режим менеджера · только просмотр — выбор обновляется в реальном времени', langIco:'RU',
+    ru:{ dir:'ltr', finishSelect:'Завершить выбор', editSelect:'Изменить выбор', downloadZip:'Скачать выбор (ZIP)', zipping:'Архивация…', selDone:'Выбор завершён — можно скачать', needPick:'Сначала выберите хотя бы один файл', dlDone:'Скачивание началось ✓', dlFail:'Ошибка скачивания, повторите', finishFirst:'Завершите выбор, чтобы скачать', mgrBadge:'Режим менеджера', mgrTitle:'Отслеживание выбора клиента в реальном времени', mgrDesc:'Это именно то, что видит клиент. Файлы, статистика и выбор обновляются в реальном времени — но только для просмотра, без возможности выбирать или изменять выбор за клиента.', mgrReadonly:'Режим менеджера · только просмотр — выбор обновляется в реальном времени', langIco:'RU',
       pageTitle:'Выбор материалов для клиента',
       pageSub:'Клиент может выбрать до 50 фото и 5 видео из всей галереи. Счётчики обновляются в реальном времени по каждому типу файлов, а выбор сверх заданной квоты блокируется автоматически.',
       share:'Поделиться', help:'Помощь',
@@ -813,6 +871,40 @@
       delTitle:'Удалить выбранные файлы?', delSub:n=>`${n} файлов будет удалено из галереи. В демо это необратимо.`, delCancel:'Отмена', delConfirm:'Удалить',
     },
   };
+  // ---- i18n additions for the face-recognition / people feature (kept separate so the blocks above stay untouched) ----
+  Object.assign(I18N.he, {
+    faceBtn:'ארגן לפי אנשים', faceBtnTitle:'זיהוי פנים — קיבוץ התמונות לפי האנשים שמופיעים בהן. רץ בדפדפן בלבד, ללא שליחת מידע.',
+    filterByPerson:'סינון לפי אדם', facePerson:'אדם',
+    faceRunTitle:'מזהה פנים…', faceRunSub:'מנתח את התמונות בדפדפן שלך. שום תמונה או נתון לא נשלח לשרת.',
+    cancel:'ביטול', canceling:'מבטל…', faceDone:n=>n?`נמצאו ${n} אנשים בגלריה`:'לא זוהו אנשים חוזרים',
+    faceNoImages:'אין תמונות שהועלו לניתוח. העלו תמונות תחילה.', faceUnsupported:'הדפדפן הזה לא תומך בזיהוי פנים מקומי.',
+    faceConsentTitle:'קיבוץ תמונות לפי אנשים', faceConsentBody:'המערכת תזהה פנים בתמונות ותקבץ אותן לפי אדם, כדי שיהיה קל למצוא ולבחור. כל העיבוד מתבצע בדפדפן שלך בלבד — שום תמונה ושום נתון ביומטרי לא נשלח לשרת ולא יוצא מהמכשיר. אפשר למחוק את הנתונים בכל רגע.', faceConsentAgree:'הבנתי, המשך',
+    faceEditTitle:'עריכת אדם', faceEditSub:'תנו שם לאדם, או הסתירו את הקבוצה אם הזיהוי שגוי.', faceNamePh:'שם (לא חובה)',
+    faceHide:'הסתר קבוצה', faceUnhide:'הצג קבוצה', save:'שמור',
+    faceClearShort:'נקה נתונים', faceClearTitle:'מחיקת נתוני זיהוי הפנים', faceClearBody:'כל נתוני זיהוי הפנים והקבוצות של הפרויקט הזה יימחקו מהמכשיר. אפשר להריץ את הזיהוי שוב בכל עת.', faceClear:'מחק', faceCleared:'נתוני זיהוי הפנים נמחקו ✓'
+  });
+  Object.assign(I18N.en, {
+    faceBtn:'Organize by people', faceBtnTitle:'Face recognition — group the photos by the people in them. Runs in your browser only; nothing is uploaded.',
+    filterByPerson:'Filter by person', facePerson:'Person',
+    faceRunTitle:'Finding people…', faceRunSub:'Analysing your photos in the browser. No photo or data is uploaded.',
+    cancel:'Cancel', canceling:'Cancelling…', faceDone:n=>n?`Found ${n} people in the gallery`:'No recurring people detected',
+    faceNoImages:'No uploaded photos to analyse yet. Add photos first.', faceUnsupported:'This browser doesn’t support on-device face grouping.',
+    faceConsentTitle:'Group photos by person', faceConsentBody:'This detects faces in the photos and groups them by person so they’re easy to find and pick. All processing happens in your browser only — no photo and no biometric data is uploaded or leaves this device. You can clear the data at any time.', faceConsentAgree:'I understand, continue',
+    faceEditTitle:'Edit person', faceEditSub:'Give this person a name, or hide the group if the grouping is wrong.', faceNamePh:'Name (optional)',
+    faceHide:'Hide group', faceUnhide:'Show group', save:'Save',
+    faceClearShort:'Clear data', faceClearTitle:'Clear face data', faceClearBody:'All face-recognition data and groups for this project will be deleted from this device. You can run recognition again at any time.', faceClear:'Clear', faceCleared:'Face data cleared ✓'
+  });
+  Object.assign(I18N.ru, {
+    faceBtn:'Сгруппировать по людям', faceBtnTitle:'Распознавание лиц — группировка фото по людям на них. Работает только в браузере, ничего не отправляется.',
+    filterByPerson:'Фильтр по человеку', facePerson:'Человек',
+    faceRunTitle:'Поиск людей…', faceRunSub:'Анализ фотографий в вашем браузере. Ничего не загружается на сервер.',
+    cancel:'Отмена', canceling:'Отмена…', faceDone:n=>n?`Найдено людей в галерее: ${n}`:'Повторяющиеся люди не найдены',
+    faceNoImages:'Нет загруженных фото для анализа. Сначала добавьте фото.', faceUnsupported:'Этот браузер не поддерживает локальную группировку по лицам.',
+    faceConsentTitle:'Группировать фото по людям', faceConsentBody:'Система распознаёт лица на фото и группирует их по людям, чтобы их было легко найти и выбрать. Вся обработка происходит только в вашем браузере — ни одно фото и никакие биометрические данные не отправляются и не покидают это устройство. Данные можно удалить в любой момент.', faceConsentAgree:'Понятно, продолжить',
+    faceEditTitle:'Изменить человека', faceEditSub:'Дайте имя человеку или скройте группу, если она неверна.', faceNamePh:'Имя (необязательно)',
+    faceHide:'Скрыть группу', faceUnhide:'Показать группу', save:'Сохранить',
+    faceClearShort:'Очистить', faceClearTitle:'Удалить данные лиц', faceClearBody:'Все данные распознавания лиц и группы для этого проекта будут удалены с этого устройства. Вы можете запустить распознавание снова в любое время.', faceClear:'Удалить', faceCleared:'Данные лиц удалены ✓'
+  });
   let lang='he', t=I18N.he;
 
   /* ---------------- data ---------------- */
@@ -868,12 +960,18 @@
   ];
 
   /* ---------------- state ---------------- */
-  const selected = new Set(['f1','f3','f6','f11']); // 2 photos + 2 videos, matching the reference
+  let selected = new Set(['f1','f3','f6','f11']); // seed picks (demo gallery); replaced on init by the client's saved picks for this project
   let view = 'grid';
   let activeAlbum = 'all';
   let activeChip = null;
   let query = '';
   let foldersExpanded = false;
+  let finished = false;   // set once the client confirms their picks (persisted per project)
+
+  /* people (face recognition) state — populated by the FACE module further below */
+  let activePerson = null;         // active "filter by person" chip; null = off
+  let PEOPLE = [];                 // clustered people index for the current project
+  let PEOPLE_SETS = {};            // personId -> Set(blobKey), rebuilt for fast visible() filtering
 
   /* ---------------- helpers ---------------- */
   function esc(x){ return String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -915,14 +1013,33 @@
     S.readFolders=function(){ try{ const a=JSON.parse(ls(folderKey())||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } };
     S.writeFolders=function(a){ try{ lsSet(folderKey(),JSON.stringify(a||[])); }catch(e){ console.error('[select] writeFolders failed',e); } };
     S.persistFolder=function(id,label){ const a=S.readFolders(); if(!a.some(x=>x.id===id)){ a.push({id:id,label:label}); S.writeFolders(a); } };
-    function idb(){ return new Promise((res,rej)=>{ let r; try{ r=indexedDB.open(DB_NAME,1); }catch(e){ rej(e); return; }
-      r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains(DB_STORE)) r.result.createObjectStore(DB_STORE); };
+    function idb(){ return new Promise((res,rej)=>{ let r; try{ r=indexedDB.open(DB_NAME,2); }catch(e){ rej(e); return; }
+      r.onupgradeneeded=()=>{ const db=r.result;
+        if(!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);   // 'blobs' (file bytes) — unchanged
+        if(!db.objectStoreNames.contains('faces')) db.createObjectStore('faces'); };  // face detections/embeddings cache
       r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
     S.putBlob=function(k,v){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(DB_STORE,'readwrite'); tx.objectStore(DB_STORE).put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })); };
     S.getBlob=function(k){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(DB_STORE,'readonly'); const rq=tx.objectStore(DB_STORE).get(k); rq.onsuccess=()=>res(rq.result||null); rq.onerror=()=>rej(rq.error); })); };
     S.delBlob=function(k){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(DB_STORE,'readwrite'); tx.objectStore(DB_STORE).delete(k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })).catch(()=>{}); };
+    // Face-recognition cache: {blobKey, modelVersion, faces:[{bbox,score,embedding,thumb}]} keyed by blobKey.
+    // Computed at most once per image (see the FACE module) and kept in the same DB as the file bytes.
+    const FACE_STORE='faces';
+    S.putFaces=function(k,v){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(FACE_STORE,'readwrite'); tx.objectStore(FACE_STORE).put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })); };
+    S.getFaces=function(k){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(FACE_STORE,'readonly'); const rq=tx.objectStore(FACE_STORE).get(k); rq.onsuccess=()=>res(rq.result||null); rq.onerror=()=>rej(rq.error); })); };
+    S.delFaces=function(k){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(FACE_STORE,'readwrite'); tx.objectStore(FACE_STORE).delete(k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })).catch(()=>{}); };
+    S.clearFaces=function(){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(FACE_STORE,'readwrite'); tx.objectStore(FACE_STORE).clear(); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })).catch(()=>{}); };
     return S;
   })();
+  // The client's "I've finished picking" flag — persisted per project so it survives refresh/reopen,
+  // exactly like the uploaded bytes above. This is what flips the download button from pale to active.
+  const DONE_KEY='kolkli_select_done';
+  function selReadDone(){ try{ return ls(DONE_KEY+'::'+SEL_STORE.scope())==='1'; }catch(e){ return false; } }
+  function selWriteDone(v){ try{ lsSet(DONE_KEY+'::'+SEL_STORE.scope(), v?'1':'0'); }catch(e){} }
+  // The client's chosen file ids — persisted per project (like the done flag and the uploaded
+  // bytes) so a refresh/reopen restores the exact picks instead of falling back to the seed.
+  const PICKS_KEY='kolkli_select_picks';
+  function selReadPicks(){ try{ const a=JSON.parse(ls(PICKS_KEY+'::'+SEL_STORE.scope())||'null'); return Array.isArray(a)?a:null; }catch(e){ return null; } }
+  function selWritePicks(){ try{ lsSet(PICKS_KEY+'::'+SEL_STORE.scope(), JSON.stringify(Array.from(selected))); }catch(e){} }
   function extOf(n){ const m=/\.([a-z0-9]+)$/i.exec(n||''); return m?m[1].toUpperCase():'FILE'; }
   function fmtSize(mb){ if(mb>=1) return mb.toFixed(1)+' MB'; return Math.round(mb*1024)+' KB'; }
   function mmss(s){ s=Math.max(0,Math.floor(s||0)); const m=Math.floor(s/60), r=s%60; return m+':'+String(r).padStart(2,'0'); }
@@ -955,6 +1072,10 @@
         if(activeChip==='selected'){ if(!selected.has(f.id)) return false; }
         else if(activeChip==='yael'){ if(!f.tags.includes('yael')) return false; }
         else if(f.kind!==activeChip) return false;
+      }
+      if(activePerson){
+        const set = PEOPLE_SETS[activePerson];
+        if(!set || !f.blobKey || !set.has(f.blobKey)) return false;   // person filter → only analysed uploads match
       }
       if(query && !f.name.toLowerCase().includes(query)) return false;
       return true;
@@ -1103,6 +1224,7 @@
       if(f.kind==='video' && c.v>=VID_CAP){ toast(t.capVid,'warn'); return; }
       selected.add(id);
     }
+    markDirty();
     refreshAll();
   }
   function selectAll(){ if(MANAGER) return;
@@ -1114,7 +1236,7 @@
       else if(f.kind==='video'){ if(c.v>=VID_CAP) continue; selected.add(f.id); c.v++; changed=true; }
       else { selected.add(f.id); changed=true; }
     }
-    if(!changed) toast(t.allSelected,'ok');
+    if(!changed) toast(t.allSelected,'ok'); else markDirty();
     refreshAll();
   }
   function deleteSelected(){ if(MANAGER) return;
@@ -1131,7 +1253,7 @@
         return false;
       });
       selRemove(_removed);   // stored rows + blobs go too, so the delete survives a reload
-      selected.clear();
+      selected.clear(); markDirty();
       closeOverlay(); toast(t.deleted(n),'ok'); refreshAll();
     });
   }
@@ -1145,7 +1267,108 @@
     el('moveSel').value=''; selSyncAlbums(); toast(t.moved(n,label),'ok'); refreshAll();
   }
 
-  function refreshAll(){ renderGrid(); renderFolders(); renderChips(); updateStats(); }
+  function refreshAll(){ renderGrid(); renderFolders(); renderChips(); renderPeople(); updateStats(); updateBottomActions(); }
+
+  /* ---------------- finish selection + download-as-zip ----------------
+     Requirement: once the client has FINISHED picking (explicit "I'm done" button), show an active
+     download button that zips every selected file. While they are still picking, that button stays
+     visible but disabled in a pale colour. Any change to the picked set re-opens the selection. */
+  function markDirty(){ if(finished){ finished=false; selWriteDone(false); } selWritePicks(); }
+
+  function toggleFinish(){ if(MANAGER) return;
+    if(!finished){
+      if(selected.size===0){ toast(t.needPick,'warn'); return; }
+      finished=true; selWriteDone(true); toast(t.selDone,'ok');
+    } else {
+      finished=false; selWriteDone(false);   // reopen for editing
+    }
+    updateBottomActions();
+  }
+
+  function updateBottomActions(){
+    const has=selected.size>0;
+    const fb=el('finishBtn'), fl=el('finishLbl'), db=el('dlZipBtn'), dl=el('dlZipLbl');
+    if(fb){
+      fb.classList.toggle('is-edit', finished);
+      if(fl) fl.textContent = finished ? t.editSelect : t.finishSelect;
+      fb.disabled = MANAGER ? true : (finished ? false : !has);   // studio view is read-only
+    }
+    if(db){
+      const ready = finished && has;
+      db.disabled = !ready;
+      db.setAttribute('aria-disabled', ready?'false':'true');
+      db.title = ready ? '' : t.finishFirst;
+      if(dl && !db.dataset.busy) dl.textContent = t.downloadZip;
+    }
+  }
+
+  function triggerDownload(blob, name){
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=name||'download';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ a.remove(); try{ URL.revokeObjectURL(url); }catch(_){} }, 1500);
+  }
+  function baseName(n){ return String(n||'file').replace(/\.[^.\/]+$/,''); }
+
+  // Demo-gallery seed files carry no real bytes (only client UPLOADS do). Synthesise a labelled
+  // placeholder that mirrors the on-screen bokeh thumbnail so a demo zip is never empty/broken.
+  function placeholderFile(f){
+    return new Promise(resolve=>{
+      if(f.kind==='doc'){
+        const note=(lang==='he'?'קובץ הדגמה מהגלריה (ללא תוכן אמיתי).':lang==='ru'?'Демонстрационный файл галереи (без реального содержимого).':'Demo gallery placeholder (no real content).');
+        resolve({ blob:new Blob(['KOLKLI — '+f.name+'\r\n\r\n'+note],{type:'text/plain'}), name:baseName(f.name)+'.txt' }); return;
+      }
+      try{
+        const W=1280,H=854, c=document.createElement('canvas'); c.width=W; c.height=H;
+        const g=c.getContext('2d'); const h=(((f.hue||210)%360)+360)%360;
+        const blob360=(cx,cy,r,hue,a)=>{ const rg=g.createRadialGradient(cx,cy,0,cx,cy,r); rg.addColorStop(0,'hsla('+hue+',82%,64%,'+a+')'); rg.addColorStop(1,'hsla('+hue+',82%,64%,0)'); g.fillStyle=rg; g.fillRect(0,0,W,H); };
+        g.fillStyle='hsl('+((h+318)%360)+',60%,32%)'; g.fillRect(0,0,W,H);
+        blob360(W*0.22,H*0.16,W*0.72,(h+38)%360,0.95);
+        blob360(W*0.84,H*0.24,W*0.75,h,0.9);
+        blob360(W*0.6,H*1.08,W*0.9,(h+318)%360,0.95);
+        if(f.kind==='video'){
+          g.fillStyle='rgba(255,255,255,.92)'; g.beginPath(); g.arc(W/2,H/2-40,74,0,Math.PI*2); g.fill();
+          g.fillStyle='hsl('+h+',70%,38%)'; g.beginPath(); g.moveTo(W/2-24,H/2-80); g.lineTo(W/2-24,H/2-0); g.lineTo(W/2+44,H/2-40); g.closePath(); g.fill();
+        }
+        g.fillStyle='rgba(0,0,0,.30)'; g.fillRect(0,H-150,W,150);
+        g.fillStyle='#fff'; g.textBaseline='middle'; g.font='600 46px system-ui,Segoe UI,Arial,sans-serif';
+        g.fillText(f.name, 54, H-75, W-108);
+        c.toBlob(b=>{ resolve({ blob:b||new Blob([f.name],{type:'text/plain'}), name:baseName(f.name)+'.png' }); },'image/png',0.9);
+      }catch(e){ resolve({ blob:new Blob([f.name],{type:'text/plain'}), name:baseName(f.name)+'.txt' }); }
+    });
+  }
+
+  async function fileBlobForZip(f){
+    if(f && (f.uploaded || f.blobKey)){
+      try{ const b=await SEL_STORE.getBlob(f.blobKey||f.id); if(b) return { blob:b, name:f.name }; }
+      catch(e){ console.warn('[select] getBlob for zip failed', f && f.name, e); }
+    }
+    return placeholderFile(f);
+  }
+
+  async function downloadZip(){
+    if(MANAGER && !finished) return;
+    if(!finished || !selected.size) return;
+    const db=el('dlZipBtn'), dl=el('dlZipLbl');
+    if(db.dataset.busy) return;
+    const ids=Array.from(selected);
+    db.dataset.busy='1'; db.disabled=true; if(dl) dl.textContent=t.zipping;
+    try{
+      const items=[];
+      for(const id of ids){ const f=FILES.find(x=>x.id===id); if(f) items.push(await fileBlobForZip(f)); }
+      if(!items.length){ toast(t.dlFail,'warn'); return; }
+      if(window.JSZip){
+        const zip=new JSZip(), used={};
+        items.forEach(it=>{ const base=baseName(it.name), ext=it.name.slice(base.length); let n=it.name,i=2; while(used[n]){ n=base+' ('+i+')'+ext; i++; } used[n]=1; zip.file(n, it.blob); });
+        const out=await zip.generateAsync({type:'blob'});
+        triggerDownload(out, 'kolkli-selection.zip');
+      } else {
+        items.forEach((it,i)=>setTimeout(()=>triggerDownload(it.blob, it.name), i*250));  // no zip lib -> spaced singles
+      }
+      toast(t.dlDone,'ok');
+    }catch(e){ console.error('[select] zip build failed', e); toast(t.dlFail,'warn'); }
+    finally{ delete db.dataset.busy; if(dl) dl.textContent=t.downloadZip; updateBottomActions(); }
+  }
 
   /* ---------------- persistence wiring (uploads only) ---------------- */
   // Store one uploaded file: bytes to IndexedDB FIRST, then the metadata row. If storage fails we roll
@@ -1178,7 +1401,9 @@
     const drop={}; ids.forEach(id=>{ drop[id]=1; });
     const arr=SEL_STORE.readMeta(); const keep=arr.filter(r=>!drop[r.id]);
     if(keep.length!==arr.length) SEL_STORE.writeMeta(keep);
-    arr.forEach(r=>{ if(drop[r.id]) SEL_STORE.delBlob(r.blobKey||r.id); });
+    const goneKeys=[];
+    arr.forEach(r=>{ if(drop[r.id]){ const bk=r.blobKey||r.id; SEL_STORE.delBlob(bk); goneKeys.push(bk); } });
+    try{ FACE.prune(goneKeys); }catch(e){}   // drop cached faces + prune people for the deleted uploads
   }
   // Keep the id counter ahead of any restored id so new uploads never collide with rehydrated ones.
   function selBumpUid(id){ const m=String(id||'').match(/[0-9]+$/); if(m){ const n=parseInt(m[0],10); if(n>uid) uid=n; } }
@@ -1351,7 +1576,7 @@
       `<div class="mactions"><button class="mbtn primary" data-close type="button">${esc(t.helpDone)}</button></div>`);
   }
   function openShare(){
-    const url = location.origin + location.pathname + '?p=demo-gallery';
+    const url = location.origin + location.pathname + '?p=' + encodeURIComponent(SEL_STORE.projectId());
     openOverlay(`${closeBtnHtml()}<h3>${esc(t.shareTitle)}</h3><p>${esc(t.shareSub)}</p>`+
       `<div class="shrow"><input type="text" id="shLink" readonly value="${esc(url)}"><button class="mbtn primary" id="shCopy" type="button">${esc(t.shareCopy)}</button></div>`);
     const inp=el('shLink'); inp.addEventListener('focus',()=>inp.select());
@@ -1446,6 +1671,8 @@
   // toolbar actions
   el('selectAllBtn').addEventListener('click',selectAll);
   el('deleteBtn').addEventListener('click',deleteSelected);
+  el('finishBtn').addEventListener('click',toggleFinish);
+  el('dlZipBtn').addEventListener('click',downloadZip);
   el('moveSel').addEventListener('change',e=>moveSelected(e.target.value));
   el('addFilesBtn').addEventListener('click',()=>el('fileInput').click());
   el('fileInput').addEventListener('change',e=>{ handleFiles(pathItems(e.target.files)); e.target.value=''; });
@@ -1505,14 +1732,304 @@
   });
   window.addEventListener('scroll',closeKebab,{passive:true});
 
+  /* ================= face recognition — group / filter the gallery by person =================
+     Runs 100% in the browser via the vendored @vladmandic/human engine (./vendor/human.js +
+     ./vendor/human-models/). Nothing is uploaded and no biometric data leaves the device. Opt-in
+     only (an explicit button + first-run consent). Per image we detect faces and compute a 1024-d
+     embedding; results (incl. a small face-crop thumbnail) are cached in the IndexedDB 'faces' store
+     keyed by blobKey, so each photo is analysed at most once. Embeddings are clustered into people;
+     the lightweight people index (labels/members/avatars) is persisted per project in localStorage. */
+  const FACE = (function(){
+    const MODEL_VERSION = 'human1|blazeface+facemesh+faceres';
+    const SIM = 0.55;                 // cosine-similarity threshold for "same person" (tunable)
+    const MIN_MEMBERS = 2;            // a person needs to appear in >= 2 photos to earn a chip
+    const MAX_DIM = 1024;            // downscale the longest edge before inference (speed + memory)
+    const PEOPLE_KEY = 'kolkli_select_people';
+    const CONSENT_KEY = 'kolkli_face_consent';
+
+    let human = null, loading = null, busy = false, cancel = false;
+    const avatarUrl = {};            // personId -> object URL for the representative face thumbnail
+
+    /* ---- capability check (WebGL + createImageBitmap) ---- */
+    function supported(){
+      if(typeof createImageBitmap !== 'function') return false;
+      try{ const c=document.createElement('canvas'); return !!(c.getContext('webgl2')||c.getContext('webgl')); }
+      catch(e){ return false; }
+    }
+
+    /* ---- people index persistence (per project, in localStorage) ---- */
+    function pkey(){ return PEOPLE_KEY+'::'+SEL_STORE.scope(); }
+    function readIndex(){ try{ const o=JSON.parse(ls(pkey())||'null'); return (o&&Array.isArray(o.people))?o:null; }catch(e){ return null; } }
+    function writeIndex(){ try{ lsSet(pkey(), JSON.stringify({ modelVersion:MODEL_VERSION, threshold:SIM, updatedAt:Date.now(), people:PEOPLE })); }catch(e){ console.error('[face] writeIndex',e); } }
+
+    /* ---- cosine similarity between two embeddings ---- */
+    function cosine(a,b){ let d=0,na=0,nb=0; const n=Math.min(a.length,b.length); for(let i=0;i<n;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; } return (na&&nb)? d/Math.sqrt(na*nb) : 0; }
+
+    /* ---- clustering: greedy centroid assignment + one merge sweep (k unknown) ---- */
+    function cluster(faces){
+      const cl=[];
+      for(const fc of faces){
+        let best=-1, bs=SIM;
+        for(let i=0;i<cl.length;i++){ const s=cosine(fc.embedding, cl[i].centroid); if(s>=bs){ bs=s; best=i; } }
+        if(best<0){ cl.push({ members:[fc], sum:fc.embedding.slice(), centroid:fc.embedding.slice() }); }
+        else { const c=cl[best]; c.members.push(fc); for(let k=0;k<c.sum.length;k++) c.sum[k]+=fc.embedding[k]; const n=c.members.length; c.centroid=c.sum.map(v=>v/n); }
+      }
+      let merged=true;
+      while(merged){ merged=false;
+        for(let i=0;i<cl.length && !merged;i++){ for(let j=i+1;j<cl.length;j++){
+          if(cosine(cl[i].centroid, cl[j].centroid)>=SIM){ const a=cl[i], b=cl[j];
+            a.members=a.members.concat(b.members); for(let k=0;k<a.sum.length;k++) a.sum[k]+=b.sum[k];
+            const n=a.members.length; a.centroid=a.sum.map(v=>v/n); cl.splice(j,1); merged=true; break; }
+        }}
+      }
+      return cl;
+    }
+
+    /* ---- turn raw clusters into the people index, carrying over prior labels/hidden by centroid match ---- */
+    function buildPeople(clusters){
+      clusters = clusters.filter(c=>c.members.length>=MIN_MEMBERS).sort((a,b)=>b.members.length-a.members.length);
+      const old = PEOPLE.slice(); const used = {}; let seq = 0;
+      return clusters.map(cl=>{
+        let rep = cl.members[0]; for(const m of cl.members){ if((m.score||0)>(rep.score||0)) rep=m; }
+        let label='', hidden=false, manual=false, personId='p'+Date.now().toString(36)+(seq++);
+        let best=null, bsim=0.5;
+        for(const op of old){ if(used[op.personId]||!op.centroid) continue; const s=cosine(cl.centroid, op.centroid); if(s>bsim){ bsim=s; best=op; } }
+        if(best){ label=best.label||''; hidden=!!best.hidden; manual=!!best.manual; personId=best.personId; used[best.personId]=1; }
+        return { personId, label, hidden, manual,
+                 avatar:{ blobKey:rep.blobKey, faceIdx:rep.faceIdx },
+                 centroid:cl.centroid,
+                 members: cl.members.map(m=>({ blobKey:m.blobKey, faceIdx:m.faceIdx })) };
+      });
+    }
+
+    /* ---- rebuild the fast blobKey lookup used by visible() ---- */
+    function rebuildSets(){
+      PEOPLE_SETS = {};
+      PEOPLE.forEach(p=>{ const s=new Set(); (p.members||[]).forEach(m=>{ if(m.blobKey) s.add(m.blobKey); }); PEOPLE_SETS[p.personId]=s; });
+      if(activePerson && !PEOPLE.some(p=>p.personId===activePerson && !p.hidden)) activePerson=null;
+    }
+
+    /* ---- lazy model loading ---- */
+    function loadScript(src){ return new Promise((res,rej)=>{ if(window.Human){ res(); return; } const s=document.createElement('script'); s.src=src; s.onload=()=>res(); s.onerror=()=>rej(new Error('failed to load '+src)); document.head.appendChild(s); }); }
+    function ensure(){
+      if(human) return Promise.resolve(human);
+      if(!loading){
+        loading = (async()=>{
+          await loadScript('./vendor/human.js');
+          const NS = window.Human; const Ctor = (typeof NS==='function') ? NS : (NS.Human || NS.default);
+          const base = new URL('./vendor/human-models/', document.baseURI).href;
+          const h = new Ctor({
+            backend:'humangl', modelBasePath:base, cacheModels:true, warmup:'none', debug:false,
+            filter:{ enabled:true, equalization:false },
+            face:{ enabled:true,
+              detector:{ enabled:true, rotation:false, maxDetected:30, minConfidence:0.2, return:false },
+              mesh:{ enabled:true }, attention:{ enabled:false }, iris:{ enabled:false },
+              description:{ enabled:true }, emotion:{ enabled:false }, antispoof:{ enabled:false }, liveness:{ enabled:false } },
+            body:{ enabled:false }, hand:{ enabled:false }, object:{ enabled:false }, gesture:{ enabled:false }, segmentation:{ enabled:false }
+          });
+          await h.load();
+          human = h; return h;
+        })();
+      }
+      return loading;
+    }
+
+    /* ---- decode + downscale a stored blob onto a working canvas ---- */
+    async function toCanvas(blob){
+      const bmp = await createImageBitmap(blob);
+      let w=bmp.width, h=bmp.height; const md=Math.max(w,h);
+      if(md>MAX_DIM){ const sc=MAX_DIM/md; w=Math.max(1,Math.round(w*sc)); h=Math.max(1,Math.round(h*sc)); }
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      try{ c.getContext('2d').drawImage(bmp,0,0,w,h); }catch(e){}
+      try{ bmp.close(); }catch(e){}
+      return c;
+    }
+    /* ---- square, padded face crop (96×96 JPEG) for the person avatar ---- */
+    function faceThumb(src, box){
+      const x=box[0], y=box[1], w=box[2], h=box[3];
+      const size=Math.max(w,h)*1.6, cx=x+w/2, cy=y+h/2;
+      let sx=Math.max(0,Math.min(cx-size/2, src.width-1)), sy=Math.max(0,Math.min(cy-size/2, src.height-1));
+      const s=Math.max(8, Math.min(size, src.width-sx, src.height-sy));
+      const c=document.createElement('canvas'); c.width=96; c.height=96;
+      try{ c.getContext('2d').drawImage(src, sx, sy, s, s, 0,0,96,96); }catch(e){}
+      return new Promise(r=>{ if(c.toBlob) c.toBlob(b=>r(b),'image/jpeg',0.82); else r(null); });
+    }
+
+    /* ---- analyse one image (uses the IDB cache when fresh) ---- */
+    async function analyse(f){
+      let rec=null; try{ rec = await SEL_STORE.getFaces(f.blobKey); }catch(e){}
+      if(rec && rec.modelVersion===MODEL_VERSION && Array.isArray(rec.faces)) return rec;
+      const blob = await SEL_STORE.getBlob(f.blobKey);
+      if(!blob){ return { blobKey:f.blobKey, modelVersion:MODEL_VERSION, faces:[] }; }
+      const canvas = await toCanvas(blob);
+      const out=[];
+      try{
+        const res = await human.detect(canvas);
+        const arr = (res && res.face) || [];
+        for(const fc of arr){
+          const emb = fc.embedding || fc.descriptor;
+          if(!emb || !emb.length) continue;
+          const score = fc.faceScore || fc.score || fc.boxScore || 1;
+          if(score < 0.4) continue;
+          const box = (fc.box && fc.box.length===4) ? fc.box.map(Number) : [0,0,canvas.width,canvas.height];
+          if(Math.max(box[2],box[3]) < 24) continue;   // skip tiny background faces
+          const thumb = await faceThumb(canvas, box);
+          out.push({ bbox:box, score:score, embedding:Array.from(emb), thumb:thumb });
+        }
+      }catch(e){ console.warn('[face] detect failed on', f.name, e); }
+      rec = { blobKey:f.blobKey, projectId:SEL_STORE.scope(), modelVersion:MODEL_VERSION, faces:out };
+      try{ await SEL_STORE.putFaces(f.blobKey, rec); }catch(e){ console.warn('[face] putFaces',e); }
+      return rec;
+    }
+
+    /* ---- the whole opt-in run ---- */
+    async function run(){
+      if(busy) return;
+      const targets = FILES.filter(f=>f.kind==='image' && f.uploaded && f.blobKey);
+      if(!targets.length){ toast(t.faceNoImages,'warn'); return; }
+      busy=true; cancel=false;
+      openProgress(0, targets.length);
+      try{ await ensure(); }
+      catch(e){ console.error('[face] model load failed',e); busy=false; closeOverlay(); toast(t.faceUnsupported,'warn'); return; }
+      const allFaces=[];
+      for(let i=0;i<targets.length;i++){
+        if(cancel) break;
+        const f=targets[i];
+        try{ const rec = await analyse(f); (rec.faces||[]).forEach((fa,idx)=> allFaces.push({ blobKey:f.blobKey, faceIdx:idx, embedding:fa.embedding, score:fa.score })); }
+        catch(e){ console.warn('[face] analyse error', f.name, e); }
+        updateProgress(i+1, targets.length);
+        await new Promise(r=>setTimeout(r,0));   // yield to keep the UI responsive
+      }
+      if(!cancel){
+        PEOPLE = buildPeople(cluster(allFaces));
+        writeIndex(); rebuildSets();
+        for(const k in avatarUrl){ try{ URL.revokeObjectURL(avatarUrl[k]); }catch(e){} delete avatarUrl[k]; }
+        renderPeople(); refreshAll(); loadAvatars();
+        toast(t.faceDone(PEOPLE.filter(p=>!p.hidden && (p.members||[]).length>=MIN_MEMBERS).length), 'ok');
+      }
+      busy=false; closeOverlay();
+    }
+
+    /* ---- representative face thumbnails, loaded lazily from IDB and cached as object URLs ---- */
+    async function loadAvatars(){
+      const jobs = PEOPLE.filter(p=>p.avatar && !avatarUrl[p.personId]).map(async p=>{
+        try{ const rec = await SEL_STORE.getFaces(p.avatar.blobKey); const fa = rec && rec.faces && rec.faces[p.avatar.faceIdx];
+          if(fa && fa.thumb){ avatarUrl[p.personId] = URL.createObjectURL(fa.thumb); } }catch(e){}
+      });
+      if(jobs.length){ await Promise.all(jobs); renderPeople(); }
+    }
+
+    /* ---- drop cached faces + prune the people index for deleted uploads (called by selRemove) ---- */
+    function prune(blobKeys){
+      if(!blobKeys || !blobKeys.length) return;
+      const drop={}; blobKeys.forEach(k=>{ if(k){ drop[k]=1; SEL_STORE.delFaces(k); } });
+      let changed=false;
+      PEOPLE.forEach(p=>{ const n0=(p.members||[]).length; p.members=(p.members||[]).filter(m=>!drop[m.blobKey]); if(p.members.length!==n0) changed=true;
+        if(p.avatar && drop[p.avatar.blobKey]){ p.avatar = p.members[0] ? { blobKey:p.members[0].blobKey, faceIdx:p.members[0].faceIdx } : null;
+          if(avatarUrl[p.personId]){ try{ URL.revokeObjectURL(avatarUrl[p.personId]); }catch(e){} delete avatarUrl[p.personId]; } } });
+      PEOPLE = PEOPLE.filter(p=>(p.members||[]).length>0);
+      if(changed){ writeIndex(); rebuildSets(); renderPeople(); loadAvatars(); }
+    }
+
+    /* ---- wipe all face/people data for this project ---- */
+    function clearAll(){
+      openConfirm(t.faceClearTitle, t.faceClearBody, t.faceClear, t.delCancel, ()=>{
+        try{ localStorage.removeItem(pkey()); }catch(e){}
+        SEL_STORE.clearFaces();
+        for(const k in avatarUrl){ try{ URL.revokeObjectURL(avatarUrl[k]); }catch(e){} delete avatarUrl[k]; }
+        PEOPLE=[]; activePerson=null; rebuildSets(); closeOverlay(); renderPeople(); refreshAll();
+        toast(t.faceCleared,'ok');
+      });
+    }
+
+    /* ---- modals ---- */
+    function openConsent(onOk){
+      openOverlay(`${closeBtnHtml()}<h3>${esc(t.faceConsentTitle)}</h3><p>${esc(t.faceConsentBody)}</p>`+
+        `<div class="mactions"><button class="mbtn ghost" data-close type="button">${esc(t.delCancel)}</button>`+
+        `<button class="mbtn primary" id="faceConsentOk" type="button">${esc(t.faceConsentAgree)}</button></div>`);
+      const ok=el('faceConsentOk'); if(ok) ok.addEventListener('click', onOk);
+    }
+    function openProgress(done,total){
+      const pct = total ? Math.round(done/total*100) : 0;
+      openOverlay(`<h3>${esc(t.faceRunTitle)}</h3><p>${esc(t.faceRunSub)}</p>`+
+        `<div class="fprog"><span id="fprogBar" style="width:${pct}%"></span></div>`+
+        `<div class="fprogtxt" id="fprogTxt">${done} / ${total}</div>`+
+        `<div class="mactions"><button class="mbtn ghost" id="fCancel" type="button">${esc(t.cancel)}</button></div>`);
+      const cb=el('fCancel'); if(cb) cb.addEventListener('click', ()=>{ cancel=true; cb.disabled=true; cb.textContent=t.canceling; });
+    }
+    function updateProgress(done,total){ const b=el('fprogBar'); if(b) b.style.width=(total?Math.round(done/total*100):0)+'%'; const x=el('fprogTxt'); if(x) x.textContent=done+' / '+total; }
+    function openEdit(personId){
+      const p = PEOPLE.find(x=>x.personId===personId); if(!p) return;
+      openOverlay(`${closeBtnHtml()}<h3>${esc(t.faceEditTitle)}</h3><p>${esc(t.faceEditSub)}</p>`+
+        `<div class="shrow"><input type="text" id="pName" value="${esc(p.label||'')}" placeholder="${esc(t.faceNamePh)}"></div>`+
+        `<div class="mactions"><button class="mbtn ghost" id="pHide" type="button">${esc(p.hidden?t.faceUnhide:t.faceHide)}</button>`+
+        `<button class="mbtn primary" id="pSave" type="button">${esc(t.save)}</button></div>`);
+      const inp=el('pName'); if(inp) inp.focus();
+      const sv=el('pSave'); if(sv) sv.addEventListener('click', ()=>{ p.label=((el('pName')||{}).value||'').trim(); p.manual=true; writeIndex(); closeOverlay(); renderPeople(); });
+      const hd=el('pHide'); if(hd) hd.addEventListener('click', ()=>{ p.hidden=!p.hidden; p.manual=true; if(p.hidden && activePerson===personId) activePerson=null; writeIndex(); closeOverlay(); refreshAll(); });
+    }
+
+    /* ---- render the "people" chips row ---- */
+    function render(){
+      const wrap=el('peopleChips'), row=el('peopleRow'); if(!wrap) return;
+      const shown = PEOPLE.filter(p=>!p.hidden && (p.members||[]).length>=MIN_MEMBERS);
+      if(!shown.length){ if(row) row.style.display='none'; wrap.innerHTML=''; return; }
+      if(row) row.style.display='';
+      let html='';
+      shown.forEach((p,i)=>{
+        const on = p.personId===activePerson, url=avatarUrl[p.personId];
+        const av = url ? `<img class="pav" src="${esc(url)}" alt="">` : `<span class="pav ph">${esc((p.label||'?').trim().charAt(0)||'?')}</span>`;
+        const name = p.label || (t.facePerson+' '+(i+1));
+        html += `<span class="pchipwrap"><button class="chip pchip${on?' on':''}" type="button" data-person="${esc(p.personId)}" title="${esc(name)}">`+
+          `${av}<span>${esc(name)}</span><em class="pcount">${(p.members||[]).length}</em></button>`+
+          `<button class="pedit" type="button" data-edit="${esc(p.personId)}" title="${esc(t.faceEditTitle)}" aria-label="${esc(t.faceEditTitle)}">`+
+          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></span>`;
+      });
+      html += `<button class="pclear" type="button" id="peopleClear" title="${esc(t.faceClearTitle)}">${esc(t.faceClearShort)}</button>`;
+      wrap.innerHTML = html;
+    }
+
+    /* ---- click routing (delegated) ---- */
+    function onClick(e){
+      const tg=e.target; if(!tg || !tg.closest) return;
+      if(tg.closest('#organizeBtn')){ e.preventDefault(); trigger(); return; }
+      const ed=tg.closest('[data-edit]'); if(ed){ e.preventDefault(); if(!MANAGER) openEdit(ed.getAttribute('data-edit')); return; }
+      if(tg.closest('#peopleClear')){ e.preventDefault(); if(!MANAGER) clearAll(); return; }
+      const ch=tg.closest('[data-person]'); if(ch){ e.preventDefault(); const id=ch.getAttribute('data-person'); activePerson=(activePerson===id)?null:id; refreshAll(); return; }
+    }
+    function trigger(){
+      if(busy) return;
+      if(!supported()){ toast(t.faceUnsupported,'warn'); return; }
+      const targets = FILES.filter(f=>f.kind==='image' && f.uploaded && f.blobKey);
+      if(!targets.length){ toast(t.faceNoImages,'warn'); return; }
+      if(ls(CONSENT_KEY)!=='1'){ openConsent(()=>{ lsSet(CONSENT_KEY,'1'); run(); }); }
+      else run();
+    }
+
+    /* ---- boot: wire clicks + restore the saved people index (fast, no recompute) ---- */
+    function init(){
+      const btn=el('organizeBtn'); if(btn && !supported()){ btn.disabled=true; btn.title=t.faceUnsupported; }
+      document.addEventListener('click', onClick);
+      const idx = readIndex();
+      if(idx){ PEOPLE = idx.people||[]; rebuildSets(); render(); loadAvatars(); }
+    }
+
+    return { init, render, trigger, prune, supported };
+  })();
+  function renderPeople(){ try{ FACE.render(); }catch(e){} }
+
   /* ---------------- init ---------------- */
   if(MANAGER){ document.body.classList.add('manager'); var _mb=el('mgrBanner'); if(_mb) _mb.classList.remove('hidden'); }
   applyTheme(ls('theme')||'light');
   selHydrate();   // rebuild uploaded files from storage BEFORE the first render (fetch from storage, not memory)
+  FACE.init();    // wire the "organize by people" button + restore any saved people groups for this project
+  { const _picks = selReadPicks(); if(_picks) selected = new Set(_picks); }   // restore the client's saved picks for this project
+  finished = selReadDone();   // restore the client's "finished picking" flag for this project
   const saved=ls('ac_lang'); applyLang(saved==='en'||saved==='ru'||saved==='he'?saved:'he');
 })();
 </script>
 <script src="./notify-sound.js" defer></script>
 <script src="./accessibility.js" defer></script>
+<script src="./cookie-consent.js" defer></script>
 </body>
 </html>

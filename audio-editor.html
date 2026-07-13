@@ -684,6 +684,10 @@
     }
   }
   function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+  // A couple of encoders (flac) call abort() right after writing a valid file, which
+  // leaves the shared core unusable; and any thrown exec can wedge it too. Tear the
+  // engine down in those cases so the next export rebuilds a fresh one (wasm stays cached).
+  function disposeEngine(){ try{ ffmpeg && ffmpeg.terminate && ffmpeg.terminate(); }catch(_){} ffmpeg=null; engineReady=false; }
 
   function encodeArgs(){
     const fmt=el('fmtSel').value, br=el('brSel').value;
@@ -726,6 +730,8 @@
     const dlName = baseName(file.name)+tagHe+'.'+outExt;
     const fade = el('fade').checked;
     const outSeconds = mode==='remove' ? (dur-d) : d;
+    // flac aborts the core right after writing a valid file; a thrown exec can wedge it too.
+    let spent = (fmt==='flac');
 
     try{
       await ffmpeg.writeFile(inName, await fetchFile(file));
@@ -755,9 +761,8 @@
       }
 
       await ffmpeg.exec(args);
-      const data = await ffmpeg.readFile(outName);
-      await ffmpeg.deleteFile(inName).catch(()=>{});
-      await ffmpeg.deleteFile(outName).catch(()=>{});
+      const data = await ffmpeg.readFile(outName);   // valid even when the core aborts right after
+      if(!spent){ await ffmpeg.deleteFile(inName).catch(()=>{}); await ffmpeg.deleteFile(outName).catch(()=>{}); }
       const blob = new Blob([data.buffer], { type: MIME[outExt] || 'audio/mpeg' });
       if(!blob.size) throw new Error('empty output');
       setProg(100);
@@ -768,10 +773,11 @@
       showResult();
     }catch(err){
       console.error(err);
-      try{ await ffmpeg.deleteFile(inName); }catch(_){}
-      try{ await ffmpeg.deleteFile(outName); }catch(_){}
+      spent = true;   // never reuse an instance that threw
       prog.classList.remove('show'); el('progWrap').classList.remove('indet');
       el('optErr').textContent=t.failed;
+    }finally{
+      if(spent) disposeEngine();
     }
     busy=false; el('cutBtn').disabled=false;
   }

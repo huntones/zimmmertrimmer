@@ -10,17 +10,17 @@
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
     --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
-    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --accent:#0891b2; --accent-dim:#0e7490; --accent-ink:#ffffff; --accent-soft:#eaf6f9;
     --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
     --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
     --danger:#e5484d; --danger-soft:#fdecec;
     --warm-soft:#fff5da; --warm-line:#f2d98a;
     --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
-    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
-    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
-    --grad-shadow:rgba(93,79,240,0.30);
-    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
-    --grad-btn-glow:rgba(59,111,246,0.38);
+    --grad:linear-gradient(105deg,#06b6d4 0%,#0e7490 100%);
+    --grad-soft:linear-gradient(120deg,#eaf6f9,#e2f2f6);
+    --grad-shadow:rgba(8,145,178,0.30);
+    --grad-btn:linear-gradient(105deg,#06b6d4 0%,#0e7490 100%);
+    --grad-btn-glow:rgba(8,145,178,0.38);
     --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
@@ -30,17 +30,17 @@
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
     --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
-    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --accent:#22c3d6; --accent-dim:#0891b2; --accent-ink:#ffffff; --accent-soft:#14282e;
     --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
     --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
     --danger:#ff6b6b; --danger-soft:#2a1719;
     --warm-soft:#2c2718; --warm-line:#5a4d24;
     --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
-    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
-    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
-    --grad-shadow:rgba(77,123,255,0.42);
-    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
-    --grad-btn-glow:rgba(77,123,255,0.45);
+    --grad:linear-gradient(105deg,#22c3d6 0%,#0891b2 100%);
+    --grad-soft:linear-gradient(120deg,#14282e,#11242a);
+    --grad-shadow:rgba(34,195,214,0.42);
+    --grad-btn:linear-gradient(105deg,#22c3d6 0%,#0891b2 100%);
+    --grad-btn-glow:rgba(34,195,214,0.45);
     --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
     --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
     --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
@@ -160,7 +160,8 @@
 
   /* file list (appears once files are added) */
   .flist{position:relative;z-index:1;display:flex;flex-direction:column;gap:9px;margin-bottom:16px;
-    max-height:calc(100vh - 300px);overflow-y:auto;overscroll-behavior:contain;}
+    max-height:min(50vh,300px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+    padding-left:2px;scrollbar-gutter:stable;}
   .flist:empty{display:none;}
   .flist::-webkit-scrollbar{width:10px;}
   .flist::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:999px;border:3px solid var(--panel);}
@@ -168,8 +169,8 @@
   .frow{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel);}
   .frow .fico{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
     background:var(--accent-soft);color:var(--accent);}
-  .frow .fico.image{color:var(--info);background:var(--info-soft);} .frow .fico.video{color:#e5484d;background:var(--danger-soft);}
-  .frow .fico.doc{color:var(--info-dim);background:var(--info-soft);}
+  .frow .fico.image{color:var(--accent);background:var(--accent-soft);} .frow .fico.video{color:#e5484d;background:var(--danger-soft);}
+  .frow .fico.doc{color:var(--accent-dim);background:var(--accent-soft);}
   .frow .fico svg{width:17px;height:17px;}
   .frow .fn{flex:1;min-width:0;}
   .frow .fn .nm{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -177,13 +178,13 @@
   .frow .fbar{height:5px;border-radius:999px;background:var(--panel-2);overflow:hidden;margin-top:5px;display:none;}
   .frow.up .fbar{display:block;}
   .frow .fbar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
-  .frow.done .fn .sz{color:var(--success-dim);}
+  .frow.done .fn .sz{color:var(--accent-dim);}
   .frow .rm{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
     cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
   .frow .rm:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
-  .frow .rm.dl:hover{border-color:var(--success);color:var(--success-dim);background:var(--success-soft);}
+  .frow .rm.dl:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
   .frow .rm svg{width:15px;height:15px;}
-  .frow .tick{width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--success-dim);}
+  .frow .tick{width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--accent-dim);}
   .frow .tick svg{width:18px;height:18px;}
 
   /* submit */
@@ -207,7 +208,7 @@
   .state{text-align:center;padding:22px 10px;}
   .state .si{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;display:flex;align-items:center;justify-content:center;}
   .state .si.warn{background:var(--warm-soft);color:var(--warn);} .state .si.lock{background:var(--accent-soft);color:var(--accent);}
-  .state .si.ok{background:var(--success-soft);color:var(--success-dim);}
+  .state .si.ok{background:var(--accent-soft);color:var(--accent-dim);}
   .state .si svg{width:32px;height:32px;}
   .state h2{font-size:20px;margin:0 0 8px;}
   .state p{font-size:14px;color:var(--muted);margin:0 auto 18px;max-width:46ch;line-height:1.6;white-space:pre-wrap;}
@@ -323,38 +324,38 @@
       <svg class="illus" viewBox="0 0 238 186" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
           <linearGradient id="ilF" x1="20" y1="70" x2="150" y2="160" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#8b5cf6"/><stop offset="1" stop-color="#6d28d9"/>
+            <stop stop-color="#22c3d6"/><stop offset="1" stop-color="#0e7490"/>
           </linearGradient>
           <linearGradient id="ilB" x1="20" y1="52" x2="150" y2="120" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#a78bfa"/><stop offset="1" stop-color="#7c3aed"/>
+            <stop stop-color="#67d5e6"/><stop offset="1" stop-color="#0891b2"/>
           </linearGradient>
         </defs>
         <rect x="20" y="52" width="132" height="96" rx="15" fill="url(#ilB)"/>
         <path d="M20 78c0-8 6-14 14-14h30l12 12h62c8 0 14 6 14 14v44c0 8-6 14-14 14H34c-8 0-14-6-14-14V78Z" fill="url(#ilF)"/>
         <g opacity=".95">
           <path d="M86 98a20 20 0 0 1 38 4h3a13 13 0 0 1 0 26H84a17 17 0 0 1-2-34l4 4Z" fill="#ffffff"/>
-          <path d="M104 96v30" stroke="#7c3aed" stroke-width="6" stroke-linecap="round"/>
-          <path d="m94 106 10-10 10 10" stroke="#7c3aed" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M104 96v30" stroke="#0891b2" stroke-width="6" stroke-linecap="round"/>
+          <path d="m94 106 10-10 10 10" stroke="#0891b2" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
         <g transform="rotate(-9 176 118)">
-          <rect x="156" y="100" width="44" height="36" rx="8" fill="#ffffff" stroke="#e7defb"/>
+          <rect x="156" y="100" width="44" height="36" rx="8" fill="#ffffff" stroke="#d5ecf1"/>
           <rect x="161" y="105" width="34" height="26" rx="5" fill="#8ab4f8"/>
           <circle cx="169" cy="113" r="2.6" fill="#fde68a"/>
           <path d="M162 130l7-8 5 5 5-6 8 9" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
         <g transform="rotate(7 196 62)">
-          <rect x="176" y="40" width="40" height="44" rx="8" fill="#ffffff" stroke="#e7defb"/>
-          <rect x="182" y="47" width="21" height="9" rx="3" fill="#7c3aed"/>
-          <rect x="182" y="61" width="28" height="3.4" rx="1.7" fill="#e7defb"/>
-          <rect x="182" y="68" width="22" height="3.4" rx="1.7" fill="#e7defb"/>
+          <rect x="176" y="40" width="40" height="44" rx="8" fill="#ffffff" stroke="#d5ecf1"/>
+          <rect x="182" y="47" width="21" height="9" rx="3" fill="#0891b2"/>
+          <rect x="182" y="61" width="28" height="3.4" rx="1.7" fill="#d5ecf1"/>
+          <rect x="182" y="68" width="22" height="3.4" rx="1.7" fill="#d5ecf1"/>
         </g>
         <g transform="rotate(12 208 120)">
-          <rect x="190" y="102" width="36" height="34" rx="7" fill="#ffffff" stroke="#e7defb"/>
+          <rect x="190" y="102" width="36" height="34" rx="7" fill="#ffffff" stroke="#d5ecf1"/>
           <rect x="195" y="108" width="18" height="8" rx="2.6" fill="#ef4444"/>
-          <rect x="195" y="121" width="24" height="3" rx="1.5" fill="#e7defb"/>
-          <rect x="195" y="127" width="18" height="3" rx="1.5" fill="#e7defb"/>
+          <rect x="195" y="121" width="24" height="3" rx="1.5" fill="#d5ecf1"/>
+          <rect x="195" y="127" width="18" height="3" rx="1.5" fill="#d5ecf1"/>
         </g>
-        <circle cx="206" cy="26" r="3.2" fill="#c4b5fd"/><circle cx="222" cy="46" r="2.4" fill="#ddd6fe"/><circle cx="150" cy="22" r="2.2" fill="#a78bfa"/>
+        <circle cx="206" cy="26" r="3.2" fill="#a5e3ee"/><circle cx="222" cy="46" r="2.4" fill="#cdeef4"/><circle cx="150" cy="22" r="2.2" fill="#67d5e6"/>
       </svg>
 
       <div class="hero">
@@ -475,6 +476,8 @@
 <script src="./supabase-config.js"></script>
 <script src="./kolkli-db.js"></script>
 <script src="./request-store.js"></script>
+<script src="./cloud-pickers-config.js"></script>
+<script src="./cloud-pickers.js"></script>
 <script>
 (function(){
   const el = id => document.getElementById(id);
@@ -929,7 +932,38 @@
   // ---------- events ----------
   const drop=el('drop'), input=el('fileInput'), folderInput=el('folderInput');
   el('srcComputer').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
-  ['srcGDrive','srcDropbox','srcOneDrive'].forEach(id=>{ const b=el(id); if(b) b.addEventListener('click',e=>{ e.stopPropagation(); toast(t.srcSoon); }); });
+
+  // Cloud sources: open the real Google Drive / Dropbox / OneDrive picker when a
+  // provider key is set in cloud-pickers-config.js; otherwise fall back to the
+  // "coming soon" toast — so an unconfigured button behaves exactly as before.
+  const CLOUD_PROVIDER={ srcGDrive:'google', srcDropbox:'dropbox', srcOneDrive:'onedrive' };
+  let cloudBusy=false;
+  function importFromCloud(provider){
+    if(cloudBusy) return; cloudBusy=true;
+    const label=window.CloudPickers.label(provider);
+    const ct=window.CloudPickers.text(lang);
+    let picked=0;
+    window.CloudPickers.open(provider,{ onProgress:n=>{ picked=n; if(n>0) toast(ct.importing(label)); } })
+      .then(items=>{
+        items=items||[];
+        if(items.length){ addFiles(items); toast(ct.imported(items.length,label)); }
+        else if(picked>0){ toast(ct.error(label)); }
+      })
+      .catch(err=>{
+        const m=err&&err.message;
+        if(m==='cancelled') return;                 // user closed the auth popup — stay quiet
+        if(m==='not-configured'){ toast(t.srcSoon); return; }
+        if(m==='popup-blocked'){ toast(ct.popupBlocked); return; }
+        toast(ct.error(label)); try{ console.warn('[cloud]',provider,err); }catch(_){}
+      })
+      .then(()=>{ cloudBusy=false; });
+  }
+  Object.keys(CLOUD_PROVIDER).forEach(id=>{ const b=el(id); if(!b) return; b.addEventListener('click',e=>{
+    e.stopPropagation();
+    const provider=CLOUD_PROVIDER[id];
+    if(window.CloudPickers && CloudPickers.enabled(provider)) importFromCloud(provider);
+    else toast(t.srcSoon);
+  }); });
   drop.addEventListener('click',()=>input.click());
   input.addEventListener('change',()=>{ addFiles(pathItems(input.files)); input.value=''; });
   folderInput.addEventListener('change',()=>{ addFiles(pathItems(folderInput.files)); folderInput.value=''; });
@@ -982,5 +1016,6 @@
   });
 })();
 </script>
+<script src="./cookie-consent.js" defer></script>
 </body>
 </html>

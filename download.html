@@ -141,6 +141,30 @@
   .bh-logo img{display:block;max-height:52px;max-width:min(220px,60vw);object-fit:contain;}
   .bh-name{font-size:clamp(20px,4vw,26px);font-weight:800;letter-spacing:-0.01em;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.30);}
   .bh-tag{font-size:14px;color:rgba(255,255,255,.92);text-shadow:0 1px 8px rgba(0,0,0,.30);max-width:46ch;}
+  /* ---- default hero: shown until the sender uploads their own background + logo ----
+     Swap assets/send-hero-default.jpg to change the graphic; tune min-height / the
+     background-position below to reframe it. The background-color is a peach fallback
+     so the strip still looks intentional if the image is slow or missing. */
+  .brandhero.bh-default{min-height:clamp(180px,23vw,260px);}
+  .brandhero.bh-default .bh-bg{background-color:#fbdcc0;background-position:center 22%;}
+  .brandhero.bh-default .bh-name{color:#5a3418;text-shadow:none;}
+  .brandhero.bh-default .bh-tag{color:#7a4a26;text-shadow:none;}
+  /* the un-branded recipient page adopts the warm delivery theme so buttons + top strip
+     match the default hero (a sender's own brand color overrides this). */
+  body.hero-default{
+    --accent:#f97316; --accent-dim:#ea580c; --accent-soft:#fff1e6;
+    --grad:linear-gradient(105deg,#fb8b3c 0%,#f4700f 100%);
+    --grad-btn:linear-gradient(105deg,#fb8b3c 0%,#f4700f 100%);
+    --grad-soft:linear-gradient(120deg,#fff1e6,#ffe7d1);
+    --grad-shadow:rgba(234,88,12,0.30); --grad-btn-glow:rgba(234,88,12,0.34);
+  }
+  html[data-theme="dark"] body.hero-default{
+    --accent:#fb923c; --accent-dim:#f97316; --accent-soft:#2c2012;
+    --grad:linear-gradient(105deg,#fb923c 0%,#f97316 100%);
+    --grad-btn:linear-gradient(105deg,#fb923c 0%,#f97316 100%);
+    --grad-soft:linear-gradient(120deg,#2c2012,#241a10);
+    --grad-shadow:rgba(251,146,60,0.42); --grad-btn-glow:rgba(251,146,60,0.45);
+  }
   body.branded .dhead .ava{display:none;}
   .poweredby{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin:22px auto 0;font-size:11.5px;
     color:var(--faint);font-family:var(--mono);letter-spacing:.02em;transition:opacity .12s;}
@@ -166,8 +190,16 @@
     box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
+<link rel="stylesheet" href="./header.css">
 </head>
 <body>
+
+<!-- ================= SHARED SITE HEADER (full nav: tools, pricing, login, sign up) ================= -->
+<div id="site-header"></div>
+<script src="./header.js"></script>
+<script src="./supabase-config.js"></script>
+<script src="./kolkli-db.js"></script>
+
 <div class="wrap">
   <div class="brandhero hidden" id="brandHero">
     <div class="bh-bg" id="bhBg"></div>
@@ -325,10 +357,14 @@
   function mixc(a,b,tt){ return {r:Math.round(a.r+(b.r-a.r)*tt),g:Math.round(a.g+(b.g-a.g)*tt),b:Math.round(a.b+(b.b-a.b)*tt)}; }
   function hexOf(c){ return '#'+[c.r,c.g,c.b].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join(''); }
   function rgbStr(c){ return c.r+','+c.g+','+c.b; }
+  // default hero graphic, shown until the sender uploads their own background + logo
+  const DEFAULT_HERO='./assets/send-hero-default.jpg';
   function applyBrand(b){
-    if(!b || !(b.logo||b.name||b.bg||b.color)) return;
-    brand=b;
-    const base=hexToRgb(b.color)||hexToRgb('#7b34ff');
+    b = b || {};
+    const hasBrand = !!(b.logo||b.name||b.bg||b.color);
+    brand = hasBrand ? b : null;
+    // apply the sender's brand color only when they actually chose one
+    const base = b.color ? hexToRgb(b.color) : null;
     if(base){
       const light=mixc(base,{r:255,g:255,b:255},0.16), dim=mixc(base,{r:0,g:0,b:0},0.14);
       const grad='linear-gradient(105deg,'+hexOf(base)+' 0%,'+hexOf(light)+' 100%)';
@@ -341,14 +377,30 @@
       st.setProperty('--grad-shadow','rgba('+rgbStr(base)+',0.32)');
       st.setProperty('--grad-btn-glow','rgba('+rgbStr(base)+',0.40)');
     }
-    const bg=el('bhBg'), scrim=el('bhScrim');
-    if(b.bg){ bg.style.backgroundImage='url("'+b.bg+'")'; scrim.style.background='linear-gradient(160deg,rgba(8,10,20,.30),rgba(8,10,20,.58))'; }
-    else { bg.style.background='var(--grad)'; scrim.style.background='linear-gradient(160deg,rgba(255,255,255,.12),rgba(0,0,0,.16))'; }
+    // "default" = the sender set neither a background image nor a logo → show the default hero
+    const isDefault = !b.bg && !b.logo;
+    const bg=el('bhBg'), scrim=el('bhScrim'), hero=el('brandHero');
+    hero.classList.toggle('bh-default', isDefault);
+    if(b.bg){
+      bg.style.background=''; bg.style.backgroundImage='url("'+b.bg+'")';
+      scrim.style.background='linear-gradient(160deg,rgba(8,10,20,.30),rgba(8,10,20,.58))';
+    } else if(isDefault){
+      bg.style.background=''; bg.style.backgroundImage='url("'+DEFAULT_HERO+'")';
+      scrim.style.background='none';
+    } else {
+      // branded (logo/name/color) but no background image → brand-color gradient
+      bg.style.backgroundImage=''; bg.style.background='var(--grad)';
+      scrim.style.background='linear-gradient(160deg,rgba(255,255,255,.12),rgba(0,0,0,.16))';
+    }
     if(b.logo){ el('bhLogoImg').src=b.logo; el('bhLogo').classList.remove('hidden'); }
+    else el('bhLogo').classList.add('hidden');
     if(b.name){ el('bhName').textContent=b.name; el('bhName').classList.remove('hidden'); }
+    else el('bhName').classList.add('hidden');
     if(b.tagline){ el('bhTag').textContent=b.tagline; el('bhTag').classList.remove('hidden'); }
-    el('brandHero').classList.remove('hidden');
-    document.body.classList.add('branded');
+    else el('bhTag').classList.add('hidden');
+    hero.classList.remove('hidden');
+    document.body.classList.toggle('branded', hasBrand);
+    document.body.classList.toggle('hero-default', isDefault);
   }
 
   // ---- IndexedDB (demo store) ----
@@ -372,6 +424,7 @@
   async function bumpDownloads(){
     try{
       record.downloads=(record.downloads||0)+1; await idbPut(key, record);
+      try{ if(window.KolkliDB && KolkliDB.enabled()) KolkliDB.bumpDownload((key||'').replace(/^t_/,'')); }catch(_){}
       try{ if('BroadcastChannel'in window){ const bc=new BroadcastChannel('audiocut_dl'); bc.postMessage({token:(key||'').replace(/^t_/,''), downloads:record.downloads}); bc.close(); } }catch(_){}
     }catch(_){}
   }
@@ -470,6 +523,18 @@
   window.__setLang=applyLang;
 
   // ---- init ----
+  // Cross-device: when the package isn't in this browser, pull it (and its bytes) from the server.
+  async function loadRemote(token){
+    try{
+      if(!(window.KolkliDB && KolkliDB.enabled())) return null;
+      const meta=await KolkliDB.pullToken('send', token);
+      if(!meta || !Array.isArray(meta.files)) return null;
+      for(const f of meta.files){ try{ const b=await KolkliDB.downloadBlob('send', token, f.id); if(b) f.blob=b; }catch(_){} }
+      try{ await idbPut('t_'+token, meta); }catch(_){}
+      return meta;
+    }catch(_){ return null; }
+  }
+
   async function init(){
     applyTheme(ls('theme')||'light');
     applyLang(detectLang());
@@ -477,6 +542,7 @@
     if(!token){ show('expiredState'); return; }
     key='t_'+decodeURIComponent(token);
     try{ record=await idbGet(key); }catch(_){ record=null; }
+    if(!record){ record=await loadRemote(decodeURIComponent(token)); }
     if(!record){ show('expiredState'); return; }
     applyBrand(record.brand);
     if(Date.now() > record.expiresAt){ try{ await idbDel(key); }catch(_){}; show('expiredState'); return; }
@@ -486,7 +552,6 @@
   init();
 })();
 </script>
-<script src="./notify-sound.js" defer></script>
-<script src="./accessibility.js" defer></script>
+<!-- notify-sound.js + accessibility.js are now loaded by the shared header.js (both self-guard against a double include). -->
 </body>
 </html>

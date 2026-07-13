@@ -10,17 +10,17 @@
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
     --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
-    --accent:#7c3aed; --accent-dim:#6a2fe0; --accent-ink:#ffffff; --accent-soft:#efe9fe;
+    --accent:#3b82f6; --accent-dim:#2f6fd6; --accent-ink:#ffffff; --accent-soft:#e8f0fe;
     --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
     --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
     --danger:#e5484d; --danger-soft:#fdecec;
     --warm-soft:#fff5da; --warm-line:#f2d98a;
     --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
-    --grad:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
-    --grad-h:linear-gradient(105deg,#6a29e6 0%,#2f74f0 100%);
-    --grad-soft:linear-gradient(120deg,#efe9fe,#e6f0ff);
-    --grad-shadow:rgba(93,79,240,0.30);
-    --grad-btn:linear-gradient(105deg,#7b34ff 0%,#3f85ff 100%);
+    --grad:linear-gradient(105deg,#4f8ef7 0%,#3b82f6 100%);
+    --grad-h:linear-gradient(105deg,#3f85ff 0%,#2f6fd6 100%);
+    --grad-soft:linear-gradient(120deg,#e8f0fe,#e6f0ff);
+    --grad-shadow:rgba(59,111,246,0.30);
+    --grad-btn:linear-gradient(105deg,#4f8ef7 0%,#3b82f6 100%);
     --grad-btn-glow:rgba(59,111,246,0.38);
     --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
@@ -32,17 +32,17 @@
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
     --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
-    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --accent:#5b95f8; --accent-dim:#4f8ef7; --accent-ink:#ffffff; --accent-soft:#182338;
     --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
     --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
     --danger:#ff6b6b; --danger-soft:#2a1719;
     --warm-soft:#2c2718; --warm-line:#5a4d24;
     --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
-    --grad:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
-    --grad-h:linear-gradient(105deg,#9a63ff 0%,#6aa2ff 100%);
-    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad:linear-gradient(105deg,#5a97ff 0%,#3f85ff 100%);
+    --grad-h:linear-gradient(105deg,#6aa2ff 0%,#5a97ff 100%);
+    --grad-soft:linear-gradient(120deg,#152238,#11242a);
     --grad-shadow:rgba(77,123,255,0.42);
-    --grad-btn:linear-gradient(105deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn:linear-gradient(105deg,#5a97ff 0%,#3f85ff 100%);
     --grad-btn-glow:rgba(77,123,255,0.45);
     --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
     --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
@@ -99,21 +99,31 @@
   body.clientview #shareBtn,
   body.clientview #albumMgrBtn,
   body.clientview .toolchk,
-  body.clientview .selbar,
-  body.clientview .fcard .facts .pick{display:none !important;}
+  body.clientview .selbar{display:none !important;}
   /* permission-gated client tools: hidden unless the owner granted the matching permission.
      the perm-* classes are toggled onto <body> in applyPreviewMode() from the saved client perms. */
   body.clientview:not(.perm-upload) .drop,
   body.clientview:not(.perm-folderCreate) #addFolderBtn,
   body.clientview:not(.perm-folderCreate) .cardmove-menu .fs-newbtn,
   body.clientview:not(.perm-delete) .fcard .fdel-x,
-  body.clientview:not(.perm-folderMove) .fcard .facts,
+  body.clientview:not(.perm-folderMove):not(.perm-multiSelect) .fcard .facts,
+  body.clientview:not(.perm-folderMove) .fcard .cardmovewrap,
   body.clientview:not(.perm-folderMove) .fcard .movemain,
   body.clientview:not(.perm-folderManage) .fi-grip,
   body.clientview:not(.perm-folderManage) .fi-act,
+  body.clientview:not(.perm-multiSelect) .fcard .facts .pick,
   body.clientview:not(.perm-selection) .fcard .fcheck{display:none !important;}
   body:not(.clientview) #clientSelectAllBtn,
   body.clientview:not(.perm-selectAll) #clientSelectAllBtn{display:none !important;}
+  /* "multiple selection" (batch pick): the .pick card toggle above + the purple bulk-action bar.
+     the whole .selbar is owner-only by default; reveal it to clients only when this permission
+     is granted — keeping the owner's settings gear + the favorites "select all" owner-side, and
+     gating the bar's own move / delete actions by their existing permissions. */
+  body.clientview.perm-multiSelect .selbar{display:flex !important;}
+  body.clientview #clientBtn,
+  body.clientview #clientSelectAllBtn{display:none !important;}
+  body.clientview:not(.perm-folderMove) #msMoveSel,
+  body.clientview:not(.perm-delete) #msDelBtn{display:none !important;}
   /* captions are read-only (still legible) unless text editing is allowed */
   body.clientview:not(.perm-editText) .fcard .fcap{pointer-events:none;}
 
@@ -132,9 +142,11 @@
     padding:0 12px;height:40px;flex:1 1 240px;min-width:180px;}
   .search svg{width:16px;height:16px;color:var(--faint);flex-shrink:0;}
   .search input{border:none;background:none;outline:none;color:var(--ink);font-family:var(--sans);font-size:14px;width:100%;}
-  .zoom{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--muted);font-family:var(--mono);white-space:nowrap;}
-  .zoom input[type=range]{accent-color:var(--accent);width:118px;cursor:pointer;}
-  .zbtn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;flex:0 0 auto;
+  .zoom{display:inline-flex;align-items:center;gap:9px;height:38px;padding:0 14px;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;
+    font-size:14px;color:var(--muted);font-family:var(--mono);white-space:nowrap;}
+  .zoom input[type=range]{accent-color:var(--accent);width:118px;cursor:pointer;direction:ltr;}
+  .zbtn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;flex:0 0 auto;
     border-radius:7px;cursor:pointer;font-size:0;line-height:0;
     background-color:var(--panel);background-repeat:no-repeat;background-position:center;
     border:1px solid var(--line);color:var(--ink-2);transition:all .12s;user-select:none;}
@@ -631,6 +643,15 @@
     display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.75);}
   .pvbody .pvnone .ni svg{width:40px;height:40px;}
   .pvbody .pvnone p{color:rgba(255,255,255,.7);font-size:14px;}
+  /* prev / next arrows shown while a file is enlarged — step through the visible gallery */
+  .pvnav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:52px;height:52px;border-radius:50%;
+    border:none;cursor:pointer;background:rgba(255,255,255,.12);color:#fff;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+    display:flex;align-items:center;justify-content:center;transition:background .12s,transform .12s;}
+  .pvnav:hover{background:rgba(255,255,255,.26);}
+  .pvnav:active{transform:translateY(-50%) scale(.93);}
+  .pvnav svg{width:26px;height:26px;}
+  .pvnav.pvnav-l{left:18px;} .pvnav.pvnav-r{right:18px;}
+  @media (max-width:560px){ .pvnav{width:44px;height:44px;} .pvnav svg{width:22px;height:22px;} .pvnav.pvnav-l{left:8px;} .pvnav.pvnav-r{right:8px;} }
 
   /* ---------- client settings (gear) button ---------- */
   .btnline.gearbtn{color:var(--accent-dim);border-color:var(--accent-soft);background:var(--accent-soft);}
@@ -717,16 +738,29 @@
   .setmodal-head h3{margin:0 0 6px;padding-inline-end:34px;font-size:17px;}
   .setmodal-head p{font-size:13px;color:var(--muted);margin:0;line-height:1.55;}
   .settingsmodal .mclose{top:18px;}
-  /* selection-album mode banner */
-  .selmode{margin:16px 24px 0;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;cursor:pointer;
-    background:var(--grad-soft);border:1px solid var(--accent-soft);transition:border-color .12s;}
-  .selmode:hover{border-color:var(--accent);}
-  .selmode .sm-ic{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  /* settings presets banner */
+  .selpreset{margin:16px 24px 0;display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border-radius:12px;
+    background:var(--grad-soft);border:1px solid var(--accent-soft);}
+  .selpreset .sp-ic{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
     background:var(--panel);color:var(--accent);box-shadow:var(--shadow-sm);}
-  .selmode .sm-ic svg{width:18px;height:18px;}
-  .selmode .sm-tx{flex:1;min-width:0;}
-  .selmode .sm-tx b{display:block;font-size:13.5px;color:var(--ink);}
-  .selmode .sm-tx small{font-size:11.5px;color:var(--muted);line-height:1.35;}
+  .selpreset .sp-ic svg{width:18px;height:18px;}
+  .selpreset .sp-main{flex:1;min-width:0;}
+  .selpreset .sp-tx b{display:block;font-size:13.5px;color:var(--ink);}
+  .selpreset .sp-tx small{display:block;font-size:11.5px;color:var(--muted);line-height:1.4;margin-top:1px;}
+  .selpreset .sp-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;}
+  .selpreset .sp-pick,.selpreset .sp-make{display:flex;gap:6px;flex:1 1 210px;min-width:0;}
+  .selpreset select,.selpreset input{flex:1;min-width:0;height:36px;background:var(--panel);border:1px solid var(--line);
+    color:var(--ink);border-radius:9px;font-family:var(--sans);font-size:13px;padding:0 10px;}
+  .selpreset select:focus,.selpreset input:focus{outline:none;border-color:var(--accent);}
+  .selpreset .sp-del{width:36px;height:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;
+    background:var(--panel);border:1px solid var(--line);border-radius:9px;color:var(--muted);transition:color .12s,border-color .12s;}
+  .selpreset .sp-del:hover{color:#e5484d;border-color:#e5484d;}
+  .selpreset .sp-del svg{width:16px;height:16px;}
+  .selpreset .sp-save{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 13px;cursor:pointer;
+    background:var(--accent);border:1px solid var(--accent);border-radius:9px;color:var(--accent-ink);font-family:var(--sans);
+    font-size:12.5px;font-weight:600;white-space:nowrap;transition:filter .12s;}
+  .selpreset .sp-save:hover{filter:brightness(1.06);}
+  .selpreset .sp-save svg{width:15px;height:15px;}
   /* tab rail */
   .settabs{display:flex;gap:4px;padding:14px 24px 0;overflow-x:auto;flex-shrink:0;}
   .settab{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:10px 10px 0 0;cursor:pointer;
@@ -747,7 +781,7 @@
   .cfield textarea:focus{outline:none;border-color:var(--accent);}
   .cfield input[type=color]{padding:4px;height:42px;cursor:pointer;}
   .rangewrap{display:flex;align-items:center;gap:10px;}
-  .rangewrap input[type=range]{accent-color:var(--accent);flex:1;cursor:pointer;}
+  .rangewrap input[type=range]{accent-color:var(--accent);flex:1;cursor:pointer;direction:ltr;}
   .rangeval{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:42px;text-align:end;}
   /* inline action buttons + danger zone */
   .setact{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;cursor:pointer;
@@ -870,6 +904,10 @@
 <div id="site-header"></div>
 <script src="./header.js"></script>
 <script src="./project-numbering.js"></script>
+<script src="./supabase-config.js"></script>
+<script src="./auth-store.js"></script>
+<script src="./kolkli-db.js"></script>
+<script src="./kolkli-file-sync.js"></script>
 <div class="wrap">
 
   <!-- ============ header ============ -->
@@ -1152,12 +1190,30 @@
       <p data-i18n="setSub"></p>
     </div>
 
-    <!-- selection-album mode -->
-    <label class="selmode">
-      <span class="sm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.48 3.5a.5.5 0 0 1 1.04 0l2.06 4.18 4.6.67a.5.5 0 0 1 .28.85l-3.33 3.25.79 4.58a.5.5 0 0 1-.73.53L12 15.9l-4.12 2.16a.5.5 0 0 1-.72-.53l.78-4.58L4.6 9.7a.5.5 0 0 1 .28-.85l4.6-.67Z"/></svg></span>
-      <span class="sm-tx"><b data-i18n="selModeTitle"></b><small data-i18n="selModeDesc"></small></span>
-      <span class="switch"><input type="checkbox" id="alSelectionMode"><span class="track"></span></span>
-    </label>
+    <!-- settings presets: save the current settings under a name + apply saved presets to future projects -->
+    <div class="selpreset">
+      <span class="sp-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></span>
+      <div class="sp-main">
+        <div class="sp-tx"><b data-i18n="presetTitle"></b><small data-i18n="presetDesc"></small></div>
+        <div class="sp-row">
+          <div class="sp-pick">
+            <select id="setPresetSel">
+              <option value="" data-i18n="presetPick"></option>
+            </select>
+            <button class="sp-del hidden" id="setPresetDel" type="button" data-i18n-title="presetDelTitle" data-i18n-aria="presetDelTitle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+          <div class="sp-make">
+            <input id="setPresetName" type="text" data-i18n-ph="presetNamePh" spellcheck="false">
+            <button class="sp-save" id="setPresetSave" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+              <span data-i18n="presetSaveBtn"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- tab rail -->
     <div class="settabs" id="setTabs">
@@ -1310,6 +1366,10 @@
             <label class="permrow">
               <span class="pl"><b data-i18n="permSelectAll"></b><small data-i18n="permSelectAllD"></small></span>
               <span class="switch"><input type="checkbox" id="perm_selectAll"><span class="track"></span></span>
+            </label>
+            <label class="permrow">
+              <span class="pl"><b data-i18n="permMultiSelect"></b><small data-i18n="permMultiSelectD"></small></span>
+              <span class="switch"><input type="checkbox" id="perm_multiSelect"><span class="track"></span></span>
             </label>
             <label class="permrow">
               <span class="pl"><b data-i18n="permFolderCreate"></b><small data-i18n="permFolderCreateD"></small></span>
@@ -1736,6 +1796,8 @@
     </button>
   </div>
   <div class="pvbody" id="pvBody"></div>
+  <button type="button" class="pvnav pvnav-l" id="pvArrowL" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <button type="button" class="pvnav pvnav-r" id="pvArrowR" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
 </div>
 
 <script>
@@ -1826,13 +1888,17 @@
       permUpload:'העלאת קבצים נוספים', permUploadD:'הוספת תמונות או קבצים לגלריה',
       permSelection:'שינוי בחירת התמונות', permSelectionD:'סימון וביטול בחירה של קבצים',
       permSelectAll:'סמן / בטל סימון הכול', permSelectAllD:'הלקוח יכול לסמן או לבטל סימון של כל הקבצים המוצגים בלחיצה אחת',
+      permMultiSelect:'בחירה מרובה של קבצים', permMultiSelectD:'הלקוח יכול לסמן כמה קבצים יחד ולבצע עליהם פעולה אחת (העברה לתיקייה או מחיקה)',
       permFolderCreate:'יצירת תיקיות חדשות', permFolderCreateD:'הלקוח יכול ליצור תיקיות חדשות בגלריה',
       permFolderManage:'ניהול מבנה התיקיות', permFolderManageD:'שינוי שם, סדר, קינון ומחיקה של תיקיות',
       permFolderMove:'העברת קבצים בין תיקיות', permFolderMoveD:'העברת קבצים מתיקייה לתיקייה',
       permViewOnly:'צפייה בלבד', permViewOnlyD:'ללא אפשרות לבצע שינויים — מבטל את כל שאר ההרשאות',
       setBtn:'הגדרות', setTitle:'הגדרות הפרויקט',
       setSub:'נהלו את פרטי הפרויקט, השיתוף, ההרשאות והעיצוב. ההגדרות נשמרות במכשיר זה בלבד.',
-      selModeTitle:'מצב פרויקט בחירה', selModeDesc:'הלקוח רק צופה, מסמן מועדפים ומוסיף הערות — בלי למחוק או לשנות סדר.',
+      presetTitle:'תבניות של הגדרות', presetDesc:'החילו ערכת הגדרות שמורה, או שמרו את ההגדרות הנוכחיות תחת שם — לשימוש חוזר מהיר בפרויקטים הבאים.',
+      presetPick:'בחירת תבנית…', presetNamePh:'שם התבנית', presetSaveBtn:'שמור כתבנית', presetDelTitle:'מחיקת התבנית',
+      presetApplied:'התבנית הוחלה', presetSaved:'התבנית נשמרה', presetUpdated:'התבנית עודכנה', presetDeleted:'התבנית נמחקה',
+      presetDelConfirmTitle:'למחוק את התבנית?', presetDelConfirmBody:n=>`התבנית "${n}" תימחק לצמיתות. פרויקטים קיימים לא יושפעו.`, presetDelYes:'מחק תבנית',
       tabGeneral:'כללי', tabAccess:'שיתוף וגישה', tabContent:'תוכן וסידור', tabBrand:'עיצוב ומיתוג', tabAdvanced:'מתקדם',
       secAlbum:'פרטי הפרויקט',
       alTitleL:'שם הפרויקט', alTitlePh:'למשל: החתונה של דנה ויוסי',
@@ -1987,13 +2053,17 @@
       permUpload:'Upload more files', permUploadD:'Add extra images or files',
       permSelection:'Change image selection', permSelectionD:'Select and deselect files',
       permSelectAll:'Select / deselect all', permSelectAllD:'The client can select or deselect all displayed files with one click',
+      permMultiSelect:'Multiple file selection', permMultiSelectD:'The client can mark several files together and act on them at once (move to folder or delete)',
       permFolderCreate:'Create new folders', permFolderCreateD:'Client can create new folders in the gallery',
       permFolderManage:'Manage folder structure', permFolderManageD:'Rename, reorder, nest and delete folders',
       permFolderMove:'Move files between folders', permFolderMoveD:'Move files from one folder to another',
       permViewOnly:'View only', permViewOnlyD:'No changes allowed — overrides all other permissions',
       setBtn:'Settings', setTitle:'Project settings',
       setSub:'Manage project details, sharing, permissions and design. Settings are stored on this device only.',
-      selModeTitle:'Selection project mode', selModeDesc:'The client can only view, mark favorites and add notes — no deleting or reordering.',
+      presetTitle:'Settings presets', presetDesc:'Apply a saved settings preset, or save the current settings under a name to reuse quickly in future projects.',
+      presetPick:'Choose a preset…', presetNamePh:'Preset name', presetSaveBtn:'Save as preset', presetDelTitle:'Delete preset',
+      presetApplied:'Preset applied', presetSaved:'Preset saved', presetUpdated:'Preset updated', presetDeleted:'Preset deleted',
+      presetDelConfirmTitle:'Delete preset?', presetDelConfirmBody:n=>`The preset "${n}" will be permanently deleted. Existing projects are unaffected.`, presetDelYes:'Delete preset',
       tabGeneral:'General', tabAccess:'Sharing & access', tabContent:'Content & order', tabBrand:'Design & branding', tabAdvanced:'Advanced',
       secAlbum:'Project details',
       alTitleL:'Project name', alTitlePh:'e.g. Dana & Joe’s wedding',
@@ -2148,13 +2218,17 @@
       permUpload:'Загрузка дополнительных файлов', permUploadD:'Добавление изображений или файлов',
       permSelection:'Изменение выбора изображений', permSelectionD:'Выбор и отмена выбора файлов',
       permSelectAll:'Выбрать / снять всё', permSelectAllD:'Клиент может выбрать или снять выбор со всех показанных файлов одним нажатием',
+      permMultiSelect:'Множественный выбор файлов', permMultiSelectD:'Клиент может отметить несколько файлов вместе и выполнить над ними одно действие (перемещение в папку или удаление)',
       permFolderCreate:'Создание новых папок', permFolderCreateD:'Клиент может создавать папки в галерее',
       permFolderManage:'Управление структурой папок', permFolderManageD:'Переименование, порядок, вложение и удаление папок',
       permFolderMove:'Перемещение файлов между папками', permFolderMoveD:'Перемещение файлов из одной папки в другую',
       permViewOnly:'Только просмотр', permViewOnlyD:'Изменения запрещены — отменяет все остальные права',
       setBtn:'Настройки', setTitle:'Настройки проекта',
       setSub:'Управляйте данными проекта, доступом, правами и оформлением. Настройки хранятся только на этом устройстве.',
-      selModeTitle:'Режим выбора', selModeDesc:'Клиент может только просматривать, отмечать избранное и оставлять заметки — без удаления и изменения порядка.',
+      presetTitle:'Пресеты настроек', presetDesc:'Примените сохранённый пресет настроек или сохраните текущие настройки под именем для быстрого повторного использования в будущих проектах.',
+      presetPick:'Выберите пресет…', presetNamePh:'Название пресета', presetSaveBtn:'Сохранить как пресет', presetDelTitle:'Удалить пресет',
+      presetApplied:'Пресет применён', presetSaved:'Пресет сохранён', presetUpdated:'Пресет обновлён', presetDeleted:'Пресет удалён',
+      presetDelConfirmTitle:'Удалить пресет?', presetDelConfirmBody:n=>`Пресет «${n}» будет удалён навсегда. Существующие проекты не затрагиваются.`, presetDelYes:'Удалить пресет',
       tabGeneral:'Общее', tabAccess:'Доступ', tabContent:'Контент и порядок', tabBrand:'Оформление', tabAdvanced:'Дополнительно',
       secAlbum:'Данные проекта',
       alTitleL:'Название проекта', alTitlePh:'напр.: Свадьба Даны и Йоси',
@@ -2269,6 +2343,196 @@
   // loaded value so saving the form doesn't drop/reset it.
   let settingsStatus='draft';
 
+  // ===================================================================
+  //  PERSISTENT GALLERY STORE  (files + client selections survive refresh,
+  //  browser close, re-login and the client share link — via
+  //  kolkli-file-sync.js -> Supabase, with an instant IndexedDB/localStorage
+  //  fallback when the backend is not configured). Scope = the GALLERY id
+  //  (owner: ac_share id; client: ?g=) so owner and client read/write the SAME
+  //  project; deliberately NOT owner-scoped.
+  // ===================================================================
+  const CID = (window.KolkliSync ? KolkliSync.clientId() : 'c_local');
+  function galleryId(){
+    if(isClientView()){ try{ return new URLSearchParams(location.search).get('g')||'default'; }catch(_){ return 'default'; } }
+    try{ return shareState().id; }catch(_){ return 'default'; }
+  }
+  const GID = galleryId();
+  const GAL = (window.KolkliSync ? KolkliSync.store({
+      service:'select', token:GID, role:(isClientView()?'client':'owner'),
+      dbName:'kolkli_gallery', metaKey:'kolkli_gallery_files', picksKey:'kolkli_gallery_picks'
+  }) : null);
+  const GAL_DONE_KEY='kolkli_gallery_done::'+GID+'::'+CID;
+  let galHydrated=false;          // true once init() has loaded the stored gallery
+  let galRemoteSelOthers=[];      // OTHER clients' picks (merge target so we never overwrite them)
+  let galLastHash='';             // structural fingerprint — skip needless pushes on view switches
+  let galMetaTimer=null, galWatchTimer=null;
+  const GAL_T={
+    he:{ saving:'שומר…', failed:'✕ נכשל · לחצו לניסיון חוזר', errEmpty:'אין קבצים שמורים בגלריה — יש להעלות קבצים לפני שליחת הקישור.', errPending:'העלאה עדיין בתהליך — יש להמתין לסיום השמירה לפני שליחת הקישור.', errFailed:'חלק מהקבצים לא נשמרו — יש להעלות אותם מחדש לפני השליחה.', stSaving:'שומר…', stSaved:'✓ נשמר', stError:'שמירה נכשלה — מנסה שוב…' },
+    en:{ saving:'saving…', failed:'✕ Failed · click to retry', errEmpty:'No saved files in the gallery yet — upload files before sending the link.', errPending:'Upload still in progress — wait for saving to finish before sending the link.', errFailed:'Some files failed to save — re-upload them before sending.', stSaving:'saving…', stSaved:'✓ saved', stError:'save failed — retrying…' },
+    ru:{ saving:'сохранение…', failed:'✕ Ошибка · нажмите для повтора', errEmpty:'В галерее ещё нет сохранённых файлов — загрузите файлы перед отправкой ссылки.', errPending:'Загрузка ещё идёт — дождитесь завершения сохранения перед отправкой ссылки.', errFailed:'Некоторые файлы не сохранились — загрузите их заново перед отправкой.', stSaving:'сохранение…', stSaved:'✓ сохранено', stError:'ошибка сохранения — повтор…' }
+  };
+  function galT(k){ return (GAL_T[lang]||GAL_T.he)[k]; }
+
+  // one metadata row per file (exactly the fields the spec lists)
+  function galFileMeta(){
+    return files.map((f,i)=>({
+      id:f.id, name:f.name, ext:f.ext, kind:f.kind,
+      type:(f.file&&f.file.type)||f.mime||'', size:f.size||0,
+      folderId:(f.folderId==null?null:f.folderId), note:f.note||'',
+      order:i, status:f.status||'stored', storagePath:'select/'+GID+'/'+f.id
+    }));
+  }
+  function galRecord(){
+    let alb={},cli={}; try{alb=loadAlbum();}catch(_){ } try{cli=loadClient();}catch(_){}
+    return { token:GID, service:'select', files:galFileMeta(),
+             folders:folders.map(fo=>({id:fo.id,name:fo.name,parentId:fo.parentId||null})),
+             title:(alb.alTitle||cli.name||''), status:(cli.status||settingsStatus||'draft'), updated:Date.now() };
+  }
+  function galSnapshotHash(rec){ rec=rec||galRecord(); return JSON.stringify(rec.files)+'|'+JSON.stringify(rec.folders)+'|'+rec.title+'|'+rec.status; }
+  // persist gallery STRUCTURE (owner only), debounced + fingerprinted; never touches picks
+  function persistGallery(){
+    if(!GAL || isClientView() || !galHydrated) return;
+    const rec=galRecord(), h=galSnapshotHash(rec);
+    if(h===galLastHash) return;
+    galLastHash=h;
+    if(galMetaTimer) clearTimeout(galMetaTimer);
+    galMetaTimer=setTimeout(()=>{ try{ GAL.writeMeta(rec); }catch(_){} }, 150);
+  }
+
+  // per-file upload-status badge
+  function galStatusHtml(f){
+    if(!f || !f.status || f.status==='stored') return '';
+    if(f.status==='failed') return '<div class="gal-status failed"><button type="button" class="gal-retry" data-galretry="'+f.id+'">'+escapeHtml(galT('failed'))+'</button></div>';
+    return '<div class="gal-status uploading"><span class="gal-spin"></span>'+escapeHtml(galT('saving'))+'</div>';
+  }
+  function updateCardStatus(f){
+    const card=document.querySelector('.fcard[data-id="'+f.id+'"]'); if(!card) return;
+    card.classList.toggle('gal-uploading', f.status==='uploading');
+    card.classList.toggle('gal-failed', f.status==='failed');
+    const th=card.querySelector('.fthumb'); if(!th) return;
+    let badge=th.querySelector('.gal-status');
+    if(!f.status || f.status==='stored'){ if(badge) badge.remove(); return; }
+    if(!badge){ badge=document.createElement('div'); th.appendChild(badge); }
+    badge.outerHTML=galStatusHtml(f);
+  }
+  // write the bytes FIRST + verify, only THEN mark "stored"; on failure show a retry badge
+  // and keep the file OUT of the "ready to send" set (never reported uploaded before proven)
+  function persistBlob(f){
+    if(!GAL || !f.file){ f.status='stored'; return; }
+    f.status='uploading';
+    GAL.putBlob(f.id, f.file).then(function(ok){
+      f.status = ok ? 'stored' : 'failed';
+      updateCardStatus(f); persistGallery(); renderStats();
+    }).catch(function(){ f.status='failed'; updateCardStatus(f); });
+  }
+  function retryBlob(id){
+    const f=fileById(id); if(!f) return;
+    if(!f.file){ f.status='stored'; renderGrid(); return; }
+    persistBlob(f); updateCardStatus(f);
+  }
+
+  // ---- client selections ----
+  function galSelectionEntries(){
+    return files.filter(f=>f.selected).map(f=>({ fileId:f.id, clientId:CID, at:Date.now(), confirmed:!!selConfirmed }));
+  }
+  // save picks now (local) + server (debounced+retried); server array = mine UNION others'
+  function persistPicks(){
+    if(!GAL || !isClientView()) return;    // only a real client (?g) persists; owner preview is ephemeral
+    const mine=galSelectionEntries();
+    const union=galRemoteSelOthers.concat(mine);
+    GAL.savePicks(union, mine, { confirmed:!!selConfirmed });
+    try{ localStorage.setItem(GAL_DONE_KEY, selConfirmed?'1':'0'); }catch(_){}
+  }
+  function applyServerSelection(sel, forClientOnly){
+    sel=Array.isArray(sel)?sel:[];
+    galRemoteSelOthers=sel.filter(e=>e&&e.clientId&&e.clientId!==CID);
+    const apply = forClientOnly ? sel.filter(e=>e.clientId===CID) : sel;
+    const ids=new Set(apply.map(e=>e.fileId));
+    let changed=false;
+    files.forEach(f=>{ const s=ids.has(f.id); if(s!==f.selected){ f.selected=s; changed=true; } });
+    return changed;
+  }
+
+  // ---- hydrate on load (owner + client) ----
+  async function hydrateGallery(){
+    if(!GAL){ galHydrated=true; return; }
+    let meta=GAL.readMeta();               // instant local (offline-safe)
+    let remoteSel=null;
+    try{
+      const remote=await GAL.pull();       // owner: pullService; client: pullToken (cross-device)
+      if(remote){
+        if(remote.files){ meta={ files:remote.files, folders:remote.folders||[] }; if(!isClientView()) GAL.writeMetaLocal(meta); }
+        if(remote.selection) remoteSel=remote.selection;
+      }
+    }catch(_){}
+    if(meta && Array.isArray(meta.folders)) folders=meta.folders.map(fo=>({id:fo.id,name:fo.name,parentId:(fo.parentId||null),open:true}));
+    if(meta && Array.isArray(meta.files)){
+      const ordered=meta.files.slice().sort((a,b)=>((a.order||0)-(b.order||0)));
+      files=ordered.map(m=>({ id:m.id, file:null, name:m.name, ext:m.ext, kind:m.kind, mime:m.type||'', size:m.size||0,
+        folderId:(m.folderId==null?null:m.folderId), note:m.note||'', url:null, selected:false, picked:false,
+        status:m.status||'stored', storagePath:m.storagePath }));
+    }
+    if(!remoteSel){ const lp=GAL.readPicks(); if(lp&&lp.selection) remoteSel=lp.selection; }
+    applyServerSelection(remoteSel, isClientView());
+    if(isClientView()){
+      let done=false; try{ done=localStorage.getItem(GAL_DONE_KEY)==='1'; }catch(_){}
+      const mineConfirmed=(remoteSel||[]).some(e=>e.clientId===CID && e.confirmed);
+      selConfirmed = done || mineConfirmed;
+    }
+    await restoreThumbs();
+    galLastHash=galSnapshotHash();         // don't re-push the record we just loaded
+    galHydrated=true;
+  }
+  async function restoreThumbs(){
+    if(!GAL) return;
+    const jobs=files.map(f=> GAL.blobUrl(f.id).then(u=>{ if(u) f.url=u; }).catch(()=>{}));
+    try{ await Promise.all(jobs); }catch(_){}
+  }
+  // owner watches the client's live picks (only when a real backend is configured)
+  function startOwnerSelectionWatch(){
+    if(!GAL || isClientView() || !GAL.enabled()) return;
+    const tick=()=>{ GAL.pullSelection().then(sel=>{ if(sel && applyServerSelection(sel,false)){ renderGrid(); renderStats(); } }); };
+    galWatchTimer=setInterval(tick, 6000);
+    try{ window.addEventListener('focus', tick); }catch(_){}
+  }
+
+  // ---- share/send guardrails ----
+  function galleryReadyForShare(){
+    if(!files.length) return { ok:false, reason:galT('errEmpty') };
+    if(files.some(f=>f.status==='uploading')) return { ok:false, reason:galT('errPending') };
+    if(files.some(f=>f.status==='failed')) return { ok:false, reason:galT('errFailed') };
+    return { ok:true };
+  }
+  function guardShare(){ const r=galleryReadyForShare(); if(!r.ok){ showToast(r.reason); return false; } return true; }
+
+  // ---- save-status pill + injected styles ----
+  function injectGalStyles(){
+    if(document.getElementById('gal-sync-styles')) return;
+    const s=document.createElement('style'); s.id='gal-sync-styles';
+    s.textContent='.fcard.gal-uploading{opacity:.72}.fcard.gal-failed{outline:2px solid #e5484d;outline-offset:-2px}'
+      +'.gal-status{position:absolute;inset-inline-start:6px;bottom:6px;z-index:6;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;color:#fff;background:rgba(20,20,26,.74)}'
+      +'.gal-status.failed{background:#e5484d;cursor:pointer}.gal-status.failed .gal-retry{all:unset;cursor:pointer;color:#fff;font-weight:600;font:inherit}'
+      +'.gal-spin{width:10px;height:10px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:galspin .7s linear infinite;display:inline-block}@keyframes galspin{to{transform:rotate(360deg)}}'
+      +'#galSavePill{position:fixed;z-index:99999;inset-inline-end:16px;bottom:16px;display:none;align-items:center;gap:7px;font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:999px;color:#fff;background:#3a3a44;box-shadow:0 6px 22px rgba(0,0,0,.22);transition:opacity .25s}'
+      +'#galSavePill.saving{background:#5b5bd6}#galSavePill.saved{background:#30a46c}#galSavePill.error{background:#e5484d}';
+    document.head.appendChild(s);
+  }
+  function initSavePill(){
+    injectGalStyles();
+    let pill=document.getElementById('galSavePill');
+    if(!pill){ pill=document.createElement('div'); pill.id='galSavePill'; document.body.appendChild(pill); }
+    let hideT=null;
+    if(window.KolkliSync && KolkliSync.onStatus){
+      KolkliSync.onStatus(function(state){
+        if(hideT){ clearTimeout(hideT); hideT=null; }
+        if(state==='saving'){ pill.className='saving'; pill.textContent=galT('stSaving'); pill.style.display='inline-flex'; pill.style.opacity='1'; }
+        else if(state==='saved'){ pill.className='saved'; pill.textContent=galT('stSaved'); pill.style.display='inline-flex'; pill.style.opacity='1'; hideT=setTimeout(function(){ pill.style.opacity='0'; setTimeout(function(){ pill.style.display='none'; },260); },1400); }
+        else if(state==='error'||state==='retrying'){ pill.className='error'; pill.textContent=galT('stError'); pill.style.display='inline-flex'; pill.style.opacity='1'; }
+      });
+    }
+  }
+
+
   // ---- helpers ----
   function organizerPayloadError(payload){
     if(payload.files > 5) return { code:'payload_limit', field:'files', max:5, actual:payload.files };
@@ -2374,7 +2638,7 @@
   function pad3(n){ return String(n).padStart(3,'0'); }
   function mmss(s){ s=Math.max(0,Math.round(s||0)); const m=Math.floor(s/60), ss=s%60; return m+':'+String(ss).padStart(2,'0'); }
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  function urlFor(f){ if(!f.url) f.url=URL.createObjectURL(f.file); return f.url; }
+  function urlFor(f){ if(!f.url && f.file){ try{ f.url=URL.createObjectURL(f.file); }catch(_){} } return f.url||''; }
   function revoke(f){ if(f.url){ URL.revokeObjectURL(f.url); f.url=null; } }
   function folderName(id){ if(id==null) return t.unsorted; const f=folders.find(x=>x.id===id); return f?f.name:t.unsorted; }
 
@@ -2640,12 +2904,13 @@
   function lockedCardHtml(f,ord){
     const fn=folderName(f.folderId);
     return `
-      <div class="fcard locked ${f.selected?'sel':''} ${selAtCap(f)?'atcap':''}" data-id="${f.id}" title="${escapeHtml(t.lockedHint(fn))}">
+      <div class="fcard locked ${f.selected?'sel':''} ${selAtCap(f)?'atcap':''} ${f.status==='uploading'?'gal-uploading':''} ${f.status==='failed'?'gal-failed':''}" data-id="${f.id}" title="${escapeHtml(t.lockedHint(fn))}">
         <div class="fthumb">
           <span class="fnum" title="${escapeHtml(t.orderTitle)}">${pad3(ord)}</span>
           ${thumbHtml(f)}
           ${wmOverlayHtml(f)}
           ${fileXButtonHtml(f)}
+          ${galStatusHtml(f)}
           <div class="fcheck" data-check="${f.id}" title="${escapeHtml(t.selectHint)}">${ICON.check}</div>
           <div class="lockbadge">
             <span class="lockfolder">${escapeHtml(t.lockedTag)}</span>
@@ -2662,12 +2927,13 @@
 
   function activeCardHtml(f,ord){
     return `
-      <div class="fcard ${f.selected?'sel':''} ${f.picked?'picked':''} ${selAtCap(f)?'atcap':''}" data-id="${f.id}" draggable="true">
+      <div class="fcard ${f.selected?'sel':''} ${f.picked?'picked':''} ${selAtCap(f)?'atcap':''} ${f.status==='uploading'?'gal-uploading':''} ${f.status==='failed'?'gal-failed':''}" data-id="${f.id}" draggable="true">
         <div class="fthumb" data-preview="${f.id}">
           <span class="fnum" title="${escapeHtml(t.orderTitle)}">${pad3(ord)}</span>
           ${thumbHtml(f)}
           ${wmOverlayHtml(f)}
           ${fileXButtonHtml(f)}
+          ${galStatusHtml(f)}
           <div class="fcheck" data-check="${f.id}" title="${escapeHtml(t.selectHint)}">${ICON.check}</div>
           <div class="fname-ov">${escapeHtml(f.name)}</div>
         </div>
@@ -2726,7 +2992,7 @@
     }
   }
 
-  function renderAll(){ renderFolders(); renderGrid(); renderStats(); }
+  function renderAll(){ renderFolders(); renderGrid(); renderStats(); persistGallery(); }
 
   // ---- stats strip: gallery total + live client-pick quotas ----
   function videosEnabled(m){
@@ -2945,8 +3211,9 @@
     return cand;
   }
   function insertFile(item,folderId,forcedName){
-    files.push({ id:nid(), file:item.file, name:forcedName||item.file.name, ext:item.ext, kind:item.kind,
-      size:item.file.size, folderId:folderId, note:'', url:null, selected:false, picked:false });
+    const rec={ id:nid(), file:item.file, name:forcedName||item.file.name, ext:item.ext, kind:item.kind,
+      size:item.file.size, folderId:folderId, note:'', url:null, selected:false, picked:false, status:'uploading' };
+    files.push(rec); persistBlob(rec);
   }
 
   // duplicate dialog (promise-ish via callback)
@@ -2985,6 +3252,7 @@
     else if(f.ext==='pdf'){ body.innerHTML=`<iframe src="${url}"></iframe>`; }
     else { body.innerHTML=`<div class="pvnone"><div class="ni">${ICON.doc}</div><div style="font-weight:600;font-size:15px;margin-bottom:6px">${escapeHtml(t.noPreviewTitle)}</div><p>${escapeHtml(t.noPreviewBody)}</p></div>`; }
     syncPvPick();
+    syncPvNav();
     el('pvOverlay').classList.add('show');
   }
   // paint the enlarged-view ✓ toggle to match the previewed file's selection state, so the
@@ -3005,6 +3273,23 @@
     el('pvOverlay').classList.remove('show');
     el('pvBody').innerHTML=''; // stop playback
     pvFile=null;
+  }
+  // show the prev/next arrows only when there's more than one file to step through;
+  // label each edge by its logical direction (RTL: forward/next = left edge)
+  function syncPvNav(){
+    const L=el('pvArrowL'), R=el('pvArrowR'); if(!L||!R) return;
+    const multi=visibleFiles().length>1;
+    L.style.display=multi?'':'none'; R.style.display=multi?'':'none';
+    L.setAttribute('aria-label', t.dir==='rtl'?'Next':'Previous');
+    R.setAttribute('aria-label', t.dir==='rtl'?'Previous':'Next');
+  }
+  // step through the currently-visible files while the preview is open (+1 next, -1 prev, wraps)
+  function navPreview(step){
+    if(!pvFile) return;
+    const items=visibleFiles(); if(items.length<2) return;
+    const idx=items.findIndex(x=>x.id===pvFile.id); if(idx<0) return;
+    const n=items.length;
+    openPreview(items[(idx+step+n)%n]);
   }
 
   // =====================================================
@@ -3155,9 +3440,9 @@
   // =====================================================
   //  CLIENT SETTINGS  (per-gallery client details + permissions)
   // =====================================================
-  const PERM_KEYS=['download','zip','editText','reorder','delete','upload','selection','selectAll','folderCreate','folderManage','folderMove','viewOnly'];
+  const PERM_KEYS=['download','zip','editText','reorder','delete','upload','selection','selectAll','multiSelect','folderCreate','folderManage','folderMove','viewOnly'];
   const CLIENT_DEFAULT={ name:'', email:'', phone:'', event:'', deadline:'', status:'draft',
-    perms:{ download:true, zip:true, editText:false, reorder:true, delete:false, upload:false, selection:true, selectAll:true, folderCreate:false, folderManage:false, folderMove:false, viewOnly:false } };
+    perms:{ download:true, zip:true, editText:false, reorder:true, delete:false, upload:false, selection:true, selectAll:true, multiSelect:false, folderCreate:false, folderManage:false, folderMove:false, viewOnly:false } };
   function loadClient(){
     try{
       const raw=localStorage.getItem(scopedKey('ac_client'));
@@ -3179,8 +3464,11 @@
     ['alWmOn','chk',false],['alWmType','sel','logo'],['alWmText','text',''],['alWmPos','sel','br'],['alWmOpacity','rng',35],
     ['alNotifNewFiles','chk',true],['alNotifFavorites','chk',true],['alNotifExpiry','chk',true],
     ['alExpiryOn','chk',false],['alExpiryDate','date',''],['alExpiryAction','sel','readonly'],
-    ['alSelectionMode','chk',false],
   ];
+  // fields a settings-preset captures for reuse: everything reusable, minus the per-project
+  // identity (title/description), the specific access password, and the specific expiry date
+  const PRESET_SKIP=['alTitle','alDesc','alPw','alExpiryDate'];
+  const PRESET_ALBUM_KEYS=ALBUM_FIELDS.filter(f=>PRESET_SKIP.indexOf(f[0])<0).map(f=>[f[0],f[1]]);
   function loadAlbum(){
     const d={}; ALBUM_FIELDS.forEach(([id,,def])=>d[id]=def);
     try{ const o=JSON.parse(localStorage.getItem(scopedKey('ac_album'))||'{}'); if(o&&typeof o==='object') Object.assign(d,o); }catch(_){}
@@ -3233,6 +3521,7 @@
     ALBUM_FIELDS.forEach(([id,kind])=>setField(id,kind,a[id]));
     renderLogoPreview();
     applyViewOnlyLock(); applySettingsDeps(); setActiveTab('general');
+    setPresets=loadSetPresets(); renderSetPresetOptions(''); el('setPresetName').value='';
     el('settingsOverlay').classList.add('show');
   }
   // "view only" is an override: when on, every other permission is forced off + disabled
@@ -3265,14 +3554,6 @@
     if(shared) el('alShareLink').value=shareLinkFor(shareState().id);
     const gu=el('alGuestUpload').checked, ga=el('alGuestApproval');
     ga.disabled=!gu; ga.closest('.permrow').classList.toggle('disabled', !gu);
-  }
-  // selection-album preset: view + favorite + note, but no delete / reorder / upload
-  function applySelectionMode(){
-    if(!el('alSelectionMode').checked) return;
-    el('perm_delete').checked=false; el('perm_reorder').checked=false; el('perm_upload').checked=false;
-    el('perm_folderCreate').checked=false; el('perm_folderManage').checked=false; el('perm_folderMove').checked=false;
-    el('alFavorites').checked=true; el('alEditRequests').checked=true;
-    applyViewOnlyLock(); applySettingsDeps();
   }
   function setActiveTab(name){
     document.querySelectorAll('#setTabs .settab').forEach(b=>b.classList.toggle('on', b.getAttribute('data-tab')===name));
@@ -3315,6 +3596,66 @@
     renderOtherCard();  // refresh the "אחר" count in case classification changed
     renderGrid();       // repaint thumbnails so watermark / brand changes show at once
     applyPreviewMode(); // if we're in the live client preview, re-apply the freshly saved permissions
+  }
+
+  // =====================================================
+  //  SETTINGS PRESETS  (save the current settings under a name, then apply
+  //  them to future projects. Stored per owner via scopedKey so they follow
+  //  the studio across every project — the reusable reason presets exist.)
+  // =====================================================
+  let setPresets=loadSetPresets();
+  function loadSetPresets(){
+    try{ const a=JSON.parse(localStorage.getItem(scopedKey('ac_setpresets'))||'[]'); return Array.isArray(a)?a:[]; }catch(_){ return []; }
+  }
+  function saveSetPresets(){ try{ localStorage.setItem(scopedKey('ac_setpresets'), JSON.stringify(setPresets)); }catch(_){} }
+  // (re)build the dropdown: keep the placeholder option, then one <option> per saved preset.
+  // selId re-selects a preset after saving; '' falls back to the placeholder.
+  function renderSetPresetOptions(selId){
+    const sel=el('setPresetSel');
+    sel.querySelectorAll('option[data-sp]').forEach(o=>o.remove());
+    setPresets.forEach(p=>{
+      const o=document.createElement('option');
+      o.value=p.id; o.textContent=p.name; o.setAttribute('data-sp','1');
+      sel.appendChild(o);
+    });
+    sel.value=(selId && setPresets.some(p=>p.id===selId)) ? selId : '';
+    el('setPresetDel').classList.toggle('hidden', !sel.value);
+  }
+  // fill the whole settings form from a stored preset (permissions + reusable album fields)
+  function applySetPreset(id){
+    const p=setPresets.find(x=>x.id===id); if(!p) return;
+    if(p.perms) PERM_KEYS.forEach(k=>{ const box=el('perm_'+k); if(box) box.checked=!!p.perms[k]; });
+    if(p.album) PRESET_ALBUM_KEYS.forEach(([fid,kind])=>{ if(Object.prototype.hasOwnProperty.call(p.album,fid)) setField(fid,kind,p.album[fid]); });
+    renderLogoPreview(); applyViewOnlyLock(); applySettingsDeps();
+    showToast(t.presetApplied);
+  }
+  function onSetPresetPick(){
+    const id=el('setPresetSel').value;
+    el('setPresetDel').classList.toggle('hidden', !id);
+    if(id) applySetPreset(id);
+  }
+  // capture the current form into a named preset. Re-saving under an existing name overwrites it.
+  function saveSetPreset(){
+    const name=el('setPresetName').value.trim();
+    if(!name){ el('setPresetName').focus(); flashInvalid(el('setPresetName')); return; }
+    const perms={}; PERM_KEYS.forEach(k=>{ const box=el('perm_'+k); perms[k]=!!(box&&box.checked); });
+    const album={}; PRESET_ALBUM_KEYS.forEach(([fid,kind])=>album[fid]=getField(fid,kind));
+    let target=setPresets.find(p=>p.name.toLowerCase()===name.toLowerCase());
+    const isNew=!target;
+    if(target){ target.perms=perms; target.album=album; }
+    else { target={ id:'sp'+genId(), name, perms, album }; setPresets.push(target); }
+    saveSetPresets();
+    renderSetPresetOptions(target.id);
+    el('setPresetName').value='';
+    showToast(isNew ? t.presetSaved : t.presetUpdated);
+  }
+  function deleteSetPreset(){
+    const id=el('setPresetSel').value; const p=setPresets.find(x=>x.id===id); if(!p) return;
+    confirmAsk(t.presetDelConfirmTitle, t.presetDelConfirmBody(p.name), ()=>{
+      setPresets=setPresets.filter(x=>x.id!==id); saveSetPresets();
+      renderSetPresetOptions('');
+      showToast(t.presetDeleted);
+    }, { yesText:t.presetDelYes, variant:'danger' });
   }
 
   // =====================================================
@@ -3615,6 +3956,7 @@
     clearTimeout(btn._flash); btn._flash=setTimeout(()=>{ span.textContent=t[key]||''; btn.classList.remove('ok'); }, 1500);
   }
   function copyShareLink(){
+    if(!guardShare()) return;
     const link=el('shareLink').value;
     const fallback=()=>{ const i=el('shareLink'); i.removeAttribute('readonly'); i.select(); try{document.execCommand('copy');}catch(_){}
       i.setAttribute('readonly','readonly'); i.blur(); };
@@ -3622,9 +3964,10 @@
     if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(link).then(done).catch(()=>{ fallback(); done(); }); }
     else { fallback(); done(); }
   }
-  function openShareLink(){ window.open(el('shareLink').value, '_blank', 'noopener'); }
+  function openShareLink(){ if(!guardShare()) return; window.open(el('shareLink').value, '_blank', 'noopener'); }
   // copy the settings-pane share link (separate input from the share modal's)
   function copyAlbumLink(){
+    if(!guardShare()) return;
     const i=el('alShareLink'), link=i.value;
     const fallback=()=>{ i.removeAttribute('readonly'); i.select(); try{document.execCommand('copy');}catch(_){} i.setAttribute('readonly','readonly'); i.blur(); };
     const done=()=>flashBtn('alShareCopy', t.shareCopied);
@@ -3632,6 +3975,7 @@
     else { fallback(); done(); }
   }
   function sendShare(){
+    if(!guardShare()) return;
     saveShareState();
     const link=el('shareLink').value, email=el('shareEmail').value.trim(), phone=el('sharePhone').value.trim();
     const subject=encodeURIComponent(t.shareTitle), body=encodeURIComponent(link);
@@ -3813,6 +4157,7 @@
 
     // purple multi-select (batch) actions
     el('msPickAllBtn').addEventListener('click',()=>{
+      if(!clientCan('multiSelect')) return;
       const vis=visibleFiles().filter(f=>!isLocked(f)); const allPick=vis.length>0 && vis.every(f=>f.picked);
       vis.forEach(f=>f.picked=!allPick); renderGrid();
     });
@@ -3822,12 +4167,13 @@
       const allSelected=vis.length>0 && vis.every(f=>f.selected);
       if(allSelected){ vis.forEach(f=>f.selected=false); selPromptShown=false; }
       else for(const f of vis){ if(!f.selected && selBlocked(f)) break; f.selected=true; }
-      renderGrid(); renderStats(); maybePromptSelConfirm();
+      renderGrid(); renderStats(); persistPicks(); maybePromptSelConfirm();
     });
     el('msDelBtn').addEventListener('click',()=>{
+      if(!clientCan('delete')) return;
       const picked=files.filter(f=>f.picked); if(!picked.length) return;
       confirmAsk(t.confirmDelTitle, t.confirmDelBody(picked.length), ()=>{
-        picked.forEach(revoke); files=files.filter(f=>!f.picked); renderAll();
+        picked.forEach(function(f){ revoke(f); if(GAL) GAL.delBlob(f.id); }); files=files.filter(f=>!f.picked); renderAll();
       });
     });
     // custom move-to-folder dropdown (themed popup instead of a native <select>)
@@ -3951,14 +4297,15 @@
       const cmOpt=e.target.closest('.cardmove-menu .fs-item'); if(cmOpt){ e.stopPropagation(); cardMoveApply(cmOpt); return; }
       const cm=e.target.closest('.cardmove'); if(cm){ e.stopPropagation(); toggleCardMove(cm); return; }
       const unassign=e.target.closest('[data-unassign]'); if(unassign){ e.stopPropagation(); const f=fileById(unassign.getAttribute('data-unassign')); if(f) unassignFile(f); return; }
-      const del=e.target.closest('[data-del]'); if(del){ e.stopPropagation(); if(!clientCan('delete')) return; const f=fileById(del.getAttribute('data-del')); if(f){ confirmAsk(t.confirmDelTitle,t.confirmDelBody(1),()=>{ revoke(f); files=files.filter(x=>x.id!==f.id); renderAll(); }); } return; }
+      const gr=e.target.closest('[data-galretry]'); if(gr){ e.stopPropagation(); retryBlob(gr.getAttribute('data-galretry')); return; }
+      const del=e.target.closest('[data-del]'); if(del){ e.stopPropagation(); if(!clientCan('delete')) return; const f=fileById(del.getAttribute('data-del')); if(f){ confirmAsk(t.confirmDelTitle,t.confirmDelBody(1),()=>{ revoke(f); if(GAL) GAL.delBlob(f.id); files=files.filter(x=>x.id!==f.id); renderAll(); }); } return; }
       const pv=e.target.closest('[data-preview]'); if(pv){ const f=fileById(pv.getAttribute('data-preview')); if(f) openPreview(f); return; }
     });
     grid.addEventListener('input',e=>{
       const note=e.target.closest('[data-note]'); if(!note) return;
       const f=fileById(note.getAttribute('data-note')); if(!f) return;
       if(!clientCan('editText')){ note.value=f.note||''; return; }  // captions locked → revert any keyboard edit
-      f.note=note.value;
+      f.note=note.value; persistGallery();
     });
     // drag files to folders
     grid.addEventListener('dragstart',e=>{
@@ -4035,7 +4382,9 @@
     el('alLogoRm').addEventListener('click',()=>{ el('alBrandLogo').value=''; renderLogoPreview(); });
     el('alShareCopy').addEventListener('click',copyAlbumLink);
     el('alWmOpacity').addEventListener('input',()=>{ el('alWmOpacityVal').textContent=el('alWmOpacity').value+'%'; });
-    el('alSelectionMode').addEventListener('change',applySelectionMode);
+    el('setPresetSel').addEventListener('change',onSetPresetPick);
+    el('setPresetSave').addEventListener('click',saveSetPreset);
+    el('setPresetDel').addEventListener('click',deleteSetPreset);
     el('alDeleteBtn').addEventListener('click',deleteAlbum);
     el('alCoverBtn').addEventListener('click',()=>el('fileInput').click());
     // album manager
@@ -4065,12 +4414,23 @@
     ['shareEmail','sharePhone','sharePw'].forEach(id=>el(id).addEventListener('input',saveShareState));
     // close any open card ⋮ menu when clicking elsewhere (kebab clicks stopPropagation, so they don't reach here)
     document.addEventListener('click',e=>{ if(!e.target.closest('.cardmenu') && !e.target.closest('[data-kebab]')) closeAllCardMenus(); });
-    document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeAllCardMenus(); closePreview(); if(moveCtx) closeMoveChoice(); document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show')); } });
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){ closeAllCardMenus(); closePreview(); if(moveCtx) closeMoveChoice(); document.querySelectorAll('.overlay.show').forEach(o=>o.classList.remove('show')); return; }
+      // ← / → step through files while the enlarged preview is open (RTL: → previous, ← next)
+      if((e.key==='ArrowLeft'||e.key==='ArrowRight') && el('pvOverlay').classList.contains('show')){
+        e.preventDefault();
+        const forward = t.dir==='rtl' ? e.key==='ArrowLeft' : e.key==='ArrowRight';
+        navPreview(forward ? 1 : -1);
+      }
+    });
     // click outside modal to close (non-destructive ones)
     ['helpOverlay','blockedOverlay','limitOverlay','selDoneOverlay','folderOverlay','settingsOverlay','shareOverlay','albumMgrOverlay'].forEach(idn=>{ el(idn).addEventListener('click',e=>{ if(e.target===el(idn)) el(idn).classList.remove('show'); }); });
     el('moveOverlay').addEventListener('click',e=>{ if(e.target===el('moveOverlay')) closeMoveChoice(); });
     el('pvOverlay').addEventListener('click',e=>{ if(e.target===el('pvOverlay')) closePreview(); });
     el('pvPick').addEventListener('click',function(){ if(pvFile){ toggleSel(pvFile.id); syncPvPick(); } });
+    // prev/next arrows step through the visible gallery (RTL: left edge = next, right edge = previous)
+    el('pvArrowL').addEventListener('click',()=>navPreview(t.dir==='rtl'?1:-1));
+    el('pvArrowR').addEventListener('click',()=>navPreview(t.dir==='rtl'?-1:1));
 
     // lang + theme
     window.__setLang=applyLang;
@@ -4185,7 +4545,7 @@
     if(selQuotaFull()){ selPromptShown=true; openSelDone(); }
   }
   function confirmSelection(){
-    selConfirmed=true;
+    selConfirmed=true; persistPicks();
     el('selDoneOverlay').classList.remove('show');
     updateFinishBtn();
     renderGrid();
@@ -4261,10 +4621,10 @@
     if(!f.selected && selBlocked(f)){ openLimitPop(f); return; }    // at the client's quota -> popup, ask to deselect first
     f.selected=!f.selected;
     if(!f.selected) selPromptShown=false;                          // dropped below cap -> allow re-prompting on refill
-    renderGrid(); renderStats();
+    renderGrid(); renderStats(); persistPicks();
     maybePromptSelConfirm();
   }
-  function togglePick(id){ const f=fileById(id); if(f && !isLocked(f)){ f.picked=!f.picked; renderGrid(); } }
+  function togglePick(id){ if(!clientCan('multiSelect')) return; const f=fileById(id); if(f && !isLocked(f)){ f.picked=!f.picked; renderGrid(); } }
   // build the themed folder list for the custom move-to-folder popup (mirrors moveOptions' tree)
   function refreshMsMove(){
     const menu=el('msMoveMenu'); if(!menu) return;
@@ -4294,6 +4654,7 @@
     menu.innerHTML = html;
   }
   function doMsMove(v){
+    if(!clientCan('folderMove')) return;
     const target = v===''?null:v;
     const picked=files.filter(f=>f.picked); if(!picked.length){ refreshMsMove(); return; }
     picked.forEach(f=>{ f.folderId=target; f.picked=false; });
@@ -4424,7 +4785,7 @@
   // =====================================================
   //  INIT
   // =====================================================
-  (function init(){
+  (async function init(){
     let th='light'; try{ th=localStorage.getItem('theme')||'light'; }catch(_){}
     applyTheme(th);
     albumMgr = loadAlbumMgr(); // safe here: AM_DEFAULT const is initialized by now
@@ -4444,9 +4805,12 @@
     showMovedInMain=(sm!=='0');
     el('showMovedChk').checked=showMovedInMain;
     bindStatic();
+    initSavePill();
+    await hydrateGallery();
     let sl='he'; try{ sl=localStorage.getItem('ac_lang')||'he'; }catch(_){}
     applyLang(sl);
     applyPreviewMode();
+    startOwnerSelectionWatch();
     // Arriving from the dashboard "+ New project" — open album settings on a blank
     // form and strip the flag so a refresh doesn't reopen it.
     if(/[?&]new=1/.test(location.search)){

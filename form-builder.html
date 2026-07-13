@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLKLI — בונה טפסים</title>
+<link rel="canonical" href="https://kolkli.com/form-builder">
+<meta name="description" content="בנו טופס משלכם בגרירה: הוסיפו שדות טקסט, מספר, אימייל, תאריך, בחירות ועוד — הכול בדפדפן.">
+<style>
+  :root {
+    --bg:#e5f2f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
+    --accent:#0091ad; --accent-dim:#00778f; --accent-ink:#ffffff; --accent-soft:#dbecf2; --accent-line:#a9d6e0;
+    --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
+    --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
+    --danger:#e5484d; --danger-soft:#fdecec;
+    --warm-soft:#fff5da; --warm-line:#f2d98a;
+    --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#00a7c6 0%,#0091ad 100%);
+    --grad-soft:linear-gradient(120deg,#dbecf2,#e5f2f6);
+    --grad-btn:linear-gradient(105deg,#00a7c6 0%,#0091ad 100%);
+    --grad-btn-glow:rgba(0,145,173,0.38);
+    --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
+    --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
+    --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
+    --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
+    --accent:#35c9ba; --accent-dim:#5fd8cb; --accent-ink:#ffffff; --accent-soft:#0f2b2a; --accent-line:#265450;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff6b6b; --danger-soft:#2a1719;
+    --warm-soft:#2c2718; --warm-line:#5a4d24;
+    --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#2fd0be 0%,#3bb6d8 100%);
+    --grad-soft:linear-gradient(120deg,#0f2b2a,#0d2630);
+    --grad-btn:linear-gradient(105deg,#2fd0be 0%,#3bb6d8 100%);
+    --grad-btn-glow:rgba(40,180,180,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    -webkit-font-smoothing:antialiased;transition:background-color .25s ease,color .25s ease;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;height:4px;background:var(--grad);z-index:100;}
+  #site-header{position:relative;z-index:5;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:var(--sans);}
+
+  .wrap{width:100%;max-width:1080px;margin:0 auto;padding:18px 22px 60px;position:relative;z-index:1;}
+  @media (max-width:840px){ .wrap{padding:18px 14px 56px;} }
+
+  /* page intro */
+  .pagehead{text-align:center;margin:0 auto 18px;}
+  .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
+  .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
+    padding:4px 11px;border-radius:999px;margin-bottom:11px;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0 auto;max-width:60ch;}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);}
+
+  /* ===== form canvas (the form being built) ===== */
+  .canvas{padding:22px 24px 24px;margin-bottom:18px;}
+  @media (max-width:560px){ .canvas{padding:18px 16px 20px;} }
+  .cv-brand{height:5px;border-radius:999px;background:var(--grad);width:64px;margin-bottom:16px;}
+  .cv-title{width:100%;border:none;background:transparent;color:var(--ink);font-family:var(--sans);
+    font-size:24px;font-weight:800;letter-spacing:-.02em;padding:2px 0;margin-bottom:2px;}
+  .cv-title:focus{outline:none;}
+  .cv-title::placeholder{color:var(--faint);}
+  .cv-desc{width:100%;border:none;background:transparent;color:var(--muted);font-family:var(--sans);
+    font-size:14px;padding:2px 0;}
+  .cv-desc:focus{outline:none;}
+  .cv-desc::placeholder{color:var(--faint);}
+  .cv-sep{height:1px;background:var(--line-2);margin:14px 0 4px;}
+
+  /* recipient block */
+  .fb-recip{border:1px solid var(--accent-line);background:var(--accent-soft);border-radius:14px;padding:14px 16px;margin:16px 0;}
+  .fb-recip-hd{display:flex;align-items:center;gap:9px;margin-bottom:12px;}
+  .fb-recip-hd .ric{width:30px;height:30px;border-radius:9px;background:var(--panel);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--shadow-sm);}
+  .fb-recip-hd .ric svg{width:17px;height:17px;}
+  .fb-recip-hd .rtt{font-size:13.5px;font-weight:700;color:var(--accent-dim);flex:1;}
+  .fb-recip-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (max-width:520px){ .fb-recip-grid{grid-template-columns:1fr;} }
+
+  /* field cards */
+  .fields{margin-top:8px;display:flex;flex-direction:column;gap:12px;}
+  .fb-field{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden;transition:border-color .12s,box-shadow .12s;}
+  .fb-field:hover{border-color:var(--accent-line);box-shadow:var(--shadow-sm);}
+  .fb-fhead{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--panel-2);border-bottom:1px solid var(--line-2);}
+  .fb-grip{color:var(--faint);cursor:grab;display:flex;flex-shrink:0;}
+  .fb-grip svg{width:16px;height:16px;}
+  .fb-tbadge{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted);}
+  .fb-tbadge .tb-ic{width:22px;height:22px;border-radius:7px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--accent-dim);}
+  .fb-tbadge .tb-ic svg{width:14px;height:14px;}
+  .fb-tbadge .tb-ic .txt{font-size:9px;font-weight:800;letter-spacing:.02em;}
+  .fb-factions{margin-inline-start:auto;display:flex;gap:5px;}
+  .fb-factions button{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .fb-factions button:hover{border-color:var(--accent);color:var(--accent);}
+  .fb-factions button.del:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .fb-factions button:disabled{opacity:.35;cursor:default;border-color:var(--line);color:var(--faint);background:var(--panel);}
+  .fb-factions svg{width:15px;height:15px;}
+  .fb-fbody{padding:14px 16px 16px;}
+
+  .fb-lbl{width:100%;background:transparent;border:none;border-bottom:1.5px dashed var(--line);color:var(--ink);
+    font-family:var(--sans);font-size:14.5px;font-weight:600;padding:2px 0 7px;margin-bottom:12px;transition:border-color .12s;}
+  .fb-lbl:focus{outline:none;border-bottom-color:var(--accent);border-bottom-style:solid;}
+  .fb-lbl::placeholder{color:var(--faint);font-weight:500;}
+
+  .fb-ctrl{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:10px;
+    font-family:var(--sans);font-size:13.5px;padding:10px 12px;pointer-events:none;}
+  textarea.fb-ctrl{resize:none;min-height:64px;}
+
+  /* options editor */
+  .fb-opts{display:flex;flex-direction:column;gap:8px;}
+  .fb-optrow{display:flex;align-items:center;gap:10px;}
+  .fb-optmark{flex-shrink:0;color:var(--faint);display:flex;}
+  .fb-optmark .box{width:16px;height:16px;border:1.6px solid var(--line);border-radius:4px;}
+  .fb-optmark .dot{width:16px;height:16px;border:1.6px solid var(--line);border-radius:50%;}
+  .fb-optmark .num{font-family:var(--mono);font-size:12px;min-width:16px;text-align:center;}
+  .fb-optinp{flex:1;min-width:0;background:transparent;border:none;border-bottom:1px solid var(--line);color:var(--ink);
+    font-family:var(--sans);font-size:13.5px;padding:5px 2px;}
+  .fb-optinp:focus{outline:none;border-bottom-color:var(--accent);}
+  .fb-optdel{flex-shrink:0;width:26px;height:26px;border-radius:7px;border:none;background:transparent;color:var(--faint);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .12s,background .12s;}
+  .fb-optdel:hover{color:var(--danger);background:var(--danger-soft);}
+  .fb-optdel svg{width:14px;height:14px;}
+  .fb-addopt{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:4px;font-size:12.5px;font-weight:600;
+    color:var(--accent-dim);background:var(--accent-soft);border:1px solid transparent;border-radius:999px;padding:6px 12px;cursor:pointer;transition:filter .12s;}
+  .fb-addopt:hover{filter:brightness(.97);}
+  .fb-addopt svg{width:13px;height:13px;}
+
+  /* layout blocks */
+  .fb-heading{width:100%;background:transparent;border:none;border-bottom:1.5px dashed var(--line);color:var(--ink);
+    font-family:var(--sans);font-size:19px;font-weight:800;letter-spacing:-.01em;padding:2px 0 6px;}
+  .fb-heading:focus{outline:none;border-bottom-color:var(--accent);border-bottom-style:solid;}
+  .fb-para{width:100%;background:transparent;border:1px dashed var(--line);border-radius:9px;color:var(--ink-2);
+    font-family:var(--sans);font-size:13.5px;line-height:1.6;padding:9px 11px;resize:vertical;min-height:52px;}
+  .fb-para:focus{outline:none;border-color:var(--accent);}
+  .fb-hr{height:0;border:none;border-top:2px solid var(--line);margin:4px 0;}
+
+  /* required toggle */
+  .fb-req{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none;}
+  .fb-req input{position:absolute;opacity:0;width:0;height:0;}
+  .fb-req .sw{position:relative;width:38px;height:22px;border-radius:999px;background:var(--line);transition:background .16s;flex-shrink:0;}
+  .fb-req .sw::after{content:'';position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .16s;}
+  .fb-req input:checked + .sw{background:var(--accent);}
+  .fb-req input:checked + .sw::after{transform:translateX(-16px);}
+
+  /* empty state */
+  .fb-empty{text-align:center;padding:34px 20px 26px;color:var(--muted);border:1.5px dashed var(--line);border-radius:14px;margin-top:8px;}
+  .fb-empty .ei{width:52px;height:52px;margin:0 auto 12px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);}
+  .fb-empty .ei svg{width:26px;height:26px;}
+  .fb-empty h3{font-size:15.5px;color:var(--ink);margin:0 0 5px;}
+  .fb-empty p{margin:0;font-size:13px;}
+
+  /* ===== palette (below the form) ===== */
+  .palcard{padding:18px 20px 22px;}
+  .pal-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+  .pal-hd h3{font-size:15px;font-weight:700;margin:0;display:flex;align-items:center;gap:8px;}
+  .pal-hd h3 svg{width:17px;height:17px;color:var(--accent);}
+  .pal-clear{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted);background:var(--panel-2);
+    border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;transition:all .12s;}
+  .pal-clear:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .pal-clear svg{width:13px;height:13px;}
+
+  .pal-group{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;}
+  .pal-group + .pal-group{margin-top:12px;padding-top:14px;border-top:1px solid var(--line-2);}
+
+  .pal-btn{display:flex;align-items:center;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:11px;
+    padding:0;overflow:hidden;cursor:pointer;text-align:start;transition:border-color .12s,box-shadow .12s,transform .06s;}
+  .pal-btn:hover{border-color:var(--accent);box-shadow:var(--shadow-sm);}
+  .pal-btn:active{transform:translateY(1px);}
+  .pal-ico{width:46px;align-self:stretch;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    border-inline-start:1px solid var(--line);color:var(--ink-2);}
+  .pal-ico svg{width:19px;height:19px;stroke-width:1.9;}
+  .pal-ico .txt{font-size:12px;font-weight:800;letter-spacing:.01em;font-family:var(--sans);}
+  .pal-btn:hover .pal-ico{color:var(--accent-dim);border-inline-start-color:var(--accent-line);}
+  .pal-label{flex:1;min-width:0;font-size:13.5px;font-weight:600;color:var(--ink);padding:0 12px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .pal-plus{flex-shrink:0;width:36px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--faint);}
+  .pal-plus svg{width:17px;height:17px;stroke-width:2.2;}
+  .pal-btn:hover .pal-plus{color:var(--accent);}
+
+  /* accent-tinted number badge like the reference */
+  .pal-ico.tint-num .txt{color:var(--accent-dim);}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+    background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
+    box-shadow:var(--shadow-lg);transition:opacity .2s,transform .2s;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<link rel="stylesheet" href="./header.css">
+<style>
+  #site-header .sh-mega:not(.open){display:none;}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
+
+<div class="wrap">
+
+  <div class="pagehead">
+    <span class="kick" data-i18n="kick"></span>
+    <h2 data-i18n="pageTitle"></h2>
+    <p data-i18n="pageSub"></p>
+  </div>
+
+  <!-- ======= FORM CANVAS ======= -->
+  <section class="card canvas" id="canvas">
+    <div class="cv-brand"></div>
+    <input class="cv-title" id="formTitle" type="text" maxlength="120">
+    <input class="cv-desc" id="formDesc" type="text" maxlength="200">
+    <div class="cv-sep"></div>
+
+    <div id="recipientArea"></div>
+    <div class="fields" id="fieldsList"></div>
+    <div id="emptyArea"></div>
+  </section>
+
+  <!-- ======= PALETTE ======= -->
+  <section class="card palcard" id="palette">
+    <div class="pal-hd">
+      <h3>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span data-i18n="palTitle"></span>
+      </h3>
+      <button class="pal-clear" id="clearBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        <span data-i18n="clearAll"></span>
+      </button>
+    </div>
+    <div id="palBody"></div>
+  </section>
+
+  <footer data-i18n="foot"></footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+  var el = function(id){ return document.getElementById(id); };
+  var LS = 'kolkli_form_builder';
+
+  /* ---------------- i18n ---------------- */
+  var I18N = {
+    he:{ dir:'rtl',
+      kick:'Kolkli Forms',
+      pageTitle:'בונה הטפסים',
+      pageSub:'הרכיבו טופס משלכם — הוסיפו רכיבים מהרשימה שלמטה וכל אחד יתווסף לטופס למעלה, מוכן לעריכה.',
+      palTitle:'רכיבי הטופס',
+      clearAll:'נקה הכל',
+      formTitlePh:'שם הטופס',
+      formDescPh:'תיאור קצר שיראה מי שממלא את הטופס…',
+      emptyTitle:'הטופס עדיין ריק',
+      emptyBody:'הוסיפו רכיבים מהרשימה שלמטה כדי לבנות את הטופס.',
+      recipTitle:'נמען הטופס',
+      recipNamePh:'שם הנמען',
+      recipEmailPh:'אימייל הנמען',
+      optionN:function(n){ return 'אפשרות '+n; },
+      addOption:'הוספת אפשרות',
+      required:'שדה חובה',
+      untitledField:'שדה ללא שם',
+      headingPh:'כותרת',
+      paraPh:'כתבו כאן טקסט חופשי שיוצג בטופס…',
+      up:'הזז מעלה', down:'הזז מטה', dup:'שכפול', del:'מחיקה', remove:'הסרה',
+      tAdded:function(n){ return 'נוסף: '+n; },
+      tRecipExists:'כבר הוגדר נמען לטופס',
+      confirmClear:'לרוקן את כל הטופס? הפעולה אינה הפיכה.',
+      foot:'KOLKLI · בונה טפסים · הדגמה מקומית — הטופס נשמר בדפדפן שלכם',
+      types:{
+        recipient:'בחר נמען', text:'קלט טקסט', number:'מספר', email:'כתובת דוא"ל', url:'כתובת אתר',
+        date:'תאריך', textarea:'תיבת טקסט חופשי', checkboxes:'בחירת אפשרויות', radio:'בחירת אפשרות',
+        select:'בחירה מרשימה', paragraph:'טקסט', heading:'כותרת', divider:'קו הפרדה'
+      },
+      ph:{ text:'תשובה קצרה', number:'0', email:'name@example.com', url:'https://', date:'', textarea:'תשובה ארוכה…', select:'בחרו מהרשימה…' }
+    },
+    en:{ dir:'ltr',
+      kick:'Kolkli Forms',
+      pageTitle:'Form builder',
+      pageSub:'Build your own form — add components from the list below and each one is appended to the form above, ready to edit.',
+      palTitle:'Form components',
+      clearAll:'Clear all',
+      formTitlePh:'Form name',
+      formDescPh:'A short description your respondent will see…',
+      emptyTitle:'Your form is empty',
+      emptyBody:'Add components from the list below to start building.',
+      recipTitle:'Form recipient',
+      recipNamePh:'Recipient name',
+      recipEmailPh:'Recipient email',
+      optionN:function(n){ return 'Option '+n; },
+      addOption:'Add option',
+      required:'Required',
+      untitledField:'Untitled field',
+      headingPh:'Heading',
+      paraPh:'Write free text to display in the form…',
+      up:'Move up', down:'Move down', dup:'Duplicate', del:'Delete', remove:'Remove',
+      tAdded:function(n){ return 'Added: '+n; },
+      tRecipExists:'A recipient is already set',
+      confirmClear:'Clear the whole form? This cannot be undone.',
+      foot:'KOLKLI · Form builder · Local demo — saved in your browser',
+      types:{
+        recipient:'Choose recipient', text:'Text input', number:'Number', email:'Email address', url:'Website URL',
+        date:'Date', textarea:'Free text box', checkboxes:'Multiple choice', radio:'Single choice',
+        select:'Dropdown', paragraph:'Text', heading:'Heading', divider:'Divider'
+      },
+      ph:{ text:'Short answer', number:'0', email:'name@example.com', url:'https://', date:'', textarea:'Long answer…', select:'Choose from the list…' }
+    }
+  };
+  var lang = 'he';
+  try { var l = localStorage.getItem('ac_lang'); if(l && I18N[l]) lang = l; } catch(_){}
+  var t = I18N[lang];
+
+  /* ---------------- svg atoms ---------------- */
+  function svg(inner){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+inner+'</svg>'; }
+  var ICONS = {
+    recipient: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="10" r="2"/><path d="M5 16c.4-1.6 1.9-2.5 3.5-2.5S11.6 14.4 12 16"/><path d="M15 9h4M15 13h4"/>'),
+    url:       svg('<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>'),
+    date:      svg('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'),
+    textarea:  svg('<path d="M4 6h16"/><path d="M4 10h16"/><path d="M4 14h11"/><path d="M4 18h7"/>'),
+    checkboxes:svg('<path d="m3 5 1.5 1.5L7 4"/><path d="M11 6h9"/><path d="m3 12.5 1.5 1.5L7 11.5"/><path d="M11 13h9"/><path d="M11 20h9"/><rect x="3" y="17.5" width="4" height="4" rx="1"/>'),
+    radio:     svg('<circle cx="5" cy="6" r="2"/><path d="M11 6h9"/><circle cx="5" cy="13" r="2"/><path d="M11 13h9"/><circle cx="5" cy="20" r="2"/><path d="M11 20h9"/>'),
+    select:    svg('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10"/><path d="M7 13h6"/><path d="m15.5 13.5 1.5 1.5 1.5-1.5"/>'),
+    divider:   svg('<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>')
+  };
+  var TXT_ICON = { text:'ABC', number:'321', email:'@', paragraph:'T', heading:'H' };
+  // small action glyphs
+  var G = {
+    grip: svg('<circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/>'),
+    up:   svg('<path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>'),
+    down: svg('<path d="M12 5v14"/><path d="m5 12 7 7 7-7"/>'),
+    dup:  svg('<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>'),
+    del:  svg('<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>'),
+    x:    svg('<path d="M18 6 6 18"/><path d="M6 6l12 12"/>'),
+    plus: svg('<path d="M12 5v14"/><path d="M5 12h14"/>')
+  };
+
+  /* ---------------- field type registry ---------------- */
+  // group: 'fields' or 'layout'  (recipient is rendered separately, first)
+  var TYPES = {
+    recipient: { group:'special' },
+    text:      { group:'fields', kind:'input' },
+    number:    { group:'fields', kind:'input' },
+    email:     { group:'fields', kind:'input' },
+    url:       { group:'fields', kind:'input' },
+    date:      { group:'fields', kind:'input' },
+    textarea:  { group:'fields', kind:'input' },
+    checkboxes:{ group:'fields', kind:'options' },
+    radio:     { group:'fields', kind:'options' },
+    select:    { group:'fields', kind:'options' },
+    paragraph: { group:'layout', kind:'layout' },
+    heading:   { group:'layout', kind:'layout' },
+    divider:   { group:'layout', kind:'layout' }
+  };
+  var PALETTE_ORDER = {
+    special: ['recipient'],
+    fields:  ['text','number','email','url','date','textarea','checkboxes','radio','select'],
+    layout:  ['paragraph','heading','divider']
+  };
+
+  /* ---------------- state ---------------- */
+  var form = { title:'', desc:'', recipient:null, fields:[] };
+  var seq = 0;
+  function uid(){ return 'f' + (Date.now().toString(36)) + '_' + (seq++); }
+
+  function load(){
+    try {
+      var raw = localStorage.getItem(LS);
+      if(!raw) return;
+      var d = JSON.parse(raw);
+      if(d && typeof d === 'object'){
+        form.title = d.title || '';
+        form.desc  = d.desc || '';
+        form.recipient = d.recipient || null;
+        form.fields = Array.isArray(d.fields) ? d.fields : [];
+        form.fields.forEach(function(f){ if(!f.id) f.id = uid(); });
+      }
+    } catch(_){}
+  }
+  function save(){ try { localStorage.setItem(LS, JSON.stringify(form)); } catch(_){} }
+
+  function newField(type){
+    var f = { id:uid(), type:type, label:'', required:false };
+    var k = TYPES[type].kind;
+    if(k === 'options'){ f.options = [ t.optionN(1), t.optionN(2) ]; }
+    if(type === 'heading'){ f.text = ''; }
+    if(type === 'paragraph'){ f.text = ''; }
+    return f;
+  }
+
+  /* ---------------- escaping ---------------- */
+  function esc(x){ return String(x==null?'':x).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  /* ---------------- toast ---------------- */
+  var toastTimer;
+  function toast(msg){
+    var n = el('toast'); n.textContent = msg; n.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function(){ n.classList.remove('show'); }, 1900);
+  }
+
+  /* ---------------- render : palette ---------------- */
+  function iconCell(type, cls){
+    var extra = cls || '';
+    if(TXT_ICON[type]) return '<span class="pal-ico '+(type==='number'?'tint-num ':'')+extra+'"><span class="txt">'+TXT_ICON[type]+'</span></span>';
+    return '<span class="pal-ico '+extra+'">'+(ICONS[type]||'')+'</span>';
+  }
+  function palBtn(type){
+    return '<button class="pal-btn" type="button" data-add="'+type+'">'
+      + iconCell(type)
+      + '<span class="pal-label">'+esc(t.types[type])+'</span>'
+      + '<span class="pal-plus">'+G.plus+'</span>'
+      + '</button>';
+  }
+  function renderPalette(){
+    var html = '';
+    ['special','fields','layout'].forEach(function(gr){
+      html += '<div class="pal-group">' + PALETTE_ORDER[gr].map(palBtn).join('') + '</div>';
+    });
+    el('palBody').innerHTML = html;
+  }
+
+  /* ---------------- render : field type badge (in card head) ---------------- */
+  function typeBadge(type){
+    var ic = TXT_ICON[type]
+      ? '<span class="txt">'+TXT_ICON[type]+'</span>'
+      : (ICONS[type]||'');
+    return '<span class="fb-tbadge"><span class="tb-ic">'+ic+'</span>'+esc(t.types[type])+'</span>';
+  }
+
+  /* ---------------- render : one field body ---------------- */
+  function inputPreview(type){
+    if(type === 'textarea') return '<textarea class="fb-ctrl" rows="2" disabled placeholder="'+esc(t.ph.textarea)+'"></textarea>';
+    var map = { text:'text', number:'number', email:'email', url:'url', date:'date' };
+    var ph = t.ph[type] || '';
+    return '<input class="fb-ctrl" type="'+(map[type]||'text')+'" disabled placeholder="'+esc(ph)+'">';
+  }
+  function optionsEditor(f){
+    var mark = f.type==='checkboxes'
+      ? '<span class="box"></span>'
+      : (f.type==='radio' ? '<span class="dot"></span>' : '');
+    var rows = f.options.map(function(opt, i){
+      var m = f.type==='select' ? '<span class="num">'+(i+1)+'</span>' : mark;
+      return '<div class="fb-optrow">'
+        + '<span class="fb-optmark">'+m+'</span>'
+        + '<input class="fb-optinp" data-opt="'+i+'" value="'+esc(opt)+'">'
+        + '<button class="fb-optdel" type="button" data-optdel="'+i+'" title="'+esc(t.remove)+'" aria-label="'+esc(t.remove)+'">'+G.x+'</button>'
+        + '</div>';
+    }).join('');
+    return '<div class="fb-opts">'+rows+'</div>'
+      + '<button class="fb-addopt" type="button" data-addopt="1">'+G.plus+'<span>'+esc(t.addOption)+'</span></button>';
+  }
+  function requiredToggle(f){
+    return '<label class="fb-req"><input type="checkbox" data-req="1"'+(f.required?' checked':'')+'><span class="sw"></span><span>'+esc(t.required)+'</span></label>';
+  }
+  function fieldBody(f){
+    var kind = TYPES[f.type].kind;
+    if(f.type === 'divider') return '<hr class="fb-hr">';
+    if(f.type === 'heading') return '<input class="fb-heading" data-text="1" value="'+esc(f.text)+'" placeholder="'+esc(t.headingPh)+'">';
+    if(f.type === 'paragraph') return '<textarea class="fb-para" data-text="1" placeholder="'+esc(t.paraPh)+'">'+esc(f.text)+'</textarea>';
+
+    var html = '<input class="fb-lbl" data-label="1" value="'+esc(f.label)+'" placeholder="'+esc(t.types[f.type])+'">';
+    if(kind === 'options') html += optionsEditor(f);
+    else html += inputPreview(f.type);
+    html += requiredToggle(f);
+    return html;
+  }
+  function fieldCard(f, i, n){
+    return '<div class="fb-field" data-id="'+f.id+'" data-type="'+f.type+'">'
+      + '<div class="fb-fhead">'
+      +   '<span class="fb-grip" title="'+esc(t.up)+' / '+esc(t.down)+'">'+G.grip+'</span>'
+      +   typeBadge(f.type)
+      +   '<div class="fb-factions">'
+      +     '<button type="button" data-act="up" title="'+esc(t.up)+'" aria-label="'+esc(t.up)+'"'+(i===0?' disabled':'')+'>'+G.up+'</button>'
+      +     '<button type="button" data-act="down" title="'+esc(t.down)+'" aria-label="'+esc(t.down)+'"'+(i===n-1?' disabled':'')+'>'+G.down+'</button>'
+      +     '<button type="button" data-act="dup" title="'+esc(t.dup)+'" aria-label="'+esc(t.dup)+'">'+G.dup+'</button>'
+      +     '<button type="button" class="del" data-act="del" title="'+esc(t.del)+'" aria-label="'+esc(t.del)+'">'+G.del+'</button>'
+      +   '</div>'
+      + '</div>'
+      + '<div class="fb-fbody">'+fieldBody(f)+'</div>'
+      + '</div>';
+  }
+
+  /* ---------------- render : recipient ---------------- */
+  function renderRecipient(){
+    var area = el('recipientArea');
+    if(!form.recipient){ area.innerHTML = ''; return; }
+    area.innerHTML =
+      '<div class="fb-recip">'
+      + '<div class="fb-recip-hd">'
+      +   '<span class="ric">'+ICONS.recipient+'</span>'
+      +   '<span class="rtt">'+esc(t.recipTitle)+'</span>'
+      +   '<button class="fb-optdel" type="button" data-recipdel="1" title="'+esc(t.remove)+'" aria-label="'+esc(t.remove)+'">'+G.x+'</button>'
+      + '</div>'
+      + '<div class="fb-recip-grid">'
+      +   '<input class="fb-ctrl" style="pointer-events:auto;background:var(--panel)" data-recip="name" value="'+esc(form.recipient.name||'')+'" placeholder="'+esc(t.recipNamePh)+'">'
+      +   '<input class="fb-ctrl" style="pointer-events:auto;background:var(--panel)" data-recip="email" type="email" dir="ltr" value="'+esc(form.recipient.email||'')+'" placeholder="'+esc(t.recipEmailPh)+'">'
+      + '</div>'
+      + '</div>';
+  }
+
+  /* ---------------- render : fields + empty ---------------- */
+  function renderFields(){
+    var list = el('fieldsList');
+    var n = form.fields.length;
+    list.innerHTML = form.fields.map(function(f,i){ return fieldCard(f,i,n); }).join('');
+    var empty = el('emptyArea');
+    if(n === 0 && !form.recipient){
+      empty.innerHTML =
+        '<div class="fb-empty">'
+        + '<div class="ei">'+svg('<path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M9 15h6M12 12v6"/>')+'</div>'
+        + '<h3>'+esc(t.emptyTitle)+'</h3><p>'+esc(t.emptyBody)+'</p>'
+        + '</div>';
+    } else {
+      empty.innerHTML = '';
+    }
+  }
+
+  /* ---------------- render : static chrome ---------------- */
+  function applyStatic(){
+    document.querySelectorAll('[data-i18n]').forEach(function(node){
+      var k = node.getAttribute('data-i18n'); if(typeof t[k]==='string') node.textContent = t[k];
+    });
+    el('formTitle').setAttribute('placeholder', t.formTitlePh);
+    el('formDesc').setAttribute('placeholder', t.formDescPh);
+  }
+
+  function renderAll(){
+    el('formTitle').value = form.title;
+    el('formDesc').value = form.desc;
+    renderRecipient();
+    renderFields();
+    renderPalette();
+  }
+
+  /* ---------------- actions ---------------- */
+  function addComponent(type){
+    if(type === 'recipient'){
+      if(form.recipient){ toast(t.tRecipExists); var r=el('recipientArea'); if(r) r.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+      form.recipient = { name:'', email:'' };
+      save(); renderRecipient(); renderFields();
+      var rr=el('recipientArea').querySelector('[data-recip="name"]'); if(rr) rr.focus();
+    } else {
+      var f = newField(type);
+      form.fields.push(f);
+      save(); renderFields();
+      var node = el('fieldsList').querySelector('[data-id="'+f.id+'"]');
+      if(node){
+        node.scrollIntoView({behavior:'smooth', block:'nearest'});
+        var focusable = node.querySelector('[data-label], [data-text]');
+        if(focusable) focusable.focus();
+      }
+    }
+    toast(t.tAdded(t.types[type]));
+  }
+  function fieldById(id){ return form.fields.find(function(f){ return f.id === id; }); }
+  function idxById(id){ return form.fields.findIndex(function(f){ return f.id === id; }); }
+
+  function moveField(id, dir){
+    var i = idxById(id); if(i<0) return;
+    var j = i + dir; if(j<0 || j>=form.fields.length) return;
+    var tmp = form.fields[i]; form.fields[i] = form.fields[j]; form.fields[j] = tmp;
+    save(); renderFields();
+  }
+  function dupField(id){
+    var i = idxById(id); if(i<0) return;
+    var copy = JSON.parse(JSON.stringify(form.fields[i])); copy.id = uid();
+    form.fields.splice(i+1, 0, copy);
+    save(); renderFields();
+  }
+  function delField(id){
+    var i = idxById(id); if(i<0) return;
+    form.fields.splice(i,1);
+    save(); renderFields();
+  }
+
+  /* ---------------- events (delegated) ---------------- */
+  // structural clicks
+  el('palBody').addEventListener('click', function(e){
+    var b = e.target.closest('[data-add]'); if(!b) return;
+    addComponent(b.getAttribute('data-add'));
+  });
+  el('clearBtn').addEventListener('click', function(){
+    if(!form.recipient && form.fields.length===0) return;
+    if(!window.confirm(t.confirmClear)) return;
+    form.recipient = null; form.fields = [];
+    save(); renderAll();
+  });
+  el('recipientArea').addEventListener('click', function(e){
+    if(e.target.closest('[data-recipdel]')){ form.recipient=null; save(); renderRecipient(); renderFields(); }
+  });
+  el('recipientArea').addEventListener('input', function(e){
+    var inp = e.target.closest('[data-recip]'); if(!inp || !form.recipient) return;
+    form.recipient[inp.getAttribute('data-recip')] = inp.value; save();
+  });
+
+  el('fieldsList').addEventListener('click', function(e){
+    var actBtn = e.target.closest('[data-act]');
+    var card = e.target.closest('.fb-field'); if(!card) return;
+    var id = card.getAttribute('data-id');
+    if(actBtn){
+      var act = actBtn.getAttribute('data-act');
+      if(act==='up') moveField(id,-1);
+      else if(act==='down') moveField(id,1);
+      else if(act==='dup') dupField(id);
+      else if(act==='del') delField(id);
+      return;
+    }
+    var addOpt = e.target.closest('[data-addopt]');
+    if(addOpt){
+      var f = fieldById(id); if(!f || !f.options) return;
+      f.options.push(t.optionN(f.options.length+1));
+      save(); renderFields();
+      var node = el('fieldsList').querySelector('[data-id="'+id+'"]');
+      var inps = node ? node.querySelectorAll('[data-opt]') : [];
+      if(inps.length) inps[inps.length-1].focus();
+      return;
+    }
+    var optDel = e.target.closest('[data-optdel]');
+    if(optDel){
+      var f2 = fieldById(id); if(!f2 || !f2.options) return;
+      var oi = parseInt(optDel.getAttribute('data-optdel'),10);
+      if(f2.options.length>1){ f2.options.splice(oi,1); save(); renderFields(); }
+      return;
+    }
+  });
+  // text edits — update state without re-rendering (keep caret/focus)
+  el('fieldsList').addEventListener('input', function(e){
+    var card = e.target.closest('.fb-field'); if(!card) return;
+    var f = fieldById(card.getAttribute('data-id')); if(!f) return;
+    if(e.target.matches('[data-label]')) { f.label = e.target.value; save(); }
+    else if(e.target.matches('[data-text]')) { f.text = e.target.value; save(); }
+    else if(e.target.matches('[data-opt]')) { f.options[parseInt(e.target.getAttribute('data-opt'),10)] = e.target.value; save(); }
+  });
+  el('fieldsList').addEventListener('change', function(e){
+    var card = e.target.closest('.fb-field'); if(!card) return;
+    var f = fieldById(card.getAttribute('data-id')); if(!f) return;
+    if(e.target.matches('[data-req]')){ f.required = e.target.checked; save(); }
+  });
+
+  el('formTitle').addEventListener('input', function(e){ form.title = e.target.value; save(); });
+  el('formDesc').addEventListener('input', function(e){ form.desc = e.target.value; save(); });
+
+  /* ---------------- language / theme ---------------- */
+  function applyLang(l){
+    if(!I18N[l]) l = 'he';
+    lang = l; t = I18N[l];
+    document.documentElement.lang = l;
+    document.documentElement.dir = t.dir;
+    applyStatic();
+    renderAll();
+    try { localStorage.setItem('ac_lang', l); } catch(_){}
+  }
+  window.__setLang = applyLang;
+
+  /* ---------------- init ---------------- */
+  try {
+    var th = localStorage.getItem('theme');
+    if(th) document.documentElement.setAttribute('data-theme', th==='dark'?'dark':'light');
+  } catch(_){}
+
+  load();
+  applyLang(lang);
+})();
+</script>
+</body>
+</html>

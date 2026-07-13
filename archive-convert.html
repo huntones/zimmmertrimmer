@@ -285,7 +285,7 @@
         </div>
 
         <div class="opt">
-          <label class="chkline"><input type="checkbox" id="combineChk"><span data-i18n="combineChk"></span></label>
+          <label class="chkline"><input type="checkbox" id="combineChk" checked><span data-i18n="combineChk"></span></label>
         </div>
 
         <button class="convbtn" id="convBtn" type="button" disabled>
@@ -541,23 +541,44 @@
 
     try{
       if(target==='zip'){
-        // read every dropped file, bundle into ONE .zip -> one result row
-        const obj={}, used=new Set();
-        for(let i=0;i<files.length;i++){
-          setProg(Math.round(i/files.length*80), t.readingFile(files[i].name));
-          const u8 = await readU8(files[i]);
-          obj[uniqueName(files[i].path||files[i].name, used)] = u8;   // keep folder tree in the archive
-          await wait(10);
-        }
-        setProg(90, t.packing);
-        try{
-          const zipped = fflate.zipSync(obj, {level:0});
-          const outName = (files.length===1 ? baseName(files[0].name) : 'archive') + '.zip';
-          const blob = new Blob([zipped], {type:'application/zip'});
-          results.push({ name:outName, blob, url:URL.createObjectURL(blob), size:blob.size, ok:true });
-        }catch(err){
-          console.error(err);
-          results.push({ name:'archive.zip', blob:null, url:null, size:0, ok:false });
+        const combine = el('combineChk').checked;
+        if(combine){
+          // bundle every dropped file into ONE .zip -> one result row
+          const obj={}, used=new Set();
+          for(let i=0;i<files.length;i++){
+            setProg(Math.round(i/files.length*80), t.readingFile(files[i].name));
+            const u8 = await readU8(files[i]);
+            obj[uniqueName(files[i].path||files[i].name, used)] = u8;   // keep folder tree in the archive
+            await wait(10);
+          }
+          setProg(90, t.packing);
+          try{
+            const zipped = fflate.zipSync(obj, {level:6});   // real DEFLATE (was level:0 = STORE, no compression)
+            const outName = (files.length===1 ? baseName(files[0].name) : 'archive') + '.zip';
+            const blob = new Blob([zipped], {type:'application/zip'});
+            results.push({ name:outName, blob, url:URL.createObjectURL(blob), size:blob.size, ok:true });
+          }catch(err){
+            console.error(err);
+            results.push({ name:'archive.zip', blob:null, url:null, size:0, ok:false });
+          }
+        } else {
+          // one .zip per dropped file -> one result row each
+          const used=new Set();
+          for(let i=0;i<files.length;i++){
+            setProg(Math.round(i/files.length*90), t.convertingFile(files[i].name));
+            const outName = uniqueName(baseName(files[i].name) + '.zip', used);
+            try{
+              const u8 = await readU8(files[i]);
+              const single = {}; single[files[i].name] = u8;
+              const zipped = fflate.zipSync(single, {level:6});
+              const blob = new Blob([zipped], {type:'application/zip'});
+              results.push({ name:outName, blob, url:URL.createObjectURL(blob), size:blob.size, ok:true });
+            }catch(err){
+              console.error(err);
+              results.push({ name:outName, blob:null, url:null, size:0, ok:false });
+            }
+            await wait(10);
+          }
         }
       } else {
         // gzip: compress EACH file separately -> one result row per file
@@ -626,7 +647,7 @@
     clearResults();
     files=[];
     el('resultsCard').classList.remove('show');
-    el('combineChk').checked=false;
+    el('combineChk').checked=true;
     clearErr();
     el('composer').style.display=''; renderFiles();
     window.scrollTo({top:0,behavior:'smooth'});

@@ -23,7 +23,7 @@
       prKick:'מסלולים ומחירים', prTitle:'תמחור פשוט ושקוף', prSub:'מתחילים בחינם — או 7 ימי ניסיון חינם ל-Creator, ללא כרטיס אשראי.',
       perMonth:'/לחודש', mostPopular:'הכי פופולרי',
       finalH:'מוכנים להתחיל?', finalP:'העלו את הקובץ הראשון — זה לוקח כמה שניות בלבד.', finalCta:'בואו נתחיל',
-      fHome:'בית', fPricing:'מסלולים ומחירים', fFaq:'שאלות נפוצות', fAI:'כלי AI', fSend:'שליחת קבצים', fReview:'אישור קבצים',
+      fHome:'בית', fPricing:'מסלולים ומחירים', fFaq:'שאלות נפוצות', fAI:'כלי AI', fSend:'שליחת קבצים', fReview:'אישור קבצים', fPrivacy:'פרטיות', fTerms:'תנאי שימוש',
       cp:'KOLKLI · העריכה רצה בדפדפן שלכם · הקבצים נשארים אצלכם.'
     },
     en: {
@@ -34,7 +34,7 @@
       prKick:'Pricing', prTitle:'Simple, transparent pricing', prSub:'Start free — or try Creator free for 7 days, no credit card.',
       perMonth:'/mo', mostPopular:'Most Popular',
       finalH:'Ready to get started?', finalP:'Upload your first file — it takes just a few seconds.', finalCta:'Get started',
-      fHome:'Home', fPricing:'Pricing', fFaq:'FAQ', fAI:'AI Tools', fSend:'Send Files', fReview:'Approve Files',
+      fHome:'Home', fPricing:'Pricing', fFaq:'FAQ', fAI:'AI Tools', fSend:'Send Files', fReview:'Approve Files', fPrivacy:'Privacy', fTerms:'Terms',
       cp:'KOLKLI · Editing runs in your browser · Your files stay with you.'
     },
     ru: {
@@ -45,7 +45,7 @@
       prKick:'Цены', prTitle:'Простые и прозрачные цены', prSub:'Начните бесплатно — или 7 дней Creator бесплатно, без карты.',
       perMonth:'/мес', mostPopular:'Самый популярный',
       finalH:'Готовы начать?', finalP:'Загрузите первый файл — это займёт всего несколько секунд.', finalCta:'Начать',
-      fHome:'Главная', fPricing:'Цены', fFaq:'FAQ', fAI:'AI-инструменты', fSend:'Отправка файлов', fReview:'Утверждение файлов',
+      fHome:'Главная', fPricing:'Цены', fFaq:'FAQ', fAI:'AI-инструменты', fSend:'Отправка файлов', fReview:'Утверждение файлов', fPrivacy:'Конфиденциальность', fTerms:'Условия',
       cp:'KOLKLI · Редактирование в вашем браузере · Ваши файлы остаются у вас.'
     }
   };
@@ -396,17 +396,20 @@
     {i:'🩹',he:'שחזור תמונה AI',en:'AI Restore Photo',ru:'AI-восстановление фото',dhe:'משפר תמונות ישנות ומטושטשות לרזולוציה גבוהה.',den:'Restores old, blurry photos to crisp high-res.',dru:'Восстанавливает старые размытые фото до высокого разрешения.',href:'../restore-image'},{i:'🎚️',he:'מאסטרינג AI',en:'AI Master Audio',ru:'AI-мастеринг аудио',dhe:'מאזן ומחזק את המיקס לסאונד מקצועי.',den:'Balances and boosts your mix to a pro sound.',dru:'Балансирует и усиливает микс до профессионального звучания.',href:'../ai-master'},
     {i:'🧽',he:'הסרת אובייקטים AI',en:'AI Remove Objects',ru:'AI-удаление объектов',dhe:'מוחק עצמים לא רצויים מהתמונה בלי עקבות.',den:'Erases unwanted objects from photos seamlessly.',dru:'Удаляет ненужные объекты с фото без следов.',href:'../ai-object-remover'},{i:'📝',he:'סיכום PDF AI',en:'AI Summarize PDF',ru:'AI-конспект PDF',dhe:'מפיק תקציר ונקודות מפתח מכל מסמך.',den:'Extracts a summary and key points from any document.',dru:'Извлекает краткое содержание и ключевые пункты из документа.',href:'../ai-summarize-pdf'}
   ];
+  // usd = base price (source of truth); ils = hand-set shekel price point.
+  // Every other currency is derived from usd by currency.js. `price` stays as a
+  // per-language fallback for when currency.js isn't present.
   var PLANS = [
-    {price:{he:'₪0',en:'$0',ru:'$0'}, he:['חינם','להתחלה מהירה'], en:['Free','To get started'], ru:['Бесплатно','Для быстрого старта'], cta:{he:'התחילו',en:'Get Started',ru:'Начать'}, feats:[
+    {usd:0, ils:0, price:{he:'₪0',en:'$0',ru:'$0'}, he:['חינם','להתחלה מהירה'], en:['Free','To get started'], ru:['Бесплатно','Для быстрого старта'], cta:{he:'התחילו',en:'Get Started',ru:'Начать'}, feats:[
       {he:'עד 3 פרויקטים פעילים',en:'Up to 3 active projects',ru:'До 3 активных проектов'},{he:'עד 3GB אחסון והעברה',en:'Up to 3GB storage & transfer',ru:'До 3 ГБ хранилища и передачи'},
       {he:'קבצים נשמרים 7 ימים',en:'Files kept for 7 days',ru:'Файлы хранятся 7 дней'},{he:'ארגון · בקשה · משוב — 2 ביום',en:'Organize · request · review — 2/day',ru:'Организация · запрос · ревью — 2/день'},
       {he:'כלי PDF בסיסיים',en:'Basic PDF tools',ru:'Базовые PDF-инструменты'}]},
-    {price:{he:'₪89',en:'$24',ru:'$24'}, pop:true, he:['Creator','ליוצרים ופרילנסרים'], en:['Creator','For creators & freelancers'], ru:['Creator','Для авторов и фрилансеров'], cta:{he:'בחרו Creator',en:'Get Creator',ru:'Выбрать Creator'}, feats:[
+    {usd:24, ils:89, price:{he:'₪89',en:'$24',ru:'$24'}, pop:true, he:['Creator','ליוצרים ופרילנסרים'], en:['Creator','For creators & freelancers'], ru:['Creator','Для авторов и фрилансеров'], cta:{he:'בחרו Creator',en:'Get Creator',ru:'Выбрать Creator'}, feats:[
       {he:'100 פרויקטים · 500 קבצים לכל אחד',en:'100 projects · 500 files each',ru:'100 проектов · 500 файлов в каждом'},{he:'250GB אחסון · עד 25GB בהעברה',en:'250GB storage · up to 25GB/transfer',ru:'250 ГБ · до 25 ГБ за передачу'},
       {he:'קבצים נשמרים 90 יום',en:'Files kept for 90 days',ru:'Файлы хранятся 90 дней'},{he:'כל הכלים + Review Studio',en:'All tools + Review Studio',ru:'Все инструменты + Review Studio'},
       {he:'מיתוג אישי וקישורים ממותגים',en:'Custom branding & branded links',ru:'Свой брендинг и фирменные ссылки'},{he:'עד 10 פעולות AI ביום',en:'Up to 10 AI actions/day',ru:'До 10 AI-операций в день'},
       {he:'עד 2 חברי צוות',en:'Up to 2 team members',ru:'До 2 участников'}]},
-    {price:{he:'₪249',en:'$69',ru:'$69'}, he:['Studio','לסטודיו וצוותים'], en:['Studio','For studios & teams'], ru:['Studio','Для студий и команд'], cta:{he:'בחרו Studio',en:'Get Studio',ru:'Выбрать Studio'}, feats:[
+    {usd:69, ils:249, price:{he:'₪249',en:'$69',ru:'$69'}, he:['Studio','לסטודיו וצוותים'], en:['Studio','For studios & teams'], ru:['Studio','Для студий и команд'], cta:{he:'בחרו Studio',en:'Get Studio',ru:'Выбрать Studio'}, feats:[
       {he:'500 פרויקטים · 2,000 קבצים לכל אחד',en:'500 projects · 2,000 files each',ru:'500 проектов · 2 000 файлов в каждом'},{he:'1TB אחסון · עד 100GB בהעברה',en:'1TB storage · up to 100GB/transfer',ru:'1 ТБ · до 100 ГБ за передачу'},
       {he:'שמירת קבצים עד שנה',en:'Files kept up to 1 year',ru:'Файлы хранятся до года'},{he:'White-label מלא + דומיין אישי',en:'Full white-label + custom domain',ru:'Полный white-label + свой домен'},
       {he:'עד 10 משתמשי צוות והרשאות',en:'Up to 10 team members & roles',ru:'До 10 участников и роли'},{he:'אוטומציות מייל ודוחות שימוש',en:'Email automations & usage reports',ru:'Email-автоматизация и отчёты'},
@@ -489,15 +492,26 @@
     var ribbon = p.pop ? '<span class="ribbon">' + S.mostPopular + '</span>' : '';
     var feats = p.feats.map(function (f) { return '<li>' + CHECK + f[L] + '</li>'; }).join('');
     // Free → sign-up; paid plans (Creator/Studio) → the checkout flow.
+    // Paid plans are gated: data-requires-auth makes auth-modal.js send guests
+    // to login/sign-up before checkout (and the checkout page re-checks too).
     var slug = (p.en[0] || '').toLowerCase();
-    var href = slug === 'free' ? '../auth?mode=signup' : '../checkout?plan=' + slug;
-    var btn = p.pop ? '<a class="cta" href="' + href + '">' + p.cta[L] + '</a>'
-                    : '<a class="ghost" href="' + href + '">' + p.cta[L] + '</a>';
+    var paid = slug !== 'free';
+    // Real Stripe billing isn't wired yet and the demo checkout is disabled, so
+    // both free and paid CTAs start a free trial / sign-up instead of the
+    // (removed) fake charge. Restore '../checkout?plan=' + slug when billing
+    // goes live to send paid plans back to checkout.
+    var href = '../auth?mode=signup';
+    var gate = paid ? ' data-requires-auth' : '';
+    var btn = p.pop ? '<a class="cta" href="' + href + '"' + gate + '>' + p.cta[L] + '</a>'
+                    : '<a class="ghost" href="' + href + '"' + gate + '>' + p.cta[L] + '</a>';
     // Creator is the trialed tier → offer the no-card 7-day trial via sign-up.
     var trialTxt = { he: 'או 7 ימי ניסיון חינם — ללא כרטיס אשראי', en: 'or start 7 days free — no credit card', ru: 'или 7 дней бесплатно — без карты' };
     var trial = slug === 'creator' ? '<a class="plan-trial" href="../auth?mode=signup">' + trialTxt[L] + '</a>' : '';
+    // Currency follows the visitor's country (currency.js); fall back to the
+    // per-language price point when the module isn't loaded.
+    var priceTxt = (window.KOLKLI_CUR && p.usd != null) ? KOLKLI_CUR.price(p.usd, p.ils) : p.price[L];
     return '<div class="plan ' + (p.pop ? 'pop' : '') + '">' + ribbon +
-      '<h3>' + name + '</h3><div class="price">' + p.price[L] + '<span>' + S.perMonth + '</span></div>' +
+      '<h3>' + name + '</h3><div class="price">' + priceTxt + '<span>' + S.perMonth + '</span></div>' +
       '<p class="tagline">' + tagline + '</p><ul>' + feats + '</ul>' + btn + trial + '</div>';
   }
   function head(kick, title, sub, newBadge) {
@@ -516,6 +530,7 @@
         '<a href="../faq/">' + S.fFaq + '</a><a href="../ai/">' + S.fAI + '</a>' +
         '<a href="../send">' + S.fSend + '</a>' +
         '<a href="../review">' + S.fReview + '</a>' +
+        '<a href="../privacy">' + S.fPrivacy + '</a><a href="../terms">' + S.fTerms + '</a>' +
       '</div><div class="cp">' + S.cp + '</div></div></div></footer>';
   }
 
@@ -652,6 +667,8 @@
   /* ---------- init ---------- */
   applyTheme(ls('theme') || 'light');
   applyLang(detectLang());
+  // Re-render the price table once IP → currency detection settles.
+  if (window.KOLKLI_CUR && KOLKLI_CUR.onReady) KOLKLI_CUR.onReady(render);
 
   var tb = el('themeToggle'); if (tb) tb.addEventListener('click', function () {
     applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');

@@ -2,6 +2,10 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<!-- Tools are addressed by path (/css-tools/gradient-generator), so this page is
+     served at deeper URLs too. Pin the base to the site root so relative
+     asset/link references keep resolving from root, not the current segment. -->
+<base href="/">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KOLKLI — כלי CSS ועיצוב</title>
 <link rel="canonical" href="https://kolkli.com/css-tools">
@@ -542,9 +546,19 @@
   }
 
   /* ---------- run + render ---------- */
-  function selectTool(id, fromHash){
+  // Tools are path-routed (/css-tools/gradient-generator) instead of #hash.
+  function ttBase(){
+    const p=location.pathname.replace(/[?#].*$/,'').replace(/\/+$/,'');
+    const i=p.toLowerCase().indexOf('/css-tools');
+    return (i<0?'':p.slice(0,i))+'/css-tools';
+  }
+  function ttSeg(){
+    const m=location.pathname.replace(/[?#].*$/,'').match(/\/css-tools(?:\.html)?\/([^/]+)/i);
+    return m&&m[1]?decodeURIComponent(m[1]):'';
+  }
+  function selectTool(id, fromRoute){
     const tool=TOOL_BY_ID[id]||TOOLS[0]; curId=tool.id;
-    if(!fromHash){ try{ history.replaceState(null,'','#'+tool.id); }catch(_){ location.hash=tool.id; } }
+    if(!fromRoute){ try{ history.replaceState(null,'',ttBase()+'/'+tool.id+location.search); }catch(_){} }
     renderSide();
     el('thIcon').innerHTML=svg(tool.ic);
     el('thName').textContent=tool.names[lang];
@@ -643,7 +657,7 @@
   el('shufBtn').addEventListener('click', shuffleTool);
   el('copyBtn').addEventListener('click', copyCode);
   el('dlBtn').addEventListener('click', downloadCode);
-  window.addEventListener('hashchange', ()=>{ const id=location.hash.replace(/^#/,''); if(id && TOOL_BY_ID[id] && id!==curId) selectTool(id, true); });
+  window.addEventListener('popstate', ()=>{ const id=ttSeg(); if(id && TOOL_BY_ID[id] && id!==curId) selectTool(id, true); });
   const tb=el('themeToggle'); if(tb) tb.addEventListener('click', ()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
 
   /* download uses the built tool's ext; stash it on run */
@@ -651,7 +665,11 @@
 
   /* ---------- init ---------- */
   applyTheme(ls('theme')||'light');
-  const startId=location.hash.replace(/^#/,''); if(startId && TOOL_BY_ID[startId]) curId=startId;
+  const startId=ttSeg() || location.hash.replace(/^#/,'');   // path seg, or legacy #tool
+  if(startId && TOOL_BY_ID[startId]){
+    curId=startId;
+    try{ history.replaceState(null,'',ttBase()+'/'+startId+location.search); }catch(_){}
+  }
   applyLang(detectLang());
 })();
 </script>

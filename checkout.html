@@ -295,6 +295,19 @@
     <span data-i18n="back"></span>
   </a>
 
+  <!-- ============ auth gate — no upgrade/payment without an account ============ -->
+  <div class="done" id="authGate">
+    <div class="seal"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+    <h1 data-i18n="gateTitle"></h1>
+    <p class="dsub" data-i18n="gateSub"></p>
+    <div class="done-actions">
+      <button class="btn-lg btn-primary" id="gateBtn" type="button">
+        <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        <span data-i18n="gateBtn"></span>
+      </button>
+    </div>
+  </div>
+
   <!-- ============ checkout view ============ -->
   <div id="checkoutView">
     <div class="co-head">
@@ -499,6 +512,7 @@
 
 <footer data-i18n="foot"></footer>
 
+<script src="./currency.js"></script>
 <script>
 /* ===================================================================
    KOLKLI checkout — a professional, WeTransfer/TransferNow-style
@@ -513,13 +527,15 @@
    =================================================================== */
 (function(){
   const el = id => document.getElementById(id);
-  // Currency follows the UI language: ₪ for Hebrew, $ for English & Russian.
-  // Each plan carries a shekel and a dollar price; the active one is picked by
-  // cur() below. ₪ shows whole units, $ shows cents.
+  // Currency follows the visitor's country (currency.js): ₪ in Israel, € in the
+  // eurozone, £ in the UK, ₽ in Russia, $ elsewhere. If the module isn't loaded
+  // we fall back to the old language-based currency (Hebrew → ₪, else $).
   const CUR = { he:{ sym:'₪', field:'ils', dec:0 }, en:{ sym:'$', field:'usd', dec:2 }, ru:{ sym:'$', field:'usd', dec:2 } };
   function cur(){ return CUR[lang] || CUR.en; }
-  const money = n => { const c = cur(); return c.sym + (+n || 0).toFixed(c.dec); };
-  const planBase = p => p.base[cur().field];
+  const money = n => window.KOLKLI_CUR ? KOLKLI_CUR.format(n)
+                                       : cur().sym + (+n || 0).toFixed(cur().dec);
+  const planBase = p => window.KOLKLI_CUR ? KOLKLI_CUR.amount(p.base.usd, p.base.ils)
+                                          : p.base[cur().field];
 
   /* ---------- plans (mirror PLANS in pages.js / index.html) ---------- */
   const PLANS = {
@@ -590,6 +606,7 @@
   const I18N = {
     he:{ dir:'rtl',
       back:'חזרה למסלולים', secure:'תשלום מאובטח',
+      gateTitle:'צריך חשבון כדי להמשיך', gateSub:'כדי לשדרג ולבצע תשלום צריך להתחבר או להירשם. אחרי ההתחברות נמשיך בדיוק מכאן.', gateBtn:'התחברות / הרשמה',
       title:'סיום ההזמנה', subtitle:'עוד כמה פרטים ואתם בפנים. אפשר לבטל בכל רגע — בלי התחייבות.',
       sec1:'המסלול והחיוב', sec2:'החשבון', sec3:'פרטי תשלום', sec4:'פרטי חיוב',
       monthly:'חודשי', yearly:'שנתי', perMonth:'/לחודש', perYear:'/לשנה',
@@ -619,6 +636,7 @@
     },
     en:{ dir:'ltr',
       back:'Back to plans', secure:'Secure checkout',
+      gateTitle:'Sign in to continue', gateSub:'To upgrade and pay you need to log in or create an account. We’ll bring you right back here.', gateBtn:'Log in / Sign up',
       title:'Complete your order', subtitle:'A few details and you’re in. Cancel anytime — no commitment.',
       sec1:'Plan & billing', sec2:'Account', sec3:'Payment details', sec4:'Billing details',
       monthly:'Monthly', yearly:'Yearly', perMonth:'/mo', perYear:'/yr',
@@ -648,6 +666,7 @@
     },
     ru:{ dir:'ltr',
       back:'Назад к тарифам', secure:'Безопасная оплата',
+      gateTitle:'Войдите, чтобы продолжить', gateSub:'Чтобы оформить подписку и оплатить, войдите или создайте аккаунт. Мы вернём вас сюда.', gateBtn:'Войти / Регистрация',
       title:'Оформление заказа', subtitle:'Пара деталей — и всё готово. Отмена в любой момент, без обязательств.',
       sec1:'Тариф и оплата', sec2:'Аккаунт', sec3:'Данные оплаты', sec4:'Данные для счёта',
       monthly:'Ежемесячно', yearly:'Ежегодно', perMonth:'/мес', perYear:'/год',
@@ -1011,8 +1030,43 @@
     el('company').classList.toggle('show');
   });
 
+  /* ---------- auth gate: no upgrade / payment without an account ---------- */
+  function signedIn(){ return !!currentUser(); }
+  function openAuthUI(){
+    if(window.AuthModal && window.AuthModal.open){ window.AuthModal.open('login'); return true; }
+    return false;
+  }
+  function showGate(){
+    el('checkoutView').style.display='none';
+    el('doneView').classList.remove('show');
+    el('authGate').classList.add('show');
+  }
+  function hideGate(){
+    el('authGate').classList.remove('show');
+    if(!el('doneView').classList.contains('show')) el('checkoutView').style.display='';
+  }
+  // Block the form and prompt to sign in / register. auth-modal.js is loaded
+  // async by header.js, so retry briefly and fall back to the full /auth page.
+  function requireAuth(){
+    if(signedIn()){ hideGate(); return true; }
+    showGate();
+    setTimeout(function(){
+      if(signedIn()){ hideGate(); return; }
+      if(!openAuthUI()){
+        var tries=0, iv=setInterval(function(){
+          if(signedIn()){ clearInterval(iv); return; }
+          if(openAuthUI()){ clearInterval(iv); }
+          else if(++tries>20){ clearInterval(iv); if(!signedIn()) location.replace('./auth'); }
+        }, 120);
+      }
+    }, 300);
+    return false;
+  }
+  el('gateBtn').addEventListener('click', function(){ if(!openAuthUI()) location.href='./auth'; });
+
   el('payForm').addEventListener('submit', function(e){
     e.preventDefault();
+    if(!signedIn()){ requireAuth(); return; }   // hard stop: must be logged in to pay
     if(!validate()) return;
     const btn=el('payBtn');
     btn.disabled=true; btn.classList.add('paying');
@@ -1035,6 +1089,14 @@
   });
 
   (function init(){
+    // --- Demo checkout is DISABLED until real Stripe billing is wired. ---
+    // The client-only flow below merely simulated a charge and upgraded the
+    // local account for FREE, so it must not be reachable in production. Every
+    // upgrade link now lands on /pricing until KOLKLI_WORKERS.billing + Stripe
+    // are configured (see CLOUDFLARE-SETUP.md Phase 3). To re-enable this page
+    // once real billing exists, flip CHECKOUT_LIVE to true.
+    var CHECKOUT_LIVE = false;
+    if(!CHECKOUT_LIVE){ location.replace('./pricing/'); return; }
     applyTheme(ls('theme')||'light');
     // deep-link: ?plan=creator|studio (legacy lite/pro/business accepted) & ?cycle=monthly|yearly
     const qp=(location.search.match(/[?&]plan=(creator|studio|lite|pro|business)/)||[])[1];
@@ -1043,13 +1105,27 @@
     if(qc) cycle=qc;
     const cc=ls('ac_country'); if(cc && COUNTRIES.some(x=>x.c===cc)) country=cc;
     applyLang(detectLang());
+    // Re-price once IP → currency detection settles (currency.js).
+    if(window.KOLKLI_CUR && KOLKLI_CUR.onReady) KOLKLI_CUR.onReady(renderAll);
     // prefill email from the signed-in demo account
     const u=currentUser(); if(u && u.email) el('email').value=u.email;
+    // Gate: an upgrade can't proceed without an account. Guests are shown the
+    // login/sign-up popup first, then continue right here once signed in.
+    requireAuth();
   })();
 
-  // Reflect a sign-in that lands after load (auth-store.js fires kolkli:auth).
+  // React to auth changes that land after load (sign-in via the popup, or
+  // auth-store.js restoring a real session — both fire kolkli:auth).
   window.addEventListener('kolkli:auth', function(){
-    const u=currentUser(); if(u && u.email && !el('email').value) el('email').value=u.email;
+    if(el('doneView').classList.contains('show')) return;   // payment finished — leave the receipt alone
+    const u=currentUser();
+    if(u){
+      if(window.AuthModal && window.AuthModal.close) window.AuthModal.close();
+      hideGate();
+      if(u.email && !el('email').value) el('email').value=u.email;
+    } else {
+      showGate();   // signed out while on checkout → gate again
+    }
   });
 })();
 </script>

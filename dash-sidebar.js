@@ -8,8 +8,8 @@
    real account name/avatar — identical to the dashboard rail.
 
    Usage:  <div id="dashRail"></div>  +  <script src="./dash-sidebar.js"></script>
-   Nav items deep-link into the dashboard via its hash router
-   (dashboard.html#project-all, #favorites, #team, …).
+   Nav items deep-link into the dashboard via its path router
+   (dashboard/project-all, dashboard/favorites, dashboard/team, …).
    Optional: window.KolkliSidebar.setLang('he'|'en'|'ru') to follow a page
    language switch;  window.KolkliSidebar.render() to force a refresh.
    ===================================================================== */
@@ -131,9 +131,9 @@
   function toolLinks() {
     var st = T();
     var links = [
-      { cls: 'editing', icon: 'scissors', label: st.editing, href: 'dashboard#editing-tools' },
-      { cls: 'ai',      icon: 'sparkles', label: st.ai,      href: 'dashboard#ai-tools' },
-      { cls: 'design',  icon: 'palette',  label: st.design,  href: 'dashboard#dev-tools' },
+      { cls: 'editing', icon: 'scissors', label: st.editing, href: 'dashboard/editing-tools' },
+      { cls: 'ai',      icon: 'sparkles', label: st.ai,      href: 'dashboard/ai-tools' },
+      { cls: 'design',  icon: 'palette',  label: st.design,  href: 'dashboard/dev-tools' },
       { cls: 'text',    icon: 'text',     label: st.text,    href: 'text-tools', active: true }
     ];
     return '<div class="side-links">' + links.map(function (x) {
@@ -144,8 +144,8 @@
   function belowTools() {
     var st = T();
     return '<div class="side-below-tools">' +
-      catHead('star', st.favorites, 'dashboard#favorites') +
-      catHead('users', st.team, 'dashboard#team') + '</div>';
+      catHead('star', st.favorites, 'dashboard/favorites') +
+      catHead('users', st.team, 'dashboard/team') + '</div>';
   }
   function storageHtml() {
     var st = T(), used = usedStorageGB(), total = PLANS[plan].limits.storageGB;
@@ -198,7 +198,7 @@
           '<span class="dash-acct-id"><span class="dash-acct-full">' + esc(name) + '</span>' +
           (user.email ? '<span class="dash-acct-mail">' + esc(user.email) + '</span>' : '') + '</span></div>' +
         '<div class="dash-acct-sep"></div>' +
-        '<a class="dash-acct-item" role="menuitem" href="dashboard#account">' + s(ICON.grid) + '<span>' + esc(st.myAccount) + '</span></a>' +
+        '<a class="dash-acct-item" role="menuitem" href="dashboard/account">' + s(ICON.grid) + '<span>' + esc(st.myAccount) + '</span></a>' +
         '<a class="dash-acct-item" role="menuitem" href="account-settings">' + s(ICON.gear) + '<span>' + esc(st.settings) + '</span></a>' +
         langSwitchHtml() +
         '<div class="dash-acct-sep"></div>' +
@@ -207,8 +207,8 @@
   }
   function railHtml() {
     var st = T();
-    return catHead('layers', st.projects, 'dashboard#project-all') +
-      catHead('files', st.mytools, 'dashboard#my-all') +
+    return catHead('layers', st.projects, 'dashboard/project-all') +
+      catHead('files', st.mytools, 'dashboard/my-all') +
       toolLinks() + belowTools() + planHtml() + accountHtml();
   }
 

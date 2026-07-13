@@ -1,8 +1,18 @@
+# SPA path routing: pages whose in-app sections live in a path segment
+# (e.g. /dashboard/project-send) are served from their .html so a direct link
+# or refresh resolves; the page's JS then routes on location.pathname. These
+# 200 rewrites must come first (first match wins). Mirrors SPA_PAGES in serve.py.
+/dashboard/*  /dashboard.html  200
+/account-settings/*  /account-settings.html  200
+/text-tools/*  /text-tools.html  200
+/css-tools/*  /css-tools.html  200
+
 # 301 redirects: every legacy .html URL -> its clean canonical URL.
 # Cloudflare Pages / Netlify format. Query strings are forwarded automatically.
 # NOTE: www -> non-www and http -> https are handled by Cloudflare redirect rules
 #       (dashboard), not here. Generated file — do not hand-edit.
 
+/about.html  /about  301
 /account-settings.html  /account-settings  301
 /ad-text-checker.html  /ad-text-checker  301
 /admin.html  /admin  301
@@ -20,6 +30,7 @@
 /audio/index.html  /audio/  301
 /audio-editor.html  /audio-editor  301
 /auth.html  /auth  301
+/blog.html  /blog  301
 /border-radius.html  /border-radius  301
 /box-shadow.html  /box-shadow  301
 /calc/index.html  /calc/  301
@@ -32,6 +43,7 @@
 /compress-pdf.html  /compress-pdf  301
 /compress-video.html  /compress-video  301
 /compress-zip.html  /compress-zip  301
+/contact.html  /contact  301
 /contrast-checker.html  /contrast-checker  301
 /convert.html  /convert  301
 /converters/index.html  /converters/  301
@@ -43,6 +55,7 @@
 /dashboard.html  /dashboard  301
 /delivery-approval-card.html  /delivery-approval-card  301
 /dev-tools/index.html  /dev-tools/  301
+/dmca.html  /dmca  301
 /doc-convert.html  /doc-convert  301
 /doc-to-pdf.html  /doc-to-pdf  301
 /documents/index.html  /documents/  301
@@ -59,6 +72,7 @@
 /files.html  /files  301
 /folder-panel.html  /folder-panel  301
 /font-convert.html  /font-convert  301
+/form-builder.html  /form-builder  301
 /gradient-generator.html  /gradient-generator  301
 /heic-to-jpg.html  /heic-to-jpg  301
 /html-cleaner.html  /html-cleaner  301
@@ -100,6 +114,7 @@
 /review.html  /review  301
 /ringtone.html  /ringtone  301
 /screen-units.html  /screen-units  301
+/security.html  /security  301
 /select.html  /select  301
 /send.html  /send  301
 /sent-files-card.html  /sent-files-card  301

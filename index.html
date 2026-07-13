@@ -212,7 +212,7 @@
   .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start;}
   .plan{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px 24px;box-shadow:var(--shadow);}
   .plan.pop{border-color:var(--accent);box-shadow:var(--shadow-lg);}
-  .plan .ribbon{position:absolute;top:-11px;inset-inline-start:24px;background:var(--grad);color:#fff;font-size:11px;font-weight:700;
+  .plan .ribbon{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:11px;font-weight:700;
     font-family:var(--mono);padding:3px 12px;border-radius:999px;box-shadow:0 4px 10px var(--grad-shadow);}
   .plan h3{font-size:18px;margin:0 0 2px;font-weight:700;}
   .plan .price{font-size:34px;font-weight:700;letter-spacing:-.02em;margin:10px 0 2px;}
@@ -698,6 +698,7 @@
   </div>
 </footer>
 
+<script src="./currency.js"></script>
 <script>
   const el = id => document.getElementById(id);
 
@@ -955,14 +956,16 @@
       {i:'🧰', he:['בחירת כלי','עורכים, ממירים, דוחסים או שולחים.'], en:['Choose a tool','Edit, convert, compress or send.'], ru:['Выберите инструмент','Редактируйте, конвертируйте, сжимайте или отправляйте.']},
       {i:'⬇️', he:['הורדה או שיתוף','מקבלים את הקובץ בחזרה או שולחים לינק.'], en:['Download or share','Get your file back, or send a link.'], ru:['Скачайте или поделитесь','Получите файл обратно или отправьте ссылку.']}
     ],
+    // usd = base price (source of truth); ils = hand-set shekel point. Other
+    // currencies are derived from usd by currency.js; `price` is the fallback.
     plans:[
-      {price:{he:'₪0',en:'$0',ru:'$0'}, he:['חינם','להתחלה מהירה'], en:['Free','To get started'], ru:['Бесплатно','Для быстрого старта'], cta:{he:'התחילו',en:'Get Started',ru:'Начать'}, feats:[
+      {usd:0, ils:0, price:{he:'₪0',en:'$0',ru:'$0'}, he:['חינם','להתחלה מהירה'], en:['Free','To get started'], ru:['Бесплатно','Для быстрого старта'], cta:{he:'התחילו',en:'Get Started',ru:'Начать'}, feats:[
         {he:'עד 3 פרויקטים פעילים',en:'Up to 3 active projects',ru:'До 3 активных проектов'},
         {he:'עד 3GB אחסון והעברה',en:'Up to 3GB storage & transfer',ru:'До 3 ГБ хранилища и передачи'},
         {he:'קבצים נשמרים 7 ימים',en:'Files kept for 7 days',ru:'Файлы хранятся 7 дней'},
         {he:'ארגון · בקשה · משוב — 2 ביום',en:'Organize · request · review — 2/day',ru:'Организация · запрос · ревью — 2/день'},
         {he:'כלי PDF בסיסיים',en:'Basic PDF tools',ru:'Базовые PDF-инструменты'}]},
-      {price:{he:'₪89',en:'$24',ru:'$24'}, pop:true, he:['Creator','ליוצרים ופרילנסרים'], en:['Creator','For creators & freelancers'], ru:['Creator','Для авторов и фрилансеров'], cta:{he:'בחרו Creator',en:'Get Creator',ru:'Выбрать Creator'}, feats:[
+      {usd:24, ils:89, price:{he:'₪89',en:'$24',ru:'$24'}, pop:true, he:['Creator','ליוצרים ופרילנסרים'], en:['Creator','For creators & freelancers'], ru:['Creator','Для авторов и фрилансеров'], cta:{he:'בחרו Creator',en:'Get Creator',ru:'Выбрать Creator'}, feats:[
         {he:'100 פרויקטים · 500 קבצים לכל אחד',en:'100 projects · 500 files each',ru:'100 проектов · 500 файлов в каждом'},
         {he:'250GB אחסון · עד 25GB בהעברה',en:'250GB storage · up to 25GB/transfer',ru:'250 ГБ · до 25 ГБ за передачу'},
         {he:'קבצים נשמרים 90 יום',en:'Files kept for 90 days',ru:'Файлы хранятся 90 дней'},
@@ -970,7 +973,7 @@
         {he:'מיתוג אישי וקישורים ממותגים',en:'Custom branding & branded links',ru:'Свой брендинг и фирменные ссылки'},
         {he:'עד 10 פעולות AI ביום',en:'Up to 10 AI actions/day',ru:'До 10 AI-операций в день'},
         {he:'עד 2 חברי צוות',en:'Up to 2 team members',ru:'До 2 участников'}]},
-      {price:{he:'₪249',en:'$69',ru:'$69'}, he:['Studio','לסטודיו וצוותים'], en:['Studio','For studios & teams'], ru:['Studio','Для студий и команд'], cta:{he:'בחרו Studio',en:'Get Studio',ru:'Выбрать Studio'}, feats:[
+      {usd:69, ils:249, price:{he:'₪249',en:'$69',ru:'$69'}, he:['Studio','לסטודיו וצוותים'], en:['Studio','For studios & teams'], ru:['Studio','Для студий и команд'], cta:{he:'בחרו Studio',en:'Get Studio',ru:'Выбрать Studio'}, feats:[
         {he:'500 פרויקטים · 2,000 קבצים לכל אחד',en:'500 projects · 2,000 files each',ru:'500 проектов · 2 000 файлов в каждом'},
         {he:'1TB אחסון · עד 100GB בהעברה',en:'1TB storage · up to 100GB/transfer',ru:'1 ТБ · до 100 ГБ за передачу'},
         {he:'שמירת קבצים עד שנה',en:'Files kept up to 1 year',ru:'Файлы хранятся до года'},
@@ -1007,13 +1010,13 @@
         {he:'כלי עיצוב ופיתוח',en:'Design & Dev',ru:'Дизайн и код',href:'./dev-tools/'}]},
       {t:{he:'AI',en:'AI',ru:'AI'}, links:[
         {he:'סטודיו AI',en:'AI Studio',ru:'AI-студия',href:'./ai/'},{he:'חיתוך חכם',en:'Smart Crop',ru:'Умная обрезка',href:'./ai-smart-crop'},{he:'הסרת רקע',en:'Remove BG',ru:'Удалить фон',href:'./remove-bg'},
-        {he:'ניקוי אודיו',en:'Audio Cleaner',ru:'Очистка звука',href:'./ai-audio-cleanup'},{he:'כתוביות',en:'Subtitles',ru:'Субтитры',href:'./subtitle-generator'},{he:'סיכום PDF',en:'Summarize PDF',ru:'Конспект PDF',href:'./ai-summarize-pdf'},{he:'שדרוג תמונה',en:'Upscaler',ru:'Апскейлер'}]},
+        {he:'ניקוי אודיו',en:'Audio Cleaner',ru:'Очистка звука',href:'./ai-audio-cleanup'},{he:'כתוביות',en:'Subtitles',ru:'Субтитры',href:'./subtitle-generator'},{he:'סיכום PDF',en:'Summarize PDF',ru:'Конспект PDF',href:'./ai-summarize-pdf'},{he:'שדרוג תמונה',en:'Upscaler',ru:'Апскейлер',href:'./ai/'}]},
       {t:{he:'חברה',en:'Company',ru:'Компания'}, links:[
-        {he:'אודות',en:'About',ru:'О нас'},{he:'מסלולים ומחירים',en:'Pricing',ru:'Цены',href:'./pricing/'},
-        {he:'בלוג',en:'Blog',ru:'Блог'},{he:'צור קשר',en:'Contact',ru:'Контакты'}]},
+        {he:'אודות',en:'About',ru:'О нас',href:'./about'},{he:'מסלולים ומחירים',en:'Pricing',ru:'Цены',href:'./pricing/'},
+        {he:'בלוג',en:'Blog',ru:'Блог',href:'./blog'},{he:'צור קשר',en:'Contact',ru:'Контакты',href:'./contact'}]},
       {t:{he:'משפטי',en:'Legal',ru:'Правовое'}, links:[
-        {he:'פרטיות',en:'Privacy',ru:'Конфиденциальность'},{he:'תנאי שימוש',en:'Terms',ru:'Условия'},
-        {he:'DMCA',en:'DMCA',ru:'DMCA'},{he:'אבטחה',en:'Security',ru:'Безопасность'}]}
+        {he:'פרטיות',en:'Privacy',ru:'Конфиденциальность',href:'./privacy'},{he:'תנאי שימוש',en:'Terms',ru:'Условия',href:'./terms'},
+        {he:'DMCA',en:'DMCA',ru:'DMCA',href:'./dmca'},{he:'אבטחה',en:'Security',ru:'Безопасность',href:'./security'}]}
     ]
   };
 
@@ -1047,16 +1050,26 @@
     const ribbon = p.pop ? `<span class="ribbon">${S.mostPopular}</span>` : '';
     const feats = p.feats.map(f=>`<li>${check}${f[L]}</li>`).join('');
     // Free → sign-up; paid plans (Creator/Studio) → the checkout flow.
+    // Paid CTAs carry data-requires-auth so auth-modal.js sends guests to
+    // login/sign-up before checkout (the checkout page re-checks as well).
     const slug = (p.en[0]||'').toLowerCase();
-    const href = slug==='free' ? './auth?mode=signup' : `./checkout.html?plan=${slug}`;
+    const paid = slug!=='free';
+    // Real Stripe billing isn't wired yet, so the demo checkout is disabled.
+    // Paid CTAs point to the pricing page (Creator also offers the free trial
+    // below). Restore `./checkout?plan=${slug}` once billing goes live.
+    const href = paid ? `./pricing/` : './auth?mode=signup';
+    const gate = paid ? ' data-requires-auth' : '';
     const btn = p.pop
-      ? `<a class="cta" href="${href}">${p.cta[L]}</a>`
-      : `<a class="ghost" href="${href}">${p.cta[L]}</a>`;
+      ? `<a class="cta" href="${href}"${gate}>${p.cta[L]}</a>`
+      : `<a class="ghost" href="${href}"${gate}>${p.cta[L]}</a>`;
     // Creator is the trialed tier → offer the no-card 7-day trial via sign-up.
     const trialTxt = { he:'או 7 ימי ניסיון חינם — ללא כרטיס אשראי', en:'or start 7 days free — no credit card', ru:'или 7 дней бесплатно — без карты' };
     const trial = slug==='creator' ? `<a class="plan-trial" href="./auth?mode=signup">${trialTxt[L]}</a>` : '';
+    // Currency follows the visitor's country (currency.js); the per-language
+    // price point is the fallback when the module isn't loaded.
+    const priceTxt = (window.KOLKLI_CUR && p.usd!=null) ? KOLKLI_CUR.price(p.usd, p.ils) : p.price[L];
     return `<div class="plan ${p.pop?'pop':''}">${ribbon}<h3>${name}</h3>
-      <div class="price">${p.price[L]}<span>${S.perMonth}</span></div><p class="tagline">${tagline}</p>
+      <div class="price">${priceTxt}<span>${S.perMonth}</span></div><p class="tagline">${tagline}</p>
       <ul>${feats}</ul>${btn}${trial}</div>`;
   }
 
@@ -1131,6 +1144,15 @@
     geoLang();
   }
   function geoLang(){
+    // currency.js resolves the country too (shared 'ac_country' key) — piggy-back
+    // on it so we don't fire a second IP lookup.
+    if(window.KOLKLI_CUR && KOLKLI_CUR.ready){
+      KOLKLI_CUR.ready.then(function(){
+        const country = ls('ac_country');
+        if(country && !ls('ac_lang')) applyLang(country==='IL' ? 'he' : 'en', false);
+      });
+      return;
+    }
     if(!('fetch' in window)) return;
     const ctrl = ('AbortController' in window) ? new AbortController() : null;
     const timer = ctrl ? setTimeout(()=>{ try{ ctrl.abort(); }catch(_){} }, 2200) : null;
@@ -1204,6 +1226,8 @@
     revealScan();
 
     detectLang();
+    // Re-render prices once IP → currency detection settles.
+    if(window.KOLKLI_CUR && KOLKLI_CUR.onReady) KOLKLI_CUR.onReady(render);
 
     const nav = document.getElementById('shNav');
     if(nav){

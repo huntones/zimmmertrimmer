@@ -316,25 +316,13 @@
     .badge-i:nth-child(n+2){border-top:1px solid var(--line-2);}
   }
 </style>
+<link rel="stylesheet" href="./header.css">
 </head>
 <body>
 
-<!-- ================= TOP NAV (guest header) ================= -->
-<header class="nav">
-  <div class="nav-in">
-    <a class="brand" href="./" aria-label="KOLKLI">
-      <span class="wm">KOLKLI</span>
-      <span class="kbox">K</span>
-    </a>
-    <div class="nav-end">
-      <button class="nav-ico" id="themeBtn" type="button" aria-label="החלפת מצב תצוגה" title="מצב כהה / בהיר">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
-      <a class="nav-login" href="./auth">התחברות</a>
-      <a class="nav-signup" href="./auth?mode=signup">הרשמה</a>
-    </div>
-  </div>
-</header>
+<!-- ================= SHARED SITE HEADER (full nav: tools, pricing, login, sign up) ================= -->
+<div id="site-header"></div>
+<script src="./header.js"></script>
 
 <div class="page">
 
@@ -509,14 +497,17 @@
 (function(){
   const $ = id => document.getElementById(id);
 
-  /* ---------- theme ---------- */
+  /* ---------- theme (shared header owns the #themeToggle button + #themeIco) ---------- */
   const root = document.documentElement;
-  try{ if(localStorage.getItem('kolkli-theme')==='dark') root.setAttribute('data-theme','dark'); }catch(_){}
-  $('themeBtn').addEventListener('click',()=>{
-    const dark = root.getAttribute('data-theme')==='dark';
-    if(dark) root.removeAttribute('data-theme'); else root.setAttribute('data-theme','dark');
-    try{ localStorage.setItem('kolkli-theme', dark?'light':'dark'); }catch(_){}
-  });
+  function applyTheme(th){
+    const dark = (th==='dark');
+    root.setAttribute('data-theme', dark?'dark':'light');
+    const ico = $('themeIco'); if(ico) ico.textContent = dark?'☀️':'🌙';
+    try{ localStorage.setItem('theme', dark?'dark':'light'); }catch(_){}
+  }
+  const themeBtn = $('themeToggle');
+  if(themeBtn) themeBtn.addEventListener('click',()=>applyTheme(root.getAttribute('data-theme')==='dark'?'light':'dark'));
+  applyTheme((()=>{ try{ return localStorage.getItem('theme'); }catch(_){ return null; } })() || 'light');
 
   /* ---------- toast ---------- */
   let toastT; const toastEl = $('toast');

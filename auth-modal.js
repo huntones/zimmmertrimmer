@@ -397,21 +397,11 @@
     return Promise.resolve('x' + (h >>> 0).toString(16));
   }
 
-  // Seed the bootstrap admin so it can sign in on any browser with a known demo
-  // password. Create-if-missing only — never clobbers a real account someone
-  // already registered with a different password. (Demo store; not real auth.)
-  (function seedAdmin() {
-    try {
-      var email = 'digitalzimmer@gmail.com';
-      if (findUser(email)) return;
-      hashPass('test1234').then(function (h) {
-        if (findUser(email)) return;                 // re-check after async hash
-        var users = loadUsers();
-        users.push({ name: 'Tal Zimmer', email: email, pass: h, role: 'admin', plan: 'studio', created: Date.now() });
-        saveUsers(users);
-      });
-    } catch (_) {}
-  })();
+  // NOTE: the bootstrap-admin seed (a hard-coded demo password shipped in
+  // client JS) was removed for launch — it let anyone sign in as admin on any
+  // browser. Admin is still granted to the owner email(s) in ADMIN_EMAILS
+  // (see auth-store.js / header.js) once that account signs in for real
+  // (Supabase) or registers a password in the local demo store.
 
   // =====================================================
   //  VALIDATION

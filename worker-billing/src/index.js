@@ -181,7 +181,7 @@ async function handleCheckout(body, user, env, cors) {
     client_reference_id: orgId,
     metadata,
     subscription_data: { metadata },
-    success_url: env.SUCCESS_URL || `${env.ALLOWED_ORIGIN}/dashboard#team`,
+    success_url: env.SUCCESS_URL || `${env.ALLOWED_ORIGIN}/dashboard/team`,
     cancel_url: env.CANCEL_URL || `${env.ALLOWED_ORIGIN}/pricing/`
   };
 
@@ -217,7 +217,7 @@ async function handlePortal(body, user, env, cors) {
 
   const session = await stripeClient(env).billingPortal.sessions.create({
     customer: org.stripe_customer,
-    return_url: env.SUCCESS_URL || `${env.ALLOWED_ORIGIN}/dashboard#team`
+    return_url: env.SUCCESS_URL || `${env.ALLOWED_ORIGIN}/dashboard/team`
   });
   return json({ url: session.url }, cors);
 }
