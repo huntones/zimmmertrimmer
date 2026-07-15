@@ -8,41 +8,41 @@
 <meta name="description" content="Send large files with a shareable link — set an expiry, add a password and a message. Recipient gets a clean download page.">
 <style>
   :root {
-    --bg:#fdf3e9; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
+    --bg:#f6f4ff; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
     --ink:#1c2030; --ink-2:#2b3140; --muted:#727a8a; --faint:#9aa1b1;
-    --accent:#f97316; --accent-dim:#ea580c; --accent-ink:#ffffff; --accent-soft:#fff1e6;
+    --accent:#6f3afb; --accent-dim:#5a24e0; --accent-ink:#ffffff; --accent-soft:#f0ebfe;
     --success:#22b04b; --success-dim:#1c9a41; --success-soft:#e6f6ec;
     --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
     --danger:#e5484d; --danger-soft:#fdecec;
     --warm-soft:#fff5da; --warm-line:#f2d98a;
     --ok:#22b04b; --warn:#c88a04; --err:#e5484d;
-    --grad:linear-gradient(105deg,#fb8b3c 0%,#f4700f 100%);
-    --grad-h:linear-gradient(105deg,#f4700f 0%,#dd5f08 100%);
-    --grad-soft:linear-gradient(120deg,#fff1e6,#ffe7d1);
-    --grad-shadow:rgba(234,88,12,0.30);
-    --grad-btn:linear-gradient(105deg,#fb8b3c 0%,#f4700f 100%);
-    --grad-btn-glow:rgba(234,88,12,0.34);
+    --grad:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);
+    --grad-h:linear-gradient(105deg,#6f3afb 0%,#5a24e0 100%);
+    --grad-soft:linear-gradient(120deg,#f0ebfe,#e7ddff);
+    --grad-shadow:rgba(111,58,251,0.30);
+    --grad-btn:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);
+    --grad-btn-glow:rgba(111,58,251,0.34);
     --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
     --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#8b93a4; --faint:#6b7280;
-    --accent:#fb923c; --accent-dim:#f97316; --accent-ink:#ffffff; --accent-soft:#2c2012;
+    --accent:#8b5cfb; --accent-dim:#6f3afb; --accent-ink:#ffffff; --accent-soft:#241a3a;
     --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
     --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
     --danger:#ff6b6b; --danger-soft:#2a1719;
     --warm-soft:#2c2718; --warm-line:#5a4d24;
     --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
-    --grad:linear-gradient(105deg,#fb923c 0%,#f97316 100%);
-    --grad-h:linear-gradient(105deg,#fdaa5e 0%,#fb923c 100%);
-    --grad-soft:linear-gradient(120deg,#2c2012,#241a10);
-    --grad-shadow:rgba(251,146,60,0.42);
-    --grad-btn:linear-gradient(105deg,#fb923c 0%,#f97316 100%);
-    --grad-btn-glow:rgba(251,146,60,0.45);
+    --grad:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);
+    --grad-h:linear-gradient(105deg,#a375ff 0%,#8b5cfb 100%);
+    --grad-soft:linear-gradient(120deg,#241a3a,#1c1430);
+    --grad-shadow:rgba(139,92,251,0.42);
+    --grad-btn:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);
+    --grad-btn-glow:rgba(139,92,251,0.45);
     --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
     --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
     --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
@@ -222,6 +222,54 @@
   .bar{height:10px;border-radius:999px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line-2);}
   .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .2s ease;}
 
+  /* animated "sending files to your client" loader — shown while createLink() writes the blobs */
+  .prog{padding:34px 24px 28px;text-align:center;overflow:hidden;}
+  .su-loader{--su-size:200px;width:var(--su-size);height:var(--su-size);margin:0 auto 22px;position:relative;display:grid;place-items:center;}
+  .su-ring{position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from -90deg,var(--accent) 0deg,#b98bff 120deg,#7c3bec 250deg,var(--accent) 360deg);
+    animation:su-spin 1.7s linear infinite;
+    -webkit-mask:radial-gradient(circle,transparent 61%,#000 63%);mask:radial-gradient(circle,transparent 61%,#000 63%);
+    filter:drop-shadow(0 0 14px var(--grad-shadow));}
+  .su-ring::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:50%;transform:translateX(-50%);box-shadow:0 0 18px rgba(255,255,255,.95);}
+  .su-pulse{position:absolute;inset:22px;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 32%,transparent);animation:su-pulse 1.7s ease-out infinite;}
+  .su-core{width:130px;height:130px;border-radius:50%;display:grid;place-items:center;position:relative;z-index:2;
+    background:linear-gradient(145deg,var(--panel),var(--panel-2));box-shadow:0 14px 32px rgba(20,24,40,.16),inset 0 1px 0 rgba(255,255,255,.5);}
+  html[data-theme="dark"] .su-core{box-shadow:0 14px 32px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);}
+  .su-percent{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:30px;font-weight:900;letter-spacing:-1px;color:color-mix(in srgb,var(--ink) 15%,transparent);z-index:1;white-space:nowrap;pointer-events:none;}
+  .su-send-icon{width:50px;height:50px;color:var(--accent);position:relative;z-index:3;animation:su-orbit 2.6s ease-in-out infinite,su-tilt 1.3s ease-in-out infinite alternate;filter:drop-shadow(0 10px 12px var(--grad-shadow));}
+  .su-flying{position:absolute;inset:-28px;pointer-events:none;z-index:4;}
+  .su-fly{position:absolute;width:40px;height:46px;border-radius:11px;display:grid;place-items:center;color:#fff;opacity:0;transform-style:preserve-3d;box-shadow:0 10px 22px rgba(31,38,61,.18),inset 0 1px 0 rgba(255,255,255,.28);}
+  .su-fly svg{width:22px;height:22px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.14));}
+  .su-fly-folder{width:46px;height:34px;border-radius:8px 8px 11px 11px;background:linear-gradient(145deg,#f4c85b,#e9a72f);animation:su-orbitFolder 5.4s ease-in-out infinite;}
+  .su-folder-tab{position:absolute;width:20px;height:8px;left:5px;top:-6px;border-radius:6px 6px 0 0;background:#efbb45;}
+  .su-fly-doc{background:linear-gradient(145deg,#6f9eff,#4d74dd);animation:su-orbitDoc 5.8s ease-in-out infinite .5s;}
+  .su-fly-audio{background:linear-gradient(145deg,#9c75f5,#7249d4);animation:su-orbitAudio 6.2s ease-in-out infinite 1s;}
+  .su-fly-video{background:linear-gradient(145deg,#f17ca9,#d85587);animation:su-orbitVideo 5.7s ease-in-out infinite 1.5s;}
+  .su-fly-image{background:linear-gradient(145deg,#50c994,#2ca56f);animation:su-orbitImage 6.4s ease-in-out infinite 2s;}
+  .su-particles{position:absolute;inset:0;pointer-events:none;}
+  .su-particle{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:0;animation:su-float 2.2s ease-out infinite;}
+  .su-particle:nth-child(1){left:18%;top:42%;animation-delay:.1s;}
+  .su-particle:nth-child(2){right:15%;top:35%;animation-delay:.7s;background:#7c3bec;}
+  .su-particle:nth-child(3){left:30%;top:18%;animation-delay:1.15s;background:#b98bff;}
+  .su-particle:nth-child(4){right:28%;top:22%;animation-delay:1.7s;}
+  .su-title{margin:0;font-size:21px;font-weight:800;color:var(--ink);}
+  .su-sub{margin:7px auto 0;max-width:360px;color:var(--muted);font-size:14px;line-height:1.6;}
+  .su-status{margin:6px 0 0;color:var(--accent-dim,var(--accent));font-size:13px;font-weight:600;min-height:18px;}
+  .prog .bar{margin-top:20px;}
+  @keyframes su-spin{to{transform:rotate(360deg);}}
+  @keyframes su-orbit{0%,100%{transform:translateY(2px) scale(.96);}50%{transform:translateY(-7px) scale(1.06);}}
+  @keyframes su-tilt{from{rotate:-8deg;}to{rotate:8deg;}}
+  @keyframes su-pulse{0%{transform:scale(.82);opacity:.7;}100%{transform:scale(1.38);opacity:0;}}
+  @keyframes su-float{0%{transform:translateY(12px) scale(.6);opacity:0;}30%{opacity:.8;}100%{transform:translateY(-34px) scale(1.15);opacity:0;}}
+  @keyframes su-orbitFolder{0%{left:10%;top:70%;opacity:0;transform:translateZ(-30px) scale(.65) rotate(-18deg);}18%{opacity:.95;}48%{left:2%;top:16%;opacity:1;transform:translateZ(40px) scale(1) rotate(8deg);}80%{left:33%;top:-4%;opacity:.7;transform:translateZ(10px) scale(.82) rotate(18deg);}100%{left:48%;top:12%;opacity:0;transform:translateZ(-40px) scale(.55) rotate(26deg);}}
+  @keyframes su-orbitDoc{0%{right:12%;top:76%;opacity:0;transform:translateZ(-35px) scale(.62) rotate(16deg);}18%{opacity:.95;}48%{right:1%;top:20%;opacity:1;transform:translateZ(45px) scale(1) rotate(-8deg);}82%{right:34%;top:-8%;opacity:.72;transform:translateZ(12px) scale(.8) rotate(-18deg);}100%{right:48%;top:13%;opacity:0;transform:translateZ(-45px) scale(.52) rotate(-25deg);}}
+  @keyframes su-orbitAudio{0%{left:42%;top:-14%;opacity:0;transform:translateZ(-25px) scale(.58) rotate(-8deg);}22%{opacity:.9;}52%{left:82%;top:38%;opacity:1;transform:translateZ(42px) scale(1) rotate(12deg);}82%{left:58%;top:82%;opacity:.65;transform:translateZ(6px) scale(.78) rotate(22deg);}100%{left:48%;top:58%;opacity:0;transform:translateZ(-38px) scale(.5) rotate(30deg);}}
+  @keyframes su-orbitVideo{0%{left:45%;top:88%;opacity:0;transform:translateZ(-35px) scale(.6) rotate(12deg);}20%{opacity:.95;}50%{left:8%;top:45%;opacity:1;transform:translateZ(48px) scale(1) rotate(-10deg);}82%{left:26%;top:2%;opacity:.7;transform:translateZ(8px) scale(.8) rotate(-18deg);}100%{left:48%;top:24%;opacity:0;transform:translateZ(-45px) scale(.52) rotate(-26deg);}}
+  @keyframes su-orbitImage{0%{right:44%;top:-8%;opacity:0;transform:translateZ(-28px) scale(.58) rotate(-12deg);}22%{opacity:.9;}52%{right:7%;top:50%;opacity:1;transform:translateZ(44px) scale(1) rotate(9deg);}82%{right:28%;top:85%;opacity:.68;transform:translateZ(8px) scale(.8) rotate(18deg);}100%{right:48%;top:56%;opacity:0;transform:translateZ(-40px) scale(.5) rotate(25deg);}}
+  @media (prefers-reduced-motion:reduce){
+    .su-ring,.su-pulse,.su-send-icon,.su-fly,.su-particle{animation-duration:.01ms!important;animation-iteration-count:1!important;}
+  }
+
   /* share result */
   .share{padding:22px;display:none;}
   .share.show{display:block;}
@@ -343,7 +391,7 @@
     transform:translateY(14px) scale(.985);opacity:0;transition:transform .26s cubic-bezier(.2,.8,.25,1),opacity .26s;}
   .adv-overlay.open .adv-modal{transform:none;opacity:1;}
   @media (max-width:560px){ .adv-modal{border-radius:18px;} }
-  .adv-close{position:absolute;top:15px;inset-inline-start:15px;width:34px;height:34px;border-radius:10px;border:none;cursor:pointer;
+  .adv-close{position:absolute;top:15px;inset-inline-end:15px;width:34px;height:34px;border-radius:10px;border:none;cursor:pointer;
     background:var(--panel-2);color:var(--muted);display:flex;align-items:center;justify-content:center;z-index:3;transition:background .12s,color .12s;}
   .adv-close:hover{background:var(--danger-soft);color:var(--danger);}
   .adv-close svg{width:17px;height:17px;}
@@ -382,6 +430,116 @@
   .switch input:checked + .track{background:var(--accent);}
   .switch input:checked + .track::after{inset-inline-start:20px;}
 
+  /* ============================================================================
+     Admin ⇄ Client view switch + live client preview
+     #viewSwitch flips the composer for a pixel-faithful preview of the recipient
+     download page (mirrors download.html), fed straight from the staged files[] +
+     brand + send options — no persistence, so it reflects every add/remove/edit the
+     instant it happens, before any link is created. Everything below is namespaced
+     under .cv- so it never collides with the composer's own .card/.flist/.frow/.chip,
+     and the client's brand accent is scoped to #cvPage via --cv-* custom props (never
+     touches :root) so it can't bleed into the composer chrome. */
+  .viewswitch{display:flex;justify-content:center;margin:0 0 16px;}
+  .vsw{display:inline-flex;gap:5px;background:var(--panel);border:1px solid var(--line);border-radius:999px;
+    padding:5px;box-shadow:var(--shadow);}
+  .vsw-btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 22px;border:none;border-radius:999px;
+    background:transparent;color:var(--muted);cursor:pointer;font-size:14px;font-weight:600;font-family:var(--sans);
+    transition:color .16s,background .16s,box-shadow .16s;white-space:nowrap;}
+  .vsw-btn svg{width:17px;height:17px;flex:0 0 auto;}
+  .vsw-btn.on{color:#fff;background:var(--grad-btn);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
+  .vsw-btn:not(.on):hover{color:var(--ink-2);}
+  @media (max-width:480px){ .vsw-btn{padding:0 15px;font-size:13px;} }
+
+  .clientview{margin:0 0 10px;}
+  .cv-cap{max-width:860px;margin:0 auto 12px;display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:12px;
+    background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 24%,var(--line));color:var(--ink-2);
+    font-size:12.5px;line-height:1.5;}
+  .cv-cap svg{width:17px;height:17px;color:var(--accent);flex:0 0 auto;}
+  .cv-frame{max-width:860px;margin:0 auto;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+    box-shadow:var(--shadow-lg);background:var(--panel);}
+  .cv-chrome{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line-2);}
+  .cv-dots{display:flex;gap:6px;flex:0 0 auto;}
+  .cv-dots i{width:11px;height:11px;border-radius:50%;background:var(--line);}
+  .cv-dots i:nth-child(1){background:#ff5f57;} .cv-dots i:nth-child(2){background:#febc2e;} .cv-dots i:nth-child(3){background:#28c840;}
+  .cv-url{flex:1;min-width:0;display:flex;align-items:center;gap:7px;height:30px;padding:0 12px;border-radius:999px;
+    background:var(--panel-2);border:1px solid var(--line-2);font-family:var(--mono);font-size:12px;color:var(--muted);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;}
+  .cv-url svg{width:13px;height:13px;color:var(--faint);flex:0 0 auto;}
+  .cv-url span{overflow:hidden;text-overflow:ellipsis;}
+  .cv-livetag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--success-dim);flex:0 0 auto;}
+  .cv-livetag .d{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px var(--success-soft);
+    animation:pulse 1.6s ease-in-out infinite;}
+  @media (max-width:480px){ .cv-livetag span{display:none;} }
+
+  /* the "client page" surface — its own bg/accent so it reads as a separate site */
+  .cv-page{--cv-accent:#6f3afb;--cv-accent-dim:#5a24e0;--cv-accent-soft:rgba(111,58,251,.14);
+    --cv-grad:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);--cv-glow:rgba(111,58,251,.34);
+    background:#eef0f6;padding:22px 18px 26px;}
+  html[data-theme="dark"] .cv-page{background:#0d0f14;}
+  .cv-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);
+    padding:24px;max-width:620px;margin:0 auto;}
+  .cv-dhead{text-align:center;border-bottom:1px solid var(--line-2);padding-bottom:18px;margin-bottom:18px;}
+  .cv-ava{width:56px;height:56px;margin:0 auto 12px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--cv-accent-soft);color:var(--cv-accent);}
+  .cv-ava svg{width:28px;height:28px;}
+  .cv-dhead h1{font-size:20px;margin:0 0 4px;font-weight:700;}
+  .cv-who{font-size:13.5px;color:var(--muted);}
+  .cv-msgbox{background:var(--panel-2);border:1px solid var(--line-2);border-radius:12px;padding:13px 15px;font-size:14px;
+    color:var(--ink-2);line-height:1.6;margin-bottom:18px;white-space:pre-wrap;word-break:break-word;}
+  .cv-metarow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;}
+  .cv-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;}
+  .cv-chip svg{width:13px;height:13px;color:var(--cv-accent);}
+  .cv-flist{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;max-height:420px;overflow-y:auto;overscroll-behavior:contain;}
+  .cv-flist::-webkit-scrollbar{width:10px;}
+  .cv-flist::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:999px;border:3px solid var(--panel);}
+  .cv-flist::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+  .cv-frow{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line-2);border-radius:12px;background:var(--panel);}
+  .cv-fico{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    background:var(--cv-accent-soft);color:var(--cv-accent);overflow:hidden;}
+  .cv-fico.image{color:var(--info);background:var(--info-soft);} .cv-fico.video{color:#e5484d;background:var(--danger-soft);}
+  .cv-fico.doc{color:var(--info-dim);background:var(--info-soft);}
+  .cv-fico.img{background:none;} .cv-fico img{width:100%;height:100%;object-fit:cover;}
+  .cv-fico svg{width:18px;height:18px;}
+  .cv-fn{flex:1;min-width:0;}
+  .cv-fn .nm{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cv-fn .sz{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .cv-act{display:flex;gap:6px;flex-shrink:0;}
+  .cv-act button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .cv-act button:hover{border-color:var(--cv-accent);color:var(--cv-accent);}
+  .cv-act svg{width:16px;height:16px;}
+  .cv-dlall{width:fit-content;max-width:100%;margin-inline:auto;display:flex;align-items:center;justify-content:center;gap:9px;
+    color:#fff;border:none;cursor:pointer;background:var(--cv-grad);font-weight:600;font-size:15px;padding:14px 34px;border-radius:999px;
+    text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:0 8px 20px var(--cv-glow);transition:filter .14s,transform .08s;}
+  .cv-dlall:hover{filter:brightness(1.05);} .cv-dlall:active{transform:translateY(1px);} .cv-dlall svg{width:17px;height:17px;}
+  .cv-empty{text-align:center;padding:34px 12px;}
+  .cv-empty-ic{width:60px;height:60px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:var(--panel-2);border:1px dashed var(--line);color:var(--muted);}
+  .cv-empty-ic svg{width:28px;height:28px;}
+  .cv-empty-t{font-size:14px;color:var(--muted);font-weight:600;}
+  .cv-seam{display:flex;align-items:flex-start;gap:8px;margin-top:18px;padding:11px 13px;border-radius:11px;
+    background:var(--warm-soft);border:1px solid var(--warm-line);font-size:11.5px;color:var(--ink-2);line-height:1.55;}
+  .cv-seam svg{width:15px;height:15px;color:var(--warn);flex-shrink:0;margin-top:1px;}
+  .cv-pbwrap{text-align:center;margin-top:18px;}
+  .cv-poweredby{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--faint);font-family:var(--mono);letter-spacing:.02em;}
+  .cv-poweredby b{color:var(--muted);font-family:var(--sans);font-weight:800;letter-spacing:0;}
+  .cv-branded .cv-ava{display:none;}
+
+  /* branded hero (mirrors download.html .brandhero) */
+  .cv-brandhero{position:relative;border-radius:16px;overflow:hidden;margin:0 auto 16px;max-width:620px;border:1px solid var(--line);box-shadow:var(--shadow-lg);}
+  .cv-bh-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;}
+  .cv-bh-scrim{position:absolute;inset:0;}
+  .cv-bh-in{position:relative;padding:30px 22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:11px;}
+  .cv-bh-logo{background:#fff;border-radius:14px;padding:10px 15px;box-shadow:0 8px 24px rgba(0,0,0,.20);}
+  .cv-bh-logo img{display:block;max-height:46px;max-width:min(200px,55vw);object-fit:contain;}
+  .cv-bh-name{font-size:clamp(19px,3.4vw,24px);font-weight:800;letter-spacing:-.01em;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.30);}
+  .cv-bh-tag{font-size:13.5px;color:rgba(255,255,255,.92);text-shadow:0 1px 8px rgba(0,0,0,.30);max-width:46ch;}
+  .cv-brandhero.cv-bh-default{min-height:clamp(160px,20vw,220px);}
+  .cv-brandhero.cv-bh-default .cv-bh-bg{background-color:#e3d7fb;background-position:center 22%;}
+  .cv-brandhero.cv-bh-default .cv-bh-name{color:#3d2270;text-shadow:none;}
+  .cv-brandhero.cv-bh-default .cv-bh-tag{color:#5a3a8f;text-shadow:none;}
+
   footer{margin-top:6px;text-align:center;color:var(--faint);font-size:12px;font-family:var(--mono);}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
     background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:999px;
@@ -399,6 +557,20 @@
 <script src="./auth-store.js"></script>
 <script src="./kolkli-db.js"></script>
 <div class="wrap">
+
+  <!-- admin ⇄ client view switch: flips the composer into a live recipient preview -->
+  <div class="viewswitch" id="viewSwitch" role="tablist">
+    <div class="vsw">
+      <button class="vsw-btn on" type="button" data-mode="admin" role="tab" aria-selected="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span id="vswAdminLbl"></span>
+      </button>
+      <button class="vsw-btn" type="button" data-mode="client" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span id="vswClientLbl"></span>
+      </button>
+    </div>
+  </div>
 
   <div class="pagehead">
     <span class="kick" data-i18n="kick"></span>
@@ -492,6 +664,26 @@
         </button>
         <div class="opterr" id="optErr"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- live client preview: a faithful mirror of the recipient download page (download.html),
+       rendered from the staged files + brand + options. Hidden until the client view is chosen. -->
+  <div class="clientview" id="clientView" style="display:none">
+    <div class="cv-cap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span id="cvCapTxt"></span>
+    </div>
+    <div class="cv-frame">
+      <div class="cv-chrome">
+        <div class="cv-dots"><i></i><i></i><i></i></div>
+        <div class="cv-url">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>kolkli.com/download</span>
+        </div>
+        <span class="cv-livetag"><span class="d"></span><span id="cvLiveTxt"></span></span>
+      </div>
+      <div class="cv-page" id="cvPage"></div>
     </div>
   </div>
 
@@ -610,9 +802,44 @@
     </div>
   </div>
 
-  <!-- progress -->
+  <!-- progress: animated "sending files to your client" loader -->
   <div class="card prog" id="progCard">
-    <div class="lbl"><span data-i18n="uploading"></span><span id="progPct">0%</span></div>
+    <div class="su-loader" role="status" aria-label="Sending files">
+      <div class="su-ring"></div>
+      <div class="su-pulse"></div>
+
+      <div class="su-core">
+        <div class="su-percent" id="progPct">0%</div>
+        <svg class="su-send-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M22 2 11 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="m22 2-7 20-4-9-9-4 20-7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="su-flying" aria-hidden="true">
+        <div class="su-fly su-fly-folder"><span class="su-folder-tab"></span></div>
+        <div class="su-fly su-fly-doc">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7V3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v5h5M10 13h5M10 16h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </div>
+        <div class="su-fly su-fly-audio">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 18V6l9-2v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="1.8"/><circle cx="15.5" cy="16" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg>
+        </div>
+        <div class="su-fly su-fly-video">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="m10 9 4 3-4 3V9ZM17 9l4-2v10l-4-2V9Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="su-fly su-fly-image">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="9" r="1.5" stroke="currentColor" stroke-width="1.7"/><path d="m5 17 4-4 3 3 2-2 5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <div class="su-particles" aria-hidden="true">
+        <i class="su-particle"></i><i class="su-particle"></i><i class="su-particle"></i><i class="su-particle"></i>
+      </div>
+    </div>
+
+    <h3 class="su-title" data-i18n="uploading"></h3>
+    <p class="su-sub" data-i18n="upSub"></p>
+    <div class="su-status" id="progMsg" aria-live="polite"></div>
     <div class="bar"><i id="progBar"></i></div>
   </div>
 
@@ -709,6 +936,8 @@
       editSub:'עדכנו נמענים, הודעה, קבצים והגדרות — ושמרו את השינויים לאותו קישור.',
       saveEditBtn:'שלח קבצים', editToast:'השליחה עודכנה ✓',
       uploading:'שולח קבצים…',
+      upSub:'אנחנו מעלים ומאבטחים את הקבצים שלכם — נא לא לסגור את הדף.',
+      upStages:[[0,'מכינים את הקבצים לשליחה…'],[22,'מעלים את הקבצים…'],[58,'מסדרים את החבילה…'],[86,'עוד רגע מסיימים…'],[100,'הקבצים מוכנים לשליחה ✓']],
       readyTitle:'הקישור מוכן!', readySub:'העתיקו ושלחו לנמען. אפשר גם לראות איך נראה עמוד ההורדה שלו.',
       copy:'העתקה', copied:'הקישור הועתק ✓',
       previewBtn:'עמוד ההורדה של הנמען', againBtn:'שליחה נוספת', delBtn:'מחיקת הקישור', emailBtn:'פתיחת אימייל',
@@ -760,6 +989,8 @@
       editSub:'Update recipients, message, files and settings — and save the changes to the same link.',
       saveEditBtn:'Send files', editToast:'Send updated ✓',
       uploading:'Uploading files…',
+      upSub:'We\'re uploading and securing your files — please don\'t close this page.',
+      upStages:[[0,'Preparing your files…'],[22,'Uploading files…'],[58,'Packing the bundle…'],[86,'Almost done…'],[100,'Your files are ready to send ✓']],
       readyTitle:'Your link is ready!', readySub:'Copy and send it to your recipient. You can also preview their download page.',
       copy:'Copy', copied:'Link copied ✓',
       previewBtn:'Recipient download page', againBtn:'Send another', delBtn:'Delete link', emailBtn:'Open email',
@@ -811,6 +1042,8 @@
       editSub:'Обновите получателей, сообщение, файлы и настройки — и сохраните изменения в той же ссылке.',
       saveEditBtn:'Отправить файлы', editToast:'Отправка обновлена ✓',
       uploading:'Загрузка файлов…',
+      upSub:'Мы загружаем и защищаем ваши файлы — не закрывайте эту страницу.',
+      upStages:[[0,'Готовим файлы…'],[22,'Загрузка файлов…'],[58,'Формируем пакет…'],[86,'Почти готово…'],[100,'Файлы готовы к отправке ✓']],
       readyTitle:'Ваша ссылка готова!', readySub:'Скопируйте и отправьте её получателю. Также можно посмотреть страницу его скачивания.',
       copy:'Копировать', copied:'Ссылка скопирована ✓',
       previewBtn:'Страница скачивания получателя', againBtn:'Отправить ещё', delBtn:'Удалить ссылку', emailBtn:'Открыть e-mail',
@@ -833,6 +1066,43 @@
     },
   };
 
+  // Strings for the live client preview. Kept separate from the composer I18N so the
+  // recipient-facing wording can mirror download.html without touching the main table.
+  const CV_I18N = {
+    he:{
+      admin:'תצוגת מנהל', client:'תצוגת לקוח', live:'תצוגה מקדימה חיה',
+      capFiles:'זו התצוגה המדויקת שהלקוח יראה. כל שינוי שתעשו מתעדכן כאן מיד — עוד לפני שליחת הקישור.',
+      capEmpty:'כך ייראה עמוד ההורדה של הלקוח. עדיין לא הועלו קבצים — ברגע שתוסיפו קובץ הוא יופיע כאן מיד.',
+      gotFiles:'שותפו איתך קבצים', fromNamed:n=>`מאת ${n}`, fromSomeone:'מישהו שיתף איתך קבצים דרך KOLKLI',
+      chipExpiry:d=>`פג תוקף בעוד ${d}`, chipFiles:n=>`${n} קבצים`, chipTotal:s=>`${s} בסך הכול`, chipPw:'מוגן בסיסמה',
+      dlAll:n=>`הורדה (${n})`, preview:'תצוגה מקדימה', download:'הורדה',
+      emptyTitle:'עדיין אין כאן קבצים',
+      seam:'מהיר ופשוט: מעלים ומקבלים תוצאה מקצועית תוך שניות — בלי התקנות, בלי סרבול.',
+      poweredBy:'מופעל על ידי', previewOnly:'זוהי תצוגה מקדימה — הלקוח יוכל להוריד לאחר שליחת הקישור',
+    },
+    en:{
+      admin:'Admin view', client:'Client view', live:'Live preview',
+      capFiles:'This is exactly what your client will see. Every change you make updates here instantly — before you even send the link.',
+      capEmpty:'This is how your client’s download page looks. No files uploaded yet — the moment you add one, it shows up here.',
+      gotFiles:'Files shared with you', fromNamed:n=>`From ${n}`, fromSomeone:'Someone shared files with you via KOLKLI',
+      chipExpiry:d=>`Expires in ${d}`, chipFiles:n=>`${n} files`, chipTotal:s=>`${s} total`, chipPw:'Password protected',
+      dlAll:n=>`Download (${n})`, preview:'Preview', download:'Download',
+      emptyTitle:'No files here yet',
+      seam:'Fast and simple: upload and get a professional result in seconds — no installs, no hassle.',
+      poweredBy:'Powered by', previewOnly:'This is a preview — your client can download once you send the link',
+    },
+    ru:{
+      admin:'Вид администратора', client:'Вид клиента', live:'Живой предпросмотр',
+      capFiles:'Это именно то, что увидит ваш клиент. Любое изменение отображается здесь мгновенно — ещё до отправки ссылки.',
+      capEmpty:'Так выглядит страница скачивания клиента. Файлы ещё не загружены — как только вы добавите файл, он появится здесь.',
+      gotFiles:'Файлы, которыми с вами поделились', fromNamed:n=>`От ${n}`, fromSomeone:'Кто-то поделился с вами файлами через KOLKLI',
+      chipExpiry:d=>`Истекает через ${d}`, chipFiles:n=>`Файлов: ${n}`, chipTotal:s=>`Всего ${s}`, chipPw:'Защищено паролем',
+      dlAll:n=>`Скачать (${n})`, preview:'Просмотр', download:'Скачать',
+      emptyTitle:'Здесь пока нет файлов',
+      seam:'Быстро и просто: загрузите и получите профессиональный результат за секунды — без установок и лишних действий.',
+      poweredBy:'Работает на', previewOnly:'Это предпросмотр — клиент сможет скачать после отправки ссылки',
+    },
+  };
   const TYPES = {
     image:['jpg','jpeg','png','gif','heic','heif','webp','bmp','svg','avif'],
     video:['mp4','mov','avi','webm','mkv','m4v'],
@@ -1022,6 +1292,7 @@
     else el('bprevLogo').classList.add('hidden');
     el('bprevName').textContent=brand.name||t.brandYou;
     renderAdvSummary();
+    refreshClientPreview();
   }
 
   function extOf(name){ const m=(name||'').match(/\.([^.\/\\]+)$/); return m?m[1].toLowerCase():''; }
@@ -1132,6 +1403,7 @@
     el('totalVal').textContent = fmtBytes(totalBytes());
     el('sendBtn').disabled = files.length===0;
     sizeFilesWindow();
+    refreshClientPreview();
   }
 
   // Cap the scrolling grid so the files card behaves as a fixed-height internal window: measure the
@@ -1150,6 +1422,122 @@
   window.addEventListener('resize', sizeFilesWindow);
   window.addEventListener('orientationchange', sizeFilesWindow);
 
+  // ===== Admin ⇄ Client view switch + live recipient preview =====
+  // A pixel-faithful, always-current mirror of the download page (download.html), fed
+  // straight from the in-memory files[] + brand + send options — no persistence, so it
+  // reflects every add/remove/edit the instant it happens, before any link is created.
+  let viewMode='admin';
+  const CV_DL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>';
+  const CV_EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const CV_BOX='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>';
+  const CV_INFO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+
+  function applyCvChrome(){
+    const ct=CV_I18N[lang]||CV_I18N.en;
+    if(el('vswAdminLbl')) el('vswAdminLbl').textContent=ct.admin;
+    if(el('vswClientLbl')) el('vswClientLbl').textContent=ct.client;
+    if(el('cvLiveTxt')) el('cvLiveTxt').textContent=ct.live;
+    if(el('cvCapTxt')) el('cvCapTxt').textContent = files.length ? ct.capFiles : ct.capEmpty;
+  }
+  function showSwitch(on){ const s=el('viewSwitch'); if(s) s.style.display=on?'':'none'; }
+  function setViewMode(m){
+    viewMode = (m==='client') ? 'client' : 'admin';
+    const isClient = viewMode==='client';
+    if(el('composer')) el('composer').style.display = isClient ? 'none' : '';
+    if(el('clientView')) el('clientView').style.display = isClient ? '' : 'none';
+    document.querySelectorAll('#viewSwitch .vsw-btn').forEach(b=>{
+      const on = b.getAttribute('data-mode')===viewMode;
+      b.classList.toggle('on', on); b.setAttribute('aria-selected', on?'true':'false');
+    });
+    if(isClient){ renderClientView(); window.scrollTo({top:0,behavior:'smooth'}); }
+    else { sizeFilesWindow(); }
+  }
+  // re-render the preview only while it's the active view (cheap no-op otherwise)
+  function refreshClientPreview(){ applyCvChrome(); if(viewMode==='client') renderClientView(); }
+
+  // brand hero, matching download.html's applyBrand(): a sender background wins, else the
+  // default hero graphic, else a brand-color gradient when only a logo/name/color is set.
+  function cvHero(b){
+    const isDefault = !(b && (b.bg||b.logo));
+    const logo = (b&&b.logo) ? `<div class="cv-bh-logo"><img src="${b.logo}" alt=""></div>` : '';
+    const name = (b&&b.name) ? `<div class="cv-bh-name">${escapeHtml(b.name)}</div>` : '';
+    const tag  = (b&&b.tagline) ? `<div class="cv-bh-tag">${escapeHtml(b.tagline)}</div>` : '';
+    let cls='cv-brandhero', bgStyle='', scrim='';
+    if(b && b.bg){
+      bgStyle=`background-image:url("${b.bg}")`;
+      scrim='background:linear-gradient(160deg,rgba(8,10,20,.30),rgba(8,10,20,.58))';
+    } else if(isDefault){
+      cls+=' cv-bh-default';
+      bgStyle=`background-image:url("./assets/send-hero-default.jpg")`;
+      scrim='background:none';
+    } else {
+      bgStyle='background:var(--cv-grad)';
+      scrim='background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(0,0,0,.16))';
+    }
+    return `<div class="${cls}"><div class="cv-bh-bg" style="${bgStyle}"></div><div class="cv-bh-scrim" style="${scrim}"></div><div class="cv-bh-in">${logo}${name}${tag}</div></div>`;
+  }
+
+  function renderClientView(){
+    const page=el('cvPage'); if(!page) return;
+    const ct=CV_I18N[lang]||CV_I18N.en;
+    applyCvChrome();
+
+    // scope the client's brand accent to the preview surface only (never touches :root)
+    const b=brandForRecord();
+    const color=(b&&b.color)||'#6f3afb';
+    const c=hexRgb(color)||hexRgb('#6f3afb');
+    const light=mixc(c,{r:255,g:255,b:255},0.16), dim=mixc(c,{r:0,g:0,b:0},0.14);
+    page.style.setProperty('--cv-accent', hexOfc(c));
+    page.style.setProperty('--cv-accent-dim', hexOfc(dim));
+    page.style.setProperty('--cv-accent-soft', 'rgba('+c.r+','+c.g+','+c.b+',0.14)');
+    page.style.setProperty('--cv-grad', 'linear-gradient(105deg,'+hexOfc(c)+' 0%,'+hexOfc(light)+' 100%)');
+    page.style.setProperty('--cv-glow', 'rgba('+c.r+','+c.g+','+c.b+',0.40)');
+
+    const branded = !!(b && (b.logo||b.name||b.bg||b.color));
+    const hasFiles = files.length>0;
+    const total = totalBytes();
+    const days = +((el('expiry')&&el('expiry').value)||7);
+    const sender = (el('senderEmail')&&el('senderEmail').value.trim())||'';
+    const msg = (el('message')&&el('message').value.trim())||'';
+    const pwOn = !!(el('pwToggle')&&el('pwToggle').checked);
+
+    const hero = cvHero(b);
+    const who = (b&&b.name) ? '' : `<div class="cv-who">${sender ? escapeHtml(ct.fromNamed(sender)) : escapeHtml(ct.fromSomeone)}</div>`;
+    const avatar = branded ? '' : `<div class="cv-ava">${CV_DL}</div>`;
+    const msgBox = msg ? `<div class="cv-msgbox">${escapeHtml(msg)}</div>` : '';
+
+    let metarow='', body='';
+    if(hasFiles){
+      metarow = `<div class="cv-metarow">`+
+        `<span class="cv-chip">${clockSvg()} ${escapeHtml(ct.chipExpiry(expiryText(days)))}</span>`+
+        `<span class="cv-chip">${fileSvg()} ${escapeHtml(ct.chipFiles(files.length))}</span>`+
+        `<span class="cv-chip">${escapeHtml(ct.chipTotal(fmtBytes(total)))}</span>`+
+        (pwOn ? `<span class="cv-chip">${lockSvg()} ${escapeHtml(ct.chipPw)}</span>` : '')+
+      `</div>`;
+      const rows = files.map(f=>{
+        const kind=f.kind, previewable = kind==='image'||kind==='video'||kind==='audio'||f.ext==='pdf';
+        return `<div class="cv-frow">`+
+          `<span class="cv-fico ${kind}${f.thumb?' img':''}">${f.thumb ? `<img src="${f.thumb}" alt="">` : ICON[kind]}</span>`+
+          `<span class="cv-fn"><div class="nm" title="${escapeHtml(f.path||f.name)}">${escapeHtml(f.name)}</div><div class="sz">${fmtBytes(f.size)}</div></span>`+
+          `<span class="cv-act">`+
+            (previewable ? `<button type="button" title="${escapeHtml(ct.preview)}">${CV_EYE}</button>` : '')+
+            `<button type="button" title="${escapeHtml(ct.download)}">${CV_DL}</button>`+
+          `</span>`+
+        `</div>`;
+      }).join('');
+      body = `<div class="cv-flist">${rows}</div>`+
+        `<button type="button" class="cv-dlall"><span>${escapeHtml(ct.dlAll(files.length))}</span>${CV_DL}</button>`;
+    } else {
+      body = `<div class="cv-empty"><div class="cv-empty-ic">${CV_BOX}</div><div class="cv-empty-t">${escapeHtml(ct.emptyTitle)}</div></div>`;
+    }
+
+    const card = `<div class="cv-card"><div class="cv-dhead">${avatar}<h1>${escapeHtml(ct.gotFiles)}</h1>${who}</div>${msgBox}${metarow}${body}`+
+      `<div class="cv-seam">${CV_INFO}<span>${escapeHtml(ct.seam)}</span></div></div>`;
+    const powered = `<div class="cv-pbwrap"><span class="cv-poweredby">${escapeHtml(ct.poweredBy)} <b>KOLKLI</b></span></div>`;
+
+    page.innerHTML = hero + card + powered;
+    page.classList.toggle('cv-branded', branded);
+  }
   function expiryText(days){ days=+days; return days===1 ? t.day : t.days(days); }
 
   function toast(msg){ const el2=el('toast'); el2.textContent=msg; el2.classList.add('show'); clearTimeout(el2._t); el2._t=setTimeout(()=>el2.classList.remove('show'),1800); }
@@ -1200,7 +1588,10 @@
       result = await withUsage('send-files', { files:files.length, totalBytes:totalBytes() }, async()=>{
         // fake-but-real progress while we write blobs to IndexedDB
         el('composer').style.display='none';
+        showSwitch(false);
         prog.classList.add('show');
+        setProg(0);
+        prog.scrollIntoView({behavior:'smooth',block:'center'});
         const days=+el('expiry').value;
         const editing=!!editToken;
         const token = editing ? editToken : randToken();
@@ -1259,6 +1650,7 @@
     }catch(err){
       prog.classList.remove('show');
       el('composer').style.display='';
+      showSwitch(true);
       if(err && err.usage) return;
       if(err && err.message==="storage_verify_failed"){
         serr("save:failed", err);
@@ -1277,7 +1669,15 @@
     if(editToken){ toast(t.editToast); editToken=null; editBase=null; syncSendChrome(); }
     if(method==='email' && result.record.recipients){ openMailto(); }
   }
-  function setProg(p){ el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%'; }
+  function setProg(p){
+    el('progBar').style.width=p+'%'; el('progPct').textContent=p+'%';
+    const msg=el('progMsg');
+    if(msg && t && Array.isArray(t.upStages)){
+      let cur=t.upStages[0][1];
+      for(const [thr,txt] of t.upStages){ if(p>=thr) cur=txt; }
+      msg.textContent=cur;
+    }
+  }
 
   let currentToken=null, currentUrl='', currentDays=7, statTimer=null, notifyEnabled=false, lastNotifiedCount=0, bc=null;
   function showShare(token, days, pwOn, notifyOn, record){
@@ -1375,7 +1775,7 @@
     el('senderEmail').value=''; syncSenderEmail();
     el('emailBtn').classList.add('hidden');
     applyDefaultsToUI();   // restore saved defaults (expiry / password / notify / copy-to-self)
-    el('composer').style.display=''; renderFiles(); syncSendChrome();
+    el('composer').style.display=''; showSwitch(true); setViewMode('admin'); renderFiles(); syncSendChrome();
     window.scrollTo({top:0,behavior:'smooth'});
   }
 
@@ -1487,6 +1887,9 @@
 
   el('flist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeFile(b.getAttribute('data-rm')); });
   el('vtoggle').addEventListener('click',e=>{ const b=e.target.closest('[data-view]'); if(!b) return; view=b.getAttribute('data-view'); try{ localStorage.setItem('kolkli_send_view',view); }catch(_){} renderFiles(); });
+  el('viewSwitch').addEventListener('click',e=>{ const b=e.target.closest('.vsw-btn'); if(!b) return; setViewMode(b.getAttribute('data-mode')); });
+  // the preview's file buttons are illustrative only — a real download happens once the link is sent
+  el('cvPage').addEventListener('click',e=>{ if(e.target.closest('button')){ e.preventDefault(); toast((CV_I18N[lang]||CV_I18N.en).previewOnly); } });
 
   function setMethod(m){
     method=m;

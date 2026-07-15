@@ -272,7 +272,27 @@
     if (isExempt()) return { ok: true, exempt: true };
     var local = localPayloadLimit(tool, payload);
     if (local) return local;
-    return call('authorize', await clientPayload(tool, payload));
+
+    // Guest email-verification gate (verify.js). Signed-in/paid users and
+    // already-verified guests pass straight through; everyone else confirms a
+    // 6-digit code first. The Worker re-checks the token, so this isn't just UI.
+    if (window.KolkliVerify && KolkliVerify.required(tool) && !KolkliVerify.isVerified()) {
+      var okv = await KolkliVerify.ensureVerified({});
+      if (!okv) return { ok: false, code: 'verify_required' };
+    }
+
+    var body = await clientPayload(tool, payload);
+    if (window.KolkliVerify && KolkliVerify.token) body.verifyToken = KolkliVerify.token();
+    var res = await call('authorize', body);
+    // Local token stale/rejected by the server → re-verify once, then retry.
+    if (res && res.code === 'verify_required' && window.KolkliVerify) {
+      KolkliVerify.clear();
+      var okv2 = await KolkliVerify.ensureVerified({});
+      if (!okv2) return { ok: false, code: 'verify_required' };
+      body.verifyToken = KolkliVerify.token();
+      res = await call('authorize', body);
+    }
+    return res;
   }
 
   async function commit(ticket) {
@@ -380,6 +400,9 @@
   }
 
   function showBlocked(info) {
+    // The verification modal (verify.js) already owns its own UX; don't stack
+    // the quota/upgrade modal on top when a guest cancels or fails to verify.
+    if (info && info.code === 'verify_required') return;
     var t = TXT[lang()] || TXT.he;
     var modal = ensureModal();
     modal.querySelector('#kuTitle').textContent = t.title;

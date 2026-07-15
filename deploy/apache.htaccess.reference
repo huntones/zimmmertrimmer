@@ -1,0 +1,48 @@
+# ============================================================
+# KOLKLI — clean (extensionless) URLs for Apache / LiteSpeed (Hostinger).
+#
+# Put this file in the SITE ROOT (Hostinger: public_html/). It makes the
+# server resolve /dashboard  ->  dashboard.html   (no ".html" in any link),
+# exactly like serve.py does locally and _redirects does on Cloudflare Pages.
+#
+# Safe everywhere else: serve.py (Python) and Cloudflare Pages both ignore
+# .htaccess, so keeping it in the repo changes nothing there.
+#
+# If uploading this returns a 500 error, your plan disallows the "Options"
+# line below — just delete that one line; the rewrites still work.
+# ============================================================
+
+# We do explicit rewrites, so turn off Apache content-negotiation guessing.
+Options -MultiViews
+DirectoryIndex index.html
+
+RewriteEngine On
+
+# --- 1) Canonical URLs: 301 any legacy .html address to its clean form ---
+#     /index.html        -> /
+#     /ai/index.html     -> /ai/
+#     /dashboard.html    -> /dashboard
+#     /app.html?x=1      -> /app?x=1   (query string is preserved)
+# Keyed on THE_REQUEST (the literal browser request) so the internal
+# rewrites in steps 2-3 below never trigger a redirect loop.
+RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
+RewriteRule ^ / [R=301,L]
+
+RewriteCond %{THE_REQUEST} \s/+([^?\s]+?)/index\.html[\s?] [NC]
+RewriteRule ^ /%1/ [R=301,L]
+
+RewriteCond %{THE_REQUEST} \s/+([^?\s]+?)\.html[\s?] [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# --- 2) SPA pages: /dashboard/<anything> is served from dashboard.html ---
+#     (the page's own JS then routes on the path). Mirrors SPA_PAGES in
+#     serve.py and the "…/*  ….html  200" rules in _redirects.
+RewriteRule ^(dashboard|account-settings|text-tools|css-tools)(/.*)?$ $1.html [L]
+
+# --- 3) Extensionless: serve /app from app.html when that file exists ---
+#     Real files (js/css/images) and real directories (/ai/, /audio/ …)
+#     are left untouched and served as-is.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^(.+?)/?$ $1.html [L]

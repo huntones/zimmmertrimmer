@@ -128,6 +128,12 @@
 #site-header .sh-prod-ic{width:38px;height:38px;border-radius:11px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;background:#efe9fe;color:#7c3aed;transition:transform .12s;}
 #site-header .sh-prod-item:hover .sh-prod-ic{transform:scale(1.07);}
+/* Per-service icon tints — mirror the "My Projects" tone colours (dashboard
+   .mp-tone-*): select=blue, receive=teal, send=purple, review=green. */
+#site-header .sh-ic-select{background:#e7effe;color:#2563eb;}
+#site-header .sh-ic-receive{background:#e0f3f8;color:#0891b2;}
+#site-header .sh-ic-send{background:#f0ebfe;color:#6f3afb;}
+#site-header .sh-ic-review{background:#e4f6ea;color:#16a34a;}
 #site-header .sh-prod-ic svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;
   stroke-linecap:round;stroke-linejoin:round;}
 #site-header .sh-prod-tx{display:flex;flex-direction:column;min-width:0;}

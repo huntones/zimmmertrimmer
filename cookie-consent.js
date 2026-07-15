@@ -57,6 +57,11 @@
   var VERSION = 1;                       // bump to re-ask everyone after a policy change
   var MAX_AGE_DAYS = 180;                // re-ask after ~6 months
   var PRIVACY_URL = '/privacy';          // clean-URL privacy page
+  // After the visitor answers, keep the floating corner cookie icon HIDDEN
+  // (it was judged intrusive). Consent stays changeable via the privacy
+  // page's "cookie settings" link, any [data-cookie-settings] element, or a
+  // link to /cookies. Set true to bring the always-visible corner button back.
+  var SHOW_CORNER_BUTTON = false;
 
   // Cookie categories. `necessary` is always granted and cannot be turned off.
   var CATS = [
@@ -219,7 +224,7 @@
   //  use. Sits in the bottom-start corner, opposite the a11y button.
   // ============================================================
   var CSS = `
-  #cc-root{ font-family:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif; }
+  #cc-root{ font-family:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif; }
   #cc-root *{ box-sizing:border-box; }
 
   /* ----- First-visit banner (bottom-start card) ----- */
@@ -425,7 +430,7 @@
   // ============================================================
   function showBanner() { renderBanner(); banner.classList.add('open'); }
   function hideBanner() { banner.classList.remove('open'); }
-  function showReopen() { reopenBtn.classList.add('show'); }
+  function showReopen() { if (SHOW_CORNER_BUTTON) reopenBtn.classList.add('show'); }
 
   var lastFocus = null;
   function openModal() {
@@ -441,7 +446,7 @@
     modal.classList.remove('open');
     // If the visitor still hasn't made a choice, keep the banner up.
     if (!hasResponded()) { banner.classList.add('open'); try { banner.focus(); } catch (e) {} }
-    else { try { (lastFocus || reopenBtn).focus(); } catch (e) {} }
+    else { try { (lastFocus || (SHOW_CORNER_BUTTON ? reopenBtn : document.body)).focus(); } catch (e) {} }
   }
   function modalOpen() { return modal.classList.contains('open'); }
 
@@ -466,7 +471,7 @@
     hideBanner();
     if (modalOpen()) modal.classList.remove('open');
     showReopen();
-    try { reopenBtn.focus(); } catch (e) {}
+    try { (SHOW_CORNER_BUTTON ? reopenBtn : document.body).focus(); } catch (e) {}
     activateScripts();
     pushConsentMode();
     emitChange();

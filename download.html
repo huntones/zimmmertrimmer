@@ -25,7 +25,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -103,9 +103,9 @@
   .frow .act button:hover{border-color:var(--accent);color:var(--accent);}
   .frow .act svg{width:16px;height:16px;}
 
-  .dlall{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+  .dlall{width:fit-content;max-width:100%;margin-inline:auto;display:flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
-    font-weight:600;font-size:15px;padding:14px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    font-weight:600;font-size:15px;padding:14px 34px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
     transition:filter .14s,transform .08s;}
   .dlall:hover{filter:brightness(1.05);} .dlall:active{transform:translateY(1px);} .dlall:disabled{opacity:.6;cursor:default;}
@@ -146,24 +146,24 @@
      background-position below to reframe it. The background-color is a peach fallback
      so the strip still looks intentional if the image is slow or missing. */
   .brandhero.bh-default{min-height:clamp(180px,23vw,260px);}
-  .brandhero.bh-default .bh-bg{background-color:#fbdcc0;background-position:center 22%;}
-  .brandhero.bh-default .bh-name{color:#5a3418;text-shadow:none;}
-  .brandhero.bh-default .bh-tag{color:#7a4a26;text-shadow:none;}
+  .brandhero.bh-default .bh-bg{background-color:#e3d7fb;background-position:center 22%;}
+  .brandhero.bh-default .bh-name{color:#3d2270;text-shadow:none;}
+  .brandhero.bh-default .bh-tag{color:#5a3a8f;text-shadow:none;}
   /* the un-branded recipient page adopts the warm delivery theme so buttons + top strip
      match the default hero (a sender's own brand color overrides this). */
   body.hero-default{
-    --accent:#f97316; --accent-dim:#ea580c; --accent-soft:#fff1e6;
-    --grad:linear-gradient(105deg,#fb8b3c 0%,#f4700f 100%);
-    --grad-btn:linear-gradient(105deg,#fb8b3c 0%,#f4700f 100%);
-    --grad-soft:linear-gradient(120deg,#fff1e6,#ffe7d1);
-    --grad-shadow:rgba(234,88,12,0.30); --grad-btn-glow:rgba(234,88,12,0.34);
+    --accent:#6f3afb; --accent-dim:#5a24e0; --accent-soft:#f0ebfe;
+    --grad:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);
+    --grad-btn:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);
+    --grad-soft:linear-gradient(120deg,#f0ebfe,#e7ddff);
+    --grad-shadow:rgba(111,58,251,0.30); --grad-btn-glow:rgba(111,58,251,0.34);
   }
   html[data-theme="dark"] body.hero-default{
-    --accent:#fb923c; --accent-dim:#f97316; --accent-soft:#2c2012;
-    --grad:linear-gradient(105deg,#fb923c 0%,#f97316 100%);
-    --grad-btn:linear-gradient(105deg,#fb923c 0%,#f97316 100%);
-    --grad-soft:linear-gradient(120deg,#2c2012,#241a10);
-    --grad-shadow:rgba(251,146,60,0.42); --grad-btn-glow:rgba(251,146,60,0.45);
+    --accent:#8b5cfb; --accent-dim:#6f3afb; --accent-soft:#241a3a;
+    --grad:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);
+    --grad-btn:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);
+    --grad-soft:linear-gradient(120deg,#241a3a,#1c1430);
+    --grad-shadow:rgba(139,92,251,0.42); --grad-btn-glow:rgba(139,92,251,0.45);
   }
   body.branded .dhead .ava{display:none;}
   .poweredby{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin:22px auto 0;font-size:11.5px;
@@ -247,8 +247,8 @@
       <div class="metarow" id="metaRow"></div>
       <div class="flist" id="flist"></div>
       <button class="dlall" id="dlAllBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
         <span id="dlAllLbl"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
       </button>
       <div class="seam">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
@@ -285,7 +285,7 @@
       pwTitle:'הקישור מוגן בסיסמה', pwSub:'הזינו את הסיסמה שקיבלתם מהשולח כדי לראות את הקבצים.',
       pwPh:'סיסמה', unlock:'פתיחה', pwWrong:'סיסמה שגויה',
       gotFiles:'שותפו איתך קבצים', fromSomeone:'מישהו שיתף איתך קבצים דרך KOLKLI', fromNamed:n=>`מאת ${n}`,
-      dlAll:n=>`הורדת הכל (${n})`, dlAllZip:'הורדת הכל כ‑ZIP', zipping:'יוצר ZIP…',
+      dlAll:n=>`הורדה (${n})`, dlAllZip:'הורדת הכל כ‑ZIP', zipping:'יוצר ZIP…',
       chipExpiry:d=>`פג תוקף בעוד ${d}`, chipFiles:n=>`${n} קבצים`, chipTotal:s=>`${s} בסך הכול`,
       day:'יום', days:d=>`${d} ימים`, today:'היום',
       preview:'תצוגה מקדימה', download:'הורדה', close:'סגור',
@@ -299,7 +299,7 @@
       pwTitle:'This link is password protected', pwSub:'Enter the password you received from the sender to see the files.',
       pwPh:'Password', unlock:'Unlock', pwWrong:'Wrong password',
       gotFiles:'Files shared with you', fromSomeone:'Someone shared files with you via KOLKLI', fromNamed:n=>`From ${n}`,
-      dlAll:n=>`Download all (${n})`, dlAllZip:'Download all as ZIP', zipping:'Zipping…',
+      dlAll:n=>`Download (${n})`, dlAllZip:'Download all as ZIP', zipping:'Zipping…',
       chipExpiry:d=>`Expires in ${d}`, chipFiles:n=>`${n} files`, chipTotal:s=>`${s} total`,
       day:'1 day', days:d=>`${d} days`, today:'today',
       preview:'Preview', download:'Download', close:'Close',
@@ -314,7 +314,7 @@
       pwTitle:'Эта ссылка защищена паролем', pwSub:'Введите пароль, полученный от отправителя, чтобы увидеть файлы.',
       pwPh:'Пароль', unlock:'Разблокировать', pwWrong:'Неверный пароль',
       gotFiles:'Файлы, которыми с вами поделились', fromSomeone:'Кто-то поделился с вами файлами через KOLKLI', fromNamed:n=>`От ${n}`,
-      dlAll:n=>`Скачать всё (${n})`, dlAllZip:'Скачать всё как ZIP', zipping:'Упаковка в ZIP…',
+      dlAll:n=>`Скачать (${n})`, dlAllZip:'Скачать всё как ZIP', zipping:'Упаковка в ZIP…',
       chipExpiry:d=>`Истекает через ${d}`, chipFiles:n=>`Файлов: ${n}`, chipTotal:s=>`Всего ${s}`,
       day:'1 день', days:d=>`${d} дн.`, today:'сегодня',
       preview:'Просмотр', download:'Скачать', close:'Закрыть',

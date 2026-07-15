@@ -35,6 +35,11 @@ export default {
         return await handleUsage(request, url, env, cors);
       }
 
+      // Guest email verification (no Supabase session — it's the guest gate).
+      if (url.pathname.indexOf('/verify/') === 0 && request.method === 'POST') {
+        return await handleVerify(request, url, env, cors);
+      }
+
       // Everything else needs a valid Supabase session.
       const user = await verifyUser(request, env);
       if (!user) return json({ error: 'unauthorized' }, cors, 401);
@@ -200,6 +205,17 @@ async function handleUsage(request, url, env, cors) {
   const user = await verifyUser(request, env);
   const plan = await userPlan(user, env);
   const action = url.pathname.replace(/^\/usage\//, '');
+
+  // Guest upload gate: signed-out callers must present a valid email-verify
+  // token for the tools that ingest files (the server-side teeth behind
+  // verify.js). The whole gate is armed by ONE switch — VERIFY_SECRET being set
+  // — so pointing the site at the Worker before finishing email setup can't
+  // brick guest uploads. Signed-in/paid users skip it; VERIFY_SCOPE=off disables.
+  if (action === 'authorize' && env.VERIFY_SECRET && !user && !isPaidPlan(plan) && verifyRequiredTool(body.tool, env)) {
+    const vt = await verifyVerifyToken(env, body.verifyToken);
+    if (!vt) return json({ ok: false, code: 'verify_required' }, cors, 403);
+  }
+
   const id = env.USAGE_LIMITER.idFromName('kolkli-usage-v1');
   const stub = env.USAGE_LIMITER.get(id);
   const res = await stub.fetch('https://usage.internal/' + action, {
@@ -220,6 +236,192 @@ async function handleUsage(request, url, env, cors) {
   return responseWithCors(res, cors);
 }
 
+/* ---------- guest email verification ---------- */
+// Which tools require a verified guest email. Mirrors verify.js's default
+// "uploads" scope; override with the VERIFY_SCOPE var (transfers|uploads|all|off).
+function verifyRequiredTool(tool, env) {
+  const scope = String((env && env.VERIFY_SCOPE) || 'uploads').toLowerCase();
+  if (scope === 'off') return false;
+  tool = String(tool || '').toLowerCase();
+  const TRANSFERS = { 'send-files': 1, 'organize-files': 1, 'review-files': 1, 'request-files': 1 };
+  if (TRANSFERS[tool]) return true;
+  if (scope === 'transfers') return false;
+  const isUpload = tool.indexOf('edit:') === 0 || tool.indexOf('ai:') === 0;
+  if (scope === 'all') return isUpload || tool.indexOf('text:') === 0 || tool.indexOf('design:') === 0;
+  return isUpload;
+}
+
+async function handleVerify(request, url, env, cors) {
+  if (!env.USAGE_LIMITER) return json({ ok: false, code: 'server_unavailable' }, cors, 503);
+  const action = url.pathname.replace(/^\/verify\//, '');
+  const body = await request.json().catch(() => ({}));
+  const ip = ipFromRequest(request);
+  const id = env.USAGE_LIMITER.idFromName('kolkli-usage-v1');
+  const stub = env.USAGE_LIMITER.get(id);
+
+  if (action === 'send') {
+    const res = await stub.fetch('https://usage.internal/verify-send', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: body.email, ip, fingerprint: body.fingerprint, anonymousId: body.anonymousId })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!data.ok) return json({ ok: false, code: data.code || 'server_unavailable', retryAfterSec: data.retryAfterSec }, cors, res.status);
+    // data.otp is server-internal — send it by email, never back to the browser.
+    const sent = await sendEmail(env, data.email, data.otp, body.lang);
+    if (!sent.ok) return json({ ok: false, code: sent.code || 'email_failed' }, cors, 502);
+    return json({ ok: true, sent: true, ttl: data.ttl, cooldown: data.cooldown }, cors);
+  }
+
+  if (action === 'check') {
+    const res = await stub.fetch('https://usage.internal/verify-check', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: body.email, code: body.code, ip })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!data.ok || !data.verified) {
+      return json({ ok: false, code: data.code || 'bad_code', attemptsLeft: data.attemptsLeft }, cors, res.status);
+    }
+    const minted = await mintVerifyToken(env, data.email);
+    if (!minted) return json({ ok: false, code: 'server_unavailable' }, cors, 500);
+    return json({ ok: true, verified: true, email: data.email, token: minted.token, expiresAt: minted.expiresAt }, cors);
+  }
+
+  return json({ ok: false, code: 'not_found' }, cors, 404);
+}
+
+/* ---------- signed verify token (HMAC-SHA256, no DB read on the hot path) ---------- */
+function b64urlFromBytes(bytes) {
+  let bin = '';
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function b64urlFromStr(str) { return b64urlFromBytes(new TextEncoder().encode(str)); }
+function b64urlToStr(s) {
+  s = s.replace(/-/g, '+').replace(/_/g, '/');
+  const bin = atob(s);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+async function hmacB64url(secret, msg) {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(msg));
+  return b64urlFromBytes(new Uint8Array(sig));
+}
+function timingEqual(a, b) {
+  if (a.length !== b.length) return false;
+  let r = 0;
+  for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return r === 0;
+}
+async function mintVerifyToken(env, email) {
+  const secret = env.VERIFY_SECRET || '';
+  if (!secret) return null;
+  const exp = Date.now() + Math.max(1, +(env.VERIFY_TOKEN_DAYS || 30)) * 24 * 60 * 60 * 1000;
+  const payload = b64urlFromStr(JSON.stringify({ e: normalizeEmail(email), exp, v: 1 }));
+  const sig = await hmacB64url(secret, payload);
+  return { token: payload + '.' + sig, expiresAt: exp };
+}
+async function verifyVerifyToken(env, token) {
+  const secret = env.VERIFY_SECRET || '';
+  if (!secret || !token || typeof token !== 'string') return null;
+  const dot = token.indexOf('.');
+  if (dot < 1) return null;
+  const payload = token.slice(0, dot), sig = token.slice(dot + 1);
+  const expect = await hmacB64url(secret, payload);
+  if (!timingEqual(sig, expect)) return null;
+  let obj;
+  try { obj = JSON.parse(b64urlToStr(payload)); } catch (_) { return null; }
+  if (!obj || !obj.e || (obj.exp || 0) < Date.now()) return null;
+  return obj;
+}
+
+/* ---------- transactional email (provider-agnostic) ---------- */
+function verifyEmailContent(code, lang, env) {
+  const brand = env.EMAIL_BRAND || 'KOLKLI';
+  const mins = Math.round(Math.max(60, +(env.VERIFY_CODE_TTL_SEC || 600)) / 60);
+  const L = {
+    he: { subject: code + ' — ' + brand + ' קוד אימות', lead: 'קוד האימות שלכם ל־' + brand + ':', note: 'הקוד תקף ל־' + mins + ' דקות. אם לא ביקשתם אותו, אפשר להתעלם מהודעה זו.' },
+    ru: { subject: code + ' — код подтверждения ' + brand, lead: 'Ваш код подтверждения ' + brand + ':', note: 'Код действителен ' + mins + ' минут. Если вы его не запрашивали, проигнорируйте это письмо.' },
+    en: { subject: code + ' is your ' + brand + ' verification code', lead: 'Your ' + brand + ' verification code is:', note: 'This code expires in ' + mins + ' minutes. If you didn’t request it, you can ignore this email.' }
+  };
+  const m = L[(lang === 'he' || lang === 'ru') ? lang : 'en'];
+  const dir = lang === 'he' ? 'rtl' : 'ltr';
+  const text = m.lead + ' ' + code + '\n\n' + m.note;
+  const html =
+    '<div style="font-family:system-ui,Segoe UI,Arial,sans-serif;max-width:440px;margin:0 auto;padding:24px;color:#1c2030" dir="' + dir + '">' +
+    '<p style="font-size:15px;margin:0 0 14px">' + m.lead + '</p>' +
+    '<div style="font-size:34px;font-weight:800;letter-spacing:.28em;text-align:center;padding:16px;border-radius:12px;background:#f2effc;color:#5b28c9">' + code + '</div>' +
+    '<p style="font-size:12.5px;color:#727a8a;margin:16px 0 0;line-height:1.6">' + m.note + '</p>' +
+    '<p style="font-size:12px;color:#a0a6b4;margin:18px 0 0">' + brand + '</p></div>';
+  return { subject: m.subject, text, html };
+}
+
+// Sends the code. Returns { ok:true } or { ok:false, code, detail }. Provider
+// is chosen by EMAIL_PROVIDER (default resend); credentials come from secrets.
+async function sendEmail(env, to, code, lang) {
+  const from = env.EMAIL_FROM || '';
+  const apiKey = env.EMAIL_API_KEY || '';
+  const provider = String(env.EMAIL_PROVIDER || 'resend').toLowerCase();
+  if (!from || (!apiKey && provider !== 'mailchannels')) return { ok: false, code: 'email_unavailable' };
+  const { subject, text, html } = verifyEmailContent(code, lang, env);
+
+  let req;
+  if (provider === 'resend') {
+    req = ['https://api.resend.com/emails', {
+      method: 'POST', headers: { authorization: 'Bearer ' + apiKey, 'content-type': 'application/json' },
+      body: JSON.stringify({ from, to, subject, html, text })
+    }];
+  } else if (provider === 'sendgrid') {
+    req = ['https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST', headers: { authorization: 'Bearer ' + apiKey, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: to }] }],
+        from: parseFrom(from), subject,
+        content: [{ type: 'text/plain', value: text }, { type: 'text/html', value: html }]
+      })
+    }];
+  } else if (provider === 'postmark') {
+    req = ['https://api.postmarkapp.com/email', {
+      method: 'POST', headers: { 'X-Postmark-Server-Token': apiKey, 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({ From: from, To: to, Subject: subject, HtmlBody: html, TextBody: text, MessageStream: env.POSTMARK_STREAM || 'outbound' })
+    }];
+  } else if (provider === 'smtp2go') {
+    req = ['https://api.smtp2go.com/v3/email/send', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ api_key: apiKey, sender: from, to: [to], subject, text_body: text, html_body: html })
+    }];
+  } else if (provider === 'mailchannels') {
+    const f = parseFrom(from);
+    const payload = { personalizations: [{ to: [{ email: to }] }], from: f, subject, content: [{ type: 'text/plain', value: text }, { type: 'text/html', value: html }] };
+    if (env.MAILCHANNELS_DKIM_DOMAIN && env.MAILCHANNELS_DKIM_SELECTOR && env.MAILCHANNELS_DKIM_KEY) {
+      payload.personalizations[0].dkim_domain = env.MAILCHANNELS_DKIM_DOMAIN;
+      payload.personalizations[0].dkim_selector = env.MAILCHANNELS_DKIM_SELECTOR;
+      payload.personalizations[0].dkim_private_key = env.MAILCHANNELS_DKIM_KEY;
+    }
+    const headers = { 'content-type': 'application/json' };
+    if (apiKey) headers['X-Api-Key'] = apiKey;
+    req = ['https://api.mailchannels.net/tx/v1/send', { method: 'POST', headers, body: JSON.stringify(payload) }];
+  } else {
+    return { ok: false, code: 'email_unavailable', detail: 'unknown provider ' + provider };
+  }
+
+  try {
+    const r = await fetch(req[0], req[1]);
+    if (r.ok || r.status === 202) return { ok: true };
+    const detail = (await r.text().catch(() => '')).slice(0, 300);
+    return { ok: false, code: 'email_failed', status: r.status, detail };
+  } catch (e) {
+    return { ok: false, code: 'email_failed', detail: String((e && e.message) || e) };
+  }
+}
+
+// "Name <addr@x>" or "addr@x" → { email, name } for the JSON-object providers.
+function parseFrom(from) {
+  const m = String(from || '').match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+  return m ? { email: m[2].trim(), name: m[1].trim() || undefined } : { email: String(from || '').trim() };
+}
+
 export class UsageLimiter {
   constructor(state, env) {
     this.state = state;
@@ -237,6 +439,8 @@ export class UsageLimiter {
       if (action === 'cancel') return this.cancel(body);
       if (action === 'status') return this.status(body);
       if (action === 'trial-claim') return this.trialClaim(body);
+      if (action === 'verify-send') return this.verifySend(body);
+      if (action === 'verify-check') return this.verifyCheck(body);
       return this.out({ ok: false, error: 'not found' }, 404);
     } catch (e) {
       return this.out({ ok: false, error: String((e && e.message) || e) }, 500);
@@ -363,6 +567,81 @@ export class UsageLimiter {
     return this.out({ ok: true, ...result });
   }
 
+  // Issue a 6-digit code for an email, stored (hashed key) with a TTL and a
+  // resend cooldown; the plaintext code only travels back to the trusted
+  // Worker, which emails it. Rate-limited per IP against send-farming.
+  async verifySend(body) {
+    const email = normalizeEmail(body.email);
+    if (!validEmailAddr(email)) return this.out({ ok: false, code: 'bad_email' }, 400);
+    if (isDisposableDomain(email)) return this.out({ ok: false, code: 'disposable' }, 403);
+
+    const ipHash = body.ip ? await sha256Hex('vip:' + body.ip) : '';
+    if (ipHash) {
+      const rl = await this.bumpVerifyRate(ipHash);
+      if (!rl.ok) return this.out(rl, 429);
+    }
+
+    const ttlMs = Math.max(60, +(this.env.VERIFY_CODE_TTL_SEC || 600)) * 1000;
+    const cooldownMs = Math.max(15, +(this.env.VERIFY_RESEND_SEC || 45)) * 1000;
+    const key = 'verify:' + await sha256Hex('vemail:' + email);
+
+    const result = await this.state.storage.transaction(async txn => {
+      const cur = await txn.get(key);
+      if (cur && cur.exp > Date.now() && (Date.now() - (cur.sentAt || 0)) < cooldownMs) {
+        return { ok: false, code: 'cooldown', retryAfterSec: Math.ceil((cooldownMs - (Date.now() - cur.sentAt)) / 1000) };
+      }
+      const otp = sixDigitCode();
+      await txn.put(key, { otp, exp: Date.now() + ttlMs, attempts: 0, sentAt: Date.now() });
+      return { ok: true, otp, ttl: Math.round(ttlMs / 1000), cooldown: Math.round(cooldownMs / 1000) };
+    });
+    if (!result.ok) return this.out(result, 429);
+    return this.out({ ok: true, email, otp: result.otp, ttl: result.ttl, cooldown: result.cooldown });
+  }
+
+  // Check a submitted code. Deletes the record on success or exhaustion so a
+  // code is single-use and brute force is bounded (attempts capped).
+  async verifyCheck(body) {
+    const email = normalizeEmail(body.email);
+    const code = String(body.code || '').replace(/\D/g, '');
+    if (!validEmailAddr(email) || code.length !== 6) return this.out({ ok: false, code: 'bad_code' }, 400);
+    const key = 'verify:' + await sha256Hex('vemail:' + email);
+    const maxAttempts = Math.max(3, +(this.env.VERIFY_MAX_ATTEMPTS || 5));
+
+    const result = await this.state.storage.transaction(async txn => {
+      const rec = await txn.get(key);
+      if (!rec || rec.exp < Date.now()) { if (rec) await txn.delete(key); return { ok: false, code: 'expired', status: 410 }; }
+      if (rec.attempts >= maxAttempts) { await txn.delete(key); return { ok: false, code: 'too_many_attempts', status: 429 }; }
+      if (rec.otp !== code) {
+        rec.attempts += 1;
+        await txn.put(key, rec);
+        return { ok: false, code: 'bad_code', attemptsLeft: Math.max(0, maxAttempts - rec.attempts), status: 401 };
+      }
+      await txn.delete(key);
+      return { ok: true, verified: true };
+    });
+    if (!result.ok) return this.out(result, result.status || 400);
+    return this.out({ ok: true, verified: true, email });
+  }
+
+  // Per-IP throttle on verification-code sends (separate from the usage limiter).
+  async bumpVerifyRate(ipHash) {
+    const burstMax = +(this.env.VERIFY_IP_BURST || 6);   // per 10-min window
+    const dailyMax = +(this.env.VERIFY_IP_DAILY || 30);
+    const bucket = Math.floor(Date.now() / (10 * 60 * 1000));
+    const day = israelDay();
+    return this.state.storage.transaction(async txn => {
+      const bk = `vburst:${bucket}:${ipHash}`;
+      const bn = +(await txn.get(bk) || 0);
+      if (bn >= burstMax) return { ok: false, code: 'ip_rate_limited', retryAfterSec: 600 };
+      await txn.put(bk, bn + 1);
+      const dk = `vday:${day}:${ipHash}`;
+      const dn = +(await txn.get(dk) || 0);
+      if (dn >= dailyMax) return { ok: false, code: 'ip_rate_limited' };
+      await txn.put(dk, dn + 1);
+      return { ok: true };
+    });
+  }
+
   async bumpIpRate(day, limit, ipHash) {
     if (!ipHash) return { ok: true };
     const burstMax = +(this.env.USAGE_IP_BURST || 40);
@@ -453,4 +732,22 @@ function israelDay(date = new Date()) {
 async function sha256Hex(value) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(value || '')));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/* ---------- verification helpers (shared by the DO + Worker) ---------- */
+function normalizeEmail(e) { return String(e || '').trim().toLowerCase(); }
+function validEmailAddr(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+// Uniform 6-digit code from CSPRNG (rejection-sample the biased tail of 2^32).
+function sixDigitCode() {
+  const a = new Uint32Array(1);
+  let n;
+  do { crypto.getRandomValues(a); n = a[0] >>> 0; } while (n >= 4294000000);
+  return String(n % 1000000).padStart(6, '0');
+}
+
+const DISPOSABLE_VERIFY_RE = /(?:^|\.)(?:mailinator|guerrilla|tempmail|temp-mail|tempmailo|10minute|tenminute|minutemail|throwaway|throw-away|trashmail|trash-mail|yopmail|getnada|sharklasers|discardmail|1secmail|secmail|moakt|mohmal|maildrop|dispostable|fakeinbox|fakemail|mintemail|tempinbox|emailondeck|spamgourmet|spam4|dropmail|mailnesia|mailcatch|burnermail|tmpmail|tmail|wegwerf|mailpoof|inboxkitten)/i;
+function isDisposableDomain(email) {
+  const m = String(email || '').match(/@([^@\s]+)$/);
+  return m ? DISPOSABLE_VERIFY_RE.test(m[1]) : false;
 }

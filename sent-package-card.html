@@ -7,7 +7,7 @@
 <meta name="description" content="Sent-package card — recipient, send date, files, downloads and link status for a KOLKLI sent package.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -17,13 +17,13 @@
     --danger:#e5484d; --danger-dim:#cf3b40; --danger-soft:#fdecec;
     --warn:#c88a04; --warn-soft:#fff5da;
     /* send service = warm orange */
-    --send:#f97316; --send-dim:#ea580c; --send-ink:#c2410c; --send-soft:#fff1e6; --send-line:#fbd6b0;
-    --send-grad:linear-gradient(105deg,#fb8b3c 0%,#f4700f 100%);
-    --send-shadow:rgba(249,115,22,0.30); --send-glow:rgba(234,88,12,0.34);
+    --send:#6f3afb; --send-dim:#5a24e0; --send-ink:#4a1fb0; --send-soft:#f0ebfe; --send-line:#d6c6fb;
+    --send-grad:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);
+    --send-shadow:rgba(111,58,251,0.30); --send-glow:rgba(90,36,224,0.34);
     --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 22px 55px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
-    --sans:'Heebo','Space Grotesk',system-ui,'Segoe UI',sans-serif;
+    --sans:'Rubik','Space Grotesk',system-ui,'Segoe UI',sans-serif;
     --mono:'Space Grotesk',ui-monospace,'SFMono-Regular',Menlo,monospace;
   }
   html[data-theme="dark"] {
@@ -33,9 +33,9 @@
     --info:#5b95f8; --info-dim:#5b95f8; --info-soft:#182338;
     --danger:#ff6b6b; --danger-dim:#ff8080; --danger-soft:#2a1719;
     --warn:#e8b84b; --warn-soft:#2c2718;
-    --send:#fb923c; --send-dim:#fdba74; --send-ink:#fdba74; --send-soft:#2c2012; --send-line:#573a1c;
-    --send-grad:linear-gradient(105deg,#fb923c 0%,#f97316 100%);
-    --send-shadow:rgba(251,146,60,0.40); --send-glow:rgba(251,146,60,0.42);
+    --send:#8b5cfb; --send-dim:#b79cff; --send-ink:#b79cff; --send-soft:#241a3a; --send-line:#3d2c66;
+    --send-grad:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);
+    --send-shadow:rgba(139,92,251,0.40); --send-glow:rgba(139,92,251,0.42);
     --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
     --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
     --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
@@ -47,7 +47,7 @@
     display:flex;flex-direction:column;align-items:center;gap:22px;padding:40px 18px 64px;}
   body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
     background:
-      radial-gradient(58% 40% at 15% 4%,rgba(249,115,22,0.10),transparent 60%),
+      radial-gradient(58% 40% at 15% 4%,rgba(111,58,251,0.10),transparent 60%),
       radial-gradient(52% 40% at 88% 2%,rgba(59,111,246,0.06),transparent 60%);}
   button{font-family:inherit;}
   svg{display:block;}

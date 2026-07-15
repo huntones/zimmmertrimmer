@@ -98,11 +98,14 @@ window.addEventListener('kolkli:consent', e => {
 
 ## Re-opening / changing consent
 
-- The small **cookie button** in the bottom corner (opposite the accessibility
-  button) opens the preferences dialog.
 - Any element with **`data-cookie-settings`**, or a link to `#cookies` /
-  `/cookies`, also opens it — e.g. the "הגדרות העוגיות" link in `privacy.html`.
+  `/cookies`, opens the preferences dialog — e.g. the "הגדרות העוגיות" link in
+  `privacy.html`.
 - Or call `KolkliConsent.open()`.
+- The small floating **cookie button** in the bottom corner is hidden by
+  default once the visitor has answered (it was judged intrusive). Flip
+  `SHOW_CORNER_BUTTON = true` in `cookie-consent.js` to bring it back as an
+  always-visible re-open handle.
 
 ## Where the choice is stored
 

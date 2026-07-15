@@ -22,13 +22,26 @@
        stays in sync without any per-page hookup.
    ============================================================ */
 (function () {
+  // Load Rubik (Hebrew UI face) on every page that includes this header.
+  (function loadRubik(){
+    try {
+      var d = document, h = d.head || d.documentElement;
+      if (d.getElementById('kolkli-rubik')) return;
+      var pc1 = d.createElement('link'); pc1.rel = 'preconnect'; pc1.href = 'https://fonts.googleapis.com';
+      var pc2 = d.createElement('link'); pc2.rel = 'preconnect'; pc2.href = 'https://fonts.gstatic.com'; pc2.crossOrigin = 'anonymous';
+      var l = d.createElement('link'); l.id = 'kolkli-rubik'; l.rel = 'stylesheet';
+      l.href = 'https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap';
+      h.appendChild(pc1); h.appendChild(pc2); h.appendChild(l);
+    } catch (e) {}
+  })();
+
   var mount = document.getElementById('site-header');
   if (!mount) return;
 
   var T = {
     he: { navTools:'כלי עריכה', navDev:'כלי עיצוב ודיגיטל', navAI:'כלי AI', navText:'כלי טקסט', navConvert:'המרה', navCompress:'דחיסה', navMarketing:'כלי שיווק וקישורים', navCalc:'מחשבונים',
           navSend:'שליחת קבצים', navRequest:'קבלת קבצים', navProducts:'כלי קבצים', navPricing:'מסלולים ומחירים', navSignin:'התחברות', navStart:'הרשמה', navNew:'חדש',
-          acctDash:'דשבורד', acctFiles:'הקבצים שלי', acctRequest:'קבלת קבצים', acctReview:'אישורי לקוח', acctSettings:'הגדרות', acctLanguage:'שפות', acctAdmin:'ניהול', acctLogout:'התנתקות' },
+          acctDash:'לוח בקרה', acctFiles:'הקבצים שלי', acctRequest:'קבלת קבצים', acctReview:'אישורי לקוח', acctSettings:'הגדרות', acctLanguage:'שפות', acctAdmin:'ניהול', acctLogout:'התנתקות' },
     en: { navTools:'Editing Tools', navDev:'Design & Digital', navAI:'AI Tools', navText:'Text Tools', navConvert:'Convert', navCompress:'Compress', navMarketing:'Marketing & Links', navCalc:'Calculators',
           navSend:'Send Files', navRequest:'Receive Files', navProducts:'Files', navPricing:'Pricing', navSignin:'Login', navStart:'Sign Up', navNew:'New',
           acctDash:'Dashboard', acctFiles:'My Files', acctRequest:'File Requests', acctReview:'Client Review', acctSettings:'Settings', acctLanguage:'Language', acctAdmin:'Admin', acctLogout:'Log out' },
@@ -56,20 +69,22 @@
   // own dedicated page. Labels + one-line descriptions carried inline per language
   // (mirrors the TOOLS mega-menu items), with an icon key from IC.
   var PRODUCTS = [
-    { ic:'folder', page:'files',   he:'בחירת קבצים', en:'Organize Files',  ru:'Упорядочить файлы',
-      dhe:'בחירה וניהול הקבצים שלך', den:'Pick & manage your files', dru:'Выбор и управление файлами' },
     { ic:'inbox',  page:'request', he:'קבלת קבצים',  en:'Receive Files', ru:'Запрос файлов',
       dhe:'איסוף קבצים מאחרים', den:'Collect files from others', dru:'Сбор файлов от других' },
-    { ic:'send',   page:'send',    he:'שליחת קבצים', en:'Send Files',    ru:'Отправка файлов',
-      dhe:'שיתוף קבצים גדולים בקישור', den:'Share big files by link', dru:'Большие файлы по ссылке' },
+    { ic:'folder', page:'files',   he:'בחירת קבצים', en:'Organize Files',  ru:'Упорядочить файлы',
+      dhe:'בחירה וניהול הקבצים שלך', den:'Pick & manage your files', dru:'Выбор и управление файлами' },
     { ic:'check',  page:'review',  he:'אישור קבצים',  en:'Approve Files', ru:'Утверждение файлов',
-      dhe:'הלקוח צופה, מעיר ומאשר', den:'The client reviews, comments & approves', dru:'Клиент смотрит, комментирует и утверждает' }
+      dhe:'הלקוח צופה, מעיר ומאשר', den:'The client reviews, comments & approves', dru:'Клиент смотрит, комментирует и утверждает' },
+    { ic:'send',   page:'send',    he:'שליחת קבצים', en:'Send Files',    ru:'Отправка файлов',
+      dhe:'שיתוף קבצים גדולים בקישור', den:'Share big files by link', dru:'Большие файлы по ссылке' }
   ];
 
   // "AI Tools" dropdown: the AI-powered tools, each a row like the Products menu
   // (colored icon tile + name + one-line description). Mirrors the wording used in
   // the AI grid on the landing page. Icon keys come from IC below.
   var AITOOLS = [
+    { ic:'film', page:'ai-marketing-video', he:'יצירת סרטון שיווקי AI', en:'AI Marketing Video', ru:'AI-промо-видео',
+      dhe:'מתמונות לסרטון ממותג בדקות', den:'Photos → branded promo video', dru:'Из фото — брендированное видео' },
     { ic:'headphones', page:'ai-audio-cleanup', he:'ניקוי אודיו AI', en:'AI Audio Cleanup', ru:'AI-очистка аудио',
       dhe:'הסרת רעש ושיפור קול', den:'Remove noise, enhance voice', dru:'Убрать шум, улучшить голос' },
     { ic:'sparkle', page:'ai-master', he:'מאסטרינג AI', en:'AI Mastering', ru:'AI-мастеринг',
@@ -369,9 +384,14 @@
   // Rows of the Products dropdown: colored icon tile + name + one-line description,
   // each linking to its dedicated product page.
   function productsHtml(lang) {
+    // Each product icon tile is tinted to match its service colour in "My
+    // Projects" (dashboard .mp-tone-*): select=blue, receive=teal, send=purple,
+    // review=green. Keyed off the page so we never touch the Hebrew rows above.
+    var TONE = { files:'select', request:'receive', send:'send', review:'review' };
     return PRODUCTS.map(function (p) {
+      var tone = TONE[p.page] || '';
       return '<a class="sh-prod-item" href="' + link(p.page) + '" role="menuitem">' +
-        '<span class="sh-prod-ic">' + svg(p.ic) + '</span>' +
+        '<span class="sh-prod-ic' + (tone ? ' sh-ic-' + tone : '') + '">' + svg(p.ic) + '</span>' +
         '<span class="sh-prod-tx"><span class="sh-prod-t">' + p[lang] + '</span>' +
         '<span class="sh-prod-d">' + p['d' + lang] + '</span></span></a>';
     }).join('');
@@ -979,6 +999,18 @@
     ul.src = link('usage-limits.js');
     ul.async = false;
     document.head.appendChild(ul);
+  }
+
+  // Guest email-verification gate. Loaded after usage-limits.js so it can reuse
+  // its fingerprint + anonymous-id + Worker plumbing. usage-limits.js calls
+  // KolkliVerify.ensureVerified() from authorize(), so every guest upload path
+  // is gated in one place; no-op until the storage Worker + email are configured.
+  if (!document.getElementById('verify-loader')) {
+    var vl = document.createElement('script');
+    vl.id = 'verify-loader';
+    vl.src = link('verify.js');
+    vl.async = false;
+    document.head.appendChild(vl);
   }
 
   // 7-day free trial (registered users only), fingerprint-gated so it can't be

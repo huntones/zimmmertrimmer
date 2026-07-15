@@ -81,9 +81,9 @@
 
   /* ---------- i18n ---------- */
   var STR = {
-    he: { projects: 'הפרויקטים שלי', mytools: 'הקבצים שלי', editing: 'כלי עריכה', ai: 'כלי AI', design: 'כלי עיצוב ודיגיטל', text: 'כלי טקסט', favorites: 'מועדפים', team: 'צוות', yourPlan: 'המנוי הפעיל שלך', upgrade: 'שדרגו מנוי', logout: 'התנתקות', myAccount: 'דשבורד', settings: 'הגדרות חשבון', payments: 'תשלומים', storage: 'STORAGE', used: 'נוצל', of: 'מתוך', left: 'נותר' },
-    en: { projects: 'My Projects', mytools: 'My Files', editing: 'Editing Tools', ai: 'AI Tools', design: 'Design & Digital', text: 'Text Tools', favorites: 'Favorites', team: 'Team', yourPlan: 'Your active plan', upgrade: 'Upgrade plan', logout: 'Log out', myAccount: 'Dashboard', settings: 'Account Settings', payments: 'Payments', storage: 'STORAGE', used: 'Used', of: 'of', left: 'Left' },
-    ru: { projects: 'Мои проекты', mytools: 'Мои файлы', editing: 'Editing Tools', ai: 'AI Tools', design: 'Design & Digital', text: 'Text Tools', favorites: 'Избранное', team: 'Команда', yourPlan: 'Ваш активный план', upgrade: 'Улучшить план', logout: 'Выйти', myAccount: 'Дашборд', settings: 'Настройки аккаунта', payments: 'Платежи', storage: 'STORAGE', used: 'Used', of: 'of', left: 'Left' }
+    he: { projects: 'הפרויקטים שלי', mytools: 'הקבצים שלי', editing: 'כלי עריכה', ai: 'כלי AI', design: 'כלי עיצוב ודיגיטל', text: 'כלי טקסט', favorites: 'מועדפים', team: 'צוות', yourPlan: 'המנוי הפעיל שלך', upgrade: 'שדרגו מנוי', logout: 'התנתקות', myAccount: 'לוח בקרה', settings: 'הגדרות חשבון', payments: 'תשלומים', storage: 'אחסון בענן', used: 'נוצל', of: 'מתוך', left: 'נותר' },
+    en: { projects: 'My Projects', mytools: 'My Files', editing: 'Editing Tools', ai: 'AI Tools', design: 'Design & Digital', text: 'Text Tools', favorites: 'Favorites', team: 'Team', yourPlan: 'Your active plan', upgrade: 'Upgrade plan', logout: 'Log out', myAccount: 'Dashboard', settings: 'Account Settings', payments: 'Payments', storage: 'Cloud Storage', used: 'Used', of: 'of', left: 'Left' },
+    ru: { projects: 'Мои проекты', mytools: 'Мои файлы', editing: 'Editing Tools', ai: 'AI Tools', design: 'Design & Digital', text: 'Text Tools', favorites: 'Избранное', team: 'Команда', yourPlan: 'Ваш активный план', upgrade: 'Улучшить план', logout: 'Выйти', myAccount: 'Дашборд', settings: 'Настройки аккаунта', payments: 'Платежи', storage: 'Облачное хранилище', used: 'Used', of: 'of', left: 'Left' }
   };
   var lang = 'he';
   function detectLang() {
@@ -115,7 +115,8 @@
     card: '<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>',
     logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
     globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/>',
-    check: '<polyline points="20 6 9 17 4 12"/>'
+    check: '<polyline points="20 6 9 17 4 12"/>',
+    cloud: '<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>'
   };
   // Interface languages offered inside the account menu (endonym + writing dir).
   var LANGS = [{ code: 'he', name: 'עברית', dir: 'rtl' }, { code: 'en', name: 'English', dir: 'ltr' }, { code: 'ru', name: 'Русский', dir: 'ltr' }];
@@ -153,7 +154,7 @@
     return '<div class="storage-chip">' +
       '<span class="storage-ring" style="--p:' + p + '"><span>' + p + '%</span></span>' +
       '<span class="storage-tx">' +
-        '<span class="storage-title">' + esc(st.storage) + '</span>' +
+        '<span class="storage-title">' + s(ICON.cloud) + esc(st.storage) + '</span>' +
         '<span class="storage-line">' + esc(st.used + ' ' + fmtStorageGB(used) + ' ' + st.of + ' ' + fmtStorageGB(total)) + '</span>' +
         '<span class="storage-left">' + esc(st.left + ' ' + fmtStorageGB(leftv)) + '</span>' +
       '</span></div>';
@@ -284,7 +285,8 @@
     '.storage-ring::before{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--panel);}' +
     '.storage-ring span{position:relative;font-family:var(--mono);font-size:12px;font-weight:900;color:var(--ink);}' +
     '.storage-tx{min-width:0;display:flex;flex-direction:column;gap:1px;}' +
-    '.storage-title{font-size:13px;font-weight:850;color:var(--ink-2);line-height:1.15;}' +
+    '.storage-title{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:850;color:var(--ink-2);line-height:1.15;}' +
+    '.storage-title svg{width:14px;height:14px;stroke:var(--accent);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}' +
     '.storage-line{font-size:11.5px;font-weight:650;color:var(--muted);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}' +
     '.storage-left{font-size:11px;color:var(--accent-dim);font-weight:800;}' +
     '.side-plan .upg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:9px;color:#fff;border:none;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);font-weight:700;font-size:13.5px;padding:11px 14px;border-radius:11px;text-shadow:0 1px 2px rgba(0,0,0,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}' +

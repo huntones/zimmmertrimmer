@@ -391,7 +391,7 @@
 
   /* ---------- AI / pricing / faq data (from index.html DATA) ---------- */
   var AI = [
-    {i:'🪄',he:'הסרת רקע AI',en:'AI Remove Background',ru:'AI-удаление фона',dhe:'מסיר רקע מתמונות בלחיצה, עם קצוות נקיים.',den:'Removes image backgrounds in one click with clean edges.',dru:'Удаляет фон с изображений в один клик с чистыми краями.',href:'../remove-bg'},{i:'🎧',he:'ניקוי אודיו AI',en:'AI Audio Cleaner',ru:'AI-очистка звука',dhe:'מסיר רעשי רקע והדים מכל הקלטה.',den:'Strips background noise and echo from any recording.',dru:'Убирает фоновый шум и эхо из любой записи.',href:'../ai-audio-cleanup'},
+    {i:'🎬',he:'יצירת סרטון שיווקי AI',en:'AI Marketing Video',ru:'AI-промо-видео',dhe:'הופך תמונות וטקסט לסרטון שיווקי ממותג.',den:'Turns photos and text into a branded promo video.',dru:'Превращает фото и текст в брендированное промо-видео.',href:'../ai-marketing-video'},{i:'🪄',he:'הסרת רקע AI',en:'AI Remove Background',ru:'AI-удаление фона',dhe:'מסיר רקע מתמונות בלחיצה, עם קצוות נקיים.',den:'Removes image backgrounds in one click with clean edges.',dru:'Удаляет фон с изображений в один клик с чистыми краями.',href:'../remove-bg'},{i:'🎧',he:'ניקוי אודיו AI',en:'AI Audio Cleaner',ru:'AI-очистка звука',dhe:'מסיר רעשי רקע והדים מכל הקלטה.',den:'Strips background noise and echo from any recording.',dru:'Убирает фоновый шум и эхо из любой записи.',href:'../ai-audio-cleanup'},
     {i:'💬',he:'יצירת כתוביות AI',en:'AI Subtitle Generator',ru:'AI-генератор субтитров',dhe:'מתמלל וידאו ואודיו לכתוביות מסונכרנות.',den:'Transcribes video and audio into synced subtitles.',dru:'Транскрибирует видео и аудио в синхронные субтитры.',href:'../subtitle-generator'},{i:'🖼️',he:'חיתוך חכם AI',en:'AI Smart Crop',ru:'AI-умная обрезка',dhe:'ממקד את הנושא וחותך אוטומטית לכל יחס.',den:'Finds the subject and auto-crops to any ratio.',dru:'Находит объект и автоматически кадрирует под любое соотношение.',href:'../ai-smart-crop'},
     {i:'🩹',he:'שחזור תמונה AI',en:'AI Restore Photo',ru:'AI-восстановление фото',dhe:'משפר תמונות ישנות ומטושטשות לרזולוציה גבוהה.',den:'Restores old, blurry photos to crisp high-res.',dru:'Восстанавливает старые размытые фото до высокого разрешения.',href:'../restore-image'},{i:'🎚️',he:'מאסטרינג AI',en:'AI Master Audio',ru:'AI-мастеринг аудио',dhe:'מאזן ומחזק את המיקס לסאונד מקצועי.',den:'Balances and boosts your mix to a pro sound.',dru:'Балансирует и усиливает микс до профессионального звучания.',href:'../ai-master'},
     {i:'🧽',he:'הסרת אובייקטים AI',en:'AI Remove Objects',ru:'AI-удаление объектов',dhe:'מוחק עצמים לא רצויים מהתמונה בלי עקבות.',den:'Erases unwanted objects from photos seamlessly.',dru:'Удаляет ненужные объекты с фото без следов.',href:'../ai-object-remover'},{i:'📝',he:'סיכום PDF AI',en:'AI Summarize PDF',ru:'AI-конспект PDF',dhe:'מפיק תקציר ונקודות מפתח מכל מסמך.',den:'Extracts a summary and key points from any document.',dru:'Извлекает краткое содержание и ключевые пункты из документа.',href:'../ai-summarize-pdf'}
@@ -577,7 +577,7 @@
   function backToDash(L) {
     if (!ls('ac_session')) return '';
     var arrow = (L === 'he') ? '→' : '←';   // back points toward the reading start
-    var txt = { he: 'חזרה לדשבורד', en: 'Back to Dashboard', ru: 'Назад в дашборд' }[L];
+    var txt = { he: 'חזרה ללוח הבקרה', en: 'Back to Dashboard', ru: 'Назад в дашборд' }[L];
     return '<div class="wrap"><a class="backdash" href="../dashboard">' +
       '<span class="bda">' + arrow + '</span>' + txt + '</a></div>';
   }

@@ -26,7 +26,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -83,6 +83,28 @@
   .tab svg{width:16px;height:16px;}
   .tab .count{font-family:var(--mono);font-size:11px;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--muted);}
   .tab.on .count{background:var(--panel);color:var(--accent-dim);}
+
+  /* preview-mode toggle (manager / client) — replaces the create/manage tabs,
+     matching the segmented manager/client switch from the selection gallery. */
+  .viewseg{display:flex;width:max-content;max-width:100%;align-items:center;gap:3px;margin:0 auto 14px;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:3px;box-shadow:var(--shadow-sm);}
+  .viewseg .vseg{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 16px;border:none;border-radius:999px;
+    background:none;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:600;white-space:nowrap;
+    transition:background .14s,color .14s,box-shadow .14s;}
+  .viewseg .vseg svg{width:15px;height:15px;}
+  .viewseg .vseg:hover{color:var(--accent);}
+  .viewseg .vseg.on{background:var(--panel);color:var(--accent);box-shadow:var(--shadow-sm);}
+  .viewseg .vseg .count{font-family:var(--mono);font-size:11px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--muted);}
+  .viewseg .vseg.on .count{color:var(--accent);}
+  /* client view: hide the builder + share card, show the REAL client form
+     (upload.html rendered from the current draft) in an embedded frame */
+  #createView.client-mode .cl-grid,
+  #createView.client-mode #shareCard{display:none;}
+  #clientFull{display:none;}
+  #createView.client-mode #clientFull{display:block;max-width:1220px;margin:0 auto;}
+  #clientFull iframe{display:block;width:100%;border:0;min-height:640px;background:transparent;overflow:hidden;}
+  /* manager view stacks the forms list under the builder */
+  #manageView:not(.hidden){margin-top:12px;}
 
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
   .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,340px);gap:16px;align-items:start;}
@@ -151,7 +173,7 @@
     .pagehead .kick{font-size:11.5px;padding:4px 10px;margin-bottom:8px;}
     .pagehead h2{font-size:clamp(21px,2.2vw,26px);margin-bottom:3px;}
     .pagehead p{font-size:13.5px;line-height:1.35;max-width:58ch;}
-    .tabs{margin-bottom:10px;}
+    .tabs,.viewseg{margin-bottom:10px;}
     .tab{height:34px;padding:0 15px;font-size:13.5px;}
     .grid{grid-template-columns:minmax(0,1fr) minmax(260px,320px);gap:14px;}
     .form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px;padding:16px;}
@@ -200,7 +222,7 @@
     .pagehead .kick{font-size:12px;padding:4px 11px;margin-bottom:5px;}
     .pagehead h2{font-size:clamp(21px,2vw,25px);margin-bottom:3px;}
     .pagehead p{font-size:14px;line-height:1.35;max-width:62ch;}
-    .tabs{margin-bottom:10px;}
+    .tabs,.viewseg{margin-bottom:10px;}
     .tab{height:36px;padding:0 17px;font-size:14.5px;}
     .grid{grid-template-columns:minmax(0,1fr) minmax(310px,380px);gap:16px;}
     .form{gap:12px 16px;padding:20px;}
@@ -264,11 +286,11 @@
     box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);}
 
   .reqlist{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:0 14px;}
-  .rcard{display:flex;flex-direction:column;align-items:stretch;gap:18px;min-height:244px;padding:18px;background:var(--panel);border:1px solid var(--line);
+  .rcard{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:18px;min-height:244px;padding:18px;background:var(--panel);border:1px solid var(--line);
     border-radius:14px;box-shadow:var(--shadow-sm);}
   .rcard.unseen{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
   .rc-main{flex:1;min-width:0;}
-  .rc-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px;}
+  .rc-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px;padding-inline-end:36px;}
   .rc-name{font-size:17px;font-weight:800;color:var(--ink);line-height:1.25;word-break:break-word;}
   .badge{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:999px;}
   .badge.b-active{background:var(--success-soft);color:var(--success-dim);}
@@ -285,6 +307,10 @@
   .minibtn.go{color:var(--accent-dim);border-color:var(--accent);background:var(--accent-soft);}
   .minibtn.edit{color:var(--accent-dim);border-color:var(--accent-line);background:var(--accent-soft);}
   .minibtn.edit:hover{border-color:var(--accent);}
+  .rc-del{position:absolute;top:14px;inset-inline-end:14px;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;
+    border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--faint);cursor:pointer;transition:all .12s;}
+  .rc-del:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .rc-del svg{width:15px;height:15px;}
 
   @media (max-width:1020px){
     .reqlist{grid-template-columns:repeat(2,minmax(0,1fr));}
@@ -388,7 +414,7 @@
   /* Received files page — full reference layout */
   body.received-screen{background:#e5f2f6}
   body.received-screen::before{display:none}
-  body.received-screen #site-header,body.received-screen .pagehead,body.received-screen .tabs{display:none!important}
+  body.received-screen #site-header,body.received-screen .pagehead,body.received-screen .viewseg{display:none!important}
   body.received-screen .wrap{padding:0 16px 28px;width:100%;max-width:none}
   .request-received-hero{display:none}
   body.received-screen .request-received-hero{height:232px;margin:0 -16px 0;display:grid;grid-template-columns:260px 1fr 260px;align-items:center;overflow:hidden;position:relative;background:radial-gradient(circle at 50% 45%,#fff 0,#f4fbfc 42%,#dbeef4 100%);border-top:4px solid #0091ad;text-align:center}
@@ -536,8 +562,6 @@
   .cl-fhd-txt{flex:1;min-width:0;}
   .cl-fhd-txt h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink);}
   .cl-fhd-txt p{margin:3px 0 0;font-size:13.5px;color:var(--muted);}
-  .cl-fhd-ico{width:46px;height:46px;flex-shrink:0;border-radius:14px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);}
-  .cl-fhd-ico svg{width:22px;height:22px;}
   .cl-div{height:1px;background:var(--line-2);margin:11px -28px 13px;}
   @media (max-width:560px){ .cl-div{margin:15px -18px 17px;} }
 
@@ -626,6 +650,178 @@
   .cl-pv-hint{text-align:center;font-size:12px;color:var(--faint);margin-top:12px;}
   .cl-pv-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px;}
 </style>
+<style id="studio-css">
+  /* ===== gear button in the create-form header ===== */
+  .cl-gear{width:42px;height:42px;flex-shrink:0;border-radius:13px;display:grid;place-items:center;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);position:relative;
+    transition:border-color .14s,color .14s,background .14s;}
+  .cl-gear:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .cl-gear:hover svg{transform:rotate(72deg);}
+  .cl-gear svg{width:21px;height:21px;transition:transform .5s cubic-bezier(.3,.8,.3,1);}
+  .cl-gear::after{content:'';position:absolute;top:-3px;inset-inline-start:-3px;width:9px;height:9px;border-radius:50%;
+    background:var(--grad-btn);box-shadow:0 0 0 2px var(--panel);}
+  .cl-gear.seen::after{display:none;}
+
+  /* ===== Form Studio modal ===== */
+  .studio{position:fixed;inset:0;z-index:230;display:none;}
+  .studio.show{display:block;}
+  .studio-scrim{position:absolute;inset:0;background:rgba(10,12,22,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;transition:opacity .2s;}
+  .studio.show .studio-scrim{opacity:1;}
+  .studio-box{position:absolute;top:50%;left:50%;width:min(1020px,calc(100vw - 28px));height:min(772px,calc(100vh - 32px));
+    background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-lg);overflow:hidden;
+    display:flex;flex-direction:column;opacity:0;transform:translate(-50%,-50%) scale(.97);
+    transition:opacity .22s ease,transform .24s cubic-bezier(.2,.9,.3,1);}
+  .studio.show .studio-box{opacity:1;transform:translate(-50%,-50%) scale(1);}
+
+  .studio-hd{display:flex;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--line-2);background:var(--panel-2);}
+  .studio-hd-ico{width:42px;height:42px;flex-shrink:0;border-radius:13px;display:grid;place-items:center;color:#fff;background:var(--grad-btn);box-shadow:0 6px 16px var(--grad-btn-glow);}
+  .studio-hd-ico svg{width:22px;height:22px;}
+  .studio-hd-t{flex:1;min-width:0;}
+  .studio-hd-t h2{margin:0;font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--ink);}
+  .studio-hd-t p{margin:2px 0 0;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .studio-x{width:36px;height:36px;flex-shrink:0;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .12s;}
+  .studio-x:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .studio-x svg{width:18px;height:18px;}
+
+  .studio-main{flex:1;min-height:0;display:grid;grid-template-columns:238px minmax(0,1fr);}
+  .studio-rail{overflow-y:auto;border-inline-end:1px solid var(--line-2);background:var(--panel-2);padding:8px 10px 16px;}
+  .st-glabel{font:600 10.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:14px 10px 7px;}
+  .st-nav{display:flex;align-items:center;gap:11px;width:100%;padding:10px 11px;border-radius:11px;border:none;background:transparent;color:var(--ink-2);cursor:pointer;font:600 13.5px var(--sans);text-align:start;margin-bottom:2px;transition:background .12s,color .12s;}
+  .st-nav:hover{background:var(--panel);}
+  .st-nav.on{background:var(--accent-soft);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  .st-nav svg{width:18px;height:18px;flex-shrink:0;}
+  .st-nav .st-count{margin-inline-start:auto;background:var(--panel);border:1px solid var(--line);color:var(--muted);}
+  .st-nav.on .st-count{background:#fff;color:var(--accent-dim);border-color:transparent;}
+
+  .studio-content{overflow-y:auto;padding:22px 26px 26px;}
+  .st-sec{display:none;}
+  .st-sec.on{display:block;animation:stFade .22s ease;}
+  @keyframes stFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .st-sec-h{font-size:16px;font-weight:800;color:var(--ink);margin:0 0 3px;letter-spacing:-.01em;}
+  .st-sec-sub{font-size:13px;color:var(--muted);margin:0 0 18px;line-height:1.5;}
+
+  .studio-ft{display:flex;align-items:center;gap:12px;padding:11px 18px;border-top:1px solid var(--line-2);background:var(--panel-2);}
+  .studio-ft-note{font-size:12px;color:var(--faint);display:inline-flex;align-items:center;gap:7px;min-width:0;}
+  .studio-ft-note svg{width:15px;height:15px;color:var(--success-dim);flex-shrink:0;}
+  .studio-done{margin-inline-start:auto;height:40px;padding:0 28px;border-radius:11px;border:none;cursor:pointer;color:#fff;font:700 14px var(--sans);
+    background:var(--grad-btn);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .studio-done:hover{filter:brightness(1.05);} .studio-done:active{transform:translateY(1px);}
+
+  .st-count{font:600 11px var(--mono);background:var(--accent-soft);color:var(--accent-dim);border-radius:999px;padding:2px 9px;}
+
+  /* palette */
+  .pal-grp{margin-bottom:20px;}
+  .pal-grp-t{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:700;color:var(--ink-2);margin:0 0 11px;}
+  .pal-grp-t::after{content:'';flex:1;height:1px;background:var(--line-2);}
+  .pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px;}
+  .pal-tile{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);cursor:pointer;text-align:start;
+    transition:border-color .12s,background .12s,transform .08s,box-shadow .12s;}
+  .pal-tile:hover{border-color:var(--accent-line);background:var(--panel);box-shadow:var(--shadow-sm);transform:translateY(-1px);}
+  .pal-tile:active{transform:translateY(0);}
+  .pal-ico{width:34px;height:34px;flex-shrink:0;border-radius:9px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);}
+  .pal-ico svg{width:18px;height:18px;}
+  .pal-tx{min-width:0;flex:1;}
+  .pal-nm{font-size:13px;font-weight:600;color:var(--ink);line-height:1.2;}
+  .pal-plus{color:var(--faint);flex-shrink:0;display:flex;}
+  .pal-plus svg{width:16px;height:16px;}
+  .pal-tile:hover .pal-plus{color:var(--accent);}
+
+  /* fields list */
+  .fld-head{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:var(--ink);margin:26px 0 12px;}
+  .fld-empty{border:1.5px dashed var(--line);border-radius:12px;padding:22px;text-align:center;color:var(--faint);font-size:13px;background:var(--panel-2);}
+  .fld-row{display:flex;align-items:center;gap:10px;padding:8px 11px;border:1px solid var(--line);border-radius:11px;background:var(--panel);margin-bottom:8px;}
+  .fld-grip{color:var(--faint);display:flex;flex-shrink:0;}
+  .fld-grip svg{width:16px;height:16px;}
+  .fld-ico{width:30px;height:30px;flex-shrink:0;border-radius:8px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);}
+  .fld-ico svg{width:15px;height:15px;}
+  .fld-lblinp{flex:1;min-width:0;background:transparent;border:none;font:600 13.5px var(--sans);color:var(--ink);padding:6px 4px;border-bottom:1px solid transparent;}
+  .fld-lblinp:focus{outline:none;border-bottom-color:var(--accent);}
+  .fld-req{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;flex-shrink:0;user-select:none;white-space:nowrap;}
+  .fld-req input{accent-color:var(--accent);width:14px;height:14px;}
+  .fld-del{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .12s;}
+  .fld-del:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .fld-del svg{width:15px;height:15px;}
+
+  /* generic studio form rows */
+  .st-field{margin-bottom:18px;}
+  .st-field > label,.st-flabel{display:block;font-size:13px;font-weight:700;color:var(--ink-2);margin-bottom:7px;}
+  .st-hint{font-size:12px;color:var(--faint);margin-top:7px;line-height:1.45;}
+  .st-row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:560px){ .st-row2{grid-template-columns:1fr;} }
+  .st-toggle{display:flex;align-items:center;gap:14px;padding:12px 15px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);margin-bottom:10px;}
+  .st-toggle[data-act]{cursor:pointer;} .st-toggle[data-act]:hover{border-color:var(--accent-line);}
+  .st-toggle-tx{flex:1;min-width:0;}
+  .st-toggle-nm{font-size:13.5px;font-weight:600;color:var(--ink);}
+  .st-toggle-ds{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .st-radio{width:20px;height:20px;flex-shrink:0;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;}
+  .st-radio.on{border-color:var(--accent);}
+  .st-radio.on::after{content:'';width:10px;height:10px;border-radius:50%;background:var(--accent);}
+
+  /* email list */
+  .em-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .em-row .cl-inp{flex:1;}
+  .em-add{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 15px;border-radius:10px;border:1px dashed var(--accent-line);background:var(--accent-soft);color:var(--accent-dim);font:600 13px var(--sans);cursor:pointer;transition:filter .12s;}
+  .em-add:hover{filter:brightness(.98);} .em-add svg{width:15px;height:15px;}
+  .em-x{width:38px;height:38px;flex-shrink:0;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);cursor:pointer;display:grid;place-items:center;}
+  .em-x:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);} .em-x svg{width:15px;height:15px;}
+
+  /* design: colours + gradients */
+  .col-row{display:flex;align-items:center;gap:12px;padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);margin-bottom:10px;}
+  .col-sw{width:40px;height:40px;flex-shrink:0;border-radius:10px;border:1px solid var(--line);overflow:hidden;padding:0;cursor:pointer;position:relative;display:block;}
+  .col-sw input[type=color]{position:absolute;inset:-6px;width:calc(100% + 12px);height:calc(100% + 12px);border:none;padding:0;cursor:pointer;background:none;}
+  .col-meta{flex:1;min-width:0;}
+  .col-nm{font-size:13px;font-weight:600;color:var(--ink);}
+  .col-hex{flex-shrink:0;width:108px;font-family:var(--mono);font-size:12.5px;text-align:center;text-transform:uppercase;}
+  .grad-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;}
+  .grad-sw{width:54px;height:44px;border-radius:12px;cursor:pointer;border:2px solid transparent;box-shadow:var(--shadow-sm);transition:transform .1s;position:relative;padding:0;}
+  .grad-sw:hover{transform:translateY(-2px);}
+  .grad-sw.on{border-color:var(--ink);}
+  .grad-sw.on::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px;text-shadow:0 1px 3px rgba(0,0,0,.5);}
+  .grad-clear{font-size:12.5px;font-weight:600;color:var(--accent-dim);background:none;border:none;cursor:pointer;padding:4px 0;}
+  .seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:3px;gap:2px;}
+  .seg button{border:none;background:transparent;border-radius:8px;padding:8px 18px;font:600 13px var(--sans);color:var(--muted);cursor:pointer;transition:all .12s;}
+  .seg button.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+
+  /* preview theming hooks + custom fields */
+  .cl-prev{--pv-accent:var(--accent);--pv-accent-soft:var(--accent-soft);--pv-accent-line:var(--accent-line);--pv-ink:var(--ink);}
+  .cl-prev .cl-pv-ava{background:var(--pv-accent-soft);color:var(--pv-accent);}
+  .cl-prev .cl-pv-name{color:var(--pv-ink);}
+  .cl-prev .cl-pv-drop{border-color:var(--pv-accent-line);background:linear-gradient(180deg,var(--pv-accent-soft),transparent 130%);}
+  .cl-prev .cl-pv-pick{color:var(--pv-accent);}
+  .cl-prev[data-w="compact"] .pv-fields,.cl-prev[data-w="compact"] .cl-pv-drop{max-width:86%;margin-inline:auto;}
+  .pv-fields{margin-top:18px;display:flex;flex-direction:column;gap:13px;text-align:start;}
+  .pv-fields:empty{display:none;}
+  .pv-fld-l{font-size:12.5px;font-weight:600;color:var(--pv-ink,var(--ink));margin-bottom:6px;display:block;}
+  .pv-fld-l .rq{color:var(--danger);margin-inline-start:3px;}
+  .pv-fld-box{min-height:38px;border:1px solid var(--line);border-radius:10px;background:var(--panel);display:flex;align-items:center;padding:0 12px;color:var(--faint);font-size:12.5px;}
+  .pv-fld-box.ta{min-height:58px;align-items:flex-start;padding-top:9px;}
+  .pv-fld-head{font-size:15px;font-weight:800;color:var(--pv-ink,var(--ink));margin-top:4px;}
+  .pv-fld-para{font-size:12.5px;color:var(--muted);line-height:1.55;}
+  .pv-fld-hr{height:1px;background:var(--line);margin:2px 0;}
+
+  /* ===== inline studio (edit mode) — builder + designer live inside the edit form ===== */
+  body.edit-request .cl-gear{display:none;}
+  body.edit-request #createView:not(.client-mode) .cl-prev{display:none;}
+  body.edit-request #createView:not(.client-mode) .cl-grid{grid-template-columns:1fr;}
+  .cl-inline-studio{grid-column:1/-1;margin-top:2px;}
+  .ist-hd{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .ist-ico{width:38px;height:38px;flex-shrink:0;border-radius:12px;display:grid;place-items:center;color:#fff;background:var(--grad-btn);box-shadow:0 6px 16px var(--grad-btn-glow);}
+  .ist-ico svg{width:20px;height:20px;}
+  .ist-tx h3{margin:0;font-size:15.5px;font-weight:800;letter-spacing:-.01em;color:var(--ink);}
+  .ist-tx p{margin:2px 0 0;font-size:12.5px;color:var(--muted);}
+  .ist-host{border:1px solid var(--line-2);border-radius:14px;overflow:hidden;background:var(--panel);}
+  .ist-host .studio-main{height:min(600px,70vh);}
+
+  @media (max-width:720px){
+    .studio-box{inset:0;width:100%;height:100%;max-width:none;border-radius:0;transform:none;}
+    .studio.show .studio-box{transform:none;}
+    .studio-main{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);}
+    .studio-rail{display:flex;gap:6px;overflow-x:auto;border-inline-end:none;border-bottom:1px solid var(--line-2);padding:10px;}
+    .st-glabel{display:none;}
+    .st-nav{width:auto;white-space:nowrap;flex-shrink:0;margin-bottom:0;}
+    .st-nav .st-count{display:none;}
+  }
+</style>
 <link rel="stylesheet" href="./header.css">
 <style>
   #site-header .sh-mega:not(.open){display:none;}
@@ -643,15 +839,15 @@
     <p data-i18n="pageSub"></p>
   </div>
 
-  <div class="tabs" id="tabs">
-    <button class="tab" id="tabManage" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
-      <span data-i18n="tabManage"></span>
+  <div class="viewseg" id="viewSeg" role="tablist" aria-label="preview mode">
+    <button class="vseg on" id="vsManager" type="button" role="tab" aria-selected="true" data-mode="manager">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span data-i18n="viewManager"></span>
       <span class="count" id="mgCount">0</span>
     </button>
-    <button class="tab on" id="tabCreate" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-      <span data-i18n="tabCreate"></span>
+    <button class="vseg" id="vsClient" type="button" role="tab" aria-selected="false" data-mode="client">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span data-i18n="viewClient"></span>
     </button>
   </div>
 
@@ -666,9 +862,9 @@
             <h1 data-i18n="formTitle"></h1>
             <p data-i18n="formSub"></p>
           </div>
-          <div class="cl-fhd-ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
-          </div>
+          <button class="cl-gear" id="openStudio" type="button" aria-label="הגדרות ורכיבי טופס">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
         </header>
 
         <div class="cl-div"></div>
@@ -687,16 +883,6 @@
             <input class="cl-inp" id="fDesc" type="text" data-i18n-ph="fDescPh">
           </div>
 
-          <!-- target folder -->
-          <div class="cl-field cl-span2">
-            <label class="cl-lbl" for="fFolder" data-i18n="fFolder"></label>
-            <div class="cl-sel">
-              <span class="cl-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
-              <select class="cl-inp" id="fFolder"></select>
-            </div>
-            <input class="cl-inp cl-newfolder hidden" id="fNewFolder" type="text" data-i18n-ph="fNewFolderPh">
-          </div>
-
           <!-- allowed file types -->
           <div class="cl-field cl-span2">
             <label class="cl-lbl" data-i18n="fTypes"></label>
@@ -705,36 +891,6 @@
               <div class="cl-typebox" id="fTypes"></div>
             </div>
             <div class="cl-sub" data-i18n="fTypesHint"></div>
-          </div>
-
-          <!-- max file size -->
-          <div class="cl-field">
-            <label class="cl-lbl" for="fMaxFile" data-i18n="fMaxFile"></label>
-            <div class="cl-sel">
-              <span class="cl-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
-              <select class="cl-inp" id="fMaxFile">
-                <option value="0" data-i18n="noLimit"></option>
-                <option value="25">25 MB</option>
-                <option value="100">100 MB</option>
-                <option value="500">500 MB</option>
-                <option value="2000">2 GB</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- max count -->
-          <div class="cl-field">
-            <label class="cl-lbl" for="fMaxCount" data-i18n="fMaxCount"></label>
-            <div class="cl-sel">
-              <span class="cl-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
-              <select class="cl-inp" id="fMaxCount">
-                <option value="0" data-i18n="noLimit"></option>
-                <option value="5" selected>5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
-            </div>
           </div>
 
           <!-- max total -->
@@ -795,6 +951,17 @@
             <textarea class="cl-inp cl-ta" id="fThanks" data-i18n-ph="fThanksPh"></textarea>
           </div>
 
+          <!-- inline form studio (edit mode): the building blocks, custom
+               fields, settings and design sections live inside the edit form -->
+          <div class="cl-field cl-inline-studio hidden" id="inlineStudioWrap">
+            <div class="cl-div"></div>
+            <div class="ist-hd">
+              <span class="ist-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M17.5 14v7M14 17.5h7"/></svg></span>
+              <div class="ist-tx"><h3 id="istTitle"></h3><p id="istSub"></p></div>
+            </div>
+            <div class="ist-host" id="inlineStudioHost"></div>
+          </div>
+
           <!-- submit -->
           <button class="cl-submit" id="createBtn" type="button">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
@@ -816,9 +983,15 @@
           <span class="cl-pv-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="previewPick"></span></span>
         </div>
         <div class="cl-pv-hint" id="pvMax"></div>
+        <div class="pv-fields" id="pvFields"></div>
         <div class="cl-pv-chips" id="pvChips"></div>
       </aside>
 
+    </div>
+
+    <!-- client view: the real upload form (upload.html), fed the current draft -->
+    <div id="clientFull">
+      <iframe id="clientFrame" title="client form preview" allowtransparency="true" scrolling="no"></iframe>
     </div>
 
     <!-- share result -->
@@ -863,10 +1036,6 @@
   <div id="manageView" class="hidden">
     <div class="mgbar">
       <h3 data-i18n="mgTitle"></h3>
-      <button class="btn grad" id="newReqBtn" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-        <span data-i18n="newReq"></span>
-      </button>
     </div>
     <div class="reqlist" id="reqList"></div>
     <div class="empty hidden" id="mgEmpty">
@@ -881,7 +1050,7 @@
   <div id="receivedView" class="hidden">
     <section class="request-received-hero">
       <div class="rrh-art"><span class="rrh-float a">&#9835;</span><span class="rrh-float b">&#9654;</span><span class="rrh-float c">&#9638;</span><div class="rrh-folder"><svg viewBox="0 0 24 24"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div></div>
-      <div class="rrh-copy"><span class="rrh-kick">KOLKLI REQUEST</span><h1>קבלו קבצים ישירות מהלקוחות שלכם</h1><p>צרו קישור העלאה, שתפו עם הלקוחות, וכל הקבצים נכנסים אוטומטית לתיקייה מסודרת אצלכם. הלקוח לא צריך חשבון או התחברות.</p><div class="rrh-btns"><button class="rrh-btn">יצירת טופס העלאה &nbsp;＋</button><button class="rrh-btn primary">טפסי העלאה שיצרתי &nbsp; 2</button></div></div>
+      <div class="rrh-copy"><span class="rrh-kick">KOLKLI REQUEST</span><h1>קבלו קבצים ישירות מהלקוחות שלכם</h1><p>צרו קישור העלאה, שתפו עם הלקוחות, וכל הקבצים נכנסים אוטומטית לתיקייה מסודרת אצלכם. הלקוח לא צריך חשבון או התחברות.</p></div>
       <div class="rrh-art rrh-right"><div class="rrh-orbit">&#8682;</div></div>
     </section>
     <div class="rvhead">
@@ -932,6 +1101,30 @@
   <footer data-i18n="foot"></footer>
 </div>
 
+<!-- ============ FORM STUDIO (gear popup) ============ -->
+<div class="studio" id="studio" role="dialog" aria-modal="true" aria-labelledby="stTitle">
+  <div class="studio-scrim" id="studioScrim"></div>
+  <div class="studio-box">
+    <header class="studio-hd">
+      <div class="studio-hd-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.5 4.8.4-3.6 3.2 1.1 4.7L12 13.8 7.8 15.8l1.1-4.7L5.3 7.9l4.8-.4L12 3z"/></svg>
+      </div>
+      <div class="studio-hd-t"><h2 id="stTitle"></h2><p id="stSub"></p></div>
+      <button class="studio-x" id="studioClose" type="button" aria-label="close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </header>
+    <div class="studio-main">
+      <nav class="studio-rail" id="studioRail"></nav>
+      <div class="studio-content" id="studioContent"></div>
+    </div>
+    <footer class="studio-ft">
+      <span class="studio-ft-note" id="studioNote"></span>
+      <button class="studio-done" id="studioDone" type="button"></button>
+    </footer>
+  </div>
+</div>
+
 <div class="pv" id="pv">
   <div class="pvbar"><div class="pvt" id="pvTitle"></div><button id="pvClose" type="button" data-i18n="close"></button></div>
   <div class="pvbody" id="pvBody"></div>
@@ -965,7 +1158,7 @@
       kick:'Kolkli Request',
       pageTitle:'קבלו קבצים ישירות מהלקוחות שלכם',
       pageSub:'צרו קישור העלאה, שלחו ללקוח, וכל הקבצים נכנסים אוטומטית לתיקייה מסודרת אצלכם. הלקוח לא צריך חשבון או התחברות.',
-      tabCreate:'יצירת טופס העלאה', tabManage:'טפסים שיצרת',
+      tabCreate:'יצירת טופס העלאה', tabManage:'טפסים שיצרת', viewManager:'תצוגת מנהל', viewClient:'תצוגת לקוח',
       formTitle:'יצירת קישור לקבלת קבצים', formSub:'שלחו קבצים בקלות ותנהלו את ההעלאה',
       editTitle:'עריכת בקשת קבצים', editSub:'עדכנו את פרטי הבקשה ושמרו את השינויים', saveEditBtn:'שמירת שינויים', editToast:'הבקשה עודכנה ✓',
       fName:'שם הבקשה', fNamePh:'לדוגמה: תמונות לאירוע',
@@ -974,7 +1167,7 @@
       fTypes:'סוגי קבצים מותרים', fTypesHint:'בלי בחירה — כל סוגי הקבצים מותרים.',
       fMaxFile:'גודל קובץ מקסימלי', fMaxCount:'מספר קבצים מקסימלי', fMaxTotal:'גודל כולל מקסימלי', fExpiry:'תוקף הקישור',
       noLimit:'ללא הגבלה',
-      expNever:'ללא תפוגה', exp1:'יום אחד', exp3:'3 ימים', exp7:'7 ימים', exp30:'30 יום',
+      expNever:'שמור לתמיד', exp1:'יום אחד', exp3:'3 ימים', exp7:'7 ימים', exp30:'30 יום',
       fPw:'להגן בסיסמה', fPwPh:'סיסמה לקישור',
       fThanks:'הודעת תודה ללקוח (לא חובה)', fThanksPh:'תודה! קיבלנו את הקבצים ונחזור אליך.',
       fNotify:'הודיעו לי כשמתקבלים קבצים',
@@ -991,10 +1184,10 @@
       mgEmptyTitle:'עדיין אין בקשות', mgEmptyBody:'צרו בקשה ראשונה כדי לקבל קבצים מלקוחות בקישור אחד.',
       stActive:'פעיל', stExpired:'פג תוקף', stClosed:'נסגר',
       chipFolder:f=>`תיקייה: ${f}`, chipFiles:n=>`${n} קבצים`, chipSize:s=>s,
-      chipCreated:d=>`נוצר ${d}`, chipExpires:d=>`פג ${d}`, chipExpired:'פג תוקף', chipNoExpiry:'ללא תפוגה',
+      chipCreated:d=>`נוצר ${d}`, chipExpires:d=>`פג ${d}`, chipExpired:'פג תוקף', chipNoExpiry:'שמור לתמיד',
       chipExpSoon:d=>`פג בעוד ${d}`,
       newN:n=> n===1?'חדש':`${n} חדשים`,
-      aFiles:n=>`קבצים (${n})`, aEdit:'עריכה', aCopy:'העתקת קישור', aClose:'סגירה', aDup:'שכפול', aDel:'מחיקה',
+      aFiles:n=>`הצג קבצים שהתקבלו`, aEdit:'עריכה', aCopy:'העתקת קישור', aClose:'סגירה', aDup:'שכפול', aDel:'מחיקה',
       confTitleClose:'סגירת הבקשה', confClose:'לסגור את הבקשה? לא יתקבלו קבצים חדשים, אך הקבצים שכבר התקבלו יישמרו.',
       confTitleDel:'מחיקת הבקשה', confDel:'האם למחוק את הבקשה? כל הקבצים שהתקבלו יימחקו לצמיתות ולא ניתן יהיה לשחזר אותם.', confCancel:'ביטול',
       dupSuffix:' (עותק)', copiedShort:'הקישור הועתק ✓', closedToast:'הבקשה נסגרה', delToast:'הבקשה נמחקה',
@@ -1020,7 +1213,7 @@
       kick:'Kolkli Request',
       pageTitle:'Receive files directly from your clients',
       pageSub:'Create an upload link, send it to your client, and every file lands automatically in an organized folder on your side. Your client needs no account and no login.',
-      tabCreate:'Create upload form', tabManage:'Forms you created',
+      tabCreate:'Create upload form', tabManage:'Forms you created', viewManager:'Manager view', viewClient:'Client view',
       formTitle:'Create a file request', formSub:'Send files easily and manage every upload',
       editTitle:'Edit file request', editSub:'Update the request details and save your changes', saveEditBtn:'Save changes', editToast:'Request updated ✓',
       fName:'Request name', fNamePh:'e.g. Event photos',
@@ -1049,7 +1242,7 @@
       chipCreated:d=>`Created ${d}`, chipExpires:d=>`Expires ${d}`, chipExpired:'Expired', chipNoExpiry:'No expiry',
       chipExpSoon:d=>`Expires in ${d}`,
       newN:n=> n===1?'new':`${n} new`,
-      aFiles:n=>`Files (${n})`, aEdit:'Edit', aCopy:'Copy link', aClose:'Close', aDup:'Duplicate', aDel:'Delete',
+      aFiles:n=>`Show received files`, aEdit:'Edit', aCopy:'Copy link', aClose:'Close', aDup:'Duplicate', aDel:'Delete',
       confTitleClose:'Close request', confClose:'Close this request? No new files will be accepted, but files already received are kept.',
       confTitleDel:'Delete request', confDel:'Delete this request? Every received file will be permanently removed and cannot be recovered.', confCancel:'Cancel',
       dupSuffix:' (copy)', copiedShort:'Link copied ✓', closedToast:'Request closed', delToast:'Request deleted',
@@ -1075,7 +1268,7 @@
       kick:'Kolkli Request',
       pageTitle:'Получайте файлы напрямую от клиентов',
       pageSub:'Создайте ссылку для загрузки, отправьте её клиенту — и каждый файл автоматически попадает в упорядоченную папку у вас. Клиенту не нужен аккаунт и вход.',
-      tabCreate:'Создать форму загрузки', tabManage:'Созданные вами формы',
+      tabCreate:'Создать форму загрузки', tabManage:'Созданные вами формы', viewManager:'Вид менеджера', viewClient:'Вид клиента',
       formTitle:'Создать запрос файлов', formSub:'Отправляйте файлы легко и управляйте загрузкой',
       editTitle:'Редактировать запрос файлов', editSub:'Обновите данные запроса и сохраните изменения', saveEditBtn:'Сохранить изменения', editToast:'Запрос обновлён ✓',
       fName:'Название запроса', fNamePh:'напр. Фото с мероприятия',
@@ -1104,7 +1297,7 @@
       chipCreated:d=>`Создан ${d}`, chipExpires:d=>`Истекает ${d}`, chipExpired:'Истёк', chipNoExpiry:'Без срока',
       chipExpSoon:d=>`Истекает через ${d}`,
       newN:n=> n===1?'новый':`${n} новых`,
-      aFiles:n=>`Файлы (${n})`, aEdit:'Редактировать', aCopy:'Копировать ссылку', aClose:'Закрыть', aDup:'Дублировать', aDel:'Удалить',
+      aFiles:n=>`Показать полученные файлы`, aEdit:'Редактировать', aCopy:'Копировать ссылку', aClose:'Закрыть', aDup:'Дублировать', aDel:'Удалить',
       confTitleClose:'Закрыть запрос', confClose:'Закрыть этот запрос? Новые файлы приниматься не будут, но уже полученные файлы сохранятся.',
       confTitleDel:'Удалить запрос', confDel:'Удалить этот запрос? Все полученные файлы будут удалены безвозвратно и не подлежат восстановлению.', confCancel:'Отмена',
       dupSuffix:' (копия)', copiedShort:'Ссылка скопирована ✓', closedToast:'Запрос закрыт', delToast:'Запрос удалён',
@@ -1131,8 +1324,9 @@
   const TYPE_KEYS = ['image','video','audio','doc'];
 
   let lang='he', t=I18N.he;
-  let view='create';
+  let view='manager';
   let createTypes = {};           // {image:true,...}
+  let selectedFolder='';          // target folder for received files (chooser removed → owner default)
   let lastToken=null;             // request just created (for share panel)
   let editToken=null;             // request being edited in the create form (null = new)
   let rvToken=null;               // request open in received view
@@ -1140,6 +1334,17 @@
   let rvCollapsed=new Set(), rvNewIds=new Set(), gridUrls=[];
   const ARCHIVE=['zip','rar','7z','gz','tar','bz2','xz'];
   let notifyEnabled=false;
+
+  // ---------- Form Studio (gear popup) state ----------
+  let customFields=[];   // [{id,type,label,required}] extra fields the client fills
+  let recipients=[];     // notification email addresses
+  let formLang='';       // '' auto | he | en | ru  → client upload form language
+  let maxCount=0, maxFileMB=0;                         // file-count / per-file caps
+  let afterUpload={mode:'thanks', redirectUrl:'', allowMore:true};
+  let formTheme={accent:'', ink:'', bg:'', gradient:'', font:'', width:'normal'};
+  let sender={name:false, email:false};               // require sender name / email
+  let studioSection='components';
+  let fldSeq=0;
 
   // ---------- helpers ----------
   function toast(msg){ const b=el('toast'); b.textContent=msg; b.classList.add('show'); clearTimeout(b._t); b._t=setTimeout(()=>b.classList.remove('show'),1900); }
@@ -1193,25 +1398,34 @@
 
   // ---------- tabs / views ----------
   function setView(v){
+    // Two-mode toggle (manager | client) plus the per-form received drill-down.
+    // Legacy callers pass 'create'/'manage' — both map to the combined manager view.
+    if(v==='create' || v==='manage') v='manager';
     if(view==='received' && v!=='received') revokeGridUrls();
     view=v;
-    document.body.classList.toggle('received-screen',v==='received');
-    el('createView').classList.toggle('hidden', v!=='create');
-    el('manageView').classList.toggle('hidden', v!=='manage');
-    el('receivedView').classList.toggle('hidden', v!=='received');
-    el('tabCreate').classList.toggle('on', v==='create');
-    el('tabManage').classList.toggle('on', v==='manage' || v==='received');
-    if(v==='manage') renderManage();
+    const isReceived=v==='received', isClient=v==='client', isManager=v==='manager';
+    document.body.classList.toggle('received-screen', isReceived);
+    document.body.classList.toggle('client-preview', isClient);
+    // Manager = form builder + the "forms you created" list, shown together.
+    // Client  = only the client-facing upload preview (builder chrome hidden).
+    el('createView').classList.toggle('hidden', isReceived);
+    el('createView').classList.toggle('client-mode', isClient);
+    el('manageView').classList.toggle('hidden', isReceived || isClient);
+    el('receivedView').classList.toggle('hidden', !isReceived);
+    el('vsManager').classList.toggle('on', isManager || isReceived);
+    el('vsManager').setAttribute('aria-selected', (isManager||isReceived)?'true':'false');
+    el('vsClient').classList.toggle('on', isClient);
+    el('vsClient').setAttribute('aria-selected', isClient?'true':'false');
+    if(isManager) renderManage();
+    if(isClient) renderPreview();
     window.scrollTo({top:0,behavior:'smooth'});
   }
 
   // ---------- create ----------
-  function fillFolders(sel){
-    const folders=KR.loadFolders();
-    const cur=sel||folders[0];
-    el('fFolder').innerHTML = folders.map(f=>`<option value="${KR.escapeHtml(f)}"${f===cur?' selected':''}>${KR.escapeHtml(f)}</option>`).join('')
-      + `<option value="__new">${KR.escapeHtml(t.newFolderOpt)}</option>`;
-  }
+  // The target-folder chooser was removed; received files go to the owner's
+  // default folder. `selectedFolder` holds it (set from saved defaults / the
+  // edited request), falling back to the first saved folder.
+  function defaultFolder(){ return selectedFolder || KR.loadFolders()[0] || 'Inbox'; }
   function renderTypeChips(){
     el('fTypes').innerHTML = TYPE_KEYS.map(k=>{
       const on=createTypes[k];
@@ -1228,14 +1442,56 @@
     const chips=[];
     const chosen=TYPE_KEYS.filter(k=>createTypes[k]);
     if(chosen.length && chosen.length<TYPE_KEYS.length) chips.push(chosen.map(k=>lblForType(k)).join(' · '));
-    const mf=+el('fMaxFile').value; if(mf) chips.push('≤ '+(mf>=1000?(mf/1000)+' GB':mf+' MB'));
-    const mc=+el('fMaxCount').value || 5; if(mc) chips.push('≤ '+mc);
+    const mf=0; // per-file size limit removed → always "any size"
     const ex=+el('fExpiry').value; if(ex) chips.push(daysWord(ex));
     if(el('fPwToggle').checked) chips.push('🔒');
     el('pvChips').innerHTML = chips.map(c=>`<span class="chip">${KR.escapeHtml(c)}</span>`).join('');
     const pvMaxEl=el('pvMax');
     if(pvMaxEl){ const sz=mf?(mf>=1000?(mf/1000)+' GB':mf+' MB'):''; pvMaxEl.textContent = mf? (t.pvPerFile?t.pvPerFile(sz):sz) : (t.pvAnySize||''); }
+    studioSyncPreview();
+    if(view==='client') syncClientFrame();
   }
+
+  // ---------- client view: the real upload page, embedded ----------
+  // "תצוגת לקוח" shows the form exactly as a client will see it: upload.html is
+  // loaded in an iframe and renders the current (unsaved) draft, which we hand it
+  // through localStorage. Nothing is stored as a real request; upload.html treats
+  // ?preview=1 as its demo mode (simulated send).
+  function clientPreviewReq(){
+    const days=+el('fExpiry').value;
+    return {
+      token:'__preview__',
+      name: el('fName').value.trim(),
+      desc: el('fDesc').value.trim(),
+      folder: defaultFolder(),
+      types: TYPE_KEYS.filter(k=>createTypes[k]),
+      maxFileMB:maxFileMB, maxCount:maxCount, maxTotalMB:+el('fMaxTotal').value,
+      expiresAt: days? Date.now()+days*86400000 : 0,
+      password:null,
+      thankYou: el('fThanks').value.trim(),
+      formLang, recipients: recipients.filter(x=>x&&x.trim()),
+      afterUpload: Object.assign({}, afterUpload),
+      theme: Object.assign({}, formTheme),
+      sender: Object.assign({}, sender),
+      customFields: customFields.map(f=>Object.assign({}, f)),
+      status:'active', submissions:[], files:[]
+    };
+  }
+  let lastClientDraft='';
+  function syncClientFrame(){
+    const fr=el('clientFrame'); if(!fr) return;
+    const json=JSON.stringify(clientPreviewReq());
+    if(json===lastClientDraft && fr.src) return;      // unchanged draft → keep the loaded frame
+    lastClientDraft=json;
+    try{ KR.lsSet('kr_client_preview', json); }catch(_){}
+    fr.src=new URL('upload?preview=1&r='+Date.now(), location.href).href;
+  }
+  // upload.html reports its rendered height so the frame reads as part of the page
+  window.addEventListener('message',e=>{
+    const d=e.data, fr=el('clientFrame');
+    if(d && d.type==='kolkli-upload-height' && fr && e.source===fr.contentWindow)
+      fr.style.height=Math.max(640, +d.h||0)+'px';
+  });
 
   async function createRequest(){
     el('createErr').textContent='';
@@ -1247,11 +1503,7 @@
     const keepExistingPw = editToken && pwOn && !pwVal && !!(KR.getRequest(editToken)||{}).password;
     if(pwOn && !pwVal && !keepExistingPw){ el('createErr').textContent=t.errPw; return; }
 
-    let folder=el('fFolder').value;
-    if(folder==='__new'){ folder=el('fNewFolder').value.trim() || 'Inbox'; }
-
-    const rawMaxCount=+el('fMaxCount').value;
-    const effectiveMaxCount=rawMaxCount || 5;
+    const folder=defaultFolder();
 
     // Editing an existing request: update in place, preserving its token, files,
     // submissions, created date and project number. No new usage quota is consumed.
@@ -1264,12 +1516,18 @@
         existing.desc=el('fDesc').value.trim();
         existing.folder=folder;
         existing.types=TYPE_KEYS.filter(k=>createTypes[k]);
-        existing.maxFileMB=+el('fMaxFile').value;
-        existing.maxCount=effectiveMaxCount;
+        existing.maxFileMB=maxFileMB;
+        existing.maxCount=maxCount;
         existing.maxTotalMB=+el('fMaxTotal').value;
         existing.expiresAt = days? Date.now()+days*86400000 : 0;
         existing.thankYou=el('fThanks').value.trim();
         existing.notify=el('fNotify').checked;
+        existing.formLang=formLang;
+        existing.recipients=recipients.filter(x=>x&&x.trim());
+        existing.afterUpload=Object.assign({}, afterUpload);
+        existing.theme=Object.assign({}, formTheme);
+        existing.sender=Object.assign({}, sender);
+        existing.customFields=customFields.map(f=>Object.assign({}, f));
         if(pwOn){ if(pwVal) existing.password=await KR.hashPass(pwVal); }
         else existing.password=null;
         KR.upsertRequest(existing);
@@ -1286,19 +1544,24 @@
 
     let req;
     try{
-      req = await withUsage('request-files', { files:effectiveMaxCount }, async()=>{
+      req = await withUsage('request-files', { files:0 }, async()=>{
         KR.addFolder(folder);
         const days=+el('fExpiry').value;
         const next={
           token: KR.randToken(),
           name, desc: el('fDesc').value.trim(), folder,
           types: TYPE_KEYS.filter(k=>createTypes[k]),
-          maxFileMB:+el('fMaxFile').value, maxCount:effectiveMaxCount, maxTotalMB:+el('fMaxTotal').value,
+          maxFileMB:maxFileMB, maxCount:maxCount, maxTotalMB:+el('fMaxTotal').value,
           expiresAt: days? Date.now()+days*86400000 : 0,
           createdAt: Date.now(),
           password: pwOn? await KR.hashPass(pwVal) : null,
           thankYou: el('fThanks').value.trim(),
           notify: el('fNotify').checked,
+          formLang, recipients: recipients.filter(x=>x&&x.trim()),
+          afterUpload: Object.assign({}, afterUpload),
+          theme: Object.assign({}, formTheme),
+          sender: Object.assign({}, sender),
+          customFields: customFields.map(f=>Object.assign({}, f)),
           status:'active', submissions:[], files:[]
         };
         if(window.KolkliProjectNumbers) await KolkliProjectNumbers.assign('receive', next);
@@ -1358,18 +1621,20 @@
   // Snapshot just the *settings* (not name/instructions/password) so each new
   // form opens with the owner's previous choices. Persisted via KR.*CreateDefaults.
   function readCreateSettings(){
-    let folder=el('fFolder').value;
-    if(folder==='__new') folder=el('fNewFolder').value.trim();
     return {
-      folder: (folder && folder!=='__new') ? folder : '',
+      folder: selectedFolder || '',
       types: TYPE_KEYS.filter(k=>createTypes[k]),
-      maxFile: el('fMaxFile').value,
-      maxCount: el('fMaxCount').value,
       maxTotal: el('fMaxTotal').value,
       expiry: el('fExpiry').value,
       pwProtect: el('fPwToggle').checked,
       notify: el('fNotify').checked,
-      thankYou: el('fThanks').value.trim()
+      thankYou: el('fThanks').value.trim(),
+      maxCount, maxFileMB, formLang,
+      recipients: recipients.slice(),
+      afterUpload: Object.assign({}, afterUpload),
+      theme: Object.assign({}, formTheme),
+      sender: Object.assign({}, sender),
+      customFields: customFields.map(f=>Object.assign({}, f))
     };
   }
   function persistCreateSettings(){ try{ KR.saveCreateDefaults(readCreateSettings()); }catch(_){} }
@@ -1382,9 +1647,7 @@
   // fallbacks below, which match the original hardcoded defaults for a new user).
   function applyCreateDefaults(d){
     d = d || KR.loadCreateDefaults() || {};
-    fillFolders(d.folder || undefined);
-    setSelectValue('fMaxFile', d.maxFile, '0');
-    setSelectValue('fMaxCount', d.maxCount, '5');
+    selectedFolder = d.folder || KR.loadFolders()[0] || 'Inbox';
     setSelectValue('fMaxTotal', d.maxTotal, '0');
     setSelectValue('fExpiry', d.expiry, '7');
     createTypes={};
@@ -1395,7 +1658,18 @@
     el('fPwToggle').checked=pwOn;
     el('fPassword').classList.toggle('hidden',!pwOn);
     el('fThanks').value = d.thankYou || '';
-    el('fNewFolder').classList.add('hidden'); el('fNewFolder').value='';
+    // ---- studio settings ----
+    maxCount = +d.maxCount || 0;
+    maxFileMB = +d.maxFileMB || 0;
+    formLang = d.formLang || '';
+    recipients = Array.isArray(d.recipients) ? d.recipients.slice() : [];
+    afterUpload = Object.assign({mode:'thanks', redirectUrl:'', allowMore:true}, d.afterUpload || {});
+    formTheme = Object.assign({accent:'', ink:'', bg:'', gradient:'', font:'', width:'normal'}, d.theme || {});
+    sender = Object.assign({name:false, email:false}, d.sender || {});
+    customFields = Array.isArray(d.customFields)
+      ? d.customFields.map(f=>({id:f.id||('fld'+(++fldSeq)), type:f.type, label:f.label||'', required:!!f.required})).filter(f=>COMP[f.type])
+      : [];
+    if(el('studio') && el('studio').classList.contains('show')){ renderStudioRail(); showStudioSection(studioSection); }
   }
 
   function resetCreate(){
@@ -1418,6 +1692,30 @@
             hd.querySelector('p').textContent  = editing ? t.editSub   : t.formSub; }
     const btnLbl=el('createBtn').querySelector('[data-i18n="createBtn"]');
     if(btnLbl) btnLbl.textContent = editing ? t.saveEditBtn : t.createBtn;
+    syncInlineStudio(editing);
+  }
+
+  // Edit mode drops the side client preview and hosts the Form Studio —
+  // building blocks, custom fields, settings and design — inline inside the
+  // edit form. The create flow keeps the gear popup + live preview, so the
+  // studio panel (rail + content, with its listeners) is physically moved
+  // between the modal shell and the form host.
+  function syncInlineStudio(editing){
+    const wrap=el('inlineStudioWrap'), host=el('inlineStudioHost');
+    const main=document.querySelector('.studio-main');
+    if(!wrap || !host || !main) return;
+    document.body.classList.toggle('edit-request', editing);
+    wrap.classList.toggle('hidden', !editing);
+    if(editing){
+      if(main.parentElement!==host) host.appendChild(main);
+      el('istTitle').textContent=S('studioTitle');
+      el('istSub').textContent=S('studioSub');
+      renderStudioRail();
+      showStudioSection(studioSection||'components');
+    }else if(main.parentElement===host){
+      const box=document.querySelector('#studio .studio-box');
+      if(box) box.insertBefore(main, box.querySelector('.studio-ft'));
+    }
   }
 
   // Load an existing request into the create form for editing. Pre-fills every
@@ -1428,8 +1726,11 @@
     editToken=token;
     const days = req.expiresAt ? Math.max(0, Math.round((req.expiresAt-(req.createdAt||req.expiresAt))/86400000)) : 0;
     applyCreateDefaults({
-      folder:req.folder, maxFile:req.maxFileMB, maxCount:req.maxCount, maxTotal:req.maxTotalMB,
-      expiry:days, types:req.types, notify:req.notify, pwProtect:!!req.password, thankYou:req.thankYou
+      folder:req.folder, maxTotal:req.maxTotalMB,
+      expiry:days, types:req.types, notify:req.notify, pwProtect:!!req.password, thankYou:req.thankYou,
+      maxCount:req.maxCount, maxFileMB:req.maxFileMB, formLang:req.formLang,
+      recipients:req.recipients, afterUpload:req.afterUpload, theme:req.theme,
+      sender:req.sender, customFields:req.customFields
     });
     el('fName').value = req.name || '';
     el('fDesc').value = req.desc || '';
@@ -1469,11 +1770,9 @@
     actions.push(`<button class="minibtn go" data-act="files">${folderSvg()} ${t.aFiles(req.files.length)}</button>`);
     actions.push(`<button class="minibtn edit" data-act="edit">${editSvg()} ${t.aEdit}</button>`);
     actions.push(`<button class="minibtn" data-act="copy">${copySvg()} ${t.aCopy}</button>`);
-    if(st==='active') actions.push(`<button class="minibtn" data-act="close">${t.aClose}</button>`);
-    actions.push(`<button class="minibtn" data-act="dup">${t.aDup}</button>`);
-    actions.push(`<button class="minibtn danger" data-act="del">${trashSvg()} ${t.aDel}</button>`);
 
     return `<div class="rcard${unseen?' unseen':''}" data-token="${req.token}">
+      <button class="rc-del" data-act="del" title="${t.aDel}" aria-label="${t.aDel}">${trashSvg()}</button>
       <div class="rc-main">
         <div class="rc-top">
           <span class="rc-name">${KR.escapeHtml(req.name)}</span>
@@ -1743,7 +2042,7 @@
     const who=(d.who && d.who.trim())? d.who.trim() : t.anonymous;
     toast(t.newUploadToast(who));
     if(req.notify){ try{ if('Notification'in window && Notification.permission==='granted') new Notification(t.notifTitle,{body:t.notifBody(d.count||0,who)}); }catch(_){} }
-    if(view==='manage') renderManage();
+    if(view==='manager') renderManage();
     else if(view==='received' && rvToken===d.token) renderReceived(false);
     updateCount();
   }
@@ -1759,11 +2058,12 @@
     applyStatic();
     { const vl=el('vwList'), vg=el('vwGrid'); if(vl) vl.title=t.viewList; if(vg) vg.title=t.viewGrid; }
     KR.lsSet('ac_lang', l);
-    renderTypeChips(); fillFolders(el('fFolder').value && el('fFolder').value!=='__new'? el('fFolder').value : undefined);
+    renderTypeChips();
     renderPreview();
-    if(view==='manage') renderManage();
+    if(view==='manager') renderManage();
     if(view==='received') renderReceived(false);
     syncCreateChrome();
+    if(typeof studioApplyChrome==='function'){ studioApplyChrome(); if(el('studio') && el('studio').classList.contains('show')){ renderStudioRail(); showStudioSection(studioSection); } }
     if(lastToken){ const r=KR.getRequest(lastToken); if(r) showShare(r); }
   }
   function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); const ic=el('themeIco'); if(ic) ic.textContent=dark?'☀️':'🌙'; KR.lsSet('theme',dark?'dark':'light'); }
@@ -1788,20 +2088,18 @@
   function searchSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>'; }
 
   // ---------- events ----------
-  el('tabCreate').addEventListener('click',()=>setView('create'));
-  el('tabManage').addEventListener('click',()=>setView('manage'));
-  el('newReqBtn').addEventListener('click',()=>{ resetCreate(); setView('create'); });
+  el('vsManager').addEventListener('click',()=>setView('manager'));
+  el('vsClient').addEventListener('click',()=>setView('client'));
   el('emptyNewBtn').addEventListener('click',()=>{ resetCreate(); setView('create'); });
   el('editReqBtn').addEventListener('click',()=>{ if(lastToken) enterEditMode(lastToken); });
   el('backBtn').addEventListener('click',()=>setView('manage'));
 
-  ['fName','fDesc','fMaxFile','fMaxCount','fExpiry'].forEach(id=>el(id).addEventListener('input',renderPreview));
+  ['fName','fDesc','fExpiry'].forEach(id=>el(id).addEventListener('input',renderPreview));
   // persist the settings as sticky per-owner defaults whenever one of them changes
-  ['fMaxFile','fMaxCount','fMaxTotal','fExpiry'].forEach(id=>el(id).addEventListener('change',persistCreateSettings));
+  ['fMaxTotal','fExpiry'].forEach(id=>el(id).addEventListener('change',persistCreateSettings));
   el('fThanks').addEventListener('input',persistCreateSettings);
   el('fNotify').addEventListener('change',persistCreateSettings);
   el('fPwToggle').addEventListener('change',e=>{ el('fPassword').classList.toggle('hidden',!e.target.checked); if(e.target.checked) el('fPassword').focus(); renderPreview(); persistCreateSettings(); });
-  el('fFolder').addEventListener('change',e=>{ el('fNewFolder').classList.toggle('hidden', e.target.value!=='__new'); if(e.target.value==='__new') el('fNewFolder').focus(); else persistCreateSettings(); });
   el('fTypes').addEventListener('click',e=>{ const c=e.target.closest('[data-type]'); if(!c) return; const k=c.getAttribute('data-type'); createTypes[k]=!createTypes[k]; c.classList.toggle('on',createTypes[k]); renderPreview(); persistCreateSettings(); });
   el('createBtn').addEventListener('click',createRequest);
 
@@ -1860,8 +2158,396 @@
   setInterval(()=>{
     const reqs=KR.loadRequests();
     const sig=reqs.map(r=>r.token+':'+r.files.length+':'+r.status).join('|');
-    if(sig!==lastSig){ lastSig=sig; if(view==='manage') renderManage(); else if(view==='received') renderReceived(false); updateCount(); }
+    if(sig!==lastSig){ lastSig=sig; if(view==='manager') renderManage(); else if(view==='received') renderReceived(false); updateCount(); }
   },4000);
+
+  // ================= FORM STUDIO (gear popup) =================
+  // A polished builder + settings panel layered over the create form. Its
+  // controls read/write the SAME underlying form inputs (createTypes,
+  // fMaxTotal, fExpiry, fPw…, fNotify, fThanks) plus the studio-only state
+  // declared above, so creating / editing a request "just works".
+
+  // ---- trilingual strings (he full, en full, ru → en fallback) ----
+  const STUDIO={
+    studioTitle:{he:'מעצב הטופס',en:'Form studio'},
+    studioSub:{he:'הוסיפו שדות, הגדירו והעצבו את טופס ההעלאה',en:'Add fields, configure and design your upload form'},
+    done:{he:'סיום',en:'Done'},
+    autosave:{he:'השינויים נשמרים אוטומטית',en:'Changes are saved automatically'},
+    navBuild:{he:'בנייה',en:'Build'}, navSettings:{he:'הגדרות',en:'Settings'}, navDesign:{he:'מראה',en:'Appearance'},
+    secComponents:{he:'רכיבי בנייה',en:'Building blocks'}, secComponentsSub:{he:'לחצו על רכיב כדי להוסיף אותו לטופס שהלקוח ימלא.',en:'Click a block to add it to the form your client fills in.'},
+    secLanguage:{he:'שפת הטופס',en:'Form language'}, secLanguageSub:{he:'באיזו שפה יראה הלקוח את טופס ההעלאה.',en:'The language your client sees the upload form in.'},
+    secRecipients:{he:'נמענים',en:'Recipients'}, secRecipientsSub:{he:'לאן יישלחו התראות על קבצים חדשים.',en:'Where notifications about new files are sent.'},
+    secFiles:{he:'קבצים',en:'Files'}, secFilesSub:{he:'אילו קבצים אפשר להעלות ומה המגבלות.',en:'What can be uploaded and the limits.'},
+    secSecurity:{he:'אבטחה',en:'Security'}, secSecuritySub:{he:'סיסמה, תוקף ופרטים שנדרשים מהלקוח.',en:'Password, expiry and details required from the client.'},
+    secNotifications:{he:'התראות',en:'Notifications'}, secNotificationsSub:{he:'מתי ואיך נעדכן אתכם.',en:'When and how we notify you.'},
+    secAfter:{he:'לאחר העלאה',en:'After upload'}, secAfterSub:{he:'מה יראה הלקוח כשיסיים להעלות.',en:'What the client sees once the upload is done.'},
+    secDesign:{he:'עיצוב',en:'Design'}, secDesignSub:{he:'צבעים, גרדיאנט, פונט ורוחב — התצוגה בצד מתעדכנת בזמן אמת.',en:'Colours, gradient, font and width — the preview updates live.'},
+    grpStructure:{he:'מבנה ועיצוב',en:'Structure & layout'}, grpBasic:{he:'שדות בסיסיים',en:'Basic fields'}, grpChoice:{he:'שדות בחירה',en:'Choice fields'},
+    cHeading:{he:'כותרת מקטע',en:'Section heading'}, cParagraph:{he:'פסקת טקסט',en:'Text paragraph'}, cDivider:{he:'מפריד',en:'Divider'},
+    cText:{he:'שדה טקסט',en:'Text field'}, cTextarea:{he:'טקסט רב־שורות',en:'Long text'}, cEmail:{he:'כתובת אימייל',en:'Email address'},
+    cNumber:{he:'שדה מספרי',en:'Number field'}, cUrl:{he:'כתובת URL',en:'URL'}, cDate:{he:'בחירת תאריך',en:'Date picker'},
+    cRadio:{he:'אפשרות בודדת',en:'Single choice'}, cCheckbox:{he:'אפשרויות מרובות',en:'Multiple choice'}, cSelect:{he:'רשימה נפתחת',en:'Dropdown'}, cRecipient:{he:'בחירת נמען',en:'Recipient picker'},
+    def_heading:{he:'כותרת חדשה',en:'New heading'}, def_paragraph:{he:'טקסט הסבר קצר ללקוח…',en:'A short explanation for the client…'}, def_divider:{he:'',en:''},
+    def_text:{he:'שדה טקסט',en:'Text field'}, def_textarea:{he:'הערות',en:'Notes'}, def_email:{he:'אימייל',en:'Email'}, def_number:{he:'מספר',en:'Number'}, def_url:{he:'קישור',en:'Link'}, def_date:{he:'תאריך',en:'Date'},
+    def_radio:{he:'בחירה אחת',en:'Choose one'}, def_checkbox:{he:'בחירה מרובה',en:'Choose several'}, def_select:{he:'בחירה מרשימה',en:'Pick from a list'}, def_recipient:{he:'בחירת נמען',en:'Choose a recipient'},
+    ph_text:{he:'טקסט',en:'Text'}, ph_textarea:{he:'טקסט חופשי…',en:'Free text…'}, ph_email:{he:'name@email.com',en:'name@email.com'}, ph_number:{he:'0',en:'0'}, ph_url:{he:'https://…',en:'https://…'}, ph_date:{he:'dd / mm / yyyy',en:'dd / mm / yyyy'}, ph_radio:{he:'בחירה אחת',en:'One choice'}, ph_checkbox:{he:'בחירה מרובה',en:'Several choices'}, ph_select:{he:'בחר/י מהרשימה…',en:'Select from list…'}, ph_recipient:{he:'בחירת נמען…',en:'Choose recipient…'},
+    fieldsInForm:{he:'שדות בטופס',en:'Fields in the form'}, noFields:{he:'עדיין לא הוספתם שדות. בחרו רכיב מהרשימה למעלה.',en:'No fields yet. Pick a block above.'},
+    required:{he:'חובה',en:'Required'}, fieldLabelPh:{he:'שם השדה',en:'Field label'}, remove:{he:'הסרה',en:'Remove'},
+    clientLang:{he:'שפת טופס הלקוח',en:'Client form language'}, langAuto:{he:'אוטומטי (לפי הדפדפן של הלקוח)',en:'Automatic (client browser)'}, clientLangHint:{he:'ברירת מחדל: הטופס מזהה את שפת הלקוח לבד.',en:'By default the form detects the client language automatically.'},
+    recipientsLbl:{he:'כתובות לקבלת התראות',en:'Notification email addresses'}, recipientsHint:{he:'לכאן יגיעו התראות על קבצים חדשים. השאירו ריק כדי לשלוח לכתובת החשבון.',en:'New-file notifications go here. Leave empty to use the account address.'}, addEmail:{he:'הוספת כתובת',en:'Add address'}, emailPh:{he:'name@email.com',en:'name@email.com'},
+    allowedTypes:{he:'סוגי קבצים מותרים',en:'Allowed file types'}, allowedTypesHint:{he:'בלי בחירה — כל סוגי הקבצים מותרים.',en:'Leave empty to allow every file type.'},
+    maxTotal:{he:'גודל כולל מקסימלי',en:'Max total size'}, maxCount:{he:'מספר קבצים מקסימלי',en:'Max number of files'}, maxPerFile:{he:'גודל קובץ בודד מקסימלי',en:'Max single-file size'}, noLimit:{he:'ללא הגבלה',en:'No limit'}, filesU:{he:'קבצים',en:'files'},
+    pwProtect:{he:'הגנה בסיסמה',en:'Password protection'}, pwProtectDs:{he:'הלקוח יזין סיסמה לפני שיוכל להעלות.',en:'The client enters a password before uploading.'}, pwPh:{he:'סיסמה לקישור',en:'Link password'}, expiry:{he:'תוקף הקישור',en:'Link expiry'},
+    reqSenderName:{he:'לחייב את הלקוח למלא שם',en:'Require the client to enter a name'}, reqSenderNameDs:{he:'לא ניתן להעלות בלי למלא שם.',en:'Files can’t be uploaded without a name.'}, reqSenderEmail:{he:'לחייב את הלקוח למלא אימייל',en:'Require the client to enter an email'}, reqSenderEmailDs:{he:'לא ניתן להעלות בלי כתובת אימייל.',en:'Files can’t be uploaded without an email.'},
+    notifyMe:{he:'התראה כשמתקבלים קבצים',en:'Notify me when files arrive'}, notifyMeDs:{he:'הודעה מיידית על כל העלאה חדשה.',en:'Instant heads-up on every new upload.'},
+    browserNotif:{he:'התראות דפדפן',en:'Browser notifications'}, notifStatusOn:{he:'מאושר',en:'Enabled'}, notifStatusOff:{he:'לא מאושר',en:'Not enabled'}, notifBlocked2:{he:'חסום בדפדפן',en:'Blocked in browser'}, enable:{he:'אפשר',en:'Enable'},
+    afterMode:{he:'מה יקרה בסיום ההעלאה',en:'What happens after upload'}, afterThanks:{he:'הצגת הודעת תודה',en:'Show a thank-you message'}, afterRedirect:{he:'הפניה לכתובת אתר',en:'Redirect to a URL'}, thanksMsg:{he:'הודעת תודה',en:'Thank-you message'}, redirectUrl:{he:'כתובת להפניה',en:'Redirect URL'}, allowMore:{he:'לאפשר העלאה נוספת',en:'Allow another upload'}, allowMoreDs:{he:'הלקוח יוכל להעלות עוד קבצים אחרי הסיום.',en:'The client can upload more files after finishing.'},
+    primaryColor:{he:'צבע ראשי',en:'Primary colour'}, textColor:{he:'צבע טקסט',en:'Text colour'}, bgColor:{he:'צבע רקע',en:'Background colour'}, gradient:{he:'גרדיאנט',en:'Gradient'}, clearGradient:{he:'הסרת גרדיאנט',en:'Clear gradient'}, font:{he:'פונט',en:'Font'}, fontDefault:{he:'ברירת מחדל',en:'Default'}, width:{he:'רוחב הטופס',en:'Form width'}, widthNormal:{he:'רגיל',en:'Normal'}, widthWide:{he:'רחב',en:'Wide'}, widthCompact:{he:'צר',en:'Compact'}, resetDesign:{he:'איפוס עיצוב',en:'Reset design'}, livePreview:{he:'התצוגה בצד מתעדכנת בזמן אמת.',en:'The preview updates live.'}
+  };
+  function S(k){ const o=STUDIO[k]; if(!o) return k; return (lang==='he'?o.he:o.en) || o.he; }
+
+  const GRADIENTS={
+    green:'linear-gradient(145deg,#3b7d5a,#2f6b4a)',
+    pink:'linear-gradient(145deg,#ff6aa0,#ff4f8b)',
+    navy:'linear-gradient(145deg,#3a2f6b,#241b52)',
+    teal:'linear-gradient(145deg,#2bb6c8,#1f8fa5)',
+    violet:'linear-gradient(145deg,#7b6cf0,#6a5ae0)'
+  };
+  const DEF_ACCENT='#0091ad', DEF_INK='#1c2030', DEF_BG='#ffffff';
+
+  // ---- studio svg atoms ----
+  function svgP(d,w){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(w||2)+'" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>'; }
+  function plusMiniSvg(){ return svgP('<path d="M12 5v14M5 12h14"/>'); }
+  function xSvg(){ return svgP('<path d="M18 6 6 18M6 6l12 12"/>',2.2); }
+  function gripSvg(){ return svgP('<circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/>'); }
+  function headingSvg(){ return svgP('<path d="M6 4v16M18 4v16M6 12h12"/>'); }
+  function paraSvg(){ return svgP('<path d="M4 6h16M4 10h16M4 14h12M4 18h9"/>'); }
+  function dividerSvg(){ return svgP('<path d="M3 12h18"/><path d="M6 8l-2 4 2 4M18 8l2 4-2 4" opacity=".5"/>'); }
+  function textSvg(){ return svgP('<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 12h6"/>'); }
+  function textareaSvg(){ return svgP('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h7"/>'); }
+  function atSvg(){ return svgP('<circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.5 7.1"/>'); }
+  function hashSvg(){ return svgP('<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>'); }
+  function urlSvg(){ return svgP('<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>'); }
+  function radioSvg(){ return svgP('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5" fill="currentColor" stroke="none"/>'); }
+  function checkSqSvg(){ return svgP('<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/>'); }
+  function dropdownSvg(){ return svgP('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m8 11 4 4 4-4"/>'); }
+  function recipientSvg(){ return svgP('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/><path d="m17 4 2 2 3-4" opacity=".7"/>'); }
+  function blocksSvg(){ return svgP('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M17.5 14v7M14 17.5h7"/>'); }
+  function globeSvg(){ return svgP('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>'); }
+  function inboxSvg(){ return svgP('<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13l3.5 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/>'); }
+  function shieldSvg(){ return svgP('<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/>'); }
+  function bellSvg(){ return svgP('<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>'); }
+  function rocketSvg(){ return svgP('<path d="M5 15c-1.5 1-2 4-2 4s3-.5 4-2c.5-.8.5-2-.3-2.7-.7-.8-1.9-.8-2.7.3z"/><path d="M9 12a12 12 0 0 1 8-8c2 0 3 1 3 3a12 12 0 0 1-8 8z"/><circle cx="14.5" cy="9.5" r="1.3"/>'); }
+  function paletteSvg(){ return svgP('<path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.5 0-1.5-1-1.8-1-3 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7z"/><circle cx="8" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="10" r="1" fill="currentColor" stroke="none"/>'); }
+  function checkCircleSvg(){ return svgP('<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>'); }
+
+  const COMP_GROUPS=[
+    {t:'grpStructure', items:['heading','paragraph','divider']},
+    {t:'grpBasic', items:['text','textarea','email','number','url','date']},
+    {t:'grpChoice', items:['radio','checkbox','select','recipient']}
+  ];
+  const COMP={
+    heading:{icon:headingSvg,k:'cHeading'}, paragraph:{icon:paraSvg,k:'cParagraph'}, divider:{icon:dividerSvg,k:'cDivider'},
+    text:{icon:textSvg,k:'cText'}, textarea:{icon:textareaSvg,k:'cTextarea'}, email:{icon:atSvg,k:'cEmail'},
+    number:{icon:hashSvg,k:'cNumber'}, url:{icon:urlSvg,k:'cUrl'}, date:{icon:calSvg,k:'cDate'},
+    radio:{icon:radioSvg,k:'cRadio'}, checkbox:{icon:checkSqSvg,k:'cCheckbox'}, select:{icon:dropdownSvg,k:'cSelect'}, recipient:{icon:recipientSvg,k:'cRecipient'}
+  };
+  const STRUCT=new Set(['heading','paragraph','divider']);
+
+  const RAIL=[
+    {g:'navBuild', items:[{id:'components', icon:blocksSvg, k:'secComponents', count:()=>customFields.length}]},
+    {g:'navSettings', items:[
+      {id:'language', icon:globeSvg, k:'secLanguage'},
+      {id:'recipients', icon:inboxSvg, k:'secRecipients', count:()=>recipients.filter(x=>x&&x.trim()).length},
+      {id:'files', icon:fileSvg, k:'secFiles'},
+      {id:'security', icon:shieldSvg, k:'secSecurity'},
+      {id:'notifications', icon:bellSvg, k:'secNotifications'},
+      {id:'after', icon:rocketSvg, k:'secAfter'}
+    ]},
+    {g:'navDesign', items:[{id:'design', icon:paletteSvg, k:'secDesign'}]}
+  ];
+
+  const esc = s => KR.escapeHtml(s==null?'':String(s));
+  function commit(){ persistCreateSettings(); renderPreview(); }
+  function restructure(sec){ commit(); renderStudioRail(); showStudioSection(sec); }
+  function fieldById(id){ return customFields.filter(f=>f.id===id)[0]||null; }
+
+  function addField(type){
+    if(!COMP[type]) return;
+    customFields.push({ id:'fld'+(++fldSeq), type:type, label:S('def_'+type), required:false });
+    restructure('components');
+  }
+
+  // ---- rail + section switching ----
+  function renderStudioRail(){
+    const rail=el('studioRail'); if(!rail) return;
+    rail.innerHTML = RAIL.map(grp=>{
+      const items=grp.items.map(it=>{
+        const c = it.count ? it.count() : 0;
+        const badge = it.count && c ? `<span class="st-count">${c}</span>` : '';
+        return `<button class="st-nav${studioSection===it.id?' on':''}" data-sec="${it.id}">${it.icon()}<span>${S(it.k)}</span>${badge}</button>`;
+      }).join('');
+      return `<div class="st-glabel">${S(grp.g)}</div>${items}`;
+    }).join('');
+  }
+  function showStudioSection(id){
+    studioSection=id;
+    el('studioContent').innerHTML = buildSection(id);
+    el('studioRail').querySelectorAll('.st-nav').forEach(n=>n.classList.toggle('on', n.getAttribute('data-sec')===id));
+  }
+  function secHead(tk,sk){ return `<div class="st-sec-h">${S(tk)}</div><div class="st-sec-sub">${S(sk)}</div>`; }
+  function buildSection(id){
+    switch(id){
+      case 'components': return buildComponents();
+      case 'language': return buildLanguage();
+      case 'recipients': return buildRecipients();
+      case 'files': return buildFiles();
+      case 'security': return buildSecurity();
+      case 'notifications': return buildNotifications();
+      case 'after': return buildAfter();
+      case 'design': return buildDesign();
+    }
+    return '';
+  }
+
+  // ---- reusable studio controls ----
+  function switchHtml(act,on){ return `<label class="cl-switch"><input type="checkbox" data-act="${act}" ${on?'checked':''}><span class="cl-track"></span><span class="cl-knob"></span></label>`; }
+  function selectHtml(act,val,opts){
+    const o=opts.map(([v,l])=>`<option value="${v}" ${String(v)===String(val)?'selected':''}>${esc(l)}</option>`).join('');
+    return `<div class="cl-sel"><span class="cl-chev">${chevSvg()}</span><select class="cl-inp" data-act="${act}">${o}</select></div>`;
+  }
+  function selectField(act,label,val,opts){ return `<div class="st-field"><label class="st-flabel">${esc(label)}</label>${selectHtml(act,val,opts)}</div>`; }
+  function toggleRow(act,nm,ds,on){ return `<div class="st-toggle"><div class="st-toggle-tx"><div class="st-toggle-nm">${esc(nm)}</div>${ds?`<div class="st-toggle-ds">${esc(ds)}</div>`:''}</div>${switchHtml(act,on)}</div>`; }
+
+  // ---- section builders ----
+  function buildComponents(){
+    let h = secHead('secComponents','secComponentsSub');
+    COMP_GROUPS.forEach(g=>{
+      h+=`<div class="pal-grp"><div class="pal-grp-t">${S(g.t)}</div><div class="pal">`;
+      g.items.forEach(type=>{
+        h+=`<button class="pal-tile" data-act="add-comp" data-type="${type}"><span class="pal-ico">${COMP[type].icon()}</span><span class="pal-tx"><span class="pal-nm">${S(COMP[type].k)}</span></span><span class="pal-plus">${plusMiniSvg()}</span></button>`;
+      });
+      h+=`</div></div>`;
+    });
+    h+=`<div class="fld-head">${S('fieldsInForm')} <span class="st-count">${customFields.length}</span></div>`;
+    if(!customFields.length) h+=`<div class="fld-empty">${S('noFields')}</div>`;
+    else h+=customFields.map(fldRowHtml).join('');
+    return h;
+  }
+  function fldRowHtml(f){
+    const req = STRUCT.has(f.type) ? '' : `<label class="fld-req"><input type="checkbox" data-act="field-req" data-id="${f.id}" ${f.required?'checked':''}>${S('required')}</label>`;
+    return `<div class="fld-row" data-id="${f.id}">
+      <span class="fld-grip">${gripSvg()}</span>
+      <span class="fld-ico">${COMP[f.type].icon()}</span>
+      <input class="fld-lblinp" data-act="field-label" data-id="${f.id}" value="${esc(f.label)}" placeholder="${S('fieldLabelPh')}">
+      ${req}
+      <button class="fld-del" data-act="del-field" data-id="${f.id}" title="${S('remove')}">${trashSvg()}</button>
+    </div>`;
+  }
+  function buildLanguage(){
+    return secHead('secLanguage','secLanguageSub')+
+      `<div class="st-field"><label class="st-flabel">${S('clientLang')}</label>`+
+      selectHtml('lang', formLang, [['',S('langAuto')],['he','עברית'],['en','English'],['ru','Русский']])+
+      `<div class="st-hint">${S('clientLangHint')}</div></div>`;
+  }
+  function buildRecipients(){
+    let h = secHead('secRecipients','secRecipientsSub')+`<label class="st-flabel">${S('recipientsLbl')}</label>`;
+    recipients.forEach((e,i)=>{
+      h+=`<div class="em-row"><input class="cl-inp" dir="ltr" data-act="email-inp" data-i="${i}" value="${esc(e)}" placeholder="${S('emailPh')}"><button class="em-x" data-act="del-email" data-i="${i}" aria-label="${S('remove')}">${xSvg()}</button></div>`;
+    });
+    h+=`<button class="em-add" data-act="add-email">${plusMiniSvg()} ${S('addEmail')}</button>`;
+    h+=`<div class="st-hint">${S('recipientsHint')}</div>`;
+    return h;
+  }
+  function buildFiles(){
+    const nl=S('noLimit');
+    let h = secHead('secFiles','secFilesSub');
+    h+=`<div class="st-field"><label class="st-flabel">${S('allowedTypes')}</label><div class="typechips">`;
+    TYPE_KEYS.forEach(k=>{ const on=createTypes[k]; h+=`<span class="tchip${on?' on':''}" data-act="type-chip" data-type="${k}">${KR.FICON[k==='doc'?'doc':k]}<span>${esc(lblForType(k))}</span></span>`; });
+    h+=`</div><div class="st-hint">${S('allowedTypesHint')}</div></div>`;
+    h+=`<div class="st-row2">`+
+      selectField('maxtotal', S('maxTotal'), el('fMaxTotal').value, [[0,nl],[100,'100 MB'],[500,'500 MB'],[2000,'2 GB'],[5000,'5 GB']])+
+      selectField('maxcount', S('maxCount'), maxCount, [[0,nl],[1,'1'],[3,'3'],[5,'5'],[10,'10'],[25,'25'],[50,'50'],[100,'100']])+
+      `</div>`;
+    h+=selectField('maxfile', S('maxPerFile'), maxFileMB, [[0,nl],[25,'25 MB'],[100,'100 MB'],[500,'500 MB'],[1000,'1 GB'],[2000,'2 GB']]);
+    return h;
+  }
+  function buildSecurity(){
+    const pwOn=el('fPwToggle').checked;
+    let h = secHead('secSecurity','secSecuritySub');
+    h+=toggleRow('pw-toggle', S('pwProtect'), S('pwProtectDs'), pwOn);
+    if(pwOn) h+=`<div class="st-field"><input class="cl-inp" dir="ltr" data-act="pw-input" value="${esc(el('fPassword').value)}" placeholder="${S('pwPh')}"></div>`;
+    h+=selectField('expiry', S('expiry'), el('fExpiry').value, [[0,t.expNever],[1,t.exp1],[3,t.exp3],[7,t.exp7],[30,t.exp30]]);
+    h+=toggleRow('sender-name', S('reqSenderName'), S('reqSenderNameDs'), sender.name);
+    h+=toggleRow('sender-email', S('reqSenderEmail'), S('reqSenderEmailDs'), sender.email);
+    return h;
+  }
+  function buildNotifications(){
+    let h = secHead('secNotifications','secNotificationsSub');
+    h+=toggleRow('notify', S('notifyMe'), S('notifyMeDs'), el('fNotify').checked);
+    const perm = ('Notification'in window)? Notification.permission : 'denied';
+    const ds = perm==='granted'? S('notifStatusOn') : perm==='denied'? S('notifBlocked2') : S('notifStatusOff');
+    const ctl = perm==='granted'? `<span class="badge b-active">${S('notifStatusOn')}</span>` : perm==='denied'? '' : `<button class="em-add" data-act="notif-enable">${S('enable')}</button>`;
+    h+=`<div class="st-toggle"><div class="st-toggle-tx"><div class="st-toggle-nm">${S('browserNotif')}</div><div class="st-toggle-ds">${ds}</div></div>${ctl}</div>`;
+    return h;
+  }
+  function buildAfter(){
+    let h = secHead('secAfter','secAfterSub')+`<label class="st-flabel">${S('afterMode')}</label>`;
+    h+=`<div class="st-toggle" data-act="after-mode" data-mode="thanks"><span class="st-radio${afterUpload.mode==='thanks'?' on':''}"></span><div class="st-toggle-tx"><div class="st-toggle-nm">${S('afterThanks')}</div></div></div>`;
+    h+=`<div class="st-toggle" data-act="after-mode" data-mode="redirect"><span class="st-radio${afterUpload.mode==='redirect'?' on':''}"></span><div class="st-toggle-tx"><div class="st-toggle-nm">${S('afterRedirect')}</div></div></div>`;
+    if(afterUpload.mode==='redirect')
+      h+=`<div class="st-field"><label class="st-flabel">${S('redirectUrl')}</label><input class="cl-inp" dir="ltr" data-act="redirect" value="${esc(afterUpload.redirectUrl)}" placeholder="https://…"></div>`;
+    else
+      h+=`<div class="st-field"><label class="st-flabel">${S('thanksMsg')}</label><textarea class="cl-inp cl-ta" data-act="thanks" placeholder="${esc(t.fThanksPh)}">${esc(el('fThanks').value)}</textarea></div>`;
+    h+=toggleRow('allowmore', S('allowMore'), S('allowMoreDs'), afterUpload.allowMore);
+    return h;
+  }
+  function buildDesign(){
+    let h = secHead('secDesign','secDesignSub');
+    h+=colorRow('accent', S('primaryColor'), formTheme.accent, DEF_ACCENT);
+    h+=colorRow('ink', S('textColor'), formTheme.ink, DEF_INK);
+    h+=colorRow('bg', S('bgColor'), formTheme.bg, DEF_BG);
+    h+=`<div class="st-field"><label class="st-flabel">${S('gradient')}</label><div class="grad-row">`;
+    Object.keys(GRADIENTS).forEach(g=>{ h+=`<button class="grad-sw${formTheme.gradient===g?' on':''}" data-act="grad" data-g="${g}" style="background:${GRADIENTS[g]}" aria-label="${g}"></button>`; });
+    h+=`</div>${formTheme.gradient?`<button class="grad-clear" data-act="grad-clear">${S('clearGradient')}</button>`:''}</div>`;
+    const fonts=[['',S('fontDefault')],['Heebo','Heebo'],['Assistant','Assistant'],['Rubik','Rubik'],['Space Grotesk','Space Grotesk'],['Arial','Arial']];
+    h+=selectField('font', S('font'), formTheme.font, fonts);
+    h+=`<div class="st-field"><label class="st-flabel">${S('width')}</label><div class="seg">`;
+    [['compact','widthCompact'],['normal','widthNormal'],['wide','widthWide']].forEach(([w,k])=>{ h+=`<button data-act="seg-width" data-w="${w}" class="${(formTheme.width||'normal')===w?'on':''}">${S(k)}</button>`; });
+    h+=`</div></div>`;
+    h+=`<button class="grad-clear" data-act="theme-reset" style="margin-top:2px">${S('resetDesign')}</button>`;
+    h+=`<div class="st-hint">${S('livePreview')}</div>`;
+    return h;
+  }
+  function colorRow(key,label,val,def){
+    const v = val || def;
+    return `<div class="col-row">
+      <label class="col-sw" style="background:${v}"><input type="color" data-act="color-${key}" value="${v}"></label>
+      <div class="col-meta"><div class="col-nm">${esc(label)}</div></div>
+      <input class="cl-inp col-hex" data-act="hex-${key}" value="${esc(val||'')}" placeholder="${def}" dir="ltr" maxlength="7">
+    </div>`;
+  }
+
+  // ---- live preview sync (theme + custom fields) ----
+  function studioSyncPreview(){
+    const aside=document.querySelector('.cl-prev'); if(!aside) return;
+    const th=formTheme;
+    if(th.accent){
+      aside.style.setProperty('--pv-accent', th.accent);
+      aside.style.setProperty('--pv-accent-soft', `color-mix(in srgb, ${th.accent} 15%, transparent)`);
+      aside.style.setProperty('--pv-accent-line', `color-mix(in srgb, ${th.accent} 45%, transparent)`);
+    } else { aside.style.removeProperty('--pv-accent'); aside.style.removeProperty('--pv-accent-soft'); aside.style.removeProperty('--pv-accent-line'); }
+    if(th.ink) aside.style.setProperty('--pv-ink', th.ink); else aside.style.removeProperty('--pv-ink');
+    aside.style.background = th.bg || '';
+    aside.style.fontFamily = th.font ? `'${th.font}', var(--sans)` : '';
+    aside.setAttribute('data-w', th.width||'normal');
+    const ava=aside.querySelector('.cl-pv-ava');
+    if(ava){ if(th.gradient && GRADIENTS[th.gradient]){ ava.style.background=GRADIENTS[th.gradient]; ava.style.color='#fff'; } else { ava.style.background=''; ava.style.color=''; } }
+    const box=el('pvFields'); if(box) box.innerHTML = customFields.map(pvFieldHtml).join('');
+  }
+  function pvFieldHtml(f){
+    const lbl=esc(f.label||'');
+    if(f.type==='heading') return `<div class="pv-fld-head">${lbl}</div>`;
+    if(f.type==='paragraph') return `<div class="pv-fld-para">${lbl}</div>`;
+    if(f.type==='divider') return `<div class="pv-fld-hr"></div>`;
+    const rq = f.required ? `<span class="rq">*</span>` : '';
+    const ph = esc(S('ph_'+f.type)||'');
+    const box = f.type==='textarea' ? `<div class="pv-fld-box ta">${ph}</div>` : `<div class="pv-fld-box">${ph}</div>`;
+    return `<div><label class="pv-fld-l">${lbl}${rq}</label>${box}</div>`;
+  }
+
+  // ---- open / close ----
+  function openStudio(){
+    studioApplyChrome();
+    renderStudioRail();
+    showStudioSection(studioSection||'components');
+    el('studio').classList.add('show');
+    document.body.style.overflow='hidden';
+    const g=el('openStudio'); if(g) g.classList.add('seen');
+    try{ KR.lsSet('kr_studio_seen','1'); }catch(_){}
+  }
+  function closeStudio(){ el('studio').classList.remove('show'); document.body.style.overflow=''; }
+  function studioApplyChrome(){
+    el('stTitle').textContent=S('studioTitle');
+    el('stSub').textContent=S('studioSub');
+    el('studioDone').textContent=S('done');
+    el('studioNote').innerHTML=checkCircleSvg()+'<span>'+esc(S('autosave'))+'</span>';
+    const g=el('openStudio'); if(g) g.setAttribute('aria-label', S('studioTitle'));
+  }
+
+  // ---- colour helpers (no re-render → keep picker/field focus) ----
+  function setColor(key,val,inputEl){
+    formTheme[key]=val;
+    const row=inputEl.closest('.col-row'); if(row){ const sw=row.querySelector('.col-sw'); if(sw) sw.style.background=val; const hx=row.querySelector('.col-hex'); if(hx) hx.value=val; }
+    commit();
+  }
+  function setColorHex(key,val,inputEl){
+    val=(val||'').trim();
+    if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(val)){
+      formTheme[key]=val;
+      const row=inputEl.closest('.col-row'); if(row){ const sw=row.querySelector('.col-sw'); if(sw) sw.style.background=val; const ci=row.querySelector('input[type=color]'); if(ci) ci.value=val; }
+      commit();
+    } else if(val===''){ formTheme[key]=''; commit(); }
+  }
+
+  // ---- event delegation ----
+  function studioClick(e){
+    const b=e.target.closest('[data-act]'); if(!b) return;
+    const act=b.getAttribute('data-act');
+    if(act.indexOf('color-')===0) return;            // native colour picker → handled on input
+    if(act==='add-comp'){ addField(b.getAttribute('data-type')); return; }
+    if(act==='del-field'){ customFields=customFields.filter(f=>f.id!==b.getAttribute('data-id')); restructure('components'); return; }
+    if(act==='add-email'){ recipients.push(''); restructure('recipients'); return; }
+    if(act==='del-email'){ recipients.splice(+b.getAttribute('data-i'),1); restructure('recipients'); return; }
+    if(act==='type-chip'){ const k=b.getAttribute('data-type'); createTypes[k]=!createTypes[k]; b.classList.toggle('on',createTypes[k]); renderTypeChips(); commit(); return; }
+    if(act==='grad'){ const g=b.getAttribute('data-g'); formTheme.gradient=(formTheme.gradient===g?'':g); restructure('design'); return; }
+    if(act==='grad-clear'){ formTheme.gradient=''; restructure('design'); return; }
+    if(act==='seg-width'){ formTheme.width=b.getAttribute('data-w'); restructure('design'); return; }
+    if(act==='theme-reset'){ formTheme={accent:'',ink:'',bg:'',gradient:'',font:'',width:'normal'}; restructure('design'); return; }
+    if(act==='after-mode'){ afterUpload.mode=b.getAttribute('data-mode'); restructure('after'); return; }
+    if(act==='notif-enable'){ if('Notification'in window){ Notification.requestPermission().then(()=>{ notifyEnabled=(Notification.permission==='granted'); showStudioSection('notifications'); }); } return; }
+  }
+  function studioChange(e){
+    const b=e.target.closest('[data-act]'); if(!b) return;
+    const act=b.getAttribute('data-act');
+    switch(act){
+      case 'field-label': { const f=fieldById(b.getAttribute('data-id')); if(f){ f.label=b.value; commit(); } break; }
+      case 'field-req': { const f=fieldById(b.getAttribute('data-id')); if(f){ f.required=b.checked; commit(); } break; }
+      case 'email-inp': { recipients[+b.getAttribute('data-i')]=b.value; persistCreateSettings(); renderStudioRail(); break; }
+      case 'lang': formLang=b.value; commit(); break;
+      case 'maxtotal': el('fMaxTotal').value=b.value; commit(); break;
+      case 'maxcount': maxCount=+b.value; commit(); break;
+      case 'maxfile': maxFileMB=+b.value; commit(); break;
+      case 'expiry': el('fExpiry').value=b.value; commit(); break;
+      case 'pw-toggle': el('fPwToggle').checked=b.checked; el('fPassword').classList.toggle('hidden',!b.checked); commit(); showStudioSection('security'); break;
+      case 'pw-input': el('fPassword').value=b.value; persistCreateSettings(); break;
+      case 'notify': el('fNotify').checked=b.checked; commit(); break;
+      case 'sender-name': sender.name=b.checked; commit(); break;
+      case 'sender-email': sender.email=b.checked; commit(); break;
+      case 'thanks': el('fThanks').value=b.value; persistCreateSettings(); break;
+      case 'redirect': afterUpload.redirectUrl=b.value; persistCreateSettings(); break;
+      case 'allowmore': afterUpload.allowMore=b.checked; commit(); break;
+      case 'font': formTheme.font=b.value; commit(); break;
+      case 'color-accent': setColor('accent',b.value,b); break;
+      case 'hex-accent': setColorHex('accent',b.value,b); break;
+      case 'color-ink': setColor('ink',b.value,b); break;
+      case 'hex-ink': setColorHex('ink',b.value,b); break;
+      case 'color-bg': setColor('bg',b.value,b); break;
+      case 'hex-bg': setColorHex('bg',b.value,b); break;
+    }
+  }
+
+  el('openStudio').addEventListener('click', openStudio);
+  el('studioClose').addEventListener('click', closeStudio);
+  el('studioScrim').addEventListener('click', closeStudio);
+  el('studioDone').addEventListener('click', closeStudio);
+  el('studioRail').addEventListener('click', e=>{ const n=e.target.closest('[data-sec]'); if(n) showStudioSection(n.getAttribute('data-sec')); });
+  el('studioContent').addEventListener('click', studioClick);
+  el('studioContent').addEventListener('input', studioChange);
+  el('studioContent').addEventListener('change', studioChange);
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && el('studio').classList.contains('show')){ e.stopPropagation(); closeStudio(); } }, true);
+  studioApplyChrome();
+  if(ls('kr_studio_seen')) el('openStudio').classList.add('seen');
 
   // ---------- init ----------
   applyTheme(ls('theme')||'light');
@@ -1876,6 +2562,7 @@
     else if(initFilesToken && KR.getRequest(initFilesToken)) openReceived(initFilesToken);
     else if(initParams.get('tab')==='manage') setView('manage');
     else if(initParams.get('tab')==='create') setView('create');
+    else setView('manager');
   };
   // Cross-device: hydrate this owner's requests from the server into the local
   // mirror first (instant no-op when Supabase is unconfigured), then route.

@@ -166,7 +166,7 @@
   var HAND = "url(\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'><path d='M9 11V5.5a1.5 1.5 0 0 1 3 0V10h1V7a1.5 1.5 0 0 1 3 0v3h1V8.5a1.5 1.5 0 0 1 3 0V15a5 5 0 0 1-5 5h-3a4 4 0 0 1-3.4-1.9L4.2 13a1.6 1.6 0 0 1 2.5-2L9 13z' fill='%23111' stroke='%23fff' stroke-width='1' stroke-linejoin='round'/></svg>\") 12 4";
 
   var CSS = `
-  #a11y-root{ font-family:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif; }
+  #a11y-root{ font-family:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif; }
   #a11y-root *{ box-sizing:border-box; }
 
   /* Floating access button */
@@ -320,7 +320,7 @@
   body.a11y-line *{ line-height:2 !important; }
   body.a11y-letter *{ letter-spacing:.11em !important; word-spacing:.16em !important; }
   body.a11y-readable *:not(code):not(pre):not(kbd):not(samp){
-    font-family:'Heebo','Segoe UI',Arial,'Helvetica Neue',sans-serif !important; letter-spacing:.01em; }
+    font-family:'Rubik','Segoe UI',Arial,'Helvetica Neue',sans-serif !important; letter-spacing:.01em; }
   body.a11y-links a{ text-decoration:underline !important; text-decoration-thickness:2px !important;
     text-underline-offset:2px !important; }
   body.a11y-links a:hover, body.a11y-links a:focus{ outline:2px solid #1a56db !important; outline-offset:2px; }

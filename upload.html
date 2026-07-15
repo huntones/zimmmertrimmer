@@ -6,6 +6,9 @@
 <title>KOLKLI — Upload files</title>
 <link rel="canonical" href="https://kolkli.com/upload">
 <meta name="description" content="Upload your files securely — no account needed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -25,7 +28,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -54,40 +57,7 @@
   button{font-family:var(--sans);}
   .wrap{width:100%;max-width:1220px;margin:0 auto;padding:10px 22px 46px;}
 
-  /* ---------- minimal client top bar: language picker + brand ---------- */
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px 18px;}
-  .topbar .brand{display:flex;align-items:center;gap:9px;}
-  .topbar .brand img{height:30px;width:auto;display:block;}
-  .lang{position:relative;}
-  .langbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 13px;border-radius:999px;
-    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;font-size:13.5px;font-weight:600;
-    box-shadow:var(--shadow-sm);transition:border-color .12s,transform .08s;}
-  .langbtn:hover{border-color:var(--accent);} .langbtn:active{transform:scale(.97);}
-  .langbtn .globe{width:17px;height:17px;color:var(--accent);}
-  .langbtn .chev{width:14px;height:14px;color:var(--faint);transition:transform .18s;}
-  .lang.open .langbtn .chev{transform:rotate(180deg);}
-  .langmenu{position:absolute;top:calc(100% + 6px);inset-inline-start:0;min-width:150px;background:var(--panel);
-    border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);padding:5px;z-index:60;
-    opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .15s,transform .15s,visibility .15s;}
-  .lang.open .langmenu{opacity:1;visibility:visible;transform:none;}
-  .langmenu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;border:none;background:transparent;
-    color:var(--ink-2);cursor:pointer;font-size:13.5px;font-weight:600;text-align:start;padding:9px 11px;border-radius:8px;transition:background .12s,color .12s;}
-  .langmenu button:hover{background:var(--panel-2);color:var(--accent-dim);}
-  .langmenu button.on{color:var(--accent-dim);}
-  .langmenu button .tick{width:15px;height:15px;opacity:0;color:var(--accent);}
-  .langmenu button.on .tick{opacity:1;}
-  /* guest auth: log in + sign up so a client can open an account without leaving the upload */
-  .topbar-end{display:flex;align-items:center;gap:8px;}
-  .tb-login{display:inline-flex;align-items:center;height:38px;padding:0 15px;border-radius:999px;
-    background:var(--panel);border:1px solid var(--line);color:var(--ink-2);font-size:13.5px;font-weight:600;
-    box-shadow:var(--shadow-sm);white-space:nowrap;transition:border-color .12s;}
-  .tb-login:hover{border-color:var(--accent);}
-  .tb-signup{display:inline-flex;align-items:center;height:38px;padding:0 17px;border-radius:999px;color:#fff;
-    font-size:13.5px;font-weight:600;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.18);
-    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
-  .tb-signup:hover{filter:brightness(1.05);} .tb-signup:active{transform:translateY(1px);}
-  @media (max-width:480px){ .langbtn #langName{display:none;} }
+
 
   /* ---------- the one big card that hosts every state ---------- */
   .card{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:22px;
@@ -265,31 +235,28 @@
   .bgdec{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:radial-gradient(380px 380px at 6% 94%,rgba(124,58,237,.20),rgba(124,58,237,0) 70%),radial-gradient(320px 320px at 97% 5%,rgba(99,102,241,.13),rgba(99,102,241,0) 70%);}
   html[data-theme="dark"] .bgdec{background:radial-gradient(380px 380px at 6% 94%,rgba(160,107,255,.16),rgba(160,107,255,0) 70%),radial-gradient(320px 320px at 97% 5%,rgba(90,151,255,.12),rgba(90,151,255,0) 70%);}
 </style>
+<link rel="stylesheet" href="./header.css">
+<style>
+  /* original site header, stripped to logo + language + login/signup:
+     hide the center nav links and the mobile menu button */
+  #site-header .sh-links,#site-header .sh-menu{display:none!important;}
+
+  /* builder "client view" preview, embedded in request.html via iframe:
+     drop the page chrome and let the parent page's background show through */
+  body.preview{background:transparent;}
+  body.preview::before{display:none;}
+  body.preview #site-header{display:none;}
+  body.preview .bgdec{display:none;}
+  body.preview .wrap{padding-top:4px;}
+</style>
 </head>
 <body>
+<div id="site-header"></div>
+<script src="./header.js"></script>
 <div class="bgdec" aria-hidden="true"></div>
 <div class="wrap">
 
-  <!-- minimal top bar: language picker (start) + KOLKLI brand (end) -->
-  <header class="topbar">
-    <a class="brand" href="./" aria-label="KOLKLI"><img src="./assets/logo.png" alt="KOLKLI" width="139" height="34" decoding="async"></a>
-    <div class="topbar-end">
-    <div class="lang" id="langWrap">
-      <button class="langbtn" id="langBtn" type="button" aria-haspopup="true" aria-expanded="false">
-        <svg class="globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/></svg>
-        <span id="langName">עברית</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="langmenu" id="langMenu" role="menu">
-        <button type="button" role="menuitem" data-lang="he">עברית<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
-        <button type="button" role="menuitem" data-lang="en">English<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
-        <button type="button" role="menuitem" data-lang="ru">Русский<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
-      </div>
-    </div>
-      <a class="tb-login" href="./auth">התחברות</a>
-      <a class="tb-signup" href="./auth?mode=signup">הרשמה</a>
-    </div>
-  </header>
+
 
   <div class="card">
     <!-- loading -->
@@ -900,6 +867,17 @@
     renderFeatures(); renderFiles(); show('uploadView');
   }
 
+  // preview embed: report the document height so the parent iframe (request.html
+  // client view) always fits the form with no inner scrollbar
+  function startHeightPing(){
+    if(window.parent===window) return;
+    let last=0;
+    const send=()=>{ const h=Math.ceil(document.documentElement.scrollHeight); if(h!==last){ last=h; try{ window.parent.postMessage({type:'kolkli-upload-height', h:h}, '*'); }catch(_){ } } };
+    try{ new ResizeObserver(send).observe(document.body); }catch(_){ setInterval(send, 600); }
+    window.addEventListener('load', send);
+    send();
+  }
+
   // ---------- i18n + theme ----------
   function applyStatic(){
     document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
@@ -979,11 +957,8 @@
   el('doneList').addEventListener('click',e=>{ const b=e.target.closest('[data-dl]'); if(b) downloadSubmitted(b.getAttribute('data-dl')); });
   ['cName','cPhone','cEmail','cNote'].forEach(id=>{ const n=el(id); if(n) n.addEventListener('input',()=>{ if(!demo && token) saveDraft(); }); });
 
-  // language picker
-  const langWrap=el('langWrap'), langBtn=el('langBtn');
-  langBtn.addEventListener('click',e=>{ e.stopPropagation(); const open=langWrap.classList.toggle('open'); langBtn.setAttribute('aria-expanded', open?'true':'false'); });
-  el('langMenu').addEventListener('click',e=>{ const b=e.target.closest('[data-lang]'); if(!b) return; applyLang(b.getAttribute('data-lang')); langWrap.classList.remove('open'); langBtn.setAttribute('aria-expanded','false'); });
-  document.addEventListener('click',e=>{ if(!langWrap.contains(e.target)){ langWrap.classList.remove('open'); langBtn.setAttribute('aria-expanded','false'); } });
+  // language picker is owned by the shared site header (header.js);
+  // it calls window.__setLang on selection so the page re-renders in place.
   window.__setLang=applyLang;
 
   // ---------- init ----------
@@ -991,6 +966,18 @@
   applyLang(KR.detectLang());
   token=(location.search.match(/[?&]req=([^&]+)/)||[])[1];
   token = token? decodeURIComponent(token) : null;
+  if(/[?&]preview=/.test(location.search)){
+    // builder "client view" (embedded by request.html): render the owner's
+    // in-progress draft exactly as a client will see it. Demo semantics —
+    // nothing is stored, sending is simulated.
+    demo=true;
+    let d=null; try{ d=JSON.parse(ls('kr_client_preview')||'null'); }catch(_){}
+    req = (d && typeof d==='object') ? d : { name:'', desc:'', types:[], maxFileMB:0, maxCount:0, maxTotalMB:0, expiresAt:null, thankYou:'' };
+    document.body.classList.add('preview');
+    enterUpload();
+    startHeightPing();
+    return;
+  }
   if(!token){
     // no link → local design preview with a demo request (nothing is stored)
     demo=true;

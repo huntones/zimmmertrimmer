@@ -187,6 +187,7 @@
     return Date.now().toString(36) + Math.random().toString(36).slice(2);
   }
   function isExpired(rec, now) {
+    if (rec && rec.saved) return false; // saved files never expire (retention timer voided)
     return !!(rec && rec.expiresAt && (now || Date.now()) > rec.expiresAt);
   }
   function emit() {
@@ -205,9 +206,11 @@
     var now = Date.now();
     var keep = [];
     var drop = [];
+    var unsavedKept = 0; // only unsaved files count against the plan cap
     readMeta(owner).sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); }).forEach(function (rec) {
-      if (isExpired(rec, now) || keep.length >= lim.max) drop.push(rec);
-      else keep.push(rec);
+      if (rec.saved) { keep.push(rec); return; } // saved: kept regardless of age or cap
+      if (isExpired(rec, now) || unsavedKept >= lim.max) { drop.push(rec); return; }
+      keep.push(rec); unsavedKept++;
     });
     if (drop.length) {
       writeMeta(keep, owner);
@@ -299,6 +302,21 @@
     writeMeta(arr, owner);
     if (rec) delBlob(rec.blobKey || rec.id).catch(function () {});
     emit();
+  };
+  // Toggle a file's "saved" flag. Saved files skip the retention timer and the
+  // plan cap in prune(), so they are never auto-deleted. Returns true if changed.
+  API.setSaved = function (idValue, saved) {
+    var owner = currentOwnerId();
+    var arr = readMeta(owner);
+    var changed = false;
+    arr.forEach(function (r) {
+      if (r.id === idValue) {
+        var val = !!saved;
+        if (r.saved !== val) { r.saved = val; changed = true; }
+      }
+    });
+    if (changed) { writeMeta(arr, owner); emit(); }
+    return changed;
   };
 
   function shouldTrackPage() {

@@ -7,7 +7,7 @@
      and link references keep resolving from root, not from the current segment. -->
 <base href="/">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KOLKLI — דשבורד</title>
+<title>KOLKLI — לוח בקרה</title>
 <link rel="canonical" href="https://kolkli.com/dashboard">
 <meta name="description" content="Your KOLKLI dashboard — manage your profile, audio, video, files and transfers. See your plan, limits and current usage.">
 <style>
@@ -32,7 +32,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -111,7 +111,7 @@
   .subitem.active .dot{opacity:1;}
   .mp-tone-select{--svc:#2563eb;--svc-bg:rgba(37,99,235,.12);--svc-line:rgba(37,99,235,.42);--svc-shadow:rgba(37,99,235,.22);}
   .mp-tone-receive{--svc:#0891b2;--svc-bg:rgba(8,145,178,.12);--svc-line:rgba(8,145,178,.42);--svc-shadow:rgba(8,145,178,.22);}
-  .mp-tone-send{--svc:#f97316;--svc-bg:rgba(249,115,22,.14);--svc-line:rgba(249,115,22,.44);--svc-shadow:rgba(249,115,22,.24);}
+  .mp-tone-send{--svc:#6f3afb;--svc-bg:rgba(111,58,251,.14);--svc-line:rgba(111,58,251,.44);--svc-shadow:rgba(111,58,251,.24);}
   .mp-tone-review{--svc:#16a34a;--svc-bg:rgba(22,163,74,.13);--svc-line:rgba(22,163,74,.42);--svc-shadow:rgba(22,163,74,.22);}
   .mp-tone-all{--svc:#4f46e5;--svc-bg:rgba(79,70,229,.12);--svc-line:rgba(79,70,229,.40);--svc-shadow:rgba(79,70,229,.22);}
   .edit-tone-all{--svc:#7c3aed;--svc-bg:rgba(124,58,237,.12);--svc-line:rgba(124,58,237,.40);--svc-shadow:rgba(124,58,237,.22);}
@@ -233,7 +233,8 @@
   .storage-ring::before{content:'';position:absolute;inset:7px;border-radius:50%;background:var(--panel);}
   .storage-ring span{position:relative;font-family:var(--mono);font-size:12px;font-weight:900;color:var(--ink);}
   .storage-tx{min-width:0;display:flex;flex-direction:column;gap:1px;}
-  .storage-title{font-size:13px;font-weight:850;color:var(--ink-2);line-height:1.15;}
+  .storage-title{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:850;color:var(--ink-2);line-height:1.15;}
+  .storage-title svg{width:14px;height:14px;stroke:var(--accent);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
   .storage-line{font-size:11.5px;font-weight:650;color:var(--muted);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .storage-left{font-size:11px;color:var(--accent-dim);font-weight:800;}
   .side-plan .upg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:9px;color:#fff;border:none;cursor:pointer;
@@ -623,6 +624,15 @@
   .mp-section-title{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:2px;}
   .mp-section-title h3{margin:0;font-size:17px;font-weight:850;letter-spacing:0;}
   .mp-section-title span{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;}
+  /* count + layout toggle share the left side of the section header */
+  .mp-title-meta{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+  /* segmented card/list layout toggle — recessed track with an accent-lit active pill */
+  .mp-viewtog{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);}
+  .mp-viewtog-b{width:33px;height:29px;display:inline-flex;align-items:center;justify-content:center;padding:0;border:none;border-radius:8px;background:transparent;color:var(--faint);cursor:pointer;transition:background .15s ease,color .15s ease;}
+  .mp-viewtog-b svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .mp-viewtog-b:hover{color:var(--ink);}
+  .mp-viewtog-b.is-on{background:var(--accent-soft);color:var(--accent-dim);}
+  html[data-theme="dark"] .mp-viewtog-b.is-on{color:var(--accent);}
   .mp-clients{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
   .mp-client{display:flex;flex-direction:column;gap:14px;min-height:248px;padding:17px;border:1px solid var(--line);border-top:3px solid var(--svc-line,var(--line));border-radius:8px;background:var(--panel);box-shadow:var(--shadow-sm);}
   .mp-client-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
@@ -722,6 +732,12 @@
      (client identity on the right beside the 4-up stat panel + order number on
      the left) · client note · action buttons. */
   .mpr-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+  /* list view: a single column of full-width order rows. Each card is
+     container-query driven, so at full width it lays out in its wide row form
+     (client identity beside the stat strip) automatically. Two classes → higher
+     specificity than the responsive .mpr-list rules, so it stays single-column
+     at every breakpoint. */
+  .mpr-list.is-rows{grid-template-columns:1fr;gap:14px}
   /* Inline empty state shown when the live dashboard search matches no card. */
   .mpr-empty{grid-column:1/-1;padding:34px 18px;text-align:center;color:var(--faint);font-weight:600;font-size:14px;border:1px dashed var(--line);border-radius:16px;background:var(--panel);}
   /* Empty state shown when a "My Projects" service has no cards yet (e.g. no files for approval). */
@@ -791,7 +807,7 @@
   /* 4-up stat panel — one boxed row divided by thin hairlines · order number below */
   .mpr-statswrap{min-width:0;display:flex;flex-direction:column;gap:13px}
   /* stat row — no outer frame; cells split only by thin inner hairlines (.mpr-stat::before) */
-  .mpr-stats{--recv-frame-soft:rgba(8,145,178,.08);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-radius:14px;background:var(--panel);overflow:hidden;transition:background .12s ease}
+  .mpr-stats{--recv-frame-soft:rgba(8,145,178,.08);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-radius:14px;background:transparent;overflow:hidden;transition:background .12s ease}
   .mpr-stats:active{background:var(--recv-frame-soft)}
   html[data-theme="dark"] .mpr-stats{--recv-frame-soft:rgba(34,195,214,.10)}
   .mpr-stat{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:7px;padding:18px 8px;min-width:0}
@@ -824,12 +840,32 @@
   .mpr-link::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
   .mpr-link.on{background:var(--success-soft);color:var(--success)}
   .mpr-link.off{background:var(--danger-soft);color:var(--danger)}
+  /* ---- retention hourglass ------------------------------------------------
+     Days left until the project's files are auto-deleted, from the retention
+     the owner set at creation. Sits beside the link-status pill in the top bar.
+     The glass icon spins continuously and the chip warms toward danger as the
+     deadline nears. Saving the project cancels the countdown (hidden via the
+     .is-saved-frame rule); un-saving restores it exactly as it was. */
+  .mpr-expiry{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:999px;
+    border:1px solid transparent;background:var(--warm-soft);color:var(--warn);
+    font-size:13px;font-weight:800;line-height:1;white-space:nowrap}
+  .mpr-expiry svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+    transform-origin:50% 50%;animation:mprHourglass 3s ease-in-out infinite}
+  .mpr-expiry.is-soon{background:rgba(234,88,12,.12);color:#c2410c;border-color:rgba(234,88,12,.34)}
+  html[data-theme="dark"] .mpr-expiry.is-soon{color:#fb923c;border-color:rgba(251,146,60,.34)}
+  .mpr-expiry.is-urgent{background:var(--danger-soft);color:var(--danger);border-color:rgba(229,72,77,.42)}
+  .mpr-expiry.is-inf{background:var(--accent-soft);color:var(--accent-dim);border-color:transparent}
+  html[data-theme="dark"] .mpr-expiry.is-inf{color:var(--accent)}
+  .mpr-expiry.is-inf svg{animation:none}
+  @keyframes mprHourglass{0%,42%{transform:rotate(0)}50%,92%{transform:rotate(180deg)}100%{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){ .mpr-expiry svg{animation:none} }
+  .mpr-card.is-saved-frame .mpr-expiry{display:none}
   /* client note */
   .mpr-note{display:flex;gap:6px;align-items:baseline;color:var(--muted);font-size:12.5px;line-height:1.5;padding:0 24px}
   .mpr-note b{flex:0 0 auto;color:var(--ink-2);font-weight:850;white-space:nowrap}
   .mpr-note .t{flex:1 1 auto;min-width:0;text-align:right;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   /* action buttons */
-  .mpr-linkrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 24px 0}
+  .mpr-linkrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:14px 24px 0}
   .mpr-bottom{display:flex;flex-wrap:wrap;gap:8px;padding:12px 24px 18px;margin-top:0}
   .mpr-action{flex:1 1 auto;min-width:104px;height:42px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 16px;font-size:12.5px;font-weight:850;cursor:pointer;text-decoration:none;white-space:nowrap}
   .mpr-action svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
@@ -854,6 +890,10 @@
   /* Received-files cards adopt the "קבצים שהתקבלו" teal for their selected state
      (wash + border + ring) instead of the global purple accent. */
   .mpr-card.is-selected{background:var(--recv-sel-bg);border-color:var(--recv-sel);box-shadow:0 0 0 1.5px var(--recv-sel),var(--shadow-lg)}
+  /* When the card is selected its body takes the soft service wash
+     (--recv-sel-bg); fill the stat strip with the same tone so the formerly
+     white tile no longer reads as a white island inside the tinted card. */
+  .mpr-card.is-selected .mpr-stats{background:var(--recv-sel-bg)}
   .mp-client.is-selected{box-shadow:0 0 0 1.5px var(--accent),var(--shadow-sm)}
   /* Select ("קבצים לבחירה") cards: neutral grey top line at rest — same as the
      received-files look. The service blue only appears as the frame (border +
@@ -879,16 +919,16 @@
   .mpr-card.mp-tone-send .mpr-receive{--recv:var(--svc);--recv-bg:var(--svc-bg);--recv-bgh:var(--svc-line);--recv-line:var(--svc-line)}
   /* send card: warm-orange client badge — filled orange background + orange ring,
      replacing the shared lavender avatar so it matches the send service tone. */
-  .mpr-card.mp-tone-send .mpr-avatar{background:linear-gradient(135deg,#ffe3cc,#ffd0a8);color:#c2410c;
+  .mpr-card.mp-tone-send .mpr-avatar{background:linear-gradient(135deg,#e7ddff,#d6c6fb);color:#4a1fb0;
     box-shadow:0 0 0 1.5px var(--panel),0 0 0 3px var(--svc)}
-  html[data-theme="dark"] .mpr-card.mp-tone-send .mpr-avatar{background:linear-gradient(135deg,#3a260f,#2c1c0c);color:#fdba74}
+  html[data-theme="dark"] .mpr-card.mp-tone-send .mpr-avatar{background:linear-gradient(135deg,#241a3a,#1c1430);color:#b79cff}
   /* Sent-files (send tone) action row + link pill — warm-orange restyle of the
      shared buttons, per request: the primary "הצג קבצים שנשלחו" CTA gets an orange
      fill with white text; "שיתוף" turns orange-on-white; the "בטל שמירה" saved
      state goes gentle orange (text + soft wash + orange frame); and the active
      "קישור פעיל" pill gains a green frame. Scoped to .mp-tone-send so the teal
      receive / green review cards keep their own look. */
-  .mpr-card.mp-tone-send .mpr-action.primary{background:linear-gradient(105deg,#fb923c 0%,#f97316 100%);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(249,115,22,.28)}
+  .mpr-card.mp-tone-send .mpr-action.primary{background:linear-gradient(105deg,#8b5cfb 0%,#6f3afb 100%);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(111,58,251,.28)}
   .mpr-card.mp-tone-send .mpr-action.share{color:var(--svc);border-color:var(--svc-line);background:var(--panel)}
   /* Selection card: blue restyle of the primary CTA + "שיתוף", matching the card's
      service tone (--svc:#2563eb) — the same blue worn by the "ערוך גלריית בחירה"
@@ -912,7 +952,42 @@
   /* Selection card: "בטל שמירה" saved state goes blue (matching --svc:#2563eb),
      mirroring the send card's orange saved state, instead of the shared green. */
   .mpr-card.mp-tone-select .mpr-action.is-saved{color:var(--svc);border-color:var(--svc);background:var(--svc-bg)}
+  /* Received card: "בטל שמירה" saved state wears the exact teal of "ערוך טופס
+     העלאה" (.mpr-receive) instead of the shared green — matched in both themes. */
+  .mpr-card.mp-tone-receive .mpr-action.is-saved{color:#0891b2;border-color:rgba(8,145,178,.42);background:rgba(8,145,178,.12)}
+  html[data-theme="dark"] .mpr-card.mp-tone-receive .mpr-action.is-saved{color:#22c3d6;border-color:rgba(34,195,214,.42);background:rgba(34,195,214,.14)}
+  /* Saved: once "שמירה" is toggled on, dim the marked stat strip so the saved
+     snapshot reads as frozen/darkened. */
+  .mpr-card.is-saved-frame .mpr-statswrap{opacity:.5;filter:grayscale(.5);transition:opacity .15s ease,filter .15s ease}
   .mpr-card.mp-tone-send .mpr-link.on{border-color:var(--success)}
+
+  /* ===== Multi-select: pick several client cards and act on them together =====
+     A "בחירה מרובה" toggle in the section header opens select mode: every card
+     grows a round checkbox at the leading edge of its top bar, a bulk action bar
+     appears above the grid, and picked cards wear the service-tinted ring. */
+  .mp-selecttog{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);color:var(--muted);font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s ease,border-color .15s ease,color .15s ease}
+  .mp-selecttog svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .mp-selecttog:hover{color:var(--ink);border-color:var(--muted)}
+  .mp-selecttog.is-on{background:var(--accent-soft);color:var(--accent-dim);border-color:transparent}
+  html[data-theme="dark"] .mp-selecttog.is-on{color:var(--accent)}
+  .mpr-bulk{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 2px;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);box-shadow:var(--shadow-sm)}
+  .mpr-bulk-count{font-size:13px;font-weight:850;color:var(--accent-dim)}
+  .mpr-bulk-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .mpr-bulk .btn{border-radius:9px;font-size:12.5px;padding:8px 12px}
+  .mpr-bulk .btn[disabled]{opacity:.5;cursor:not-allowed;pointer-events:none}
+  /* Leading select checkbox on each card — hidden until select mode is on. Sized
+     to the same round check the processed-files cards use; tinted per service via
+     --recv-sel (teal/blue/green/purple) so it matches the card it belongs to. */
+  .mpr-check{display:none;flex:0 0 auto;position:relative;width:30px;height:30px;cursor:pointer;align-items:center;justify-content:center}
+  .mpr-list.is-selecting .mpr-check{display:inline-flex}
+  .mpr-check input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer}
+  .mpr-check span{width:26px;height:26px;border-radius:999px;border:1.5px solid var(--line);background:var(--panel);color:transparent;display:grid;place-items:center;box-shadow:var(--shadow-sm);transition:background .14s ease,border-color .14s ease,color .14s ease,transform .12s ease}
+  .mpr-check svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+  .mpr-check:hover span{border-color:var(--recv-sel);transform:translateY(-1px)}
+  .mpr-check input:focus-visible + span{outline:2px solid var(--recv-sel);outline-offset:2px}
+  .mpr-check input:checked + span{background:var(--recv-sel);border-color:var(--recv-sel);color:#fff;box-shadow:0 6px 16px rgba(8,145,178,.28)}
+  .mpr-card.is-picked{box-shadow:0 0 0 2px var(--recv-sel),var(--shadow-lg)}
+  .mpr-card.is-picked .mpr-bar{background:var(--recv-sel-bg)}
   /* Stat font sizes intentionally left to the shared base .mpr-stat rules so the
      select / review / send cards read exactly like the received-files cards:
      first stat 12.5px, the rest 16px, labels 10.5px. */
@@ -1033,7 +1108,7 @@
   .pf-name{flex:1;min-width:0;margin:0;font-size:14px;font-weight:500;line-height:1.3;color:var(--ink);letter-spacing:-.01em;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .pf-corner{position:relative;flex-shrink:0;display:flex;align-items:center;gap:9px;}
-  .pf-fileicon{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;background:var(--grad-soft);color:var(--accent);}
+  .pf-fileicon{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;background:var(--svc-bg,var(--grad-soft));color:var(--svc,var(--accent));}
   .pf-fileicon svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
   .pf-kebab{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .14s;}
   .pf-kebab:hover{background:var(--panel-2);color:var(--ink-2);border-color:var(--sel-line);}
@@ -1069,6 +1144,29 @@
     background:var(--accent);opacity:0;pointer-events:none;transition:opacity .12s;}
   .pf-wave:hover .pf-hover{opacity:.4;}
   .pf-total{font-family:var(--mono);font-size:13px;font-weight:800;color:var(--ink-2);}
+  /* video preview: a real <video> element with native controls; its poster is an
+     early frame seeked on load (see pfWireVideos) so a genuine still shows, not a wave */
+  .pf-video{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;
+    background:#0b0d16;border:1px solid var(--line-2);}
+  .pf-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0b0d16;display:block;}
+  .pf-video-ph{position:absolute;inset:0;display:none;place-items:center;background:var(--grad-soft);color:var(--accent);}
+  .pf-video-ph svg{width:44px;height:44px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+  .pf-video.is-empty .pf-video-ph{display:grid;}
+  .pf-video.is-empty video{visibility:hidden;}
+  /* Video section: the film / format tiles follow the blue video tone (--svc)
+     instead of the default purple accent — matching the blue sidebar, corner
+     file-icon and empty state. Scoped to video so audio/images/docs keep theirs. */
+  .edit-tone-video .pf-video-ph{background:var(--svc-bg);color:var(--svc);}
+  .edit-tone-video .pf-pill.primary{background:var(--svc-bg);color:var(--svc);}
+  /* image preview: the real picture loaded from the stored file (see pfWireImages),
+     so an image card shows an actual thumbnail rather than just a format/size badge */
+  .pf-image{position:relative;width:100%;height:96px;border-radius:12px;overflow:hidden;
+    background:var(--grad-soft);border:1px solid var(--line-2);}
+  .pf-image img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--grad-soft);display:block;}
+  .pf-image-ph{position:absolute;inset:0;display:none;place-items:center;background:var(--grad-soft);color:var(--accent);}
+  .pf-image-ph svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+  .pf-image.is-empty .pf-image-ph{display:grid;}
+  .pf-image.is-empty img{visibility:hidden;}
   /* footer actions */
   .pf-divider{height:1px;background:var(--line-2);margin-top:18px;}
   .pf-foot{display:flex;align-items:center;justify-content:center;gap:12px;padding-top:15px;flex-wrap:wrap;direction:ltr;}
@@ -1081,6 +1179,21 @@
   .pf-fbtn.download:hover{filter:brightness(1.05);background:var(--grad-btn);}
   .pf-fbtn.delete{color:var(--danger);}
   .pf-fbtn.delete:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  /* footer save toggle: neutral until saved, then a filled "kept" (green) state */
+  .pf-fbtn.save:hover{border-color:var(--success);color:var(--success-dim);background:var(--success-soft);}
+  .pf-fbtn.save.is-saved{border-color:var(--success);color:#fff;background:var(--success);}
+  .pf-fbtn.save.is-saved:hover{background:var(--success-dim);border-color:var(--success-dim);color:#fff;}
+  /* top-left delete corner: icon-only, danger-tinted on hover */
+  .pf-del-corner{flex-shrink:0;width:34px;height:34px;padding:0;border-radius:10px;display:grid;place-items:center;
+    border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;transition:all .14s;}
+  .pf-del-corner svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .pf-del-corner:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .pf-card.pf-selecting .pf-item .pf-del-corner{display:none;} /* select mode uses the leading checkbox + bulk delete */
+  /* retention hourglass chip (amber countdown); when saved it is greyed and struck diagonally */
+  .pf-keep{position:relative;background:var(--warm-soft);color:var(--warn);}
+  .pf-keep.is-saved{background:var(--panel-2);color:var(--muted);}
+  .pf-keep.is-saved::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:linear-gradient(to top right, transparent calc(50% - 1px), currentColor calc(50% - 1px), currentColor calc(50% + 1px), transparent calc(50% + 1px));}
   /* image / document variant — no transport row (no `player` markup is emitted) */
   /* responsive column count handled below: 2-up ≤1150px, 1-up ≤900px */
   @media(max-width:560px){ .pf-foot .pf-fbtn{flex:1 1 auto;} }
@@ -1536,7 +1649,7 @@
       menu:'תפריט',
       adminPanel:'ניהול (אדמין)',
       hi:function(n){ return 'שלום, '+n+' 👋'; },
-      welcomeSub:'ברוכים הבאים לדשבורד של KOLKLI — כאן מנהלים את החשבון, הקבצים והמנוי שלכם.',
+      welcomeSub:'ברוכים הבאים ללוח הבקרה של KOLKLI — כאן מנהלים את החשבון, הקבצים והמנוי שלכם.',
       guestNote:'אתם צופים במצב אורח. ', guestSignin:'התחברו כדי לשמור ולסנכרן את הנתונים שלכם.',
       /* my account */
       yourPlan:'המנוי הפעיל שלך',
@@ -1922,6 +2035,7 @@
     check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
     user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/>',
     grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
+    rows:'<rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/>',
     users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
     copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
     music:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
@@ -1933,6 +2047,7 @@
     inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
     chev:'<polyline points="6 9 12 15 18 9"/>',
     check:'<polyline points="20 6 9 17 4 12"/>',
+    cloud:'<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
     zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
     crown:'<path d="M2 7l4.5 4L12 4l5.5 7L22 7l-2 12H4L2 7z"/>',
     drive:'<line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/>',
@@ -1990,7 +2105,8 @@
     openext:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
     archive:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>',
     eye:'<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>',
-    lock:'<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
+    lock:'<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    infinity:'<path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z"/>'
   };
   var PLAN_ICON = { free:'zap', creator:'crown', studio:'shield' };
 
@@ -2252,7 +2368,7 @@
           (user.email ? '<span class="dash-acct-mail">'+esc(user.email)+'</span>' : '')+'</span>'+
         '</div>'+
         '<div class="dash-acct-sep"></div>'+
-        '<button class="dash-acct-item" type="button" role="menuitem" data-dash-view="account">'+s(ICON.grid)+'<span>'+esc(({he:'דשבורד',en:'Dashboard',ru:'Дашборд'})[lang]||'Dashboard')+'</span></button>'+
+        '<button class="dash-acct-item" type="button" role="menuitem" data-dash-view="account">'+s(ICON.grid)+'<span>'+esc(({he:'לוח בקרה',en:'Dashboard',ru:'Дашборд'})[lang]||'Dashboard')+'</span></button>'+
         '<a class="dash-acct-item" role="menuitem" href="account-settings">'+s(ICON.gear)+'<span>'+esc(dashTopLabel('settings',t.settingsTitle))+'</span></a>'+
         acctLangSwitchHtml()+
         '<div class="dash-acct-sep"></div>'+
@@ -2398,10 +2514,10 @@
   }
   function storageText(){
     return ({
-      he:{ title:'STORAGE', used:'נוצל', of:'מתוך', left:'נותר' },
-      en:{ title:'STORAGE', used:'Used', of:'of', left:'Left' },
-      ru:{ title:'STORAGE', used:'Used', of:'of', left:'Left' }
-    })[lang] || { title:'STORAGE', used:'Used', of:'of', left:'Left' };
+      he:{ title:'אחסון בענן', used:'נוצל', of:'מתוך', left:'נותר' },
+      en:{ title:'Cloud Storage', used:'Used', of:'of', left:'Left' },
+      ru:{ title:'Облачное хранилище', used:'Used', of:'of', left:'Left' }
+    })[lang] || { title:'Cloud Storage', used:'Used', of:'of', left:'Left' };
   }
   function fmtStorageGB(gb){
     if(gb===INF) return '∞';
@@ -2421,7 +2537,7 @@
     var p=storagePctRaw(used,total), left=(total===INF?INF:Math.max(0,total-used)), st=storageText();
     return '<div class="storage-chip" title="'+esc(st.used+' '+fmtStorageGB(used)+' '+st.of+' '+fmtStorageGB(total))+'">'+
       '<span class="storage-ring" style="--p:'+p+'"><span>'+p+'%</span></span>'+
-      '<span class="storage-tx"><span class="storage-title">'+esc(st.title)+'</span>'+
+      '<span class="storage-tx"><span class="storage-title">'+s(ICON.cloud)+esc(st.title)+'</span>'+
       '<span class="storage-line">'+esc(st.used+' '+fmtStorageGB(used)+' '+st.of+' '+fmtStorageGB(total))+'</span>'+
       '<span class="storage-left">'+esc(st.left+' '+fmtStorageGB(left))+'</span></span>'+
     '</div>';
@@ -2658,6 +2774,7 @@
     }
   };
   var AI_TOOLS = [
+    {ic:'film',he:'יצירת סרטון שיווקי AI',en:'AI Marketing Video',ru:'AI Marketing Video',dhe:'הופך תמונות וטקסט לסרטון שיווקי ממותג.',den:'Turn photos into a branded promo video.',dru:'Turn photos into a branded promo video.',href:'ai-marketing-video',demo:true},
     {ic:'sparkles',he:'הסרת רקע AI',en:'AI Remove Background',ru:'AI Remove Background',dhe:'מסיר רקע מתמונות בלחיצה, עם קצוות נקיים.',den:'Erase image backgrounds in a click.',dru:'Erase image backgrounds in a click.',href:'remove-bg',demo:true},
     {ic:'music',he:'ניקוי אודיו AI',en:'AI Audio Cleanup',ru:'AI Audio Cleanup',dhe:'מסיר רעשי רקע והדים מכל הקלטה.',den:'Remove noise and enhance voice.',dru:'Remove noise and enhance voice.',href:'ai-audio-cleanup',demo:true},
     {ic:'text',he:'יצירת כתוביות AI',en:'AI Subtitles',ru:'AI Subtitles',dhe:'מתמלל וידאו ואודיו לכתוביות מסונכרנות.',den:'Auto transcript and captions.',dru:'Auto transcript and captions.',href:'subtitle-generator',demo:true},
@@ -2692,7 +2809,7 @@
       {ic:'minimize',he:'דחיסת אודיו',en:'Compress Audio',ru:'Сжать аудио',dhe:'קובץ אודיו קטן יותר',den:'Smaller audio files',dru:'Уменьшение аудио',href:'compress-audio'},
       {ic:'sparkles',he:'ניקוי אודיו AI',en:'AI Audio Cleanup',ru:'AI очистка аудио',dhe:'הסרת רעש ושיפור קול',den:'Remove noise and enhance voice',dru:'Удаление шума',href:'ai-audio-cleanup'}
     ]},
-    { icon:'camera', he:'תמונות', en:'Images', ru:'Изображения', tools:[
+    { icon:'image', he:'תמונות', en:'Images', ru:'Изображения', tools:[
       {ic:'image',he:'שינוי גודל',en:'Resize Image',ru:'Изменить размер',dhe:'שינוי מידות מהיר',den:'Change dimensions fast',dru:'Изменение размеров',href:'resize-image'},
       {ic:'crop',he:'חיתוך תמונה',en:'Crop Image',ru:'Обрезать изображение',dhe:'חיתוך ויישור',den:'Crop and straighten',dru:'Обрезка и выравнивание',href:'crop-image'},
       {ic:'sparkles',he:'הסרת רקע',en:'Remove Background',ru:'Удалить фон',dhe:'הסרה בקליק אחד',den:'One-click cutout',dru:'Удаление фона',href:'remove-bg'},
@@ -3040,9 +3157,9 @@
       { client:'Ron Studio', email:'hello@ronstudio.com', phone:'077-3301920', title:'Wedding Raw Files', _ts:Date.parse('2026-07-09'), f1:'42 files', l1:'Received', f2:'8.6 GB', l2:'Total size', f3:'18/07/2026', l3:'Expires', note:'Incoming files are shown only inside Receive Files.', status:'Active request' }
     ],
     send:[
-      { client:'Daniel Smith', email:'daniel.smith@email.com', phone:'054-2210148', link:'https://kolkli.com/d/SND-24061985', title:'Final Event Delivery', _ts:Date.parse('2026-07-03'), _new:true, f1:'32 files', l1:'Sent', f2:'4 downloads', l2:'Activity', f3:'4.2 GB', l3:'Total size', note:'Final files were sent from the workspace to the client.', status:'Delivered' },
-      { client:'Moran Halevi', email:'moran@email.com', phone:'052-6640912', link:'https://kolkli.com/d/SND-24061986', title:'Edited Portraits Pack', _ts:Date.parse('2026-06-28'), f1:'14 files', l1:'Sent', f2:'1 download', l2:'Activity', f3:'860 MB', l3:'Total size', note:'Transfer package contains edited images only.', status:'Downloaded' },
-      { client:'Studio North', email:'team@studionorth.com', phone:'077-2298400', link:'https://kolkli.com/d/SND-24061987', title:'Commercial Cut Exports', _ts:Date.parse('2026-06-25'), f1:'9 files', l1:'Sent', f2:'0 downloads', l2:'Activity', f3:'540 MB', l3:'Total size', note:'Outgoing delivery stays separate from received uploads.', status:'Link active' }
+      { client:'Daniel Smith', email:'daniel.smith@email.com', phone:'054-2210148', link:'https://kolkli.com/d/SND-24061985', title:'Final Event Delivery', _ts:Date.parse('2026-07-03'), _new:true, f1:'32 files', l1:'Sent', f2:'4', l2:'Downloads', f3:'4.2 GB', l3:'Total size', note:'Final files were sent from the workspace to the client.', status:'Delivered' },
+      { client:'Moran Halevi', email:'moran@email.com', phone:'052-6640912', link:'https://kolkli.com/d/SND-24061986', title:'Edited Portraits Pack', _ts:Date.parse('2026-06-28'), f1:'14 files', l1:'Sent', f2:'1', l2:'Downloads', f3:'860 MB', l3:'Total size', note:'Transfer package contains edited images only.', status:'Downloaded' },
+      { client:'Studio North', email:'team@studionorth.com', phone:'077-2298400', link:'https://kolkli.com/d/SND-24061987', title:'Commercial Cut Exports', _ts:Date.parse('2026-06-25'), f1:'9 files', l1:'Sent', f2:'0', l2:'Downloads', f3:'540 MB', l3:'Total size', note:'Outgoing delivery stays separate from received uploads.', status:'Link active' }
     ],
     review:[
       { client:'Daniel Smith', email:'daniel.smith@email.com', phone:'054-2210148', link:'https://kolkli.com/v/RVW-3310', title:'Event Highlights Review', _ts:Date.parse('2026-07-02'), _new:true, f1:'16 files', l1:'Materials', f2:'3 comments', l2:'Feedback', f3:'180 MB', l3:'Total size', note:'Materials were sent to the client for comments and approval.', status:'Waiting approval' },
@@ -3067,7 +3184,7 @@
       label:{
         'Gallery':'גלריה', 'Chosen':'נבחרו', 'Link sent':'קישור נשלח', 'Updated':'עודכן',
         'Received':'התקבלו', 'Total size':'נפח כולל', 'Expires':'תפוגה', 'Created':'נוצר', 'Created on':'תאריך יצירה',
-        'Sent':'נשלחו', 'Activity':'פעילות', 'Sent on':'תאריך שליחה',
+        'Sent':'נשלחו', 'Activity':'פעילות', 'Downloads':'הורדות', 'Sent on':'תאריך שליחה',
         'Materials':'חומרים', 'Feedback':'משוב', 'Shared on':'תאריך יצירה'
       },
       unit:{ files:'קבצים', selected:'נבחרו', download:'הורדה', downloads:'הורדות', comment:'הערה', comments:'הערות' },
@@ -3113,7 +3230,7 @@
       label:{
         'Gallery':'Галерея', 'Chosen':'Выбрано', 'Link sent':'Ссылка отправлена', 'Updated':'Обновлено',
         'Received':'Получено', 'Total size':'Общий размер', 'Expires':'Истекает', 'Created':'Создано', 'Created on':'Дата создания',
-        'Sent':'Отправлено', 'Activity':'Активность', 'Sent on':'Дата отправки',
+        'Sent':'Отправлено', 'Activity':'Активность', 'Downloads':'Загрузки', 'Sent on':'Дата отправки',
         'Materials':'Материалы', 'Feedback':'Отзывы', 'Shared on':'Дата отправки'
       },
       unit:{ files:'файлов', selected:'выбрано', download:'загрузка', downloads:'загрузок', comment:'комментарий', comments:'комментариев' },
@@ -3184,6 +3301,32 @@
     requestAnimationFrame(function(){ wrap.classList.add('show'); wrap.querySelector('.kc-ok').focus(); });
   }
   function projMyProjectsText(){ var m=projL10n(); return m ? m.myProjects : 'MY PROJECTS'; }
+  // ---- My Projects layout toggle: card grid (default, 3-up) ↔ single-column
+  // list of wide rows. The choice is persisted so it survives view switches,
+  // reloads and re-login. viewProjects() reads projViewMode() to seed the
+  // .mpr-list modifier class and the active toggle button; wireMain() flips both
+  // live on click without a full re-render (keeps card selection + scroll).
+  var PROJ_VIEW_KEY='kolkli_projects_view';
+  function projViewMode(){ return lsGet(PROJ_VIEW_KEY)==='list' ? 'list' : 'grid'; }
+  function setProjViewMode(m){ lsSet(PROJ_VIEW_KEY, m==='list' ? 'list' : 'grid'); }
+  function projViewToggleText(){
+    var d={
+      he:{ grid:'תצוגת כרטיסיות', list:'תצוגת רשימה' },
+      en:{ grid:'Card view', list:'List view' },
+      ru:{ grid:'Карточки', list:'Список' }
+    };
+    return d[lang] || d.en;
+  }
+  function projViewToggleHtml(){
+    var mode=projViewMode(), tt=projViewToggleText();
+    function btn(m,icon){
+      var on=mode===m;
+      return '<button type="button" class="mp-viewtog-b'+(on?' is-on':'')+'" data-projview-mode="'+m+'"'+
+        ' aria-pressed="'+(on?'true':'false')+'" title="'+esc(tt[m])+'" aria-label="'+esc(tt[m])+'">'+s(icon)+'</button>';
+    }
+    return '<div class="mp-viewtog" role="group" aria-label="'+esc(tt.list)+' / '+esc(tt.grid)+'">'+
+      btn('grid', ICON.grid)+btn('list', ICON.rows)+'</div>';
+  }
   function projCardsCountText(n){ var m=projL10n(); return n+' '+(m ? m.clientCards : 'CLIENT CARDS'); }
   function svcText(key,field){ var m=projL10n(); return (m&&m.svc[key]&&m.svc[key][field]) || (PROJECT_SERVICES[key]||{})[field] || ''; }
   function projLabel(str){ var m=projL10n(); return (m&&m.label[str]) || str; }
@@ -3279,7 +3422,7 @@
           link:'upload?req='+encodeURIComponent(r.token),
           f1:files.length+' files', l1:'Received', f2:(window.KR?KR.fmtBytes(bytes):fmtDashBytes(bytes)), l2:'Total size',
           f3:riExpiry(r)||projectDate(r.createdAt), l3:r.expiresAt?'Expires':'Created', note:r.desc||sub.note||'Files received from the client through a request link.',
-          status:riStatusLabel(riStatus(r)), linkStatus:riStatus(r), fileStage:riFileStage(r), filesCount:files.length, filesHref:'request?tab=manage&files='+encodeURIComponent(r.token), editHref:'request?edit='+encodeURIComponent(r.token),
+          status:riStatusLabel(riStatus(r)), linkStatus:riStatus(r), fileStage:riFileStage(r), filesCount:files.length, zipDownloads:Number(r.zipDownloads)||0, filesHref:'request?tab=manage&files='+encodeURIComponent(r.token), editHref:'request?edit='+encodeURIComponent(r.token),
           avatar:sub.avatar||r.clientAvatar||r.avatar||'', _ts:Number(r.createdAt)||0, _new:true,
           projectNumberText:projectNumberText('receive',r), projectNumber:r.projectNumber };
       });
@@ -3287,7 +3430,7 @@
       var sends=ensureProjectNumbers('send', readOwnArray('kolkli_send_links'), function(list){ lsSetOwn('kolkli_send_links', JSON.stringify((list||[]).slice(0,100))); });
       cards=sends.slice(0,3).map(function(x,i){
         return { client:x.client||('Client '+(i+1)), email:x.email||'', phone:x.phone||'', link:x.url||x.link||(x.token?('download?t='+encodeURIComponent(x.token)):''), title:x.name||('Sent package '+(i+1)),
-          f1:(x.files||0)+' files', l1:'Sent', f2:(x.downloads||0)+' downloads', l2:'Activity',
+          f1:(x.files||0)+' files', l1:'Sent', f2:''+(x.downloads||0), l2:'Downloads',
           f3:(window.KR?KR.fmtBytes(x.bytes):fmtDashBytes(x.bytes)), l3:'Total size', note:'Files sent from your workspace to the client.', status:x.downloads?'Downloaded':'Link active',
           avatar:x.clientAvatar||x.avatar||'', token:x.token, _ts:Number(x.createdAt)||0, _new:true,
           projectNumberText:projectNumberText('send',x), projectNumber:x.projectNumber };
@@ -3418,6 +3561,59 @@
       card.f1, card.f2, card.f3, card.l1, card.l2, card.l3
     ]).join(' '));
   }
+  // ---- Retention countdown -------------------------------------------------
+  // Days left until a project's files are auto-deleted, from the retention the
+  // owner picked at creation. Site convention (see send.html / request.html):
+  // card.expiresAt is an absolute ms timestamp and 0 means "keep forever".
+  // Cards with no wired expiry fall back to a 30-day window from their creation
+  // date (_ts / createdAt) so the countdown is still shown for demo data.
+  var PROJ_DEFAULT_RETENTION_DAYS = 30;
+  function projExpiryInfo(card){
+    var exp = card.expiresAt;
+    if(exp === 0 || card.retention === 'never' || card.retention === 0) return { unlimited:true };
+    if(typeof exp !== 'number' || !isFinite(exp) || exp <= 0){
+      var created = (typeof card._ts==='number' && card._ts)
+        || (typeof card.createdAt==='number' && card.createdAt)
+        || Date.now();
+      exp = created + PROJ_DEFAULT_RETENTION_DAYS*86400000;
+    }
+    var days = Math.ceil((exp - Date.now())/86400000);
+    if(days < 0) days = 0;
+    return { unlimited:false, days:days, expiresAt:exp };
+  }
+  // Hebrew phrasing: "נותרו N ימים" · "נותרו יומיים" · "נותר יום אחד" · "פג היום".
+  function projExpiryLabel(days){
+    if(days >= 3) return 'נותרו '+days+' ימים';
+    if(days === 2) return 'נותרו יומיים';
+    if(days === 1) return 'נותר יום אחד';
+    return 'פג היום';
+  }
+  // Animated-hourglass retention chip for a project card's top bar. Carries its
+  // absolute expiry on data-expires-at so projExpiryTick can refresh it in place.
+  function projExpiryHtml(card){
+    var info = projExpiryInfo(card);
+    if(info.unlimited){
+      return '<span class="mpr-expiry is-inf" title="הקבצים נשמרים ללא הגבלת זמן">'+
+        s(ICON.infinity)+'<span class="mpr-expiry-txt">ללא תפוגה</span></span>';
+    }
+    var d = info.days;
+    var cls = d<=1 ? ' is-urgent' : d<=3 ? ' is-soon' : '';
+    return '<span class="mpr-expiry'+cls+'" data-expires-at="'+info.expiresAt+'" title="הזמן שנותר עד למחיקת הקבצים אוטומטית">'+
+      s(ICON.hourglass)+'<span class="mpr-expiry-txt">'+esc(projExpiryLabel(d))+'</span></span>';
+  }
+  // Re-tick every live retention chip across day boundaries so the countdown
+  // stays current without re-rendering the grid. Installed once.
+  function projExpiryTick(){
+    var now = Date.now();
+    document.querySelectorAll('.mpr-expiry[data-expires-at]').forEach(function(el){
+      var exp = +el.getAttribute('data-expires-at'); if(!exp) return;
+      var days = Math.ceil((exp-now)/86400000); if(days<0) days=0;
+      var txt = el.querySelector('.mpr-expiry-txt'); if(txt) txt.textContent = projExpiryLabel(days);
+      el.classList.toggle('is-urgent', days<=1);
+      el.classList.toggle('is-soon', days>1 && days<=3);
+    });
+  }
+  if(!window.__kolkliExpiryTimer){ window.__kolkliExpiryTimer = setInterval(projExpiryTick, 60000); }
   function projectReceiveHtml(card, pkey){
     var n=projectFilesCount(card), href=card.filesHref||'request?tab=manage', initials=projectInitials(card.client);
     // Top bar action edits the request: opens request.html's create form pre-filled
@@ -3435,8 +3631,9 @@
     var linkPill='<span class="mpr-link '+(linkActive?'on':'off')+'">'+(linkActive?'קישור פעיל':'קישור לא פעיל')+'</span>';
     var idText='RF-'+projNum5(card.projectNumber||'10002');
     var rk=projReadKey(card, 'receive'), newCls=(card._new && !projIsProjRead(rk))?' is-new':'';
-    return '<article class="mpr-card mp-tone-receive'+newCls+'" data-proj-key="'+esc(pkey||'')+'" data-read-key="'+esc(rk)+'" data-search="'+esc(projCardHay(card, idText))+'">'+
+    return '<article class="mpr-card mp-tone-receive'+newCls+(projIsPicked(rk)?' is-picked':'')+'" data-proj-key="'+esc(pkey||'')+'" data-read-key="'+esc(rk)+'" data-search="'+esc(projCardHay(card, idText))+'">'+
       '<header class="mpr-bar">'+
+        projCheckHtml(rk)+
         '<a class="mpr-receive" href="'+esc(editHref)+'">'+s(ICON.filepen)+'<span>ערוך טופס העלאה</span></a>'+
         '<div class="mpr-idwrap">'+
           linkPill+
@@ -3455,17 +3652,17 @@
         '<div class="mpr-statswrap">'+
           '<div class="mpr-stats">'+
             '<div class="mpr-stat">'+s(ICON.files)+'<div class="mpr-stat-txt"><b>'+n+'</b><span>סה"כ קבצים</span></div></div>'+
-            '<div class="mpr-stat">'+s(ICON.hourglass)+'<div class="mpr-stat-txt"><b class="mpr-days">עוד 5 ימים</b><span>נותרו</span></div></div>'+
+            '<div class="mpr-stat">'+s(ICON.download)+'<div class="mpr-stat-txt"><b>'+(Number(card.zipDownloads)||0)+'</b><span>הורדות</span></div></div>'+
             '<div class="mpr-stat">'+s(ICON.drive)+'<div class="mpr-stat-txt"><b dir="ltr">'+esc(card.f2||'0 B')+'</b><span>נפח כולל</span></div></div>'+
           '</div>'+
         '</div>'+
       '</div>'+
       '<div class="mpr-note"><b>נושא:</b><span class="t" dir="auto">'+esc(note)+'</span></div>'+
-      '<div class="mpr-linkrow"><span class="mpr-status st-'+esc(stage)+'">'+esc(stageLabel)+'</span>'+'<div class="mpr-order">מספר מזהה: <b>'+esc(idText)+'</b></div>'+'</div>'+
+      '<div class="mpr-linkrow"><span class="mpr-status st-'+esc(stage)+'">'+esc(stageLabel)+'</span>'+projExpiryHtml(card)+'<div class="mpr-order">מספר מזהה: <b>'+esc(idText)+'</b></div>'+'</div>'+
       '<div class="mpr-bottom">'+
         (n>0
-        ? '<a class="mpr-action primary" href="'+esc(href)+'">'+s(ICON.folder)+'הצג קבצים שהתקבלו</a>'
-        : '<button class="mpr-action primary is-disabled" type="button" disabled aria-disabled="true">'+s(ICON.folder)+'הצג קבצים שהתקבלו</button>')+
+        ? '<a class="mpr-action primary" href="'+esc(href)+'">'+s(ICON.inbox)+'הצג קבצים שהתקבלו</a>'
+        : '<button class="mpr-action primary is-disabled" type="button" disabled aria-disabled="true">'+s(ICON.inbox)+'הצג קבצים שהתקבלו</button>')+
         '<button class="mpr-action share" type="button" data-proj-share="'+esc(card.link||href)+'" data-proj-name="'+esc(card.client||'')+'">'+s(ICON.share)+'שיתוף</button>'+
         '<button class="mpr-action" type="button" data-save-project>'+s(ICON.save)+'שמירה</button>'+
       '</div>'+
@@ -3522,8 +3719,9 @@
     // keep their plain service link + badge.
     var receiveHref = (tone==='send' && card.token) ? 'send?edit='+encodeURIComponent(card.token) : svc.href;
     var receiveLabel = (tone==='send') ? 'ערוך שליחת קבצים' : svcText(tone,'badge');
-    return '<article class="mpr-card mp-tone-'+esc(tone)+newCls+'" data-proj-key="'+esc(pkey||'')+'" data-read-key="'+esc(rk)+'" data-search="'+esc(projCardHay(card, idText))+'">'+
+    return '<article class="mpr-card mp-tone-'+esc(tone)+newCls+(projIsPicked(rk)?' is-picked':'')+'" data-proj-key="'+esc(pkey||'')+'" data-read-key="'+esc(rk)+'" data-search="'+esc(projCardHay(card, idText))+'">'+
       '<header class="mpr-bar">'+
+        projCheckHtml(rk)+
         '<a class="mpr-receive" href="'+esc(receiveHref)+'">'+s(ICON[svc.icon])+'<span>'+esc(receiveLabel)+'</span></a>'+
         '<div class="mpr-idwrap">'+
           linkPill+
@@ -3546,7 +3744,7 @@
         '</div>'+
       '</div>'+
       '<div class="mpr-note"><b>נושא:</b><span class="t" dir="auto">'+esc(projNote(card.note))+'</span></div>'+
-      '<div class="mpr-linkrow">'+projStatusPillHtml(card, svc)+'<div class="mpr-order">מספר מזהה: <b>'+esc(idText)+'</b></div>'+'</div>'+
+      '<div class="mpr-linkrow">'+projStatusPillHtml(card, svc)+projExpiryHtml(card)+'<div class="mpr-order">מספר מזהה: <b>'+esc(idText)+'</b></div>'+'</div>'+
       '<div class="mpr-bottom">'+
         '<a class="mpr-action primary" href="'+esc(primaryHref)+'">'+s(ICON.folder)+esc(svcText(tone,'cta'))+'</a>'+
         copyBtn+
@@ -3605,6 +3803,67 @@
   // view) so the gray highlight follows the user across view switches and any
   // main re-render — reapplied in wireMain(). One card selected at a time.
   var selectedProjectKey=null;
+  // ---- Multi-select mode for the client cards: pick several at once and act on
+  // them together (bulk delete). Mirrors the processed-files select mode. State
+  // is keyed by the active service view (projectServiceKey), and each picked card
+  // is tracked by its data-read-key — the very key deletion persists — so a
+  // checked card maps straight to projMarkProjDeleted with no extra lookup.
+  var projSelectMode={};   // serviceKey -> true while the select bar is open
+  var projSelection={};    // serviceKey -> { readKey: true }
+  function projSelScope(){ return projectServiceKey(); }
+  function projSelBag(key){ key=key||projSelScope(); if(!projSelection[key]) projSelection[key]={}; return projSelection[key]; }
+  function projInSelectMode(key){ return !!projSelectMode[key||projSelScope()]; }
+  function projSetSelectMode(key,on){ key=key||projSelScope(); if(on){ projSelectMode[key]=true; } else { delete projSelectMode[key]; delete projSelection[key]; } }
+  function projSelectedKeys(key){ var b=projSelBag(key); return Object.keys(b).filter(function(k){ return !!b[k]; }); }
+  function projMultiText(){
+    var d={
+      he:{ enter:'בחירה מרובה', exit:'סיום בחירה', pick:'בחירת כרטיס',
+        selected:function(n){ return n+' נבחרו'; }, selectAll:'בחירת הכל', clear:'ניקוי בחירה', del:'מחיקה',
+        delTitle:function(n){ return n===1?'האם למחוק את הכרטיס?':'האם למחוק '+n+' כרטיסים?'; },
+        delBody:function(n){ return (n===1?'הכרטיס יימחק לצמיתות ולא ניתן יהיה לשחזר אותו לאחר מכן.':n+' כרטיסים יימחקו לצמיתות ולא ניתן יהיה לשחזר אותם לאחר מכן.'); },
+        delOk:'מחיקה', cancel:'ביטול', done:function(n){ return n===1?'כרטיס אחד נמחק':n+' כרטיסים נמחקו'; } },
+      en:{ enter:'Select multiple', exit:'Done', pick:'Select card',
+        selected:function(n){ return n+' selected'; }, selectAll:'Select all', clear:'Clear', del:'Delete',
+        delTitle:function(n){ return n===1?'Delete this card?':'Delete '+n+' cards?'; },
+        delBody:function(n){ return (n===1?'The card':n+' cards')+' will be permanently removed and cannot be restored later.'; },
+        delOk:'Delete', cancel:'Cancel', done:function(n){ return n===1?'1 card deleted':n+' cards deleted'; } },
+      ru:{ enter:'Выбрать несколько', exit:'Готово', pick:'Выбрать карточку',
+        selected:function(n){ return 'Выбрано: '+n; }, selectAll:'Выбрать все', clear:'Очистить', del:'Удалить',
+        delTitle:function(n){ return n===1?'Удалить карточку?':'Удалить '+n+' карточек?'; },
+        delBody:function(n){ return (n===1?'Карточка будет удалена безвозвратно и не подлежит восстановлению.':n+' карточек будут удалены безвозвратно и не подлежат восстановлению.'); },
+        delOk:'Удалить', cancel:'Отмена', done:function(n){ return n===1?'Удалена 1 карточка':'Удалено карточек: '+n; } }
+    };
+    return d[lang]||d.en;
+  }
+  // True when this card (by its read key) is currently picked in select mode —
+  // used to re-render the checked box + ring from state so a re-render (tab
+  // switch, ticking countdown) never drops the visible selection.
+  function projIsPicked(rk){ return !!(rk && projInSelectMode() && projSelBag()[rk]); }
+  // Round select checkbox injected at the leading edge of each card's top bar;
+  // stays display:none until the .mpr-list wears .is-selecting.
+  function projCheckHtml(rk){
+    var lbl=projMultiText().pick, on=projIsPicked(rk);
+    return '<label class="mpr-check" title="'+esc(lbl)+'"><input type="checkbox" data-proj-check aria-label="'+esc(lbl)+'"'+(on?' checked':'')+'><span aria-hidden="true">'+s(ICON.check)+'</span></label>';
+  }
+  // Select-mode toggle shown in the section header beside the grid/list switch.
+  function projSelectToggleHtml(key){
+    var on=projInSelectMode(key), m=projMultiText();
+    return '<button type="button" class="mp-selecttog'+(on?' is-on':'')+'" data-proj-selecttoggle aria-pressed="'+(on?'true':'false')+'">'+
+      s(on?ICON.x:ICON.pick)+'<span>'+esc(on?m.exit:m.enter)+'</span></button>';
+  }
+  // Bulk action bar above the grid — count + select-all / clear / delete.
+  function projBulkHtml(key){
+    if(!projInSelectMode(key)) return '';
+    var m=projMultiText(), none=projSelectedKeys(key).length===0;
+    return '<div class="mpr-bulk" data-proj-bulk>'+
+      '<span class="mpr-bulk-count">'+esc(m.selected(projSelectedKeys(key).length))+'</span>'+
+      '<div class="mpr-bulk-actions">'+
+        '<button class="btn ghost" type="button" data-proj-selectall>'+s(ICON.check)+esc(m.selectAll)+'</button>'+
+        '<button class="btn ghost" type="button" data-proj-clearsel'+(none?' disabled':'')+'>'+esc(m.clear)+'</button>'+
+        '<button class="btn danger" type="button" data-proj-delsel'+(none?' disabled':'')+'>'+s(ICON.trash)+esc(m.del)+'</button>'+
+      '</div>'+
+    '</div>';
+  }
   // Stable id for a card so its selected state survives re-renders. Namespaced
   // by service key (a card belongs to exactly one service view) and by index,
   // which disambiguates demo cards that can share a client/number.
@@ -3723,8 +3982,9 @@
     return '<section class="mp-shell">'+
       '<div class="mp-head"><div><h2>'+esc(projMyProjectsText())+'</h2></div>'+action+'</div>'+
       '<div class="mp-tools mp-tools-4">'+projectToolHtml(key)+'</div>'+
-      '<div class="mp-section-title"><h3>'+esc(svcText(key,'section'))+'</h3><span>'+esc(projCardsCountText(cards.length))+'</span></div>'+
-      '<div class="mpr-list">'+(cards.length ? cards.map(function(c,i){
+      '<div class="mp-section-title"><h3>'+esc(svcText(key,'section'))+'</h3><div class="mp-title-meta"><span>'+esc(projCardsCountText(cards.length))+'</span>'+(cards.length ? projSelectToggleHtml(key) : '')+projViewToggleHtml()+'</div></div>'+
+      projBulkHtml(key)+
+      '<div class="mpr-list'+(projInSelectMode(key) ? ' is-selecting' : '')+(projViewMode()==='list' ? ' is-rows' : '')+'">'+(cards.length ? cards.map(function(c,i){
         // In the combined "all" view each card carries its own service (c._svc);
         // otherwise every card belongs to the active service.
         var ck=(key==='all' && c._svc) ? c._svc : key, csvc=PROJECT_SERVICES[ck];
@@ -3749,7 +4009,12 @@
       removeConfirm:'למחוק את הקובץ מההיסטוריה?',
       share:'שיתוף', quickCopy:'העתקת קישור', play:'נגן',
       shareTitle:'שיתוף הקובץ', shareVia:'שיתוף מהיר דרך',
-      copy:'העתקה', copied:'הקישור הועתק ✓', copiedShort:'הועתק ✓', more:'עוד…', emailShare:'אימייל'
+      copy:'העתקה', copied:'הקישור הועתק ✓', copiedShort:'הועתק ✓', more:'עוד…', emailShare:'אימייל',
+      saveAct:'שמירה', savedState:'נשמר', unsaveTitle:'לחצו לביטול השמירה',
+      keepExpired:'פג התוקף', keptChip:'נשמר',
+      keepDaysTxt:function(d){ return d===1?'נותר יום אחד':(d===2?'נותרו יומיים':'נותרו '+d+' ימים'); },
+      savedToast:'הקובץ סומן לשמירה — לא יימחק אוטומטית',
+      unsavedToast:'השמירה בוטלה — הקובץ יימחק בתום התקופה'
     },
     en:{
       history:'Processed file history',
@@ -3765,7 +4030,12 @@
       removeConfirm:'Delete this file from history?',
       share:'Share', quickCopy:'Copy link', play:'Play',
       shareTitle:'Share file', shareVia:'Quick share via',
-      copy:'Copy', copied:'Link copied ✓', copiedShort:'Copied ✓', more:'More…', emailShare:'Email'
+      copy:'Copy', copied:'Link copied ✓', copiedShort:'Copied ✓', more:'More…', emailShare:'Email',
+      saveAct:'Save', savedState:'Saved', unsaveTitle:'Click to unsave',
+      keepExpired:'Expired', keptChip:'Kept',
+      keepDaysTxt:function(d){ return d===1?'1 day left':(d+' days left'); },
+      savedToast:'File saved — it won’t be auto-deleted',
+      unsavedToast:'Save removed — file will be deleted when the period ends'
     },
     ru:{
       history:'История обработанных файлов',
@@ -3781,7 +4051,12 @@
       removeConfirm:'Удалить файл из истории?',
       share:'Поделиться', quickCopy:'Копировать ссылку', play:'Воспроизвести',
       shareTitle:'Поделиться файлом', shareVia:'Быстрый доступ',
-      copy:'Копировать', copied:'Ссылка скопирована ✓', copiedShort:'Скопировано ✓', more:'Ещё…', emailShare:'Эл. почта'
+      copy:'Копировать', copied:'Ссылка скопирована ✓', copiedShort:'Скопировано ✓', more:'Ещё…', emailShare:'Эл. почта',
+      saveAct:'Сохранить', savedState:'Сохранён', unsaveTitle:'Нажмите, чтобы отменить',
+      keepExpired:'Истёк', keptChip:'Сохранён',
+      keepDaysTxt:function(d){ return d===1?'остался 1 день':('осталось '+d+' дн.'); },
+      savedToast:'Файл сохранён — не будет удалён автоматически',
+      unsavedToast:'Сохранение отменено — файл удалится по истечении срока'
     }
   };
   var PF_ACTIONS = {
@@ -3923,14 +4198,14 @@
     var cfg={
       'my-all':{ category:'all', icon:'layers', title:t.allTitle, sub:t.allSub, emptyT:t.allEmptyT, emptyP:t.allEmptyP,
         cta:{href:'app',label:t.openAll},
-        tools:[{ic:'music',href:'app',label:L({he:'אודיו',en:'Audio',ru:'Аудио'})},{ic:'film',href:'video-cut',label:L({he:'וידאו',en:'Video',ru:'Видео'})},{ic:'camera',href:'image-convert',label:L({he:'תמונות',en:'Images',ru:'Изображения'})},{ic:'files',href:'doc-convert',label:L({he:'מסמכים',en:'Documents',ru:'Документы'})}] },
+        tools:[{ic:'music',href:'app',label:L({he:'אודיו',en:'Audio',ru:'Аудио'})},{ic:'film',href:'video-cut',label:L({he:'וידאו',en:'Video',ru:'Видео'})},{ic:'image',href:'image-convert',label:L({he:'תמונות',en:'Images',ru:'Изображения'})},{ic:'files',href:'doc-convert',label:L({he:'מסמכים',en:'Documents',ru:'Документы'})}] },
       'my-audio':{ category:'audio', icon:'music', title:t.audioTitle, sub:t.audioSub, emptyT:t.audioEmptyT, emptyP:t.audioEmptyP,
         cta:{href:'app',label:t.openAudio},
         tools:[{ic:'scissors',href:'app',label:L({he:'עריכת אודיו',en:'Edit Audio',ru:'Редактор'})},{ic:'merge',href:'merge-audio',label:L({he:'מיזוג',en:'Merge',ru:'Объединить'})},{ic:'refresh',href:'convert',label:L({he:'המרה',en:'Convert',ru:'Конвертация'})},{ic:'minimize',href:'compress-audio',label:L({he:'דחיסה',en:'Compress',ru:'Сжатие'})},{ic:'zap',href:'ai-audio-cleanup',label:L({he:'ניקוי AI',en:'AI Cleanup',ru:'AI-очистка'})}] },
       'my-video':{ category:'video', icon:'film', title:t.videoTitle, sub:t.videoSub, emptyT:t.videoEmptyT, emptyP:t.videoEmptyP,
         cta:{href:'video-cut',label:t.openVideo},
         tools:[{ic:'scissors',href:'video-cut',label:L({he:'חיתוך',en:'Cut',ru:'Обрезка'})},{ic:'refresh',href:'video-convert',label:L({he:'המרה',en:'Convert',ru:'Конвертация'})},{ic:'minimize',href:'compress-video',label:L({he:'דחיסה',en:'Compress',ru:'Сжатие'})},{ic:'music',href:'mp4-to-mp3',label:L({he:'חילוץ אודיו',en:'Extract Audio',ru:'Извлечь аудио'})},{ic:'files',href:'subtitle-generator',label:L({he:'כתוביות',en:'Subtitles',ru:'Субтитры'})}] },
-      'my-images':{ category:'images', icon:'camera', title:t.imgTitle, sub:t.imgSub, emptyT:t.imgEmptyT, emptyP:t.imgEmptyP,
+      'my-images':{ category:'images', icon:'image', title:t.imgTitle, sub:t.imgSub, emptyT:t.imgEmptyT, emptyP:t.imgEmptyP,
         cta:{href:'image-convert',label:t.openImg},
         tools:[{ic:'scissors',href:'crop-image',label:L({he:'חיתוך',en:'Crop',ru:'Обрезка'})},{ic:'swap',href:'resize-image',label:L({he:'שינוי גודל',en:'Resize',ru:'Размер'})},{ic:'refresh',href:'image-convert',label:L({he:'המרה',en:'Convert',ru:'Конвертация'})},{ic:'minimize',href:'compress-image',label:L({he:'דחיסה',en:'Compress',ru:'Сжатие'})},{ic:'zap',href:'remove-bg',label:L({he:'הסרת רקע',en:'Remove BG',ru:'Удалить фон'})}] },
       'my-docs':{ category:'documents', icon:'files', title:t.docTitle, sub:t.docSub, emptyT:t.docEmptyT, emptyP:t.docEmptyP,
@@ -4056,7 +4331,8 @@
   var pfWaveObs=null;
   function pfWaveDecodeCard(card){
     var rec=pfFindRec(card.getAttribute('data-pf-id'));
-    if(rec&&pfIsMedia(rec.category||'audio')) pfEnsureRealWave(rec);
+    // Only audio gets a decoded waveform; video cards render a real <video> instead.
+    if(rec&&(rec.category||'audio')==='audio') pfEnsureRealWave(rec);
   }
   function pfWireWaveforms(host){
     var cards=host.querySelectorAll('.pf-item[data-pf-id]');
@@ -4088,6 +4364,86 @@
       // onto the freshly injected bars; otherwise leave it at rest.
       if(String(pfPlayId)===String(rec.id)) pfWaveTick();
     });
+  }
+  // ---- real video preview for video cards ----
+  // Each video card holds an empty <video>; its stored blob is loaded lazily as the
+  // card scrolls into view, then an early frame is seeked so a genuine still shows.
+  var pfVideoObs=null, pfVideoUrls=[];
+  function pfVideoFail(v){ var w=v&&v.closest('.pf-video'); if(w) w.classList.add('is-empty'); }
+  function pfVideoQuality(h){
+    return h>=2160?'2160p':h>=1440?'1440p':h>=1080?'1080p':h>=720?'720p':h>=480?'480p':h>0?h+'p':'';
+  }
+  // Replace the id-derived placeholder duration/resolution with the clip's real values.
+  function pfVideoApplyMeta(v,id){
+    var d=v.duration, q=pfVideoQuality(v.videoHeight||0);
+    pfEachCard(id,function(card){
+      if(d&&isFinite(d)){ var dur=card.querySelector('[data-pf-dur]'); if(dur) dur.textContent=pfMmss(d); }
+      if(q){ var ql=card.querySelector('[data-pf-quality]'); if(ql) ql.textContent=q; }
+    });
+  }
+  function pfLoadVideo(v){
+    if(!v||v.getAttribute('data-pf-loaded')) return;
+    var id=v.getAttribute('data-pf-video'), api=window.KolkliProcessedFiles, rec=pfFindRec(id);
+    if(!api||!api.getBlob||!rec){ pfVideoFail(v); return; }
+    v.setAttribute('data-pf-loaded','1');
+    api.getBlob(rec).then(function(blob){
+      if(!blob){ pfVideoFail(v); return; }
+      var url=URL.createObjectURL(blob); pfVideoUrls.push(url);
+      v.addEventListener('loadedmetadata',function(){
+        // Nudge to an early frame so the poster is a real still, not a black frame.
+        try{ v.currentTime=Math.min(0.3,(v.duration||1)/2); }catch(_){}
+        pfVideoApplyMeta(v,id);
+        var w=v.closest('.pf-video'); if(w) w.classList.remove('is-empty');
+      },{once:true});
+      v.addEventListener('error',function(){ pfVideoFail(v); },{once:true});
+      v.src=url;
+    }).catch(function(){ pfVideoFail(v); });
+  }
+  function pfWireVideos(host){
+    var vids=host.querySelectorAll('video[data-pf-video]');
+    if(pfVideoObs){ try{pfVideoObs.disconnect();}catch(_){} pfVideoObs=null; }
+    // Free blob URLs from a previous render — those <video> elements are gone now.
+    pfVideoUrls.forEach(function(u){ try{URL.revokeObjectURL(u);}catch(_){} }); pfVideoUrls=[];
+    if(!('IntersectionObserver' in window)){
+      Array.prototype.forEach.call(vids,pfLoadVideo);
+      return;
+    }
+    pfVideoObs=new IntersectionObserver(function(entries,obs){
+      entries.forEach(function(e){ if(e.isIntersecting){ obs.unobserve(e.target); pfLoadVideo(e.target); } });
+    },{rootMargin:'200px'});
+    Array.prototype.forEach.call(vids,function(v){ pfVideoObs.observe(v); });
+  }
+  // ---- real thumbnail preview for image cards (mirrors pfWireVideos) ----
+  // Each image card holds an empty <img>; its stored blob is loaded lazily as the
+  // card scrolls into view, so the card shows the actual picture, not just a badge.
+  var pfImageObs=null, pfImageUrls=[];
+  function pfImageFail(img){ var w=img&&img.closest('.pf-image'); if(w) w.classList.add('is-empty'); }
+  function pfLoadImage(img){
+    if(!img||img.getAttribute('data-pf-loaded')) return;
+    var id=img.getAttribute('data-pf-image'), api=window.KolkliProcessedFiles, rec=pfFindRec(id);
+    if(!api||!api.getBlob||!rec){ pfImageFail(img); return; }
+    img.setAttribute('data-pf-loaded','1');
+    api.getBlob(rec).then(function(blob){
+      if(!blob){ pfImageFail(img); return; }
+      var url=URL.createObjectURL(blob); pfImageUrls.push(url);
+      img.addEventListener('load',function(){ var w=img.closest('.pf-image'); if(w) w.classList.remove('is-empty'); },{once:true});
+      img.addEventListener('error',function(){ pfImageFail(img); },{once:true});
+      img.src=url;
+    }).catch(function(){ pfImageFail(img); });
+  }
+  function pfWireImages(host){
+    var imgs=host.querySelectorAll('img[data-pf-image]');
+    if(pfImageObs){ try{pfImageObs.disconnect();}catch(_){} pfImageObs=null; }
+    // Free blob URLs from a previous render — those <img> elements are gone now.
+    pfImageUrls.forEach(function(u){ try{URL.revokeObjectURL(u);}catch(_){} }); pfImageUrls=[];
+    if(!('IntersectionObserver' in window)){
+      Array.prototype.forEach.call(imgs,pfLoadImage);
+      return;
+    }
+    pfImageObs=new IntersectionObserver(function(entries,obs){
+      entries.forEach(function(e){ if(e.isIntersecting){ obs.unobserve(e.target); pfLoadImage(e.target); } });
+    },{rootMargin:'200px'});
+    Array.prototype.forEach.call(imgs,function(v){ pfImageObs.observe(v); });
   }
   // ---- real audio transport for media cards (play / scrub / live progress) ----
   // One shared <audio> element serves whichever card is active, so only a single
@@ -4280,16 +4636,42 @@
   }
   function pfShareLink(rec){ return 'https://kolkli.com/f/'+(String((rec&&rec.id)||'').slice(0,10)||'file'); }
 
+  // Retention countdown text: "X days left" until the file is auto-deleted.
+  function pfKeepText(rec){
+    var set=PF_TEXT[lang]||PF_TEXT.en;
+    if(!rec.expiresAt) return '';
+    var ms=rec.expiresAt-Date.now();
+    if(ms<=0) return set.keepExpired||PF_TEXT.en.keepExpired;
+    var d=Math.max(1,Math.ceil(ms/86400000));
+    return (set.keepDaysTxt||PF_TEXT.en.keepDaysTxt)(d);
+  }
+  // Hourglass chip with days-remaining. When the file is saved the countdown is
+  // void: the chip is greyed and struck with a diagonal line (see .pf-keep.is-saved).
+  function pfKeepChip(rec){
+    var saved=!!rec.saved, set=PF_TEXT[lang]||PF_TEXT.en;
+    var label=saved ? (set.keptChip||PF_TEXT.en.keptChip) : pfKeepText(rec);
+    if(!label) return '';
+    var title=saved ? (set.unsaveTitle||label) : label;
+    return '<span class="pf-pill pf-keep'+(saved?' is-saved':'')+'" title="'+esc(title)+'">'+
+      s(ICON.hourglass)+'<span>'+esc(label)+'</span></span>';
+  }
   function processedItemHtml(rec,cfg,kind){
     var selected=pfIsSelected(kind,rec.id);
-    var cat=rec.category||'audio', media=pfIsMedia(cat), name=rec.name||'processed-file';
+    var cat=rec.category||'audio', media=pfIsMedia(cat), isVideo=cat==='video', isImage=cat==='images', name=rec.name||'processed-file';
     var pills=
-      '<span class="pf-pill primary">'+s(ICON.music)+esc(pfFormatLabel(rec))+'</span>'+
+      '<span class="pf-pill primary">'+s(ICON[pfHeroIcon(cat)])+esc(pfFormatLabel(rec))+'</span>'+
       '<span class="pf-pill">'+s(ICON.drive)+esc(fmtDashBytes(rec.size))+'</span>'+
-      (media?('<span class="pf-pill">'+s(ICON.signal)+esc(pfQualityLabel(rec))+'</span>'+
-              '<span class="pf-pill">'+s(ICON.clock)+'<span data-pf-dur>'+esc(pfMmss(pfDurationSecs(rec)))+'</span></span>'):'');
-    // Transport row: play button on the left, real waveform in the middle, time on the right.
-    var player=media?(
+      (media?('<span class="pf-pill">'+s(ICON.signal)+'<span data-pf-quality>'+esc(pfQualityLabel(rec))+'</span></span>'+
+              '<span class="pf-pill">'+s(ICON.clock)+'<span data-pf-dur>'+esc(pfMmss(pfDurationSecs(rec)))+'</span></span>'):'')+
+      pfKeepChip(rec);
+    // Video: a real <video> player showing an actual frame (blob loaded lazily, see
+    // pfWireVideos). Audio: play button + real waveform + time transport.
+    var player=isVideo?(
+      '<div class="pf-video is-empty" data-pf-video-wrap>'+
+        '<video data-pf-video="'+esc(rec.id)+'" preload="metadata" controls playsinline '+
+          'aria-label="'+esc(name)+'"></video>'+
+        '<span class="pf-video-ph" aria-hidden="true">'+s(ICON.film)+'</span>'+
+      '</div>'):media?(
       '<div class="pf-wave-row">'+
         '<button class="pf-play" type="button" data-pf-play aria-label="'+esc(pfText('play'))+'">'+
           '<svg class="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'+
@@ -4305,6 +4687,11 @@
           '<span class="pf-cur">'+esc(pfClock(0))+'</span>'+
           '<span class="pf-total" data-pf-total>'+esc(pfClock(pfDurationSecs(rec)))+'</span>'+
         '</div>'+
+      '</div>'):isImage?(
+      // Image: a real thumbnail of the stored picture (blob loaded lazily, see pfWireImages).
+      '<div class="pf-image is-empty" data-pf-image-wrap>'+
+        '<img data-pf-image="'+esc(rec.id)+'" alt="'+esc(name)+'" loading="lazy" decoding="async">'+
+        '<span class="pf-image-ph" aria-hidden="true">'+s(ICON.image)+'</span>'+
       '</div>'):'';
     return '<article class="pf-item '+(media?'':'no-player ')+(selected?'is-selected':'')+'" data-pf-id="'+esc(rec.id)+'">'+
       '<label class="pf-select" title="'+esc(pfMultiText('select'))+'">'+
@@ -4314,6 +4701,7 @@
       '<div class="pf-body">'+
         '<div class="pf-main">'+
           '<div class="pf-main-head">'+
+            '<button class="pf-del-corner" type="button" data-pf-remove="'+esc(rec.id)+'" title="'+esc(pfText('remove'))+'" aria-label="'+esc(pfText('remove'))+'">'+s(ICON.trash)+'</button>'+
             '<h3 class="pf-name" dir="auto" title="'+esc(name)+'">'+esc(name)+'</h3>'+
             '<div class="pf-corner">'+
               '<span class="pf-fileicon">'+s(ICON[pfHeroIcon(cat)])+'</span>'+
@@ -4325,7 +4713,7 @@
       '</div>'+
       '<div class="pf-divider"></div>'+
       '<div class="pf-foot">'+
-        '<button class="pf-fbtn delete" type="button" data-pf-remove="'+esc(rec.id)+'">'+s(ICON.trash)+esc(pfText('remove'))+'</button>'+
+        '<button class="pf-fbtn save'+(rec.saved?' is-saved':'')+'" type="button" data-pf-save="'+esc(rec.id)+'" aria-pressed="'+(rec.saved?'true':'false')+'" title="'+esc(rec.saved?pfText('unsaveTitle'):pfText('saveAct'))+'">'+s(rec.saved?ICON.check:ICON.save)+esc(rec.saved?pfText('savedState'):pfText('saveAct'))+'</button>'+
         '<button class="pf-fbtn share" type="button" data-pf-share="'+esc(rec.id)+'">'+s(ICON.share)+esc(pfText('share'))+'</button>'+
         '<button class="pf-fbtn download" type="button" data-pf-download="'+esc(rec.id)+'">'+s(ICON.download)+esc(pfText('download'))+'</button>'+
       '</div>'+
@@ -5042,6 +5430,9 @@
       return zip.generateAsync({type:'blob'}).then(function(blob){
         var safe=(r.name||'kolkli-files').replace(/[^\w֐-׿ \-]+/g,'').trim()||'kolkli-files';
         riTrigger(blob, safe+'.zip'); restore();
+        // Count each successful ZIP export of the received files; surfaced on the
+        // dashboard receive card's "הורדות" stat (see projectReceiveHtml).
+        try{ r.zipDownloads=(Number(r.zipDownloads)||0)+1; KR.upsertRequest(r); }catch(e){}
       });
     }).catch(function(){ riToast(t.ri.dlAllEmpty); restore(); });
   }
@@ -5212,7 +5603,7 @@
     kind=String(kind||'').toLowerCase();
     if(kind==='audio') return 'music';
     if(kind==='video') return 'film';
-    if(kind==='image' || kind==='images') return 'camera';
+    if(kind==='image' || kind==='images') return 'image';
     return 'files';
   }
   function dsPush(out,o){
@@ -5655,6 +6046,21 @@
     host.querySelectorAll('[data-project-view]').forEach(function(b){
       b.addEventListener('click', function(){ selectView(b.getAttribute('data-project-view')); });
     });
+    // My Projects layout toggle (card grid ↔ list). Flip the .mpr-list modifier
+    // and the active button live — no re-render, so card selection and scroll
+    // position are preserved — and persist the choice for future renders.
+    host.querySelectorAll('[data-projview-mode]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var mode=b.getAttribute('data-projview-mode');
+        setProjViewMode(mode);
+        host.querySelectorAll('.mpr-list').forEach(function(l){ l.classList.toggle('is-rows', mode==='list'); });
+        host.querySelectorAll('[data-projview-mode]').forEach(function(x){
+          var on=x.getAttribute('data-projview-mode')===mode;
+          x.classList.toggle('is-on', on);
+          x.setAttribute('aria-pressed', on?'true':'false');
+        });
+      });
+    });
     host.querySelectorAll('[data-edit-view]').forEach(function(b){
       b.addEventListener('click', function(){ selectView(b.getAttribute('data-edit-view')); });
     });
@@ -5678,7 +6084,17 @@
     host.querySelectorAll('[data-proj-key]').forEach(function(card){
       var pk=card.getAttribute('data-proj-key');
       if(pk && pk===selectedProjectKey) card.classList.add('is-selected');
-      card.addEventListener('click', function(){
+      card.addEventListener('click', function(e){
+        // In multi-select mode a click anywhere on the card toggles its pick (the
+        // round checkbox is just the visual affordance) — never the single-select
+        // gray wash or read-marking. Clicks on the card's own controls (links,
+        // buttons, the checkbox label itself) are left to behave normally.
+        if(card.closest('.mpr-list.is-selecting')){
+          if(e.target.closest('a,button,input,label,[data-proj-share],[data-copy-link]')) return;
+          var box=card.querySelector('[data-proj-check]');
+          if(box){ box.checked=!box.checked; box.dispatchEvent(new Event('change',{bubbles:true})); }
+          return;
+        }
         // Any interaction with the card counts as viewing the order — entering
         // it (the open CTA navigates away before returning here), or simply
         // selecting it. Clear the "new order" wash and persist it as read so it
@@ -5694,6 +6110,78 @@
         selectedProjectKey=pk;
         host.querySelectorAll('[data-proj-key].is-selected').forEach(function(o){ o.classList.remove('is-selected'); });
         card.classList.add('is-selected');
+      });
+    });
+    // ---- Multi-select mode for the client cards ----
+    // Re-reads the picked set straight from the DOM (source of truth = which
+    // checkboxes are checked) so the persisted selection bag, per-card ring and
+    // bulk-bar controls always agree, without a full re-render on every click.
+    function projBulkSync(){
+      var list=host.querySelector('.mpr-list.is-selecting'); if(!list) return;
+      var bag=projSelBag(projSelScope());
+      Object.keys(bag).forEach(function(k){ delete bag[k]; });
+      var picked=0;
+      list.querySelectorAll('[data-proj-check]').forEach(function(cb){
+        var c=cb.closest('[data-read-key]'); if(!c) return;
+        if(cb.checked){ bag[c.getAttribute('data-read-key')]=true; picked++; c.classList.add('is-picked'); }
+        else c.classList.remove('is-picked');
+      });
+      var bar=host.querySelector('[data-proj-bulk]'); if(!bar) return;
+      var m=projMultiText(), none=picked===0;
+      var cnt=bar.querySelector('.mpr-bulk-count'); if(cnt) cnt.textContent=m.selected(picked);
+      var clr=bar.querySelector('[data-proj-clearsel]'); if(clr) clr.disabled=none;
+      var del=bar.querySelector('[data-proj-delsel]'); if(del) del.disabled=none;
+    }
+    host.querySelectorAll('[data-proj-selecttoggle]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var key=projSelScope();
+        projSetSelectMode(key, !projInSelectMode(key));
+        renderMain();
+      });
+    });
+    host.querySelectorAll('[data-proj-check]').forEach(function(cb){
+      cb.addEventListener('change', projBulkSync);
+    });
+    host.querySelectorAll('[data-proj-selectall]').forEach(function(b){
+      b.addEventListener('click', function(){
+        host.querySelectorAll('.mpr-list.is-selecting [data-proj-check]').forEach(function(cb){ cb.checked=true; });
+        projBulkSync();
+      });
+    });
+    host.querySelectorAll('[data-proj-clearsel]').forEach(function(b){
+      b.addEventListener('click', function(){
+        host.querySelectorAll('.mpr-list.is-selecting [data-proj-check]').forEach(function(cb){ cb.checked=false; });
+        projBulkSync();
+      });
+    });
+    host.querySelectorAll('[data-proj-delsel]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var key=projSelScope(), picked=[];
+        host.querySelectorAll('.mpr-list.is-selecting [data-proj-check]').forEach(function(cb){
+          if(cb.checked){ var c=cb.closest('[data-read-key]'); if(c) picked.push(c); }
+        });
+        if(!picked.length) return;
+        var m=projMultiText(), n=picked.length;
+        kConfirm({ title:m.delTitle(n), body:m.delBody(n), ok:m.delOk, cancel:m.cancel, danger:true, onOk:function(){
+          picked.forEach(function(card){
+            // Persist each deletion so the cards stay gone across tab switches,
+            // reloads and re-login — same mechanism the per-card trash uses.
+            projMarkProjDeleted(card.getAttribute('data-read-key'));
+            card.style.transition='opacity .18s'; card.style.opacity='0';
+            setTimeout(function(){ card.remove(); }, 180);
+          });
+          riToast(m.done(n));
+          // Once the removed cards leave the DOM, resync the bar — and if the grid
+          // is now empty, exit select mode and re-render to the empty state.
+          setTimeout(function(){
+            if(!host.querySelectorAll('.mpr-list [data-proj-check]').length){
+              projSetSelectMode(key, false);
+              renderMain();
+            } else {
+              projBulkSync();
+            }
+          }, 220);
+        }});
       });
     });
     host.querySelectorAll('[data-copy-link]').forEach(function(b){
@@ -5718,6 +6206,8 @@
         // again cancels the save and restores the original state.
         var saved=b.classList.toggle('is-saved');
         b.innerHTML=s(saved?ICON.x:ICON.save)+(saved?'בטל שמירה':'שמירה');
+        // Dim the marked stat strip while saved, so the frozen snapshot reads clearly.
+        var card=b.closest('.mpr-card'); if(card) card.classList.toggle('is-saved-frame', saved);
         var msg=saved
           ? ((lang==='he')?'נשמר ✓':(lang==='ru')?'Сохранено ✓':'Saved ✓')
           : ((lang==='he')?'השמירה בוטלה':(lang==='ru')?'Сохранение отменено':'Save canceled');
@@ -5827,6 +6317,20 @@
     // Draw a real waveform per media card by decoding its stored audio. Done lazily
     // as cards scroll into view so a large library doesn't decode everything at once.
     pfWireWaveforms(host);
+    // Load a real video frame + native player into each video card (also lazy).
+    pfWireVideos(host);
+    // Load the real picture into each image card (also lazy, on scroll-into-view).
+    pfWireImages(host);
+    host.querySelectorAll('[data-pf-save]').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(!window.KolkliProcessedFiles || !KolkliProcessedFiles.setSaved) return;
+        var rid=b.getAttribute('data-pf-save');
+        var rec=pfFindRec(rid);
+        var nowSaved=!(rec && rec.saved);
+        KolkliProcessedFiles.setSaved(rid, nowSaved); // emits → view re-renders
+        riToast(nowSaved ? pfText('savedToast') : pfText('unsavedToast'));
+      });
+    });
     host.querySelectorAll('[data-pf-share]').forEach(function(b){
       b.addEventListener('click', function(){ pfShareDialog(pfFindRec(b.getAttribute('data-pf-share'))); });
     });

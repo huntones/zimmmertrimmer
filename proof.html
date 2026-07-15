@@ -6,6 +6,9 @@
 <title>KOLKLI — Review & approve</title>
 <link rel="canonical" href="https://kolkli.com/proof">
 <meta name="description" content="Review the work, leave your comments and approve — no account needed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -25,7 +28,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
     /* responsive player height: scales with the viewport but stays compact so the whole page fits one screen */
     --playerH:clamp(200px,38vh,400px);
   }
@@ -122,6 +125,21 @@
   @media (max-width:800px){ .stage{grid-template-columns:1fr;} }
   .media{background:#0b0d14;border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:180px;display:flex;align-items:center;justify-content:center;}
   .media img{max-width:100%;max-height:var(--playerH);display:block;object-fit:contain;}
+  /* image region annotation overlay */
+  .imgstage{position:relative;display:inline-block;max-width:100%;max-height:var(--playerH);line-height:0;}
+  .imgstage img{max-height:var(--playerH);}
+  .anno-svg{position:absolute;inset:0;width:100%;height:100%;touch-action:none;}
+  .anno-svg.arm{cursor:crosshair;}
+  .anno-tools{position:absolute;top:8px;inset-inline-start:8px;display:flex;gap:5px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:5px;box-shadow:var(--shadow);z-index:4;flex-wrap:wrap;max-width:calc(100% - 16px);}
+  .anno-tool{width:32px;height:32px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;}
+  .anno-tool:hover{background:var(--panel-2);}
+  .anno-tool.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dim);}
+  .anno-tool svg{width:17px;height:17px;}
+  .anno-color{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);padding:2px;cursor:pointer;background:var(--panel-2);}
+  .anno-clear{height:30px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;}
+  .anno-clear:hover{border-color:var(--danger);color:var(--danger);}
+  .anno-num{fill:#fff;font:700 13px var(--sans);}
+  .anno-hint{position:absolute;inset-block-end:8px;inset-inline-start:50%;transform:translateX(-50%);z-index:4;background:rgba(15,18,15,.82);color:#fff;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;white-space:nowrap;pointer-events:none;}
   .media audio{width:92%;margin:26px 0;}
   .media iframe{width:100%;height:var(--playerH);border:none;background:#fff;}
   .media .dlonly{padding:40px 20px;text-align:center;color:#c7ccda;}
@@ -133,6 +151,9 @@
   /* large 16:9 player that fills the stage column (matches the reference size) */
   .vplayer{position:relative;width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;background:#000;line-height:0;user-select:none;}
   .vplayer video{width:100%;height:100%;max-width:100%;max-height:none;display:block;object-fit:contain;background:#000;cursor:pointer;}
+  /* preview watermark overlay (video is not baked — drawn live over the player) */
+  .vp-wm{position:absolute;inset:0;pointer-events:none;z-index:3;}
+  .vp-wm img{width:100%;height:100%;object-fit:contain;display:block;}
   .vp-big{position:absolute;inset:0;margin:auto;width:74px;height:74px;border-radius:50%;border:none;cursor:pointer;
     background:rgba(12,15,26,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#fff;
     display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(0,0,0,.45);
@@ -220,6 +241,15 @@
   .decstate .dt span{font-size:12.5px;color:var(--muted);}
   .decstate .redo{margin-inline-start:auto;height:34px;padding:0 13px;border-radius:9px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);cursor:pointer;font-size:12px;font-weight:600;}
   .decstate .redo:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .decstate.rejected .di{background:var(--danger,#e5484d);color:#fff;}
+  /* change-request priority picker */
+  .prio-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px;}
+  .prio-lbl{font-size:12.5px;font-weight:600;color:var(--muted);margin-inline-end:2px;}
+  .prio{border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .12s;}
+  .prio:hover{border-color:var(--accent);}
+  .prio.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dim);}
+  .decbtn.approve.locked{opacity:.5;filter:grayscale(.4);cursor:not-allowed;box-shadow:none;}
+  .dec-hint{margin-top:9px;font-size:12px;color:var(--muted);text-align:center;}
 
   /* states */
   .state{text-align:center;padding:26px 12px;}
@@ -285,8 +315,11 @@
   .attchip{display:flex;align-items:center;gap:8px;margin-top:8px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);font-size:12px;color:var(--ink-2);}
   .attchip svg{width:14px;height:14px;flex-shrink:0;} .attchip span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .attchip .ax{cursor:pointer;color:var(--faint);border:none;background:none;font-size:17px;line-height:1;padding:0;} .attchip .ax:hover{color:var(--danger);}
-  .cf-mini{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .cf-mini{min-width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:inline-flex;gap:6px;align-items:center;justify-content:center;transition:all .12s;padding:0 8px;font-size:11.5px;font-weight:600;}
   .cf-mini:hover{border-color:var(--accent);color:var(--accent);} .cf-mini svg{width:15px;height:15px;}
+  .cf-mini.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim);}
+  .cr-link{flex:1;min-width:120px;} .cr-link input{width:100%;padding:7px 10px;font-size:12.5px;}
+  .addfoot{flex-wrap:wrap;}
 
   .filterbtn{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;font-weight:600;}
   .filterbtn svg{width:13px;height:13px;}
@@ -302,6 +335,11 @@
   .cmt-att svg{width:12px;height:12px;}
   .cmt-badge{display:inline-flex;align-items:center;margin-top:8px;font-size:10px;font-weight:700;border-radius:999px;padding:2px 8px;}
   .cmt-badge.changes{background:var(--warm-soft);color:var(--warn);} .cmt-badge.rejected{background:var(--danger-soft);color:var(--danger);}
+  .cmt-prio{display:inline-flex;align-items:center;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;border-radius:999px;padding:2px 7px;}
+  .cmt-prio.p-low{background:var(--info-soft);color:var(--info-dim);} .cmt-prio.p-medium{background:var(--warm-soft);color:var(--warn);} .cmt-prio.p-high{background:var(--danger-soft);color:var(--danger);}
+  .cmt-extra{display:inline-flex;align-items:center;gap:5px;margin-top:8px;margin-inline-end:6px;font-size:11.5px;font-weight:600;}
+  .cmt-extra svg{width:14px;height:14px;}
+  a.cmt-att{text-decoration:none;}
 
   /* comment pins on the player seek bar */
   .vp-pin{position:absolute;top:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;
@@ -416,6 +454,22 @@
       <div class="pwerr" id="pwErr"></div>
     </div>
 
+    <!-- email verification gate -->
+    <div class="state hidden" id="emailState">
+      <div class="si lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></div>
+      <h2 data-i18n="evTitle"></h2>
+      <p data-i18n="evSub"></p>
+      <form class="pwform" id="evForm">
+        <input id="evEmail" type="email" dir="ltr" data-i18n-ph="evEmailPh" autocomplete="email">
+        <button type="submit" data-i18n="evSend"></button>
+      </form>
+      <form class="pwform hidden" id="evCodeForm">
+        <input id="evCode" type="text" inputmode="numeric" dir="ltr" data-i18n-ph="evCodePh" autocomplete="one-time-code" maxlength="6">
+        <button type="submit" data-i18n="evVerify"></button>
+      </form>
+      <div class="pwerr" id="evErr"></div>
+    </div>
+
   </div><!-- /gateCard -->
 
   <!-- review -->
@@ -492,7 +546,7 @@
             <div class="panel-h"><span data-i18n="statusTitle"></span><span class="qm">?</span></div>
             <div class="decidebar" id="decideBar"></div>
           </div>
-          <div class="card panel">
+          <div class="card panel" id="progressPanel">
             <div class="panel-h"><span data-i18n="progressTitle"></span><span class="qm">?</span></div>
             <div class="tracker" id="tracker"></div>
           </div>
@@ -518,6 +572,7 @@
 <script src="./supabase-config.js"></script>
 <script src="./kolkli-db.js"></script>
 <script src="./review-store.js"></script>
+<script src="./watermark-preview.js"></script>
 <script>
 (function(){
   const el = id => document.getElementById(id);
@@ -607,6 +662,7 @@
     stUploaded:'הועלה', stReview:'בבדיקה', stCommented:'נשלחו הערות', stApprovedStep:'אושר',
     backToProjects:'חזרה לפרויקטים', needHelp:'זקוק לעזרה?', helpMsg:'לכל שאלה פנו לבעל הפרויקט ששלח לכם את הקישור.',
     linkCopied:'הקישור הועתק ✓', dlBlocked:'ההורדה כבויה בפרויקט הזה',
+    dlWmBlocked:'זוהי תצוגה מקדימה מוגנת בסימן מים — ההורדה אינה זמינה', wmPreview:'תצוגה מקדימה',
     badgeChanges:'בקשת תיקון', badgeRejected:'דחייה', namePrompt:'מה השם שלך?',
   });
   Object.assign(I18N.en,{
@@ -618,6 +674,7 @@
     stUploaded:'Uploaded', stReview:'In review', stCommented:'Comments sent', stApprovedStep:'Approved',
     backToProjects:'Back to projects', needHelp:'Need help?', helpMsg:'For any question, contact the project owner who sent you the link.',
     linkCopied:'Link copied ✓', dlBlocked:'Download is off for this project',
+    dlWmBlocked:'This is a watermark-protected preview — download is not available', wmPreview:'Preview',
     badgeChanges:'Change request', badgeRejected:'Rejected', namePrompt:'What is your name?',
   });
   Object.assign(I18N.ru,{
@@ -629,14 +686,45 @@
     stUploaded:'Загружено', stReview:'На проверке', stCommented:'Комментарии', stApprovedStep:'Утверждено',
     backToProjects:'К проектам', needHelp:'Нужна помощь?', helpMsg:'По любым вопросам обращайтесь к владельцу проекта, приславшему ссылку.',
     linkCopied:'Ссылка скопирована ✓', dlBlocked:'Скачивание отключено для этого проекта',
+    dlWmBlocked:'Это предпросмотр с водяным знаком — скачивание недоступно', wmPreview:'Предпросмотр',
     badgeChanges:'Правки', badgeRejected:'Отклонено', namePrompt:'Как вас зовут?',
   });
+  // ---- Review Studio gate strings ----
+  Object.assign(I18N.he,{
+    needNote:'צריך לכתוב הערה לפני דחייה או בקשת תיקון', needFullView:'צריך לצפות בכל הסרטון/האודיו לפני האישור',
+    prioLabel:'עדיפות:', prioLow:'נמוכה', prioMed:'בינונית', prioHigh:'גבוהה',
+    anno_point:'נקודה', anno_rect:'מלבן', anno_arrow:'חץ', anno_circle:'עיגול', anno_text:'טקסט',
+    annoColor:'צבע הסימון', annoClear:'ניקוי', annoTextPrompt:'טקסט להוספה על התמונה:', annoChip:'סימון',
+    segMark:'סימון קטע', segClear:'ביטול קטע', segChip:'קטע', segStart:'התחלה', segEnd:'סיום', playFrom:'נגן מכאן', segHint:'הפעילו/עצרו את הנגן כדי לקבוע התחלה וסיום',
+    crLink:'קישור חיצוני', crLinkPh:'https://…', crVoice:'הקלטה קולית', crVoiceStop:'עצור', crVoiceRec:'מקליט…', crVoiceReady:'הוקלט', crShot:'צילום מסך', voicePlay:'נגן הקלטה', linkOpen:'פתח קישור',
+    ntLimitT:'הגעתם למספר הצפיות המרבי', ntLimitB:'הקישור הזה נחסם לאחר שהגיע למכסת הצפיות. בקשו מבעל הפרויקט קישור חדש.',
+    evTitle:'אימות במייל', evSub:'לצפייה בחומרים, הזינו את כתובת המייל שלכם ונשלח קוד אימות.',
+    evEmailPh:'you@email.com', evSend:'שליחת קוד', evCodePh:'קוד בן 6 ספרות', evVerify:'אימות',
+    evBadEmail:'כתובת מייל לא תקינה', evBadCode:'קוד שגוי, נסו שוב', evSent:c=>`קוד לדוגמה (הדגמה): ${c}`,
+  });
+  const PROOF_EN={
+    needNote:'Please add a note before rejecting or requesting changes', needFullView:'Watch the full video/audio before approving',
+    prioLabel:'Priority:', prioLow:'Low', prioMed:'Medium', prioHigh:'High',
+    anno_point:'Point', anno_rect:'Rectangle', anno_arrow:'Arrow', anno_circle:'Circle', anno_text:'Text',
+    annoColor:'Marker colour', annoClear:'Clear', annoTextPrompt:'Text to place on the image:', annoChip:'Mark',
+    segMark:'Mark segment', segClear:'Clear segment', segChip:'Segment', segStart:'Start', segEnd:'End', playFrom:'Play from here', segHint:'Play/pause to set the start and end',
+    crLink:'External link', crLinkPh:'https://…', crVoice:'Voice note', crVoiceStop:'Stop', crVoiceRec:'Recording…', crVoiceReady:'Recorded', crShot:'Screenshot', voicePlay:'Play recording', linkOpen:'Open link',
+    ntLimitT:'View limit reached', ntLimitB:'This link was blocked after reaching its view quota. Ask the project owner for a new link.',
+    evTitle:'Email verification', evSub:'To view the materials, enter your email and we will send a verification code.',
+    evEmailPh:'you@email.com', evSend:'Send code', evCodePh:'6-digit code', evVerify:'Verify',
+    evBadEmail:'Invalid email address', evBadCode:'Wrong code, try again', evSent:c=>`Demo code: ${c}`,
+  };
+  Object.assign(I18N.en, PROOF_EN);
+  Object.assign(I18N.ru, PROOF_EN);
 
   let lang='he', t=I18N.he;
   let proj=null, token=null, brand=null, isDemo=false;
   let activeVer=1, activeId=null, activeMedia=null, activeUrl=null;
   let viewedMarked=false;
   let mediaDuration=0, mediaW=0, mediaH=0, tlZoom=1, pendingAtt=null;
+  let annoTool=null, annoColor='#e5484d', pendingAnno=null, annoRO=null;  // image region annotation
+  let pendingSeg=null;   // A/V time-segment mark {start,end}
+  let pendingLink='', pendingVoice=null;  // change-request extras
   function fresh(){ return isDemo ? proj : RV.getProject(token); }
   // Local cache write only — the reviewing client is anonymous and cannot
   // own-upsert the server row. Server writes go through the token-gated RPC
@@ -648,6 +736,32 @@
   function dbDecision(dec,status,ev){ if(dbOn()) KolkliDB.setDecision('review', token, dec, status||null, ev||null); }
   function dbEvent(ev){ if(dbOn()) KolkliDB.addEvent('review', token, ev); }
   function isTimed(it){ return !!(it && (it.kind==='video'||it.kind==='audio')); }
+
+  // ---- Review Studio settings (proj.settings); null-safe with legacy fallback ----
+  // Projects created before the settings gear have no proj.settings, so granular
+  // permissions default ON and every gate falls back to today's behaviour.
+  function PS(){ return (proj && proj.settings) || null; }
+  function permOf(key){
+    const s=PS();
+    if(s && s.perms && typeof s.perms[key]==='boolean') return s.perms[key];
+    if(key==='comment'||key==='download'||key==='approve') return !!(proj && proj.perms && proj.perms[key]);
+    return true;
+  }
+  function apprOf(key,dflt){ const s=PS(); return (s && s.approval && typeof s.approval[key]!=='undefined') ? s.approval[key] : dflt; }
+  function chgEnabled(key){ const s=PS(); return (s && s.changeReq && typeof s.changeReq[key]==='boolean') ? s.changeReq[key] : true; }
+  function showProgress(){ const s=PS(); return !(s && s.statuses && s.statuses.showProgressBar===false); }
+  // full-view gate: track which timed items were watched to the end
+  const fullyViewed=new Set();
+  let changePriority='medium';
+  function versionItems(){ return (RV.itemsOfVersion ? RV.itemsOfVersion(proj, activeVer) : (proj.items||[])); }
+  function allTimedViewed(){ const timed=versionItems().filter(isTimed); return timed.every(it=>fullyViewed.has(it.id)); }
+  function markFullView(it,ended){
+    if(!it || !isTimed(it) || fullyViewed.has(it.id)) return;
+    const dur=(activeMedia&&isFinite(activeMedia.duration))?activeMedia.duration:mediaDuration;
+    const cur=activeMedia?activeMedia.currentTime:0;
+    if(ended || (dur>0 && cur/dur>=0.98)){ fullyViewed.add(it.id); if(apprOf('requireFullViewBeforeApprove',false)) renderDecide(); }
+  }
+
   function pinColor(i){ return i%2 ? 'var(--info)' : 'var(--accent)'; }
   function shortDate(ms){ const d=new Date(ms); try{ return d.toLocaleDateString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(_){ return ''; } }
   // comment-thread filter: cycles All → Mine → time/page-marked (see #filterBtn handler)
@@ -679,7 +793,7 @@
   function clientName(){ return (el('cName').value||'').trim(); }
   function fmtDateTime(ms){ const d=new Date(ms); try{ return d.toLocaleString(lang==='he'?'he-IL':lang==='ru'?'ru-RU':'en-US',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }catch(_){ return d.toISOString().slice(0,16).replace('T',' '); } }
 
-  function show(id){ ['loadingState','noticeState','pwState'].forEach(s=>el(s).classList.toggle('hidden', s!==id)); el('gateCard').classList.remove('hidden'); el('reviewView').classList.add('hidden'); el('markBtn').classList.add('hidden'); }
+  function show(id){ ['loadingState','noticeState','pwState','emailState'].forEach(s=>el(s).classList.toggle('hidden', s!==id)); el('gateCard').classList.remove('hidden'); el('reviewView').classList.add('hidden'); el('markBtn').classList.add('hidden'); }
   function notice(tk,bk){ el('noticeTitle').textContent=t[tk]; el('noticeBody').textContent=t[bk]; show('noticeState'); }
 
   // ---- client branding (ported from download.html) ----
@@ -715,6 +829,12 @@
   // ---- render ----
   function itemsOf(v){ return RV.itemsOfVersion(proj, v); }
   function activeItem(){ return (proj.items||[]).find(i=>i.id===activeId)||null; }
+  // Download name reflects the baked preview's real container (e.g. an mp3 whose
+  // watermarked preview was rendered to wav downloads as .wav).
+  function dlFileName(it){
+    if(it && it.previewId && it.previewExt){ return String(it.name||'file').replace(/\.[^.\/\\]+$/,'')+'.'+it.previewExt; }
+    return it ? it.name : 'file';
+  }
 
   function renderHead(){
     el('projName').textContent=proj.name;
@@ -746,7 +866,7 @@
   async function fillStripThumbs(items){
     for(const it of items){
       if(it.kind!=='image') continue;
-      try{ const blob=await RV.loadItemBlob(token, it.id); if(!blob) continue;
+      try{ const blob=await RV.loadItemBlob(token, it.previewId||it.id); if(!blob) continue;
         const holder=document.querySelector(`[data-sthumb="${it.id}"]`); if(!holder) continue;
         holder.innerHTML=`<img src="${URL.createObjectURL(blob)}" alt="">`;
       }catch(_){}
@@ -756,13 +876,17 @@
   async function renderMedia(){
     const it=activeItem(); const box=el('media'); activeMedia=null; demoTime=0;
     mediaDuration=0; mediaW=0; mediaH=0;
+    pendingAnno=null; pendingSeg=null;                      // reset per-item annotation state
+    if(annoRO){ try{ annoRO.disconnect(); }catch(_){} annoRO=null; }
     if(activeUrl){ try{ URL.revokeObjectURL(activeUrl); }catch(_){} activeUrl=null; }
     el('activeName').textContent = it? it.name : '';
     el('fcIc').innerHTML = it ? (RV.FICON[it.kind]||RV.FICON.doc) : '';
-    el('dlBtn').classList.toggle('hidden', !(it && proj.perms.download));
+    el('dlBtn').classList.toggle('hidden', !(it && permOf('download') && !it.wmOverlay));
     el('tlCard').classList.toggle('hidden', !isTimed(it));
     if(!it){ box.innerHTML=''; updateFileSub(); return; }
-    let blob=null; if(!isDemo){ try{ blob=await RV.loadItemBlob(token, it.id); }catch(_){} }
+    // serve the watermarked preview when one was baked (image / audio); the
+    // original stays server-side and is never handed to the client link.
+    let blob=null; if(!isDemo){ try{ blob=await RV.loadItemBlob(token, it.previewId||it.id); }catch(_){} }
 
     if(isTimed(it) && !blob){
       // demo / missing file: show a poster and drive the timeline from a known duration
@@ -772,13 +896,14 @@
     }
     if(!blob){ box.innerHTML=`<div class="dlonly"><div class="nm">${RV.escapeHtml(it.name)}</div></div>`; updateFileSub(); renderAddFoot(); return; }
     const url=URL.createObjectURL(blob); activeUrl=url;
-    if(it.kind==='image') box.innerHTML=`<img src="${url}" alt="${RV.escapeHtml(it.name)}">`;
-    else if(it.kind==='video'){ box.innerHTML=videoPlayerHTML(url); activeMedia=box.querySelector('video'); wireVideoPlayer(box.querySelector('.vplayer')); }
+    if(it.kind==='image') mountImageStage(box, url, it);
+    else if(it.kind==='video'){ box.innerHTML=videoPlayerHTML(url); activeMedia=box.querySelector('video'); const vp=box.querySelector('.vplayer'); wireVideoPlayer(vp); if(it.wmOverlay && proj.watermark && proj.watermark.visual) attachVideoWatermark(vp, activeMedia, proj.watermark.visual); }
     else if(it.kind==='audio'){ box.innerHTML=`<audio src="${url}" controls controlsList="nodownload noplaybackrate"></audio>`; activeMedia=box.querySelector('audio'); }
     else if(it.ext==='pdf') box.innerHTML=`<iframe src="${url}"></iframe>`;
     else box.innerHTML=`<div class="dlonly"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M4 2h10l6 6v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg></div><div class="nm">${RV.escapeHtml(it.name)}</div></div>`;
     if(activeMedia){
-      activeMedia.addEventListener('timeupdate',()=>{ syncPin(); onTime(); });
+      activeMedia.addEventListener('timeupdate',()=>{ syncPin(); onTime(); markFullView(it); });
+      activeMedia.addEventListener('ended',()=>{ markFullView(it,true); });
       const meta=()=>{ mediaDuration=isFinite(activeMedia.duration)?activeMedia.duration:0; if(it.kind==='video'){ mediaW=activeMedia.videoWidth||0; mediaH=activeMedia.videoHeight||0; } onMeta(); };
       activeMedia.addEventListener('loadedmetadata',meta);
       if(activeMedia.readyState>=1) meta();
@@ -853,34 +978,94 @@
       const i=all.indexOf(c);   // numbering stays aligned with the timeline pins, which use the full order
       const who=(c.author&&c.author.trim())?c.author.trim():t.anon;
       const mine = me && who.toLowerCase()===me;
-      const pos = c.tcode!=null ? `<span class="cmt-tc" data-seek="${c.tcode}">${clockSvg()} ${mmss(c.tcode)}</span>`
+      const pos = c.tcodeEnd!=null ? `<span class="cmt-tc" data-seek="${c.tcode}" title="${t.playFrom}">${clockSvg()} ${mmss(c.tcode)}–${mmss(c.tcodeEnd)}</span>`
+                : c.tcode!=null ? `<span class="cmt-tc" data-seek="${c.tcode}">${clockSvg()} ${mmss(c.tcode)}</span>`
                 : c.page!=null ? `<span class="cmt-tc">${t.pagePick} ${c.page}</span>` : '';
+      const prio = c.priority ? `<span class="cmt-prio p-${c.priority}">${t['prio'+c.priority.charAt(0).toUpperCase()+c.priority.slice(1)]||c.priority}</span>` : '';
       const title = c.title ? `<div class="cmt-title">${RV.escapeHtml(c.title)}</div>` : '';
       const att = c.att ? `<button class="cmt-att" data-att="${c.att.id}" data-attn="${RV.escapeHtml(c.att.name)}">${clipSvg()}${RV.escapeHtml(c.att.name)}</button>` : '';
+      const anno = c.anno ? `<span class="cmt-extra" style="color:${c.anno.color||'var(--accent)'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>${t.annoChip}</span>` : '';
+      const link = c.link ? `<a class="cmt-att" href="${RV.escapeHtml(c.link)}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>${t.linkOpen}</a>` : '';
+      const voice = c.voice ? `<button class="cmt-att" data-voice="${c.voice.id}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>${t.voicePlay}${c.voice.dur?` · ${mmss(c.voice.dur)}`:''}</button>` : '';
       const badge = c.decision==='changes' ? `<div><span class="cmt-badge changes">${t.badgeChanges}</span></div>`
                   : c.decision==='rejected' ? `<div><span class="cmt-badge rejected">${t.badgeRejected}</span></div>` : '';
       return `<div class="cmt${mine?' mine':''}" data-seek="${c.tcode!=null?c.tcode:''}">
-        <div class="cmt-top"><span class="cmt-num" style="background:${pinColor(i)}">${i+1}</span><span class="cmt-who">${RV.escapeHtml(who)}</span>${pos}<span class="cmt-when">${shortDate(c.at)}</span></div>
-        ${title}<div class="cmt-body">${RV.escapeHtml(c.body)}</div>${att}${badge}
+        <div class="cmt-top"><span class="cmt-num" style="background:${pinColor(i)}">${i+1}</span><span class="cmt-who">${RV.escapeHtml(who)}</span>${pos}${prio}<span class="cmt-when">${shortDate(c.at)}</span></div>
+        ${title}<div class="cmt-body">${RV.escapeHtml(c.body)}</div>${anno}${att}${link}${voice}${badge}
       </div>`;
     }).join('');
   }
   function renderAddFoot(){
-    const it=activeItem(); const foot=el('addFoot');
+    const it=activeItem(); const foot=el('addFoot'); const post=el('postBtn');
     // remove any transient controls, keep the post button
     foot.querySelectorAll('[data-transient]').forEach(n=>n.remove());
+    // the static attach button doubles as the change-request "example file" tool
+    el('attBtn').classList.toggle('hidden', !chgEnabled('exampleFile'));
     if(!it) return;
+    const ins=node=>{ node.setAttribute('data-transient',''); foot.insertBefore(node, post); };
+    const mk=(cls,html)=>{ const n=document.createElement('span'); n.className=cls; n.innerHTML=html; return n; };
+    const btn=(id,cls,html,title)=>{ const b=document.createElement('button'); b.type='button'; b.id=id; b.className=cls; b.innerHTML=html; if(title) b.title=title; return b; };
     if(it.kind==='video'||it.kind==='audio'){
-      const chip=document.createElement('span'); chip.className='pinchip'; chip.setAttribute('data-transient','');
-      chip.innerHTML=`${clockSvg()} <span id="curTime">${t.atNow('0:00')}</span>`;
-      foot.insertBefore(chip, el('postBtn'));
-    } else if(it.ext==='pdf'){
-      const wrap=document.createElement('span'); wrap.className='pagepick'; wrap.setAttribute('data-transient','');
-      wrap.innerHTML=`${t.pagePick} <input class="inp" id="pageNum" type="number" min="1" value="1">`;
-      foot.insertBefore(wrap, el('postBtn'));
+      const chip=mk('pinchip', `${clockSvg()} <span id="curTime">${t.atNow('0:00')}</span>`); ins(chip);
+      // A/V time-segment marking
+      if(permOf('markTimeline') && annoOn('avSegment')){
+        let lbl=t.segMark;
+        if(pendingSeg && pendingSeg.end==null) lbl=t.segEnd;
+        else if(pendingSeg) lbl=`${mmss(pendingSeg.start)}–${mmss(pendingSeg.end)}`;
+        const sb=btn('segBtn','cf-mini seg'+(pendingSeg?' on':''), `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg><span>${lbl}</span>`, t.segMark);
+        ins(sb); sb.addEventListener('click',segClick);
+        if(pendingSeg){ const sc=btn('segClr','cf-mini', '×', t.segClear); ins(sc); sc.addEventListener('click',()=>{ pendingSeg=null; renderAddFoot(); }); }
+      }
+    } else if(it.ext==='pdf' && permOf('markPdfPage') && annoOn('pdfPageComment')){
+      const wrap=mk('pagepick', `${t.pagePick} <input class="inp" id="pageNum" type="number" min="1" value="1">`); ins(wrap);
+    }
+    // change-request extras
+    if(chgEnabled('screenshot') && (it.kind==='video'||it.kind==='image')){
+      const b=btn('crShotBtn','cf-mini', `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3.2"/></svg>`, t.crShot); ins(b); b.addEventListener('click',captureShot);
+    }
+    if(chgEnabled('voiceNote')){
+      const rec=(voiceRec && voiceRec.state==='recording');
+      const b=btn('crVoiceBtn','cf-mini'+(rec||pendingVoice?' on':''), rec? `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><span>${t.crVoiceStop}</span>` : pendingVoice? `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/></svg><span>${t.crVoiceReady}${pendingVoice.dur?' '+mmss(pendingVoice.dur):''}</span>` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4"/></svg>`, t.crVoice); ins(b); b.addEventListener('click',voiceToggle);
+      if(pendingVoice && !rec){ const vc=btn('crVoiceClr','cf-mini','×',t.annoClear); ins(vc); vc.addEventListener('click',()=>{ pendingVoice=null; renderAddFoot(); }); }
+    }
+    if(chgEnabled('externalLink')){
+      const wrap=mk('cr-link', `<input class="inp" id="crLinkInp" type="url" placeholder="${t.crLinkPh}" value="${RV.escapeHtml(pendingLink||'')}">`); ins(wrap);
+      const inp=wrap.querySelector('#crLinkInp'); inp.addEventListener('input',()=>{ pendingLink=inp.value.trim(); });
     }
   }
   function syncPin(){ const c=el('curTime'); if(c && activeMedia) c.textContent=t.atNow(mmss(activeMedia.currentTime)); }
+  // ---- A/V segment marking (§5) ----
+  function segClick(){
+    const cur=Math.floor((activeMedia?activeMedia.currentTime:demoTime)||0);
+    if(!pendingSeg) pendingSeg={start:cur,end:null};
+    else if(pendingSeg.end==null) pendingSeg.end=Math.max(cur,pendingSeg.start+1);
+    else pendingSeg=null;
+    renderAddFoot();
+  }
+  // ---- voice note (§4) ----
+  let voiceRec=null, voiceChunks=[], voiceStartAt=0;
+  async function voiceToggle(){
+    if(voiceRec && voiceRec.state==='recording'){ voiceRec.stop(); return; }
+    if(!navigator.mediaDevices || !window.MediaRecorder){ toast(t.crVoice+' ✕'); return; }
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      voiceChunks=[]; voiceRec=new MediaRecorder(stream); voiceStartAt=Date.now();
+      voiceRec.ondataavailable=e=>{ if(e.data && e.data.size) voiceChunks.push(e.data); };
+      voiceRec.onstop=()=>{ const blob=new Blob(voiceChunks,{type:(voiceRec&&voiceRec.mimeType)||'audio/webm'}); const dur=Math.round((Date.now()-voiceStartAt)/1000); pendingVoice={blob,dur}; try{ stream.getTracks().forEach(x=>x.stop()); }catch(_){} voiceRec=null; renderAddFoot(); };
+      voiceRec.start(); renderAddFoot();
+    }catch(err){ toast(t.crVoice+' ✕'); voiceRec=null; }
+  }
+  // ---- screenshot capture (§4) ----
+  function captureShot(){
+    const it=activeItem(); if(!it) return;
+    if(it.kind==='video' && activeMedia && activeMedia.videoWidth){
+      try{
+        const cv=document.createElement('canvas'); cv.width=activeMedia.videoWidth; cv.height=activeMedia.videoHeight;
+        cv.getContext('2d').drawImage(activeMedia,0,0,cv.width,cv.height);
+        cv.toBlob(b=>{ if(b){ setAtt(new File([b],'screenshot.png',{type:'image/png'})); toast(t.crShot+' ✓'); } },'image/png');
+      }catch(e){ el('attInput').click(); }
+    } else { el('attInput').click(); }
+  }
 
   function selectItem(id){
     activeId=id;
@@ -888,36 +1073,51 @@
     renderMedia(); renderThread();
   }
   function renderPerms(){
-    const canComment = proj.perms.comment && RV.statusOf(proj)!=='closed' && RV.statusOf(proj)!=='expired';
+    const alive = RV.statusOf(proj)!=='closed' && RV.statusOf(proj)!=='expired';
+    const canComment = permOf('comment') && alive;
     el('addBox').classList.toggle('hidden', !canComment);
-    el('viewOnly').classList.toggle('hidden', proj.perms.comment);
-    el('markBtn').classList.toggle('hidden', !canComment);
+    el('viewOnly').classList.toggle('hidden', permOf('comment'));
+    el('markBtn').classList.toggle('hidden', !(canComment && permOf('markTimeline')));
     renderDecide();
   }
   function renderDecide(){
     renderTracker();
     const bar=el('decideBar'); const st=RV.statusOf(proj);
-    if(!proj.perms.approve || st==='expired'){ el('statusPanel').classList.add('hidden'); return; }
+    const canApprove=permOf('approve'), canChanges=permOf('requestChanges'), canReject=permOf('reject');
+    if(!(canApprove||canChanges||canReject) || st==='expired'){ el('statusPanel').classList.add('hidden'); return; }
     el('statusPanel').classList.remove('hidden');
     if(proj.decision){
       const d=proj.decision;
       const cls=d.state==='approved'?'approved':d.state==='rejected'?'rejected':'changes';
       const icon=d.state==='approved'?checkSvg():d.state==='rejected'?xSvg():refreshSvg();
       const label=d.state==='approved'?t.approvedT:d.state==='rejected'?t.rejectedT:t.changesT;
+      // client may reverse a decision only when the owner allows it and it isn't locked
+      const canRedo = st!=='closed' && apprOf('allowChangeAfter',true) && !apprOf('lockAfterDecision',false);
       bar.innerHTML=`<div class="decstate ${cls}"><div class="di">${icon}</div>
         <div class="dt"><b>${label}</b><span>${t.decidedAt(fmtDateTime(d.at))}</span></div>
-        ${st==='closed'?'':`<button class="redo" id="redoBtn" type="button">${t.redo}</button>`}</div>`;
+        ${canRedo?`<button class="redo" id="redoBtn" type="button">${t.redo}</button>`:''}</div>`;
     } else if(st==='closed'){
       el('statusPanel').classList.add('hidden');
     } else {
-      bar.innerHTML=`<div class="decrow">
-        <button class="decbtn reject" id="rejectBtn" type="button">${xSvg()} ${t.reject}</button>
-        <button class="decbtn changes" id="changesBtn" type="button">${refreshSvg()} ${t.needsFix}</button>
-        <button class="decbtn approve" id="approveBtn" type="button">${checkSvg()} ${t.finalApprove}</button>
-      </div>`;
+      // change-request priority picker (shown when the owner enabled it)
+      let prio='';
+      if((canChanges||canReject) && chgEnabled('priority')){
+        const opt=(v,lbl)=>`<button type="button" class="prio ${changePriority===v?'on':''}" data-prio="${v}">${lbl}</button>`;
+        prio=`<div class="prio-row" id="prioRow"><span class="prio-lbl">${t.prioLabel}</span>
+          ${opt('low',t.prioLow)}${opt('medium',t.prioMed)}${opt('high',t.prioHigh)}</div>`;
+      }
+      // approve gate: require full view of every timed item first
+      const needFull = canApprove && apprOf('requireFullViewBeforeApprove',false) && !allTimedViewed();
+      const btns=[];
+      if(canReject) btns.push(`<button class="decbtn reject" id="rejectBtn" type="button">${xSvg()} ${t.reject}</button>`);
+      if(canChanges) btns.push(`<button class="decbtn changes" id="changesBtn" type="button">${refreshSvg()} ${t.needsFix}</button>`);
+      if(canApprove) btns.push(`<button class="decbtn approve${needFull?' locked':''}" id="approveBtn" type="button"${needFull?' data-locked="1"':''}>${checkSvg()} ${t.finalApprove}</button>`);
+      bar.innerHTML=prio+`<div class="decrow">${btns.join('')}</div>`+(needFull?`<div class="dec-hint">${t.needFullView}</div>`:'');
     }
   }
   function renderTracker(){
+    const pp=el('progressPanel'); if(pp) pp.classList.toggle('hidden', !showProgress());
+    if(!showProgress()) return;
     const st=RV.statusOf(proj); const nComments=(proj.comments||[]).length; const d=proj.decision;
     let reached=0;
     if(st==='viewed'||st==='changes'||st==='approved'||nComments>0) reached=1;
@@ -952,14 +1152,17 @@
     const it=activeItem(); if(!it) return;
     const body=(el('cBody').value||'').trim();
     const title=(el('cTitle').value||'').trim();
-    if(!body && !title && !pendingAtt) return;
+    if(!body && !title && !pendingAtt && !pendingAnno && !pendingSeg && !pendingLink && !pendingVoice) return;
     const f=fresh(); if(!f){ notice('ntMissingT','ntMissingB'); return; }
     if(RV.statusOf(f)==='closed'){ notice('ntClosedT','ntClosedB'); return; }
     const who=clientName();
-    const c={ id:'rc'+RV.randToken(), itemId:it.id, author:who, title, body, at:Date.now(), tcode:null, page:null, decision:null, resolved:false };
-    if(isTimed(it)) c.tcode=Math.floor((activeMedia?activeMedia.currentTime:demoTime)||0);
+    const c={ id:'rc'+RV.randToken(), itemId:it.id, author:who, title, body, at:Date.now(), tcode:null, tcodeEnd:null, page:null, anno:null, link:null, voice:null, decision:null, resolved:false };
+    if(isTimed(it)){ c.tcode = pendingSeg ? pendingSeg.start : Math.floor((activeMedia?activeMedia.currentTime:demoTime)||0); if(pendingSeg) c.tcodeEnd=pendingSeg.end; }
     else if(it.ext==='pdf'){ const pn=el('pageNum'); if(pn && +pn.value>0) c.page=+pn.value; }
+    if(pendingAnno) c.anno=pendingAnno;
+    if(pendingLink) c.link=pendingLink;
     if(pendingAtt){ const aid='ra'+RV.randToken(); if(!isDemo){ try{ await RV.saveItemBlob(token, aid, pendingAtt.file); }catch(_){} } c.att={ id:aid, name:pendingAtt.file.name, size:pendingAtt.file.size }; }
+    if(pendingVoice){ const vid='rv'+RV.randToken(); if(!isDemo){ try{ await RV.saveItemBlob(token, vid, pendingVoice.blob); }catch(_){} } c.voice={ id:vid, dur:pendingVoice.dur||0 }; }
     const ev={type:'commented', at:Date.now(), who};
     f.comments=(f.comments||[]).concat([c]);
     f.events=(f.events||[]).concat([ev]);
@@ -968,26 +1171,35 @@
     if(who) saveName(who);
     if(!isDemo){ RV.post({type:'commented', token, who}); dbComment(c, ev); }
     el('cBody').value=''; el('cTitle').value=''; clearAtt();
-    renderThread(); renderStrip(); renderSeekPins(); renderTimeline(); renderDecide();
+    clearPendingAnno(); pendingSeg=null; pendingLink=''; pendingVoice=null;
+    renderThread(); renderStrip(); renderSeekPins(); renderTimeline(); renderDecide(); renderAddFoot();
     document.querySelectorAll('.sthumb').forEach(s=>s.classList.toggle('on', s.getAttribute('data-item')===activeId));
     toast(t.commentAdded);
   }
   function decide(state){
     const who=clientName();
     if(!who){ el('cName').focus(); toast(t.needName); return; }
+    // owner may require the client to watch every video/audio fully before approving
+    if(state==='approved' && apprOf('requireFullViewBeforeApprove',false) && !allTimedViewed()){ toast(t.needFullView); return; }
     let note='';
     if(state==='changes'||state==='rejected'){ note=(el('cBody').value||'').trim(); }
+    // owner may require a written reason when rejecting / requesting changes
+    if((state==='changes'||state==='rejected') && apprOf('requireNoteOnReject',true) && !note){ toast(t.needNote); el('cBody').focus(); return; }
     const f=fresh(); if(!f){ notice('ntMissingT','ntMissingB'); return; }
     if(RV.statusOf(f)==='closed'){ notice('ntClosedT','ntClosedB'); return; }
+    const usePrio = (state==='changes'||state==='rejected') && chgEnabled('priority');
     const dec={ state, by:who, at:Date.now(), version:activeVer };
+    if(usePrio) dec.priority=changePriority;
     const ev={type:state, at:Date.now(), who};
     f.decision=dec;
-    f.status = state==='approved'? 'approved':'changes';   // keep owner-page status enum
+    f.status = state==='approved'? 'approved' : state==='rejected'? 'rejected' : 'changes';
+    // owner option: lock the project automatically once it is finally approved
+    if(state==='approved' && apprOf('closeOnFinalApproval', true)) f.status='closed';
     f.events=(f.events||[]).concat([ev]);
     let noteComment=null;
     if((state==='changes'||state==='rejected') && note){
       const it=activeItem();
-      if(it){ noteComment={ id:'rc'+RV.randToken(), itemId:it.id, author:who, title:'', body:note, at:Date.now(), tcode:(isTimed(it)?Math.floor((activeMedia?activeMedia.currentTime:demoTime)||0):null), page:null, decision:state, resolved:false }; f.comments=(f.comments||[]).concat([noteComment]); }
+      if(it){ noteComment={ id:'rc'+RV.randToken(), itemId:it.id, author:who, title:'', body:note, at:Date.now(), tcode:(isTimed(it)?Math.floor((activeMedia?activeMedia.currentTime:demoTime)||0):null), page:null, decision:state, priority:(usePrio?changePriority:null), resolved:false }; f.comments=(f.comments||[]).concat([noteComment]); }
     }
     persist(f); saveName(who);
     if(!isDemo){ RV.post({type:state, token, who}); dbDecision(dec, f.status, ev); if(noteComment) dbComment(noteComment, null); }
@@ -1004,7 +1216,92 @@
   function saveName(n){ RV.lsSet('rv_client_name', n); }
   function setAtt(file){ pendingAtt={file}; el('attName').textContent=file.name; el('attChip').classList.remove('hidden'); }
   function clearAtt(){ pendingAtt=null; el('attInput').value=''; el('attChip').classList.add('hidden'); }
+
+  // ================= IMAGE REGION ANNOTATION (§6) =================
+  function annoOn(key){ const s=PS(); return (s && s.annotate && typeof s.annotate[key]==='boolean') ? s.annotate[key] : true; }
+  function imgToolsOn(){ return permOf('markImageRegion') && permOf('comment') && RV.statusOf(proj)!=='closed' && RV.statusOf(proj)!=='expired'
+      && (annoOn('imgPoint')||(annoOn('imgDraw')&&(annoOn('imgRect')||annoOn('imgArrow')||annoOn('imgCircle')))||annoOn('imgText')); }
+  function annoClamp(v){ return Math.max(0,Math.min(1,v)); }
+  const _ic={
+    point:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+    rect:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="1"/></svg>',
+    arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M9 7h8v8"/></svg>',
+    circle:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/></svg>',
+    text:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg>'
+  };
+  function mountImageStage(box, url, it){
+    if(!imgToolsOn()){ box.innerHTML=`<img src="${url}" alt="${RV.escapeHtml(it.name)}">`; return; }
+    const tools=[];
+    if(annoOn('imgPoint')) tools.push('point');
+    if(annoOn('imgDraw')&&annoOn('imgRect')) tools.push('rect');
+    if(annoOn('imgArrow')) tools.push('arrow');
+    if(annoOn('imgCircle')) tools.push('circle');
+    if(annoOn('imgText')) tools.push('text');
+    const toolBtns=tools.map(k=>`<button class="anno-tool" type="button" data-tool="${k}" title="${t['anno_'+k]}" aria-label="${t['anno_'+k]}">${_ic[k]}</button>`).join('');
+    const colorBtn=annoOn('imgColor')?`<input class="anno-color" type="color" id="annoColor" value="${annoColor}" title="${t.annoColor}">`:'';
+    box.innerHTML=`<div class="imgstage" id="imgStage">
+      <img src="${url}" alt="${RV.escapeHtml(it.name)}">
+      <svg class="anno-svg" id="annoSvg"></svg>
+      <div class="anno-tools">${toolBtns}${colorBtn}<button class="anno-clear hidden" type="button" id="annoClear">${t.annoClear}</button></div>
+    </div>`;
+    annoTool=null; renderAnnoOverlay(); wireAnnoStage();
+  }
+  function selectTool(k){
+    annoTool=(annoTool===k?null:k);
+    document.querySelectorAll('#imgStage [data-tool]').forEach(b=>b.classList.toggle('on', b.getAttribute('data-tool')===annoTool));
+    const svg=el('annoSvg'); if(svg) svg.classList.toggle('arm', !!annoTool);
+  }
+  function clearPendingAnno(){ pendingAnno=null; const c=el('annoClear'); if(c) c.classList.add('hidden'); renderAnnoOverlay(); }
+  function afterAnnoDraw(){
+    const c=el('annoClear'); if(c) c.classList.toggle('hidden', !pendingAnno);
+    renderAnnoOverlay();
+    if(pendingAnno){ el('addBox').scrollIntoView({behavior:'smooth',block:'center'}); const cb=el('cBody'); if(cb) cb.focus(); }
+  }
+  function wireAnnoStage(){
+    const svg=el('annoSvg'), stage=el('imgStage'); if(!svg||!stage) return;
+    stage.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>selectTool(b.getAttribute('data-tool'))));
+    const cc=el('annoColor'); if(cc) cc.addEventListener('input',()=>{ annoColor=cc.value; if(pendingAnno){ pendingAnno.color=annoColor; renderAnnoOverlay(); } });
+    const clr=el('annoClear'); if(clr) clr.addEventListener('click',clearPendingAnno);
+    let drawing=false, start=null;
+    const at=e=>{ const r=svg.getBoundingClientRect(); return { x:annoClamp((e.clientX-r.left)/r.width), y:annoClamp((e.clientY-r.top)/r.height) }; };
+    svg.addEventListener('pointerdown',e=>{
+      if(!annoTool) return; e.preventDefault(); const p=at(e);
+      if(annoTool==='point'){ pendingAnno={type:'point',x:p.x,y:p.y,color:annoColor}; afterAnnoDraw(); return; }
+      if(annoTool==='text'){ const txt=(prompt(t.annoTextPrompt)||'').trim(); if(txt){ pendingAnno={type:'text',x:p.x,y:p.y,text:txt,color:annoColor}; afterAnnoDraw(); } return; }
+      drawing=true; start=p; try{ svg.setPointerCapture(e.pointerId); }catch(_){}
+      pendingAnno={type:annoTool,x:p.x,y:p.y,w:0,h:0,x2:p.x,y2:p.y,color:annoColor}; renderAnnoOverlay();
+    });
+    svg.addEventListener('pointermove',e=>{ if(!drawing) return; const p=at(e); if(annoTool==='arrow'){ pendingAnno.x2=p.x; pendingAnno.y2=p.y; } else { pendingAnno.w=p.x-start.x; pendingAnno.h=p.y-start.y; } renderAnnoOverlay(); });
+    const end=e=>{ if(!drawing) return; drawing=false; try{ svg.releasePointerCapture(e.pointerId); }catch(_){}
+      if(annoTool==='arrow'){ if(Math.hypot(pendingAnno.x2-pendingAnno.x, pendingAnno.y2-pendingAnno.y)<0.01) pendingAnno=null; }
+      else if(Math.abs(pendingAnno.w)<0.012 && Math.abs(pendingAnno.h)<0.012) pendingAnno=null;
+      afterAnnoDraw();
+    };
+    svg.addEventListener('pointerup',end); svg.addEventListener('pointercancel',end);
+    if(window.ResizeObserver){ annoRO=new ResizeObserver(()=>renderAnnoOverlay()); annoRO.observe(stage); }
+  }
+  function annoShapeSVG(a,W,H,n){
+    const c=a.color||'#e5484d'; const sw=2.4;
+    const numAt=(x,y)=>n!=null?`<circle cx="${x}" cy="${y}" r="10" fill="${c}"/><text class="anno-num" x="${x}" y="${(y+4.5).toFixed(1)}" text-anchor="middle">${n}</text>`:'';
+    if(a.type==='point'){ const x=a.x*W, y=a.y*H; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="${c}" stroke="#fff" stroke-width="2"/>`+numAt(x, y-16); }
+    if(a.type==='text'){ const x=a.x*W, y=a.y*H; const tw=(a.text||'').length*7+14; return `<rect x="${x.toFixed(1)}" y="${(y-14).toFixed(1)}" width="${tw}" height="20" rx="5" fill="${c}"/><text x="${(x+7).toFixed(1)}" y="${(y).toFixed(1)}" fill="#fff" font-size="12" font-weight="700">${RV.escapeHtml(a.text||'')}</text>`; }
+    if(a.type==='arrow'){ const x1=a.x*W,y1=a.y*H,x2=a.x2*W,y2=a.y2*H; const ang=Math.atan2(y2-y1,x2-x1),h=12; const ax1=x2-h*Math.cos(ang-0.45),ay1=y2-h*Math.sin(ang-0.45),ax2=x2-h*Math.cos(ang+0.45),ay2=y2-h*Math.sin(ang+0.45);
+      return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/><path d="M${x2.toFixed(1)} ${y2.toFixed(1)} L${ax1.toFixed(1)} ${ay1.toFixed(1)} M${x2.toFixed(1)} ${y2.toFixed(1)} L${ax2.toFixed(1)} ${ay2.toFixed(1)}" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" fill="none"/>`+numAt(x1,y1-14); }
+    // rect / circle share a bounding box; normalize negative w/h
+    const x=(Math.min(a.x,a.x+a.w))*W, y=(Math.min(a.y,a.y+a.h))*H, w=Math.abs(a.w)*W, hh=Math.abs(a.h)*H;
+    if(a.type==='circle'){ return `<ellipse cx="${(x+w/2).toFixed(1)}" cy="${(y+hh/2).toFixed(1)}" rx="${(w/2).toFixed(1)}" ry="${(hh/2).toFixed(1)}" fill="none" stroke="${c}" stroke-width="${sw}"/>`+numAt(x+w/2, y-4); }
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${hh.toFixed(1)}" rx="3" fill="none" stroke="${c}" stroke-width="${sw}"/>`+numAt(x, y-4);
+  }
+  function itemAnnoComments(it){ const p=fresh()||proj; return (p.comments||[]).filter(c=>c.itemId===it.id && c.anno); }
+  function renderAnnoOverlay(){
+    const svg=el('annoSvg'); if(!svg) return; const it=activeItem(); if(!it) return;
+    const r=svg.getBoundingClientRect(); const W=r.width||1, H=r.height||1;
+    let html=''; itemAnnoComments(it).forEach((c,i)=> html+=annoShapeSVG(c.anno,W,H,i+1));
+    if(pendingAnno) html+=annoShapeSVG(pendingAnno,W,H,null);
+    svg.innerHTML=html;
+  }
   async function fetchAtt(id,name){ try{ const blob=await RV.loadItemBlob(token, id); if(!blob) return; const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000); }catch(_){} }
+  async function playVoice(id){ try{ const blob=await RV.loadItemBlob(token, id); if(!blob) return; const url=URL.createObjectURL(blob); const a=new Audio(url); a.play().catch(()=>{}); a.addEventListener('ended',()=>{ try{ URL.revokeObjectURL(url); }catch(_){} }); }catch(_){} }
   function demoProject(){
     const now=Date.now(), day=86400000;
     return {
@@ -1026,8 +1323,44 @@
   async function unlock(e){
     e.preventDefault();
     const val=el('pwInput').value;
-    if(await RV.hashPass(val)===proj.password){ el('pwForm').classList.remove('bad'); el('pwErr').textContent=''; enterReview(); }
+    if(await RV.hashPass(val)===proj.password){ el('pwForm').classList.remove('bad'); el('pwErr').textContent=''; proceedToReview(); }
     else { el('pwForm').classList.add('bad'); el('pwErr').textContent=t.pwWrong; }
+  }
+
+  // ---- security gates (§8): view-count limit + email verification ----
+  function viewLimitReached(){
+    const s=PS(); const max=(s&&s.security&&+s.security.maxViews)||0; if(!max||isDemo) return false;
+    const k='rv_views::'+token; const n=+(ls(k)||0);
+    if(n>=max) return true;
+    RV.lsSet(k, String(n+1)); return false;
+  }
+  function needEmailVerify(){ const s=PS(); return !!(s&&s.security&&s.security.requireEmailVerify) && !isDemo && !ls('rv_verified::'+token); }
+  function proceedToReview(){
+    if(viewLimitReached()){ notice('ntLimitT','ntLimitB'); return; }
+    if(needEmailVerify()){ show('emailState'); setTimeout(()=>{ const e=el('evEmail'); if(e) e.focus(); },40); return; }
+    enterReview();
+  }
+  let evPendingCode='', evPendingEmail='';
+  function evSendCode(e){
+    e.preventDefault();
+    const email=(el('evEmail').value||'').trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ el('evErr').textContent=t.evBadEmail; return; }
+    el('evErr').textContent=''; evPendingEmail=email;
+    // Demo/self-contained: generate a code locally and surface it. When the KolkliVerify
+    // backend is armed this is where its /verify/start call would go instead.
+    evPendingCode=String(Math.floor(100000+Math.random()*900000));
+    el('evForm').classList.add('hidden'); el('evCodeForm').classList.remove('hidden');
+    setTimeout(()=>{ const c=el('evCode'); if(c) c.focus(); },40);
+    toast(t.evSent(evPendingCode));
+  }
+  function evVerify(e){
+    e.preventDefault();
+    const code=(el('evCode').value||'').trim();
+    if(code!==evPendingCode){ el('evErr').textContent=t.evBadCode; return; }
+    el('evErr').textContent='';
+    RV.lsSet('rv_verified::'+token, evPendingEmail);
+    if(!ls('rv_client_name')) RV.lsSet('rv_client_name', evPendingEmail);
+    enterReview();
   }
 
   function enterReview(){
@@ -1038,6 +1371,25 @@
     renderHead(); renderVersions(); renderStrip(); renderPerms();
     selectItem(activeId);
     markViewed();
+  }
+
+  // Paint the preview watermark over a video player. Video previews are NOT
+  // re-encoded (that is heavy in-browser) — the mark is drawn live at the video's
+  // native aspect and letterboxed the same way (object-fit:contain) so it lands
+  // on the picture, and the download button is hidden for these items.
+  async function attachVideoWatermark(vplayer, video, visual){
+    if(!vplayer || !video || !window.KolkliWatermark) return;
+    if(!KolkliWatermark.hasVisualContent(visual)) return;
+    let logo=null;
+    if(visual.type==='logo'){ try{ logo=await KolkliWatermark.loadLogo(visual.logo); }catch(_){ return; } }
+    const paint=()=>{
+      const w=video.videoWidth||1280, h=video.videoHeight||720; if(!w||!h) return;
+      let layer=vplayer.querySelector('.vp-wm');
+      if(!layer){ layer=document.createElement('div'); layer.className='vp-wm'; vplayer.appendChild(layer); }
+      try{ layer.innerHTML='<img src="'+KolkliWatermark.layerDataURL(visual, w, h, logo)+'" alt="">'; }catch(_){}
+    };
+    if(video.readyState>=1 && video.videoWidth) paint();
+    else video.addEventListener('loadedmetadata', paint, {once:true});
   }
 
   // ---- modern custom video player (no native controls → no download / speed / PiP menu) ----
@@ -1164,6 +1516,8 @@
   el('strip').addEventListener('click',e=>{ const s=e.target.closest('[data-item]'); if(s) selectItem(s.getAttribute('data-item')); });
   el('vSwitch').addEventListener('click',e=>{ const b=e.target.closest('[data-ver]'); if(!b) return; activeVer=+b.getAttribute('data-ver'); const items=itemsOf(activeVer); activeId=items.length?items[0].id:null; renderVersions(); renderStrip(); selectItem(activeId); });
   el('thread').addEventListener('click',e=>{
+    const vc=e.target.closest('[data-voice]'); if(vc){ playVoice(vc.getAttribute('data-voice')); return; }
+    if(e.target.closest('a[href]')) return;   // let external links open
     const att=e.target.closest('[data-att]'); if(att){ fetchAtt(att.getAttribute('data-att'),att.getAttribute('data-attn')); return; }
     const s=e.target.closest('[data-seek]'); if(s){ const v=s.getAttribute('data-seek'); if(v!=='') seekTo(+v); }
   });
@@ -1174,10 +1528,13 @@
     toast(filterName(cmtFilter));
     renderThread();
   });
-  el('dlBtn').addEventListener('click',async()=>{ const it=activeItem(); if(!it) return; if(!proj.perms.download||isDemo){ toast(t.dlBlocked); return; } const blob=await RV.loadItemBlob(token, it.id); if(!blob) return; const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=it.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000); });
+  el('dlBtn').addEventListener('click',async()=>{ const it=activeItem(); if(!it) return; if(it.wmOverlay){ toast(t.dlWmBlocked); return; } if(!proj.perms.download||isDemo){ toast(t.dlBlocked); return; } const blob=await RV.loadItemBlob(token, it.previewId||it.id); if(!blob) return; const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=dlFileName(it); document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000); });
   el('decideBar').addEventListener('click',e=>{
-    if(e.target.closest('#approveBtn')) decide('approved');
-    else if(e.target.closest('#changesBtn')) decide('changes');
+    const p=e.target.closest('[data-prio]');
+    if(p){ changePriority=p.getAttribute('data-prio'); el('decideBar').querySelectorAll('[data-prio]').forEach(b=>b.classList.toggle('on', b===p)); return; }
+    const ap=e.target.closest('#approveBtn');
+    if(ap){ if(ap.getAttribute('data-locked')){ toast(t.needFullView); return; } decide('approved'); return; }
+    if(e.target.closest('#changesBtn')) decide('changes');
     else if(e.target.closest('#rejectBtn')) decide('rejected');
     else if(e.target.closest('#redoBtn')) redo();
   });
@@ -1197,6 +1554,8 @@
   el('helpBtn').addEventListener('click',()=>toast(t.helpMsg));
   el('appsBtn').addEventListener('click',()=>{ location.href='./'; });
   el('pwForm').addEventListener('submit',unlock);
+  el('evForm').addEventListener('submit',evSendCode);
+  el('evCodeForm').addEventListener('submit',evVerify);
   el('langBtn').addEventListener('click',toggleLangMenu);
   el('langMenu').addEventListener('click',e=>{
     const b=e.target.closest('[data-lang]');
@@ -1228,7 +1587,7 @@
     if(st==='expired'){ notice('ntExpiredT','ntExpiredB'); return; }
     if(st==='closed'){ notice('ntClosedT','ntClosedB'); return; }
     if(proj.password){ show('pwState'); setTimeout(()=>el('pwInput').focus(),40); return; }
-    enterReview();
+    proceedToReview();
   });
 })();
 </script>

@@ -26,7 +26,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
     --card-size:170px;
   }
   html[data-theme="dark"] {
@@ -145,7 +145,7 @@
   .zoom{display:inline-flex;align-items:center;gap:9px;height:38px;padding:0 14px;
     background:var(--panel-2);border:1px solid var(--line);border-radius:999px;
     font-size:14px;color:var(--muted);font-family:var(--mono);white-space:nowrap;}
-  .zoom input[type=range]{accent-color:var(--accent);width:118px;cursor:pointer;direction:ltr;}
+  .zoom input[type=range]{accent-color:var(--accent);width:118px;cursor:pointer;direction:rtl;}
   .zbtn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;flex:0 0 auto;
     border-radius:7px;cursor:pointer;font-size:0;line-height:0;
     background-color:var(--panel);background-repeat:no-repeat;background-position:center;
@@ -2356,6 +2356,19 @@
     if(isClientView()){ try{ return new URLSearchParams(location.search).get('g')||'default'; }catch(_){ return 'default'; } }
     try{ return shareState().id; }catch(_){ return 'default'; }
   }
+  // Arriving from the dashboard "יצירת גלריית בחירה" (files?new=1): every click must open a
+  // BRAND-NEW, empty gallery. The gallery id lives in ONE owner-scoped key (ac_share), so
+  // without this it gets reused and the previous project's files reappear. Mint a fresh id
+  // and wipe the live per-project scratch (album settings + client details) BEFORE GID is
+  // read, so the store hydrates with nothing. Never touch a client share view (?g=).
+  (function freshGalleryIfNew(){
+    try{
+      if(!/[?&]new=1/.test(location.search) || isClientView()) return;
+      persistShare({ id: genId() });                    // new gallery id → empty file store
+      localStorage.removeItem(scopedKey('ac_album'));   // blank title/brand/watermark/perms
+      localStorage.removeItem(scopedKey('ac_client'));  // blank client name/email/phone
+    }catch(_){}
+  })();
   const GID = galleryId();
   const GAL = (window.KolkliSync ? KolkliSync.store({
       service:'select', token:GID, role:(isClientView()?'client':'owner'),
@@ -2365,6 +2378,7 @@
   let galHydrated=false;          // true once init() has loaded the stored gallery
   let galRemoteSelOthers=[];      // OTHER clients' picks (merge target so we never overwrite them)
   let galLastHash='';             // structural fingerprint — skip needless pushes on view switches
+  let galTitle='';                // project name from the synced gallery record (a real client has no owner localStorage)
   let galMetaTimer=null, galWatchTimer=null;
   const GAL_T={
     he:{ saving:'שומר…', failed:'✕ נכשל · לחצו לניסיון חוזר', errEmpty:'אין קבצים שמורים בגלריה — יש להעלות קבצים לפני שליחת הקישור.', errPending:'העלאה עדיין בתהליך — יש להמתין לסיום השמירה לפני שליחת הקישור.', errFailed:'חלק מהקבצים לא נשמרו — יש להעלות אותם מחדש לפני השליחה.', stSaving:'שומר…', stSaved:'✓ נשמר', stError:'שמירה נכשלה — מנסה שוב…' },
@@ -2457,11 +2471,13 @@
   async function hydrateGallery(){
     if(!GAL){ galHydrated=true; return; }
     let meta=GAL.readMeta();               // instant local (offline-safe)
+    if(meta && meta.title) galTitle=String(meta.title);
     let remoteSel=null;
     try{
       const remote=await GAL.pull();       // owner: pullService; client: pullToken (cross-device)
       if(remote){
-        if(remote.files){ meta={ files:remote.files, folders:remote.folders||[] }; if(!isClientView()) GAL.writeMetaLocal(meta); }
+        if(remote.title) galTitle=String(remote.title);
+        if(remote.files){ meta={ files:remote.files, folders:remote.folders||[], title:galTitle }; if(!isClientView()) GAL.writeMetaLocal(meta); }
         if(remote.selection) remoteSel=remote.selection;
       }
     }catch(_){}
@@ -4591,7 +4607,9 @@
     if(effectiveClientView()){
       try{
         const a=loadAlbum(), c=loadClient();
-        const name=(a.alTitle||'').trim() || (c.name||'').trim();
+        // owner preview reads the local settings; a real client (?g=) has none of the
+        // owner's localStorage, so fall back to the synced gallery record's title
+        const name=(a.alTitle||'').trim() || (c.name||'').trim() || String(galTitle||'').trim();
         if(name) title=name;
       }catch(_){}
     }

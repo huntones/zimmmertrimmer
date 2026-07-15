@@ -262,6 +262,16 @@
   };
   RV.saveBrand = function (b) { RV.lsSet(scopedKey('kolkli_brand'), JSON.stringify(b || {})); };
 
+  // ---------- owner-scoped Review Studio settings defaults ----------
+  // The full approval config (permissions, approval rules, change requests,
+  // annotations, security, notifications, branding, statuses) is remembered per
+  // owner so it carries across new projects. Each project also stores its own
+  // snapshot in `project.settings`.
+  RV.loadReviewPrefs = function () {
+    try { var s = JSON.parse(RV.ls(scopedKey('kolkli_review_prefs')) || 'null'); return s || null; } catch (_) { return null; }
+  };
+  RV.saveReviewPrefs = function (s) { try { RV.lsSet(scopedKey('kolkli_review_prefs'), JSON.stringify(s || {})); } catch (_) {} };
+
   // ---------- language detection (matches header/send/request) ----------
   RV.detectLang = function () {
     var chosen = RV.ls('ac_lang'); if (chosen === 'he' || chosen === 'en' || chosen === 'ru') return chosen;

@@ -24,7 +24,9 @@ import sys
 import time
 import traceback
 
-PORT = 7000
+# Port the reverse proxy (nginx) forwards to. Override with the PORT env var or
+# the first CLI arg:   PORT=8000 python3 serve.py    OR    python3 serve.py 8000
+PORT = int(os.environ.get("PORT") or (sys.argv[1] if len(sys.argv) > 1 and str(sys.argv[1]).isdigit() else 7000))
 ROOT = os.path.dirname(os.path.abspath(__file__))
 LOGFILE = os.path.join(ROOT, "server.log")
 

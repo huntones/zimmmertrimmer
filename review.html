@@ -26,7 +26,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0e130e; --panel:#161d16; --panel-2:#1c261b; --line:#2b382a; --line-2:#233022;
@@ -358,6 +358,7 @@
   .badge.b-viewed{background:var(--accent-soft);color:var(--accent-dim);}
   .badge.b-changes{background:var(--warm-soft);color:var(--warn);}
   .badge.b-approved{background:var(--success-soft);color:var(--success-dim);}
+  .badge.b-rejected{background:var(--danger-soft);color:var(--danger);}
   .badge.b-closed{background:var(--panel-2);color:var(--faint);border:1px solid var(--line);}
   .badge.b-expired{background:var(--warm-soft);color:var(--warn);}
   .newbadge{font-family:var(--mono);font-size:11.5px;font-weight:700;background:var(--grad);color:#fff;padding:3px 9px;border-radius:999px;}
@@ -421,6 +422,12 @@
   .fc-on{font-size:12.5px;color:var(--faint);font-family:var(--mono);}
   .fc-pos{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent-dim);background:var(--accent-soft);border-radius:999px;padding:2px 9px;cursor:default;}
   .fc-pos svg{width:11px;height:11px;}
+  .fc-extras{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px;}
+  .fc-chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;border-radius:999px;padding:3px 10px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink-2);text-decoration:none;}
+  .fc-chip.lnk:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .fc-chip.prio-low{background:var(--info-soft);color:var(--info-dim);border-color:transparent;}
+  .fc-chip.prio-medium{background:var(--warm-soft);color:var(--warn);border-color:transparent;}
+  .fc-chip.prio-high{background:var(--danger-soft);color:var(--danger);border-color:transparent;}
   .fc-body{font-size:15px;color:var(--ink-2);line-height:1.55;white-space:pre-wrap;word-break:break-word;}
   .fc-foot{display:flex;align-items:center;gap:8px;margin-top:9px;}
   .fc-res{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);cursor:pointer;font-size:13px;font-weight:600;transition:all .12s;}
@@ -544,8 +551,11 @@
      GREEN "SEND FOR APPROVAL" REDESIGN — hero banner + create layout
      ====================================================================== */
 
-  /* mockup is header-less: the green hero is the top of the page */
-  #site-header{display:none;}
+  /* Show the shared site header (logo on the start/right, centered nav,
+     account on the end/left) above the hero — same as every other in-app
+     page. It stays sticky at the top; the green hero sits right below it.
+     Only the focused project-detail view hides it (it has its own compact
+     top bar) — see body.review-detail below. */
   body::before{z-index:5;}
 
   /* ---- hero banner (background illustration lives here) ---- */
@@ -582,6 +592,37 @@
   .rv-btn.rv-ghost:hover,.rv-btn.rv-ghost.on{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
   .rv-btn .count{font-family:var(--mono);font-size:13px;font-weight:700;min-width:22px;height:22px;padding:0 6px;border-radius:999px;
     display:inline-flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent-dim);}
+
+  /* ---- admin / client view toggle (replaces the create/manage tabs) ---- */
+  .rv-cta{flex-direction:column;align-items:center;gap:13px;}
+  .rv-seg{display:inline-flex;padding:5px;gap:4px;border-radius:16px;background:rgba(255,255,255,.9);
+    border:1px solid #cbe6bd;box-shadow:0 8px 22px rgba(50,90,40,.13);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);}
+  html[data-theme="dark"] .rv-seg{background:rgba(24,34,22,.9);border-color:#2e3d2b;}
+  .rv-segbtn{display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 24px;border:0;border-radius:12px;cursor:pointer;
+    font-family:var(--sans);font-size:16px;font-weight:700;color:var(--ink-2);background:transparent;
+    transition:background .16s,color .16s,box-shadow .16s;}
+  .rv-segbtn svg{width:18px;height:18px;}
+  .rv-segbtn:hover{color:var(--accent-dim);}
+  html[data-theme="dark"] .rv-segbtn:not(.on):hover{color:var(--accent);}
+  .rv-segbtn.on{color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
+    text-shadow:0 1px 2px rgba(0,0,0,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 20px var(--grad-btn-glow);}
+  /* secondary link back to the projects list */
+  .rv-projlink{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 15px;border-radius:11px;cursor:pointer;
+    font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--ink-2);background:rgba(255,255,255,.55);
+    border:1px solid transparent;transition:color .14s,background .14s,border-color .14s;}
+  html[data-theme="dark"] .rv-projlink{background:rgba(24,34,22,.5);}
+  .rv-projlink svg{width:16px;height:16px;opacity:.85;}
+  .rv-projlink:hover,.rv-projlink.on{color:var(--accent-dim);background:var(--accent-soft);border-color:#cbe6bd;}
+  .rv-projlink .count{font-family:var(--mono);font-size:12.5px;font-weight:700;min-width:20px;height:20px;padding:0 6px;border-radius:999px;
+    display:inline-flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent-dim);}
+  html[data-theme="dark"] .rv-projlink .count{background:rgba(122,196,86,.16);}
+
+  /* create screen shows form (admin) or the live client preview, one at a time */
+  #createGrid.mode-admin,#createGrid.mode-client{grid-template-columns:minmax(0,1fr);}
+  #createGrid.mode-admin>.col:last-child{display:none;}
+  #createGrid.mode-client>.col:first-child{display:none;}
+  #createGrid.mode-client>.col:last-child{max-width:560px;margin-inline:auto;width:100%;}
+  #createGrid.mode-client .rvside{position:static;top:auto;}
 
   /* ---- content container pulled up over the hero ---- */
   .wrap{max-width:1200px;margin:0 auto;padding:14px 22px 46px;position:relative;z-index:3;}
@@ -699,20 +740,28 @@
     .rvf-msg .ta{min-height:96px;}
     .rvform{padding:20px 18px;}
   }
+  @media (max-width:440px){
+    .rv-seg{width:100%;max-width:340px;}
+    .rv-segbtn{flex:1;justify-content:center;padding:0 12px;font-size:15px;}
+  }
 </style>
 <style>
   /* ============================================================
      SCREENSHOT-MATCHED CLIENT-REVIEW PROJECT DETAIL  ( ?p= view )
      A skin layered on top of #projectView — all data logic stays.
      ============================================================ */
-  body.review-detail{background:#e8ecf0;}
-  html[data-theme="dark"] body.review-detail{background:#090c09;}
+  body.review-detail{background:var(--bg);}
   body.review-detail::before{display:none;}
-  body.review-detail #site-header,
+  /* Header now shows on this view too (unified across the app); only the
+     decorative green hero stays hidden here. */
   body.review-detail .rv-hero{display:none!important;}
-  body.review-detail .wrap{max-width:1160px;margin:16px auto 34px;padding:0;position:static;
-    background:var(--panel);border:1px solid var(--line);border-radius:20px;
-    box-shadow:0 20px 55px rgba(28,40,26,.16);overflow:hidden;}
+  /* Full-width, unboxed page — no floating card, matching the create/manage views. */
+  body.review-detail .wrap{max-width:none;margin:0;padding:0;position:static;
+    background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;}
+  /* The shared site header supplies the KOLKLI brand; drop the duplicate in-card
+     logo and keep only the Share action in the compact project toolbar. */
+  body.review-detail .rd-brand{display:none;}
+  body.review-detail .rd-topbar{justify-content:flex-end;}
   body.review-detail .wrap>footer{display:none;}
   body.review-detail .pbwrap{display:none;}
 
@@ -849,6 +898,184 @@
     .review-detail .itemgrid{grid-template-columns:1fr;}
     .review-detail #dName{font-size:20px;}
   }
+
+  /* ---- preview watermark section ---- */
+  .wmsec{margin-top:2px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);overflow:hidden;}
+  .wmsec-head{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer;user-select:none;}
+  .wmsec-head .wmi{width:34px;height:34px;flex:none;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);color:var(--accent-dim);}
+  .wmsec-head .wmi svg{width:18px;height:18px;}
+  .wmsec-head .wmt{flex:1;min-width:0;}
+  .wmsec-head .wmt b{display:block;font-size:14.5px;color:var(--ink);}
+  .wmsec-head .wmt span{display:block;font-size:12.5px;color:var(--muted);margin-top:1px;}
+  /* iOS-style switch */
+  .sw{position:relative;width:42px;height:24px;flex:none;}
+  .sw input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;}
+  .sw .track{position:absolute;inset:0;background:var(--line-2);border:1px solid var(--line);border-radius:999px;transition:background .16s;}
+  .sw .knob{position:absolute;top:2px;inset-inline-start:2px;width:18px;height:18px;border-radius:50%;background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.28);transition:transform .16s;}
+  .sw input:checked ~ .track{background:var(--accent);border-color:var(--accent);}
+  html[dir="rtl"] .sw input:checked ~ .knob{transform:translateX(-18px);}
+  html:not([dir="rtl"]) .sw input:checked ~ .knob{transform:translateX(18px);}
+  .wmsec-body{padding:0 14px 14px;display:none;}
+  .wmsec.on .wmsec-body{display:block;}
+  .wmsec.on .wmsec-head{border-bottom:1px solid var(--line);}
+  .wm-note{font-size:12.5px;color:var(--muted);background:var(--panel);border:1px dashed var(--line);border-radius:9px;padding:9px 11px;margin:12px 0;display:flex;gap:8px;align-items:flex-start;}
+  .wm-note svg{width:15px;height:15px;flex:none;margin-top:1px;color:var(--accent-dim);}
+  .wm-block{margin-top:12px;}
+  .wm-block > .wblbl{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink-2);margin:0 0 9px;}
+  .wm-block > .wblbl svg{width:15px;height:15px;color:var(--muted);}
+  .wm-block.off{opacity:.42;pointer-events:none;filter:grayscale(.3);}
+  .wm-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;}
+  .wm-f{min-width:0;} .wm-f .wfl{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;}
+  .wm-seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px;}
+  .wm-seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:600;
+    padding:5px 12px;border-radius:7px;cursor:pointer;}
+  .wm-seg button.on{background:var(--accent);color:var(--accent-ink);}
+  .wm-row{display:flex;align-items:center;gap:9px;}
+  .wm-range{display:flex;align-items:center;gap:9px;}
+  .wm-range input[type=range]{flex:1;min-width:60px;accent-color:var(--accent);height:4px;}
+  .wm-range .val{font-family:var(--mono);font-size:12px;color:var(--ink-2);min-width:42px;text-align:end;}
+  .wm-color{width:38px;height:34px;padding:0;border:1px solid var(--line);border-radius:9px;background:var(--panel);cursor:pointer;flex:none;}
+  .wm-color::-webkit-color-swatch-wrapper{padding:3px;} .wm-color::-webkit-color-swatch{border:none;border-radius:6px;}
+  .wm-pos{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:96px;}
+  .wm-pos button{aspect-ratio:1;border:1px solid var(--line);background:var(--panel);border-radius:6px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;padding:0;}
+  .wm-pos button i{width:7px;height:7px;border-radius:2px;background:var(--faint);display:block;}
+  .wm-pos button.on{border-color:var(--accent);background:var(--accent-soft);}
+  .wm-pos button.on i{background:var(--accent);}
+  .wm-pos.tiled{opacity:.4;pointer-events:none;}
+  .wm-logo{display:flex;align-items:center;gap:9px;}
+  .wm-logo .lp{width:40px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--panel);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted);}
+  .wm-logo .lp img{max-width:100%;max-height:100%;object-fit:contain;} .wm-logo .lp svg{width:16px;height:16px;}
+  .wm-mini{border:1px solid var(--line);background:var(--panel);color:var(--ink-2);border-radius:8px;padding:7px 11px;
+    font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .wm-mini:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .wm-chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);cursor:pointer;user-select:none;}
+  .wm-chk input{width:16px;height:16px;accent-color:var(--accent);}
+  .wm-hide{display:none !important;}
+  /* watermarked preview thumb badge in the client mock */
+  .pvthumb.pvwm{position:relative;}
+  .pvthumb .pvwm-badge{position:absolute;inset-block-end:2px;inset-inline-end:2px;background:rgba(0,0,0,.62);color:#fff;
+    font-size:9px;line-height:1;padding:2px 4px;border-radius:4px;font-weight:700;}
+  @media (max-width:720px){ .wm-grid2{grid-template-columns:1fr;} }
+</style>
+<style id="review-studio-css">
+  :root{ --accent-line:color-mix(in srgb, var(--accent) 42%, var(--line)); }
+
+  /* ===== settings gear in the form header ===== */
+  .rvf-hd{display:flex;align-items:center;gap:12px;margin:0 0 20px;}
+  .rvf-hd .rvf-title{margin:0;flex:1;min-width:0;}
+  .cl-gear{width:44px;height:44px;flex-shrink:0;border-radius:13px;display:grid;place-items:center;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);position:relative;
+    transition:border-color .14s,color .14s,background .14s;}
+  .cl-gear:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .cl-gear:hover svg{transform:rotate(72deg);}
+  .cl-gear svg{width:22px;height:22px;transition:transform .5s cubic-bezier(.3,.8,.3,1);}
+  .cl-gear::after{content:'';position:absolute;top:-3px;inset-inline-start:-3px;width:9px;height:9px;border-radius:50%;
+    background:var(--grad-btn);box-shadow:0 0 0 2px var(--panel);}
+  .cl-gear.seen::after{display:none;}
+
+  /* active-settings summary chips shown on the form */
+  .rs-chips{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 18px;}
+  .rs-chips:empty{display:none;}
+  .rs-chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--accent-dim);
+    background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:999px;padding:5px 11px;line-height:1;}
+  .rs-chip svg{width:13px;height:13px;}
+  .rs-chip.muted{color:var(--muted);background:var(--panel-2);border-color:var(--line);}
+
+  /* ===== Review Studio modal ===== */
+  .studio{position:fixed;inset:0;z-index:230;display:none;}
+  .studio.show{display:block;}
+  .studio-scrim{position:absolute;inset:0;background:rgba(10,14,10,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;transition:opacity .2s;}
+  .studio.show .studio-scrim{opacity:1;}
+  .studio-box{position:absolute;top:50%;left:50%;width:min(1040px,calc(100vw - 28px));height:min(788px,calc(100vh - 32px));
+    background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-lg);overflow:hidden;
+    display:flex;flex-direction:column;opacity:0;transform:translate(-50%,-50%) scale(.97);
+    transition:opacity .22s ease,transform .24s cubic-bezier(.2,.9,.3,1);}
+  .studio.show .studio-box{opacity:1;transform:translate(-50%,-50%) scale(1);}
+
+  .studio-hd{display:flex;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--line-2);background:var(--panel-2);}
+  .studio-hd-ico{width:44px;height:44px;flex-shrink:0;border-radius:13px;display:grid;place-items:center;color:#fff;background:var(--grad-btn);box-shadow:0 6px 16px var(--grad-btn-glow);}
+  .studio-hd-ico svg{width:23px;height:23px;}
+  .studio-hd-t{flex:1;min-width:0;}
+  .studio-hd-t h2{margin:0;font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--ink);}
+  .studio-hd-t p{margin:2px 0 0;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .studio-x{width:36px;height:36px;flex-shrink:0;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .12s;}
+  .studio-x:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .studio-x svg{width:18px;height:18px;}
+
+  .studio-main{flex:1;min-height:0;display:grid;grid-template-columns:246px minmax(0,1fr);}
+  .studio-rail{overflow-y:auto;border-inline-end:1px solid var(--line-2);background:var(--panel-2);padding:8px 10px 16px;}
+  .st-glabel{font:600 10.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:14px 10px 7px;}
+  .st-nav{display:flex;align-items:center;gap:11px;width:100%;padding:10px 11px;border-radius:11px;border:none;background:transparent;color:var(--ink-2);cursor:pointer;font:600 13.5px var(--sans);text-align:start;margin-bottom:2px;transition:background .12s,color .12s;}
+  .st-nav:hover{background:var(--panel);}
+  .st-nav.on{background:var(--accent-soft);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  .st-nav svg{width:18px;height:18px;flex-shrink:0;}
+  .st-nav span{flex:1;min-width:0;}
+  .st-nav .st-count{margin-inline-start:auto;flex:none;}
+
+  .studio-content{overflow-y:auto;padding:22px 26px 26px;}
+  .st-sec{display:none;}
+  .st-sec.on{display:block;animation:stFade .22s ease;}
+  @keyframes stFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .st-sec-h{font-size:16px;font-weight:800;color:var(--ink);margin:0 0 3px;letter-spacing:-.01em;}
+  .st-sec-sub{font-size:13px;color:var(--muted);margin:0 0 18px;line-height:1.5;}
+
+  .studio-ft{display:flex;align-items:center;gap:12px;padding:11px 18px;border-top:1px solid var(--line-2);background:var(--panel-2);}
+  .studio-ft-note{font-size:12px;color:var(--faint);display:inline-flex;align-items:center;gap:7px;min-width:0;}
+  .studio-ft-note svg{width:15px;height:15px;color:var(--success-dim);flex-shrink:0;}
+  .studio-done{margin-inline-start:auto;height:40px;padding:0 28px;border-radius:11px;border:none;cursor:pointer;color:#fff;font:700 14px var(--sans);
+    background:var(--grad-btn);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 16px var(--grad-btn-glow);transition:filter .14s,transform .08s;}
+  .studio-done:hover{filter:brightness(1.05);} .studio-done:active{transform:translateY(1px);}
+  .st-count{font:600 11px var(--mono);background:var(--accent-soft);color:var(--accent-dim);border-radius:999px;padding:2px 9px;}
+
+  /* sub-group heading inside a section */
+  .st-sub{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:700;color:var(--ink-2);margin:22px 0 11px;}
+  .st-sub:first-of-type{margin-top:4px;}
+  .st-sub::after{content:'';flex:1;height:1px;background:var(--line-2);}
+  .st-sub svg{width:15px;height:15px;color:var(--accent);flex-shrink:0;}
+
+  /* toggle row (reuses review .sw switch) */
+  .st-toggle{display:flex;align-items:center;gap:14px;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);margin-bottom:9px;}
+  .st-toggle.dis{opacity:.5;pointer-events:none;}
+  .st-toggle-tx{flex:1;min-width:0;}
+  .st-toggle-nm{font-size:13.5px;font-weight:600;color:var(--ink);}
+  .st-toggle-ds{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4;}
+
+  /* generic fields */
+  .st-field{margin-bottom:16px;}
+  .st-flabel{display:block;font-size:13px;font-weight:700;color:var(--ink-2);margin-bottom:7px;}
+  .st-hint{font-size:12px;color:var(--faint);margin-top:7px;line-height:1.45;}
+  .st-row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:560px){ .st-row2{grid-template-columns:1fr;} }
+  .st-note{display:flex;gap:9px;align-items:flex-start;font-size:12px;color:var(--muted);line-height:1.5;
+    background:var(--panel-2);border:1px solid var(--line-2);border-radius:11px;padding:11px 13px;margin-bottom:16px;}
+  .st-note svg{width:16px;height:16px;color:var(--accent);flex-shrink:0;margin-top:1px;}
+  .st-seg{display:inline-flex;flex-wrap:wrap;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:3px;gap:2px;}
+  .st-seg button{border:none;background:transparent;border-radius:8px;padding:8px 16px;font:600 13px var(--sans);color:var(--muted);cursor:pointer;transition:all .12s;}
+  .st-seg button.on{background:var(--panel);color:var(--accent-dim);box-shadow:var(--shadow-sm);}
+  /* section mount points wrap relocated inline blocks */
+  .st-mount{margin-bottom:4px;}
+  .st-mount .opt{margin-bottom:16px;}
+  .st-mount .optlbl{font-size:13px;}
+  .st-mount .rvf-notify{margin:0;}
+
+  /* status legend */
+  .rs-legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;}
+  .rs-lg{display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);font-size:13px;font-weight:600;color:var(--ink-2);}
+  .rs-lg .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px color-mix(in srgb,currentColor 16%,transparent);}
+  .st-field input[type=number].inp{width:160px;}
+
+  @media (max-width:720px){
+    .studio-box{inset:0;width:100%;height:100%;max-width:none;border-radius:0;transform:none;}
+    .studio.show .studio-box{transform:none;}
+    .studio-main{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);}
+    .studio-rail{display:flex;gap:6px;overflow-x:auto;border-inline-end:none;border-bottom:1px solid var(--line-2);padding:10px;}
+    .st-glabel{display:none;}
+    .st-nav{width:auto;white-space:nowrap;flex-shrink:0;margin-bottom:0;}
+    .st-nav .st-count{display:none;}
+  }
 </style>
 </head>
 <body>
@@ -861,11 +1088,17 @@
     <h1 class="rv-title" data-i18n="pageTitle"></h1>
     <p class="rv-sub" data-i18n="pageSub"></p>
     <div class="rv-cta" id="tabs">
-      <button class="rv-btn rv-primary on" id="tabCreate" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-        <span data-i18n="tabCreate"></span>
-      </button>
-      <button class="rv-btn rv-ghost" id="tabManage" type="button">
+      <div class="rv-seg" id="viewToggle" role="tablist" aria-label="Admin / client view">
+        <button class="rv-segbtn on" id="modeAdmin" type="button" role="tab" aria-selected="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+          <span data-i18n="modeAdmin"></span>
+        </button>
+        <button class="rv-segbtn" id="modeClient" type="button" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span data-i18n="modeClient"></span>
+        </button>
+      </div>
+      <button class="rv-projlink" id="tabManage" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
         <span data-i18n="tabManage"></span>
         <span class="count" id="mgCount">0</span>
@@ -878,10 +1111,16 @@
 
   <!-- ============ CREATE ============ -->
   <div id="createView">
-    <div class="grid" id="createGrid">
+    <div class="grid mode-admin" id="createGrid">
       <div class="col">
         <div class="card rvform">
-          <h3 class="rvf-title" data-i18n="formTitle"></h3>
+          <div class="rvf-hd">
+            <h3 class="rvf-title" data-i18n="formTitle"></h3>
+            <button class="cl-gear" id="openStudio" type="button" data-i18n-al="studioOpenAria" aria-label="הגדרות אישור">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+            </button>
+          </div>
+          <div class="rs-chips" id="rsChips"></div>
 
           <!-- project name + client -->
           <div class="rvf-row2">
@@ -927,28 +1166,101 @@
             </div>
           </div>
 
-          <!-- what the client can do -->
-          <div class="opt rvf-permsopt">
-            <div class="optlbl" data-i18n="fPerms"></div>
-            <div class="perms" id="perms">
-              <label class="permrow on" data-perm="download">
-                <input type="checkbox" id="pmDownload" checked>
-                <span class="pchk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
-                <span class="pt"><b data-i18n="permDownload"></b><span data-i18n="permDownloadD"></span></span>
-                <span class="pk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></span>
+          <!-- preview watermark (protects the client preview; original stays untouched) -->
+          <div class="opt rvf-wm">
+            <div class="wmsec" id="wmSec">
+              <label class="wmsec-head">
+                <span class="wmi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                <span class="wmt"><b data-i18n="wmTitle"></b><span data-i18n="wmSub"></span></span>
+                <span class="sw"><input type="checkbox" id="wmOn"><span class="track"></span><span class="knob"></span></span>
               </label>
-              <label class="permrow on" data-perm="approve">
-                <input type="checkbox" id="pmApprove" checked>
-                <span class="pchk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
-                <span class="pt"><b data-i18n="permApprove"></b><span data-i18n="permApproveD"></span></span>
-                <span class="pk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg></span>
-              </label>
-              <label class="permrow on" data-perm="comment">
-                <input type="checkbox" id="pmComment" checked>
-                <span class="pchk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
-                <span class="pt"><b data-i18n="permComment"></b><span data-i18n="permCommentD"></span></span>
-                <span class="pk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-              </label>
+              <div class="wmsec-body">
+                <div class="wm-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span data-i18n="wmNote"></span></div>
+
+                <!-- VISUAL — images & video -->
+                <div class="wm-block" id="wmVisualBlock">
+                  <div class="wblbl">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>
+                    <span data-i18n="wmVisualT"></span>
+                    <label class="sw" style="margin-inline-start:auto"><input type="checkbox" id="wmVisOn" checked><span class="track"></span><span class="knob"></span></label>
+                  </div>
+                  <div id="wmVisBody">
+                    <div class="wm-grid2">
+                      <div class="wm-f">
+                        <span class="wfl" data-i18n="wmType"></span>
+                        <div class="wm-seg" id="wmTypeSeg">
+                          <button type="button" data-wmtype="text" data-i18n="wmTypeText"></button>
+                          <button type="button" data-wmtype="logo" data-i18n="wmTypeLogo"></button>
+                        </div>
+                      </div>
+                      <div class="wm-f" id="wmTextRow">
+                        <span class="wfl" data-i18n="wmText"></span>
+                        <div class="wm-row">
+                          <input class="inp" id="wmTextInp" type="text" data-i18n-ph="wmTextPh">
+                          <input class="wm-color" id="wmColor" type="color" value="#ffffff" title="">
+                        </div>
+                      </div>
+                      <div class="wm-f wm-hide" id="wmLogoRow">
+                        <span class="wfl" data-i18n="wmLogo"></span>
+                        <div class="wm-logo">
+                          <span class="lp" id="wmLogoPrev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg></span>
+                          <button type="button" class="wm-mini" id="wmLogoBtn" data-i18n="wmLogoUp"></button>
+                          <button type="button" class="wm-mini wm-hide" id="wmLogoRm" data-i18n="wmLogoRm"></button>
+                          <input type="file" id="wmLogoInput" accept="image/*" hidden>
+                        </div>
+                      </div>
+                      <div class="wm-f">
+                        <span class="wfl" data-i18n="wmPosition"></span>
+                        <div class="wm-pos" id="wmPos">
+                          <button type="button" data-pos="tl"><i></i></button><button type="button" data-pos="tc"><i></i></button><button type="button" data-pos="tr"><i></i></button>
+                          <button type="button" data-pos="ml"><i></i></button><button type="button" data-pos="mc"><i></i></button><button type="button" data-pos="mr"><i></i></button>
+                          <button type="button" data-pos="bl"><i></i></button><button type="button" data-pos="bc"><i></i></button><button type="button" data-pos="br"><i></i></button>
+                        </div>
+                      </div>
+                      <div class="wm-f">
+                        <span class="wfl" data-i18n="wmSize"></span>
+                        <div class="wm-range"><input type="range" id="wmSize" min="2" max="18" step="1" value="6"><span class="val" id="wmSizeV"></span></div>
+                        <span class="wfl" style="margin-top:9px" data-i18n="wmOpacity"></span>
+                        <div class="wm-range"><input type="range" id="wmOpacity" min="5" max="100" step="1" value="45"><span class="val" id="wmOpacityV"></span></div>
+                      </div>
+                      <div class="wm-f">
+                        <span class="wfl" data-i18n="wmRotation"></span>
+                        <div class="wm-range"><input type="range" id="wmRotation" min="-90" max="90" step="1" value="0"><span class="val" id="wmRotationV"></span></div>
+                        <label class="wm-chk" style="margin-top:13px"><input type="checkbox" id="wmTile"><span data-i18n="wmTile"></span></label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- AUDIO -->
+                <div class="wm-block" id="wmAudioBlock">
+                  <div class="wblbl">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    <span data-i18n="wmAudioT"></span>
+                    <label class="sw" style="margin-inline-start:auto"><input type="checkbox" id="wmAudOn" checked><span class="track"></span><span class="knob"></span></label>
+                  </div>
+                  <div id="wmAudBody">
+                    <div class="wm-grid2">
+                      <div class="wm-f">
+                        <span class="wfl" data-i18n="wmInterval"></span>
+                        <div class="wm-range"><input type="range" id="wmInterval" min="3" max="60" step="1" value="15"><span class="val" id="wmIntervalV"></span></div>
+                        <label class="wm-chk" style="margin-top:11px"><input type="checkbox" id="wmRandom"><span data-i18n="wmRandom"></span></label>
+                      </div>
+                      <div class="wm-f">
+                        <span class="wfl" data-i18n="wmVolume"></span>
+                        <div class="wm-range"><input type="range" id="wmVolume" min="5" max="100" step="1" value="30"><span class="val" id="wmVolumeV"></span></div>
+                        <span class="wfl" style="margin-top:9px" data-i18n="wmPlacement"></span>
+                        <select class="inp" id="wmPlacement">
+                          <option value="throughout" data-i18n="wmPlAll"></option>
+                          <option value="start" data-i18n="wmPlStart"></option>
+                          <option value="middle" data-i18n="wmPlMiddle"></option>
+                          <option value="end" data-i18n="wmPlEnd"></option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1161,6 +1473,190 @@
   <footer data-i18n="foot"></footer>
 </div>
 
+<!-- ============ REVIEW STUDIO (settings gear) ============ -->
+<div class="studio" id="reviewStudio" role="dialog" aria-modal="true" aria-labelledby="rsTitle">
+  <div class="studio-scrim" id="rsScrim"></div>
+  <div class="studio-box">
+    <header class="studio-hd">
+      <div class="studio-hd-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-4"/></svg></div>
+      <div class="studio-hd-t"><h2 id="rsTitle" data-i18n="rsTitle"></h2><p data-i18n="rsSub"></p></div>
+      <button class="studio-x" id="rsClose" type="button" data-i18n-al="close" aria-label="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </header>
+    <div class="studio-main">
+      <nav class="studio-rail" id="rsRail">
+        <div class="st-glabel" data-i18n="rsGrpAccess"></div>
+        <button class="st-nav on" type="button" data-sec="perms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg><span data-i18n="rsNavPerms"></span></button>
+        <button class="st-nav" type="button" data-sec="approval"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg><span data-i18n="rsNavApproval"></span></button>
+        <button class="st-nav" type="button" data-sec="changes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg><span data-i18n="rsNavChanges"></span></button>
+        <button class="st-nav" type="button" data-sec="annotate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span data-i18n="rsNavAnnotate"></span></button>
+        <div class="st-glabel" data-i18n="rsGrpProtect"></div>
+        <button class="st-nav" type="button" data-sec="security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="rsNavSecurity"></span></button>
+        <button class="st-nav" type="button" data-sec="notify"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span data-i18n="rsNavNotify"></span></button>
+        <div class="st-glabel" data-i18n="rsGrpPresent"></div>
+        <button class="st-nav" type="button" data-sec="branding"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C21.996 6.012 17.5 2 12 2Z"/></svg><span data-i18n="rsNavBranding"></span></button>
+        <button class="st-nav" type="button" data-sec="statuses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="4" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="20" y1="20" x2="20" y2="14"/></svg><span data-i18n="rsNavStatuses"></span></button>
+      </nav>
+
+      <div class="studio-content" id="rsContent">
+
+        <!-- ===== PERMISSIONS ===== -->
+        <section class="st-sec on" data-sec="perms">
+          <h3 class="st-sec-h" data-i18n="rsPermsH"></h3>
+          <p class="st-sec-sub" data-i18n="rsPermsSub"></p>
+
+          <label class="st-toggle dis"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmView"></span><span class="st-toggle-ds" data-i18n="rsPmViewD"></span></span><span class="sw"><input type="checkbox" data-rs="perms.view" checked disabled><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmDownload"></span><span class="st-toggle-ds" data-i18n="rsPmDownloadD"></span></span><span class="sw"><input type="checkbox" id="pmDownload" data-rs="perms.download" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmComment"></span><span class="st-toggle-ds" data-i18n="rsPmCommentD"></span></span><span class="sw"><input type="checkbox" id="pmComment" data-rs="perms.comment" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmReply"></span><span class="st-toggle-ds" data-i18n="rsPmReplyD"></span></span><span class="sw"><input type="checkbox" data-rs="perms.replyToComments" checked><span class="track"></span><span class="knob"></span></span></label>
+
+          <div class="st-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg><span data-i18n="rsSubDecisions"></span></div>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmApprove"></span><span class="st-toggle-ds" data-i18n="rsPmApproveD"></span></span><span class="sw"><input type="checkbox" id="pmApprove" data-rs="perms.approve" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmChanges"></span><span class="st-toggle-ds" data-i18n="rsPmChangesD"></span></span><span class="sw"><input type="checkbox" data-rs="perms.requestChanges" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmReject"></span><span class="st-toggle-ds" data-i18n="rsPmRejectD"></span></span><span class="sw"><input type="checkbox" data-rs="perms.reject" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmPerFile"></span><span class="st-toggle-ds" data-i18n="rsPmPerFileD"></span></span><span class="sw"><input type="checkbox" data-rs="perms.approvePerFile" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmWhole"></span><span class="st-toggle-ds" data-i18n="rsPmWholeD"></span></span><span class="sw"><input type="checkbox" data-rs="perms.approveWholeProject" checked><span class="track"></span><span class="knob"></span></span></label>
+
+          <div class="st-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span data-i18n="rsSubMarking"></span></div>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmMarkTl"></span><span class="st-toggle-ds" data-i18n="rsPmMarkTlD"></span></span><span class="sw"><input type="checkbox" data-rs="perms.markTimeline" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmMarkImg"></span><span class="st-toggle-ds" data-i18n="rsPmMarkImgD"></span></span><span class="sw"><input type="checkbox" data-rs="perms.markImageRegion" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsPmMarkPdf"></span><span class="st-toggle-ds" data-i18n="rsPmMarkPdfD"></span></span><span class="sw"><input type="checkbox" data-rs="perms.markPdfPage" checked><span class="track"></span><span class="knob"></span></span></label>
+
+          <div class="st-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span data-i18n="rsSubResponses"></span></div>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsRespFree"></span></span><span class="sw"><input type="checkbox" data-rs="responses.freeComment" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsRespApproved"></span></span><span class="sw"><input type="checkbox" data-rs="responses.approved" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsRespChanges"></span></span><span class="sw"><input type="checkbox" data-rs="responses.needsChanges" checked><span class="track"></span><span class="knob"></span></span></label>
+        </section>
+
+        <!-- ===== APPROVAL & WORKFLOW ===== -->
+        <section class="st-sec" data-sec="approval">
+          <h3 class="st-sec-h" data-i18n="rsApprH"></h3>
+          <p class="st-sec-sub" data-i18n="rsApprSub"></p>
+
+          <div class="st-field">
+            <span class="st-flabel" data-i18n="rsApprMode"></span>
+            <div class="st-seg" id="rsApprModeSeg">
+              <button type="button" data-seg="approval.mode" data-val="wholeProject" data-i18n="rsApprModeWhole"></button>
+              <button type="button" data-seg="approval.mode" data-val="perFile" data-i18n="rsApprModeFile"></button>
+            </div>
+            <input type="hidden" data-rs="approval.mode" value="wholeProject">
+          </div>
+
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsApprReqNote"></span><span class="st-toggle-ds" data-i18n="rsApprReqNoteD"></span></span><span class="sw"><input type="checkbox" data-rs="approval.requireNoteOnReject" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsApprReqStatus"></span><span class="st-toggle-ds" data-i18n="rsApprReqStatusD"></span></span><span class="sw"><input type="checkbox" data-rs="approval.requireStatusEachFile"><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsApprFullView"></span><span class="st-toggle-ds" data-i18n="rsApprFullViewD"></span></span><span class="sw"><input type="checkbox" data-rs="approval.requireFullViewBeforeApprove"><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsApprLock"></span><span class="st-toggle-ds" data-i18n="rsApprLockD"></span></span><span class="sw"><input type="checkbox" data-rs="approval.lockAfterDecision"><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsApprChangeAfter"></span><span class="st-toggle-ds" data-i18n="rsApprChangeAfterD"></span></span><span class="sw"><input type="checkbox" data-rs="approval.allowChangeAfter" checked><span class="track"></span><span class="knob"></span></span></label>
+
+          <div class="st-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M3 7.5 12 3l9 4.5"/><path d="m3 16.5 9 4.5 9-4.5"/></svg><span data-i18n="rsSubWorkflow"></span></div>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsWfVersions"></span><span class="st-toggle-ds" data-i18n="rsWfVersionsD"></span></span><span class="sw"><input type="checkbox" data-rs="approval.versioning" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsWfCloseFinal"></span><span class="st-toggle-ds" data-i18n="rsWfCloseFinalD"></span></span><span class="sw"><input type="checkbox" data-rs="approval.closeOnFinalApproval" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsWfReopen"></span><span class="st-toggle-ds" data-i18n="rsWfReopenD"></span></span><span class="sw"><input type="checkbox" data-rs="approval.allowReopen" checked><span class="track"></span><span class="knob"></span></span></label>
+        </section>
+
+        <!-- ===== CHANGE REQUESTS ===== -->
+        <section class="st-sec" data-sec="changes">
+          <h3 class="st-sec-h" data-i18n="rsChgH"></h3>
+          <p class="st-sec-sub" data-i18n="rsChgSub"></p>
+          <div class="st-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span data-i18n="rsChgNote"></span></div>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsChgPriority"></span><span class="st-toggle-ds" data-i18n="rsChgPriorityD"></span></span><span class="sw"><input type="checkbox" data-rs="changeReq.priority" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsChgExample"></span><span class="st-toggle-ds" data-i18n="rsChgExampleD"></span></span><span class="sw"><input type="checkbox" data-rs="changeReq.exampleFile" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsChgScreenshot"></span><span class="st-toggle-ds" data-i18n="rsChgScreenshotD"></span></span><span class="sw"><input type="checkbox" data-rs="changeReq.screenshot" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsChgVoice"></span><span class="st-toggle-ds" data-i18n="rsChgVoiceD"></span></span><span class="sw"><input type="checkbox" data-rs="changeReq.voiceNote"><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsChgLink"></span><span class="st-toggle-ds" data-i18n="rsChgLinkD"></span></span><span class="sw"><input type="checkbox" data-rs="changeReq.externalLink" checked><span class="track"></span><span class="knob"></span></span></label>
+        </section>
+
+        <!-- ===== ANNOTATIONS ===== -->
+        <section class="st-sec" data-sec="annotate">
+          <h3 class="st-sec-h" data-i18n="rsAnnH"></h3>
+          <p class="st-sec-sub" data-i18n="rsAnnSub"></p>
+
+          <div class="st-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg><span data-i18n="rsSubAV"></span></div>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnTl"></span><span class="st-toggle-ds" data-i18n="rsAnnTlD"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.avTimeline" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnSeg"></span><span class="st-toggle-ds" data-i18n="rsAnnSegD"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.avSegment" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnPlay"></span><span class="st-toggle-ds" data-i18n="rsAnnPlayD"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.avPlayFromPoint" checked><span class="track"></span><span class="knob"></span></span></label>
+
+          <div class="st-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg><span data-i18n="rsSubImg"></span></div>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnPoint"></span><span class="st-toggle-ds" data-i18n="rsAnnPointD"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.imgPoint" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnDraw"></span><span class="st-toggle-ds" data-i18n="rsAnnDrawD"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.imgDraw" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnRect"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.imgRect" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnArrow"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.imgArrow" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnCircle"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.imgCircle" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnText"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.imgText" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnColor"></span><span class="st-toggle-ds" data-i18n="rsAnnColorD"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.imgColor" checked><span class="track"></span><span class="knob"></span></span></label>
+
+          <div class="st-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span data-i18n="rsSubPdf"></span></div>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnPdfPage"></span><span class="st-toggle-ds" data-i18n="rsAnnPdfPageD"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.pdfPageComment" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsAnnPdfMark"></span><span class="st-toggle-ds" data-i18n="rsAnnPdfMarkD"></span></span><span class="sw"><input type="checkbox" data-rs="annotate.pdfMarkup" checked><span class="track"></span><span class="knob"></span></span></label>
+        </section>
+
+        <!-- ===== SECURITY ===== -->
+        <section class="st-sec" data-sec="security">
+          <h3 class="st-sec-h" data-i18n="rsSecH"></h3>
+          <p class="st-sec-sub" data-i18n="rsSecSub"></p>
+          <div class="st-mount" id="rsMountPw"></div>
+          <div class="st-mount" id="rsMountExp"></div>
+          <div class="st-field">
+            <span class="st-flabel" data-i18n="rsSecMaxViews"></span>
+            <input class="inp" type="number" min="0" step="1" data-rs="security.maxViews" value="0" style="max-width:160px">
+            <div class="st-hint" data-i18n="rsSecMaxViewsD"></div>
+          </div>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsSecVerify"></span><span class="st-toggle-ds" data-i18n="rsSecVerifyD"></span></span><span class="sw"><input type="checkbox" data-rs="security.requireEmailVerify"><span class="track"></span><span class="knob"></span></span></label>
+          <div class="st-mount" id="rsMountWm"></div>
+        </section>
+
+        <!-- ===== NOTIFICATIONS ===== -->
+        <section class="st-sec" data-sec="notify">
+          <h3 class="st-sec-h" data-i18n="rsNotH"></h3>
+          <p class="st-sec-sub" data-i18n="rsNotSub"></p>
+          <div class="st-mount" id="rsMountNotify"></div>
+          <div class="st-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg><span data-i18n="rsNotEvents"></span></div>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsNotOpened"></span></span><span class="sw"><input type="checkbox" data-rs="notify.opened" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsNotViewed"></span></span><span class="sw"><input type="checkbox" data-rs="notify.viewed" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsNotDownloaded"></span></span><span class="sw"><input type="checkbox" data-rs="notify.downloaded" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsNotCommented"></span></span><span class="sw"><input type="checkbox" data-rs="notify.commented" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsNotChanges"></span></span><span class="sw"><input type="checkbox" data-rs="notify.requestedChanges" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsNotApproved"></span></span><span class="sw"><input type="checkbox" data-rs="notify.approved" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsNotRejected"></span></span><span class="sw"><input type="checkbox" data-rs="notify.rejected" checked><span class="track"></span><span class="knob"></span></span></label>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsNotFinished"></span></span><span class="sw"><input type="checkbox" data-rs="notify.finished" checked><span class="track"></span><span class="knob"></span></span></label>
+        </section>
+
+        <!-- ===== BRANDING ===== -->
+        <section class="st-sec" data-sec="branding">
+          <h3 class="st-sec-h" data-i18n="rsBrandH"></h3>
+          <p class="st-sec-sub" data-i18n="rsBrandSub"></p>
+          <div class="st-mount" id="rsMountBrand"></div>
+          <div class="st-field">
+            <span class="st-flabel" data-i18n="rsBrandOpen"></span>
+            <textarea class="ta" data-rs="branding.openMsg" rows="2" data-i18n-ph="rsBrandOpenPh"></textarea>
+          </div>
+          <div class="st-field">
+            <span class="st-flabel" data-i18n="rsBrandClose"></span>
+            <textarea class="ta" data-rs="branding.closeMsg" rows="2" data-i18n-ph="rsBrandClosePh"></textarea>
+          </div>
+          <div class="st-field">
+            <span class="st-flabel" data-i18n="rsBrandSign"></span>
+            <input class="inp" type="text" data-rs="branding.signature" data-i18n-ph="rsBrandSignPh">
+          </div>
+        </section>
+
+        <!-- ===== STATUSES & PROGRESS ===== -->
+        <section class="st-sec" data-sec="statuses">
+          <h3 class="st-sec-h" data-i18n="rsStH"></h3>
+          <p class="st-sec-sub" data-i18n="rsStSub"></p>
+          <label class="st-toggle"><span class="st-toggle-tx"><span class="st-toggle-nm" data-i18n="rsStProgress"></span><span class="st-toggle-ds" data-i18n="rsStProgressD"></span></span><span class="sw"><input type="checkbox" data-rs="statuses.showProgressBar" checked><span class="track"></span><span class="knob"></span></span></label>
+          <div class="st-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"/><path d="m4 15 4-4 4 3 5-6"/></svg><span data-i18n="rsStLegend"></span></div>
+          <div class="rs-legend" id="rsLegend"></div>
+        </section>
+
+      </div>
+    </div>
+    <footer class="studio-ft">
+      <span class="studio-ft-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="rsAutosave"></span></span>
+      <button class="studio-done" id="rsDone" type="button" data-i18n="rsDone"></button>
+    </footer>
+  </div>
+</div>
+
 <div class="pv" id="pv">
   <div class="pvbar"><div class="pvt" id="pvTitle"></div><button id="pvClose" type="button" data-i18n="close"></button></div>
   <div class="pvbody" id="pvBody"></div>
@@ -1183,6 +1679,7 @@
 <script src="./auth-store.js"></script>
 <script src="./kolkli-db.js"></script>
 <script src="./review-store.js"></script>
+<script src="./watermark-preview.js"></script>
 <script src="./vendor/qrcode.min.js"></script>
 <script>
 (function(){
@@ -1195,6 +1692,7 @@
       pageTitle:'שלחו ללקוח לאישור',
       pageSub:'צרו פרויקט, העלו חומרים, ושתפו קישור פרטי וממותג. הלקוח צופה, מגיב, מאשר או מבקש תיקונים — בלי לפתוח חשבון.',
       tabCreate:'פרויקט חדש', tabManage:'הפרויקטים שלי',
+      modeAdmin:'תצוגת מנהל', modeClient:'תצוגת לקוח',
       formTitle:'יצירת פרויקט לאישור',
       fName:'שם הפרויקט', fNamePh:'לדוגמה: קליפ בת מצווה — משפחת כהן',
       fClient:'שם הלקוח', fClientPh:'למי זה נשלח',
@@ -1206,10 +1704,20 @@
       permApprove:'לאשר או לבקש תיקונים', permApproveD:'כפתורי החלטה ברורים ללקוח',
       permDownload:'להוריד קבצים', permDownloadD:'הורדת החומרים הסופיים',
       fExpiry:'תוקף הקישור',
-      expNever:'ללא תפוגה', exp1:'יום אחד', exp3:'3 ימים', exp7:'7 ימים', exp30:'30 יום',
+      expNever:'שמור לתמיד', exp1:'יום אחד', exp3:'3 ימים', exp7:'7 ימים', exp30:'30 יום',
       fPwLbl:'סיסמה', fPw:'להגן בסיסמה', fPwPh:'סיסמה לקישור',
       fBrand:'מיתוג', fBrandHint:'הלוגו, השם והצבע יופיעו במסך של הלקוח. נשמר גם לפעם הבאה.',
       brNamePh:'שם העסק', brLogo:'העלאת לוגו', brRemove:'הסרה',
+      wmTitle:'סימן מים לתצוגה מקדימה', wmSub:'הגנה על החומרים שנשלחים ללקוח לתצוגה',
+      wmNote:'סימן המים חל אך ורק על קובצי התצוגה המקדימה שהלקוח רואה ומוריד. הקובץ המקורי שלכם נשמר ללא כל שינוי.',
+      wmVisualT:'תמונות ווידאו', wmType:'סוג', wmTypeText:'טקסט', wmTypeLogo:'לוגו',
+      wmText:'טקסט הסימן', wmTextPh:'לדוגמה: תצוגה מקדימה',
+      wmLogo:'קובץ לוגו', wmLogoUp:'העלאת לוגו', wmLogoRm:'הסרה',
+      wmPosition:'מיקום', wmSize:'גודל', wmOpacity:'שקיפות', wmRotation:'סיבוב', wmTile:'חזרה על פני כל הקובץ',
+      wmAudioT:'אודיו — סימן מים קולי', wmInterval:'תדירות (שנייה בין ביפים)', wmRandom:'מרווחים אקראיים',
+      wmVolume:'עוצמת השמע', wmPlacement:'מיקום ההשמעה',
+      wmPlAll:'לאורך כל הרצועה', wmPlStart:'בתחילת הקובץ', wmPlMiddle:'באמצע', wmPlEnd:'בסוף',
+      wmProtected:'מוגן בסימן מים', wmVisualChip:'סימן מים חזותי', wmAudioChip:'סימן מים קולי',
       fNotify:'הודיעו לי על פעילות מהלקוח',
       createBtn:'צרו קישור לאישור',
       previewLabel:'מה הלקוח רואה', previewEmpty:'החומרים שנשלחו לצפייה כאן',
@@ -1221,10 +1729,10 @@
       foot:'KOLKLI · Client Review · הדגמה מקומית עד לחיבור השרת',
       mgTitle:'הפרויקטים שלי', newReq:'פרויקט חדש',
       mgEmptyTitle:'עדיין אין פרויקטים', mgEmptyBody:'צרו פרויקט ראשון כדי לשלוח חומרים ללקוח ולקבל אישור בקישור אחד.',
-      stDraft:'טיוטה', stSent:'נשלח', stViewed:'נצפה', stChanges:'נדרש תיקון', stApproved:'אושר', stClosed:'נסגר', stExpired:'פג תוקף',
+      stDraft:'טיוטה', stSent:'נשלח', stViewed:'נצפה', stChanges:'נדרש תיקון', stApproved:'אושר', stRejected:'נדחה', stClosed:'נסגר', stExpired:'פג תוקף',
       pcView:'צפייה', pcComment:'הערות', pcApprove:'אישור', pcDownload:'הורדה',
       chipClient:c=>`לקוח: ${c}`, chipItems:n=>`${n} פריטים`, chipVersion:v=>`גרסה ${v}`,
-      chipCreated:d=>`נוצר ${d}`, chipActivity:d=>`פעילות: ${d}`, chipExpires:d=>`פג ${d}`, chipNoExpiry:'ללא תפוגה', chipExpSoon:d=>`פג בעוד ${d}`,
+      chipCreated:d=>`נוצר ${d}`, chipActivity:d=>`פעילות: ${d}`, chipExpires:d=>`פג ${d}`, chipNoExpiry:'שמור לתמיד', chipExpSoon:d=>`פג בעוד ${d}`,
       chipComments:n=>`${n} הערות`,
       newN:n=> n===1?'חדש':`${n} חדשים`,
       aOpen:'פתיחה', aCopy:'העתקת קישור', aClose:'סגירה', aReopen:'פתיחה מחדש', aDel:'מחיקה', aAddVer:'הוספת גרסה',
@@ -1252,6 +1760,7 @@
       pageTitle:'Send work to your client for sign-off',
       pageSub:'Create a project, upload materials, and share a private, branded link. Your client views, comments, approves or requests changes — with no account.',
       tabCreate:'New project', tabManage:'My projects',
+      modeAdmin:'Admin view', modeClient:'Client view',
       formTitle:'Create a review project',
       fName:'Project name', fNamePh:'e.g. Bat-mitzvah film — Cohen family',
       fClient:'Client name', fClientPh:'Who is this for',
@@ -1267,6 +1776,16 @@
       fPwLbl:'Password', fPw:'Protect with a password', fPwPh:'Link password',
       fBrand:'Branding', fBrandHint:'Your logo, name and colour show on the client screen. Saved for next time too.',
       brNamePh:'Business name', brLogo:'Upload logo', brRemove:'Remove',
+      wmTitle:'Preview watermark', wmSub:'Protect the material you send the client to review',
+      wmNote:'The watermark is applied only to the preview files the client views and downloads. Your original file is kept completely unchanged.',
+      wmVisualT:'Images & video', wmType:'Type', wmTypeText:'Text', wmTypeLogo:'Logo',
+      wmText:'Watermark text', wmTextPh:'e.g. PREVIEW',
+      wmLogo:'Logo file', wmLogoUp:'Upload logo', wmLogoRm:'Remove',
+      wmPosition:'Position', wmSize:'Size', wmOpacity:'Opacity', wmRotation:'Rotation', wmTile:'Repeat across the whole file',
+      wmAudioT:'Audio — sound watermark', wmInterval:'Frequency (seconds between beeps)', wmRandom:'Random intervals',
+      wmVolume:'Volume', wmPlacement:'Placement',
+      wmPlAll:'Throughout the track', wmPlStart:'At the start', wmPlMiddle:'In the middle', wmPlEnd:'At the end',
+      wmProtected:'Watermark protected', wmVisualChip:'Visual watermark', wmAudioChip:'Audio watermark',
       fNotify:'Notify me on client activity',
       createBtn:'Create review link',
       previewLabel:'What your client will see', previewEmpty:'Your materials will appear here',
@@ -1278,7 +1797,7 @@
       foot:'KOLKLI · Client Review · Local demo until the server is connected',
       mgTitle:'My projects', newReq:'New project',
       mgEmptyTitle:'No projects yet', mgEmptyBody:'Create your first project to send work to a client and collect approval with a single link.',
-      stDraft:'Draft', stSent:'Sent', stViewed:'Viewed', stChanges:'Changes requested', stApproved:'Approved', stClosed:'Closed', stExpired:'Expired',
+      stDraft:'Draft', stSent:'Sent', stViewed:'Viewed', stChanges:'Changes requested', stApproved:'Approved', stRejected:'Rejected', stClosed:'Closed', stExpired:'Expired',
       pcView:'View', pcComment:'Comment', pcApprove:'Approve', pcDownload:'Download',
       chipClient:c=>`Client: ${c}`, chipItems:n=>`${n} items`, chipVersion:v=>`Version ${v}`,
       chipCreated:d=>`Created ${d}`, chipActivity:d=>`Activity: ${d}`, chipExpires:d=>`Expires ${d}`, chipNoExpiry:'No expiry', chipExpSoon:d=>`Expires in ${d}`,
@@ -1309,6 +1828,7 @@
       pageTitle:'Отправьте работу клиенту на одобрение',
       pageSub:'Создайте проект, загрузите материалы и поделитесь личной брендированной ссылкой. Клиент смотрит, комментирует, одобряет или просит правки — без аккаунта.',
       tabCreate:'Новый проект', tabManage:'Мои проекты',
+      modeAdmin:'Вид администратора', modeClient:'Вид клиента',
       formTitle:'Создать проект на одобрение',
       fName:'Название проекта', fNamePh:'напр. Клип на бат-мицву — семья Коэн',
       fClient:'Имя клиента', fClientPh:'Для кого это',
@@ -1324,6 +1844,16 @@
       fPwLbl:'Пароль', fPw:'Защитить паролем', fPwPh:'Пароль ссылки',
       fBrand:'Брендинг', fBrandHint:'Ваш логотип, имя и цвет появятся на экране клиента. Сохраняется и на будущее.',
       brNamePh:'Название бизнеса', brLogo:'Загрузить логотип', brRemove:'Убрать',
+      wmTitle:'Водяной знак для предпросмотра', wmSub:'Защита материалов, отправленных клиенту на просмотр',
+      wmNote:'Водяной знак применяется только к файлам предпросмотра, которые клиент видит и скачивает. Ваш оригинал остаётся без изменений.',
+      wmVisualT:'Изображения и видео', wmType:'Тип', wmTypeText:'Текст', wmTypeLogo:'Логотип',
+      wmText:'Текст знака', wmTextPh:'напр. PREVIEW',
+      wmLogo:'Файл логотипа', wmLogoUp:'Загрузить логотип', wmLogoRm:'Убрать',
+      wmPosition:'Положение', wmSize:'Размер', wmOpacity:'Прозрачность', wmRotation:'Поворот', wmTile:'Повтор по всему файлу',
+      wmAudioT:'Аудио — звуковой знак', wmInterval:'Частота (секунд между сигналами)', wmRandom:'Случайные интервалы',
+      wmVolume:'Громкость', wmPlacement:'Расположение',
+      wmPlAll:'По всей дорожке', wmPlStart:'В начале', wmPlMiddle:'В середине', wmPlEnd:'В конце',
+      wmProtected:'Защищено водяным знаком', wmVisualChip:'Визуальный знак', wmAudioChip:'Звуковой знак',
       fNotify:'Уведомлять меня об активности клиента',
       createBtn:'Создать ссылку на одобрение',
       previewLabel:'Что увидит ваш клиент', previewEmpty:'Ваши материалы появятся здесь',
@@ -1335,7 +1865,7 @@
       foot:'KOLKLI · Client Review · Локальная демонстрация до подключения сервера',
       mgTitle:'Мои проекты', newReq:'Новый проект',
       mgEmptyTitle:'Проектов пока нет', mgEmptyBody:'Создайте первый проект, чтобы отправить работу клиенту и получить одобрение по одной ссылке.',
-      stDraft:'Черновик', stSent:'Отправлен', stViewed:'Просмотрен', stChanges:'Нужны правки', stApproved:'Одобрен', stClosed:'Закрыт', stExpired:'Истёк',
+      stDraft:'Черновик', stSent:'Отправлен', stViewed:'Просмотрен', stChanges:'Нужны правки', stApproved:'Одобрен', stRejected:'Отклонён', stClosed:'Закрыт', stExpired:'Истёк',
       pcView:'Просмотр', pcComment:'Комментарии', pcApprove:'Одобрение', pcDownload:'Скачивание',
       chipClient:c=>`Клиент: ${c}`, chipItems:n=>`${n} элементов`, chipVersion:v=>`Версия ${v}`,
       chipCreated:d=>`Создан ${d}`, chipActivity:d=>`Активность: ${d}`, chipExpires:d=>`Истекает ${d}`, chipNoExpiry:'Без срока', chipExpSoon:d=>`Истекает через ${d}`,
@@ -1370,7 +1900,7 @@
     footPrivacy:'מדיניות פרטיות', footSecurity:'הגנה מלאה על הקבצים',
     mnPreview:'תצוגה מקדימה', mnDownload:'הורדה',
     accessTitle:'הגדרות גישה', accPwOn:'🔒 מוגן בסיסמה', accPwOff:'🔓 ללא סיסמה',
-    accExp:d=>`⏳ תוקף הקישור: ${d}`, accExpNever:'⏳ הקישור ללא תפוגה',
+    accExp:d=>`⏳ תוקף הקישור: ${d}`, accExpNever:'⏳ הקישור שמור לתמיד',
     accCan:list=>`הלקוח יכול: ${list}`,
     a11yToast:'תפריט נגישות — בקרוב',
   });
@@ -1395,11 +1925,158 @@
     a11yToast:'Меню доступности — скоро',
   });
 
+  // ---- Review Studio (settings gear) strings ----
+  Object.assign(I18N.he,{
+    studioOpenAria:'הגדרות פרויקט האישור',
+    rsTitle:'הגדרות פרויקט האישור', rsSub:'כל מה שקשור לתהליך הצפייה, ההערות והאישור של הלקוח.',
+    rsAutosave:'הכול נשמר אוטומטית', rsDone:'סיום',
+    rsGrpAccess:'תהליך האישור', rsGrpProtect:'הגנה והתראות', rsGrpPresent:'מצג ומעקב',
+    rsNavPerms:'הרשאות הלקוח', rsNavApproval:'אישור ותהליך', rsNavChanges:'בקשות תיקון',
+    rsNavAnnotate:'הערות וסימון', rsNavSecurity:'אבטחה', rsNavNotify:'התראות',
+    rsNavBranding:'מיתוג', rsNavStatuses:'סטטוסים והתקדמות',
+    rsPermsH:'מה הלקוח יכול לעשות', rsPermsSub:'בחרו אילו פעולות זמינות ללקוח בקישור.',
+    rsPmView:'צפייה בקבצים', rsPmViewD:'תמיד פעיל — בלי זה אין מה לאשר',
+    rsPmDownload:'הורדת קבצים', rsPmDownloadD:'הורדת החומרים הסופיים',
+    rsPmComment:'הוספת הערות', rsPmCommentD:'הערות על סרטון, תמונה או מסמך',
+    rsPmReply:'תגובה להערות', rsPmReplyD:'הלקוח יכול להגיב על הערות קיימות',
+    rsSubDecisions:'החלטות', rsPmApprove:'אישור', rsPmApproveD:'סימון "מאושר"',
+    rsPmChanges:'בקשת תיקונים', rsPmChangesD:'כפתור "דורש תיקונים"',
+    rsPmReject:'דחיית קובץ', rsPmRejectD:'הלקוח יכול לדחות',
+    rsPmPerFile:'אישור לכל קובץ בנפרד', rsPmPerFileD:'החלטה נפרדת לכל פריט',
+    rsPmWhole:'אישור כל הפרויקט', rsPmWholeD:'אישור אחד לכל החומרים',
+    rsSubMarking:'סימון', rsPmMarkTl:'סימון בטיימליין', rsPmMarkTlD:'הערה בנקודת זמן בוידאו/אודיו',
+    rsPmMarkImg:'סימון אזור בתמונה', rsPmMarkImgD:'הצבעה על נקודה/אזור בתמונה',
+    rsPmMarkPdf:'הערה על עמוד PDF', rsPmMarkPdfD:'הערה על עמוד מסוים',
+    rsSubResponses:'סוגי תגובות', rsRespFree:'💬 הערה חופשית', rsRespApproved:'👍 מאושר', rsRespChanges:'🔄 דורש תיקונים',
+    rsApprH:'כללי אישור ותהליך', rsApprSub:'איך מתנהל האישור ומה קורה אחריו.',
+    rsApprMode:'שיטת אישור', rsApprModeWhole:'כל הפרויקט', rsApprModeFile:'קובץ‑קובץ',
+    rsApprReqNote:'חובת הערה בדחייה', rsApprReqNoteD:'לא ניתן לדחות בלי לכתוב סיבה',
+    rsApprReqStatus:'חובה לבחור סטטוס לכל קובץ', rsApprReqStatusD:'אין אישור סופי עד שכל קובץ קיבל החלטה',
+    rsApprFullView:'צפייה מלאה לפני אישור', rsApprFullViewD:'אפשר לאשר וידאו/אודיו רק אחרי צפייה עד הסוף',
+    rsApprLock:'נעילת אישור לאחר שליחה', rsApprLockD:'לאחר החלטה — אי אפשר לשנות',
+    rsApprChangeAfter:'אפשר לשנות אישור', rsApprChangeAfterD:'הלקוח יכול לחזור בו מהחלטה',
+    rsSubWorkflow:'תהליך עבודה', rsWfVersions:'היסטוריית גרסאות', rsWfVersionsD:'שמירת גרסאות והעלאת גרסה חדשה',
+    rsWfCloseFinal:'סגירה באישור סופי', rsWfCloseFinalD:'הפרויקט ננעל אוטומטית כשמאושר',
+    rsWfReopen:'פתיחה מחדש', rsWfReopenD:'אפשר לפתוח פרויקט סגור במידת הצורך',
+    rsChgH:'בקשות תיקון', rsChgSub:'אילו כלים זמינים ללקוח כשמבקש תיקון.',
+    rsChgNote:'הכלים האלה מופיעים ללקוח במסך בקשת התיקון.',
+    rsChgPriority:'עדיפות', rsChgPriorityD:'נמוכה / בינונית / גבוהה',
+    rsChgExample:'קובץ לדוגמה', rsChgExampleD:'העלאת קובץ ייחוס',
+    rsChgScreenshot:'צילום מסך', rsChgScreenshotD:'צירוף צילום מסך',
+    rsChgVoice:'הודעה קולית', rsChgVoiceD:'הקלטת הסבר קולי',
+    rsChgLink:'קישור חיצוני', rsChgLinkD:'הפניה לקישור חיצוני',
+    rsAnnH:'הערות וסימון', rsAnnSub:'כלי הסימון שהלקוח יקבל לפי סוג הקובץ.',
+    rsSubAV:'וידאו ואודיו', rsAnnTl:'הערות בטיימליין', rsAnnTlD:'הערה לפי שנייה מדויקת',
+    rsAnnSeg:'סימון קטע זמן', rsAnnSegD:'לדוגמה 00:34–00:41',
+    rsAnnPlay:'השמעה מהנקודה', rsAnnPlayD:'ניגון בדיוק מהנקודה של ההערה',
+    rsSubImg:'תמונות', rsAnnPoint:'סימון נקודה', rsAnnPointD:'הצבעה על נקודה בתמונה',
+    rsAnnDraw:'ציור על התמונה', rsAnnDrawD:'כלי ציור חופשי', rsAnnRect:'מלבן', rsAnnArrow:'חץ', rsAnnCircle:'עיגול', rsAnnText:'טקסט',
+    rsAnnColor:'בחירת צבע', rsAnnColorD:'צבע לסימונים',
+    rsSubPdf:'מסמכים (PDF)', rsAnnPdfPage:'הערה לכל עמוד', rsAnnPdfPageD:'תגובה ממוקדת לעמוד',
+    rsAnnPdfMark:'סימון וציור', rsAnnPdfMarkD:'סימון טקסט וציור על העמוד',
+    rsSecH:'אבטחה', rsSecSub:'הגנה על הקישור והחומרים.',
+    rsSecMaxViews:'הגבלת מספר צפיות', rsSecMaxViewsD:'0 = ללא הגבלה. לאחר המכסה הקישור נחסם.',
+    rsSecVerify:'אימות במייל לפני פתיחה', rsSecVerifyD:'הלקוח יזין קוד שנשלח למייל לפני שרואה את החומרים',
+    rsNotH:'התראות', rsNotSub:'מתי לקבל עדכון על פעילות הלקוח.',
+    rsNotEvents:'שלחו לי התראה כאשר', rsNotOpened:'הלקוח פתח את הקישור', rsNotViewed:'הלקוח צפה בקובץ',
+    rsNotDownloaded:'הלקוח הוריד', rsNotCommented:'הלקוח השאיר הערה', rsNotChanges:'הלקוח ביקש תיקונים',
+    rsNotApproved:'הלקוח אישר', rsNotRejected:'הלקוח דחה', rsNotFinished:'הלקוח סיים את הבדיקה',
+    rsBrandH:'מיתוג', rsBrandSub:'הלוגו, הצבע וההודעות שיופיעו במסך של הלקוח.',
+    rsBrandOpen:'הודעת פתיחה', rsBrandOpenPh:'מה שהלקוח יראה בכניסה…',
+    rsBrandClose:'הודעת סיום', rsBrandClosePh:'מה שיוצג לאחר אישור…',
+    rsBrandSign:'חתימת העסק', rsBrandSignPh:'שם / חתימה בתחתית',
+    rsStH:'סטטוסים והתקדמות', rsStSub:'איך מוצג מצב הפרויקט לכם וללקוח.',
+    rsStProgress:'סרגל התקדמות', rsStProgressD:'מציג את שלבי הפרויקט — צפייה, הערות, תיקונים, אישור',
+    rsStLegend:'מקרא סטטוסים',
+    rsLgPending:'ממתין לצפייה', rsLgViewed:'נצפה', rsLgComment:'התקבלה הערה', rsLgChanges:'דורש תיקונים',
+    rsLgProgress:'בטיפול', rsLgNewVer:'נשלחה גרסה חדשה', rsLgAwaiting:'ממתין לאישור', rsLgApproved:'אושר',
+    rsLgRejected:'נדחה', rsLgClosed:'נסגר',
+    rsChipWm:'סימן מים', rsChipPw:'סיסמה', rsChipExp:d=>`תוקף ${d}`, rsChipVerify:'אימות מייל', rsChipViews:n=>`עד ${n} צפיות`,
+    rsChipNotify:n=>`${n} התראות`,
+  });
+  const RS_EN = {
+    studioOpenAria:'Approval project settings',
+    rsTitle:'Approval project settings', rsSub:'Everything about how your client views, comments and signs off.',
+    rsAutosave:'Everything saves automatically', rsDone:'Done',
+    rsGrpAccess:'Approval flow', rsGrpProtect:'Protection & alerts', rsGrpPresent:'Presentation & tracking',
+    rsNavPerms:'Client permissions', rsNavApproval:'Approval & flow', rsNavChanges:'Change requests',
+    rsNavAnnotate:'Comments & markup', rsNavSecurity:'Security', rsNavNotify:'Notifications',
+    rsNavBranding:'Branding', rsNavStatuses:'Statuses & progress',
+    rsPermsH:'What the client can do', rsPermsSub:'Choose which actions are available on the link.',
+    rsPmView:'View files', rsPmViewD:'Always on — nothing to approve without it',
+    rsPmDownload:'Download files', rsPmDownloadD:'Download the final materials',
+    rsPmComment:'Leave comments', rsPmCommentD:'Notes on a video, image or document',
+    rsPmReply:'Reply to comments', rsPmReplyD:'The client can reply to existing comments',
+    rsSubDecisions:'Decisions', rsPmApprove:'Approve', rsPmApproveD:'Mark as “approved”',
+    rsPmChanges:'Request changes', rsPmChangesD:'A “needs changes” button',
+    rsPmReject:'Reject a file', rsPmRejectD:'The client can reject',
+    rsPmPerFile:'Approve each file', rsPmPerFileD:'A separate decision per item',
+    rsPmWhole:'Approve whole project', rsPmWholeD:'One approval for everything',
+    rsSubMarking:'Marking', rsPmMarkTl:'Timeline marking', rsPmMarkTlD:'Comment at a timecode on video/audio',
+    rsPmMarkImg:'Mark image region', rsPmMarkImgD:'Point to a spot/area on an image',
+    rsPmMarkPdf:'Comment on a PDF page', rsPmMarkPdfD:'Comment on a specific page',
+    rsSubResponses:'Response types', rsRespFree:'💬 Free comment', rsRespApproved:'👍 Approved', rsRespChanges:'🔄 Needs changes',
+    rsApprH:'Approval rules & flow', rsApprSub:'How sign-off works and what happens next.',
+    rsApprMode:'Approval mode', rsApprModeWhole:'Whole project', rsApprModeFile:'File by file',
+    rsApprReqNote:'Require a note when rejecting', rsApprReqNoteD:'A reason is required to reject',
+    rsApprReqStatus:'Require a status per file', rsApprReqStatusD:'No final sign-off until every file has a decision',
+    rsApprFullView:'Full view before approval', rsApprFullViewD:'Video/audio can be approved only after watching to the end',
+    rsApprLock:'Lock decision after sending', rsApprLockD:'Once decided — it cannot be changed',
+    rsApprChangeAfter:'Allow changing a decision', rsApprChangeAfterD:'The client can reverse a decision',
+    rsSubWorkflow:'Workflow', rsWfVersions:'Version history', rsWfVersionsD:'Keep versions and upload a new one',
+    rsWfCloseFinal:'Close on final approval', rsWfCloseFinalD:'The project locks automatically when approved',
+    rsWfReopen:'Allow reopening', rsWfReopenD:'A closed project can be reopened if needed',
+    rsChgH:'Change requests', rsChgSub:'Which tools the client gets when requesting a change.',
+    rsChgNote:'These tools appear to the client on the change-request screen.',
+    rsChgPriority:'Priority', rsChgPriorityD:'Low / medium / high',
+    rsChgExample:'Example file', rsChgExampleD:'Upload a reference file',
+    rsChgScreenshot:'Screenshot', rsChgScreenshotD:'Attach a screenshot',
+    rsChgVoice:'Voice note', rsChgVoiceD:'Record a spoken note',
+    rsChgLink:'External link', rsChgLinkD:'Point to an external URL',
+    rsAnnH:'Comments & markup', rsAnnSub:'The markup tools the client gets, per file type.',
+    rsSubAV:'Video & audio', rsAnnTl:'Timeline comments', rsAnnTlD:'A comment at an exact second',
+    rsAnnSeg:'Time-segment marking', rsAnnSegD:'e.g. 00:34–00:41',
+    rsAnnPlay:'Play from the point', rsAnnPlayD:'Play exactly from the comment’s moment',
+    rsSubImg:'Images', rsAnnPoint:'Point marker', rsAnnPointD:'Pin a spot on the image',
+    rsAnnDraw:'Draw on the image', rsAnnDrawD:'Freehand drawing', rsAnnRect:'Rectangle', rsAnnArrow:'Arrow', rsAnnCircle:'Circle', rsAnnText:'Text',
+    rsAnnColor:'Colour picker', rsAnnColorD:'Colour for markings',
+    rsSubPdf:'Documents (PDF)', rsAnnPdfPage:'Comment per page', rsAnnPdfPageD:'A focused comment on a page',
+    rsAnnPdfMark:'Mark & draw', rsAnnPdfMarkD:'Highlight text and draw on the page',
+    rsSecH:'Security', rsSecSub:'Protect the link and the materials.',
+    rsSecMaxViews:'Limit number of views', rsSecMaxViewsD:'0 = unlimited. The link is blocked after the quota.',
+    rsSecVerify:'Email verification before opening', rsSecVerifyD:'The client enters a code sent to their email before seeing the materials',
+    rsNotH:'Notifications', rsNotSub:'When to get updates about client activity.',
+    rsNotEvents:'Notify me when', rsNotOpened:'The client opened the link', rsNotViewed:'The client viewed a file',
+    rsNotDownloaded:'The client downloaded', rsNotCommented:'The client left a comment', rsNotChanges:'The client requested changes',
+    rsNotApproved:'The client approved', rsNotRejected:'The client rejected', rsNotFinished:'The client finished the review',
+    rsBrandH:'Branding', rsBrandSub:'The logo, colour and messages shown on the client screen.',
+    rsBrandOpen:'Welcome message', rsBrandOpenPh:'What the client sees on arrival…',
+    rsBrandClose:'Closing message', rsBrandClosePh:'Shown after approval…',
+    rsBrandSign:'Business signature', rsBrandSignPh:'Name / signature at the bottom',
+    rsStH:'Statuses & progress', rsStSub:'How the project state is shown to you and the client.',
+    rsStProgress:'Progress bar', rsStProgressD:'Shows the project stages — viewed, comments, changes, approval',
+    rsStLegend:'Status legend',
+    rsLgPending:'Pending view', rsLgViewed:'Viewed', rsLgComment:'Comment received', rsLgChanges:'Needs changes',
+    rsLgProgress:'In progress', rsLgNewVer:'New version sent', rsLgAwaiting:'Awaiting approval', rsLgApproved:'Approved',
+    rsLgRejected:'Rejected', rsLgClosed:'Closed',
+    rsChipWm:'Watermark', rsChipPw:'Password', rsChipExp:d=>`Expires ${d}`, rsChipVerify:'Email verify', rsChipViews:n=>`${n} views max`,
+    rsChipNotify:n=>`${n} alerts`,
+  };
+  Object.assign(I18N.en, RS_EN);
+  Object.assign(I18N.ru, RS_EN);
+  // owner-side feedback chips for client annotations / priority / extras
+  Object.assign(I18N.he,{ fcPrioLow:'עדיפות נמוכה', fcPrioMedium:'עדיפות בינונית', fcPrioHigh:'עדיפות גבוהה', fcAnno:'סימון על התמונה', fcLink:'קישור', fcVoice:'הקלטה קולית' });
+  const RS_FEED_EN={ fcPrioLow:'Low priority', fcPrioMedium:'Medium priority', fcPrioHigh:'High priority', fcAnno:'Image mark', fcLink:'Link', fcVoice:'Voice note' };
+  Object.assign(I18N.en, RS_FEED_EN); Object.assign(I18N.ru, RS_FEED_EN);
+
   let lang='he', t=I18N.he;
   let view='create';
+  let viewMode='admin'; // 'admin' = edit form · 'client' = live client preview
   let newItems=[];            // {id,file,name,ext,kind,size}
   let uid=1;
   let brand={ name:'', tagline:'', logo:'', bg:'', color:'#57ab3f' };
+  // preview-watermark settings (applied only to the client PREVIEW; originals kept clean)
+  let wm=(window.KolkliWatermark && KolkliWatermark.defaults()) || {on:false,visual:{on:true},audio:{on:true}};
   let lastToken=null;         // project just created (for share panel)
   let dToken=null;            // project open in detail view
   let dVersion=1;             // version shown in detail
@@ -1459,11 +2136,34 @@
     el('createView').classList.toggle('hidden', v!=='create');
     el('manageView').classList.toggle('hidden', v!=='manage');
     el('projectView').classList.toggle('hidden', v!=='project');
-    el('tabCreate').classList.toggle('on', v==='create');
     el('tabManage').classList.toggle('on', v==='manage' || v==='project');
     document.body.classList.toggle('review-detail', v==='project');
     if(v!=='project') closeCardMenu();
     if(v==='manage') renderManage();
+    applyMode();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // ---------- admin / client preview toggle ----------
+  // `viewMode` decides whether the create screen shows the manager's edit form
+  // (admin) or the live mock of what the end client sees (client). It is only
+  // meaningful while the create screen is open; on the projects list / detail
+  // views both toggle buttons sit inactive.
+  function applyMode(){
+    const g=el('createGrid');
+    if(g){ g.classList.toggle('mode-client', viewMode==='client'); g.classList.toggle('mode-admin', viewMode!=='client'); }
+    const admin  = view==='create' && viewMode==='admin';
+    const client = view==='create' && viewMode==='client';
+    el('modeAdmin').classList.toggle('on', admin);
+    el('modeClient').classList.toggle('on', client);
+    el('modeAdmin').setAttribute('aria-selected', String(admin));
+    el('modeClient').setAttribute('aria-selected', String(client));
+    if(client) renderPreview();
+  }
+  function setMode(m){
+    viewMode=m;
+    if(view!=='create'){ setView('create'); return; } // setView re-applies the mode
+    applyMode();
     window.scrollTo({top:0,behavior:'smooth'});
   }
 
@@ -1485,6 +2185,111 @@
     return { name:brand.name, tagline:brand.tagline||'', logo:brand.logo||'', bg:brand.bg||'', color:brand.color };
   }
 
+  // ---------- preview watermark ----------
+  const WM_PREFS_KEY='rv_wm_prefs';
+  let wmPvRAF=0;
+  function loadWmPrefs(){
+    try{
+      const s=JSON.parse(RV.ls(WM_PREFS_KEY)||'null');
+      if(s && s.visual && s.audio && window.KolkliWatermark){
+        wm=Object.assign(KolkliWatermark.defaults(), s);
+        wm.visual=Object.assign(KolkliWatermark.defaults().visual, s.visual);
+        wm.audio=Object.assign(KolkliWatermark.defaults().audio, s.audio);
+      }
+    }catch(_){}
+  }
+  function saveWmPrefs(){ try{ RV.lsSet(WM_PREFS_KEY, JSON.stringify(wm)); }catch(_){} }
+  function setWmLogoPreview(dataUrl){
+    if(dataUrl){ el('wmLogoPrev').innerHTML='<img src="'+dataUrl+'" alt="">'; el('wmLogoRm').classList.remove('wm-hide'); }
+    else { el('wmLogoPrev').innerHTML=RV.FICON.image; el('wmLogoRm').classList.add('wm-hide'); }
+  }
+  // Reflect the wm state onto the controls and show only the blocks relevant to
+  // the uploaded files (both shown while the dropzone is still empty).
+  function renderWmUI(){
+    if(!el('wmSec')) return;
+    el('wmOn').checked=!!wm.on;
+    el('wmSec').classList.toggle('on', !!wm.on);
+    el('wmVisOn').checked=!!wm.visual.on;
+    el('wmVisualBlock').classList.toggle('off', !wm.visual.on);
+    document.querySelectorAll('#wmTypeSeg button').forEach(b=>b.classList.toggle('on', b.getAttribute('data-wmtype')===wm.visual.type));
+    el('wmTextRow').classList.toggle('wm-hide', wm.visual.type!=='text');
+    el('wmLogoRow').classList.toggle('wm-hide', wm.visual.type!=='logo');
+    el('wmTextInp').value=wm.visual.text||'';
+    el('wmColor').value=/^#[0-9a-f]{6}$/i.test(wm.visual.color||'')?wm.visual.color:'#ffffff';
+    setWmLogoPreview(wm.visual.logo||'');
+    document.querySelectorAll('#wmPos button').forEach(b=>b.classList.toggle('on', b.getAttribute('data-pos')===wm.visual.position));
+    el('wmPos').classList.toggle('tiled', !!wm.visual.tile);
+    el('wmSize').value=wm.visual.size; el('wmSizeV').textContent=wm.visual.size+'%';
+    el('wmOpacity').value=wm.visual.opacity; el('wmOpacityV').textContent=wm.visual.opacity+'%';
+    el('wmRotation').value=wm.visual.rotation; el('wmRotationV').textContent=wm.visual.rotation+'°';
+    el('wmTile').checked=!!wm.visual.tile;
+    el('wmAudOn').checked=!!wm.audio.on;
+    el('wmAudioBlock').classList.toggle('off', !wm.audio.on);
+    el('wmInterval').value=wm.audio.interval; el('wmIntervalV').textContent=wm.audio.interval+'s';
+    el('wmRandom').checked=!!wm.audio.random;
+    el('wmVolume').value=wm.audio.volume; el('wmVolumeV').textContent=wm.audio.volume+'%';
+    el('wmPlacement').value=wm.audio.placement;
+    const kinds=new Set(newItems.map(f=>f.kind));
+    const hasV=!newItems.length || kinds.has('image')||kinds.has('video');
+    const hasA=!newItems.length || kinds.has('audio');
+    el('wmVisualBlock').classList.toggle('wm-hide', !hasV);
+    el('wmAudioBlock').classList.toggle('wm-hide', !hasA);
+  }
+  function scheduleWmPreview(){ if(wmPvRAF) return; wmPvRAF=requestAnimationFrame(()=>{ wmPvRAF=0; renderPreview(); }); }
+  // Repaint the client-mock image thumbs with the live watermark baked in.
+  async function paintWmThumbs(){
+    if(!(wm.on && wm.visual.on) || !window.KolkliWatermark) return;
+    if(!KolkliWatermark.hasVisualContent(wm.visual)) return;
+    let logo=null;
+    if(wm.visual.type==='logo'){ try{ logo=await KolkliWatermark.loadLogo(wm.visual.logo); }catch(_){ return; } }
+    const holders=el('pvThumbs').querySelectorAll('.pvthumb');
+    const shown=newItems.slice(0,8);
+    for(let i=0;i<shown.length;i++){
+      const f=shown[i]; if(f.kind!=='image') continue;
+      const holder=holders[i]; if(!holder) continue;
+      try{
+        const src=await KolkliWatermark.loadBitmap(f.file);
+        const canvas=KolkliWatermark.composeCanvas(src, wm.visual, 260, logo);
+        if(src.close) src.close();
+        const c=document.createElement('canvas');
+        c.width=canvas.width; c.height=canvas.height;
+        c.style.width='100%'; c.style.height='100%'; c.style.objectFit='cover';
+        c.getContext('2d').drawImage(canvas,0,0);
+        holder.classList.add('pvwm'); holder.innerHTML='';
+        holder.appendChild(c);
+        holder.insertAdjacentHTML('beforeend','<span class="pvwm-badge">WM</span>');
+      }catch(_){}
+    }
+  }
+  // Settings snapshot to persist on a project — null when nothing actually applies.
+  function wmForItems(items){
+    if(!(wm && wm.on) || !window.KolkliWatermark) return null;
+    const kinds=new Set((items||[]).map(i=>i.kind));
+    const anyV=wm.visual.on && KolkliWatermark.hasVisualContent(wm.visual) && (kinds.has('image')||kinds.has('video'));
+    const anyA=wm.audio.on && kinds.has('audio');
+    if(!anyV && !anyA) return null;
+    return JSON.parse(JSON.stringify(wm));
+  }
+  // Store the ORIGINAL under id (kept clean) and, when the settings apply, a
+  // watermarked PREVIEW under id+'-pv'. Returns fields to merge onto the item meta.
+  async function saveWithWatermark(token, id, file, kind, ext, settings){
+    await RV.saveItemBlob(token, id, file);
+    const mode=(settings && window.KolkliWatermark) ? KolkliWatermark.appliesTo(kind, settings) : null;
+    if(!mode) return {};
+    try{
+      if(mode==='bake-image'){
+        const r=await KolkliWatermark.bakeImage(file, settings.visual, ext);
+        if(r&&r.blob){ const pid=id+'-pv'; await RV.saveItemBlob(token,pid,r.blob); return {previewId:pid, previewExt:r.ext, wmKind:'image'}; }
+      } else if(mode==='bake-audio'){
+        const r=await KolkliWatermark.bakeAudio(file, settings.audio);
+        if(r&&r.blob){ const pid=id+'-pv'; await RV.saveItemBlob(token,pid,r.blob); return {previewId:pid, previewExt:r.ext, wmKind:'audio'}; }
+      } else if(mode==='overlay-video'){
+        return {wmOverlay:true, wmKind:'video'};
+      }
+    }catch(err){ try{ console.warn('[watermark] bake failed for '+(file&&file.name), err); }catch(_){} }
+    return {};
+  }
+
   // ---------- create ----------
   function typeIcon(kind){ return RV.FICON[kind]||RV.FICON.doc; }
   // accepts a FileList/File[] or an array of {file,path}; keeps each file's relative path so
@@ -1504,7 +2309,7 @@
       const ext=RV.extOf(file.name), kind=RV.kindOf(ext);
       newItems.push({ id:'ri'+RV.randToken()+(uid++), file, name:file.name, path, ext, kind, size:file.size });
     });
-    renderMaterials(); renderPreview();
+    renderMaterials(); renderWmUI(); renderPreview();
   }
 
   // walk dropped directories via the entries API so whole folders keep their tree
@@ -1535,7 +2340,7 @@
       } else resolve();
     });
   }
-  function removeItem(id){ newItems=newItems.filter(f=>f.id!==id); renderMaterials(); renderPreview(); }
+  function removeItem(id){ newItems=newItems.filter(f=>f.id!==id); renderMaterials(); renderWmUI(); renderPreview(); }
   function renderMaterials(){
     el('mlist').innerHTML = newItems.map(f=>{
       const th = f.kind==='image' ? `<img src="${URL.createObjectURL(f.file)}" alt="">` : typeIcon(f.kind);
@@ -1570,13 +2375,158 @@
     if(el('pmApprove').checked) chips.push(`<span class="chip">${t.pcApprove}</span>`);
     if(el('pmDownload').checked) chips.push(`<span class="chip">${t.pcDownload}</span>`);
     if(el('fPwToggle').checked) chips.push(`<span class="chip">🔒</span>`);
+    if(wm.on){
+      const kinds=new Set(newItems.map(f=>f.kind));
+      const hasVis=!newItems.length || kinds.has('image')||kinds.has('video');
+      const hasAud=!newItems.length || kinds.has('audio');
+      if(wm.visual.on && hasVis) chips.push(`<span class="chip">🛡️ ${t.wmVisualChip}</span>`);
+      if(wm.audio.on && hasAud) chips.push(`<span class="chip">🔊 ${t.wmAudioChip}</span>`);
+    }
     el('pvChips').innerHTML = chips.join('');
+    paintWmThumbs();
   }
   function shade(hex,amt){
     const m=/^#?([0-9a-f]{6})$/i.exec(hex||''); if(!m) return hex;
     const n=parseInt(m[1],16); let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
     r=Math.round(r+(255-r)*amt); g=Math.round(g+(255-g)*amt); b=Math.round(b+(255-b)*amt);
     return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+  }
+
+  // ================= REVIEW STUDIO (settings gear) =================
+  const RS_PREFS_KEY='rv_settings_prefs';
+  let reviewSettings=defaultReviewSettings();
+  let rsMounted=false;
+
+  function defaultReviewSettings(){
+    return {
+      perms:{ view:true, download:true, comment:true, replyToComments:true, approve:true, requestChanges:true, reject:true, approvePerFile:true, approveWholeProject:true, markTimeline:true, markImageRegion:true, markPdfPage:true },
+      responses:{ freeComment:true, approved:true, needsChanges:true },
+      approval:{ mode:'wholeProject', requireNoteOnReject:true, requireStatusEachFile:false, requireFullViewBeforeApprove:false, lockAfterDecision:false, allowChangeAfter:true, versioning:true, closeOnFinalApproval:true, allowReopen:true },
+      changeReq:{ priority:true, exampleFile:true, screenshot:true, voiceNote:false, externalLink:true },
+      annotate:{ avTimeline:true, avSegment:true, avPlayFromPoint:true, imgPoint:true, imgDraw:true, imgRect:true, imgArrow:true, imgCircle:true, imgText:true, imgColor:true, pdfPageComment:true, pdfMarkup:true },
+      security:{ private:true, maxViews:0, requireEmailVerify:false, passwordOn:false, expiryDays:30, watermarkVisual:false, watermarkAudio:false, blockDownload:false },
+      notify:{ master:true, opened:true, viewed:true, downloaded:true, commented:true, requestedChanges:true, approved:true, rejected:true, finished:true },
+      branding:{ openMsg:'', closeMsg:'', signature:'' },
+      statuses:{ showProgressBar:true }
+    };
+  }
+  function rsGet(o,path){ return path.split('.').reduce((a,k)=> (a==null? undefined : a[k]), o); }
+  function rsSet(o,path,v){ const ks=path.split('.'); let a=o; for(let i=0;i<ks.length-1;i++){ if(a[ks[i]]==null||typeof a[ks[i]]!=='object') a[ks[i]]={}; a=a[ks[i]]; } a[ks[ks.length-1]]=v; }
+  function rsInput(path){ return document.querySelector('#reviewStudio [data-rs="'+path+'"]'); }
+  function rsChecked(path){ const i=rsInput(path); return i? !!i.checked : false; }
+
+  // relocate the existing inline blocks into their studio panels (once)
+  function rsMountInline(){
+    if(rsMounted) return; rsMounted=true;
+    const move=(sel,mountId)=>{ const node=document.querySelector(sel), mount=el(mountId); if(node&&mount) mount.appendChild(node); };
+    move('.rvf-pw','rsMountPw');
+    move('.rvf-exp','rsMountExp');
+    move('.rvf-wm','rsMountWm');
+    move('.rvf-brand','rsMountBrand');
+    move('.rvf-notify','rsMountNotify');
+    const trio=document.querySelector('.rvf-trio'); if(trio) trio.style.display='none';
+  }
+
+  function collectReviewSettings(){
+    const s=defaultReviewSettings();
+    document.querySelectorAll('#reviewStudio [data-rs]').forEach(inp=>{
+      const path=inp.getAttribute('data-rs'); let v;
+      if(inp.type==='checkbox') v=inp.checked;
+      else if(inp.type==='number') v=Math.max(0,parseInt(inp.value,10)||0);
+      else v=inp.value;
+      rsSet(s,path,v);
+    });
+    // enrich from the relocated inline controls (single source of truth for these)
+    if(el('fPwToggle')) s.security.passwordOn=!!el('fPwToggle').checked;
+    if(el('fExpiry')) s.security.expiryDays=+el('fExpiry').value||0;
+    s.security.watermarkVisual=!!(wm.on && wm.visual.on);
+    s.security.watermarkAudio=!!(wm.on && wm.audio.on);
+    s.security.blockDownload=!(el('pmDownload') && el('pmDownload').checked);
+    if(el('fNotify')) s.notify.master=!!el('fNotify').checked;
+    return s;
+  }
+  function applyReviewSettings(s){
+    if(!s) return;
+    document.querySelectorAll('#reviewStudio [data-rs]').forEach(inp=>{
+      const v=rsGet(s,inp.getAttribute('data-rs')); if(v===undefined||v===null) return;
+      if(inp.type==='checkbox') inp.checked=!!v; else inp.value=v;
+    });
+    if(el('fNotify') && typeof s.notify==='object' && typeof s.notify.master==='boolean') el('fNotify').checked=s.notify.master;
+    rsSyncSegs(); rsSyncDeps();
+  }
+  function rsSyncSegs(){
+    document.querySelectorAll('#reviewStudio [data-seg]').forEach(btn=>{
+      const hidden=rsInput(btn.getAttribute('data-seg'));
+      btn.classList.toggle('on', !!hidden && hidden.value===btn.getAttribute('data-val'));
+    });
+  }
+  // grey-out rows whose parent capability is off
+  function rsDep(path,on){ const i=rsInput(path); const row=i? i.closest('.st-toggle') : null; if(row) row.classList.toggle('dis', !on); }
+  function rsSyncDeps(){
+    const canComment=rsChecked('perms.comment');
+    ['perms.replyToComments','perms.markTimeline','perms.markImageRegion','perms.markPdfPage',
+     'annotate.avTimeline','annotate.avSegment','annotate.avPlayFromPoint','annotate.imgPoint',
+     'annotate.imgDraw','annotate.imgColor','annotate.pdfPageComment','annotate.pdfMarkup'].forEach(p=>rsDep(p,canComment));
+    const canDraw=canComment && rsChecked('annotate.imgDraw');
+    ['annotate.imgRect','annotate.imgArrow','annotate.imgCircle','annotate.imgText'].forEach(p=>rsDep(p,canDraw));
+    const canChanges=rsChecked('perms.requestChanges');
+    ['changeReq.priority','changeReq.exampleFile','changeReq.screenshot','changeReq.voiceNote','changeReq.externalLink','responses.needsChanges'].forEach(p=>rsDep(p,canChanges));
+    rsDep('responses.approved', rsChecked('perms.approve'));
+    rsDep('approval.allowChangeAfter', !rsChecked('approval.lockAfterDecision'));
+  }
+
+  function openStudio(){
+    rsMountInline();
+    if(typeof renderWmUI==='function') renderWmUI();
+    el('reviewStudio').classList.add('show');
+    document.body.style.overflow='hidden';
+    el('openStudio').classList.add('seen'); RV.lsSet('rv_studio_seen','1');
+    rsSyncDeps();
+  }
+  function closeStudio(){ el('reviewStudio').classList.remove('show'); document.body.style.overflow=''; }
+  function showStudioSection(id){
+    document.querySelectorAll('#reviewStudio .st-nav').forEach(b=>b.classList.toggle('on', b.getAttribute('data-sec')===id));
+    document.querySelectorAll('#reviewStudio .st-sec').forEach(s=>s.classList.toggle('on', s.getAttribute('data-sec')===id));
+    const c=el('rsContent'); if(c) c.scrollTop=0;
+  }
+
+  function buildStatusLegend(){
+    const box=el('rsLegend'); if(!box) return;
+    const items=[['#e0a020','rsLgPending'],['#3b82f6','rsLgViewed'],['#6366f1','rsLgComment'],['#e0803a','rsLgChanges'],
+      ['#8b5cf6','rsLgProgress'],['#0ea5e9','rsLgNewVer'],['#f59e0b','rsLgAwaiting'],['#3d9e46','rsLgApproved'],
+      ['#e5484d','rsLgRejected'],['#7a8a7a','rsLgClosed']];
+    box.innerHTML=items.map(([c,k])=>`<span class="rs-lg" style="color:${c}"><span class="dot"></span><span style="color:var(--ink-2)">${(t[k]||k)}</span></span>`).join('');
+  }
+
+  function updateChips(){
+    const s=reviewSettings||collectReviewSettings();
+    const c=[];
+    const chip=(txt,muted)=>`<span class="rs-chip${muted?' muted':''}">${txt}</span>`;
+    c.push(chip(eyeSvg()+' '+t.pcView));
+    if(s.perms.comment) c.push(chip(t.pcComment));
+    if(s.perms.approve) c.push(chip(t.pcApprove));
+    if(s.perms.download) c.push(chip(t.pcDownload)); else c.push(chip('🚫 '+t.pcDownload,true));
+    if(s.security.passwordOn) c.push(chip('🔒 '+t.rsChipPw));
+    if(s.security.expiryDays) c.push(chip('⏳ '+t.rsChipExp(daysWord(s.security.expiryDays))));
+    if(s.security.maxViews) c.push(chip('👁 '+t.rsChipViews(s.security.maxViews)));
+    if(s.security.requireEmailVerify) c.push(chip('✉️ '+t.rsChipVerify));
+    if(s.security.watermarkVisual) c.push(chip('🛡️ '+t.wmVisualChip));
+    if(s.security.watermarkAudio) c.push(chip('🔊 '+t.wmAudioChip));
+    if(el('rsChips')) el('rsChips').innerHTML=c.join('');
+  }
+
+  function persistReviewSettings(){
+    try{ if(RV.saveReviewPrefs) RV.saveReviewPrefs(reviewSettings); else RV.lsSet(RS_PREFS_KEY, JSON.stringify(reviewSettings)); }catch(_){}
+  }
+  function loadReviewPrefs(){
+    try{ if(RV.loadReviewPrefs){ const s=RV.loadReviewPrefs(); if(s) return s; } }catch(_){}
+    try{ const s=JSON.parse(RV.ls(RS_PREFS_KEY)||'null'); if(s) return s; }catch(_){}
+    return null;
+  }
+  function onStudioChange(){
+    reviewSettings=collectReviewSettings();
+    persistReviewSettings();
+    rsSyncSegs(); rsSyncDeps(); updateChips(); renderPreview();
   }
 
   async function createProject(){
@@ -1592,11 +2542,16 @@
       proj = await withUsage('review-files', { files:newItems.length }, async()=>{
         const days=+el('fExpiry').value;
         const items = newItems.map(f=>({ id:f.id, name:(f.path||f.name), ext:f.ext, kind:f.kind, size:f.size, at:Date.now(), version:1 }));
+        const wmSettings = wmForItems(items);
+        reviewSettings = collectReviewSettings();       // snapshot the full approval config
+        const settings = JSON.parse(JSON.stringify(reviewSettings));
         const next={
           token: RV.randToken(),
           name, client: el('fClient').value.trim(), message: el('fMessage').value.trim(),
           brand: collectBrand(),
+          watermark: wmSettings,
           perms:{ comment:el('pmComment').checked, download:el('pmDownload').checked, approve:el('pmApprove').checked },
+          settings,                                      // full Review Studio config (§1–§12)
           password: pwOn? await RV.hashPass(pwVal) : null,
           expiresAt: days? Date.now()+days*86400000 : 0,
           createdAt: Date.now(),
@@ -1605,8 +2560,14 @@
           items, comments:[], events:[], decision:null
         };
         if(window.KolkliProjectNumbers) await KolkliProjectNumbers.assign('review', next);
-        // persist blobs
-        try{ for(const f of newItems){ await RV.saveItemBlob(next.token, f.id, f.file); } }
+        // persist blobs — the original is stored untouched; when a watermark is
+        // configured a protected preview is baked and saved alongside it.
+        try{
+          for(const f of newItems){
+            const extra=await saveWithWatermark(next.token, f.id, f.file, f.kind, f.ext, wmSettings);
+            const meta=items.find(m=>m.id===f.id); if(meta) Object.assign(meta, extra);
+          }
+        }
         catch(_){ el('createErr').textContent=t.errNoFiles; throw new Error('blob_write_failed'); }
         RV.upsertProject(next);
         return next;
@@ -1667,7 +2628,7 @@
     el('fNotify').checked=true; el('fExpiry').value='30';
     el('pmComment').checked=true; el('pmApprove').checked=true; el('pmDownload').checked=false;
     syncPermRows();
-    newItems=[]; renderMaterials();
+    newItems=[]; renderMaterials(); renderWmUI();
     el('createErr').textContent=''; lastToken=null;
     el('shareCard').classList.remove('show'); el('createGrid').classList.remove('hidden');
     renderPreview();
@@ -1679,6 +2640,10 @@
   // ---------- manage ----------
   function updateCount(){ el('mgCount').textContent = RV.loadProjects().length; }
   function statusLabel(s){ return t['st'+s.charAt(0).toUpperCase()+s.slice(1)] || s; }
+  // the "reopen" action is offered only when the project's settings allow it
+  function reopenAllowed(pr){ return !(pr && pr.settings && pr.settings.approval && pr.settings.approval.allowReopen===false); }
+  // "add version" is offered only when versioning is enabled in the project settings
+  function versioningOn(pr){ return !(pr && pr.settings && pr.settings.approval && pr.settings.approval.versioning===false); }
   function projectNumberText(proj){
     return window.KolkliProjectNumbers ? KolkliProjectNumbers.display('review', proj, lang) : '';
   }
@@ -1699,7 +2664,7 @@
     const actions=[];
     actions.push(`<button class="minibtn go" data-act="open">${eyeSvg()} ${t.aOpen}</button>`);
     actions.push(`<button class="minibtn" data-act="copy">${copySvg()} ${t.aCopy}</button>`);
-    if(st==='closed') actions.push(`<button class="minibtn" data-act="reopen">${t.aReopen}</button>`);
+    if(st==='closed'){ if(reopenAllowed(proj)) actions.push(`<button class="minibtn" data-act="reopen">${t.aReopen}</button>`); }
     else if(st!=='expired') actions.push(`<button class="minibtn" data-act="close">${t.aClose}</button>`);
     actions.push(`<button class="minibtn danger" data-act="del">${trashSvg()} ${t.aDel}</button>`);
 
@@ -1785,9 +2750,9 @@
     const acts=[];
     acts.push(`<button class="btn" data-dact="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>${t.openClient}</button>`);
     acts.push(`<button class="btn" data-dact="copy">${copySvg()}${t.aCopy}</button>`);
-    if(st!=='closed'&&st!=='expired') acts.push(`<button class="btn" data-dact="addver">${layersSvg()}${t.aAddVer}</button>`);
+    if(st!=='closed'&&st!=='expired'&&versioningOn(p)) acts.push(`<button class="btn" data-dact="addver">${layersSvg()}${t.aAddVer}</button>`);
     acts.push(`<button class="btn" data-dact="access">${lockSvg()}${t.aAccess}</button>`);
-    if(st==='closed') acts.push(`<button class="btn rd-primary" data-dact="reopen">${refreshSvg()}${t.aReopen}</button>`);
+    if(st==='closed'){ if(reopenAllowed(p)) acts.push(`<button class="btn rd-primary" data-dact="reopen">${refreshSvg()}${t.aReopen}</button>`); }
     else if(st!=='expired') acts.push(`<button class="btn rd-primary" data-dact="close">${lockSvg()}${t.aClose}</button>`);
     el('dActions').innerHTML=acts.join('');
 
@@ -1833,8 +2798,15 @@
       const who=(c.author&&c.author.trim())?c.author.trim():t.anonymous;
       const av=(who||'?').trim().charAt(0).toUpperCase()||'?';
       let pos='';
-      if(c.tcode!=null) pos=`<span class="fc-pos">${clockSvg()} ${mmss(c.tcode)}</span>`;
+      if(c.tcodeEnd!=null) pos=`<span class="fc-pos">${clockSvg()} ${mmss(c.tcode)}–${mmss(c.tcodeEnd)}</span>`;
+      else if(c.tcode!=null) pos=`<span class="fc-pos">${clockSvg()} ${mmss(c.tcode)}</span>`;
       else if(c.page!=null) pos=`<span class="fc-pos">${fileSvg()} ${t.posPage(c.page)}</span>`;
+      const prio=c.priority?`<span class="fc-chip prio-${c.priority}">${t['fcPrio'+c.priority.charAt(0).toUpperCase()+c.priority.slice(1)]||c.priority}</span>`:'';
+      const extras=[];
+      if(c.anno) extras.push(`<span class="fc-chip" style="color:${c.anno.color||'var(--accent-dim)'}">📍 ${t.fcAnno}</span>`);
+      if(c.link) extras.push(`<a class="fc-chip lnk" href="${RV.escapeHtml(c.link)}" target="_blank" rel="noopener noreferrer">🔗 ${t.fcLink}</a>`);
+      if(c.voice) extras.push(`<span class="fc-chip">🎙️ ${t.fcVoice}${c.voice.dur?' '+mmss(c.voice.dur):''}</span>`);
+      const extrasRow=(prio||extras.length)?`<div class="fc-extras">${prio}${extras.join('')}</div>`:'';
       return `<div class="fcard${c.resolved?' res':''}" data-cid="${c.id}">
         <div class="fc-top">
           <span class="fc-av">${RV.escapeHtml(av)}</span>
@@ -1842,7 +2814,8 @@
           <span class="fc-on">${RV.escapeHtml(it.name)} · ${fmtDateTime(c.at)}</span>
           ${pos}
         </div>
-        <div class="fc-body">${RV.escapeHtml(c.body)}</div>
+        ${c.body?`<div class="fc-body">${RV.escapeHtml(c.body)}</div>`:''}
+        ${extrasRow}
         <div class="fc-foot">
           <button class="fc-res${c.resolved?' done':''}" data-res="${c.id}">${checkSvg()} ${c.resolved?t.resolved:t.resolve}</button>
         </div>
@@ -1882,8 +2855,8 @@
     try{
       for(const file of arr){
         const ext=RV.extOf(file.name), kind=RV.kindOf(ext), id='ri'+RV.randToken()+(uid++);
-        await RV.saveItemBlob(p.token, id, file);
-        metas.push({ id, name:file.name, ext, kind, size:file.size, at:Date.now(), version:nv });
+        const extra=await saveWithWatermark(p.token, id, file, kind, ext, p.watermark);
+        metas.push(Object.assign({ id, name:file.name, ext, kind, size:file.size, at:Date.now(), version:nv }, extra));
       }
     }catch(_){ return; }
     p.items=(p.items||[]).concat(metas);
@@ -1987,7 +2960,13 @@
     else if(d.type==='rejected') msg=t.actRejected(who);
     if(msg){
       toast(msg);
-      if(p.notify){ try{ if('Notification'in window && Notification.permission==='granted') new Notification(t.notifTitle,{body:msg}); }catch(_){} }
+      // browser push honors the master toggle AND the per-event switches in the Review Studio
+      if(p.notify){
+        const nk={viewed:'viewed',commented:'commented',approved:'approved',changes:'requestedChanges',rejected:'rejected',opened:'opened',downloaded:'downloaded'}[d.type];
+        const gn=p.settings&&p.settings.notify;
+        const allowed = !gn || nk===undefined || gn[nk]!==false;
+        if(allowed){ try{ if('Notification'in window && Notification.permission==='granted') new Notification(t.notifTitle,{body:msg}); }catch(_){} }
+      }
     }
     if(view==='manage') renderManage();
     else if(view==='project' && dToken===d.token) renderProject();
@@ -1998,6 +2977,8 @@
   function applyStatic(){
     document.querySelectorAll('[data-i18n]').forEach(n=>{ const k=n.getAttribute('data-i18n'); if(typeof t[k]==='string') n.textContent=t[k]; });
     document.querySelectorAll('[data-i18n-ph]').forEach(n=>{ const k=n.getAttribute('data-i18n-ph'); if(typeof t[k]==='string') n.setAttribute('placeholder',t[k]); });
+    document.querySelectorAll('[data-i18n-al]').forEach(n=>{ const k=n.getAttribute('data-i18n-al'); if(typeof t[k]==='string') n.setAttribute('aria-label',t[k]); });
+    if(typeof buildStatusLegend==='function') buildStatusLegend();
   }
   function applyLang(l){
     lang=l; t=I18N[l];
@@ -2104,10 +3085,11 @@
   function dlSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>'; }
 
   // ---------- events ----------
-  el('tabCreate').addEventListener('click',()=>setView('create'));
+  el('modeAdmin').addEventListener('click',()=>setMode('admin'));
+  el('modeClient').addEventListener('click',()=>setMode('client'));
   el('tabManage').addEventListener('click',()=>setView('manage'));
-  el('newReqBtn').addEventListener('click',()=>{ resetCreate(); setView('create'); });
-  el('emptyNewBtn').addEventListener('click',()=>{ resetCreate(); setView('create'); });
+  el('newReqBtn').addEventListener('click',()=>{ resetCreate(); viewMode='admin'; setView('create'); });
+  el('emptyNewBtn').addEventListener('click',()=>{ resetCreate(); viewMode='admin'; setView('create'); });
   el('toManageBtn').addEventListener('click',()=>setView('manage'));
   el('backBtn').addEventListener('click',()=>setView('manage'));
 
@@ -2124,7 +3106,20 @@
   el('mlist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeItem(b.getAttribute('data-rm')); });
 
   // perms + preview inputs
-  el('perms').addEventListener('change',()=>{ syncPermRows(); renderPreview(); });
+  // ---------- Review Studio wiring ----------
+  el('openStudio').addEventListener('click', openStudio);
+  el('rsClose').addEventListener('click', closeStudio);
+  el('rsDone').addEventListener('click', closeStudio);
+  el('rsScrim').addEventListener('click', closeStudio);
+  el('rsRail').addEventListener('click', e=>{ const b=e.target.closest('[data-sec]'); if(b) showStudioSection(b.getAttribute('data-sec')); });
+  el('rsContent').addEventListener('click', e=>{
+    const seg=e.target.closest('[data-seg]'); if(!seg) return;
+    const hidden=rsInput(seg.getAttribute('data-seg')); if(hidden) hidden.value=seg.getAttribute('data-val');
+    onStudioChange();
+  });
+  el('reviewStudio').addEventListener('change', onStudioChange);
+  el('reviewStudio').addEventListener('input', onStudioChange);
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && el('reviewStudio').classList.contains('show')) closeStudio(); });
   ['fName','fMessage'].forEach(id=>el(id).addEventListener('input',renderPreview));
   el('brName').addEventListener('input',()=>{ brand.name=el('brName').value.trim(); RV.saveBrand(brand); renderPreview(); });
   el('brColor').addEventListener('input',()=>{ brand.color=el('brColor').value; RV.saveBrand(brand); renderPreview(); });
@@ -2138,6 +3133,30 @@
     el('logoInput').value='';
   });
   el('logoRmBtn').addEventListener('click',()=>{ brand.logo=''; RV.saveBrand(brand); setLogoPreview(''); renderPreview(); });
+
+  // watermark controls
+  el('wmOn').addEventListener('change',e=>{ wm.on=e.target.checked; el('wmSec').classList.toggle('on',wm.on); saveWmPrefs(); renderPreview(); });
+  el('wmVisOn').addEventListener('change',e=>{ wm.visual.on=e.target.checked; el('wmVisualBlock').classList.toggle('off',!wm.visual.on); saveWmPrefs(); renderPreview(); });
+  el('wmAudOn').addEventListener('change',e=>{ wm.audio.on=e.target.checked; el('wmAudioBlock').classList.toggle('off',!wm.audio.on); saveWmPrefs(); renderPreview(); });
+  el('wmTypeSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-wmtype]'); if(!b) return; wm.visual.type=b.getAttribute('data-wmtype'); renderWmUI(); saveWmPrefs(); scheduleWmPreview(); });
+  el('wmTextInp').addEventListener('input',e=>{ wm.visual.text=e.target.value; saveWmPrefs(); scheduleWmPreview(); });
+  el('wmColor').addEventListener('input',e=>{ wm.visual.color=e.target.value; saveWmPrefs(); scheduleWmPreview(); });
+  el('wmPos').addEventListener('click',e=>{ const b=e.target.closest('[data-pos]'); if(!b) return; wm.visual.position=b.getAttribute('data-pos'); document.querySelectorAll('#wmPos button').forEach(x=>x.classList.toggle('on',x===b)); saveWmPrefs(); scheduleWmPreview(); });
+  el('wmSize').addEventListener('input',e=>{ wm.visual.size=+e.target.value; el('wmSizeV').textContent=e.target.value+'%'; saveWmPrefs(); scheduleWmPreview(); });
+  el('wmOpacity').addEventListener('input',e=>{ wm.visual.opacity=+e.target.value; el('wmOpacityV').textContent=e.target.value+'%'; saveWmPrefs(); scheduleWmPreview(); });
+  el('wmRotation').addEventListener('input',e=>{ wm.visual.rotation=+e.target.value; el('wmRotationV').textContent=e.target.value+'°'; saveWmPrefs(); scheduleWmPreview(); });
+  el('wmTile').addEventListener('change',e=>{ wm.visual.tile=e.target.checked; el('wmPos').classList.toggle('tiled',wm.visual.tile); saveWmPrefs(); scheduleWmPreview(); });
+  el('wmLogoBtn').addEventListener('click',()=>el('wmLogoInput').click());
+  el('wmLogoInput').addEventListener('change',()=>{
+    const f=el('wmLogoInput').files&&el('wmLogoInput').files[0]; if(!f) return;
+    const r=new FileReader(); r.onload=()=>{ wm.visual.logo=r.result; setWmLogoPreview(wm.visual.logo); saveWmPrefs(); scheduleWmPreview(); }; r.readAsDataURL(f);
+    el('wmLogoInput').value='';
+  });
+  el('wmLogoRm').addEventListener('click',()=>{ wm.visual.logo=''; setWmLogoPreview(''); saveWmPrefs(); scheduleWmPreview(); });
+  el('wmInterval').addEventListener('input',e=>{ wm.audio.interval=+e.target.value; el('wmIntervalV').textContent=e.target.value+'s'; saveWmPrefs(); });
+  el('wmRandom').addEventListener('change',e=>{ wm.audio.random=e.target.checked; saveWmPrefs(); });
+  el('wmVolume').addEventListener('input',e=>{ wm.audio.volume=+e.target.value; el('wmVolumeV').textContent=e.target.value+'%'; saveWmPrefs(); });
+  el('wmPlacement').addEventListener('change',e=>{ wm.audio.placement=e.target.value; saveWmPrefs(); });
 
   el('createBtn').addEventListener('click',createProject);
   el('copyBtn').addEventListener('click',()=>{ if(lastToken) copyLink(lastToken); toast(t.copied); });
@@ -2203,8 +3222,14 @@
   // ---------- init ----------
   applyTheme(ls('theme')||'light');
   loadBrandUI();
+  loadWmPrefs();
+  // Review Studio: relocate inline blocks into the gear, hydrate saved settings, seed defaults
+  rsMountInline();
+  const savedRS=loadReviewPrefs(); reviewSettings = savedRS ? Object.assign(defaultReviewSettings(), savedRS) : defaultReviewSettings();
+  applyReviewSettings(reviewSettings);
+  if(ls('rv_studio_seen')) el('openStudio').classList.add('seen');
   applyLang(RV.detectLang());
-  syncPermRows(); renderMaterials(); renderPreview(); updateCount();
+  renderMaterials(); renderWmUI(); renderPreview(); updateChips(); updateCount();
   requestNotifyPerm();
   const openTok=(location.search.match(/[?&]p=([^&]+)/)||[])[1];
   const routeInitial=function(){

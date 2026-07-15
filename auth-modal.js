@@ -51,7 +51,7 @@
       switchToSignupText: 'אין לכם חשבון עדיין?', switchToSignupLink: 'הרשמה',
       switchToLoginText: 'כבר יש לכם חשבון?', switchToLoginLink: 'התחברות',
       privacy: 'ההרשמה נועדה רק לשמירת קבצים וקישורים. עריכת האודיו עצמה תמיד נשארת במחשב שלכם ולא עולה לשרת.',
-      dashboard: 'לדשבורד', goFiles: 'לאזור הקבצים שלי', logout: 'התנתקות', close: 'סגירה',
+      dashboard: 'ללוח הבקרה', goFiles: 'לאזור הקבצים שלי', logout: 'התנתקות', close: 'סגירה',
       signedHi: function (n) { return 'שלום, ' + n + '!'; },
       welcomeBack: 'התחברת בהצלחה 👋', accountCreated: 'החשבון נוצר בהצלחה 🎉',
       errRequired: 'שדה חובה', errEmail: 'כתובת אימייל לא תקינה', errPassShort: 'הסיסמה חייבת לפחות 6 תווים',

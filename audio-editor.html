@@ -27,7 +27,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk',system-ui,'Segoe UI','Heebo',sans-serif;
+    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -67,6 +67,33 @@
   .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
 
   .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+
+  /* wizard */
+  .wizard{max-width:1040px;margin:0 auto;}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);margin:0 0 22px;padding:0;list-style:none;counter-reset:wstep;}
+  .steps li{position:relative;text-align:center;color:var(--faint);font-size:12.5px;font-weight:600;}
+  .steps li::before{counter-increment:wstep;content:counter(wstep);position:relative;z-index:2;width:34px;height:34px;margin:0 auto 7px;
+    display:grid;place-items:center;border-radius:50%;border:2px solid var(--line);background:var(--panel);color:var(--muted);font-family:var(--mono);}
+  .steps li::after{content:'';position:absolute;z-index:1;top:16px;right:50%;width:100%;height:2px;background:var(--line);}
+  .steps li:first-child::after{display:none;}
+  .steps li.active,.steps li.done{color:var(--ink);}
+  .steps li.active::before{border-color:var(--accent);background:var(--accent);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);}
+  .steps li.done::before{content:'\2713';border-color:var(--success);background:var(--success-soft);color:var(--success-dim);}
+  .steps li.done::after,.steps li.active::after{background:var(--accent);}
+  .wizard-step{display:none;}
+  .wizard-step.active{display:block;animation:stepIn .2s ease-out;}
+  @keyframes stepIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .step-card{padding:20px;}
+  .step-title{margin:0 0 4px;font-size:18px;}
+  .step-sub{margin:0 0 18px;color:var(--muted);font-size:13px;}
+  .wizard-nav{display:flex;justify-content:space-between;gap:12px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line);}
+  .navbtn{min-width:130px;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:999px;
+    padding:12px 22px;background:var(--panel);color:var(--ink);font-size:14px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-sm);}
+  .navbtn.primary{margin-inline-start:auto;color:#fff;border-color:transparent;background:var(--grad-btn);box-shadow:0 6px 16px var(--grad-btn-glow);}
+  .navbtn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;}
+  .stage-status{text-align:center;padding:34px 18px;color:var(--muted);}
+  .stage-status svg{width:44px;height:44px;color:var(--accent);margin-bottom:9px;}
+  @media(max-width:560px){.steps li span{font-size:11px}.step-card{padding:14px}.navbtn{min-width:0;flex:1;padding:11px 14px}}
 
   /* dropzone */
   .drop{border:2.5px dashed color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:16px;padding:64px 28px;text-align:center;cursor:pointer;
@@ -173,7 +200,7 @@
   .sel:focus{outline:none;border-color:var(--accent);}
   .sel:disabled{opacity:.5;cursor:not-allowed;}
 
-  .cutbtn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
+  .cutbtn{display:none;width:100%;align-items:center;justify-content:center;gap:9px;color:#fff;border:none;cursor:pointer;
     background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
     font-weight:600;font-size:15px;padding:14px 20px;border-radius:999px;text-shadow:0 1px 2px rgba(0,0,0,.18);margin-top:18px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 8px 20px var(--grad-btn-glow);
@@ -244,8 +271,18 @@
     <p data-i18n="pageSub"></p>
   </div>
 
+  <div class="wizard" id="wizard">
+  <ol class="steps" aria-label="Wizard progress">
+    <li class="active" data-step-indicator="1"><span data-i18n="stepUpload"></span></li>
+    <li data-step-indicator="2"><span data-i18n="stepSettings"></span></li>
+    <li data-step-indicator="3"><span data-i18n="stepProcess"></span></li>
+  </ol>
+
   <!-- upload -->
-  <div id="composer">
+  <section class="wizard-step active card step-card" data-step="1">
+    <h3 class="step-title" data-i18n="step1Title"></h3>
+    <p class="step-sub" data-i18n="step1Sub"></p>
+    <div id="composer">
     <div class="drop" id="drop">
       <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
       <div class="big" data-i18n="dropBig"></div>
@@ -255,7 +292,15 @@
     </div>
     <input type="file" id="fileInput" accept="audio/*,.mp3,.wav,.flac,.aac,.m4a,.ogg,.opus">
 
+    </div>
+    <div class="wizard-nav">
+      <button class="navbtn" type="button" disabled data-i18n="prev"></button>
+      <button class="navbtn primary" id="step1Next" type="button" disabled data-i18n="next"></button>
+    </div>
+  </section>
+
     <!-- editor -->
+  <section class="wizard-step" data-step="2">
     <div class="editor" id="editor">
       <div class="nowbar">
         <div class="nico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
@@ -343,9 +388,20 @@
         <div class="opterr" id="optErr"></div>
         <div class="rtnote" data-i18n="rtNote"></div>
       </div>
+      <div class="wizard-nav">
+        <button class="navbtn" id="step2Prev" type="button" data-i18n="prev"></button>
+        <button class="navbtn primary" id="step2Next" type="button" data-i18n="next"></button>
+      </div>
     </div>
-  </div>
+  </section>
 
+  <section class="wizard-step card step-card" data-step="3">
+  <h3 class="step-title" data-i18n="step3Title"></h3>
+  <p class="step-sub" data-i18n="step3Sub"></p>
+  <div class="stage-status" id="stageStatus">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    <div data-i18n="readyToProcess"></div>
+  </div>
   <!-- progress -->
   <div class="card prog" id="progCard">
     <div class="lbl"><span class="nm" id="progName" data-i18n="working"></span><span id="progPct"></span></div>
@@ -379,6 +435,13 @@
     </div>
   </div>
 
+  <div class="wizard-nav">
+    <button class="navbtn" id="step3Prev" type="button" data-i18n="prev"></button>
+    <button class="navbtn primary" id="step3Action" type="button" data-i18n="startProcess"></button>
+  </div>
+  </section>
+  </div>
+
   <footer data-i18n="foot"></footer>
 </div>
 <audio id="audio" preload="metadata"></audio>
@@ -396,6 +459,10 @@
   const I18N = {
     he:{
       dir:'rtl', langIco:'EN',
+      stepUpload:'העלאת קובץ', stepSettings:'הגדרות עיבוד', stepProcess:'עיבוד והורדה',
+      step1Title:'שלב 1 – העלאת קבצים', step1Sub:'העלו את קובץ האודיו שברצונכם לחתוך.',
+      step3Title:'שלב 3 – עיבוד והורדה', step3Sub:'התחילו את העיבוד, עקבו אחר ההתקדמות והורידו את הקובץ המוגמר.',
+      prev:'הקודם', next:'הבא', startProcess:'התחל עיבוד', downloadFile:'הורד קובץ', readyToProcess:'הכול מוכן. לחצו על „התחל עיבוד” כדי ליצור את הקובץ.',
       kick:'עורך אודיו',
       pageTitle:'ערכו אודיו חזותית — מהיר ופשוט',
       pageSub:'העלו שיר, ראו את גלי הקול, סמנו קטע בגרירה — ואז חתכו אותו (השאירו רק את הקטע) או מחקו אותו מהשיר. מהיר, פשוט ובאיכות מקצועית.',
@@ -426,6 +493,10 @@
     },
     en:{
       dir:'ltr', langIco:'עב',
+      stepUpload:'Upload file', stepSettings:'Processing settings', stepProcess:'Process & download',
+      step1Title:'Step 1 – Upload files', step1Sub:'Upload the audio file you want to cut.',
+      step3Title:'Step 3 – Process and download', step3Sub:'Start processing, follow its progress, and download the finished file.',
+      prev:'Previous', next:'Next', startProcess:'Start processing', downloadFile:'Download file', readyToProcess:'Everything is ready. Select “Start processing” to create your file.',
       kick:'Audio editor',
       pageTitle:'Edit audio visually — fast and simple',
       pageSub:'Load a song, see the waveform, drag to select a segment — then trim it (keep only the segment) or delete it from the track. Fast, simple and professional-quality.',
@@ -456,6 +527,10 @@
     },
     ru:{
       dir:'ltr',
+      stepUpload:'Загрузка файла', stepSettings:'Настройки обработки', stepProcess:'Обработка и загрузка',
+      step1Title:'Шаг 1 – Загрузка файла', step1Sub:'Загрузите аудиофайл, который хотите обрезать.',
+      step3Title:'Шаг 3 – Обработка и загрузка', step3Sub:'Запустите обработку, следите за прогрессом и загрузите готовый файл.',
+      prev:'Назад', next:'Далее', startProcess:'Начать обработку', downloadFile:'Скачать файл', readyToProcess:'Всё готово. Нажмите «Начать обработку», чтобы создать файл.',
       kick:'Аудиоредактор',
       pageTitle:'Редактируйте аудио визуально — быстро и просто',
       pageSub:'Загрузите песню, посмотрите на волновую форму, выделите фрагмент — затем обрежьте его (оставить только фрагмент) или удалите из трека. Быстро, просто и профессионального качества.',
@@ -508,6 +583,27 @@
   function toast(msg){ const e=el('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),1900); }
   const sleep = ms => new Promise(r=>setTimeout(r,ms));
 
+  // ---- wizard navigation ----
+  let currentStep=1;
+  function goStep(step){
+    if(step===2 && !file) return;
+    currentStep=clamp(step,1,3);
+    document.querySelectorAll('.wizard-step').forEach(n=>n.classList.toggle('active', Number(n.dataset.step)===currentStep));
+    document.querySelectorAll('[data-step-indicator]').forEach(n=>{
+      const s=Number(n.dataset.stepIndicator);
+      n.classList.toggle('active',s===currentStep);
+      n.classList.toggle('done',s<currentStep);
+    });
+    if(currentStep===2) setTimeout(()=>{ drawWave(); renderTL(); },0);
+    el('wizard').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function syncFinalAction(){
+    el('step3Action').textContent=result?t.downloadFile:t.startProcess;
+    el('step3Action').disabled=busy;
+    el('step3Prev').disabled=busy;
+    el('stageStatus').style.display=(busy||result)?'none':'';
+  }
+
   // ---- intake ----
   function loadFile(f){
     if(!f) return;
@@ -529,9 +625,9 @@
       el('nowSub').textContent=`${srcExt.toUpperCase()} · ${tc(dur)} · ${fmtBytes(f.size)}`;
       el('drop').style.display='none';
       el('editor').classList.add('show');
+      el('step1Next').disabled=false;
       setPlayIcon(false);
       renderTL(); renderPlay();
-      el('editor').scrollIntoView({behavior:'smooth',block:'start'});
       decodeWave(f);
     };
     a.onerror=()=>{ /* metadata may still work through ffmpeg later; ignore */ };
@@ -712,6 +808,7 @@
     pausePlayback();
     busy=true;
     el('cutBtn').disabled=true;
+    syncFinalAction();
     el('resultsCard').classList.remove('show');
     const prog=el('progCard'); prog.classList.add('show');
     el('progName').textContent=t.engineLoading; el('progPct').textContent='';
@@ -719,7 +816,7 @@
     el('editor').scrollIntoView({behavior:'smooth',block:'end'});
 
     const ok=await ensureEngine();
-    if(!ok){ busy=false; el('cutBtn').disabled=false; prog.classList.remove('show'); el('progWrap').classList.remove('indet'); return; }
+    if(!ok){ busy=false; el('cutBtn').disabled=false; prog.classList.remove('show'); el('progWrap').classList.remove('indet'); syncFinalAction(); return; }
 
     el('progName').textContent=t.working; setProg(0);
     const fmt=el('fmtSel').value;
@@ -779,7 +876,7 @@
     }finally{
       if(spent) disposeEngine();
     }
-    busy=false; el('cutBtn').disabled=false;
+    busy=false; el('cutBtn').disabled=false; syncFinalAction();
   }
 
   function showResult(){
@@ -791,6 +888,7 @@
        <span class="rn"><div class="nm" title="${escapeHtml(result.name)}">${escapeHtml(result.name)}</div><div class="meta">${meta}</div></span>`;
     const ra=el('resAudio'); ra.src=result.url;
     el('resultsCard').classList.add('show');
+    syncFinalAction();
     el('resultsCard').scrollIntoView({behavior:'smooth',block:'center'});
   }
 
@@ -806,7 +904,7 @@
     el('resultsCard').classList.remove('show');
     el('resAudio').pause(); el('resAudio').removeAttribute('src');
     el('optErr').textContent='';
-    if(el('editor').classList.contains('show')) el('editor').scrollIntoView({behavior:'smooth',block:'start'});
+    goStep(2);
   }
   // full reset — drop the current audio and go back to upload
   function reset(){
@@ -818,8 +916,11 @@
     el('resAudio').removeAttribute('src');
     el('editor').classList.remove('show');
     el('drop').style.display='';
+    el('step1Next').disabled=true;
     el('resultsCard').classList.remove('show');
     el('optErr').textContent='';
+    syncFinalAction();
+    goStep(1);
     drawWave();
     window.scrollTo({top:0,behavior:'smooth'});
   }
@@ -848,6 +949,7 @@
     try{ localStorage.setItem('ac_lang', l); }catch(_){}
     setPlayIcon(!el('audio').paused && !el('audio').ended);
     setMode(mode);
+    syncFinalAction();
     if(result && el('resultsCard').classList.contains('show')) showResult();
   }
   function ls(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } }
@@ -903,6 +1005,11 @@
   el('fmtSel').addEventListener('change',syncQual);
 
   el('cutBtn').addEventListener('click',run);
+  el('step1Next').addEventListener('click',()=>goStep(2));
+  el('step2Prev').addEventListener('click',()=>goStep(1));
+  el('step2Next').addEventListener('click',()=>goStep(3));
+  el('step3Prev').addEventListener('click',()=>goStep(2));
+  el('step3Action').addEventListener('click',()=>result?download():run());
   el('dlBtn').addEventListener('click',download);
   el('againBtn').addEventListener('click',editAgain);
   el('newBtn').addEventListener('click',reset);
@@ -916,6 +1023,7 @@
   applyLang(detectLang());
   syncQual();
   setMode('keep');
+  syncFinalAction();
   // warm up the engine in the background so the first export feels instant
   setTimeout(()=>{ ensureEngine().catch(()=>{}); }, 500);
 })();

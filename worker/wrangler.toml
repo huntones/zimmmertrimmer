@@ -16,9 +16,34 @@ R2_BUCKET         = "kolkli-files"
 # Lock this to your site's origin in production (e.g. https://kolkli.com).
 ALLOWED_ORIGIN    = "*"
 
+# --- Guest email verification (see EMAIL-VERIFICATION.md) --------------
+# Guests must confirm a 6-digit code before an upload is authorized.
+# Provider ∈ resend | sendgrid | postmark | smtp2go | mailchannels.
+EMAIL_PROVIDER    = "resend"
+# Must be an address on a domain you've verified with the provider.
+EMAIL_FROM        = "KOLKLI <verify@YOUR-DOMAIN.com>"
+EMAIL_BRAND       = "KOLKLI"
+# Which tools the gate applies to: transfers | uploads | all | off.
+#   transfers = the four file services only (recommended)
+#   uploads   = file services + edit:*/ai:* file tools (default in verify.js)
+#   off       = disable the server-side gate entirely
+VERIFY_SCOPE      = "uploads"
+# Optional tuning (defaults shown): code lifetime, resend cooldown, attempts,
+# signed-token lifetime, per-IP send throttles.
+# VERIFY_CODE_TTL_SEC = "600"
+# VERIFY_RESEND_SEC   = "45"
+# VERIFY_MAX_ATTEMPTS = "5"
+# VERIFY_TOKEN_DAYS   = "30"
+# VERIFY_IP_BURST     = "6"
+# VERIFY_IP_DAILY     = "30"
+
 # --- Secrets (DO NOT put here; set with `wrangler secret put NAME`) ----
 #   R2_ACCESS_KEY_ID       ← from R2 → Manage API Tokens
 #   R2_SECRET_ACCESS_KEY   ← from R2 → Manage API Tokens
+#   VERIFY_SECRET          ← any long random string; signs the verify tokens
+#                            (generate: `openssl rand -base64 48`)
+#   EMAIL_API_KEY          ← your email provider's API key
+#                            (not needed only if EMAIL_PROVIDER=mailchannels)
 
 # --- Durable Object: free/anonymous usage limits --------------------
 # Required for /usage/* quota enforcement. The object stores counters
