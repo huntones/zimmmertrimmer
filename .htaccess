@@ -1,0 +1,32 @@
+# KOLKLI clean URLs for Hostinger (Apache/LiteSpeed)
+
+Options -MultiViews
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Redirect browser requests for /index.html (including nested index files)
+  # to their canonical directory URL. THE_REQUEST prevents rewrite loops.
+  RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html(?:[?\s]) [NC]
+  RewriteRule ^(.*/)?index\.html$ /$1 [R=301,L,NE]
+
+  # Redirect legacy public URLs such as /dashboard.html to /dashboard.
+  # The query string is retained automatically.
+  RewriteCond %{THE_REQUEST} \s/+(.+?)\.html(?:[?\s]) [NC]
+  RewriteRule ^(.+)\.html$ /$1 [R=301,L,NE]
+
+  # Dashboard-style pages use deeper client-side paths. Serve the owning HTML
+  # page when users open or refresh /dashboard/view-name directly.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(dashboard|account-settings|text-tools|css-tools)(?:/.*)?$ $1.html [L]
+
+  # Resolve every other extensionless URL from its matching .html file without
+  # exposing .html in the browser address bar.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.+?)/?$ $1.html [L]
+</IfModule>

@@ -17,7 +17,7 @@ echo Starting local server on http://localhost:7000
 echo מפעיל שרת מקומי - השאירו חלון זה פתוח
 echo.
 
-start "" http://localhost:7000/index.html
+start "" http://localhost:7000/
 
 :serve
 rem --- free port 7000 if a previous/stuck server is still holding it, so the

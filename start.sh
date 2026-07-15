@@ -4,7 +4,7 @@ set -e
 
 cd "$(dirname "$0")"
 PORT=7000
-URL="http://localhost:${PORT}/index.html"
+URL="http://localhost:${PORT}/"
 
 if command -v xdg-open >/dev/null 2>&1; then
   (sleep 1; xdg-open "$URL" >/dev/null 2>&1) &

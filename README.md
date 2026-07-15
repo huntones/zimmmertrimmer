@@ -31,7 +31,7 @@ Mac/Linux: run `./start.sh`
 
 Or manually, in this folder:
     python -m http.server 7000
-then open http://localhost:7000/index.html
+then open http://localhost:7000/
 
 You'll land on the homepage — click "Open the Editor" to reach the app
 (`app.html`). There, wait for the dot at the top to turn green ("Engine ready"

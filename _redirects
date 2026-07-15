@@ -1,4 +1,4 @@
-# SPA path routing: pages whose in-app sections live in a path segment
+﻿# SPA path routing: pages whose in-app sections live in a path segment
 # (e.g. /dashboard/project-send) are served from their .html so a direct link
 # or refresh resolves; the page's JS then routes on location.pathname. These
 # 200 rewrites must come first (first match wins). Mirrors SPA_PAGES in serve.py.
@@ -10,7 +10,7 @@
 # 301 redirects: every legacy .html URL -> its clean canonical URL.
 # Cloudflare Pages / Netlify format. Query strings are forwarded automatically.
 # NOTE: www -> non-www and http -> https are handled by Cloudflare redirect rules
-#       (dashboard), not here. Generated file — do not hand-edit.
+#       (dashboard), not here. Generated file ג€” do not hand-edit.
 
 /about.html  /about  301
 /account-settings.html  /account-settings  301
@@ -141,3 +141,134 @@
 /watermark.html  /watermark  301
 /whatsapp-link.html  /whatsapp-link  301
 /work-hours-calculator.html  /work-hours-calculator  301
+
+# 200 rewrites: clean public URLs -> their HTML files (prevents direct-load/refresh 404s).
+# Legacy .html requests above still receive a permanent 301 to the canonical clean URL.
+/about  /about.html  200
+/account-settings  /account-settings.html  200
+/ad-text-checker  /ad-text-checker.html  200
+/admin  /admin.html  200
+/ai/  /ai/index.html  200
+/ai-audio-cleanup  /ai-audio-cleanup.html  200
+/ai-marketing-video  /ai-marketing-video.html  200
+/ai-master  /ai-master.html  200
+/ai-object-remover  /ai-object-remover.html  200
+/ai-smart-crop  /ai-smart-crop.html  200
+/ai-summarize-pdf  /ai-summarize-pdf.html  200
+/app  /app.html  200
+/approval-card  /approval-card.html  200
+/approval-detail-card  /approval-detail-card.html  200
+/archive-convert  /archive-convert.html  200
+/aspect-ratio  /aspect-ratio.html  200
+/audio/  /audio/index.html  200
+/audio-editor  /audio-editor.html  200
+/auth  /auth.html  200
+/blog  /blog.html  200
+/border-radius  /border-radius.html  200
+/box-shadow  /box-shadow.html  200
+/calc/  /calc/index.html  200
+/checkout  /checkout.html  200
+/color-code-generator  /color-code-generator.html  200
+/color-convert  /color-convert.html  200
+/compress/  /compress/index.html  200
+/compress-audio  /compress-audio.html  200
+/compress-image  /compress-image.html  200
+/compress-pdf  /compress-pdf.html  200
+/compress-video  /compress-video.html  200
+/compress-zip  /compress-zip.html  200
+/contact  /contact.html  200
+/contrast-checker  /contrast-checker.html  200
+/convert  /convert.html  200
+/converters/  /converters/index.html  200
+/copy-generator  /copy-generator.html  200
+/create-link-card  /create-link-card.html  200
+/crop-image  /crop-image.html  200
+/css-tools  /css-tools.html  200
+/cta-generator  /cta-generator.html  200
+/dashboard  /dashboard.html  200
+/delivery-approval-card  /delivery-approval-card.html  200
+/dev-tools/  /dev-tools/index.html  200
+/dmca  /dmca.html  200
+/doc-convert  /doc-convert.html  200
+/doc-to-pdf  /doc-to-pdf.html  200
+/documents/  /documents/index.html  200
+/download-landing  /download-landing.html  200
+/download-portal  /download-portal.html  200
+/download  /download.html  200
+/ebook-convert  /ebook-convert.html  200
+/embed-code  /embed-code.html  200
+/extract-audio  /extract-audio.html  200
+/fade-audio  /fade-audio.html  200
+/faq/  /faq/index.html  200
+/favicon-generator  /favicon-generator.html  200
+/filename-generator  /filename-generator.html  200
+/files  /files.html  200
+/folder-panel  /folder-panel.html  200
+/font-convert  /font-convert.html  200
+/form-builder  /form-builder.html  200
+/gradient-generator  /gradient-generator.html  200
+/heic-to-jpg  /heic-to-jpg.html  200
+/html-cleaner  /html-cleaner.html  200
+/image-color-picker  /image-color-picker.html  200
+/image-convert  /image-convert.html  200
+/image-to-base64  /image-to-base64.html  200
+/images/  /images/index.html  200
+/json-formatter  /json-formatter.html  200
+/link-preview  /link-preview.html  200
+/lorem-ipsum-generator  /lorem-ipsum-generator.html  200
+/mailto-link  /mailto-link.html  200
+/marketing/  /marketing/index.html  200
+/merge-audio  /merge-audio.html  200
+/merge-pdf  /merge-pdf.html  200
+/meta-length  /meta-length.html  200
+/meta-tags  /meta-tags.html  200
+/minify  /minify.html  200
+/mp4-to-mp3  /mp4-to-mp3.html  200
+/normalize-audio  /normalize-audio.html  200
+/order-summary-card  /order-summary-card.html  200
+/package-stats-card  /package-stats-card.html  200
+/palette-generator  /palette-generator.html  200
+/password-generator  /password-generator.html  200
+/pdf-to-jpg  /pdf-to-jpg.html  200
+/percent-calculator  /percent-calculator.html  200
+/placeholder-generator  /placeholder-generator.html  200
+/presentation-convert  /presentation-convert.html  200
+/pricing/  /pricing/index.html  200
+/privacy  /privacy.html  200
+/proof  /proof.html  200
+/qr-generator  /qr-generator.html  200
+/received-files-popup  /received-files-popup.html  200
+/redirect-generator  /redirect-generator.html  200
+/remove-bg  /remove-bg.html  200
+/request  /request.html  200
+/resize-image  /resize-image.html  200
+/restore-image  /restore-image.html  200
+/review  /review.html  200
+/ringtone  /ringtone.html  200
+/screen-units  /screen-units.html  200
+/security  /security.html  200
+/select  /select.html  200
+/send  /send.html  200
+/sent-files-card  /sent-files-card.html  200
+/sent-package-card  /sent-package-card.html  200
+/share-link-card  /share-link-card.html  200
+/sidebar  /sidebar.html  200
+/spreadsheet-convert  /spreadsheet-convert.html  200
+/subtitle-generator  /subtitle-generator.html  200
+/terms  /terms.html  200
+/text-tools  /text-tools.html  200
+/timezone-converter  /timezone-converter.html  200
+/tools/  /tools/index.html  200
+/trim-silence  /trim-silence.html  200
+/unit-converter  /unit-converter.html  200
+/upload  /upload.html  200
+/url-encode  /url-encode.html  200
+/utm-builder  /utm-builder.html  200
+/uuid-generator  /uuid-generator.html  200
+/video/  /video/index.html  200
+/video-convert  /video-convert.html  200
+/video-cut  /video-cut.html  200
+/vocal-remover  /vocal-remover.html  200
+/watermark  /watermark.html  200
+/whatsapp-link  /whatsapp-link.html  200
+/work-hours-calculator  /work-hours-calculator.html  200
