@@ -282,6 +282,7 @@
     he:{ dir:'rtl', langIco:'EN',
       loading:'טוען את הקבצים…',
       expiredTitle:'הקישור לא זמין', expiredBody:'הקישור פג תוקף, נמחק, או לא קיים במכשיר הזה. בקשו מהשולח קישור חדש.',
+      stoppedTitle:'הקישור הושהה', stoppedBody:'השולח עצר את הקישור הזה זמנית. פנו אליו לקבלת גישה מחודשת.',
       pwTitle:'הקישור מוגן בסיסמה', pwSub:'הזינו את הסיסמה שקיבלתם מהשולח כדי לראות את הקבצים.',
       pwPh:'סיסמה', unlock:'פתיחה', pwWrong:'סיסמה שגויה',
       gotFiles:'שותפו איתך קבצים', fromSomeone:'מישהו שיתף איתך קבצים דרך KOLKLI', fromNamed:n=>`מאת ${n}`,
@@ -296,6 +297,7 @@
     en:{ dir:'ltr', langIco:'עב',
       loading:'Loading files…',
       expiredTitle:'Link unavailable', expiredBody:'This link has expired, was deleted, or doesn’t exist on this device. Ask the sender for a new one.',
+      stoppedTitle:'Link paused', stoppedBody:'The sender has stopped this link. Contact them to regain access.',
       pwTitle:'This link is password protected', pwSub:'Enter the password you received from the sender to see the files.',
       pwPh:'Password', unlock:'Unlock', pwWrong:'Wrong password',
       gotFiles:'Files shared with you', fromSomeone:'Someone shared files with you via KOLKLI', fromNamed:n=>`From ${n}`,
@@ -311,6 +313,7 @@
       dir:'ltr',
       loading:'Загрузка файлов…',
       expiredTitle:'Ссылка недоступна', expiredBody:'Эта ссылка истекла, была удалена или не существует на этом устройстве. Попросите отправителя прислать новую.',
+      stoppedTitle:'Ссылка приостановлена', stoppedBody:'Отправитель остановил эту ссылку. Свяжитесь с ним, чтобы восстановить доступ.',
       pwTitle:'Эта ссылка защищена паролем', pwSub:'Введите пароль, полученный от отправителя, чтобы увидеть файлы.',
       pwPh:'Пароль', unlock:'Разблокировать', pwWrong:'Неверный пароль',
       gotFiles:'Файлы, которыми с вами поделились', fromSomeone:'Кто-то поделился с вами файлами через KOLKLI', fromNamed:n=>`От ${n}`,
@@ -452,6 +455,7 @@
       </div>`;
     }).join('');
     el('dlAllLbl').textContent = t.dlAll(record.files.length);
+    el('dlAllBtn').classList.toggle('hidden', record.allowZip===false);
     show('transferView');
   }
   function ICON_clock(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'; }
@@ -546,6 +550,7 @@
     if(!record){ show('expiredState'); return; }
     applyBrand(record.brand);
     if(Date.now() > record.expiresAt){ try{ await idbDel(key); }catch(_){}; show('expiredState'); return; }
+    if(record.disabled){ show('expiredState'); const es=el('expiredState'), h=es.querySelector('h2'), pp=es.querySelector('p'); if(h&&t.stoppedTitle) h.textContent=t.stoppedTitle; if(pp&&t.stoppedBody) pp.textContent=t.stoppedBody; return; }
     if(record.password){ show('pwState'); setTimeout(()=>el('pwInput').focus(),40); return; }
     renderTransfer();
   }

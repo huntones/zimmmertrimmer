@@ -112,7 +112,7 @@
   .mp-tone-select{--svc:#2563eb;--svc-bg:rgba(37,99,235,.12);--svc-line:rgba(37,99,235,.42);--svc-shadow:rgba(37,99,235,.22);}
   .mp-tone-receive{--svc:#0891b2;--svc-bg:rgba(8,145,178,.12);--svc-line:rgba(8,145,178,.42);--svc-shadow:rgba(8,145,178,.22);}
   .mp-tone-send{--svc:#6f3afb;--svc-bg:rgba(111,58,251,.14);--svc-line:rgba(111,58,251,.44);--svc-shadow:rgba(111,58,251,.24);}
-  .mp-tone-review{--svc:#16a34a;--svc-bg:rgba(22,163,74,.13);--svc-line:rgba(22,163,74,.42);--svc-shadow:rgba(22,163,74,.22);}
+  .mp-tone-review{--svc:#0b7a41;--svc-bg:rgba(11,122,65,.13);--svc-line:rgba(11,122,65,.42);--svc-shadow:rgba(11,122,65,.22);}
   .mp-tone-all{--svc:#4f46e5;--svc-bg:rgba(79,70,229,.12);--svc-line:rgba(79,70,229,.40);--svc-shadow:rgba(79,70,229,.22);}
   .edit-tone-all{--svc:#7c3aed;--svc-bg:rgba(124,58,237,.12);--svc-line:rgba(124,58,237,.40);--svc-shadow:rgba(124,58,237,.22);}
   .edit-tone-audio{--svc:#c026d3;--svc-bg:rgba(192,38,211,.12);--svc-line:rgba(192,38,211,.40);--svc-shadow:rgba(192,38,211,.22);}
@@ -621,7 +621,7 @@
   .mp-tool-ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   .mp-tool-t{display:block;font-size:15px;font-weight:850;line-height:1.15;}
   .mp-tool-d{display:block;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.25;}
-  .mp-section-title{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:2px;}
+  .mp-section-title{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:2px;position:relative;}
   .mp-section-title h3{margin:0;font-size:17px;font-weight:850;letter-spacing:0;}
   .mp-section-title span{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;}
   /* count + layout toggle share the left side of the section header */
@@ -758,13 +758,27 @@
   html[data-theme="dark"] .mpr-card{--recv-sel:#22c3d6;--recv-sel-bg:#14282e}
 
   /* ---- top action bar: received-files (right) · status + menu (left) ---- */
-  .mpr-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 20px;border-bottom:1px solid var(--line)}
+  /* The bar mirrors .mpr-body's grid exactly — same column template, same gap,
+     same inline padding — so its second cell lands right on top of the stat
+     strip. The link pill centers in that cell, which is the centre of the strip
+     and therefore the centre of the middle stat (downloads). Any change to the
+     body's tracks must be repeated here or the pill drifts off the stat.
+     The trash is taken out of the tracks (absolute, at the card's inline-end
+     padding edge) so it can't claim a column. --bar-nudge still keeps the
+     service button off the card's edge. Narrow cards stack the body, so there is
+     no stat column to centre over — the bar falls back to a plain flex row in the
+     max-width:480px container query below. */
+  .mpr-bar{--bar-nudge:18px;position:relative;display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);align-items:center;gap:34px;padding:15px 24px;border-bottom:1px solid var(--line)}
+  /* checkbox + service button share the first cell so the pill keeps the second.
+     The gap doubles as the service button's nudge away from the leading edge —
+     the checkbox stays pinned there, the button sits clear of it. */
+  .mpr-barlead{display:flex;align-items:center;gap:22px;min-width:0;margin-inline-start:var(--bar-nudge)}
   .mpr-receive{--recv:#0891b2;--recv-bg:rgba(8,145,178,.12);--recv-bgh:rgba(8,145,178,.2);--recv-line:rgba(8,145,178,.42);display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border-radius:12px;border:1px solid var(--recv-line);background:var(--recv-bg);color:var(--recv);font-size:13.5px;font-weight:800;text-decoration:none;white-space:nowrap;cursor:pointer;transition:border-color .15s ease,background .15s ease}
   .mpr-receive:hover{border-color:var(--recv);background:var(--recv-bgh)}
   .mpr-receive>svg:first-child{width:17px;height:17px;stroke:var(--recv);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .mpr-receive>svg:last-child{width:16px;height:16px;stroke:var(--recv);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.75}
   html[data-theme="dark"] .mpr-receive{--recv:#22c3d6;--recv-bg:rgba(34,195,214,.14);--recv-bgh:rgba(34,195,214,.22);--recv-line:rgba(34,195,214,.42)}
-  .mpr-side{display:inline-flex;align-items:center;gap:8px}
+  .mpr-side{position:absolute;inset-inline-end:24px;top:0;bottom:0;display:inline-flex;align-items:center;gap:8px}
   /* active-order status pill */
   .mpr-status{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:var(--success-soft);color:var(--success);font-size:12.5px;font-weight:850;white-space:nowrap}
   .mpr-status::after{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 3px rgba(43,184,60,.18)}
@@ -792,7 +806,7 @@
   .mpr-avatar img{width:100%;height:100%;object-fit:cover}
   /* Review-tone card: green round frame + green inner fill on the avatar, echoing
      the card's approval green (--svc) used by the link pill and approve button. */
-  .mpr-card.mp-tone-review .mpr-avatar{background:linear-gradient(135deg,rgba(22,163,74,.18),rgba(22,163,74,.10));color:var(--svc);box-shadow:0 0 0 1.5px var(--panel),0 0 0 3px var(--svc)}
+  .mpr-card.mp-tone-review .mpr-avatar{background:linear-gradient(135deg,rgba(11,122,65,.18),rgba(11,122,65,.10));color:var(--svc);box-shadow:0 0 0 1.5px var(--panel),0 0 0 3px var(--svc)}
   /* Select-tone card: blue round frame + blue inner fill on the avatar, echoing
      the "בחירת קבצים" service blue (--svc) used by the badge and open-selection CTA. */
   .mpr-card.mp-tone-select .mpr-avatar{background:linear-gradient(135deg,rgba(37,99,235,.18),rgba(37,99,235,.10));color:var(--svc);box-shadow:0 0 0 1.5px var(--panel),0 0 0 3px var(--svc)}
@@ -832,10 +846,11 @@
   .mpr-order{font-size:14px;font-weight:800;color:var(--muted);text-align:center}
   .mpr-order b{color:var(--ink);font-weight:900;direction:ltr;unicode-bidi:isolate;display:inline-block}
   /* מספר מזהה grouped with its link-status pill (pill sits to the left of the id
-     in RTL). margin-inline-end (physical-left margin in RTL) nudges the whole
-     group toward the receive button; cqi keeps the nudge proportional so narrow
-     cards don't overflow the header row. */
-  .mpr-idwrap{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 8px;min-width:0;margin-inline-end:clamp(4px,2cqi,16px)}
+     in RTL). It owns the bar's second grid cell — the one that mirrors the stat
+     strip — and centres inside it, so the pill lands dead centre over the middle
+     stat. The inline-end nudge below only applies to the narrow flex fallback,
+     where there is no stat column to line up with. */
+  .mpr-idwrap{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 8px;min-width:0;justify-self:center}
   .mpr-link{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:999px;border:1px solid transparent;font-size:13.5px;font-weight:800;white-space:nowrap}
   .mpr-link::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
   .mpr-link.on{background:var(--success-soft);color:var(--success)}
@@ -847,7 +862,7 @@
      deadline nears. Saving the project cancels the countdown (hidden via the
      .is-saved-frame rule); un-saving restores it exactly as it was. */
   .mpr-expiry{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:999px;
-    border:1px solid transparent;background:var(--warm-soft);color:var(--warn);
+    border:1px solid color-mix(in srgb,var(--success) 30%,transparent);background:var(--success-soft);color:var(--success-dim);
     font-size:13px;font-weight:800;line-height:1;white-space:nowrap}
   .mpr-expiry svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
     transform-origin:50% 50%;animation:mprHourglass 3s ease-in-out infinite}
@@ -861,18 +876,27 @@
   @media (prefers-reduced-motion:reduce){ .mpr-expiry svg{animation:none} }
   .mpr-card.is-saved-frame .mpr-expiry{display:none}
   /* client note */
-  .mpr-note{display:flex;gap:6px;align-items:baseline;color:var(--muted);font-size:12.5px;line-height:1.5;padding:0 24px}
+  .mpr-note{display:flex;gap:6px;align-items:baseline;color:var(--muted);font-size:12.5px;line-height:1.5;padding:16px 24px 0;border-top:1px solid var(--line)}
   .mpr-note b{flex:0 0 auto;color:var(--ink-2);font-weight:850;white-space:nowrap}
   .mpr-note .t{flex:1 1 auto;min-width:0;text-align:right;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   /* action buttons */
   .mpr-linkrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:14px 24px 0}
-  .mpr-bottom{display:flex;flex-wrap:wrap;gap:8px;padding:12px 24px 18px;margin-top:0}
+  .mpr-bottom{display:flex;flex-wrap:wrap;gap:8px;padding:12px 24px 18px;margin-top:12px;border-top:1px solid var(--line)}
   .mpr-action{flex:1 1 auto;min-width:104px;height:42px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 16px;font-size:12.5px;font-weight:850;cursor:pointer;text-decoration:none;white-space:nowrap}
   .mpr-action svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
   .mpr-action.primary{background:var(--grad-btn);border-color:transparent;color:#fff;box-shadow:0 8px 18px var(--grad-btn-glow)}
   .mpr-action.is-disabled,.mpr-action:disabled{opacity:.5;cursor:not-allowed;box-shadow:none;filter:saturate(.15)}
   .mpr-action.share{color:var(--accent);border-color:var(--accent-soft)}
   .mpr-action.is-saved{color:var(--success-dim);border-color:var(--success);background:var(--success-soft)}
+  /* FR-layout icon buttons: the header edit control and the footer share/save
+     controls collapse to compact icon-only squares, leaving one dominant primary
+     action per card. Colour, border and icon are inherited from the existing
+     .mpr-receive / .mpr-action rules (incl. per-tone overrides) — only the
+     footprint changes, so the wide card keeps its look. */
+  .mpr-receive.is-ico{width:40px;height:40px;padding:0;gap:0;justify-content:center}
+  .mpr-receive.is-ico>span{display:none}
+  .mpr-action.is-ico{flex:0 0 auto;width:42px;min-width:0;padding:0}
+  .mpr-action.is-ico>svg{width:17px;height:17px}
 
   /* Selected order/project card — click marks the current order with the brand
      accent (border + ring) over a soft accent wash, so it stays clearly and
@@ -885,6 +909,42 @@
      and returns the card to its normal panel background. Declared before the
      .is-selected rules below so selecting a card (equal specificity) wins. */
   .mpr-card.is-new,.mp-client.is-new{background:var(--new-bg);border-color:var(--new-line)}
+  /* …and a loud red NEW ribbon folded over the bar's end corner. It rides the
+     same .is-new state as the wash, so the first interaction with the order —
+     opening it, downloading from it, or just clicking the card — clears both at
+     once with no extra bookkeeping. Rendered on every card, revealed by the
+     class. One red for both themes: contrast is against the ribbon's own fill.
+     Geometry: a fixed 150x20 band rotated 45° about its own centre and nudged so
+     the centre lands on the corner diagonal ~26px in, putting its long edges
+     across the corner at ~38px and ~66px along each card edge. The band is far
+     longer than the corner is wide on purpose — .mpr-card's own overflow:hidden
+     and border-radius clip the tails, and that clip is what makes the fold read.
+     A 45° rotation has no logical-property form, so the two writing directions
+     are mirrored by hand; each anchors to the same edge .mpr-side does. */
+  .mpr-new{display:none;position:absolute;top:0;width:150px;height:20px;
+    align-items:center;justify-content:center;gap:5px;
+    background:#d92d20;color:#fff;font-size:10px;font-weight:900;letter-spacing:.14em;line-height:1;
+    white-space:nowrap;pointer-events:none;z-index:2;box-shadow:0 4px 12px rgba(217,45,32,.38)}
+  html[dir="rtl"] .mpr-new{left:0;transform:translate(-49px,16px) rotate(-45deg)}
+  html:not([dir="rtl"]) .mpr-new{right:0;transform:translate(49px,16px) rotate(45deg)}
+  .mpr-new::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor;animation:mprDotPulse 1.6s ease-in-out infinite}
+  .mpr-card.is-new .mpr-new{display:flex}
+  @media (prefers-reduced-motion:reduce){ .mpr-new::before{animation:none} }
+  /* The corner the ribbon now occupies is the corner the delete button sat in, so
+     push the end group clear of the band's inner edge whenever the tag shows.
+     52px leaves the button's nearest corner outside the band with room to spare,
+     and it outranks the container-query .mpr-side rules on specificity, so this
+     one declaration covers every width at which .mpr-side is still absolute. */
+  .mpr-card.is-new .mpr-side{inset-inline-end:52px}
+  /* Below 481px .mpr-side rejoins the flex row and the inset stops biting — hold
+     the same clearance with the bar's own end padding instead. */
+  @container (max-width:480px){ .mpr-card.is-new .mpr-bar{padding-inline-end:52px} }
+  /* The link pill is centred inside the grid track that the absolutely-positioned
+     .mpr-side floats over, so it cannot see the displaced end group and the two
+     collide once the track gets tight (~481-560px cards). Off-centre the pill
+     there by enough to clear it — a centred box moves by half its end margin.
+     Wider cards have the room already. */
+  @container (max-width:760px) and (min-width:481px){ .mpr-card.is-new .mpr-idwrap{margin-inline-end:40px} }
   .mpr-card:not(.is-selected):hover,.mp-client:not(.is-selected):hover{box-shadow:var(--shadow-lg)}
   .mp-client.is-selected{background:var(--sel-bg)}
   /* Received-files cards adopt the "קבצים שהתקבלו" teal for their selected state
@@ -940,7 +1000,7 @@
      the primary "הצג קבצים לאישור" CTA gets a green fill with white text and the
      "שיתוף" button turns green-on-white. Scoped to .mp-tone-review only, so the
      other cards' shared .mpr-action.primary / .share buttons keep their look. */
-  .mpr-card.mp-tone-review .mpr-action.primary{background:linear-gradient(105deg,#22c55e 0%,#16a34a 100%);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(22,163,74,.28)}
+  .mpr-card.mp-tone-review .mpr-action.primary{background:linear-gradient(105deg,#16a35a 0%,#076f39 100%);border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(7,111,57,.28)}
   .mpr-card.mp-tone-review .mpr-action.share{color:var(--svc);border-color:var(--svc-line);background:var(--panel)}
   /* Received-files card: teal restyle of the primary CTA + share, matching the
      card's own service tone (--svc:#0891b2) instead of the shared purple gradient,
@@ -959,7 +1019,13 @@
   /* Saved: once "שמירה" is toggled on, dim the marked stat strip so the saved
      snapshot reads as frozen/darkened. */
   .mpr-card.is-saved-frame .mpr-statswrap{opacity:.5;filter:grayscale(.5);transition:opacity .15s ease,filter .15s ease}
-  .mpr-card.mp-tone-send .mpr-link.on{border-color:var(--success)}
+  /* Active "קישור פעיל" pill gains a green frame on every wide service card —
+     received (receive) · selection (select) · approval (review) · sent (send) —
+     so the live-link status reads as a bordered chip across all four categories. */
+  .mpr-card.mp-tone-send .mpr-link.on,
+  .mpr-card.mp-tone-select .mpr-link.on,
+  .mpr-card.mp-tone-review .mpr-link.on,
+  .mpr-card.mp-tone-receive .mpr-link.on{border-color:var(--success)}
 
   /* ===== Multi-select: pick several client cards and act on them together =====
      A "בחירה מרובה" toggle in the section header opens select mode: every card
@@ -970,18 +1036,27 @@
   .mp-selecttog:hover{color:var(--ink);border-color:var(--muted)}
   .mp-selecttog.is-on{background:var(--accent-soft);color:var(--accent-dim);border-color:transparent}
   html[data-theme="dark"] .mp-selecttog.is-on{color:var(--accent)}
-  .mpr-bulk{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 2px;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);box-shadow:var(--shadow-sm)}
+  /* Out of flow entirely — an absolute overlay centred over the section-title
+     band (its natural visual home), so entering/leaving select mode never
+     inserts a flex child into .mp-shell and the grid below cannot shift. */
+  .mpr-bulk{position:absolute;top:50%;transform:translateY(-50%);inset-inline:24%;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);box-shadow:var(--shadow-sm);pointer-events:none}
   .mpr-bulk-count{font-size:13px;font-weight:850;color:var(--accent-dim)}
   .mpr-bulk-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .mpr-bulk .btn{border-radius:9px;font-size:12.5px;padding:8px 12px}
+  .mpr-bulk .btn{border-radius:9px;font-size:12.5px;padding:8px 12px;pointer-events:auto}
   .mpr-bulk .btn[disabled]{opacity:.5;cursor:not-allowed;pointer-events:none}
-  /* Leading select checkbox on each card — hidden until select mode is on. Sized
-     to the same round check the processed-files cards use; tinted per service via
-     --recv-sel (teal/blue/green/purple) so it matches the card it belongs to. */
-  .mpr-check{display:none;flex:0 0 auto;position:relative;width:30px;height:30px;cursor:pointer;align-items:center;justify-content:center}
-  .mpr-list.is-selecting .mpr-check{display:inline-flex}
+  /* Leading select checkbox on each card — always on show, so multi-select is a
+     standing option rather than something the toolbar toggle has to unlock; the
+     first tick turns select mode on. Sized to the same round check the processed-
+     files cards use; tinted per service via --recv-sel (teal/blue/green/purple)
+     so it matches the card it belongs to. Muted until select mode is live. */
+  /* Pulled back toward the card's leading edge (right in RTL) without moving the
+     service button next to it — hence a visual offset, not a margin. Capped at
+     the nudge so it can never cross the bar's padding on narrow cards, where
+     --bar-nudge drops to 0 and the offset cancels itself out. */
+  .mpr-check{display:inline-flex;flex:0 0 auto;position:relative;inset-inline-start:calc(0px - min(10px, var(--bar-nudge, 0px)));width:30px;height:30px;cursor:pointer;align-items:center;justify-content:center;opacity:1;transition:opacity .14s ease}
+  .mpr-list.is-selecting .mpr-check,.mpr-card:hover .mpr-check,.mpr-check:focus-within{opacity:1}
   .mpr-check input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer}
-  .mpr-check span{width:26px;height:26px;border-radius:999px;border:1.5px solid var(--line);background:var(--panel);color:transparent;display:grid;place-items:center;box-shadow:var(--shadow-sm);transition:background .14s ease,border-color .14s ease,color .14s ease,transform .12s ease}
+  .mpr-check span{width:28px;height:28px;border-radius:999px;border:2px solid color-mix(in srgb, var(--recv-sel) 40%, var(--line));background:var(--panel);color:transparent;display:grid;place-items:center;box-shadow:0 1px 4px rgba(15,23,42,.12);transition:background .14s ease,border-color .14s ease,color .14s ease,transform .12s ease}
   .mpr-check svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
   .mpr-check:hover span{border-color:var(--recv-sel);transform:translateY(-1px)}
   .mpr-check input:focus-visible + span{outline:2px solid var(--recv-sel);outline-offset:2px}
@@ -1001,6 +1076,9 @@
      lines and stat cells so everything packs into a single line at this width. */
   @container (max-width:760px) and (min-width:481px){
     .mpr-body{grid-template-columns:minmax(150px,200px) 1fr;gap:16px;padding:20px 20px}
+    /* keep the bar's tracks identical to the body's at this width */
+    .mpr-bar{grid-template-columns:minmax(150px,200px) minmax(0,1fr);gap:16px;padding:15px 20px}
+    .mpr-side{inset-inline-end:20px}
     .mpr-person{gap:11px}
     .mpr-avatar{width:50px;height:50px;flex-basis:50px;font-size:18px}
     .mpr-name{font-size:16px}
@@ -1019,6 +1097,11 @@
   /* narrow cards: stack — client identity on top, stat strip directly beneath */
   @container (max-width:480px){
     .mpr-body{grid-template-columns:1fr;gap:16px}
+    /* body stacks: no stat column to centre the pill over, so the bar goes back
+       to the plain flex row (button at the start, pill nudged, trash at the end) */
+    .mpr-bar{display:flex;justify-content:space-between;gap:14px;padding:15px 20px}
+    .mpr-side{position:static}
+    .mpr-idwrap{margin-inline-end:calc(clamp(4px,2cqi,16px) + var(--bar-nudge,0px))}
   }
   @container (max-width:400px){
     .mpr-stats{grid-template-columns:repeat(2,1fr)}
@@ -1026,7 +1109,9 @@
     .mpr-stat{border-top:1px solid var(--line)}
     .mpr-stat:nth-child(-n+2){border-top:none}
     .mpr-stat:nth-child(odd){border-inline-start:1px solid var(--line)}
-    .mpr-bar{flex-wrap:wrap}
+    /* wrapped rows have no dead space to reclaim — drop the nudge so the button
+       stays flush with the card's inline-start padding */
+    .mpr-bar{--bar-nudge:0px;flex-wrap:wrap}
   }
 
   /* ---------- processed files history ---------- */
@@ -1563,6 +1648,16 @@
     .dash-acct-btn{width:42px;padding:0;justify-content:center;}
     .dash-acct-menu{width:min(270px,calc(100vw - 28px));}
   }
+  /* Sent-deliveries manage drawer */
+  .mpr-manage{border-top:1px solid var(--line,#e5e8f0);}
+  .mpr-managebtn{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;background:none;border:none;cursor:pointer;color:var(--svc,#6f3afb);font-size:12.5px;font-weight:700;padding:10px 14px;}
+  .mpr-managebtn svg{width:15px;height:15px;}
+  .mpr-managedrawer{display:flex;flex-wrap:wrap;gap:7px;padding:0 14px 12px;}
+  .mpr-managedrawer[hidden]{display:none;}
+  .mpr-mact{flex:1 1 auto;min-width:120px;padding:8px 10px;border:1px solid var(--line,#e5e8f0);border-radius:9px;background:var(--panel-2,#f5f6fa);color:var(--ink-2,#2b3140);font-size:12px;font-weight:600;cursor:pointer;}
+  .mpr-mact:hover{border-color:var(--svc,#6f3afb);color:var(--svc,#6f3afb);}
+  .mpr-mact.danger{color:#e5484d;}
+  .mpr-mact.danger:hover{border-color:#e5484d;}
 </style>
 <link rel="stylesheet" href="./header.css">
 </head>
@@ -3192,7 +3287,7 @@
         'Waiting for selection':'ממתין לבחירה', 'In progress':'בחירה בתהליך', 'Selection in progress':'בחירה בתהליך', 'Selection complete':'הבחירה הסתיימה', 'View only':'לצפייה בלבד', 'Selection unavailable':'הבחירה אינה זמינה', 'Awaiting picks':'ממתין לבחירה',
         'Pending review':'ממתין לבדיקה', 'Received':'התקבל', 'Active request':'בקשה פעילה',
         'Delivered':'נמסר', 'Downloaded':'הורד', 'Link active':'קישור פעיל',
-        'Not downloaded':'טרם הורד', 'Files downloaded':'הקבצים הורדו',
+        'Not downloaded':'טרם הורד', 'Files downloaded':'הקבצים הורדו', 'Link stopped':'הקישור נעצר', 'Link expired':'פג תוקף',
         'Waiting approval':'ממתין לאישור', 'Changes requested':'התבקשו שינויים', 'In review':'בבדיקה חוזרת',
         'Approved':'אושר', 'Rejected':'נדחה', 'New version sent':'נשלחה גרסה חדשה', 'Viewed':'נצפה',
         draft:'טיוטה', sent:'נשלח', approved:'מאושר', closed:'סגור', expired:'פג תוקף', changes:'התבקשו שינויים', review:'בבדיקה חוזרת', viewed:'נצפה', rejected:'נדחה'
@@ -3238,7 +3333,7 @@
         'Waiting for selection':'Ожидает выбора', 'In progress':'Выбор в процессе', 'Selection in progress':'Выбор в процессе', 'Selection complete':'Выбор завершён', 'View only':'Только просмотр', 'Selection unavailable':'Выбор недоступен', 'Awaiting picks':'Ожидает выбора',
         'Pending review':'Ожидает проверки', 'Received':'Получено', 'Active request':'Активный запрос',
         'Delivered':'Доставлено', 'Downloaded':'Скачано', 'Link active':'Ссылка активна',
-        'Not downloaded':'Ещё не скачано', 'Files downloaded':'Файлы скачаны',
+        'Not downloaded':'Ещё не скачано', 'Files downloaded':'Файлы скачаны', 'Link stopped':'Ссылка остановлена', 'Link expired':'Срок истёк',
         'Waiting approval':'Ожидает согласования', 'Changes requested':'Запрошены изменения', 'In review':'На повторной проверке',
         'Approved':'Одобрено', 'Rejected':'Отклонено', 'New version sent':'Отправлена новая версия', 'Viewed':'Просмотрено',
         draft:'Черновик', sent:'Отправлено', approved:'Согласовано', closed:'Закрыто', expired:'Истекло', changes:'Запрошены изменения', review:'На повторной проверке', viewed:'Просмотрено', rejected:'Отклонено'
@@ -3428,13 +3523,14 @@
       });
     } else if(key==='send'){
       var sends=ensureProjectNumbers('send', readOwnArray('kolkli_send_links'), function(list){ lsSetOwn('kolkli_send_links', JSON.stringify((list||[]).slice(0,100))); });
-      cards=sends.slice(0,3).map(function(x,i){
-        return { client:x.client||('Client '+(i+1)), email:x.email||'', phone:x.phone||'', link:x.url||x.link||(x.token?('download?t='+encodeURIComponent(x.token)):''), title:x.name||('Sent package '+(i+1)),
+      cards=sends.map(function(x,i){
+        return { client:x.client||x.recipientName||('Client '+(i+1)), email:x.email||x.recipient||x.recipients||'', phone:x.phone||'', link:x.url||x.link||(x.token?('download?t='+encodeURIComponent(x.token)):''), title:x.name||x.recipientName||('Sent package '+(i+1)),
           f1:(x.files||0)+' files', l1:'Sent', f2:''+(x.downloads||0), l2:'Downloads',
-          f3:(window.KR?KR.fmtBytes(x.bytes):fmtDashBytes(x.bytes)), l3:'Total size', note:'Files sent from your workspace to the client.', status:x.downloads?'Downloaded':'Link active',
-          avatar:x.clientAvatar||x.avatar||'', token:x.token, _ts:Number(x.createdAt)||0, _new:true,
+          f3:(window.KR?KR.fmtBytes(x.bytes):fmtDashBytes(x.bytes)), l3:'Total size', note:x.message||'Files sent from your workspace to the client.', status:x.downloads?'Downloaded':'Link active',
+          avatar:x.clientAvatar||x.avatar||'', token:x.token, expiresAt:(typeof x.expiresAt==='number'?x.expiresAt:undefined), disabled:!!x.disabled, allowZip:x.allowZip!==false, _ts:Number(x.createdAt)||0, _new:true,
           projectNumberText:projectNumberText('send',x), projectNumber:x.projectNumber };
       });
+      return cards;
     } else if(key==='review'){
       var reviews=(window.RV&&RV.loadProjects) ? ensureProjectNumbers('review', RV.loadProjects(), RV.saveProjects) : readOwnArray('rv_projects');
       cards=reviews.slice(0,3).map(function(p,i){
@@ -3529,7 +3625,40 @@
     var m=String(card&&card.f2||'').match(/\d+/);
     return m ? parseInt(m[0],10) : 0;
   }
+  // ---- Sent-deliveries management (mirrors send.html's IndexedDB + index writers) ----
+  function sendManageText(){
+    return lang==='he'
+      ? { manage:'ניהול המשלוח', extend7:'הארכה +7 ימים', extend30:'הארכה +30 יום', stop:'עצירת הקישור', resume:'חידוש הקישור', del:'מחיקה לצמיתות', resend:'שליחה חוזרת', extended:'התוקף הוארך ✓', stopped:'הקישור נעצר', resumed:'הקישור חודש', deleted:'המשלוח נמחק', delT:'למחוק את המשלוח לצמיתות?', delB:'הקבצים והקישור יימחקו לצמיתות ולא ניתן לשחזר.', cancel:'ביטול' }
+      : lang==='ru'
+      ? { manage:'Управление', extend7:'Продлить +7 дней', extend30:'Продлить +30 дней', stop:'Остановить ссылку', resume:'Возобновить ссылку', del:'Удалить навсегда', resend:'Отправить снова', extended:'Срок продлён ✓', stopped:'Ссылка остановлена', resumed:'Ссылка возобновлена', deleted:'Отправка удалена', delT:'Удалить отправку навсегда?', delB:'Файлы и ссылка будут удалены безвозвратно.', cancel:'Отмена' }
+      : { manage:'Manage delivery', extend7:'Extend +7 days', extend30:'Extend +30 days', stop:'Stop link', resume:'Resume link', del:'Delete permanently', resend:'Resend', extended:'Expiry extended ✓', stopped:'Link stopped', resumed:'Link resumed', deleted:'Delivery deleted', delT:'Delete this delivery permanently?', delB:'The files and link are permanently deleted and cannot be recovered.', cancel:'Cancel' };
+  }
+  function sendIdb(){ return new Promise(function(res,rej){ var r=indexedDB.open('audiocut',1); r.onupgradeneeded=function(){ if(!r.result.objectStoreNames.contains('transfers')) r.result.createObjectStore('transfers'); }; r.onsuccess=function(){ res(r.result); }; r.onerror=function(){ rej(r.error); }; }); }
+  function sendIdbGet(k){ return sendIdb().then(function(db){ return new Promise(function(res,rej){ var rq=db.transaction('transfers','readonly').objectStore('transfers').get(k); rq.onsuccess=function(){res(rq.result);}; rq.onerror=function(){rej(rq.error);}; }); }); }
+  function sendIdbPut(k,v){ return sendIdb().then(function(db){ return new Promise(function(res,rej){ var tx=db.transaction('transfers','readwrite'); tx.objectStore('transfers').put(v,k); tx.oncomplete=function(){res();}; tx.onerror=function(){rej(tx.error);}; }); }); }
+  function sendIdbDel(k){ return sendIdb().then(function(db){ return new Promise(function(res,rej){ var tx=db.transaction('transfers','readwrite'); tx.objectStore('transfers').delete(k); tx.oncomplete=function(){res();}; tx.onerror=function(){rej(tx.error);}; }); }); }
+  // patch BOTH the localStorage index (dashboard reads this) AND the IndexedDB record
+  function updateSend(token, patch){
+    var arr=readOwnArray('kolkli_send_links'), i;
+    for(i=0;i<arr.length;i++){ if(arr[i].token===token){ for(var k in patch) arr[i][k]=patch[k]; break; } }
+    try{ lsSetOwn('kolkli_send_links', JSON.stringify(arr.slice(0,100))); }catch(e){}
+    return sendIdbGet('t_'+token).then(function(rec){ if(rec){ for(var k in patch) rec[k]=patch[k]; return sendIdbPut('t_'+token, rec); } }).catch(function(){});
+  }
+  function deleteSend(token){
+    var arr=readOwnArray('kolkli_send_links').filter(function(x){ return x.token!==token; });
+    try{ lsSetOwn('kolkli_send_links', JSON.stringify(arr.slice(0,100))); }catch(e){}
+    try{ if(window.KolkliDB && KolkliDB.enabled()) KolkliDB.deleteProject('send', token); }catch(e){}
+    return sendIdbDel('t_'+token).catch(function(){});
+  }
+  // Live download counts: reflect recipient downloads onto the visible card without a reload.
+  try{ if('BroadcastChannel'in window){ var _dlBC=new BroadcastChannel('audiocut_dl'); _dlBC.onmessage=function(e){ var d=e.data||{}; if(!d.token||typeof d.downloads!=='number') return;
+    var card=document.querySelector('[data-send-token="'+d.token+'"]');
+    if(card){ var st=card.querySelectorAll('.mpr-stat b'); if(st&&st[1]) st[1].textContent=String(d.downloads); }
+    updateSend(d.token,{downloads:d.downloads});
+  }; } }catch(e){}
   function projSendStatus(card){
+    if(card && card.disabled) return { cls:'st-danger', label:'Link stopped' };
+    if(card && typeof card.expiresAt==='number' && card.expiresAt>0 && Date.now()>card.expiresAt) return { cls:'st-danger', label:'Link expired' };
     return sendDownloadCount(card)>0
       ? { cls:'st-success', label:'Files downloaded' }
       : { cls:'st-warn',    label:'Not downloaded' };
@@ -3627,20 +3756,20 @@
     var stage=card.fileStage||(n>0?'ready':'uploading'), stageLabel=riFileStageLabel(stage);
     // Link status pill shown to the left of the id: green when the request link
     // is still live, red once it has expired (or the request was closed).
-    var linkActive=(card.linkStatus||'active')==='active';
-    var linkPill='<span class="mpr-link '+(linkActive?'on':'off')+'">'+(linkActive?'קישור פעיל':'קישור לא פעיל')+'</span>';
     var idText='RF-'+projNum5(card.projectNumber||'10002');
     var rk=projReadKey(card, 'receive'), newCls=(card._new && !projIsProjRead(rk))?' is-new':'';
     return '<article class="mpr-card mp-tone-receive'+newCls+(projIsPicked(rk)?' is-picked':'')+'" data-proj-key="'+esc(pkey||'')+'" data-read-key="'+esc(rk)+'" data-search="'+esc(projCardHay(card, idText))+'">'+
       '<header class="mpr-bar">'+
-        projCheckHtml(rk)+
-        '<a class="mpr-receive" href="'+esc(editHref)+'">'+s(ICON.filepen)+'<span>ערוך טופס העלאה</span></a>'+
+        '<div class="mpr-barlead">'+projCheckHtml(rk)+
+        '<a class="mpr-receive" href="'+esc(editHref)+'" title="ערוך טופס העלאה" aria-label="ערוך טופס העלאה">'+s(ICON.inbox)+'<span>ערוך טופס העלאה</span></a>'+
+        '</div>'+
         '<div class="mpr-idwrap">'+
-          linkPill+
+          '<div class="mpr-order">מספר מזהה: <b>'+esc(idText)+'</b></div>'+
         '</div>'+
         '<div class="mpr-side">'+
           '<button class="mpr-menu" type="button" data-del-project aria-label="'+esc(projDelText().title)+'">'+s(ICON.trash)+'</button>'+
         '</div>'+
+        '<span class="mpr-new" dir="ltr">NEW</span>'+
       '</header>'+
       '<div class="mpr-body">'+
         '<div class="mpr-person"><span class="mpr-avatar">'+avatar+'</span><div class="mpr-person-copy">'+
@@ -3658,13 +3787,13 @@
         '</div>'+
       '</div>'+
       '<div class="mpr-note"><b>נושא:</b><span class="t" dir="auto">'+esc(note)+'</span></div>'+
-      '<div class="mpr-linkrow"><span class="mpr-status st-'+esc(stage)+'">'+esc(stageLabel)+'</span>'+projExpiryHtml(card)+'<div class="mpr-order">מספר מזהה: <b>'+esc(idText)+'</b></div>'+'</div>'+
+      '<div class="mpr-linkrow"><span class="mpr-status st-'+esc(stage)+'">'+esc(stageLabel)+'</span>'+projExpiryHtml(card)+'</div>'+
       '<div class="mpr-bottom">'+
         (n>0
         ? '<a class="mpr-action primary" href="'+esc(href)+'">'+s(ICON.inbox)+'הצג קבצים שהתקבלו</a>'
         : '<button class="mpr-action primary is-disabled" type="button" disabled aria-disabled="true">'+s(ICON.inbox)+'הצג קבצים שהתקבלו</button>')+
-        '<button class="mpr-action share" type="button" data-proj-share="'+esc(card.link||href)+'" data-proj-name="'+esc(card.client||'')+'">'+s(ICON.share)+'שיתוף</button>'+
-        '<button class="mpr-action" type="button" data-save-project>'+s(ICON.save)+'שמירה</button>'+
+        '<button class="mpr-action share is-ico" type="button" title="שיתוף" aria-label="שיתוף" data-proj-share="'+esc(card.link||href)+'" data-proj-name="'+esc(card.client||'')+'">'+s(ICON.share)+'</button>'+
+        '<button class="mpr-action is-ico" type="button" data-save-project title="שמירה" aria-label="שמירה">'+s(ICON.save)+'</button>'+
       '</div>'+
     '</article>';
   }
@@ -3680,8 +3809,6 @@
     var idPrefix = tone==='review' ? 'RE-' : tone==='send' ? 'SE-' : 'SF-';
     var idFallback = tone==='send' ? '10001' : tone==='review' ? '10001' : '10001';
     var idText = idPrefix+projNum5(card.projectNumber||idFallback);
-    var linkActive=(card.linkStatus||'active')==='active';
-    var linkPill='<span class="mpr-link '+(linkActive?'on':'off')+'">'+(linkActive?'קישור פעיל':'קישור לא פעיל')+'</span>';
     var midIcon = tone==='send' ? ICON.download : tone==='review' ? ICON.filepen : ICON.pick;
     var endIcon = ICON.drive;
     // Client identity block mirrors the received-files card (projectReceiveHtml):
@@ -3691,7 +3818,7 @@
       '<span class="mpr-crow">'+s(ICON.phone)+'<a class="v" href="tel:'+esc(phone.replace(/[^\d+]/g,''))+'">'+esc(phone)+'</a></span>'+
       '<span class="mpr-crow he">'+s(ICON.calendar)+'<span class="v">'+esc(received)+'</span></span>';
     var copyBtn = card.link
-      ? '<button class="mpr-action share" type="button" data-proj-share="'+esc(card.link)+'" data-proj-name="'+esc(card.client||'')+'">'+s(ICON.share)+'שיתוף</button>'
+      ? '<button class="mpr-action share is-ico" type="button" title="שיתוף" aria-label="שיתוף" data-proj-share="'+esc(card.link)+'" data-proj-name="'+esc(card.client||'')+'">'+s(ICON.share)+'</button>'
       : '';
     // "פתיחת אישור" opens the client's specific review project inside review.html,
     // keyed by its project token (?p=…) — the same routing review.html uses to
@@ -3718,17 +3845,20 @@
     // files and settings can be changed and re-saved to the same link. Other tones
     // keep their plain service link + badge.
     var receiveHref = (tone==='send' && card.token) ? 'send?edit='+encodeURIComponent(card.token) : svc.href;
-    var receiveLabel = (tone==='send') ? 'ערוך שליחת קבצים' : svcText(tone,'badge');
-    return '<article class="mpr-card mp-tone-'+esc(tone)+newCls+(projIsPicked(rk)?' is-picked':'')+'" data-proj-key="'+esc(pkey||'')+'" data-read-key="'+esc(rk)+'" data-search="'+esc(projCardHay(card, idText))+'">'+
+    var receiveLabel = (tone==='send') ? 'ערוך שליחת קבצים' : (tone==='review') ? 'ערוך טופס לאישור' : svcText(tone,'badge');
+    var manageHtml = (tone==='send' && card.token) ? sendManageHtml(card) : '';
+    return '<article class="mpr-card mp-tone-'+esc(tone)+newCls+(projIsPicked(rk)?' is-picked':'')+'" data-proj-key="'+esc(pkey||'')+'" data-read-key="'+esc(rk)+'" data-search="'+esc(projCardHay(card, idText))+'"'+(tone==='send'&&card.token?' data-send-token="'+esc(card.token)+'"':'')+'>'+
       '<header class="mpr-bar">'+
-        projCheckHtml(rk)+
-        '<a class="mpr-receive" href="'+esc(receiveHref)+'">'+s(ICON[svc.icon])+'<span>'+esc(receiveLabel)+'</span></a>'+
+        '<div class="mpr-barlead">'+projCheckHtml(rk)+
+        '<a class="mpr-receive'+(tone==='send'||tone==='review'||tone==='select'?'':' is-ico')+'" href="'+esc(receiveHref)+'" title="'+esc(receiveLabel)+'" aria-label="'+esc(receiveLabel)+'">'+s(ICON[svc.icon])+'<span>'+esc(receiveLabel)+'</span></a>'+
+        '</div>'+
         '<div class="mpr-idwrap">'+
-          linkPill+
+          '<div class="mpr-order">מספר מזהה: <b>'+esc(idText)+'</b></div>'+
         '</div>'+
         '<div class="mpr-side">'+
           '<button class="mpr-menu" type="button" data-del-project aria-label="'+esc(projDelText().title)+'">'+s(ICON.trash)+'</button>'+
         '</div>'+
+        '<span class="mpr-new" dir="ltr">NEW</span>'+
       '</header>'+
       '<div class="mpr-body">'+
         '<div class="mpr-person"><span class="mpr-avatar">'+avatar+'</span><div class="mpr-person-copy">'+
@@ -3744,13 +3874,29 @@
         '</div>'+
       '</div>'+
       '<div class="mpr-note"><b>נושא:</b><span class="t" dir="auto">'+esc(projNote(card.note))+'</span></div>'+
-      '<div class="mpr-linkrow">'+projStatusPillHtml(card, svc)+projExpiryHtml(card)+'<div class="mpr-order">מספר מזהה: <b>'+esc(idText)+'</b></div>'+'</div>'+
+      '<div class="mpr-linkrow">'+projStatusPillHtml(card, svc)+projExpiryHtml(card)+'</div>'+
       '<div class="mpr-bottom">'+
         '<a class="mpr-action primary" href="'+esc(primaryHref)+'">'+s(ICON.folder)+esc(svcText(tone,'cta'))+'</a>'+
         copyBtn+
-        '<button class="mpr-action" type="button" data-save-project>'+s(ICON.save)+'שמירה</button>'+
+        '<button class="mpr-action is-ico" type="button" data-save-project title="שמירה" aria-label="שמירה">'+s(ICON.save)+'</button>'+
       '</div>'+
+      manageHtml+
     '</article>';
+  }
+  // Send-only management drawer: extend expiry, stop/resume the link, resend, hard-delete.
+  function sendManageHtml(card){
+    var m=sendManageText(), tk=esc(card.token);
+    var COG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+    return '<div class="mpr-manage">'+
+      '<button class="mpr-managebtn" type="button" data-send-manage>'+COG+'<span>'+esc(m.manage)+'</span></button>'+
+      '<div class="mpr-managedrawer" hidden>'+
+        '<button type="button" class="mpr-mact" data-send-extend="'+tk+'" data-days="7">'+esc(m.extend7)+'</button>'+
+        '<button type="button" class="mpr-mact" data-send-extend="'+tk+'" data-days="30">'+esc(m.extend30)+'</button>'+
+        '<button type="button" class="mpr-mact" data-send-toggle="'+tk+'">'+esc(card.disabled?m.resume:m.stop)+'</button>'+
+        (card.link?'<button type="button" class="mpr-mact" data-send-resend="'+esc(card.link)+'" data-proj-name="'+esc(card.client||'')+'">'+esc(m.resend)+'</button>':'')+
+        '<button type="button" class="mpr-mact danger" data-send-harddel="'+tk+'">'+esc(m.del)+'</button>'+
+      '</div>'+
+    '</div>';
   }
   function projectClientHtml(card, svc, pkey){
     var filesAction = svc.tone==='receive'
@@ -3840,7 +3986,7 @@
   // switch, ticking countdown) never drops the visible selection.
   function projIsPicked(rk){ return !!(rk && projInSelectMode() && projSelBag()[rk]); }
   // Round select checkbox injected at the leading edge of each card's top bar;
-  // stays display:none until the .mpr-list wears .is-selecting.
+  // always visible, and ticking it is what turns select mode on.
   function projCheckHtml(rk){
     var lbl=projMultiText().pick, on=projIsPicked(rk);
     return '<label class="mpr-check" title="'+esc(lbl)+'"><input type="checkbox" data-proj-check aria-label="'+esc(lbl)+'"'+(on?' checked':'')+'><span aria-hidden="true">'+s(ICON.check)+'</span></label>';
@@ -3982,8 +4128,7 @@
     return '<section class="mp-shell">'+
       '<div class="mp-head"><div><h2>'+esc(projMyProjectsText())+'</h2></div>'+action+'</div>'+
       '<div class="mp-tools mp-tools-4">'+projectToolHtml(key)+'</div>'+
-      '<div class="mp-section-title"><h3>'+esc(svcText(key,'section'))+'</h3><div class="mp-title-meta"><span>'+esc(projCardsCountText(cards.length))+'</span>'+(cards.length ? projSelectToggleHtml(key) : '')+projViewToggleHtml()+'</div></div>'+
-      projBulkHtml(key)+
+      '<div class="mp-section-title"><h3>'+esc(svcText(key,'section'))+'</h3><div class="mp-title-meta"><span>'+esc(projCardsCountText(cards.length))+'</span>'+(cards.length ? projSelectToggleHtml(key) : '')+projViewToggleHtml()+'</div>'+projBulkHtml(key)+'</div>'+
       '<div class="mpr-list'+(projInSelectMode(key) ? ' is-selecting' : '')+(projViewMode()==='list' ? ' is-rows' : '')+'">'+(cards.length ? cards.map(function(c,i){
         // In the combined "all" view each card carries its own service (c._svc);
         // otherwise every card belongs to the active service.
@@ -6072,9 +6217,38 @@
           // Persist the deletion so the project stays gone across tab switches,
           // reloads and re-login — not only removed from the current DOM.
           projMarkProjDeleted(card.getAttribute('data-read-key'));
+          var _stk=card.getAttribute('data-send-token'); if(_stk){ deleteSend(_stk); }
           card.style.transition='opacity .18s'; card.style.opacity='0';
           setTimeout(function(){ card.remove(); }, 180);
           riToast(d.done);
+        }});
+      });
+    });
+    // Sent-deliveries management drawer actions.
+    host.querySelectorAll('[data-send-manage]').forEach(function(b){
+      b.addEventListener('click', function(e){ e.stopPropagation(); var dr=b.parentNode.querySelector('.mpr-managedrawer'); if(dr) dr.hidden=!dr.hidden; });
+    });
+    host.querySelectorAll('[data-send-extend]').forEach(function(b){
+      b.addEventListener('click', function(e){ e.stopPropagation(); var tk=b.getAttribute('data-send-extend'), days=parseInt(b.getAttribute('data-days'),10)||7;
+        var arr=readOwnArray('kolkli_send_links'), rec=null, i; for(i=0;i<arr.length;i++){ if(arr[i].token===tk){ rec=arr[i]; break; } }
+        var base=(rec&&typeof rec.expiresAt==='number'&&rec.expiresAt>Date.now())?rec.expiresAt:Date.now();
+        updateSend(tk,{expiresAt:base+days*86400000, disabled:false}).then(function(){ riToast(sendManageText().extended); renderMain(); });
+      });
+    });
+    host.querySelectorAll('[data-send-toggle]').forEach(function(b){
+      b.addEventListener('click', function(e){ e.stopPropagation(); var tk=b.getAttribute('data-send-toggle');
+        var arr=readOwnArray('kolkli_send_links'), cur=false, i; for(i=0;i<arr.length;i++){ if(arr[i].token===tk){ cur=!!arr[i].disabled; break; } }
+        updateSend(tk,{disabled:!cur}).then(function(){ riToast(!cur?sendManageText().stopped:sendManageText().resumed); renderMain(); });
+      });
+    });
+    host.querySelectorAll('[data-send-resend]').forEach(function(b){
+      b.addEventListener('click', function(e){ e.stopPropagation(); projShareDialog({ link:b.getAttribute('data-send-resend')||'', name:b.getAttribute('data-proj-name')||'' }); });
+    });
+    host.querySelectorAll('[data-send-harddel]').forEach(function(b){
+      b.addEventListener('click', function(e){ e.stopPropagation(); var tk=b.getAttribute('data-send-harddel'), m=sendManageText();
+        kConfirm({ title:m.delT, body:m.delB, ok:m.del, cancel:m.cancel, danger:true, onOk:function(){
+          var card=b.closest('[data-proj-key]');
+          deleteSend(tk).then(function(){ if(card){ var rk=card.getAttribute('data-read-key'); if(rk) projMarkProjDeleted(rk); card.style.transition='opacity .18s'; card.style.opacity='0'; setTimeout(function(){ card.remove(); },180); } riToast(m.deleted); });
         }});
       });
     });
@@ -6095,6 +6269,9 @@
           if(box){ box.checked=!box.checked; box.dispatchEvent(new Event('change',{bubbles:true})); }
           return;
         }
+        // Outside select mode the box is still on the card, and reaching for it
+        // means picking — not opening the order. Let it do its own thing.
+        if(e.target.closest('.mpr-check')) return;
         // Any interaction with the card counts as viewing the order — entering
         // it (the open CTA navigates away before returning here), or simply
         // selecting it. Clear the "new order" wash and persist it as read so it
@@ -6140,7 +6317,20 @@
       });
     });
     host.querySelectorAll('[data-proj-check]').forEach(function(cb){
-      cb.addEventListener('change', projBulkSync);
+      cb.addEventListener('change', function(){
+        var key=projSelScope();
+        // The box is on every card at all times, so ticking one with select mode
+        // still off is itself the way in: turn the mode on, keep this first pick
+        // in the bag, and re-render so the bulk bar and ring come with it.
+        if(cb.checked && !projInSelectMode(key)){
+          var c=cb.closest('[data-read-key]');
+          projSetSelectMode(key, true);
+          if(c) projSelBag(key)[c.getAttribute('data-read-key')]=true;
+          renderMain();
+          return;
+        }
+        projBulkSync();
+      });
     });
     host.querySelectorAll('[data-proj-selectall]').forEach(function(b){
       b.addEventListener('click', function(){
@@ -6205,7 +6395,7 @@
         // Toggle: "שמירה" saves and flips the button to "בטל שמירה"; clicking
         // again cancels the save and restores the original state.
         var saved=b.classList.toggle('is-saved');
-        b.innerHTML=s(saved?ICON.x:ICON.save)+(saved?'בטל שמירה':'שמירה');
+        b.innerHTML=s(saved?ICON.x:ICON.save);var _sl=saved?'בטל שמירה':'שמירה';b.title=_sl;b.setAttribute('aria-label',_sl);
         // Dim the marked stat strip while saved, so the frozen snapshot reads clearly.
         var card=b.closest('.mpr-card'); if(card) card.classList.toggle('is-saved-frame', saved);
         var msg=saved
