@@ -26,7 +26,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
+    --sans:'Overpass','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -521,7 +521,7 @@
     const sh=SHAPES.find(s=>s.id===shape), sz=SIZES.find(s=>s.id===size);
     const c=color, cd=darken(c,26), cl=lighten(c,40);
     const base={ 'display':'inline-flex','align-items':'center','justify-content':'center',
-      'font-family':"'Space Grotesk',system-ui,'Segoe UI',sans-serif",'font-weight':'600',
+      'font-family':"'Overpass',system-ui,'Segoe UI',sans-serif",'font-weight':'600',
       'font-size':sz.font,'padding':sz.pad,'border-radius':sh.radius,'text-decoration':'none',
       'cursor':'pointer','line-height':'1.25','letter-spacing':'.005em' };
     if(style==='filled'){

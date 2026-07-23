@@ -26,7 +26,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
+    --sans:'Overpass','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -74,12 +74,21 @@
   .iconbtn{width:38px;height:38px;padding:0;justify-content:center;font-size:15px;line-height:1;}
 
   /* page intro */
-  .pagehead{margin:2px 0 10px;}
+  .pagehead{margin:2px 0 10px;text-align:center;}
   .pagehead h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-0.02em;margin:0 0 6px;}
   .pagehead .kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11.5px;font-weight:600;
     letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);
     padding:4px 11px;border-radius:999px;margin-bottom:7px;}
-  .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+  .pagehead p{font-size:14.5px;color:var(--muted);margin:0 auto;max-width:64ch;}
+
+  /* page-level back button (top-left) — same pill styling as the "received files" screen */
+  .sendtop{display:flex;justify-content:flex-end;margin:2px 0 8px;}
+  .backbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);cursor:pointer;font-size:13px;font-weight:600;box-shadow:var(--shadow-sm);
+    transition:border-color .12s,color .12s,transform .08s;}
+  .backbtn:hover{border-color:var(--accent);color:var(--ink);}
+  .backbtn:active{transform:translateY(1px);}
+  .backbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 
   /* layout */
   .grid{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
@@ -201,6 +210,21 @@
   .ta{resize:vertical;min-height:46px;}
   .inp[dir=ltr]{text-align:start;}
   select.inp{cursor:pointer;}
+  /* recipient email chips: a token box that mirrors .inp; comma / Enter tokenises */
+  .tok{display:flex;flex-wrap:wrap;align-items:center;gap:6px;width:100%;cursor:text;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:7px 9px;
+    transition:border-color .12s,box-shadow .12s;}
+  .tok:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .tok-input{flex:1 1 120px;min-width:120px;border:none;outline:none;background:transparent;color:var(--ink);
+    font-family:var(--sans);font-size:13.5px;padding:3px 2px;direction:ltr;text-align:start;}
+  .tok.has-chips .tok-input::placeholder{color:transparent;}
+  .tok-chip{display:inline-flex;align-items:center;gap:6px;direction:ltr;font-size:12.5px;color:var(--ink);
+    background:var(--accent-soft);border:1px solid var(--accent);border-radius:999px;padding:3px 5px 3px 10px;max-width:100%;}
+  .tok-chip .tok-mail{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px;}
+  .tok-chip.tok-bad{background:var(--danger-soft,#fdecec);border-color:var(--danger,#d64545);color:var(--danger,#d64545);}
+  .tok-x{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;
+    border:none;border-radius:50%;background:transparent;color:inherit;cursor:pointer;font-size:15px;line-height:1;opacity:.7;}
+  .tok-x:hover{opacity:1;background:rgba(0,0,0,.08);}
   .chkline{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);cursor:pointer;margin-bottom:8px;}
   .chkline input{accent-color:var(--accent);width:15px;height:15px;}
   .hidden{display:none !important;}
@@ -549,8 +573,8 @@
   /* ===== 3-step send wizard ===== */
   #viewSwitch{display:none !important;}
   .wz{max-width:1080px;margin:0 auto;}
-  .wz-bar{display:flex;align-items:center;gap:8px;margin:0 0 18px;}
-  .wz-track{display:flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0;}
+  .wz-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 18px;}
+  .wz-track{display:flex;align-items:center;justify-content:center;gap:8px;flex:0 1 auto;min-width:0;}
   .wz-tab{display:inline-flex;align-items:center;gap:9px;padding:8px 15px;border-radius:999px;border:1px solid var(--line);
     background:var(--panel);color:var(--muted);font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;
     transition:background .15s,color .15s,border-color .15s,box-shadow .15s;}
@@ -564,11 +588,6 @@
   .wz-tab:disabled{cursor:not-allowed;opacity:.55;}
   .wz-conn{flex:0 0 auto;width:22px;height:2px;background:var(--line);border-radius:2px;transition:background .2s ease;}
   .wz-conn.done{background:var(--accent);}
-  .wz-gear{flex:0 0 auto;margin-inline-start:6px;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
-    background:var(--panel);border:1px solid var(--line);color:var(--muted);cursor:pointer;box-shadow:var(--shadow-sm);
-    transition:border-color .12s,color .12s;}
-  .wz-gear:hover{border-color:var(--accent);color:var(--accent);}
-  .wz-gear svg{width:20px;height:20px;}
   @media(max-width:600px){ .wz-tab .wz-lbl{display:none;} .wz-tab{padding:8px 12px;} .wz-conn{width:12px;} }
 
   .wz-step{display:none;}
@@ -651,6 +670,14 @@
 <script src="./kolkli-db.js"></script>
 <div class="wrap">
 
+  <!-- page-level back button (top-left), arrow pill like the "received files" screen -->
+  <div class="sendtop">
+    <button class="backbtn" id="pageBackBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      <span data-i18n="pageBack"></span>
+    </button>
+  </div>
+
   <!-- admin ⇄ client view switch: flips the composer into a live recipient preview -->
   <div class="viewswitch" id="viewSwitch" role="tablist">
     <div class="vsw">
@@ -680,7 +707,6 @@
         <span class="wz-conn"></span>
         <button class="wz-tab" type="button" data-goto="3" id="wzTab3"><span class="wz-num">3</span><span class="wz-lbl" data-i18n="wzStep3"></span></button>
       </div>
-      <button class="wz-gear" id="advBtn" type="button" data-i18n-title="advBtnTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     </div>
 
     <!-- STEP 1 - files -->
@@ -721,8 +747,8 @@
       </div>
 
       <div class="wz-foot">
-        <button class="wz-back" type="button" disabled aria-disabled="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><span data-i18n="wzBack"></span></button>
-        <button class="wz-next" id="toStep2" type="button" disabled><span data-i18n="wzContinue"></span><svg class="wz-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+        <button class="wz-back" type="button" disabled aria-disabled="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><span data-i18n="wzBack"></span></button>
+        <button class="wz-next" id="toStep2" type="button" disabled><span data-i18n="wzContinue"></span><svg class="wz-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
       </div>
     </section>
 
@@ -733,12 +759,11 @@
         <p class="wz-stepsub" data-i18n="wzS2Sub"></p>
         <div class="card side" style="position:static;top:auto;">
           <div class="opt">
-            <label data-i18n="clientNameLbl"></label>
-            <input class="inp" id="recipientName" type="text" data-i18n-ph="clientNamePh">
-          </div>
-          <div class="opt">
             <label data-i18n="clientEmailLbl"></label>
-            <input class="inp" id="recipients" type="text" dir="ltr" data-i18n-ph="toPh">
+            <div class="tok" id="recipTok">
+              <input class="tok-input" id="recipInput" type="text" dir="ltr" autocomplete="off" data-i18n-ph="toPh">
+            </div>
+            <input type="hidden" id="recipients">
           </div>
           <div class="opt">
             <label data-i18n="subjectLbl"></label>
@@ -782,8 +807,8 @@
         </div>
       </div>
       <div class="wz-foot">
-        <button class="wz-back" type="button" data-goto="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><span data-i18n="wzBack"></span></button>
-        <button class="wz-next" id="toStep3" type="button"><span data-i18n="wzContinue"></span><svg class="wz-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+        <button class="wz-back" type="button" data-goto="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><span data-i18n="wzBack"></span></button>
+        <button class="wz-next" id="toStep3" type="button"><span data-i18n="wzContinue"></span><svg class="wz-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
       </div>
     </section>
 
@@ -800,7 +825,7 @@
         <div class="opterr" id="optErr"></div>
       </div>
       <div class="wz-foot">
-        <button class="wz-back" type="button" data-goto="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><span data-i18n="wzBack"></span></button>
+        <button class="wz-back" type="button" data-goto="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><span data-i18n="wzBack"></span></button>
         <button class="sendbtn wz-send" id="sendBtn" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
           <span data-i18n="sendBtn"></span>
@@ -1060,7 +1085,7 @@
   const I18N = {
     he:{
       dir:'rtl', langIco:'EN',
-      toFiles:'הקבצים שלי', signin:'התחברות',
+      toFiles:'הקבצים שלי', signin:'התחברות', pageBack:'חזרה',
       kick:'שליחת קבצים גדולים',
       pageTitle:'שלחו קבצים גדולים בקישור אחד',
       pageSub:'גררו קבצים, הגדירו תוקף וסיסמה, וקבלו קישור הורדה מסודר לנמען. מהיר, פשוט ובאיכות מקצועית.',
@@ -1114,7 +1139,7 @@
       wzContinue:'הבא', wzBack:'הקודם',
       wzS2Title:'למי שולחים?', wzS2Sub:'פרטי הנמען וההודעה — הכול לא חובה חוץ מהקבצים עצמם.',
       wzS3Title:'סקירה ושליחה', wzS3Sub:'עברו על הפרטים, וכשמוכנים — שלחו. אפשר לחזור אחורה ולשנות בכל רגע.',
-      clientNameLbl:'שם הלקוח', clientNamePh:'איך קוראים ללקוח?', clientEmailLbl:'אימייל הלקוח (לא חובה)',
+      clientNameLbl:'שם הלקוח', clientNamePh:'איך קוראים ללקוח?', clientEmailLbl:'אימייל הלקוח',
       qsHead:'הגדרות מהירות', advOpen:'עוד הגדרות מתקדמות',
       newFolder:'תיקייה חדשה', newFolderPrompt:'שם התיקייה:', newFolderMade:'התיקייה נוצרה ✓', rootFolder:'ללא תיקייה',
       zipChk:'אפשר הורדת ZIP', zipSub:'הנמען יוכל להוריד את כל הקבצים כקובץ ZIP אחד.',
@@ -1124,7 +1149,7 @@
     },
     en:{
       dir:'ltr', langIco:'עב',
-      toFiles:'My files', signin:'Sign in',
+      toFiles:'My files', signin:'Sign in', pageBack:'Back',
       kick:'Send large files',
       pageTitle:'Send large files with one link',
       pageSub:'Drop files, set an expiry and a password, and get a clean download link for your recipient. Fast, simple and professional-quality.',
@@ -1178,7 +1203,7 @@
       wzContinue:'Next', wzBack:'Previous',
       wzS2Title:'Who are you sending to?', wzS2Sub:'Recipient details and a message — all optional except the files themselves.',
       wzS3Title:'Review & send', wzS3Sub:'Check the details, then send. You can go back and change anything at any time.',
-      clientNameLbl:'Client name', clientNamePh:'Name of the client', clientEmailLbl:'Client email (optional)',
+      clientNameLbl:'Client name', clientNamePh:'Name of the client', clientEmailLbl:'Client email',
       qsHead:'Quick settings', advOpen:'More advanced settings',
       newFolder:'New folder', newFolderPrompt:'Folder name:', newFolderMade:'Folder created ✓', rootFolder:'No folder',
       zipChk:'Allow ZIP download', zipSub:'The recipient can download all files as a single ZIP.',
@@ -1188,7 +1213,7 @@
     },
     ru:{
       dir:'ltr',
-      toFiles:'Мои файлы', signin:'Вход',
+      toFiles:'Мои файлы', signin:'Вход', pageBack:'Назад',
       kick:'Отправка больших файлов',
       pageTitle:'Отправляйте большие файлы одной ссылкой',
       pageSub:'Перетащите файлы, задайте срок действия и пароль — и получите чистую ссылку для скачивания для получателя. Быстро, просто и профессионального качества.',
@@ -1242,7 +1267,7 @@
       wzContinue:'Далее', wzBack:'Назад',
       wzS2Title:'Кому отправляем?', wzS2Sub:'Данные получателя и сообщение — всё необязательно, кроме самих файлов.',
       wzS3Title:'Обзор и отправка', wzS3Sub:'Проверьте детали и отправьте. Вернуться и изменить можно в любой момент.',
-      clientNameLbl:'Имя клиента', clientNamePh:'Как зовут клиента?', clientEmailLbl:'Email клиента (необязательно)',
+      clientNameLbl:'Имя клиента', clientNamePh:'Как зовут клиента?', clientEmailLbl:'Email клиента',
       qsHead:'Быстрые настройки', advOpen:'Больше настроек',
       newFolder:'Новая папка', newFolderPrompt:'Название папки:', newFolderMade:'Папка создана ✓', rootFolder:'Без папки',
       zipChk:'Разрешить скачивание ZIP', zipSub:'Получатель сможет скачать все файлы одним ZIP-архивом.',
@@ -1517,7 +1542,8 @@
   // accepts either a FileList/File[] or an array of {file,path}; keeps each file's relative
   // path so dropped folders keep their structure (used as the zip entry path on the recipient side)
   function pathItems(list){ return Array.from(list||[]).map(f=>({file:f, path:f.webkitRelativePath||f.name})); }
-  function addFiles(items){
+  function addFiles(items, autoAdvance){
+    const before = files.length;
     (items||[]).forEach(it=>{
       const file = it.file || it;                       // tolerate a raw File too
       const path = (it.path || file.webkitRelativePath || file.name);
@@ -1529,6 +1555,11 @@
     });
     renderFiles();
     slog("intake", { staged: files.length, totalBytes: totalBytes() });
+    // the moment files are actually uploaded, glide on to step 2 (delivery details);
+    // a short beat lets the freshly added thumbnails paint before the transition
+    if(autoAdvance && files.length>before && step===1){
+      setTimeout(()=>{ if(step===1 && files.length) goStep(2); }, 650);
+    }
   }
 
   // walk dropped directories via the entries API so whole folders keep their tree
@@ -1536,7 +1567,7 @@
     let items;
     try{ items = await filesFromDataTransfer(dt); }
     catch(_){ items = pathItems(dt.files); }
-    addFiles(items);
+    addFiles(items, true);
   }
   function filesFromDataTransfer(dt){
     const list = dt.items ? Array.from(dt.items) : [];
@@ -2029,7 +2060,7 @@
     files=[]; folders=[]; currentToken=null; editToken=null; editBase=null;
     stopStatWatch(); notifyEnabled=false; lastNotifiedCount=0;
     el('shareCard').classList.remove('show');
-    el('message').value=''; el('recipients').value=''; if(el('subject')) el('subject').value='';
+    el('message').value=''; el('recipients').value=''; if(window.renderRecipChips) renderRecipChips(); if(el('subject')) el('subject').value='';
     if(el('recipientName')) el('recipientName').value='';
     el('senderEmail').value=''; syncSenderEmail();
     el('emailBtn').classList.add('hidden');
@@ -2071,6 +2102,7 @@
     syncSenderEmail();
     if(el('recipientName')) el('recipientName').value=rec.recipientName||'';
     if(el('recipients')) el('recipients').value=to;
+    if(window.renderRecipChips) renderRecipChips();
     if(el('subject')) el('subject').value=rec.subject||'';
     if(el('message')) el('message').value=rec.message||'';
 
@@ -2138,8 +2170,8 @@
   el('chooseBtn').addEventListener('click',e=>{ e.stopPropagation(); input.click(); });
   el('chooseFolderBtn').addEventListener('click',e=>{ e.stopPropagation(); folderInput.click(); });
   drop.addEventListener('click',()=>input.click());
-  input.addEventListener('change',()=>{ addFiles(pathItems(input.files)); input.value=''; });
-  folderInput.addEventListener('change',()=>{ addFiles(pathItems(folderInput.files)); folderInput.value=''; });
+  input.addEventListener('change',()=>{ addFiles(pathItems(input.files), true); input.value=''; });
+  folderInput.addEventListener('change',()=>{ addFiles(pathItems(folderInput.files), true); folderInput.value=''; });
   ;['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
   ;['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,()=>drop.classList.remove('over')));
   drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer) addFromDataTransfer(e.dataTransfer); });
@@ -2184,6 +2216,57 @@
   // the preview's file buttons are illustrative only — a real download happens once the link is sent
   el('cvPage').addEventListener('click',e=>{ if(e.target.closest('button')){ e.preventDefault(); toast((CV_I18N[lang]||CV_I18N.en).previewOnly); } });
 
+  // ===== recipient email chips =====
+  // #recipients stays the canonical comma-joined value every downstream reader
+  // uses; #recipInput is the visible field and each address becomes a removable
+  // chip. Comma / semicolon / Enter (and blur / multi-value paste) tokenise.
+  (function(){
+    const hidden=el('recipients'), box=el('recipTok'), input=el('recipInput');
+    if(!hidden || !box || !input) return;
+    const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let recips=[];
+    function sync(){ hidden.value=recips.join(', '); hidden.dispatchEvent(new Event('input',{bubbles:true})); }
+    function paint(){
+      box.querySelectorAll('.tok-chip').forEach(c=>c.remove());
+      recips.forEach((addr,i)=>{
+        const chip=document.createElement('span');
+        chip.className='tok-chip'+(EMAIL_RE.test(addr)?'':' tok-bad');
+        const m=document.createElement('span'); m.className='tok-mail'; m.textContent=addr; chip.appendChild(m);
+        const x=document.createElement('button'); x.type='button'; x.className='tok-x'; x.setAttribute('aria-label','remove'); x.innerHTML='&times;';
+        x.addEventListener('click',()=>{ recips.splice(i,1); paint(); sync(); input.focus(); });
+        chip.appendChild(x);
+        box.insertBefore(chip,input);
+      });
+      // keep the i18n placeholder attribute intact; just hide it once chips exist
+      box.classList.toggle('has-chips', recips.length>0);
+    }
+    function addTokens(raw){
+      let added=false;
+      String(raw).split(/[,;\s]+/).map(s=>s.trim()).filter(Boolean).forEach(p=>{
+        if(!recips.some(r=>r.toLowerCase()===p.toLowerCase())){ recips.push(p); added=true; }
+      });
+      if(added){ paint(); sync(); }
+      return added;
+    }
+    function commit(){ if(input.value.trim()){ addTokens(input.value); input.value=''; } }
+    input.addEventListener('keydown',e=>{
+      if(e.key===','||e.key===';'||e.key==='Enter'){ e.preventDefault(); commit(); }
+      else if(e.key==='Backspace' && !input.value && recips.length){ recips.pop(); paint(); sync(); }
+    });
+    input.addEventListener('blur',commit);
+    input.addEventListener('paste',e=>{
+      const txt=((e.clipboardData||window.clipboardData)||{}).getData ? (e.clipboardData||window.clipboardData).getData('text') : '';
+      if(txt && /[,;\s]/.test(txt)){ e.preventDefault(); addTokens(txt); }
+    });
+    box.addEventListener('mousedown',e=>{ if(e.target===box){ e.preventDefault(); input.focus(); } });
+    // rebuild chips from whatever the hidden input currently holds (edit / reset / restore)
+    window.renderRecipChips=function(){
+      recips=String(hidden.value||'').split(/[,;]+/).map(s=>s.trim()).filter(Boolean);
+      paint();
+    };
+    renderRecipChips();
+  })();
+
   function setMethod(m){ method=(m==='email')?'email':'link'; }
   el('pwToggle').addEventListener('change',e=>{
     el('password').classList.toggle('hidden', !e.target.checked); if(e.target.checked) el('password').focus();
@@ -2208,7 +2291,6 @@
   const advOverlay=el('advOverlay');
   function openAdv(){ advOverlay.classList.add('open'); document.body.style.overflow='hidden'; }
   function closeAdv(){ advOverlay.classList.remove('open'); document.body.style.overflow=''; renderAdvSummary(); }
-  el('advBtn').addEventListener('click',openAdv);
   el('advClose').addEventListener('click',closeAdv);
   el('advDone').addEventListener('click',closeAdv);
   advOverlay.addEventListener('mousedown',e=>{ if(e.target===advOverlay) closeAdv(); });
@@ -2238,6 +2320,7 @@
   });
 
   window.__setLang=applyLang;
+  el('pageBackBtn').addEventListener('click',()=>{ if(history.length>1) history.back(); else location.href='./dashboard'; });
   el('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
   // keep the branding gate + locked sender email in sync when the user logs in/out or switches plan
   window.addEventListener('kolkli:auth',()=>{ applyBrandGate(); syncSenderEmail(); });

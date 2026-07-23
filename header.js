@@ -22,15 +22,15 @@
        stays in sync without any per-page hookup.
    ============================================================ */
 (function () {
-  // Load Rubik (Hebrew UI face) on every page that includes this header.
-  (function loadRubik(){
+  // Load Overpass (Latin UI face) + Rubik (Hebrew UI face) + Open Sans (legacy, in-tool font pickers) on every page that includes this header.
+  (function loadOpenSans(){
     try {
       var d = document, h = d.head || d.documentElement;
-      if (d.getElementById('kolkli-rubik')) return;
+      if (d.getElementById('kolkli-opensans')) return;
       var pc1 = d.createElement('link'); pc1.rel = 'preconnect'; pc1.href = 'https://fonts.googleapis.com';
       var pc2 = d.createElement('link'); pc2.rel = 'preconnect'; pc2.href = 'https://fonts.gstatic.com'; pc2.crossOrigin = 'anonymous';
-      var l = d.createElement('link'); l.id = 'kolkli-rubik'; l.rel = 'stylesheet';
-      l.href = 'https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap';
+      var l = d.createElement('link'); l.id = 'kolkli-opensans'; l.rel = 'stylesheet';
+      l.href = 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@300..800&family=Overpass:wght@300..800&family=Rubik:wght@300..900&display=swap';
       h.appendChild(pc1); h.appendChild(pc2); h.appendChild(l);
     } catch (e) {}
   })();
@@ -732,6 +732,28 @@
   syncIcons();
   renderAuthArea();
 
+  // Theme toggle. Every page carrying the shared header gets a working button.
+  // Some pages define their own applyTheme() + click listener (to also recolour
+  // canvases, waveforms, charts…). Because header.js runs before those page
+  // scripts, THIS listener is attached first and fires first on a click; we defer
+  // our own apply to a microtask and only act when no page handler already flipped
+  // the theme — so the header default and a page override never double-toggle and
+  // cancel each other out. Pages with no theme code get a fully working toggle
+  // from here alone, with the choice persisted to localStorage('theme').
+  var themeBtn = mount.querySelector('#themeToggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      var before = isDark() ? 'dark' : 'light';
+      setTimeout(function () {
+        if ((isDark() ? 'dark' : 'light') !== before) { syncIcons(); return; }
+        var next = before === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+        syncIcons();
+      }, 0);
+    });
+  }
+
   // mobile menu
   if (menuBtn && panel) {
     menuBtn.addEventListener('click', function () { panel.classList.toggle('open'); });
@@ -1070,6 +1092,21 @@
     ax.src = link('accessibility.js');
     ax.async = true;
     document.head.appendChild(ax);
+  }
+
+  // KOLKLI AI Assistant: self-contained floating helper (brand-gradient bubble +
+  // chat window) that knows the KOLKLI system — page-aware guidance, quick
+  // actions, tool recommendations and troubleshooting. Loaded on every header
+  // page from here; sits on the inline-START corner so it never collides with
+  // the accessibility widget on the inline-END corner. Runs a built-in knowledge
+  // brain by default; wire a real LLM via window.KOLKLI_AI = { endpoint } or
+  // KolkliAI.configure({endpoint}). Self-guards against a double include.
+  if (!document.getElementById('kai-loader')) {
+    var kai = document.createElement('script');
+    kai.id = 'kai-loader';
+    kai.src = link('ai-assistant.js');
+    kai.async = true;
+    document.head.appendChild(kai);
   }
 
   // Site-wide cookie-consent banner: self-contained, depth-aware, GDPR-first

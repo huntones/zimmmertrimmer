@@ -170,7 +170,10 @@
 #site-header .sh-icon{width:38px;height:38px;padding:0;justify-content:center;font-size:15px;line-height:1;}
 #site-header .sh-lang{width:auto;gap:8px;padding:0 13px;border-radius:18px;}
 #site-header .sh-lang svg:first-child{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
-#site-header .sh-theme{display:none!important;}
+/* Light/Dark theme toggle — an icon pill matching the language/menu pills.
+   Wired by header.js (with a per-page applyTheme override when present). */
+#site-header .sh-theme{display:inline-flex;}
+#site-header .sh-theme #themeIco{font-size:15px;line-height:1;}
 
 /* ============================================================
    Language picker dropdown (owned by header.js). The globe pill
@@ -366,3 +369,92 @@
 /* Tools mega-menu is horizontally centered in the bar, so it needs no explicit
    RTL flip — centering is symmetric, and the flex rows inside auto-mirror via
    direction:inherit (icon → right). */
+
+/* ============================================================
+   DARK MODE. The desktop header/nav has always hardcoded its
+   light palette (it doesn't lean on the page theme vars the way
+   the body does), so it needs its own dark treatment. These rules
+   flip the nav bar, every mega-menu, the product / AI / language /
+   account dropdowns and the pills to a matching dark surface, so
+   the chrome tracks the rest of the site. All scoped under
+   html[data-theme="dark"] #site-header → light mode is untouched.
+   The mobile drop-panel already themes via var(--panel/--ink/--line),
+   so only its section label needs a nudge here.
+   ============================================================ */
+html[data-theme="dark"] #site-header .sh-nav{background:rgba(15,17,23,.78);border-bottom-color:transparent;}
+html[data-theme="dark"] #site-header .sh-nav.scrolled{background:rgba(15,17,23,.92);border-bottom-color:#242a36;}
+html[data-theme="dark"] #site-header.sh-signed-in .sh-nav{background:#0f1218;border-bottom-color:#232833;}
+html[data-theme="dark"] #site-header.sh-signed-in .sh-nav.scrolled{background:#0f1218;border-bottom-color:#2a3140;}
+
+html[data-theme="dark"] #site-header .sh-brand{color:#eef1f6;}
+html[data-theme="dark"] #site-header .sh-links a,
+html[data-theme="dark"] #site-header .sh-tlink{color:#dbe0ec;}
+html[data-theme="dark"] #site-header .sh-links a:hover,
+html[data-theme="dark"] #site-header .sh-tlink:hover,
+html[data-theme="dark"] #site-header .sh-drop.open .sh-tlink{color:#a887ff;}
+
+/* action pills (language, theme, ☰, account) */
+html[data-theme="dark"] #site-header .sh-pill{background:rgba(255,255,255,.06);border-color:#2c3340;color:#e7eaf2;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);}
+html[data-theme="dark"] #site-header .sh-pill:hover{border-color:#3d4658;background:rgba(255,255,255,.1);}
+html[data-theme="dark"] #site-header .sh-acctbtn-name{color:#e7eaf2;}
+
+/* mega-menus (Tools / Dev / Text) + every anchored dropdown share one dark surface */
+html[data-theme="dark"] #site-header .sh-mega,
+html[data-theme="dark"] #site-header .sh-prodmenu,
+html[data-theme="dark"] #site-header .sh-aimenu,
+html[data-theme="dark"] #site-header .sh-langmenu,
+html[data-theme="dark"] #site-header .sh-acctmenu{background:#171b23;border-color:#272e3b;
+  box-shadow:0 30px 72px rgba(0,0,0,.62);}
+
+/* colored icon tiles → a neutral translucent chip so the brand-hued glyph pops */
+html[data-theme="dark"] #site-header .sh-col-i,
+html[data-theme="dark"] #site-header .sh-item .it-ic,
+html[data-theme="dark"] #site-header .sh-prod-ic{background:rgba(255,255,255,.07);}
+
+html[data-theme="dark"] #site-header .sh-item:hover,
+html[data-theme="dark"] #site-header .sh-prod-item:hover{background:rgba(255,255,255,.05);}
+html[data-theme="dark"] #site-header .sh-item .it-t,
+html[data-theme="dark"] #site-header .sh-prod-t{color:#e7eaf2;}
+html[data-theme="dark"] #site-header .sh-item .it-d,
+html[data-theme="dark"] #site-header .sh-prod-d,
+html[data-theme="dark"] #site-header .sh-col-h,
+html[data-theme="dark"] #site-header .sh-panel-h{color:#8b93a4;}
+html[data-theme="dark"] #site-header .sh-item:hover .it-t,
+html[data-theme="dark"] #site-header .sh-prod-item:hover .sh-prod-t{color:#a887ff;}
+
+/* mega-menu promo foot + AI "see all" bar */
+html[data-theme="dark"] #site-header .sh-mega-foot{background:linear-gradient(100deg,#1b1830,#161f2e);
+  border-top-color:#272e3b;}
+html[data-theme="dark"] #site-header .sh-foot-t{color:#aab3c6;}
+html[data-theme="dark"] #site-header .sh-foot-cta,
+html[data-theme="dark"] #site-header .sh-aimenu-all{color:#a887ff;}
+html[data-theme="dark"] #site-header .sh-aimenu-all{background:linear-gradient(100deg,#1b1830,#161f2e);}
+
+/* language picker options */
+html[data-theme="dark"] #site-header .sh-langopt{color:#e7eaf2;}
+html[data-theme="dark"] #site-header .sh-langopt:hover{background:rgba(255,255,255,.06);color:#a887ff;}
+html[data-theme="dark"] #site-header .sh-langopt.active{color:#a887ff;}
+
+/* account dropdown internals */
+html[data-theme="dark"] #site-header .sh-acct-name{color:#f0f2f7;}
+html[data-theme="dark"] #site-header .sh-acct-mail{color:#8b93a4;}
+html[data-theme="dark"] #site-header .sh-acct-plan{background:#251d3a;color:#b79bff;}
+html[data-theme="dark"] #site-header .sh-acct-sep{background:#272e3b;}
+html[data-theme="dark"] #site-header .sh-acct-item{color:#e7eaf2;}
+html[data-theme="dark"] #site-header .sh-acct-item:hover{background:rgba(255,255,255,.05);color:#a887ff;}
+html[data-theme="dark"] #site-header .sh-acct-item svg{color:#8b93a4;}
+html[data-theme="dark"] #site-header .sh-acct-item:hover svg{color:#a887ff;}
+html[data-theme="dark"] #site-header .sh-acct-admin,
+html[data-theme="dark"] #site-header .sh-acct-admin svg{color:#a887ff;}
+html[data-theme="dark"] #site-header .sh-acct-out,
+html[data-theme="dark"] #site-header .sh-acct-out svg{color:#ff6b6b;}
+html[data-theme="dark"] #site-header .sh-acct-out:hover{background:rgba(255,107,107,.12);color:#ff6b6b;}
+html[data-theme="dark"] #site-header .sh-acct-langbox{border-color:#2a303c;background:rgba(255,255,255,.03);}
+html[data-theme="dark"] #site-header .sh-acct-langhead{color:#e7eaf2;}
+html[data-theme="dark"] #site-header .sh-acct-langhead svg,
+html[data-theme="dark"] #site-header .sh-acct-langhead .sh-chev{color:#8b93a4;}
+html[data-theme="dark"] #site-header .sh-acct-langhead b{color:#a887ff;}
+html[data-theme="dark"] #site-header .sh-acct-langopt{color:#aab3c6;}
+html[data-theme="dark"] #site-header .sh-acct-langopt:hover,
+html[data-theme="dark"] #site-header .sh-acct-langopt.active{background:rgba(255,255,255,.06);color:#a887ff;}

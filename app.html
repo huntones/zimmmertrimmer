@@ -26,7 +26,7 @@
     --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
+    --sans:'Overpass','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -56,10 +56,10 @@
 
   /* ---------- header ---------- */
   .topbar{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-bottom:22px;}
-  .intro{margin:4px 0 22px;}
+  .intro{margin:4px 0 22px;text-align:center;}
   .intro-h{font-size:clamp(26px,3.6vw,38px);font-weight:800;letter-spacing:-0.02em;line-height:1.15;margin:0 0 12px;
     background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
-  .intro-p{font-size:15px;line-height:1.7;color:var(--ink-2);margin:0 0 9px;max-width:74ch;}
+  .intro-p{font-size:15px;line-height:1.7;color:var(--ink-2);margin:0 auto 9px;max-width:74ch;}
   .intro-p:last-child{margin-bottom:0;}
   @media (max-width:640px){ .intro-p{font-size:14px;} }
   .brand-h{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
@@ -386,6 +386,76 @@
     .wrap{width:100%;max-width:none;}
   }
 
+  /* ---------- wizard (stepper + step nav) ---------- */
+  /* The three cards below are the wizard's steps. The wizard script adds
+     body.wiz once it boots, so if it ever fails the page falls back to the
+     plain long-scroll form it was before. */
+  .stepper,.wiznav{display:none;}
+  body.wiz .stepper{display:flex;}
+  body.wiz .wiznav{display:flex;}
+  body.wiz [data-wizstep]{display:none;}
+  body.wiz [data-wizstep].on{display:block;animation:stepIn .22s ease both;}
+  body.wiz #startBtn{display:none;} /* the nav's next button drives the run */
+  @keyframes stepIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  .stepper{align-items:flex-start;margin-top:18px;padding:18px 14px 16px;background:var(--panel);
+    border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+  .stepper .st{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;
+    background:none;border:none;padding:0 4px;cursor:default;font-family:var(--sans);color:var(--muted);}
+  .stepper .st.can{cursor:pointer;}
+  /* connector runs from the previous pip's centre to this one; logical insets flip in RTL */
+  .stepper .st + .st::before{content:'';position:absolute;top:17px;height:2px;border-radius:2px;
+    inset-inline-start:calc(-50% + 24px);width:calc(100% - 48px);background:var(--line);transition:background .25s;}
+  .stepper .st.done::before,.stepper .st.on::before{background:var(--grad);}
+  .stepper .stdot{position:relative;z-index:1;width:34px;height:34px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;
+    background:var(--panel-2);border:1.5px solid var(--line);color:var(--faint);
+    transition:background .2s,color .2s,border-color .2s,box-shadow .2s;}
+  .stepper .stdot svg{width:16px;height:16px;display:none;}
+  .stepper .st.on .stdot{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 4px 12px var(--grad-shadow);}
+  .stepper .st.done .stdot{background:var(--accent-soft);border-color:transparent;color:var(--accent);}
+  .stepper .st.done .stdot svg{display:block;}
+  .stepper .st.done .stdot i{display:none;}
+  .stepper .stdot i{font-style:normal;}
+  .stepper .stlbl{font-size:13.5px;font-weight:600;line-height:1.3;text-align:center;transition:color .2s;}
+  .stepper .st.on .stlbl{color:var(--ink);font-weight:700;}
+  .stepper .st.done .stlbl{color:var(--ink-2);}
+  .stepper .st.can:hover .stlbl{color:var(--accent);}
+
+  .wiznav{align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding:14px 16px;
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+  .wizbtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 20px;
+    border-radius:999px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);
+    font-size:14.5px;font-weight:600;cursor:pointer;
+    transition:border-color .12s,color .12s,filter .14s,transform .08s,opacity .12s;}
+  .wizbtn svg{width:16px;height:16px;flex-shrink:0;}
+  html[dir=rtl] .wizbtn .chev{transform:scaleX(-1);}
+  .wizbtn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .wizbtn:active:not(:disabled){transform:translateY(1px);}
+  .wizbtn:disabled{opacity:.45;cursor:not-allowed;}
+  .wizbtn.primary{min-width:172px;border:none;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.18);
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0) 55%),var(--grad-btn);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px var(--grad-btn-glow);}
+  .wizbtn.primary:hover:not(:disabled){filter:brightness(1.05);color:#fff;}
+  .wizbtn.primary:disabled{box-shadow:none;}
+  .wizbtn.primary.isfinish{
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),
+      linear-gradient(105deg,var(--success) 0%,var(--success-dim) 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -2px 4px rgba(0,0,0,.14),0 6px 16px rgba(34,176,75,.32);}
+  .wizbtn .chk{display:none;}
+  .wizbtn.isfinish .chev{display:none;}
+  .wizbtn.isfinish .chk{display:block;}
+  .wizcount{font-family:var(--mono);font-size:12.5px;color:var(--muted);white-space:nowrap;}
+  @media (max-width:560px){
+    .stepper{padding:16px 8px 14px;}
+    .stepper .stlbl{font-size:11.5px;}
+    .stepper .st + .st::before{inset-inline-start:calc(-50% + 20px);width:calc(100% - 40px);}
+    .wiznav{padding:12px;}
+    .wizcount{display:none;}
+    .wizbtn{flex:1;padding:0 12px;}
+    .wizbtn.primary{min-width:0;}
+  }
+
 </style>
 <link rel="stylesheet" href="./header.css">
 </head>
@@ -400,8 +470,6 @@
   <section class="intro">
     <h2 class="intro-h" data-i18n="introTitle"></h2>
     <p class="intro-p" data-i18n="introP1"></p>
-    <p class="intro-p" data-i18n="introP2"></p>
-    <p class="intro-p" data-i18n="introP3"></p>
   </section>
 
   <!-- ============ header ============ -->
@@ -415,8 +483,24 @@
     </div>
   </div>
 
+  <!-- ============ wizard stepper ============ -->
+  <nav class="stepper" id="stepper" aria-label="steps">
+    <button type="button" class="st" data-goto="1">
+      <span class="stdot"><i>1</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      <span class="stlbl" data-i18n="step1"></span>
+    </button>
+    <button type="button" class="st" data-goto="2">
+      <span class="stdot"><i>2</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      <span class="stlbl" data-i18n="step2"></span>
+    </button>
+    <button type="button" class="st" data-goto="3">
+      <span class="stdot"><i>3</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      <span class="stlbl" data-i18n="step3"></span>
+    </button>
+  </nav>
+
   <!-- ============ step 1 ============ -->
-  <section class="card">
+  <section class="card" data-wizstep="1">
     <div class="cardhead">
       <div class="stepnum">1</div>
       <div><p class="t" data-i18n="step1"></p><p class="s" data-i18n="step1sub"></p></div>
@@ -459,7 +543,7 @@
   </section>
 
   <!-- ============ step 2 ============ -->
-  <section class="card">
+  <section class="card" data-wizstep="2">
     <div class="cardhead">
       <div class="stepnum">2</div>
       <div><p class="t" data-i18n="step2"></p><p class="s" data-i18n="step2sub"></p></div>
@@ -582,7 +666,7 @@
   </section>
 
   <!-- ============ step 3 ============ -->
-  <section class="card">
+  <section class="card" data-wizstep="3">
     <div class="cardhead">
       <div class="stepnum">3</div>
       <div><p class="t" data-i18n="step3"></p><p class="s" data-i18n="step3sub"></p></div>
@@ -619,6 +703,20 @@
       </button>
     </div>
   </section>
+
+  <!-- ============ wizard nav ============ -->
+  <div class="wiznav" id="wizNav">
+    <button type="button" class="wizbtn" id="wizPrev">
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span id="wizPrevTxt"></span>
+    </button>
+    <span class="wizcount" id="wizCount"></span>
+    <button type="button" class="wizbtn primary" id="wizNext">
+      <span id="wizNextTxt"></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
+  </div>
 
   <footer data-i18n="footer"></footer>
 </div>
@@ -661,9 +759,7 @@
     he: {
       dir:'rtl', langIco:'EN', help:'עזרה', organize:'בחירת קבצים',
       introTitle:'חותך אודיו',
-      introP1:'העלו שיר אחד או כמה קבצי אודיו, והכינו אותם במהירות לשימוש אחיד ומקצועי.',
-      introP2:'הכלי מזהה באופן אוטומטי את ה־BPM ואת הסולם המוזיקלי של כל שיר, מאפשר לחתוך אותו לאורך הרצוי - 15, 20, 30, 45, 60 או 90 שניות ולהחיל עוצמת שמע אחידה על כל הקבצים.',
-      introP3:'ניתן לבחור הגדרות עיבוד נוספות, להתאים את איכות הקובץ והפורמט ולאחר מכן להוריד את כל הקבצים המוכנים למחשב בלחיצה אחת.',
+      introP1:'העלו קובץ אחד או יותר, חתכו לאורך הרצוי ואזנו את עוצמת השמע (זיהוי BPM וסולם מתבצע אוטומטית), והורידו הכול בלחיצה אחת.',
       step1:'העלאת קבצים', step1sub:'העלה את קבצי האודיו שברצונך לעבד',
       dropBig:'גרור קבצים לכאן', or:'או', choose:'בחר קבצים',
       fmts:'פורמטים נתמכים: MP3, WAV, FLAC, AAC, M4A',
@@ -703,9 +799,7 @@
     en: {
       dir:'ltr', langIco:'עב', help:'Help', organize:'Organize',
       introTitle:'Audio Cutter',
-      introP1:'Upload one song or several audio files and quickly prepare them for a consistent, professional result.',
-      introP2:'The tool automatically detects the BPM and musical key of each song, lets you cut it to the length you want — 15, 20, 30, 45, 60 or 90 seconds — and applies a uniform loudness level across all files.',
-      introP3:'You can choose additional processing settings, adjust the file quality and format, then download all the finished files to your computer in a single click.',
+      introP1:'Upload one or more files, trim to the length you want and balance the loudness (BPM and key are detected automatically), then download everything in a single click.',
       step1:'Upload files', step1sub:'Add the audio files you want to process',
       dropBig:'Drag files here', or:'or', choose:'Choose files',
       fmts:'Supported: MP3, WAV, FLAC, AAC, M4A',
@@ -746,9 +840,7 @@
       dir:'ltr',
       help:'Помощь', organize:'Упорядочить',
       introTitle:'Обрезка аудио',
-      introP1:'Загрузите одну песню или несколько аудиофайлов и быстро подготовьте их к единому профессиональному результату.',
-      introP2:'Инструмент автоматически определяет BPM и музыкальную тональность каждой песни, позволяет обрезать её до нужной длины — 15, 20, 30, 45, 60 или 90 секунд — и применяет единый уровень громкости ко всем файлам.',
-      introP3:'Можно выбрать дополнительные настройки обработки, настроить качество и формат файла, а затем скачать все готовые файлы на компьютер одним нажатием.',
+      introP1:'Загрузите один или несколько файлов, обрежьте до нужной длины и выровняйте громкость (BPM и тональность определяются автоматически), затем скачайте всё одним нажатием.',
       step1:'Загрузите файлы', step1sub:'Добавьте аудиофайлы для обработки',
       dropBig:'Перетащите файлы сюда', or:'или', choose:'Выбрать файлы',
       fmts:'Поддерживаются: MP3, WAV, FLAC, AAC, M4A',
@@ -1597,6 +1689,117 @@
   setView(savedView);
   applyLang(detectLang());
   loadEngine();
+})();
+</script>
+
+<script>
+/* ---------- wizard ----------
+   Turns the three step cards into a one-at-a-time 1-2-3 flow with prev/next/finish.
+   It drives the existing controls rather than duplicating them: "next" on step 2 is
+   the hidden #startBtn, and "finish" is the existing clear-and-restart flow. All
+   state is read back off the DOM the tool already maintains, so nothing above needs
+   to know the wizard exists. */
+(function(){
+  var WIZ = {
+    he:{ prev:'הקודם', next:'הבא', finish:'סיום', count:function(a,b){ return 'שלב '+a+' מתוך '+b; } },
+    en:{ prev:'Back',  next:'Next', finish:'Finish', count:function(a,b){ return 'Step '+a+' of '+b; } },
+    ru:{ prev:'Назад', next:'Далее', finish:'Готово', count:function(a,b){ return 'Шаг '+a+' из '+b; } }
+  };
+  var el = function(id){ return document.getElementById(id); };
+  var stepper=el('stepper'), nav=el('wizNav'), prevBtn=el('wizPrev'), nextBtn=el('wizNext'),
+      prevTxt=el('wizPrevTxt'), nextTxt=el('wizNextTxt'), count=el('wizCount'),
+      startBtn=el('startBtn'), listSection=el('listSection'), dot=el('dot'), restartBtn=el('restartBtn'),
+      siteHdr=el('site-header');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('[data-wizstep]'))
+    .sort(function(a,b){ return a.dataset.wizstep - b.dataset.wizstep; });
+  var pips = Array.prototype.slice.call(stepper ? stepper.querySelectorAll('.st') : []);
+  if(!cards.length || !stepper || !nav || !startBtn || !listSection || !dot || !restartBtn) return;
+
+  var LAST = cards.length, cur = 1, seen = 1;
+
+  var words    = function(){ return WIZ[document.documentElement.lang] || WIZ.en; };
+  var hasFiles = function(){ return !listSection.classList.contains('hidden'); };
+  var busy     = function(){ return dot.classList.contains('busy'); };
+  // nothing to configure or process until at least one file is in the list
+  var canReach = function(n){ return n === 1 || hasFiles(); };
+
+  function sync(){
+    var w = words();
+    pips.forEach(function(p){
+      var n = +p.dataset.goto;
+      p.classList.toggle('on', n === cur);
+      p.classList.toggle('done', n < cur);
+      p.classList.toggle('can', n !== cur && n <= seen && canReach(n) && !busy());
+      if(n === cur) p.setAttribute('aria-current','step'); else p.removeAttribute('aria-current');
+    });
+    count.textContent = w.count(cur, LAST);
+    prevTxt.textContent = w.prev;
+    prevBtn.style.visibility = cur === 1 ? 'hidden' : 'visible';
+    prevBtn.disabled = cur === 1 || busy();
+    if(cur === LAST){
+      nextBtn.classList.add('isfinish');
+      nextTxt.textContent = w.finish;
+      nextBtn.disabled = busy();
+    } else if(cur === 2){
+      // step 2's next IS the run: mirror #startBtn's own label + gating
+      // ("start processing" / "analyzing…" / "processing…")
+      var lbl = startBtn.querySelector('span');
+      nextBtn.classList.remove('isfinish');
+      nextTxt.textContent = (lbl && lbl.textContent.trim()) || w.next;
+      nextBtn.disabled = startBtn.disabled;
+    } else {
+      nextBtn.classList.remove('isfinish');
+      nextTxt.textContent = w.next;
+      nextBtn.disabled = !hasFiles();
+    }
+  }
+
+  // the site header is sticky, so scrolling to the stepper has to clear it
+  function headerH(){
+    if(!siteHdr) return 0;
+    var pos = getComputedStyle(siteHdr).position;
+    return (pos === 'sticky' || pos === 'fixed') ? siteHdr.getBoundingClientRect().height : 0;
+  }
+
+  function goTo(n){
+    n = Math.min(LAST, Math.max(1, n));
+    if(!canReach(n)) n = 1;
+    cur = n;
+    if(n > seen) seen = n;
+    cards.forEach(function(c){ c.classList.toggle('on', +c.dataset.wizstep === cur); });
+    sync();
+    // pull the stepper back into view only if the user has scrolled past it
+    var y = stepper.getBoundingClientRect().top + window.scrollY - headerH() - 16;
+    if(window.scrollY > y) window.scrollTo({ top:Math.max(0, y), behavior:'smooth' });
+  }
+
+  prevBtn.addEventListener('click', function(){ if(!prevBtn.disabled) goTo(cur - 1); });
+  nextBtn.addEventListener('click', function(){
+    if(nextBtn.disabled) return;
+    if(cur === LAST){ restartBtn.click(); return; }      // finish -> confirm -> clear -> back to step 1
+    if(cur === 2){ goTo(3); startBtn.click(); return; }  // leaving the settings starts the run
+    goTo(cur + 1);
+  });
+  pips.forEach(function(p){
+    p.addEventListener('click', function(){
+      var n = +p.dataset.goto;
+      if(n <= seen && canReach(n) && !busy()) goTo(n);
+    });
+  });
+
+  // The tool's own code owns the file list, the engine state and the language;
+  // watch those nodes instead of hooking into it.
+  var mo = new MutationObserver(function(){
+    if(cur > 1 && !hasFiles()) goTo(1);   // list emptied (cleared or last file removed)
+    else sync();
+  });
+  mo.observe(listSection, { attributes:true, attributeFilter:['class'] });
+  mo.observe(dot, { attributes:true, attributeFilter:['class'] });
+  mo.observe(document.documentElement, { attributes:true, attributeFilter:['lang'] });
+  mo.observe(startBtn, { attributes:true, attributeFilter:['disabled'], childList:true, subtree:true, characterData:true });
+
+  document.body.classList.add('wiz');
+  goTo(1);
 })();
 </script>
 

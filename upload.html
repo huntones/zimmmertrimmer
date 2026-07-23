@@ -8,7 +8,7 @@
 <meta name="description" content="Upload your files securely — no account needed.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300..800&family=Overpass:wght@300..800&family=Rubik:wght@300..900&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#eef0f6; --panel:#ffffff; --panel-2:#f5f6fa; --line:#e5e8f0; --line-2:#eef0f6;
@@ -28,7 +28,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
+    --sans:'Overpass','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -104,6 +104,17 @@
     font-family:var(--sans);font-size:14px;padding:11px 13px;transition:border-color .12s,box-shadow .12s;}
   .inp:focus,.ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
   .ta{resize:vertical;min-height:78px;}
+
+  /* custom fields built in the owner's Form Studio */
+  #xFields:empty{display:none;}
+  .xf-head{grid-column:1 / -1;font-size:16px;font-weight:800;letter-spacing:-0.01em;margin-top:6px;}
+  .xf-para{grid-column:1 / -1;font-size:13px;color:var(--muted);line-height:1.6;white-space:pre-wrap;}
+  .xf-hr{grid-column:1 / -1;height:1px;background:var(--line);margin:4px 0;}
+  .xf-block{grid-column:1 / -1;display:flex;align-items:center;gap:9px;padding:12px 14px;border:1.5px dashed var(--line);border-radius:12px;background:var(--panel-2);color:var(--muted);font-size:13px;font-weight:600;}
+  .opts{display:flex;flex-direction:column;gap:9px;padding-top:2px;}
+  .opt{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--ink-2);cursor:pointer;}
+  .opt input{accent-color:var(--accent);width:16px;height:16px;margin:0;flex-shrink:0;}
+  select.inp{cursor:pointer;}
 
   /* big centered dropzone */
   .drop{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;
@@ -362,6 +373,9 @@
         </div>
       </div>
 
+      <!-- custom fields the owner added in the Form Studio (request.html) -->
+      <div class="fields" id="xFields"></div>
+
       <div class="drop" id="drop">
         <div class="cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
         <div class="big" data-i18n="dropBig"></div>
@@ -482,6 +496,7 @@
       errType:n=>`"${n}" — סוג קובץ לא מותר בבקשה זו`, errSize:(n,s)=>`"${n}" גדול מדי (מקסימום ${s})`,
       errCount:n=>`אפשר להעלות עד ${n} קבצים`, errTotal:s=>`חריגה מהגודל הכולל המותר (${s})`,
       errNone:'צריך לבחור לפחות קובץ אחד', errName:'צריך למלא שם מלא', errEmail:'צריך למלא כתובת אימייל תקינה', remove:'הסרה',
+      errRequired:l=>`יש למלא את השדה "${l}"`, xfSelect:'בחרו מהרשימה…',
       uploadFail:'ההעלאה נכשלה, נסו שוב', added:n=>`נוספו ${n} קבצים`,
     },
     en:{ dir:'ltr',
@@ -515,6 +530,7 @@
       errType:n=>`"${n}" — file type not allowed for this request`, errSize:(n,s)=>`"${n}" is too large (max ${s})`,
       errCount:n=>`You can upload up to ${n} files`, errTotal:s=>`Over the allowed total size (${s})`,
       errNone:'Choose at least one file', errName:'Please enter your full name', errEmail:'Please enter a valid email address', remove:'Remove',
+      errRequired:l=>`Please fill in "${l}"`, xfSelect:'Select from the list…',
       uploadFail:'Upload failed, please try again', added:n=>`${n} files added`,
     },
     ru:{ dir:'ltr',
@@ -548,6 +564,7 @@
       errType:n=>`«${n}» — тип файла не разрешён для этого запроса`, errSize:(n,s)=>`«${n}» слишком большой (макс. ${s})`,
       errCount:n=>`Можно загрузить до ${n} файлов`, errTotal:s=>`Превышен допустимый общий размер (${s})`,
       errNone:'Выберите хотя бы один файл', errName:'Введите полное имя', errEmail:'Введите корректный адрес эл. почты', remove:'Удалить',
+      errRequired:l=>`Заполните поле «${l}»`, xfSelect:'Выберите из списка…',
       uploadFail:'Ошибка загрузки, попробуйте снова', added:n=>`Добавлено файлов: ${n}`,
     },
   };
@@ -582,7 +599,7 @@
     try{
       const meta = files.map(f=>({ id:f.id, name:f.name, path:f.path, ext:f.ext, kind:f.kind, size:f.size }));
       if(!meta.length){ lsRemove(draftKey()); return; }
-      const d = { v:1, name:el('cName').value, phone:el('cPhone').value, email:el('cEmail').value, note:el('cNote').value, files:meta, at:Date.now() };
+      const d = { v:1, name:el('cName').value, phone:el('cPhone').value, email:el('cEmail').value, note:el('cNote').value, custom:readCustomVals(), files:meta, at:Date.now() };
       KR.lsSet(draftKey(), JSON.stringify(d));
       log('draft saved', meta.length, 'file(s)');
     }catch(e){ warn('saveDraft failed', e); }
@@ -632,6 +649,96 @@
     el('featRow').innerHTML=cards.join('');
   }
   function mb(n){ return n>=1000? (n/1000)+'GB' : n+'MB'; }
+
+  // ---------- custom fields (built by the owner in the Form Studio) ----------
+  // req.customFields = [{id,type,label,required,options?}] — rendered into
+  // #xFields, validated on submit, kept in the draft and sent with the
+  // submission as sub.custom = [{id,type,label,value}].
+  const XSTRUCT={heading:1,paragraph:1,divider:1,image:1,video:1,score:1,popup:1,serial:1};
+  let customVals={};      // id -> string | string[] (checkbox)
+  function customFieldList(){ return (req && Array.isArray(req.customFields)) ? req.customFields.filter(f=>f && f.id && f.type) : []; }
+  function xfNodes(id){ return document.querySelectorAll('[data-xf="'+id+'"]'); }
+  function xfInputHtml(f){
+    const fid='xf_'+f.id, E=KR.escapeHtml;
+    switch(f.type){
+      case 'textarea': return `<textarea class="ta" id="${fid}" data-xf="${E(f.id)}"></textarea>`;
+      case 'radio':
+      case 'checkbox': {
+        const opts=(Array.isArray(f.options)?f.options:[]).map(o=>{
+          const ov=E(String(o));
+          return `<label class="opt"><input type="${f.type}" name="${fid}" value="${ov}" data-xf="${E(f.id)}"><span>${ov}</span></label>`;
+        }).join('');
+        return `<div class="opts">${opts}</div>`;
+      }
+      case 'select':
+      case 'recipient': {
+        const list = f.type==='recipient'
+          ? ((req.recipients||[]).map(String).filter(x=>x.trim()))
+          : (Array.isArray(f.options)?f.options.map(String):[]);
+        if(!list.length) return `<input class="inp" id="${fid}" data-xf="${E(f.id)}" type="text">`;
+        const o=list.map(v=>{ const ov=E(v); return `<option value="${ov}">${ov}</option>`; }).join('');
+        return `<select class="inp" id="${fid}" data-xf="${E(f.id)}"><option value="">${E(t.xfSelect)}</option>${o}</select>`;
+      }
+      case 'email':  return `<input class="inp" id="${fid}" data-xf="${E(f.id)}" type="email" dir="ltr" placeholder="you@mail.com" autocomplete="off">`;
+      case 'number': return `<input class="inp" id="${fid}" data-xf="${E(f.id)}" type="number" dir="ltr">`;
+      case 'url':    return `<input class="inp" id="${fid}" data-xf="${E(f.id)}" type="url" dir="ltr" placeholder="https://…">`;
+      case 'date':   return `<input class="inp" id="${fid}" data-xf="${E(f.id)}" type="date">`;
+      case 'phone':  return `<input class="inp" id="${fid}" data-xf="${E(f.id)}" type="tel" dir="ltr" placeholder="050-0000000" autocomplete="off">`;
+      case 'file':   return `<input class="inp file" id="${fid}" data-xf="${E(f.id)}" type="file">`;
+      default:       return `<input class="inp" id="${fid}" data-xf="${E(f.id)}" type="text">`;
+    }
+  }
+  function renderCustomFields(){
+    const box=el('xFields'); if(!box) return;
+    box.innerHTML = customFieldList().map(f=>{
+      const lbl=KR.escapeHtml(f.label||'');
+      if(f.type==='heading')   return `<div class="xf-head">${lbl}</div>`;
+      if(f.type==='paragraph') return `<div class="xf-para">${lbl}</div>`;
+      if(f.type==='divider')   return `<div class="xf-hr"></div>`;
+      if(XSTRUCT[f.type])      return `<div class="xf-block">${lbl}</div>`;
+      const rq=f.required? ' <span class="req">*</span>' : '';
+      return `<div class="field full" data-xfrow="${KR.escapeHtml(f.id)}"><label>${lbl}${rq}</label>${xfInputHtml(f)}</div>`;
+    }).join('');
+    applyCustomVals();
+  }
+  function readCustomVals(){
+    const m={};
+    customFieldList().forEach(f=>{
+      if(XSTRUCT[f.type]) return;
+      if(f.type==='radio'){ let v=''; xfNodes(f.id).forEach(i=>{ if(i.checked) v=i.value; }); m[f.id]=v; }
+      else if(f.type==='checkbox'){ const a=[]; xfNodes(f.id).forEach(i=>{ if(i.checked) a.push(i.value); }); m[f.id]=a; }
+      else { const n=xfNodes(f.id)[0]; m[f.id]=n?n.value:''; }
+    });
+    return m;
+  }
+  function applyCustomVals(){
+    customFieldList().forEach(f=>{
+      const v=customVals[f.id]; if(v==null || XSTRUCT[f.type]) return;
+      if(f.type==='radio' || f.type==='checkbox'){
+        const vals=Array.isArray(v)?v:[v];
+        xfNodes(f.id).forEach(i=>{ i.checked=vals.indexOf(i.value)>=0; });
+      } else { const n=xfNodes(f.id)[0]; if(n) n.value=v; }
+    });
+  }
+  // validate + collect: shows the error and returns null when a required field
+  // is empty, otherwise the answers as [{id,type,label,value}]
+  function collectCustom(){
+    const vals=readCustomVals(), out=[];
+    const flds=customFieldList();
+    for(let i=0;i<flds.length;i++){
+      const f=flds[i]; if(XSTRUCT[f.type]) continue;
+      const v=vals[f.id];
+      const empty = Array.isArray(v) ? !v.length : !(v && String(v).trim());
+      if(f.required && empty){
+        el('upErr').textContent=t.errRequired(f.label||'');
+        const row=document.querySelector('[data-xfrow="'+f.id+'"]');
+        if(row){ row.scrollIntoView({behavior:'smooth',block:'center'}); const n=row.querySelector('input,textarea,select'); if(n){ try{ n.focus({preventScroll:true}); }catch(_){ } } }
+        return null;
+      }
+      if(!empty) out.push({ id:f.id, type:f.type, label:f.label||'', value: Array.isArray(v)? v.join(', ') : String(v).trim() });
+    }
+    return out;
+  }
 
   // ---------- file intake with validation ----------
   // accepts a FileList/File[] or an array of {file,path}; keeps each file's relative path so
@@ -711,6 +818,7 @@
     if(!files.length){ el('upErr').textContent=t.errNone; return; }
     if(!name){ el('upErr').textContent=t.errName; el('cName').focus(); return; }
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ el('upErr').textContent=t.errEmail; el('cEmail').focus(); return; }
+    const custom=collectCustom(); if(custom===null) return;
     el('upErr').textContent='';
 
     // demo preview (opened without a real request link): simulate a successful upload
@@ -752,7 +860,7 @@
     }
 
     const sub={ id:subId, name, phone:el('cPhone').value.trim(),
-      email, note:el('cNote').value.trim(), at:Date.now(), fileIds:metas.map(m=>m.id) };
+      email, note:el('cNote').value.trim(), custom:custom, at:Date.now(), fileIds:metas.map(m=>m.id) };
     req.submissions = (req.submissions||[]).concat([sub]);
     req.files = (req.files||[]).concat(metas);
     try{
@@ -783,6 +891,7 @@
   function resetForm(){
     files=[]; uploading=false;
     el('cName').value=''; el('cPhone').value=''; el('cEmail').value=''; el('cNote').value='';
+    customVals={}; renderCustomFields();
     if(el('doneList')) el('doneList').innerHTML='';
     renderFiles(); el('upErr').textContent=''; show('uploadView');
     window.scrollTo({top:0,behavior:'smooth'});
@@ -825,6 +934,7 @@
         if(d.phone!=null) el('cPhone').value=d.phone;
         if(d.email!=null) el('cEmail').value=d.email;
         if(d.note!=null) el('cNote').value=d.note;
+        if(d.custom && typeof d.custom==='object'){ customVals=d.custom; applyCustomVals(); }
         const metas=Array.isArray(d.files)?d.files:[];
         for(let i=0;i<metas.length;i++){
           const m=metas[i];
@@ -864,7 +974,7 @@
     el('reqName').textContent=req.name || t.heroTitle;
     el('reqDesc').textContent=req.desc || t.heroSub2;
     el('fileInput').setAttribute('accept', acceptAttr());
-    renderFeatures(); renderFiles(); show('uploadView');
+    renderFeatures(); renderCustomFields(); renderFiles(); show('uploadView');
   }
 
   // preview embed: report the document height so the parent iframe (request.html
@@ -891,7 +1001,7 @@
     const nm=el('langName'); if(nm) nm.textContent=LNAME[l]||l;
     document.querySelectorAll('#langMenu button').forEach(b=>b.classList.toggle('on', b.getAttribute('data-lang')===l));
     if(req){
-      if(!el('uploadView').classList.contains('hidden')){ el('reqDesc').textContent=req.desc || t.heroSub2; renderFeatures(); renderFiles(); }
+      if(!el('uploadView').classList.contains('hidden')){ el('reqDesc').textContent=req.desc || t.heroSub2; renderFeatures(); customVals=readCustomVals(); renderCustomFields(); renderFiles(); }
       if(!el('successState').classList.contains('hidden')) el('successBody').textContent = req.thankYou || t.successDefault;
     }
   }
@@ -956,6 +1066,7 @@
   el('pwForm').addEventListener('submit',tryUnlock);
   el('doneList').addEventListener('click',e=>{ const b=e.target.closest('[data-dl]'); if(b) downloadSubmitted(b.getAttribute('data-dl')); });
   ['cName','cPhone','cEmail','cNote'].forEach(id=>{ const n=el(id); if(n) n.addEventListener('input',()=>{ if(!demo && token) saveDraft(); }); });
+  ['input','change'].forEach(ev=>el('xFields').addEventListener(ev,()=>{ customVals=readCustomVals(); if(!demo && token) saveDraft(); }));
 
   // language picker is owned by the shared site header (header.js);
   // it calls window.__setLang on selection so the page re-renders in place.

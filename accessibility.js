@@ -166,7 +166,7 @@
   var HAND = "url(\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'><path d='M9 11V5.5a1.5 1.5 0 0 1 3 0V10h1V7a1.5 1.5 0 0 1 3 0v3h1V8.5a1.5 1.5 0 0 1 3 0V15a5 5 0 0 1-5 5h-3a4 4 0 0 1-3.4-1.9L4.2 13a1.6 1.6 0 0 1 2.5-2L9 13z' fill='%23111' stroke='%23fff' stroke-width='1' stroke-linejoin='round'/></svg>\") 12 4";
 
   var CSS = `
-  #a11y-root{ font-family:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif; }
+  #a11y-root{ font-family:'Overpass','Rubik',system-ui,'Segoe UI',sans-serif; }
   #a11y-root *{ box-sizing:border-box; }
 
   /* Floating access button */

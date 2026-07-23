@@ -257,10 +257,19 @@
 
   // ---------- owner-scoped brand ----------
   RV.loadBrand = function () {
-    var d = { name: '', tagline: '', logo: '', bg: '', color: '#57ab3f' };
+    var d = { name: '', tagline: '', logo: '', bg: '', color: '#0b7a41' };
     try { return Object.assign(d, JSON.parse(RV.ls(scopedKey('kolkli_brand')) || '{}')); } catch (_) { return d; }
   };
   RV.saveBrand = function (b) { RV.lsSet(scopedKey('kolkli_brand'), JSON.stringify(b || {})); };
+
+  // ---------- owner-scoped create-screen cover image ----------
+  // The hero cover of the "create project" screen is a per-owner preference so it
+  // carries across projects. Empty string → fall back to the default hero art.
+  RV.loadCover = function () { return RV.ls(scopedKey('kolkli_review_cover')) || ''; };
+  RV.saveCover = function (dataUrl) {
+    if (dataUrl) RV.lsSet(scopedKey('kolkli_review_cover'), dataUrl);
+    else { try { localStorage.removeItem(scopedKey('kolkli_review_cover')); } catch (_) {} }
+  };
 
   // ---------- owner-scoped Review Studio settings defaults ----------
   // The full approval config (permissions, approval rules, change requests,

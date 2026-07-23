@@ -26,7 +26,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
+    --sans:'Overpass','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -352,6 +352,8 @@
       checkEmail:'שלחנו לכם מייל אימות — אשרו אותו ואז התחברו.',
       resetSent:'שלחנו קישור לאיפוס סיסמה למייל שלכם.',
       resetNeedEmail:'הזינו קודם את כתובת האימייל.',
+      resetDemoAsk:'הקלידו סיסמה חדשה (לפחות 6 תווים) בשדה הסיסמה, ואז לחצו שוב על ״שכחתם סיסמה?״',
+      resetDemoDone:'הסיסמה אופסה והתחברתם ✓',
       foot:'KOLKLI · ההרשמה מקומית להדגמה. מהיר, פשוט ובאיכות מקצועית.',
     },
     en:{
@@ -385,6 +387,8 @@
       checkEmail:'We sent you a confirmation email — confirm it, then sign in.',
       resetSent:'We emailed you a password-reset link.',
       resetNeedEmail:'Enter your email address first.',
+      resetDemoAsk:'Type a new password (at least 6 characters) in the password field, then click “Forgot password?” again.',
+      resetDemoDone:'Password reset — you’re signed in ✓',
       foot:'KOLKLI · Accounts are local (demo). Fast, simple and professional-quality.',
     },
     ru:{
@@ -418,6 +422,8 @@
       checkEmail:'Мы отправили письмо для подтверждения — подтвердите и войдите.',
       resetSent:'Мы отправили ссылку для сброса пароля на вашу почту.',
       resetNeedEmail:'Сначала введите адрес электронной почты.',
+      resetDemoAsk:'Введите новый пароль (не менее 6 символов) в поле пароля и снова нажмите «Забыли пароль?».',
+      resetDemoDone:'Пароль сброшен — вы вошли ✓',
       foot:'KOLKLI · Аккаунты локальные (демо). Быстро, просто и профессионального качества.',
     },
   };
@@ -529,9 +535,17 @@
         await grantTrial(email);
         showSigned(name, email, t.accountCreated);
       } else {
-        const u=findUser(email);
+        let u=findUser(email);
         if(!u){ setErr('emailField','emailErr',t.errNoUser); return; }
-        if(u.pass!==await hashPass(pass)){ setErr('passField','passErr',t.errWrongPass); return; }
+        // A record with no local password came from a social login / server sync / seed —
+        // let the first sign-in claim it by storing this password, instead of rejecting
+        // every attempt with "wrong password".
+        if(!u.pass){
+          const us=loadUsers(), ix=us.findIndex(x=>(x.email||'').toLowerCase()===email);
+          if(ix>-1){ us[ix].pass=await hashPass(pass); saveUsers(us); u=us[ix]; }
+        } else if(u.pass!==await hashPass(pass)){
+          setErr('passField','passErr',t.errWrongPass); return;
+        }
         setSession(email);
         showSigned(u.name, email, t.welcomeBack);
       }
@@ -632,7 +646,23 @@
       window.KolkliAuth.resetPassword(em).then(r=>showMsg(r.ok?t.resetSent:(r.message||t.forgotMsg), r.ok?'info':'err'));
       return;
     }
-    showMsg(t.forgotMsg,'info');
+    // Demo mode (no server to email a link): reset the password locally. The user types
+    // the new password in the password field, then clicks this — we store it and sign
+    // them straight in.
+    clearErrors();
+    const em2=el('emailInput').value.trim().toLowerCase();
+    const np=el('passInput').value;
+    if(!em2 || !EMAIL_RE.test(em2)){ setErr('emailField','emailErr',t.errEmail); return; }
+    if(!np || np.length<6){ setErr('passField','passErr',t.errPassShort); showMsg(t.resetDemoAsk,'info'); return; }
+    (async()=>{
+      const us=loadUsers();
+      const ix=us.findIndex(x=>(x.email||'').toLowerCase()===em2);
+      if(ix<0){ setErr('emailField','emailErr',t.errNoUser); return; }
+      us[ix].pass=await hashPass(np);
+      saveUsers(us);
+      setSession(em2);
+      showSigned(us[ix].name||em2.split('@')[0], em2, t.resetDemoDone);
+    })();
   });
   el('passEye').addEventListener('click',()=>{
     const inp=el('passInput'), show=inp.type==='password';

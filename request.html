@@ -26,7 +26,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
+    --sans:'Overpass','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -489,6 +489,9 @@
   .grp-fico{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--grad);color:#fff;}
   .grp-fico svg{width:15px;height:15px;}
   .grp-nm{font-size:13.5px;font-weight:700;color:var(--ink);}
+  .grp-ans{display:flex;flex-wrap:wrap;gap:3px 16px;margin-top:5px;padding-inline-start:26px;font-size:12px;color:var(--muted);}
+  .grp-ans-it .k{font-weight:700;color:var(--ink);margin-inline-end:4px;}
+  .grp-ans-it .k::after{content:':';}
   .grp-count{margin-inline-start:auto;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dim);white-space:nowrap;}
   .ft-file{display:flex;align-items:center;gap:11px;min-width:0;}
   .ft-ico{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);overflow:hidden;cursor:pointer;}
@@ -552,7 +555,7 @@
   .nores p{margin:0;font-size:14px;}
 
   /* ================= create-link : redesigned create view ================= */
-  .cl-grid{display:grid;grid-template-columns:minmax(0,1fr) 306px;gap:22px;align-items:start;}
+  .cl-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;align-items:start;max-width:860px;margin-inline:auto;}
   @media (max-width:900px){ .cl-grid{grid-template-columns:1fr;} }
   .cl-card{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);}
   .cl-form{padding:16px 28px 18px;min-width:0;}
@@ -683,8 +686,13 @@
   .studio-x:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
   .studio-x svg{width:18px;height:18px;}
 
-  .studio-main{flex:1;min-height:0;display:grid;grid-template-columns:238px minmax(0,1fr);}
-  .studio-rail{overflow-y:auto;border-inline-end:1px solid var(--line-2);background:var(--panel-2);padding:8px 10px 16px;}
+  .studio-main{flex:1;min-height:0;position:relative;overflow:hidden;display:flex;align-items:stretch;}
+  /* docked navigation column — an integral part of the modal, flush against the content (right side in RTL) */
+  .studio-rail{order:0;flex:0 0 224px;width:224px;overflow-y:auto;
+    border-inline-end:1px solid var(--line-2);background:var(--panel-2);padding:14px 12px 18px;}
+  /* second docked navigation column (advanced + appearance) on the opposite edge (left side in RTL) */
+  .studio-rail2{order:2;flex:0 0 224px;width:224px;overflow-y:auto;
+    border-inline-start:1px solid var(--line-2);background:var(--panel-2);padding:14px 12px 18px;}
   .st-glabel{font:600 10.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:14px 10px 7px;}
   .st-nav{display:flex;align-items:center;gap:11px;width:100%;padding:10px 11px;border-radius:11px;border:none;background:transparent;color:var(--ink-2);cursor:pointer;font:600 13.5px var(--sans);text-align:start;margin-bottom:2px;transition:background .12s,color .12s;}
   .st-nav:hover{background:var(--panel);}
@@ -693,7 +701,7 @@
   .st-nav .st-count{margin-inline-start:auto;background:var(--panel);border:1px solid var(--line);color:var(--muted);}
   .st-nav.on .st-count{background:#fff;color:var(--accent-dim);border-color:transparent;}
 
-  .studio-content{overflow-y:auto;padding:22px 26px 26px;}
+  .studio-content{order:1;flex:1;min-width:0;overflow-y:auto;padding:24px 30px 28px;}
   .st-sec{display:none;}
   .st-sec.on{display:block;animation:stFade .22s ease;}
   @keyframes stFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
@@ -710,21 +718,22 @@
   .st-count{font:600 11px var(--mono);background:var(--accent-soft);color:var(--accent-dim);border-radius:999px;padding:2px 9px;}
 
   /* palette */
-  .pal-grp{margin-bottom:20px;}
-  .pal-grp-t{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:700;color:var(--ink-2);margin:0 0 11px;}
-  .pal-grp-t::after{content:'';flex:1;height:1px;background:var(--line-2);}
-  .pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px;}
-  .pal-tile{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);cursor:pointer;text-align:start;
-    transition:border-color .12s,background .12s,transform .08s,box-shadow .12s;}
-  .pal-tile:hover{border-color:var(--accent-line);background:var(--panel);box-shadow:var(--shadow-sm);transform:translateY(-1px);}
+  .pal-grp{margin-bottom:22px;}
+  .pal-grp-t{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;color:var(--muted);margin:0 0 12px;text-align:center;}
+  .pal-grp-t::before,.pal-grp-t::after{content:'';flex:1;height:1px;background:var(--line-2);}
+  .pal{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+  .pal-tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:15px 8px;min-height:90px;border:1px solid var(--line);border-radius:14px;background:var(--panel-2);cursor:pointer;text-align:center;
+    transition:border-color .14s,background .14s,transform .1s,box-shadow .14s;}
+  .pal-tile:hover{border-color:var(--accent-line);background:var(--panel);box-shadow:var(--shadow-sm);transform:translateY(-2px);}
   .pal-tile:active{transform:translateY(0);}
-  .pal-ico{width:34px;height:34px;flex-shrink:0;border-radius:9px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);}
-  .pal-ico svg{width:18px;height:18px;}
-  .pal-tx{min-width:0;flex:1;}
-  .pal-nm{font-size:13px;font-weight:600;color:var(--ink);line-height:1.2;}
-  .pal-plus{color:var(--faint);flex-shrink:0;display:flex;}
-  .pal-plus svg{width:16px;height:16px;}
-  .pal-tile:hover .pal-plus{color:var(--accent);}
+  .pal-ico{width:30px;height:30px;flex-shrink:0;display:grid;place-items:center;color:var(--ink-2);transition:color .14s;}
+  .pal-ico svg{width:23px;height:23px;}
+  .pal-tile:hover .pal-ico{color:var(--accent);}
+  .pal-tx{min-width:0;width:100%;}
+  .pal-nm{font-size:12px;font-weight:600;color:var(--ink-2);line-height:1.25;}
+  .pal-plus{position:absolute;top:6px;inset-inline-start:6px;width:19px;height:19px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;opacity:0;transform:scale(.5);transition:opacity .14s,transform .14s;box-shadow:0 2px 6px rgba(0,0,0,.18);pointer-events:none;}
+  .pal-plus svg{width:13px;height:13px;}
+  .pal-tile:hover .pal-plus{opacity:1;transform:scale(1);}
 
   /* fields list */
   .fld-head{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:var(--ink);margin:26px 0 12px;}
@@ -741,6 +750,8 @@
   .fld-del{width:30px;height:30px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .12s;}
   .fld-del:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
   .fld-del svg{width:15px;height:15px;}
+  .fld-row.has-opts{border-radius:11px 11px 0 0;margin-bottom:0;}
+  .fld-optrow{display:flex;flex-direction:column;gap:6px;padding:9px 11px 11px;border:1px solid var(--line);border-top:1px dashed var(--line);border-radius:0 0 11px 11px;background:var(--panel-2);margin-bottom:8px;}
 
   /* generic studio form rows */
   .st-field{margin-bottom:18px;}
@@ -798,6 +809,25 @@
   .pv-fld-head{font-size:15px;font-weight:800;color:var(--pv-ink,var(--ink));margin-top:4px;}
   .pv-fld-para{font-size:12.5px;color:var(--muted);line-height:1.55;}
   .pv-fld-hr{height:1px;background:var(--line);margin:2px 0;}
+  .pv-opts{display:flex;flex-direction:column;gap:7px;}
+  .pv-opt{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);}
+  .pv-mark{width:14px;height:14px;flex-shrink:0;border:1.5px solid var(--line);border-radius:50%;background:var(--panel);}
+  .pv-mark.sq{border-radius:4px;}
+  .pv-fld-box.sel{justify-content:space-between;gap:10px;}
+  .pv-fld-box .pv-chev{color:var(--faint);font-size:10px;}
+  /* palette basic widgets + content-block placeholders */
+  .pv-content-block{display:flex;align-items:center;gap:9px;padding:11px 13px;border:1.5px dashed var(--pv-accent-line,var(--line));border-radius:11px;background:var(--panel-2);color:var(--muted);font-size:12.5px;font-weight:600;}
+  .pv-cico{width:22px;height:22px;flex-shrink:0;color:var(--pv-accent,var(--accent));display:grid;place-items:center;}
+  .pv-cico svg{width:17px;height:17px;}
+  .pv-faces,.pv-stars{font-size:19px;letter-spacing:6px;}
+  .pv-stars{color:#f4b740;}
+  .pv-fld-box.sig{font-family:'Segoe Script','Brush Script MT',cursive;font-size:15px;color:var(--faint);}
+  .fc-field.type-content{display:flex;align-items:center;gap:9px;}
+  .fc-cico{width:26px;height:26px;flex-shrink:0;color:var(--accent);display:grid;place-items:center;}
+  .fc-cico svg{width:19px;height:19px;}
+  .fc-faces,.fc-stars{font-size:19px;letter-spacing:6px;padding:2px 0;}
+  .fc-stars{color:#f4b740;}
+  .fc-ghost.sig{font-family:'Segoe Script','Brush Script MT',cursive;font-size:15px;}
 
   /* ===== inline studio (edit mode) — builder + designer live inside the edit form ===== */
   body.edit-request .cl-gear{display:none;}
@@ -812,15 +842,194 @@
   .ist-host{border:1px solid var(--line-2);border-radius:14px;overflow:hidden;background:var(--panel);}
   .ist-host .studio-main{height:min(600px,70vh);}
 
+  /* ===== docked Form Studio (create mode) =============================
+     The studio lives on BOTH sides of the page as an integral part of the
+     layout (nav rail | form | controls) instead of a floating window. The
+     gear toggles it; it reuses the same panels as the modal fallback. */
+  .cl-dock{display:flex;flex-direction:column;position:sticky;top:16px;align-self:stretch;
+    max-height:calc(100vh - 32px);background:var(--panel);border:1px solid var(--line);
+    border-radius:18px;box-shadow:var(--shadow-sm);overflow:hidden;}
+  .cl-dock[hidden]{display:none;}
+  .cl-dock-hd{display:flex;align-items:center;gap:11px;padding:13px 14px;
+    border-bottom:1px solid var(--line-2);background:var(--panel-2);}
+  .cl-dock-ico{width:36px;height:36px;flex-shrink:0;border-radius:11px;display:grid;place-items:center;
+    color:#fff;background:var(--grad-btn);box-shadow:0 5px 13px var(--grad-btn-glow);}
+  .cl-dock-ico svg{width:19px;height:19px;}
+  .cl-dock-hd-tx{flex:1;min-width:0;}
+  .cl-dock-hd-tx h3{margin:0;font-size:14px;font-weight:800;letter-spacing:-.01em;color:var(--ink);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cl-dock-hd-tx p{margin:2px 0 0;font-size:11px;color:var(--muted);line-height:1.35;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cl-dock-x{width:31px;height:31px;flex-shrink:0;border-radius:9px;border:1px solid var(--line);
+    background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .12s;}
+  .cl-dock-x:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
+  .cl-dock-x svg{width:16px;height:16px;}
+  .cl-dock-body{flex:1;min-height:0;overflow-y:auto;}
+  /* the moved navigation rails fill the dock (drop the modal fixed flex sizing) */
+  .cl-dock-nav .cl-dock-body .studio-rail,
+  .cl-dock-nav .cl-dock-body .studio-rail2{flex:none;width:auto;overflow:visible;
+    border:none;background:transparent;padding:8px 10px;}
+  .cl-dock-nav .cl-dock-body .studio-rail2{border-top:1px solid var(--line-2);}
+  /* the moved content pane fills the controls dock */
+  .cl-dock-ctl .cl-dock-body .studio-content{flex:none;width:auto;overflow:visible;padding:20px 20px 24px;}
+
+  /* open state: nav | form | controls, form centred; reclaim the page side margins */
+  body.studio-docked .wrap{width:100%;max-width:none;padding-inline:0;}
+  .cl-grid.studio-docked{grid-template-columns:minmax(228px,320px) minmax(360px,660px) minmax(210px,264px);
+    max-width:none;gap:20px;justify-content:space-between;transition:grid-template-columns .28s cubic-bezier(.4,0,.2,1);}
+
+  /* ---- collapsible studio nav sidebar: a chevron folds it to a slim rail pinned at the far edge ---- */
+  .cl-dock-collapse{width:30px;height:30px;flex-shrink:0;margin-inline-start:auto;border-radius:9px;
+    border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;
+    display:grid;place-items:center;transition:border-color .14s,color .14s,background .14s;}
+  .cl-dock-collapse:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+  .cl-dock-collapse svg{width:16px;height:16px;transition:transform .25s;}
+  /* edge-tab variant: the collapse handle rides the vertical centre of the nav rail's
+     inner (form-facing) edge instead of sitting in the header. Overflow is opened so the
+     tab can nudge into the gutter; the header/body carry their own radii to stay round. */
+  .cl-dock-nav{overflow:visible;}
+  .cl-dock-nav .cl-dock-hd{border-radius:18px 18px 0 0;}
+  .cl-dock-nav .cl-dock-body{border-radius:0 0 18px 18px;}
+  #dockNavToggle.cl-nav-edge{position:absolute;top:50%;right:-12px;transform:translateY(-50%);
+    margin:0;width:26px;height:46px;border-radius:10px;z-index:6;box-shadow:var(--shadow-sm);}
+  @media (min-width:861px){
+    .cl-grid.studio-docked.nav-collapsed{grid-template-columns:minmax(228px,320px) minmax(360px,1fr) 54px;}
+    /* swapped sides: palette/content dock on the (RTL) right, studio nav on the left */
+    .cl-grid.studio-docked > #dockCtl{order:1;}
+    .cl-grid.studio-docked > .cl-form{order:2;}
+    .cl-grid.studio-docked > #dockNav{order:3;}
+    /* lift the two side rails up into the empty header band so they start
+       near the top of the page instead of level with the form card */
+    .cl-grid.studio-docked > #dockCtl,
+    .cl-grid.studio-docked > #dockNav{margin-top:-166px;}
+    .nav-collapsed #dockNav .cl-dock-hd{flex-direction:column;gap:12px;padding:12px 0;justify-content:flex-start;border-radius:18px;}
+    .nav-collapsed #dockNav .cl-dock-hd-tx{display:none;}
+    .nav-collapsed #dockNav .cl-dock-body{display:none;}
+    .nav-collapsed #dockNav .cl-dock-collapse svg{transform:rotate(180deg);}
+  }
+  @media (max-width:860px){ .cl-dock-collapse{display:none;} }
+  @media (max-width:1180px){
+    .cl-grid.studio-docked{grid-template-columns:minmax(196px,264px) minmax(300px,1fr) minmax(184px,220px);gap:14px;}
+  }
+  @media (max-width:860px){
+    .cl-grid.studio-docked{grid-template-columns:1fr;gap:14px;}
+    body.studio-docked .cl-dock{position:static;max-height:none;}
+  }
+
   @media (max-width:720px){
     .studio-box{inset:0;width:100%;height:100%;max-width:none;border-radius:0;transform:none;}
     .studio.show .studio-box{transform:none;}
-    .studio-main{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);}
-    .studio-rail{display:flex;gap:6px;overflow-x:auto;border-inline-end:none;border-bottom:1px solid var(--line-2);padding:10px;}
-    .st-glabel{display:none;}
-    .st-nav{width:auto;white-space:nowrap;flex-shrink:0;margin-bottom:0;}
-    .st-nav .st-count{display:none;}
+    /* narrow screens: the two nav columns dock as horizontal strips above the content — still integral, never floating */
+    .studio-main{flex-direction:column;}
+    .studio-rail,.studio-rail2{flex:0 0 auto;width:auto;max-width:none;overflow-x:auto;overflow-y:hidden;
+      display:flex;align-items:center;gap:7px;padding:9px 14px;}
+    .studio-rail{order:0;border-inline-end:none;border-bottom:1px solid var(--line-2);}
+    .studio-rail2{order:1;border-inline-start:none;border-bottom:1px solid var(--line-2);}
+    .studio-content{order:2;padding:20px 18px 24px;}
+    .studio-rail .st-glabel,.studio-rail2 .st-glabel{display:none;}
+    .studio-rail .st-nav,.studio-rail2 .st-nav{width:auto;flex:0 0 auto;margin-bottom:0;white-space:nowrap;}
+    .studio-rail .st-nav .st-count,.studio-rail2 .st-nav .st-count{margin-inline-start:6px;}
   }
+</style>
+<style id="canvas-css">
+  /* ===== live form canvas (Wix-style builder, manager view) =====
+     The centre of the builder is now a live WYSIWYG of the client-facing
+     upload form. Palette clicks insert real fields here in real time; the
+     old admin config inputs (#fcAdmin) live in the studio side panels. */
+  #formCanvas{display:none;}
+  #createView.canvas-mode:not(.client-mode) #formCanvas{display:block;}
+  #createView.canvas-mode:not(.client-mode) .cl-form > .cl-fhd,
+  #createView.canvas-mode:not(.client-mode) .cl-form > .cl-div,
+  #createView.canvas-mode:not(.client-mode) #fcAdmin{display:none;}
+  #createView.canvas-mode:not(.client-mode) .cl-fields{display:block;margin-top:4px;padding-top:18px;border-top:1px solid var(--line-2);}
+  body.edit-request #createView.canvas-mode:not(.client-mode) .cl-form > .cl-fhd{display:none;}
+
+  .fc-frame{--pv-accent:var(--accent);--pv-accent-soft:var(--accent-soft);--pv-accent-line:var(--accent-line);--pv-ink:var(--ink);
+    border-radius:16px;}
+  .fc-frame[data-w="compact"]{max-width:440px;margin-inline:auto;}
+  .fc-frame[data-w="wide"]{max-width:none;}
+
+  /* hero / header (inline-editable title + subtitle) */
+  .fc-hero{text-align:center;padding:2px 4px 0;}
+  .fc-ic{width:60px;height:60px;margin:0 auto 14px;border-radius:16px;display:grid;place-items:center;
+    background:var(--pv-accent-soft);color:var(--pv-accent);box-shadow:var(--shadow-sm);}
+  .fc-ic svg{width:28px;height:28px;}
+  .fc-title,.fc-sub{display:block;width:100%;text-align:center;border:1px solid transparent;border-radius:10px;
+    background:transparent;padding:5px 10px;transition:border-color .12s,background .12s;}
+  .fc-title{font:800 22px/1.25 var(--sans);color:var(--pv-ink,var(--ink));letter-spacing:-.01em;}
+  .fc-sub{font:500 14px var(--sans);color:var(--muted);margin-top:2px;}
+  .fc-title::placeholder,.fc-sub::placeholder{color:var(--faint);}
+  .fc-title:hover,.fc-sub:hover{background:var(--panel-2);}
+  .fc-title:focus,.fc-sub:focus{outline:none;border-color:var(--pv-accent);background:var(--panel);}
+  .fc-hrule{width:46px;height:4px;border-radius:99px;margin:13px auto 0;
+    background:linear-gradient(90deg,var(--pv-accent),color-mix(in srgb,var(--pv-accent) 35%,transparent));}
+
+  /* fixed client fields (name / phone / email / message) — preview only */
+  .fc-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:22px;}
+  @media (max-width:560px){ .fc-grid{grid-template-columns:1fr;} }
+  .fc-fx{display:flex;flex-direction:column;gap:6px;}
+  .fc-fx.full{grid-column:1/-1;}
+  .fc-fx > label{font-size:12.5px;font-weight:600;color:var(--pv-ink,var(--ink-2));}
+  .fc-fx > label .req{color:var(--danger);margin-inline-start:3px;}
+  .fc-ghost{min-height:42px;border:1px solid var(--line);border-radius:11px;background:var(--panel-2);
+    display:flex;align-items:center;padding:0 13px;color:var(--faint);font-size:13px;}
+  .fc-ghost.ta{min-height:66px;align-items:flex-start;padding-top:12px;}
+  .fc-ghost.sel{justify-content:space-between;gap:10px;}
+
+  /* custom fields — the live, editable blocks */
+  .fc-custom{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+  .fc-custom:empty{display:none;}
+  .fc-field{position:relative;border:1.5px dashed transparent;border-radius:13px;padding:12px;margin:0 -6px;
+    transition:border-color .14s,background .14s;}
+  .fc-field:hover,.fc-field:focus-within{border-color:var(--pv-accent-line);
+    background:color-mix(in srgb,var(--pv-accent-soft) 40%,transparent);}
+  .fc-field.type-divider{padding:6px 12px;}
+  .fc-ftools{position:absolute;top:-14px;inset-inline-end:10px;display:flex;gap:3px;padding:3px;border-radius:10px;
+    background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-sm);
+    opacity:0;transform:translateY(4px);transition:opacity .14s,transform .14s;pointer-events:none;z-index:2;}
+  .fc-field:hover .fc-ftools,.fc-field:focus-within .fc-ftools{opacity:1;transform:none;pointer-events:auto;}
+  .fc-tt{width:28px;height:28px;border-radius:7px;border:none;background:transparent;color:var(--muted);
+    cursor:pointer;display:grid;place-items:center;transition:background .12s,color .12s;}
+  .fc-tt:hover{background:var(--panel-2);color:var(--accent-dim);}
+  .fc-tt.danger:hover{background:var(--danger-soft);color:var(--danger);}
+  .fc-tt svg{width:15px;height:15px;}
+  .fc-treq{display:inline-flex;align-items:center;gap:5px;padding:0 9px;height:28px;border-radius:7px;
+    font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;}
+  .fc-treq input{accent-color:var(--pv-accent);width:13px;height:13px;margin:0;}
+  .fc-treq.on{color:var(--accent-dim);}
+  .fc-flabel{display:flex;align-items:center;gap:4px;margin-bottom:8px;}
+  .fc-labelinp{flex:1;min-width:0;background:transparent;border:none;border-bottom:1px solid transparent;
+    font:600 13px var(--sans);color:var(--pv-ink,var(--ink-2));padding:2px 2px 4px;}
+  .fc-labelinp:focus{outline:none;border-bottom-color:var(--pv-accent);}
+  .fc-flabel .req{color:var(--danger);font-weight:700;}
+  .fc-optsinp{width:100%;margin-top:9px;background:var(--panel-2);border:1px dashed var(--line);border-radius:9px;
+    font:500 12px var(--sans);color:var(--muted);padding:7px 10px;}
+  .fc-optsinp:focus{outline:none;border-color:var(--pv-accent);color:var(--ink);}
+  .fc-opts{display:flex;flex-direction:column;gap:8px;}
+  .fc-opt{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink-2);}
+  .fc-mark{width:15px;height:15px;flex-shrink:0;border:1.6px solid var(--line);border-radius:50%;background:var(--panel);}
+  .fc-mark.sq{border-radius:5px;}
+  .fc-chev{color:var(--faint);font-size:11px;}
+  .fc-f-head{width:100%;background:transparent;border:none;font:800 16px var(--sans);color:var(--pv-ink,var(--ink));padding:2px;}
+  .fc-f-head:focus{outline:none;}
+  .fc-f-para{width:100%;background:transparent;border:none;resize:vertical;font:500 13px var(--sans);
+    color:var(--muted);line-height:1.55;padding:2px;min-height:42px;}
+  .fc-f-para:focus{outline:none;}
+  .fc-f-hr{height:1px;background:var(--line);margin:6px 0;}
+
+  /* dropzone + submit (preview of the client's controls) */
+  .fc-drop{margin-top:22px;border:2px dashed var(--pv-accent-line);border-radius:16px;padding:26px 16px;text-align:center;
+    background:color-mix(in srgb,var(--pv-accent-soft) 55%,var(--panel));}
+  .fc-drop-ic{color:var(--pv-accent);}
+  .fc-drop-ic svg{width:34px;height:34px;}
+  .fc-drop-big{font-size:15px;font-weight:700;color:var(--pv-ink,var(--ink));margin-top:8px;}
+  .fc-drop-sub{font-size:12.5px;color:var(--faint);margin-top:5px;}
+  .fc-submit{width:100%;margin-top:18px;height:50px;border-radius:14px;border:none;color:#fff;
+    font:700 15px var(--sans);cursor:default;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--pv-accent);
+    box-shadow:0 10px 24px color-mix(in srgb,var(--pv-accent) 35%,transparent);}
+  .fc-empty{border:1.5px dashed var(--line);border-radius:13px;padding:26px 18px;text-align:center;
+    color:var(--faint);font-size:13px;line-height:1.6;background:var(--panel-2);margin-top:16px;}
 </style>
 <link rel="stylesheet" href="./header.css">
 <style>
@@ -843,6 +1052,10 @@
     <button class="vseg on" id="vsManager" type="button" role="tab" aria-selected="true" data-mode="manager">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span data-i18n="viewManager"></span>
+    </button>
+    <button class="vseg" id="vsForms" type="button" role="tab" aria-selected="false" data-mode="forms">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span data-i18n="viewForms"></span>
       <span class="count" id="mgCount">0</span>
     </button>
     <button class="vseg" id="vsClient" type="button" role="tab" aria-selected="false" data-mode="client">
@@ -852,8 +1065,20 @@
   </div>
 
   <!-- ============ CREATE ============ -->
-  <div id="createView">
+  <div id="createView" class="canvas-mode">
     <div class="cl-grid" id="createGrid">
+      <!-- docked Form Studio: navigation rail (create-mode both-sides layout) -->
+      <aside class="cl-dock cl-dock-nav" id="dockNav" hidden>
+        <div class="cl-dock-hd">
+          <span class="cl-dock-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M17.5 14v7M14 17.5h7"/></svg></span>
+          <div class="cl-dock-hd-tx"><h3 id="dockNavTitle"></h3><p id="dockNavSub"></p></div>
+        </div>
+        <div class="cl-dock-body" id="dockNavBody"></div>
+        <button class="cl-dock-collapse cl-nav-edge" id="dockNavToggle" type="button" aria-expanded="true" aria-label="Toggle sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+      </aside>
+
 
       <!-- ===== form (right) ===== -->
       <section class="cl-card cl-form">
@@ -862,15 +1087,15 @@
             <h1 data-i18n="formTitle"></h1>
             <p data-i18n="formSub"></p>
           </div>
-          <button class="cl-gear" id="openStudio" type="button" aria-label="הגדרות ורכיבי טופס">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          </button>
         </header>
 
         <div class="cl-div"></div>
 
+        <div id="formCanvas" class="fc-canvas"></div>
+
         <div class="cl-fields">
 
+          <div id="fcAdmin">
           <!-- request name -->
           <div class="cl-field cl-span2">
             <label class="cl-lbl" for="fName"><span data-i18n="fName"></span> <span class="cl-req">*</span></label>
@@ -950,6 +1175,7 @@
             <label class="cl-lbl" for="fThanks" data-i18n="fThanks"></label>
             <textarea class="cl-inp cl-ta" id="fThanks" data-i18n-ph="fThanksPh"></textarea>
           </div>
+          </div><!-- /fcAdmin -->
 
           <!-- inline form studio (edit mode): the building blocks, custom
                fields, settings and design sections live inside the edit form -->
@@ -972,19 +1198,9 @@
         </div>
       </section>
 
-      <!-- ===== live client preview (left) ===== -->
-      <aside class="cl-card cl-prev">
-        <div class="cl-pv-logo"></div>
-        <div class="cl-pv-ava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg></div>
-        <div class="cl-pv-name" id="pvName"></div>
-        <div class="cl-pv-desc" id="pvDesc"></div>
-        <div class="cl-pv-sub" data-i18n="previewDrop"></div>
-        <div class="cl-pv-drop">
-          <span class="cl-pv-pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="previewPick"></span></span>
-        </div>
-        <div class="cl-pv-hint" id="pvMax"></div>
-        <div class="pv-fields" id="pvFields"></div>
-        <div class="cl-pv-chips" id="pvChips"></div>
+      <!-- docked Form Studio: active-section controls (create-mode both-sides layout) -->
+      <aside class="cl-dock cl-dock-ctl" id="dockCtl" hidden>
+        <div class="cl-dock-body" id="dockCtlBody"></div>
       </aside>
 
     </div>
@@ -1116,6 +1332,7 @@
     </header>
     <div class="studio-main">
       <nav class="studio-rail" id="studioRail"></nav>
+      <nav class="studio-rail2" id="studioRail2"></nav>
       <div class="studio-content" id="studioContent"></div>
     </div>
     <footer class="studio-ft">
@@ -1158,7 +1375,7 @@
       kick:'Kolkli Request',
       pageTitle:'קבלו קבצים ישירות מהלקוחות שלכם',
       pageSub:'צרו קישור העלאה, שלחו ללקוח, וכל הקבצים נכנסים אוטומטית לתיקייה מסודרת אצלכם. הלקוח לא צריך חשבון או התחברות.',
-      tabCreate:'יצירת טופס העלאה', tabManage:'טפסים שיצרת', viewManager:'תצוגת מנהל', viewClient:'תצוגת לקוח',
+      tabCreate:'יצירת טופס העלאה', tabManage:'טפסים שיצרת', viewManager:'עריכת טופס', viewForms:'הטפסים שלי', viewClient:'תצוגה מקדימה',
       formTitle:'יצירת קישור לקבלת קבצים', formSub:'שלחו קבצים בקלות ותנהלו את ההעלאה',
       editTitle:'עריכת בקשת קבצים', editSub:'עדכנו את פרטי הבקשה ושמרו את השינויים', saveEditBtn:'שמירת שינויים', editToast:'הבקשה עודכנה ✓',
       fName:'שם הבקשה', fNamePh:'לדוגמה: תמונות לאירוע',
@@ -1191,7 +1408,7 @@
       confTitleClose:'סגירת הבקשה', confClose:'לסגור את הבקשה? לא יתקבלו קבצים חדשים, אך הקבצים שכבר התקבלו יישמרו.',
       confTitleDel:'מחיקת הבקשה', confDel:'האם למחוק את הבקשה? כל הקבצים שהתקבלו יימחקו לצמיתות ולא ניתן יהיה לשחזר אותם.', confCancel:'ביטול',
       dupSuffix:' (עותק)', copiedShort:'הקישור הועתק ✓', closedToast:'הבקשה נסגרה', delToast:'הבקשה נמחקה',
-      back:'חזרה', sortNew:'החדשים ביותר', sortOld:'הישנים ביותר', sortName:'לפי שם לקוח',
+      back:'חזרה', backDash:'חזרה ללוח הבקרה', sortNew:'החדשים ביותר', sortOld:'הישנים ביותר', sortName:'לפי שם לקוח',
       fAll:'הכל', anonymous:'לקוח ללא שם',
       searchPh:'חיפוש קובץ…', viewList:'תצוגת רשימה', viewGrid:'תמונות ממוזערות', noResults:'לא נמצאו קבצים תואמים', newTag:'חדש',
       thName:'שם הקובץ', thType:'סוג', thSize:'גודל', thDate:'תאריך העלאה', thStatus:'סטטוס', thActions:'פעולות', fStatusUp:'הועלה',
@@ -1213,7 +1430,7 @@
       kick:'Kolkli Request',
       pageTitle:'Receive files directly from your clients',
       pageSub:'Create an upload link, send it to your client, and every file lands automatically in an organized folder on your side. Your client needs no account and no login.',
-      tabCreate:'Create upload form', tabManage:'Forms you created', viewManager:'Manager view', viewClient:'Client view',
+      tabCreate:'Create upload form', tabManage:'Forms you created', viewManager:'Edit form', viewForms:'My forms', viewClient:'Preview',
       formTitle:'Create a file request', formSub:'Send files easily and manage every upload',
       editTitle:'Edit file request', editSub:'Update the request details and save your changes', saveEditBtn:'Save changes', editToast:'Request updated ✓',
       fName:'Request name', fNamePh:'e.g. Event photos',
@@ -1246,7 +1463,7 @@
       confTitleClose:'Close request', confClose:'Close this request? No new files will be accepted, but files already received are kept.',
       confTitleDel:'Delete request', confDel:'Delete this request? Every received file will be permanently removed and cannot be recovered.', confCancel:'Cancel',
       dupSuffix:' (copy)', copiedShort:'Link copied ✓', closedToast:'Request closed', delToast:'Request deleted',
-      back:'Back', sortNew:'Newest first', sortOld:'Oldest first', sortName:'By client name',
+      back:'Back', backDash:'Back to Dashboard', sortNew:'Newest first', sortOld:'Oldest first', sortName:'By client name',
       fAll:'All', anonymous:'Unnamed client',
       searchPh:'Search files…', viewList:'List view', viewGrid:'Thumbnails', noResults:'No matching files', newTag:'New',
       thName:'File name', thType:'Type', thSize:'Size', thDate:'Uploaded', thStatus:'Status', thActions:'Actions', fStatusUp:'Uploaded',
@@ -1268,7 +1485,7 @@
       kick:'Kolkli Request',
       pageTitle:'Получайте файлы напрямую от клиентов',
       pageSub:'Создайте ссылку для загрузки, отправьте её клиенту — и каждый файл автоматически попадает в упорядоченную папку у вас. Клиенту не нужен аккаунт и вход.',
-      tabCreate:'Создать форму загрузки', tabManage:'Созданные вами формы', viewManager:'Вид менеджера', viewClient:'Вид клиента',
+      tabCreate:'Создать форму загрузки', tabManage:'Созданные вами формы', viewManager:'Редактировать форму', viewForms:'Мои формы', viewClient:'Предпросмотр',
       formTitle:'Создать запрос файлов', formSub:'Отправляйте файлы легко и управляйте загрузкой',
       editTitle:'Редактировать запрос файлов', editSub:'Обновите данные запроса и сохраните изменения', saveEditBtn:'Сохранить изменения', editToast:'Запрос обновлён ✓',
       fName:'Название запроса', fNamePh:'напр. Фото с мероприятия',
@@ -1301,7 +1518,7 @@
       confTitleClose:'Закрыть запрос', confClose:'Закрыть этот запрос? Новые файлы приниматься не будут, но уже полученные файлы сохранятся.',
       confTitleDel:'Удалить запрос', confDel:'Удалить этот запрос? Все полученные файлы будут удалены безвозвратно и не подлежат восстановлению.', confCancel:'Отмена',
       dupSuffix:' (копия)', copiedShort:'Ссылка скопирована ✓', closedToast:'Запрос закрыт', delToast:'Запрос удалён',
-      back:'Назад', sortNew:'Сначала новые', sortOld:'Сначала старые', sortName:'По имени клиента',
+      back:'Назад', backDash:'Назад в дашборд', sortNew:'Сначала новые', sortOld:'Сначала старые', sortName:'По имени клиента',
       fAll:'Все', anonymous:'Клиент без имени',
       searchPh:'Поиск файлов…', viewList:'Список', viewGrid:'Эскизы', noResults:'Совпадений не найдено', newTag:'Новый',
       thName:'Имя файла', thType:'Тип', thSize:'Размер', thDate:'Загружен', thStatus:'Статус', thActions:'Действия', fStatusUp:'Загружен',
@@ -1344,6 +1561,7 @@
   let formTheme={accent:'', ink:'', bg:'', gradient:'', font:'', width:'normal'};
   let sender={name:false, email:false};               // require sender name / email
   let studioSection='components';
+  let studioOpen=false;   // studio shown (docked side panels or modal fallback)
   let fldSeq=0;
 
   // ---------- helpers ----------
@@ -1398,25 +1616,28 @@
 
   // ---------- tabs / views ----------
   function setView(v){
-    // Two-mode toggle (manager | client) plus the per-form received drill-down.
-    // Legacy callers pass 'create'/'manage' — both map to the combined manager view.
-    if(v==='create' || v==='manage') v='manager';
+    // Three-mode toggle (manager | forms | client) plus the received drill-down.
+    // Legacy callers pass 'create' (→ builder) and 'manage' (→ the forms list).
+    if(v==='create') v='manager';
+    if(v==='manage') v='forms';
     if(view==='received' && v!=='received') revokeGridUrls();
     view=v;
-    const isReceived=v==='received', isClient=v==='client', isManager=v==='manager';
+    const isReceived=v==='received', isClient=v==='client', isManager=v==='manager', isForms=v==='forms';
     document.body.classList.toggle('received-screen', isReceived);
     document.body.classList.toggle('client-preview', isClient);
-    // Manager = form builder + the "forms you created" list, shown together.
+    // Manager = form builder. Forms = the "forms you created" list (own tab).
     // Client  = only the client-facing upload preview (builder chrome hidden).
-    el('createView').classList.toggle('hidden', isReceived);
+    el('createView').classList.toggle('hidden', isReceived || isForms);
     el('createView').classList.toggle('client-mode', isClient);
-    el('manageView').classList.toggle('hidden', isReceived || isClient);
+    el('manageView').classList.toggle('hidden', !isForms);
     el('receivedView').classList.toggle('hidden', !isReceived);
-    el('vsManager').classList.toggle('on', isManager || isReceived);
-    el('vsManager').setAttribute('aria-selected', (isManager||isReceived)?'true':'false');
+    el('vsManager').classList.toggle('on', isManager);
+    el('vsManager').setAttribute('aria-selected', isManager?'true':'false');
+    el('vsForms').classList.toggle('on', isForms || isReceived);
+    el('vsForms').setAttribute('aria-selected', (isForms||isReceived)?'true':'false');
     el('vsClient').classList.toggle('on', isClient);
     el('vsClient').setAttribute('aria-selected', isClient?'true':'false');
-    if(isManager) renderManage();
+    if(isForms) renderManage();
     if(isClient) renderPreview();
     window.scrollTo({top:0,behavior:'smooth'});
   }
@@ -1436,19 +1657,9 @@
   function lblForType(k){ return t['t'+k.charAt(0).toUpperCase()+k.slice(1)]; }
 
   function renderPreview(){
-    el('pvName').textContent = el('fName').value.trim() || I18N[lang].fNamePh;
-    const desc=el('fDesc').value.trim();
-    el('pvDesc').textContent = desc; el('pvDesc').style.display = desc? '' : 'none';
-    const chips=[];
-    const chosen=TYPE_KEYS.filter(k=>createTypes[k]);
-    if(chosen.length && chosen.length<TYPE_KEYS.length) chips.push(chosen.map(k=>lblForType(k)).join(' · '));
-    const mf=0; // per-file size limit removed → always "any size"
-    const ex=+el('fExpiry').value; if(ex) chips.push(daysWord(ex));
-    if(el('fPwToggle').checked) chips.push('🔒');
-    el('pvChips').innerHTML = chips.map(c=>`<span class="chip">${KR.escapeHtml(c)}</span>`).join('');
-    const pvMaxEl=el('pvMax');
-    if(pvMaxEl){ const sz=mf?(mf>=1000?(mf/1000)+' GB':mf+' MB'):''; pvMaxEl.textContent = mf? (t.pvPerFile?t.pvPerFile(sz):sz) : (t.pvAnySize||''); }
+    // The side preview card was removed; only the client-frame sync below remains.
     studioSyncPreview();
+    renderFormCanvas();
     if(view==='client') syncClientFrame();
   }
 
@@ -1473,7 +1684,7 @@
       afterUpload: Object.assign({}, afterUpload),
       theme: Object.assign({}, formTheme),
       sender: Object.assign({}, sender),
-      customFields: customFields.map(f=>Object.assign({}, f)),
+      customFields: cloneFields(customFields),
       status:'active', submissions:[], files:[]
     };
   }
@@ -1527,7 +1738,7 @@
         existing.afterUpload=Object.assign({}, afterUpload);
         existing.theme=Object.assign({}, formTheme);
         existing.sender=Object.assign({}, sender);
-        existing.customFields=customFields.map(f=>Object.assign({}, f));
+        existing.customFields=cloneFields(customFields);
         if(pwOn){ if(pwVal) existing.password=await KR.hashPass(pwVal); }
         else existing.password=null;
         KR.upsertRequest(existing);
@@ -1561,7 +1772,7 @@
           afterUpload: Object.assign({}, afterUpload),
           theme: Object.assign({}, formTheme),
           sender: Object.assign({}, sender),
-          customFields: customFields.map(f=>Object.assign({}, f)),
+          customFields: cloneFields(customFields),
           status:'active', submissions:[], files:[]
         };
         if(window.KolkliProjectNumbers) await KolkliProjectNumbers.assign('receive', next);
@@ -1634,7 +1845,7 @@
       afterUpload: Object.assign({}, afterUpload),
       theme: Object.assign({}, formTheme),
       sender: Object.assign({}, sender),
-      customFields: customFields.map(f=>Object.assign({}, f))
+      customFields: cloneFields(customFields)
     };
   }
   function persistCreateSettings(){ try{ KR.saveCreateDefaults(readCreateSettings()); }catch(_){} }
@@ -1667,9 +1878,16 @@
     formTheme = Object.assign({accent:'', ink:'', bg:'', gradient:'', font:'', width:'normal'}, d.theme || {});
     sender = Object.assign({name:false, email:false}, d.sender || {});
     customFields = Array.isArray(d.customFields)
-      ? d.customFields.map(f=>({id:f.id||('fld'+(++fldSeq)), type:f.type, label:f.label||'', required:!!f.required})).filter(f=>COMP[f.type])
+      ? d.customFields.map(f=>{
+          const c={id:f.id||('fld'+(++fldSeq)), type:f.type, label:f.label||'', required:!!f.required};
+          if(Array.isArray(f.options)) c.options=f.options.map(o=>String(o));
+          return c;
+        }).filter(f=>COMP[f.type])
       : [];
-    if(el('studio') && el('studio').classList.contains('show')){ renderStudioRail(); showStudioSection(studioSection); }
+    // keep the id counter ahead of ids loaded from saved settings so a newly
+    // added field can never collide with (and silently shadow) a loaded one
+    customFields.forEach(f=>{ const m=/^fld(\d+)$/.exec(f.id); if(m && +m[1]>fldSeq) fldSeq=+m[1]; });
+    if(studioOpen){ renderStudioRail(); showStudioSection(studioSection); }
   }
 
   function resetCreate(){
@@ -1680,6 +1898,7 @@
     el('shareCard').classList.remove('show'); el('createGrid').classList.remove('hidden');
     syncCreateChrome();
     renderPreview();
+    openStudio();  // keep the studio docked when starting a new form
   }
 
   // Swap the create form's title/subtitle/submit label between "new request" and
@@ -1702,6 +1921,7 @@
   // between the modal shell and the form host.
   function syncInlineStudio(editing){
     const wrap=el('inlineStudioWrap'), host=el('inlineStudioHost');
+    if(editing && (studioOpen || (el('createGrid') && el('createGrid').classList.contains('studio-docked')))){ studioOpen=false; undockStudio(); }
     const main=document.querySelector('.studio-main');
     if(!wrap || !host || !main) return;
     document.body.classList.toggle('edit-request', editing);
@@ -1858,6 +2078,14 @@
   }
   function revokeGridUrls(){ gridUrls.forEach(u=>{ try{URL.revokeObjectURL(u);}catch(_){}}); gridUrls=[]; }
 
+  // answers a client typed into the owner's custom form fields, shown under
+  // the sender's group header in the received view
+  function subAnswersHtml(sub){
+    const items=(sub && Array.isArray(sub.custom) ? sub.custom : []).filter(a=>a && a.value!=null && String(a.value).trim());
+    if(!items.length) return '';
+    return `<div class="grp-ans">${items.map(a=>`<span class="grp-ans-it"><span class="k">${KR.escapeHtml(a.label||'')}</span>${KR.escapeHtml(String(a.value))}</span>`).join('')}</div>`;
+  }
+
   function summaryHtml(req, st){
     const subs=req.submissions.slice().sort((a,b)=>a.at-b.at);
     const primary=subs.filter(s=>s.name||s.email||s.phone)[0]||subs[0]||null;
@@ -1913,7 +2141,7 @@
           <span class="grp-fico">${folderSvg()}</span>
           <span class="grp-nm">${nm}</span>
           <span class="grp-count">${t.chipFiles(g.files.length)}</span>
-        </div></td></tr>`;
+        </div>${subAnswersHtml(g.sub)}</td></tr>`;
       return grp + g.files.map(f=>fileRowHtml(f, g.sub.id, collapsed)).join('');
     }).join('');
     return `<div class="ftbl-wrap"><table class="ftbl"><colgroup><col class="cg-name"><col><col><col><col><col class="cg-act"></colgroup>${head}<tbody>${body}</tbody></table></div>`;
@@ -1949,6 +2177,7 @@
           <span class="fg-nm">${nm}</span>
           <span class="fg-count">${t.chipFiles(g.files.length)}</span>
         </div>
+        ${subAnswersHtml(g.sub)}
         <div class="fgrid">${g.files.map(gcardHtml).join('')}</div>
       </div>`;
     }).join('');
@@ -2042,7 +2271,7 @@
     const who=(d.who && d.who.trim())? d.who.trim() : t.anonymous;
     toast(t.newUploadToast(who));
     if(req.notify){ try{ if('Notification'in window && Notification.permission==='granted') new Notification(t.notifTitle,{body:t.notifBody(d.count||0,who)}); }catch(_){} }
-    if(view==='manager') renderManage();
+    if(view==='forms') renderManage();
     else if(view==='received' && rvToken===d.token) renderReceived(false);
     updateCount();
   }
@@ -2060,10 +2289,10 @@
     KR.lsSet('ac_lang', l);
     renderTypeChips();
     renderPreview();
-    if(view==='manager') renderManage();
+    if(view==='forms') renderManage();
     if(view==='received') renderReceived(false);
     syncCreateChrome();
-    if(typeof studioApplyChrome==='function'){ studioApplyChrome(); if(el('studio') && el('studio').classList.contains('show')){ renderStudioRail(); showStudioSection(studioSection); } }
+    if(typeof studioApplyChrome==='function'){ studioApplyChrome(); if(studioOpen){ renderStudioRail(); showStudioSection(studioSection); } }
     if(lastToken){ const r=KR.getRequest(lastToken); if(r) showShare(r); }
   }
   function applyTheme(th){ const dark=(th==='dark'); document.documentElement.setAttribute('data-theme',dark?'dark':'light'); const ic=el('themeIco'); if(ic) ic.textContent=dark?'☀️':'🌙'; KR.lsSet('theme',dark?'dark':'light'); }
@@ -2089,6 +2318,7 @@
 
   // ---------- events ----------
   el('vsManager').addEventListener('click',()=>setView('manager'));
+  el('vsForms').addEventListener('click',()=>setView('forms'));
   el('vsClient').addEventListener('click',()=>setView('client'));
   el('emptyNewBtn').addEventListener('click',()=>{ resetCreate(); setView('create'); });
   el('editReqBtn').addEventListener('click',()=>{ if(lastToken) enterEditMode(lastToken); });
@@ -2158,7 +2388,7 @@
   setInterval(()=>{
     const reqs=KR.loadRequests();
     const sig=reqs.map(r=>r.token+':'+r.files.length+':'+r.status).join('|');
-    if(sig!==lastSig){ lastSig=sig; if(view==='manager') renderManage(); else if(view==='received') renderReceived(false); updateCount(); }
+    if(sig!==lastSig){ lastSig=sig; if(view==='forms') renderManage(); else if(view==='received') renderReceived(false); updateCount(); }
   },4000);
 
   // ================= FORM STUDIO (gear popup) =================
@@ -2169,12 +2399,26 @@
 
   // ---- trilingual strings (he full, en full, ru → en fallback) ----
   const STUDIO={
+    moveUp:{he:'העבר למעלה',en:'Move up'}, moveDown:{he:'העבר למטה',en:'Move down'},
+    fcName:{he:'שם מלא',en:'Full name'}, fcPhone:{he:'טלפון',en:'Phone'}, fcEmail:{he:'כתובת אימייל',en:'Email address'}, fcMessage:{he:'הודעה (אופציונלי)',en:'Message (optional)'},
+    fcTitlePh:{he:'כותרת הטופס',en:'Form title'}, fcSubPh:{he:'תיאור קצר שהלקוח יראה…',en:'A short description the client will see…'},
+    fcDropTitle:{he:'גררו קבצים לכאן או לחצו לבחירה',en:'Drag files here or click to choose'}, fcDropSub:{he:'העלאה מאובטחת',en:'Secure upload'},
+    fcSubmit:{he:'שליחת הטופס',en:'Submit form'},
+    fcEmpty:{he:'עדיין אין שדות מותאמים. לחצו על רכיב מרשימת רכיבי הבנייה כדי להוסיף שדה לטופס — הוא יופיע כאן מיד.',en:'No custom fields yet. Click a building block to add a field — it appears here instantly.'},
+    fieldsCanvasHint:{he:'השדות שתוסיפו מופיעים ומתעדכנים בזמן אמת בטופס שבמרכז. לחצו על שדה כדי לערוך אותו, לסמן כחובה, לשנות סדר או למחוק.',en:'Fields you add appear and update live in the form in the centre. Click a field to edit it, mark required, reorder or delete.'},
+    railToggle:{he:'הצג או הסתר את התפריט',en:'Show or hide the menu'},
     studioTitle:{he:'מעצב הטופס',en:'Form studio'},
     studioSub:{he:'הוסיפו שדות, הגדירו והעצבו את טופס ההעלאה',en:'Add fields, configure and design your upload form'},
     done:{he:'סיום',en:'Done'},
     autosave:{he:'השינויים נשמרים אוטומטית',en:'Changes are saved automatically'},
-    navBuild:{he:'בנייה',en:'Build'}, navSettings:{he:'הגדרות',en:'Settings'}, navDesign:{he:'מראה',en:'Appearance'},
+    navBuild:{he:'בנייה',en:'Build'}, navSettings:{he:'הגדרות',en:'Settings'}, navDesign:{he:'מראה',en:'Appearance'}, navMore:{he:'מתקדם',en:'Advanced'},
     secComponents:{he:'רכיבי בנייה',en:'Building blocks'}, secComponentsSub:{he:'לחצו על רכיב כדי להוסיף אותו לטופס שהלקוח ימלא.',en:'Click a block to add it to the form your client fills in.'},
+    dragField:{he:'גרור שדה לטופס',en:'Drag a field to the form'}, dragFieldSub:{he:'גרור את סוג השדה הרצוי אל התצוגה המקדימה כדי להוסיף אותו',en:'Drag the field type you want onto the preview to add it'},
+    grpInput:{he:'שדות קלט',en:'Input fields'}, grpContent:{he:'אלמנטי תוכן',en:'Content elements'},
+    palText:{he:'טקסט',en:'Text'}, palEmail:{he:'אימייל',en:'Email'}, palPhone:{he:'טלפון',en:'Phone'}, palNumber:{he:'מספר',en:'Number'}, palChoice:{he:'בחירה',en:'Choice'}, palCheckbox:{he:'סימון מרובע',en:'Checkbox'}, palDate:{he:'תאריך',en:'Date'}, palTextarea:{he:'טקסט ארוך',en:'Long text'}, palFile:{he:'העלאת קובץ',en:'File upload'}, palRating:{he:'סולם דירוג',en:'Rating scale'}, palSatisfaction:{he:'דירוג שביעות רצון',en:'Satisfaction'}, palSignature:{he:'חתימה',en:'Signature'},
+    palHeading:{he:'כותרת',en:'Heading'}, palTextblock:{he:'בלוק טקסט',en:'Text block'}, palImage:{he:'תמונה',en:'Image'}, palVideo:{he:'סרטון',en:'Video'}, palSerial:{he:'מספר מקוון',en:'Serial number'}, palDivider:{he:'מפריד',en:'Divider'}, palPopup:{he:'פופאפ',en:'Popup'}, palScore:{he:'הצגת ניקוד',en:'Score'}, palUrl:{he:'כתובת URL',en:'URL'}, palSelect:{he:'רשימה נפתחת',en:'Dropdown'}, palRecipient:{he:'בחירת נמען',en:'Recipient'},
+    def_phone:{he:'טלפון',en:'Phone'}, def_file:{he:'קובץ מצורף',en:'Attachment'}, def_signature:{he:'חתימה',en:'Signature'}, def_satisfaction:{he:'שביעות רצון',en:'Satisfaction'}, def_rating:{he:'דירוג',en:'Rating'}, def_image:{he:'תמונה',en:'Image'}, def_video:{he:'סרטון',en:'Video'}, def_score:{he:'הצגת ניקוד',en:'Score'}, def_popup:{he:'חלון קופץ',en:'Popup'}, def_serial:{he:'מספר מקוון',en:'Serial number'},
+    ph_phone:{he:'050-0000000',en:'050-0000000'}, ph_file:{he:'בחירת קובץ…',en:'Choose a file…'}, ph_signature:{he:'חתמו כאן',en:'Sign here'}, ph_satisfaction:{he:'🙁 😐 🙂 😄 🤩',en:'🙁 😐 🙂 😄 🤩'}, ph_rating:{he:'★★★★★',en:'★★★★★'},
     secLanguage:{he:'שפת הטופס',en:'Form language'}, secLanguageSub:{he:'באיזו שפה יראה הלקוח את טופס ההעלאה.',en:'The language your client sees the upload form in.'},
     secRecipients:{he:'נמענים',en:'Recipients'}, secRecipientsSub:{he:'לאן יישלחו התראות על קבצים חדשים.',en:'Where notifications about new files are sent.'},
     secFiles:{he:'קבצים',en:'Files'}, secFilesSub:{he:'אילו קבצים אפשר להעלות ומה המגבלות.',en:'What can be uploaded and the limits.'},
@@ -2193,6 +2437,8 @@
     ph_text:{he:'טקסט',en:'Text'}, ph_textarea:{he:'טקסט חופשי…',en:'Free text…'}, ph_email:{he:'name@email.com',en:'name@email.com'}, ph_number:{he:'0',en:'0'}, ph_url:{he:'https://…',en:'https://…'}, ph_date:{he:'dd / mm / yyyy',en:'dd / mm / yyyy'}, ph_radio:{he:'בחירה אחת',en:'One choice'}, ph_checkbox:{he:'בחירה מרובה',en:'Several choices'}, ph_select:{he:'בחר/י מהרשימה…',en:'Select from list…'}, ph_recipient:{he:'בחירת נמען…',en:'Choose recipient…'},
     fieldsInForm:{he:'שדות בטופס',en:'Fields in the form'}, noFields:{he:'עדיין לא הוספתם שדות. בחרו רכיב מהרשימה למעלה.',en:'No fields yet. Pick a block above.'},
     required:{he:'חובה',en:'Required'}, fieldLabelPh:{he:'שם השדה',en:'Field label'}, remove:{he:'הסרה',en:'Remove'},
+    fieldOptions:{he:'אפשרויות בחירה (מופרדות בפסיק)',en:'Choices (comma separated)'}, optionsPh:{he:'אפשרות 1, אפשרות 2',en:'Option 1, Option 2'},
+    optA:{he:'אפשרות 1',en:'Option 1'}, optB:{he:'אפשרות 2',en:'Option 2'},
     clientLang:{he:'שפת טופס הלקוח',en:'Client form language'}, langAuto:{he:'אוטומטי (לפי הדפדפן של הלקוח)',en:'Automatic (client browser)'}, clientLangHint:{he:'ברירת מחדל: הטופס מזהה את שפת הלקוח לבד.',en:'By default the form detects the client language automatically.'},
     recipientsLbl:{he:'כתובות לקבלת התראות',en:'Notification email addresses'}, recipientsHint:{he:'לכאן יגיעו התראות על קבצים חדשים. השאירו ריק כדי לשלוח לכתובת החשבון.',en:'New-file notifications go here. Leave empty to use the account address.'}, addEmail:{he:'הוספת כתובת',en:'Add address'}, emailPh:{he:'name@email.com',en:'name@email.com'},
     allowedTypes:{he:'סוגי קבצים מותרים',en:'Allowed file types'}, allowedTypesHint:{he:'בלי בחירה — כל סוגי הקבצים מותרים.',en:'Leave empty to allow every file type.'},
@@ -2241,25 +2487,48 @@
   function paletteSvg(){ return svgP('<path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.5 0-1.5-1-1.8-1-3 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7z"/><circle cx="8" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="10" r="1" fill="currentColor" stroke="none"/>'); }
   function checkCircleSvg(){ return svgP('<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>'); }
 
+  function phoneSvg(){ return svgP('<path d="M6.5 3h3l1.6 4.4-2.1 1.2a12.5 12.5 0 0 0 5.6 5.6l1.2-2.1 4.4 1.6v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z"/>'); }
+  function envelopeSvg(){ return svgP('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/>'); }
+  function letterTSvg(){ return svgP('<path d="M5 5h14M12 5v14"/>'); }
+  function choiceListSvg(){ return svgP('<circle cx="19" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="19" cy="18" r="1.4" fill="currentColor" stroke="none"/><path d="M4 6h10M4 12h10M4 18h10"/>'); }
+  function paperclipSvg(){ return svgP('<path d="M20.5 11.5 12 20a4.7 4.7 0 0 1-6.7-6.7L14 4.6a3.1 3.1 0 0 1 4.4 4.4l-8.7 8.7a1.55 1.55 0 0 1-2.2-2.2l7.9-7.9"/>'); }
+  function pageSvg(){ return svgP('<path d="M6 3h8l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4M8 12h8M8 16h6"/>'); }
+  function textBlockSvg(){ return svgP('<path d="M5 7h14M5 12h14M5 17h9"/>'); }
+  function dividerLineSvg(){ return svgP('<path d="M4 12h16"/>'); }
+  function signatureSvg(){ return svgP('<path d="M3 16c2.5 0 3.6-8 5.5-8s1.8 5 3.5 5 2.5-3 4.5-3"/><path d="M3 20h18"/>'); }
+  function smileySvg(){ return svgP('<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1" fill="currentColor" stroke="none"/>'); }
+  function barChartSvg(){ return svgP('<path d="M6 20v-8M12 20V6M18 20v-5"/><path d="M3 20h18"/>'); }
+  function imageSvg(){ return svgP('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m4 18 5-5 3.5 3.5L16 13l4 4"/>'); }
+  function videoSvg(){ return svgP('<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3z"/>'); }
+  function bubbleSvg(){ return svgP('<path d="M21 11.5a8 8 0 0 1-11.5 7.2L4 20l1.3-4.3A8 8 0 1 1 21 11.5z"/>'); }
+  function serialSvg(){ return svgP('<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v5.5"/><path d="m9.5 11.5 2.5 2.5 2.5-2.5"/>'); }
   const COMP_GROUPS=[
-    {t:'grpStructure', items:['heading','paragraph','divider']},
-    {t:'grpBasic', items:['text','textarea','email','number','url','date']},
-    {t:'grpChoice', items:['radio','checkbox','select','recipient']}
+    {t:'grpInput', items:['text','email','phone','number','radio','checkbox','date','textarea','file','rating','satisfaction','signature']},
+    {t:'grpContent', items:['heading','paragraph','image','video','serial','divider']}
   ];
   const COMP={
-    heading:{icon:headingSvg,k:'cHeading'}, paragraph:{icon:paraSvg,k:'cParagraph'}, divider:{icon:dividerSvg,k:'cDivider'},
-    text:{icon:textSvg,k:'cText'}, textarea:{icon:textareaSvg,k:'cTextarea'}, email:{icon:atSvg,k:'cEmail'},
-    number:{icon:hashSvg,k:'cNumber'}, url:{icon:urlSvg,k:'cUrl'}, date:{icon:calSvg,k:'cDate'},
-    radio:{icon:radioSvg,k:'cRadio'}, checkbox:{icon:checkSqSvg,k:'cCheckbox'}, select:{icon:dropdownSvg,k:'cSelect'}, recipient:{icon:recipientSvg,k:'cRecipient'}
+    heading:{icon:headingSvg,k:'palHeading'}, paragraph:{icon:textBlockSvg,k:'palTextblock'}, divider:{icon:dividerLineSvg,k:'palDivider'},
+    text:{icon:letterTSvg,k:'palText'}, textarea:{icon:pageSvg,k:'palTextarea'}, email:{icon:envelopeSvg,k:'palEmail'},
+    number:{icon:hashSvg,k:'palNumber'}, url:{icon:urlSvg,k:'palUrl'}, date:{icon:calSvg,k:'palDate'},
+    radio:{icon:choiceListSvg,k:'palChoice'}, checkbox:{icon:checkSqSvg,k:'palCheckbox'}, select:{icon:dropdownSvg,k:'palSelect'}, recipient:{icon:recipientSvg,k:'palRecipient'},
+    phone:{icon:phoneSvg,k:'palPhone'}, file:{icon:paperclipSvg,k:'palFile'}, signature:{icon:signatureSvg,k:'palSignature'}, satisfaction:{icon:smileySvg,k:'palSatisfaction'}, rating:{icon:barChartSvg,k:'palRating'},
+    image:{icon:imageSvg,k:'palImage'}, video:{icon:videoSvg,k:'palVideo'}, score:{icon:barChartSvg,k:'palScore'}, popup:{icon:bubbleSvg,k:'palPopup'}, serial:{icon:serialSvg,k:'palSerial'}
   };
-  const STRUCT=new Set(['heading','paragraph','divider']);
+  const STRUCT=new Set(['heading','paragraph','divider','image','video','score','popup','serial']);
+  const CONTENT=new Set(['image','video','score','popup','serial']);
+  const CHOICE=new Set(['radio','checkbox','select']);   // types that carry an options list
 
   const RAIL=[
     {g:'navBuild', items:[{id:'components', icon:blocksSvg, k:'secComponents', count:()=>customFields.length}]},
     {g:'navSettings', items:[
       {id:'language', icon:globeSvg, k:'secLanguage'},
       {id:'recipients', icon:inboxSvg, k:'secRecipients', count:()=>recipients.filter(x=>x&&x.trim()).length},
-      {id:'files', icon:fileSvg, k:'secFiles'},
+      {id:'files', icon:fileSvg, k:'secFiles'}
+    ]}
+  ];
+  // secondary floating rail (advanced settings + appearance)
+  const RAIL2=[
+    {g:'navMore', items:[
       {id:'security', icon:shieldSvg, k:'secSecurity'},
       {id:'notifications', icon:bellSvg, k:'secNotifications'},
       {id:'after', icon:rocketSvg, k:'secAfter'}
@@ -2271,17 +2540,24 @@
   function commit(){ persistCreateSettings(); renderPreview(); }
   function restructure(sec){ commit(); renderStudioRail(); showStudioSection(sec); }
   function fieldById(id){ return customFields.filter(f=>f.id===id)[0]||null; }
+  function cloneFields(a){ return (a||[]).map(f=>{ const c=Object.assign({}, f); if(Array.isArray(f.options)) c.options=f.options.slice(); return c; }); }
 
   function addField(type){
     if(!COMP[type]) return;
-    customFields.push({ id:'fld'+(++fldSeq), type:type, label:S('def_'+type), required:false });
+    const f={ id:'fld'+(++fldSeq), type:type, label:S('def_'+type), required:false };
+    if(CHOICE.has(type)) f.options=[S('optA'), S('optB')];
+    customFields.push(f);
     restructure('components');
   }
 
   // ---- rail + section switching ----
   function renderStudioRail(){
-    const rail=el('studioRail'); if(!rail) return;
-    rail.innerHTML = RAIL.map(grp=>{
+    renderRailInto(el('studioRail'), RAIL);
+    renderRailInto(el('studioRail2'), RAIL2);
+  }
+  function renderRailInto(rail, groups){
+    if(!rail) return;
+    rail.innerHTML = groups.map(grp=>{
       const items=grp.items.map(it=>{
         const c = it.count ? it.count() : 0;
         const badge = it.count && c ? `<span class="st-count">${c}</span>` : '';
@@ -2293,7 +2569,7 @@
   function showStudioSection(id){
     studioSection=id;
     el('studioContent').innerHTML = buildSection(id);
-    el('studioRail').querySelectorAll('.st-nav').forEach(n=>n.classList.toggle('on', n.getAttribute('data-sec')===id));
+    document.querySelectorAll('.studio-rail .st-nav, .studio-rail2 .st-nav').forEach(n=>n.classList.toggle('on', n.getAttribute('data-sec')===id));
   }
   function secHead(tk,sk){ return `<div class="st-sec-h">${S(tk)}</div><div class="st-sec-sub">${S(sk)}</div>`; }
   function buildSection(id){
@@ -2321,7 +2597,7 @@
 
   // ---- section builders ----
   function buildComponents(){
-    let h = secHead('secComponents','secComponentsSub');
+    let h = secHead('dragField','dragFieldSub');
     COMP_GROUPS.forEach(g=>{
       h+=`<div class="pal-grp"><div class="pal-grp-t">${S(g.t)}</div><div class="pal">`;
       g.items.forEach(type=>{
@@ -2329,20 +2605,22 @@
       });
       h+=`</div></div>`;
     });
-    h+=`<div class="fld-head">${S('fieldsInForm')} <span class="st-count">${customFields.length}</span></div>`;
-    if(!customFields.length) h+=`<div class="fld-empty">${S('noFields')}</div>`;
-    else h+=customFields.map(fldRowHtml).join('');
+    h+=`<div class="st-hint" style="margin-top:16px">${S('fieldsCanvasHint')}</div>`;
     return h;
   }
   function fldRowHtml(f){
     const req = STRUCT.has(f.type) ? '' : `<label class="fld-req"><input type="checkbox" data-act="field-req" data-id="${f.id}" ${f.required?'checked':''}>${S('required')}</label>`;
-    return `<div class="fld-row" data-id="${f.id}">
+    const hasOpts = CHOICE.has(f.type);
+    const opts = hasOpts
+      ? `<div class="fld-optrow"><label class="st-flabel">${S('fieldOptions')}</label><input class="cl-inp" data-act="field-opts" data-id="${f.id}" value="${esc((f.options||[]).join(', '))}" placeholder="${S('optionsPh')}"></div>`
+      : '';
+    return `<div class="fld-row${hasOpts?' has-opts':''}" data-id="${f.id}">
       <span class="fld-grip">${gripSvg()}</span>
       <span class="fld-ico">${COMP[f.type].icon()}</span>
       <input class="fld-lblinp" data-act="field-label" data-id="${f.id}" value="${esc(f.label)}" placeholder="${S('fieldLabelPh')}">
       ${req}
       <button class="fld-del" data-act="del-field" data-id="${f.id}" title="${S('remove')}">${trashSvg()}</button>
-    </div>`;
+    </div>${opts}`;
   }
   function buildLanguage(){
     return secHead('secLanguage','secLanguageSub')+
@@ -2410,7 +2688,7 @@
     h+=`<div class="st-field"><label class="st-flabel">${S('gradient')}</label><div class="grad-row">`;
     Object.keys(GRADIENTS).forEach(g=>{ h+=`<button class="grad-sw${formTheme.gradient===g?' on':''}" data-act="grad" data-g="${g}" style="background:${GRADIENTS[g]}" aria-label="${g}"></button>`; });
     h+=`</div>${formTheme.gradient?`<button class="grad-clear" data-act="grad-clear">${S('clearGradient')}</button>`:''}</div>`;
-    const fonts=[['',S('fontDefault')],['Heebo','Heebo'],['Assistant','Assistant'],['Rubik','Rubik'],['Space Grotesk','Space Grotesk'],['Arial','Arial']];
+    const fonts=[['',S('fontDefault')],['Heebo','Heebo'],['Assistant','Assistant'],['Open Sans','Open Sans'],['Overpass','Overpass'],['Arial','Arial']];
     h+=selectField('font', S('font'), formTheme.font, fonts);
     h+=`<div class="st-field"><label class="st-flabel">${S('width')}</label><div class="seg">`;
     [['compact','widthCompact'],['normal','widthNormal'],['wide','widthWide']].forEach(([w,k])=>{ h+=`<button data-act="seg-width" data-w="${w}" class="${(formTheme.width||'normal')===w?'on':''}">${S(k)}</button>`; });
@@ -2450,29 +2728,185 @@
     if(f.type==='heading') return `<div class="pv-fld-head">${lbl}</div>`;
     if(f.type==='paragraph') return `<div class="pv-fld-para">${lbl}</div>`;
     if(f.type==='divider') return `<div class="pv-fld-hr"></div>`;
+    if(CONTENT.has(f.type)) return `<div class="pv-content-block"><span class="pv-cico">${COMP[f.type].icon()}</span><span>${lbl}</span></div>`;
     const rq = f.required ? `<span class="rq">*</span>` : '';
+    if(f.type==='signature') return `<div><label class="pv-fld-l">${lbl}${rq}</label><div class="pv-fld-box sig">${esc(S('ph_signature'))}</div></div>`;
+    if(f.type==='satisfaction') return `<div><label class="pv-fld-l">${lbl}${rq}</label><div class="pv-faces">🙁 😐 🙂 😄 🤩</div></div>`;
+    if(f.type==='rating') return `<div><label class="pv-fld-l">${lbl}${rq}</label><div class="pv-stars">★★★★★</div></div>`;
+    if(f.type==='radio' || f.type==='checkbox'){
+      const opts=((f.options&&f.options.length)? f.options : [S('ph_'+f.type)]).map(o=>`<span class="pv-opt"><span class="pv-mark${f.type==='checkbox'?' sq':''}"></span>${esc(o)}</span>`).join('');
+      return `<div><label class="pv-fld-l">${lbl}${rq}</label><div class="pv-opts">${opts}</div></div>`;
+    }
+    if(f.type==='select' || f.type==='recipient'){
+      const first = f.type==='recipient'
+        ? (recipients.filter(x=>x&&x.trim())[0] || S('ph_recipient'))
+        : ((f.options&&f.options[0]) || S('ph_select'));
+      return `<div><label class="pv-fld-l">${lbl}${rq}</label><div class="pv-fld-box sel"><span>${esc(first)}</span><span class="pv-chev">&#9660;</span></div></div>`;
+    }
     const ph = esc(S('ph_'+f.type)||'');
     const box = f.type==='textarea' ? `<div class="pv-fld-box ta">${ph}</div>` : `<div class="pv-fld-box">${ph}</div>`;
     return `<div><label class="pv-fld-l">${lbl}${rq}</label>${box}</div>`;
   }
 
+  // ---- live form canvas (Wix-style builder in the manager view) ----
+  // The centre card renders the client-facing upload form as a live WYSIWYG.
+  // Every field mutation / theme change funnels through commit() -> renderPreview()
+  // -> renderFormCanvas(), so palette clicks appear in the form in real time.
+  function fcCloudSvg(){ return svgP('<path d="M12 13v8"/><path d="m8 17 4-4 4 4"/><path d="M20 16.5A4.5 4.5 0 0 0 17.5 8h-1.26A7 7 0 1 0 5 15.5"/>'); }
+  function fcUpSvg(){ return svgP('<path d="m18 15-6-6-6 6"/>',2.2); }
+  function fcDownSvg(){ return svgP('<path d="m6 9 6 6 6-6"/>',2.2); }
+  function fcThemeVars(frame){
+    const th=formTheme;
+    if(th.accent){
+      frame.style.setProperty('--pv-accent', th.accent);
+      frame.style.setProperty('--pv-accent-soft', `color-mix(in srgb, ${th.accent} 15%, transparent)`);
+      frame.style.setProperty('--pv-accent-line', `color-mix(in srgb, ${th.accent} 45%, transparent)`);
+    } else { frame.style.removeProperty('--pv-accent'); frame.style.removeProperty('--pv-accent-soft'); frame.style.removeProperty('--pv-accent-line'); }
+    if(th.ink) frame.style.setProperty('--pv-ink', th.ink); else frame.style.removeProperty('--pv-ink');
+    frame.style.background = th.bg || '';
+    frame.style.fontFamily = th.font ? `'${th.font}', var(--sans)` : '';
+    frame.setAttribute('data-w', th.width||'normal');
+    const ic=frame.querySelector('.fc-ic');
+    if(ic){ if(th.gradient && GRADIENTS[th.gradient]){ ic.style.background=GRADIENTS[th.gradient]; ic.style.color='#fff'; } else { ic.style.background=''; ic.style.color=''; } }
+  }
+  function fcFieldHtml(f){
+    const up=`<button class="fc-tt" type="button" data-act="field-move" data-dir="-1" data-id="${f.id}" title="${S('moveUp')}">${fcUpSvg()}</button>`;
+    const down=`<button class="fc-tt" type="button" data-act="field-move" data-dir="1" data-id="${f.id}" title="${S('moveDown')}">${fcDownSvg()}</button>`;
+    const del=`<button class="fc-tt danger" type="button" data-act="del-field" data-id="${f.id}" title="${S('remove')}">${trashSvg()}</button>`;
+    const reqToggle = STRUCT.has(f.type) ? '' :
+      `<label class="fc-treq${f.required?' on':''}" title="${S('required')}"><input type="checkbox" data-act="field-req" data-id="${f.id}" ${f.required?'checked':''}>${S('required')}</label>`;
+    const tools=`<div class="fc-ftools">${up}${down}${reqToggle}${del}</div>`;
+    if(f.type==='heading') return `<div class="fc-field type-heading" data-id="${f.id}">${tools}<input class="fc-f-head" data-act="field-label" data-id="${f.id}" value="${esc(f.label)}" placeholder="${S('def_heading')}"></div>`;
+    if(f.type==='paragraph') return `<div class="fc-field type-paragraph" data-id="${f.id}">${tools}<textarea class="fc-f-para" data-act="field-label" data-id="${f.id}" placeholder="${S('def_paragraph')}">${esc(f.label)}</textarea></div>`;
+    if(f.type==='divider') return `<div class="fc-field type-divider" data-id="${f.id}">${tools}<div class="fc-f-hr"></div></div>`;
+    if(CONTENT.has(f.type)) return `<div class="fc-field type-content" data-id="${f.id}">${tools}<span class="fc-cico">${COMP[f.type].icon()}</span><input class="fc-labelinp cblk" data-act="field-label" data-id="${f.id}" value="${esc(f.label)}" placeholder="${S('fieldLabelPh')}"></div>`;
+    const rq = f.required ? ` <span class="req">*</span>` : '';
+    const lbl = `<div class="fc-flabel"><input class="fc-labelinp" data-act="field-label" data-id="${f.id}" value="${esc(f.label)}" placeholder="${S('fieldLabelPh')}">${rq}</div>`;
+    if(f.type==='signature') return `<div class="fc-field" data-id="${f.id}">${tools}${lbl}<div class="fc-ghost sig">${esc(S('ph_signature'))}</div></div>`;
+    if(f.type==='satisfaction') return `<div class="fc-field" data-id="${f.id}">${tools}${lbl}<div class="fc-faces">🙁 😐 🙂 😄 🤩</div></div>`;
+    if(f.type==='rating') return `<div class="fc-field" data-id="${f.id}">${tools}${lbl}<div class="fc-stars">★★★★★</div></div>`;
+    if(f.type==='radio' || f.type==='checkbox'){
+      const opts=((f.options&&f.options.length)? f.options : [S('ph_'+f.type)]).map(o=>`<span class="fc-opt"><span class="fc-mark${f.type==='checkbox'?' sq':''}"></span>${esc(o)}</span>`).join('');
+      return `<div class="fc-field" data-id="${f.id}">${tools}${lbl}<div class="fc-opts">${opts}</div><input class="fc-optsinp" data-act="field-opts" data-id="${f.id}" value="${esc((f.options||[]).join(', '))}" placeholder="${S('optionsPh')}"></div>`;
+    }
+    if(f.type==='select' || f.type==='recipient'){
+      const first = f.type==='recipient'
+        ? (recipients.filter(x=>x&&x.trim())[0] || S('ph_recipient'))
+        : ((f.options&&f.options[0]) || S('ph_select'));
+      const optsEditor = f.type==='select'
+        ? `<input class="fc-optsinp" data-act="field-opts" data-id="${f.id}" value="${esc((f.options||[]).join(', '))}" placeholder="${S('optionsPh')}">`
+        : '';
+      return `<div class="fc-field" data-id="${f.id}">${tools}${lbl}<div class="fc-ghost sel"><span>${esc(first)}</span><span class="fc-chev">&#9660;</span></div>${optsEditor}</div>`;
+    }
+    const ph = esc(S('ph_'+f.type)||'');
+    const ghost = f.type==='textarea' ? `<div class="fc-ghost ta">${ph}</div>` : `<div class="fc-ghost">${ph}</div>`;
+    return `<div class="fc-field" data-id="${f.id}">${tools}${lbl}${ghost}</div>`;
+  }
+  function renderFormCanvas(){
+    const box=el('formCanvas'); if(!box) return;
+    // Don't clobber an inline text field the user is typing into (preserve caret).
+    const ae=document.activeElement;
+    const typingInCanvas = ae && box.contains(ae) && (ae.tagName==='TEXTAREA' || (ae.tagName==='INPUT' && ae.type!=='checkbox' && ae.type!=='radio'));
+    if(typingInCanvas){ const fr0=box.querySelector('.fc-frame'); if(fr0) fcThemeVars(fr0); return; }
+    const title=esc(el('fName').value||'');
+    const sub=esc(el('fDesc').value||'');
+    const fixed = `<div class="fc-grid">`+
+      `<div class="fc-fx"><label>${S('fcName')} <span class="req">*</span></label><div class="fc-ghost"></div></div>`+
+      `<div class="fc-fx"><label>${S('fcPhone')}</label><div class="fc-ghost"></div></div>`+
+      `<div class="fc-fx full"><label>${S('fcEmail')} <span class="req">*</span></label><div class="fc-ghost" dir="ltr">you@mail.com</div></div>`+
+      `<div class="fc-fx full"><label>${S('fcMessage')}</label><div class="fc-ghost ta"></div></div>`+
+      `</div>`;
+    const custom = customFields.length
+      ? `<div class="fc-custom">${customFields.map(fcFieldHtml).join('')}</div>`
+      : `<div class="fc-empty">${S('fcEmpty')}</div>`;
+    let sub2 = S('fcDropSub');
+    if(maxFileMB) sub2 += ' · ' + (maxFileMB>=1000 ? (maxFileMB/1000)+' GB' : maxFileMB+' MB');
+    const drop = `<div class="fc-drop"><div class="fc-drop-ic">${fcCloudSvg()}</div><div class="fc-drop-big">${S('fcDropTitle')}</div><div class="fc-drop-sub">${esc(sub2)}</div></div>`;
+    box.innerHTML = `<div class="fc-frame">`+
+      `<div class="fc-hero"><div class="fc-ic">${fcCloudSvg()}</div>`+
+      `<input class="fc-title" data-act="canvas-title" value="${title}" placeholder="${S('fcTitlePh')}">`+
+      `<input class="fc-sub" data-act="canvas-sub" value="${sub}" placeholder="${S('fcSubPh')}">`+
+      `<div class="fc-hrule"></div></div>`+
+      fixed + custom + drop +
+      `<button class="fc-submit" type="button" tabindex="-1">${S('fcSubmit')}</button>`+
+      `</div>`;
+    const fr=box.querySelector('.fc-frame'); if(fr) fcThemeVars(fr);
+  }
+
   // ---- open / close ----
+  // The studio has two homes that share the SAME panels (#studioRail/#studioRail2/
+  // #studioContent): docked as integral side rails flanking the create form on wide
+  // screens, or the floating modal as a narrow-screen fallback. Panels are physically
+  // moved between homes, so every listener bound to them survives the move.
+  const DOCK_MIN = 1080;                       // min viewport width to dock on the sides
+  function studioCanDock(){ return window.innerWidth >= DOCK_MIN; }
+  // ----- collapsible studio nav sidebar (docked create mode) -----
+  function setNavCollapsed(on, persist){
+    const g=el('createGrid'); if(!g) return;
+    g.classList.toggle('nav-collapsed', !!on);
+    const b=el('dockNavToggle');
+    if(b){ b.setAttribute('aria-expanded', on?'false':'true');
+           const lbl=(typeof S==='function')?S('railToggle'):'Toggle sidebar';
+           b.setAttribute('aria-label', lbl); b.setAttribute('title', lbl); }
+    if(persist){ try{ KR.lsSet('kr_studio_nav_collapsed', on?'1':'0'); }catch(_){} }
+  }
+  function toggleNavCollapsed(){
+    const g=el('createGrid');
+    setNavCollapsed(!(g && g.classList.contains('nav-collapsed')), true);
+  }
+  function toggleStudio(){ if(studioOpen) closeStudio(); else openStudio(); }
   function openStudio(){
+    if(editToken) return;                      // edit mode hosts the studio inline instead
+    studioOpen=true;
     studioApplyChrome();
-    renderStudioRail();
-    showStudioSection(studioSection||'components');
-    el('studio').classList.add('show');
-    document.body.style.overflow='hidden';
+    placeStudio();
     const g=el('openStudio'); if(g) g.classList.add('seen');
     try{ KR.lsSet('kr_studio_seen','1'); }catch(_){}
   }
-  function closeStudio(){ el('studio').classList.remove('show'); document.body.style.overflow=''; }
+  // choose the right home for the current width, moving panels if needed, then paint
+  function placeStudio(){
+    if(!studioOpen) return;
+    dockStudio();                 // create mode: the studio is a permanent 3-col layout (no gear, no modal)
+    renderStudioRail();
+    showStudioSection(studioSection||'components');
+  }
+  function dockStudio(){
+    if(el('studio').classList.contains('show')){ el('studio').classList.remove('show'); document.body.style.overflow=''; }
+    const navBody=el('dockNavBody'), ctlBody=el('dockCtlBody');
+    const rail=el('studioRail'), rail2=el('studioRail2'), content=el('studioContent');
+    if(!navBody||!ctlBody||!rail||!content) return;
+    if(rail.parentElement!==navBody){ navBody.appendChild(rail); navBody.appendChild(rail2); }
+    if(content.parentElement!==ctlBody) ctlBody.appendChild(content);
+    el('dockNavTitle').textContent=S('studioTitle');
+    el('dockNavSub').textContent=S('studioSub');
+    const dc=el('dockClose'); if(dc) dc.setAttribute('aria-label', S('done'));
+    el('createGrid').classList.add('studio-docked');
+    document.body.classList.add('studio-docked');
+    el('dockNav').hidden=false; el('dockCtl').hidden=false;
+    { let c='0'; try{ c=ls('kr_studio_nav_collapsed')||'0'; }catch(_){} setNavCollapsed(c==='1', false); }
+  }
+  function undockStudio(){
+    const main=document.querySelector('#studio .studio-box .studio-main') || document.querySelector('.studio-main');
+    const rail=el('studioRail'), rail2=el('studioRail2'), content=el('studioContent');
+    if(main && rail && content && rail.parentElement!==main){
+      main.insertBefore(rail, main.firstChild);
+      main.appendChild(content);
+      main.appendChild(rail2);
+    }
+    const cg=el('createGrid'); if(cg) cg.classList.remove('studio-docked');
+    document.body.classList.remove('studio-docked');
+    if(el('dockNav')) el('dockNav').hidden=true;
+    if(el('dockCtl')) el('dockCtl').hidden=true;
+  }
+  function showStudioModal(){ el('studio').classList.add('show'); document.body.style.overflow='hidden'; }
+  function closeStudio(){ studioOpen=false; undockStudio(); el('studio').classList.remove('show'); document.body.style.overflow=''; }
   function studioApplyChrome(){
     el('stTitle').textContent=S('studioTitle');
     el('stSub').textContent=S('studioSub');
     el('studioDone').textContent=S('done');
     el('studioNote').innerHTML=checkCircleSvg()+'<span>'+esc(S('autosave'))+'</span>';
     const g=el('openStudio'); if(g) g.setAttribute('aria-label', S('studioTitle'));
+    const dt=el('dockNavTitle'); if(dt){ dt.textContent=S('studioTitle'); el('dockNavSub').textContent=S('studioSub'); }
   }
 
   // ---- colour helpers (no re-render → keep picker/field focus) ----
@@ -2497,6 +2931,7 @@
     if(act.indexOf('color-')===0) return;            // native colour picker → handled on input
     if(act==='add-comp'){ addField(b.getAttribute('data-type')); return; }
     if(act==='del-field'){ customFields=customFields.filter(f=>f.id!==b.getAttribute('data-id')); restructure('components'); return; }
+    if(act==='field-move'){ const id=b.getAttribute('data-id'),dir=+b.getAttribute('data-dir'); const i=customFields.findIndex(f=>f.id===id),j=i+dir; if(i>-1&&j>-1&&j<customFields.length){ const tmp=customFields[i]; customFields[i]=customFields[j]; customFields[j]=tmp; commit(); } return; }
     if(act==='add-email'){ recipients.push(''); restructure('recipients'); return; }
     if(act==='del-email'){ recipients.splice(+b.getAttribute('data-i'),1); restructure('recipients'); return; }
     if(act==='type-chip'){ const k=b.getAttribute('data-type'); createTypes[k]=!createTypes[k]; b.classList.toggle('on',createTypes[k]); renderTypeChips(); commit(); return; }
@@ -2513,6 +2948,7 @@
     switch(act){
       case 'field-label': { const f=fieldById(b.getAttribute('data-id')); if(f){ f.label=b.value; commit(); } break; }
       case 'field-req': { const f=fieldById(b.getAttribute('data-id')); if(f){ f.required=b.checked; commit(); } break; }
+      case 'field-opts': { const f=fieldById(b.getAttribute('data-id')); if(f){ f.options=b.value.split(',').map(s=>s.trim()).filter(Boolean); commit(); } break; }
       case 'email-inp': { recipients[+b.getAttribute('data-i')]=b.value; persistCreateSettings(); renderStudioRail(); break; }
       case 'lang': formLang=b.value; commit(); break;
       case 'maxtotal': el('fMaxTotal').value=b.value; commit(); break;
@@ -2524,6 +2960,8 @@
       case 'notify': el('fNotify').checked=b.checked; commit(); break;
       case 'sender-name': sender.name=b.checked; commit(); break;
       case 'sender-email': sender.email=b.checked; commit(); break;
+      case 'canvas-title': el('fName').value=b.value; persistCreateSettings(); break;
+      case 'canvas-sub': el('fDesc').value=b.value; persistCreateSettings(); break;
       case 'thanks': el('fThanks').value=b.value; persistCreateSettings(); break;
       case 'redirect': afterUpload.redirectUrl=b.value; persistCreateSettings(); break;
       case 'allowmore': afterUpload.allowMore=b.checked; commit(); break;
@@ -2537,17 +2975,19 @@
     }
   }
 
-  el('openStudio').addEventListener('click', openStudio);
+  { const dc=el('dockClose'); if(dc) dc.addEventListener('click', closeStudio); }
+  { const b=el('dockNavToggle'); if(b) b.addEventListener('click', toggleNavCollapsed); }
   el('studioClose').addEventListener('click', closeStudio);
   el('studioScrim').addEventListener('click', closeStudio);
   el('studioDone').addEventListener('click', closeStudio);
-  el('studioRail').addEventListener('click', e=>{ const n=e.target.closest('[data-sec]'); if(n) showStudioSection(n.getAttribute('data-sec')); });
+  el('studioRail').addEventListener('click', e=>{ const n=e.target.closest('[data-sec]'); if(!n) return; showStudioSection(n.getAttribute('data-sec')); });
+  el('studioRail2').addEventListener('click', e=>{ const n=e.target.closest('[data-sec]'); if(!n) return; showStudioSection(n.getAttribute('data-sec')); });
   el('studioContent').addEventListener('click', studioClick);
   el('studioContent').addEventListener('input', studioChange);
   el('studioContent').addEventListener('change', studioChange);
-  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && el('studio').classList.contains('show')){ e.stopPropagation(); closeStudio(); } }, true);
+  { const fc=el('formCanvas'); if(fc){ fc.addEventListener('click', studioClick); fc.addEventListener('input', studioChange); fc.addEventListener('change', studioChange); } }
+  { let rz; window.addEventListener('resize', ()=>{ if(!studioOpen||editToken) return; clearTimeout(rz); rz=setTimeout(placeStudio, 150); }); }
   studioApplyChrome();
-  if(ls('kr_studio_seen')) el('openStudio').classList.add('seen');
 
   // ---------- init ----------
   applyTheme(ls('theme')||'light');
@@ -2563,6 +3003,7 @@
     else if(initParams.get('tab')==='manage') setView('manage');
     else if(initParams.get('tab')==='create') setView('create');
     else setView('manager');
+    openStudio();  // studio panels stay permanently docked in create/manager mode
   };
   // Cross-device: hydrate this owner's requests from the server into the local
   // mirror first (instant no-op when Supabase is unconfigured), then route.

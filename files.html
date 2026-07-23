@@ -26,7 +26,7 @@
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
+    --sans:'Overpass','Rubik',system-ui,'Segoe UI',sans-serif;
     --card-size:170px;
   }
   html[data-theme="dark"] {
@@ -63,6 +63,9 @@
 
   /* ---------- header ---------- */
   .topbar{position:relative;display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+  .backbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink-2);cursor:pointer;font-size:13px;font-weight:600;box-shadow:var(--shadow-sm);margin-inline-end:auto;}
+  .backbtn:hover{border-color:var(--accent);color:var(--accent);} .backbtn svg{width:15px;height:15px;}
   .brand{display:flex;align-items:center;gap:12px;}
   .brand .logo{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;
     background:var(--grad);color:#fff;box-shadow:0 4px 12px var(--grad-shadow);flex-shrink:0;}
@@ -134,6 +137,12 @@
     letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border:1px solid transparent;
     padding:4px 11px;border-radius:999px;margin-bottom:11px;}
   .pagehead p{font-size:14.5px;color:var(--muted);margin:0;max-width:64ch;}
+
+  /* ---------- cover hero: banner shown under the manager/client view toggle ---------- */
+  .cover-hero{width:100%;margin:0 0 20px;border-radius:16px;overflow:hidden;border:1px solid var(--line);
+    box-shadow:var(--shadow-sm);background:var(--panel-2);aspect-ratio:32 / 5;}
+  .cover-hero img{width:100%;height:100%;object-fit:cover;display:block;}
+  @media (max-width:640px){ .cover-hero{aspect-ratio:32 / 7;margin-bottom:14px;} }
 
   /* ---------- toolbar ---------- */
   .toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);
@@ -705,6 +714,14 @@
   .logup-btn{background:var(--accent-soft);color:var(--accent-dim);border:1px solid transparent;}
   .logup-rm{background:transparent;color:var(--danger);border:1px solid var(--line);}
   .logup-hint{display:block;margin-top:8px;font-size:11.5px;color:var(--muted);line-height:1.4;}
+  /* cover-image uploader inside the project-settings modal */
+  .covup{display:flex;flex-direction:column;gap:10px;}
+  .covup-prev{width:100%;aspect-ratio:16 / 5;border-radius:12px;border:1px dashed var(--line);overflow:hidden;
+    background:var(--panel-2);display:flex;align-items:center;justify-content:center;}
+  .covup-prev.has{border-style:solid;}
+  .covup-prev img{width:100%;height:100%;object-fit:cover;}
+  .covup-ph{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.03em;}
+  .covup-actions{display:flex;gap:8px;flex-wrap:wrap;}
   /* ---------- watermark overlay painted on gallery thumbnails ---------- */
   .fwm{position:absolute;z-index:3;pointer-events:none;display:flex;align-items:center;justify-content:center;max-width:46%;max-height:46%;}
   .fwm.pos-tl{top:8%;left:8%;} .fwm.pos-tr{top:8%;right:8%;}
@@ -912,6 +929,10 @@
 
   <!-- ============ header ============ -->
   <div class="topbar">
+    <button class="backbtn" id="backBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      <span data-i18n="back"></span>
+    </button>
     <div class="viewseg" id="viewSeg" role="tablist" aria-label="preview mode">
       <button class="vseg on" id="vsUser" type="button" role="tab" aria-selected="true" data-mode="user">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -934,10 +955,13 @@
     </div>
   </div>
 
+  <!-- ============ cover hero (appears when a cover image is set) ============ -->
+  <div class="cover-hero hidden" id="coverHero" aria-hidden="true"></div>
+
   <!-- ============ page intro ============ -->
   <div class="pagehead">
     <h2 id="pageTitle" data-i18n="pageTitle"></h2>
-    <p data-i18n="pageSub"></p>
+    <p id="pageSub" data-i18n="pageSub"></p>
   </div>
 
   <!-- ============ stats strip ============ -->
@@ -1255,10 +1279,22 @@
             </div>
             <div class="cfield full">
               <label data-i18n="alCoverL"></label>
-              <button class="setact" id="alCoverBtn" type="button">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg>
-                <span data-i18n="alCoverBtn"></span>
-              </button>
+              <div class="covup" id="alCoverUp">
+                <div class="covup-prev" id="alCoverPrev"><span class="covup-ph" data-i18n="alCoverNone"></span></div>
+                <div class="covup-actions">
+                  <button class="setact" id="alCoverBtn" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m8 17 4-4 4 4"/></svg>
+                    <span data-i18n="alCoverBtn"></span>
+                  </button>
+                  <button class="setact danger hidden" id="alCoverRm" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                    <span data-i18n="alCoverRemove"></span>
+                  </button>
+                </div>
+              </div>
+              <input type="file" id="alCoverFile" accept="image/*" hidden>
+              <input type="hidden" id="alCover">
+              <small class="logup-hint" data-i18n="alCoverHint"></small>
             </div>
           </div>
         </div>
@@ -1807,7 +1843,7 @@
   const I18N = {
     he:{
       dir:'rtl', langIco:'EN',
-      toEditor:'לעורך', help:'עזרה', signin:'התחברות', send:'שליחת קבצים',
+      back:'חזרה', toEditor:'לעורך', help:'עזרה', signin:'התחברות', send:'שליחת קבצים',
       kick:'מסך העבודה המרכזי',
       pageTitle:'בחירת קבצים',
       pageSub:'ארגנו, מיינו ובחרו את קבצי המדיה שלכם — תמונות, וידאו, אודיו ומסמכים. מהיר, פשוט ובאיכות מקצועית.',
@@ -1831,6 +1867,8 @@
       selLockedToast:'הבחירה שלכם אושרה וננעלה — לא ניתן לשנות אותה.',
       selDoneCountAny:(n)=>`בחרתם ${n} קבצים.`,
       finishSelBtn:'סיימתי לבחור', finishSelTitle:'סיימתי לבחור — נעילת הבחירה ושליחתה',
+      clientWelcome:'ברוכים הבאים לעמוד בחירת הקבצים',
+      clientWelcomeSub:'סמנו את התמונות, הסרטונים או הקבצים הרצויים ולאחר שתסיימו לחצו על "סיימתי לבחור".',
       viewUser:'תצוגת מנהל', viewClient:'תצוגת לקוח',
       finishNoneToast:'עדיין לא בחרתם קבצים.',
       pickHint:'סמן / בטל סימון', msCount:n=>`<b>${n}</b> סומנו`, msPh:'העבר לתיקייה…', msMoveTitle:'העבר את המסומנים לתיקייה',
@@ -1871,7 +1909,7 @@
       noPreviewTitle:'אין תצוגה מקדימה', noPreviewBody:'לקובץ הזה אין תצוגה מקדימה בדפדפן.',
       helpTitle:'איך זה עובד', helpClose:'הבנתי',
       helpBody1:'גררו קבצים (תמונות, וידאו, אודיו, מסמכים) לאזור ההעלאה, צרו תיקיות ראשיות ומיינו אליהן, והשתמשו בחיפוש ובזום כדי לנווט. כל תיקייה חדשה נוצרת כתיקייה ראשית בלבד, גם אם אתם נמצאים בתוך תיקייה אחרת. אפשר לבחור כמה קבצים ולמחוק אותם ביחד או לגרור את כולם יחד לתוך תיקייה. כל קובץ ממוספר אוטומטית (001, 002, 003…) לפי סדר התצוגה — גררו קובץ למקום אחר בגלריה כדי לשנות את הסדר, והמספור יתעדכן מיד. הסדר קובע את רצף הייצוא.',
-      helpBody2:'הוסיפו כיתוב מתחת לכל תמונה — הוא הופך לשם הקובץ בהורדה. לחצו על "הורדת הכל (ZIP)" כדי לשמור את כל הקבצים כארכיון אחד; כל קובץ ממוספר לפי סדר הגלריה, ואם הוזן כיתוב הוא מצורף לשם (למשל "001 - כך הכל התחיל.jpg", וללא כיתוב פשוט "002.jpg"). מהיר, פשוט ובאיכות מקצועית.',
+      helpBody2:'הוסיפו כיתוב מתחת לכל תמונה — הוא הופך לשם הקובץ בהורדה. לחצו על "הורדת הכל (ZIP)" כדי לשמור את כל הקבצים כארכיון אחד; כל קובץ ממוספר לפי סדר הגלריה ולצד המספר נשמר שם הקובץ המקורי (למשל "001 - img_23892.jpg"), ואם הוזן כיתוב הוא מחליף את השם המקורי (למשל "002 - כך הכל התחיל.jpg"). מהיר, פשוט ובאיכות מקצועית.',
       clientBtn:'הגדרות לקוח', clientTitle:'הגדרות הלקוח',
       clientSub:'נהלו את פרטי הלקוח ואת ההרשאות שלו בגלריה. ההגדרות נשמרות במכשיר זה בלבד.',
       clientDetails:'פרטי הלקוח', clientPerms:'הרשאות לקוח',
@@ -1904,6 +1942,7 @@
       alTitleL:'שם הפרויקט', alTitlePh:'למשל: החתונה של דנה ויוסי',
       alDescL:'תיאור קצר', alDescPh:'כמה מילים על האירוע…',
       alCoverL:'תמונת קאבר', alCoverBtn:'העלה תמונה',
+      alCoverNone:'אין תמונת קאבר', alCoverRemove:'הסר', alCoverHint:'תמונת הקאבר תוצג בראש הגלריה, מתחת לכפתורי תצוגת מנהל / תצוגת לקוח.',
       secVisibility:'נראות הפרויקט', alVisibilityL:'מי יכול לראות',
       visPrivate:'פרטי — רק אני', visLink:'כל מי שיש לו קישור', visPassword:'מוגן בסיסמה',
       alShareLinkL:'קישור לשיתוף', alPrivateNote:'הפרויקט פרטי — רק אתם רואים אותו. בחרו ב"כל מי שיש לו קישור" כדי לקבל קישור לשיתוף ולהגדיר הגנות.',
@@ -1972,7 +2011,7 @@
     },
     en:{
       dir:'ltr', langIco:'עב',
-      toEditor:'Editor', help:'Help', signin:'Sign in', send:'Send files',
+      back:'Back', toEditor:'Editor', help:'Help', signin:'Sign in', send:'Send files',
       kick:'The main workspace',
       pageTitle:'Organize files',
       pageSub:'Organize, sort and select your media — images, video, audio and documents. Fast, simple and professional-quality.',
@@ -1996,6 +2035,8 @@
       selLockedToast:'Your selection is confirmed and locked — it can no longer be changed.',
       selDoneCountAny:(n)=>`You selected ${n} files.`,
       finishSelBtn:'Finish selecting', finishSelTitle:"I'm done selecting — lock and submit my picks",
+      clientWelcome:'Welcome to the file-selection page',
+      clientWelcomeSub:'Mark the photos, videos or files you want, and when you finish click "Finish selecting".',
       viewUser:'Manager view', viewClient:'Client view',
       finishNoneToast:"You haven't selected any files yet.",
       pickHint:'Mark / unmark', msCount:n=>`<b>${n}</b> marked`, msPh:'Move to folder…', msMoveTitle:'Move marked to folder',
@@ -2036,7 +2077,7 @@
       noPreviewTitle:'No preview', noPreviewBody:'This file can’t be previewed in the browser.',
       helpTitle:'How it works', helpClose:'Got it',
       helpBody1:'Drop files (images, video, audio, documents) onto the upload area, create top-level folders and sort into them, and use search + zoom to navigate. Every new folder is created as a main folder, even when another folder is currently selected. Select multiple files to delete them together or drag them all into a folder at once. Every file is auto-numbered (001, 002, 003…) by display order — drag a file to a new spot to reorder, and the numbers update instantly. The order sets the export sequence.',
-      helpBody2:'Add a caption under each image — it becomes the file name on download. Click "Download all (ZIP)" to save every file as one archive; each file is numbered by gallery order, and if a caption was entered it is appended (e.g. "001 - The beginning.jpg", or just "002.jpg" without one): no file is uploaded. Fast, simple and professional-quality.',
+      helpBody2:'Add a caption under each image — it becomes the file name on download. Click "Download all (ZIP)" to save every file as one archive; each file is numbered by gallery order and keeps its original name next to the number (e.g. "001 - img_23892.jpg"), and a caption you enter replaces that original name (e.g. "002 - The beginning.jpg"): no file is uploaded. Fast, simple and professional-quality.',
       clientBtn:'Client', clientTitle:'Client settings',
       clientSub:'Manage this client’s details and what they can do in the gallery. Settings are stored on this device only.',
       clientDetails:'Client details', clientPerms:'Client permissions',
@@ -2069,6 +2110,7 @@
       alTitleL:'Project name', alTitlePh:'e.g. Dana & Joe’s wedding',
       alDescL:'Short description', alDescPh:'A few words about the event…',
       alCoverL:'Cover image', alCoverBtn:'Upload image',
+      alCoverNone:'No cover image', alCoverRemove:'Remove', alCoverHint:'The cover image appears at the top of the gallery, below the Manager / Client view buttons.',
       secVisibility:'Project visibility', alVisibilityL:'Who can view',
       visPrivate:'Private — only me', visLink:'Anyone with the link', visPassword:'Password protected',
       alShareLinkL:'Share link', alPrivateNote:'This project is private — only you can see it. Choose "Anyone with the link" to get a shareable link and set protections.',
@@ -2137,7 +2179,7 @@
     },
     ru:{
       dir:'ltr',
-      toEditor:'Редактор', help:'Помощь', signin:'Вход', send:'Отправить файлы',
+      back:'Назад', toEditor:'Редактор', help:'Помощь', signin:'Вход', send:'Отправить файлы',
       kick:'Основное рабочее пространство',
       pageTitle:'Упорядочить файлы',
       pageSub:'Упорядочивайте, сортируйте и выбирайте медиа — изображения, видео, аудио и документы. Быстро, просто и профессионального качества.',
@@ -2161,6 +2203,8 @@
       selLockedToast:'Ваш выбор подтверждён и зафиксирован — изменить его нельзя.',
       selDoneCountAny:(n)=>`Вы выбрали ${n} файлов.`,
       finishSelBtn:'Завершить выбор', finishSelTitle:'Я закончил выбор — зафиксировать и отправить',
+      clientWelcome:'Добро пожаловать на страницу выбора файлов',
+      clientWelcomeSub:'Отметьте нужные фотографии, видео или файлы, а по завершении нажмите «Завершить выбор».',
       viewUser:'Вид менеджера', viewClient:'Вид клиента',
       finishNoneToast:'Вы ещё не выбрали файлы.',
       pickHint:'Отметить / снять', msCount:n=>`Отмечено: <b>${n}</b>`, msPh:'В папку…', msMoveTitle:'Переместить отмеченные в папку',
@@ -2201,7 +2245,7 @@
       noPreviewTitle:'Быстро, просто и профессионального качества.',
       helpTitle:'Как это работает', helpClose:'Понятно',
       helpBody1:'Перетащите файлы (изображения, видео, аудио, документы) в область загрузки, создавайте папки и сортируйте по ним, используйте поиск и масштаб для навигации. Выберите несколько файлов, чтобы удалить их вместе или перетащить сразу в папку. Каждый файл авто-нумеруется (001, 002, 003…) по порядку отображения — перетащите файл на новое место для изменения порядка, и номера обновятся мгновенно. Порядок задаёт последовательность экспорта. Также можно вкладывать папки в папки (любой глубины) и перетаскивать целую папку в другую — все её файлы и подпапки перемещаются вместе.',
-      helpBody2:'Добавьте подпись под каждым изображением — она станет именем файла при загрузке. Нажмите «Скачать всё (ZIP)», чтобы сохранить все файлы одним архивом; каждый файл нумеруется по порядку галереи, и если введена подпись, она добавляется к имени (например «001 - Начало.jpg», или просто «002.jpg» без неё). Быстро, просто и профессионального качества.',
+      helpBody2:'Добавьте подпись под каждым изображением — она станет именем файла при загрузке. Нажмите «Скачать всё (ZIP)», чтобы сохранить все файлы одним архивом; каждый файл нумеруется по порядку галереи, а рядом с номером сохраняется исходное имя файла (например «001 - img_23892.jpg»), а введённая подпись заменяет исходное имя (например «002 - Начало.jpg»). Быстро, просто и профессионального качества.',
       clientBtn:'Клиент', clientTitle:'Настройки клиента',
       clientSub:'Управляйте данными клиента и его правами в галерее. Настройки хранятся только на этом устройстве.',
       clientDetails:'Данные клиента', clientPerms:'Права клиента',
@@ -2234,6 +2278,7 @@
       alTitleL:'Название проекта', alTitlePh:'напр.: Свадьба Даны и Йоси',
       alDescL:'Краткое описание', alDescPh:'Несколько слов о событии…',
       alCoverL:'Обложка', alCoverBtn:'Загрузить изображение',
+      alCoverNone:'Нет обложки', alCoverRemove:'Удалить', alCoverHint:'Обложка показывается вверху галереи, под кнопками «Вид менеджера / Вид клиента».',
       secVisibility:'Видимость проекта', alVisibilityL:'Кто может смотреть',
       visPrivate:'Приватный — только я', visLink:'Любой, у кого есть ссылка', visPassword:'Защищён паролем',
       alShareLinkL:'Ссылка для доступа', alPrivateNote:'Проект приватный — виден только вам. Выберите «Любой, у кого есть ссылка», чтобы получить ссылку и настроить защиту.',
@@ -3008,7 +3053,7 @@
     }
   }
 
-  function renderAll(){ renderFolders(); renderGrid(); renderStats(); persistGallery(); }
+  function renderAll(){ renderFolders(); renderGrid(); renderStats(); renderCoverHero(); persistGallery(); }
 
   // ---- stats strip: gallery total + live client-pick quotas ----
   function videosEnabled(m){
@@ -3472,7 +3517,7 @@
   // ---- new album-level settings (stored under ac_album) ----
   // [id, kind, default] — kind: text|sel|date|chk|rng
   const ALBUM_FIELDS=[
-    ['alTitle','text',''],['alDesc','text',''],
+    ['alTitle','text',''],['alDesc','text',''],['alCover','text',''],
     ['alVisibility','sel','link'],['alPwOn','chk',false],['alPw','text',''],
     ['alGuestUpload','chk',false],['alGuestApproval','chk',true],['alApproval','chk',false],
     ['alSort','sel','name'],['alView','sel','grid'],['alFavorites','chk',true],['alEditRequests','chk',false],
@@ -3483,7 +3528,7 @@
   ];
   // fields a settings-preset captures for reuse: everything reusable, minus the per-project
   // identity (title/description), the specific access password, and the specific expiry date
-  const PRESET_SKIP=['alTitle','alDesc','alPw','alExpiryDate'];
+  const PRESET_SKIP=['alTitle','alDesc','alCover','alPw','alExpiryDate'];
   const PRESET_ALBUM_KEYS=ALBUM_FIELDS.filter(f=>PRESET_SKIP.indexOf(f[0])<0).map(f=>[f[0],f[1]]);
   function loadAlbum(){
     const d={}; ALBUM_FIELDS.forEach(([id,,def])=>d[id]=def);
@@ -3524,6 +3569,42 @@
     rd.readAsDataURL(file);
   }
 
+  // paint the cover image (data URL held in the hidden #alCover input) into the settings preview
+  function renderCoverPreview(){
+    const data=el('alCover').value;
+    const prev=el('alCoverPrev'), rm=el('alCoverRm');
+    if(data){ prev.innerHTML='<img src="'+data+'" alt="">'; prev.classList.add('has'); rm.classList.remove('hidden'); }
+    else { prev.innerHTML='<span class="covup-ph">'+escapeHtml(t.alCoverNone||'')+'</span>'; prev.classList.remove('has'); rm.classList.add('hidden'); }
+  }
+  // read the picked cover, downscale to a sane banner width (keeps localStorage small), stash the data URL
+  function onCoverFile(e){
+    const file=e.target.files && e.target.files[0]; e.target.value='';
+    if(!file || !/^image\//.test(file.type)) return;
+    const rd=new FileReader();
+    rd.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const max=1600; let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+        if(!w || !h){ el('alCover').value=rd.result; renderCoverPreview(); return; }
+        const sc=Math.min(1, max/Math.max(w,h)); w=Math.max(1,Math.round(w*sc)); h=Math.max(1,Math.round(h*sc));
+        const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h);
+        let out; try{ out=cv.toDataURL('image/jpeg',0.85); }catch(_){ out=rd.result; }
+        el('alCover').value=out; renderCoverPreview();
+      };
+      img.onerror=()=>{ el('alCover').value=rd.result; renderCoverPreview(); };
+      img.src=rd.result;
+    };
+    rd.readAsDataURL(file);
+  }
+  // paint the saved cover as a hero banner directly under the manager/client view toggle
+  function renderCoverHero(){
+    const hero=el('coverHero'); if(!hero) return;
+    let data=''; try{ data=(loadAlbum().alCover)||''; }catch(_){ data=''; }
+    if(data){ hero.innerHTML='<img src="'+data+'" alt="">'; hero.classList.remove('hidden'); hero.setAttribute('aria-hidden','false'); }
+    else { hero.innerHTML=''; hero.classList.add('hidden'); hero.setAttribute('aria-hidden','true'); }
+  }
+
   // isNew (from the dashboard "+ New project") opens a blank form for a fresh
   // album without touching stored data — nothing persists until Save.
   function openSettings(isNew){
@@ -3535,7 +3616,7 @@
     el('cEvent').value=c.event||''; el('cDeadline').value=c.deadline||''; settingsStatus=normStatus(c.status);
     PERM_KEYS.forEach(k=>{ const box=el('perm_'+k); if(box) box.checked=!!c.perms[k]; });
     ALBUM_FIELDS.forEach(([id,kind])=>setField(id,kind,a[id]));
-    renderLogoPreview();
+    renderLogoPreview(); renderCoverPreview();
     applyViewOnlyLock(); applySettingsDeps(); setActiveTab('general');
     setPresets=loadSetPresets(); renderSetPresetOptions(''); el('setPresetName').value='';
     el('settingsOverlay').classList.add('show');
@@ -3612,6 +3693,7 @@
     renderOtherCard();  // refresh the "אחר" count in case classification changed
     renderGrid();       // repaint thumbnails so watermark / brand changes show at once
     applyPreviewMode(); // if we're in the live client preview, re-apply the freshly saved permissions
+    renderCoverHero();  // repaint the cover banner under the view toggle
   }
 
   // =====================================================
@@ -4054,9 +4136,10 @@
     btn.disabled=true; if(span) span.textContent=t.preparingZip;
     try{
       const items=ordered.map((f,i)=>{
-        const num=pad3(i+1), cap=sanitizeName(f.note);   // 001, 002 … + optional caption
+        const num=pad3(i+1);                             // 001, 002 … by gallery order
+        const cap=sanitizeName(f.note) || sanitizeName(stripExt(f.name));  // a caption replaces the original name
         const base = cap ? `${num} - ${cap}` : num;
-        return { name:`${base}.${f.ext}`, blob:f.file };
+        return { name: f.ext ? `${base}.${f.ext}` : base, blob:f.file };
       });
       const blob=await buildZip(items);
       const zipName=sanitizeName(loadClient().name)||t.zipName;
@@ -4354,6 +4437,12 @@
       clearReorderMarks(); renderGrid();
     });
 
+    // back — return to where we came from, fall back to the dashboard
+    el('backBtn').addEventListener('click',()=>{
+      if(history.length>1){ history.back(); }
+      else { location.href='./dashboard'; }
+    });
+
     // modals
     el('helpBtn').addEventListener('click',()=>el('helpOverlay').classList.add('show'));
     el('helpClose').addEventListener('click',()=>el('helpOverlay').classList.remove('show'));
@@ -4402,7 +4491,9 @@
     el('setPresetSave').addEventListener('click',saveSetPreset);
     el('setPresetDel').addEventListener('click',deleteSetPreset);
     el('alDeleteBtn').addEventListener('click',deleteAlbum);
-    el('alCoverBtn').addEventListener('click',()=>el('fileInput').click());
+    el('alCoverBtn').addEventListener('click',()=>el('alCoverFile').click());
+    el('alCoverFile').addEventListener('change',onCoverFile);
+    el('alCoverRm').addEventListener('click',()=>{ el('alCover').value=''; renderCoverPreview(); });
     // album manager
     el('albumMgrBtn').addEventListener('click',openAlbumMgr);
     el('albumMgrSave').addEventListener('click',saveAlbumMgr);
@@ -4614,6 +4705,20 @@
       }catch(_){}
     }
     h.textContent=title;
+    applyPageSub();
+  }
+  // Client view swaps the generic marketing subtitle for a welcome + how-to line;
+  // the owner's manager view keeps the generic pageSub copy. Runs after every i18n
+  // pass (which resets the <p> via data-i18n) and after every view toggle.
+  function applyPageSub(){
+    const p=el('pageSub'); if(!p) return;
+    if(effectiveClientView()){
+      p.textContent='';
+      const b=document.createElement('b'); b.textContent=t.clientWelcome;
+      p.append(b, document.createElement('br'), document.createTextNode(t.clientWelcomeSub));
+    }else{
+      p.textContent=t.pageSub;
+    }
   }
   function updateFinishBtn(){
     const b=el('finishSelBtn'); if(!b) return;

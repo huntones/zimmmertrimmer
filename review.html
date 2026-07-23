@@ -8,41 +8,41 @@
 <meta name="description" content="Send work to your client for sign-off — share a private, branded link, collect comments, and get approval.">
 <style>
   :root {
-    --bg:#eef5ea; --panel:#ffffff; --panel-2:#f2f7ef; --line:#e2ebdc; --line-2:#eef4e9;
-    --ink:#1e2a20; --ink-2:#2f3d31; --muted:#6b7a6c; --faint:#97a897;
-    --accent:#57ab3f; --accent-dim:#468a31; --accent-ink:#ffffff; --accent-soft:#e6f4dd;
-    --success:#3d9e46; --success-dim:#2f8a3a; --success-soft:#e5f4e0;
+    --bg:#edf5f0; --panel:#ffffff; --panel-2:#f0f7f3; --line:#dfeae2; --line-2:#ecf4ef;
+    --ink:#16241c; --ink-2:#2a3d34; --muted:#63776b; --faint:#92a89b;
+    --accent:#0b7a41; --accent-dim:#076f39; --accent-ink:#ffffff; --accent-soft:#dcefe4;
+    --success:#0f9a4d; --success-dim:#0b7d3e; --success-soft:#dff3e8;
     --info:#3b82f6; --info-dim:#2f6fd6; --info-soft:#e8f0fe;
     --danger:#e5484d; --danger-soft:#fdecec;
     --warm-soft:#fff5da; --warm-line:#f2d98a;
-    --ok:#3d9e46; --warn:#c88a04; --err:#e5484d;
-    --grad:linear-gradient(105deg,#7cc24a 0%,#4ca338 100%);
-    --grad-h:linear-gradient(105deg,#6fb63f 0%,#3f9330 100%);
-    --grad-soft:linear-gradient(120deg,#e9f5e2,#e0f1d7);
-    --grad-shadow:rgba(76,163,56,0.30);
-    --grad-btn:linear-gradient(105deg,#7cc24a 0%,#4ca338 100%);
-    --grad-btn-glow:rgba(76,163,56,0.36);
+    --ok:#0f9a4d; --warn:#c88a04; --err:#e5484d;
+    --grad:linear-gradient(105deg,#16a35a 0%,#076f39 100%);
+    --grad-h:linear-gradient(105deg,#1aad61 0%,#0a7c40 100%);
+    --grad-soft:linear-gradient(120deg,#e2f3e9,#d4ecdd);
+    --grad-shadow:rgba(7,111,57,0.30);
+    --grad-btn:linear-gradient(105deg,#16a35a 0%,#076f39 100%);
+    --grad-btn-glow:rgba(7,111,57,0.36);
     --shadow:0 1px 2px rgba(20,24,44,0.04), 0 8px 26px rgba(20,24,44,0.06);
     --shadow-lg:0 2px 6px rgba(20,24,44,0.05), 0 20px 50px rgba(20,24,44,0.10);
     --shadow-sm:0 1px 2px rgba(20,24,44,0.05);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
+    --sans:'Overpass','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
-    --bg:#0e130e; --panel:#161d16; --panel-2:#1c261b; --line:#2b382a; --line-2:#233022;
-    --ink:#eef3ec; --ink-2:#dce7da; --muted:#8fa08d; --faint:#6c7a6b;
-    --accent:#79c65a; --accent-dim:#8ed26f; --accent-ink:#0e130e; --accent-soft:#1c2e17;
-    --success:#4ec971; --success-dim:#43b863; --success-soft:#14261a;
+    --bg:#0c1310; --panel:#131d18; --panel-2:#18261f; --line:#263831; --line-2:#1f3029;
+    --ink:#ecf3ef; --ink-2:#d8e7de; --muted:#8aa096; --faint:#667a70;
+    --accent:#35c07e; --accent-dim:#5fd39a; --accent-ink:#0c1310; --accent-soft:#123023;
+    --success:#3fce85; --success-dim:#2fbd77; --success-soft:#10281c;
     --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
     --danger:#ff6b6b; --danger-soft:#2a1719;
     --warm-soft:#2c2718; --warm-line:#5a4d24;
-    --ok:#4ec971; --warn:#e8b84b; --err:#ff6b6b;
-    --grad:linear-gradient(105deg,#7cc24a 0%,#4ca338 100%);
-    --grad-h:linear-gradient(105deg,#8ed36a 0%,#5cb545 100%);
-    --grad-soft:linear-gradient(120deg,#16240f,#112610);
-    --grad-shadow:rgba(90,180,70,0.42);
-    --grad-btn:linear-gradient(105deg,#7cc24a 0%,#4ca338 100%);
-    --grad-btn-glow:rgba(90,180,70,0.40);
+    --ok:#3fce85; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(105deg,#16a35a 0%,#076f39 100%);
+    --grad-h:linear-gradient(105deg,#2ecb7c 0%,#109455 100%);
+    --grad-soft:linear-gradient(120deg,#0f2a1c,#0b2617);
+    --grad-shadow:rgba(20,160,95,0.42);
+    --grad-btn:linear-gradient(105deg,#16a35a 0%,#076f39 100%);
+    --grad-btn-glow:rgba(20,160,95,0.40);
     --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
     --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
     --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
@@ -543,8 +543,8 @@
   body.review-dashboard .minibtn{height:41px;padding:0 18px;background:#fff;border-radius:8px}
   body.review-dashboard .minibtn.go{margin-inline-start:auto;background:#fff;color:#7040ed;border-color:#9b73ff}
   body.review-dashboard .minibtn[data-act="copy"]{background:#7037f5;color:#fff;border:0}
-  .review-stats{margin-top:28px;height:92px;border-radius:12px;background:linear-gradient(90deg,#f3faef,#eaf6e2);display:grid;grid-template-columns:repeat(4,1fr) 1.25fr;align-items:center;text-align:center;color:#68786a}
-  .review-stat{border-left:1px solid #e0ebd9;font-size:13px}.review-stat b{display:block;color:#1c2a1d;font-size:18px;margin-bottom:2px}.review-board{color:#3f9330;font-weight:700}
+  .review-stats{margin-top:28px;height:92px;border-radius:12px;background:linear-gradient(90deg,#eff9f3,#e0f4e8);display:grid;grid-template-columns:repeat(4,1fr) 1.25fr;align-items:center;text-align:center;color:#62786c}
+  .review-stat{border-left:1px solid #daebe1;font-size:13px}.review-stat b{display:block;color:#172a1f;font-size:18px;margin-bottom:2px}.review-board{color:#0a7c40;font-weight:700}
   @media(max-width:800px){body.review-dashboard .mgbar{position:static;margin-bottom:12px}.review-filters{grid-template-columns:1fr}.review-filters .rf-sep{display:none}body.review-dashboard .rcard{display:flex}.review-stats{grid-template-columns:1fr 1fr;height:auto;padding:16px;gap:18px}}
 
   /* ======================================================================
@@ -560,24 +560,24 @@
 
   /* ---- hero banner (background illustration lives here) ---- */
   .rv-hero{position:relative;isolation:isolate;text-align:center;overflow:hidden;
-    padding:54px 20px 172px;background:linear-gradient(160deg,#e8f5df 0%,#dcefcf 58%,#e8f5df 100%);}
+    padding:54px 20px 172px;background:linear-gradient(160deg,#e3f3ea 0%,#d2ecdd 58%,#e3f3ea 100%);}
   .rv-hero-bg{position:absolute;inset:0;z-index:-2;
     background:url('assets/hero-bg.jpg') center top/cover no-repeat;}
   .rv-hero::after{content:'';position:absolute;inset:0;z-index:-1;
     background:radial-gradient(125% 92% at 50% 32%,rgba(255,255,255,.66),rgba(255,255,255,0) 60%);}
-  html[data-theme="dark"] .rv-hero{background:#101a0f;}
-  html[data-theme="dark"] .rv-hero-bg{background-color:#101a0f;opacity:.85;}
-  html[data-theme="dark"] .rv-hero::after{background:radial-gradient(125% 92% at 50% 32%,rgba(14,19,14,.55),rgba(14,19,14,0) 62%);}
+  html[data-theme="dark"] .rv-hero{background:#0c1a13;}
+  html[data-theme="dark"] .rv-hero-bg{background-color:#0c1a13;opacity:.85;}
+  html[data-theme="dark"] .rv-hero::after{background:radial-gradient(125% 92% at 50% 32%,rgba(12,19,15,.55),rgba(12,19,15,0) 62%);}
   .rv-hero-inner{position:relative;max-width:760px;margin:0 auto;}
   .rv-kick{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;font-weight:700;
     letter-spacing:.16em;text-transform:uppercase;color:var(--accent-dim);
-    background:rgba(255,255,255,.72);border:1px solid #cbe6bd;padding:5px 14px;border-radius:999px;
-    box-shadow:0 2px 10px rgba(60,120,40,.10);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
-  html[data-theme="dark"] .rv-kick{background:rgba(20,32,18,.7);border-color:#2e4726;color:var(--accent);}
-  .rv-title{margin:16px 0 0;font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.02em;line-height:1.12;color:#20301f;}
-  html[data-theme="dark"] .rv-title{color:#eaf3e6;}
-  .rv-sub{margin:12px auto 0;max-width:54ch;font-size:clamp(14px,1.55vw,16.5px);line-height:1.5;color:#5a6b5a;}
-  html[data-theme="dark"] .rv-sub{color:#a7b6a3;}
+    background:rgba(255,255,255,.72);border:1px solid #c2e3d0;padding:5px 14px;border-radius:999px;
+    box-shadow:0 2px 10px rgba(9,105,55,.10);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
+  html[data-theme="dark"] .rv-kick{background:rgba(16,32,23,.7);border-color:#254a35;color:var(--accent);}
+  .rv-title{margin:16px 0 0;font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.02em;line-height:1.12;color:#1a3024;}
+  html[data-theme="dark"] .rv-title{color:#e8f3ec;}
+  .rv-sub{margin:12px auto 0;max-width:54ch;font-size:clamp(14px,1.55vw,16.5px);line-height:1.5;color:#556b60;}
+  html[data-theme="dark"] .rv-sub{color:#a1b6ab;}
   .rv-cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:26px;}
   .rv-btn{display:inline-flex;align-items:center;gap:9px;height:52px;padding:0 26px;border-radius:14px;cursor:pointer;
     font-family:var(--sans);font-size:16px;font-weight:700;border:1px solid transparent;
@@ -587,18 +587,19 @@
   .rv-btn.rv-primary{color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
     text-shadow:0 1px 2px rgba(0,0,0,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 10px 26px var(--grad-btn-glow);}
   .rv-btn.rv-primary:hover{filter:brightness(1.05);}
-  .rv-btn.rv-ghost{color:var(--ink-2);background:rgba(255,255,255,.94);border-color:#dbe7d4;box-shadow:0 6px 18px rgba(50,90,40,.12);}
-  html[data-theme="dark"] .rv-btn.rv-ghost{background:rgba(24,34,22,.9);border-color:#2e3d2b;color:var(--ink-2);}
+  .rv-btn.rv-ghost{color:var(--ink-2);background:rgba(255,255,255,.94);border-color:#d3e7dc;box-shadow:0 6px 18px rgba(8,90,48,.12);}
+  html[data-theme="dark"] .rv-btn.rv-ghost{background:rgba(20,34,26,.9);border-color:#293d33;color:var(--ink-2);}
   .rv-btn.rv-ghost:hover,.rv-btn.rv-ghost.on{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
   .rv-btn .count{font-family:var(--mono);font-size:13px;font-weight:700;min-width:22px;height:22px;padding:0 6px;border-radius:999px;
     display:inline-flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent-dim);}
 
-  /* ---- admin / client view toggle (replaces the create/manage tabs) ---- */
-  .rv-cta{flex-direction:column;align-items:center;gap:13px;}
+  /* ---- admin / client / projects view toggle — one unified pill, on a single
+         row (mirrors the "New request" screen's .viewseg) ---- */
+  .rv-cta{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:center;gap:13px;}
   .rv-seg{display:inline-flex;padding:5px;gap:4px;border-radius:16px;background:rgba(255,255,255,.9);
-    border:1px solid #cbe6bd;box-shadow:0 8px 22px rgba(50,90,40,.13);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);}
-  html[data-theme="dark"] .rv-seg{background:rgba(24,34,22,.9);border-color:#2e3d2b;}
-  .rv-segbtn{display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 24px;border:0;border-radius:12px;cursor:pointer;
+    border:1px solid #c2e3d0;box-shadow:0 8px 22px rgba(8,90,48,.13);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);}
+  html[data-theme="dark"] .rv-seg{background:rgba(20,34,26,.9);border-color:#293d33;}
+  .rv-segbtn{display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 20px;border:0;border-radius:12px;cursor:pointer;
     font-family:var(--sans);font-size:16px;font-weight:700;color:var(--ink-2);background:transparent;
     transition:background .16s,color .16s,box-shadow .16s;}
   .rv-segbtn svg{width:18px;height:18px;}
@@ -606,23 +607,70 @@
   html[data-theme="dark"] .rv-segbtn:not(.on):hover{color:var(--accent);}
   .rv-segbtn.on{color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--grad-btn);
     text-shadow:0 1px 2px rgba(0,0,0,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 20px var(--grad-btn-glow);}
+  /* the projects segment carries a count of saved projects */
+  .rv-segbtn .count{font-family:var(--mono);font-size:12.5px;font-weight:700;min-width:20px;height:20px;padding:0 6px;border-radius:999px;
+    display:inline-flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent-dim);}
+  .rv-segbtn.on .count{background:rgba(255,255,255,.28);color:#fff;}
   /* secondary link back to the projects list */
   .rv-projlink{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 15px;border-radius:11px;cursor:pointer;
     font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--ink-2);background:rgba(255,255,255,.55);
     border:1px solid transparent;transition:color .14s,background .14s,border-color .14s;}
-  html[data-theme="dark"] .rv-projlink{background:rgba(24,34,22,.5);}
+  html[data-theme="dark"] .rv-projlink{background:rgba(20,34,26,.5);}
   .rv-projlink svg{width:16px;height:16px;opacity:.85;}
-  .rv-projlink:hover,.rv-projlink.on{color:var(--accent-dim);background:var(--accent-soft);border-color:#cbe6bd;}
+  .rv-projlink:hover,.rv-projlink.on{color:var(--accent-dim);background:var(--accent-soft);border-color:#c2e3d0;}
   .rv-projlink .count{font-family:var(--mono);font-size:12.5px;font-weight:700;min-width:20px;height:20px;padding:0 6px;border-radius:999px;
     display:inline-flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent-dim);}
-  html[data-theme="dark"] .rv-projlink .count{background:rgba(122,196,86,.16);}
+  html[data-theme="dark"] .rv-projlink .count{background:rgba(22,163,90,.16);}
 
-  /* create screen shows form (admin) or the live client preview, one at a time */
-  #createGrid.mode-admin,#createGrid.mode-client{grid-template-columns:minmax(0,1fr);}
-  #createGrid.mode-admin>.col:last-child{display:none;}
-  #createGrid.mode-client>.col:first-child{display:none;}
-  #createGrid.mode-client>.col:last-child{max-width:560px;margin-inline:auto;width:100%;}
+  /* ---- hero back button + cover-image control (mirror the "received files" screen) ---- */
+  .rv-hero-back{position:absolute;top:16px;right:18px;z-index:6;display:none;align-items:center;gap:7px;height:38px;padding:0 15px;
+    border-radius:999px;border:1px solid #c2e3d0;background:rgba(255,255,255,.92);color:var(--ink-2);
+    font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 6px 16px rgba(8,90,48,.12);
+    -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);transition:border-color .14s,color .14s,background .14s;}
+  .rv-hero-back svg{width:15px;height:15px;}
+  .rv-hero-back:hover{border-color:var(--accent);color:var(--accent-dim);}
+  html[data-theme="dark"] .rv-hero-back{background:rgba(20,34,26,.9);border-color:#293d33;color:var(--ink-2);}
+  body.review-create .rv-hero-back{display:inline-flex;}
+
+  .rv-hero-cover{position:absolute;top:16px;left:18px;z-index:6;display:none;gap:8px;}
+  body.review-create .rv-hero-cover{display:inline-flex;}
+  .rv-cover-btn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:999px;
+    border:1px solid #c2e3d0;background:rgba(255,255,255,.92);color:var(--ink-2);
+    font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 6px 16px rgba(8,90,48,.12);
+    -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);transition:border-color .14s,color .14s,background .14s;}
+  .rv-cover-btn svg{width:16px;height:16px;}
+  .rv-cover-btn:hover{border-color:var(--accent);color:var(--accent-dim);}
+  .rv-cover-btn.rv-cover-rm{padding:0 13px;color:var(--muted);}
+  .rv-cover-btn.rv-cover-rm:hover{border-color:#d98a8a;color:#c0392b;}
+  html[data-theme="dark"] .rv-cover-btn{background:rgba(20,34,26,.9);border-color:#293d33;color:var(--ink-2);}
+
+  /* create screen: admin = approval form + docked settings sidebar; client = live preview, alone */
+  #createGrid.mode-admin{grid-template-columns:minmax(276px,344px) minmax(0,1fr) minmax(276px,344px);}
+  #createGrid.mode-admin>.rv-sdock{order:1;display:flex;}       /* order:1 → leading column → inline-start (right in RTL): approval-flow settings */
+  #createGrid.mode-admin>.rv-formcol{order:2;}                  /* center: the create form is the main area between the two side docks */
+  #createGrid.mode-admin>.rv-sdock-l{order:3;display:flex;}     /* order:3 → trailing column → inline-end (left in RTL): protection + tracking settings */
+  #createGrid.mode-admin>.rv-prevcol{display:none;}
+  /* either side dock collapses independently to a slim rail */
+  #createGrid.mode-admin.sdock-collapsed{grid-template-columns:56px minmax(0,1fr) minmax(276px,344px);}
+  #createGrid.mode-admin.sdockl-collapsed{grid-template-columns:minmax(276px,344px) minmax(0,1fr) 56px;}
+  #createGrid.mode-admin.sdock-collapsed.sdockl-collapsed{grid-template-columns:56px minmax(0,1fr) 56px;}
+  /* full-bleed the create wrap in admin mode so both settings docks pin flush to their edges (right + left), framing the centered form — mirrors the File-Request studio */
+  @media (min-width:1081px){
+    .wrap:has(> #createView:not(.hidden) > #createGrid.mode-admin:not(.hidden)){max-width:none;padding-inline:0;}
+  }
+
+  #createGrid.mode-client{grid-template-columns:minmax(0,1fr);}
+  #createGrid.mode-client>.rv-formcol{display:none;}
+  #createGrid.mode-client>.rv-sdock{display:none;}
+  #createGrid.mode-client>.rv-prevcol{max-width:560px;margin-inline:auto;width:100%;}
   #createGrid.mode-client .rvside{position:static;top:auto;}
+
+  @media (max-width:1080px){
+    #createGrid.mode-admin,#createGrid.mode-admin.sdock-collapsed,#createGrid.mode-admin.sdockl-collapsed,#createGrid.mode-admin.sdock-collapsed.sdockl-collapsed{grid-template-columns:1fr;}
+    #createGrid.mode-admin>.rv-formcol{order:1;}   /* stack under one column: form first, then the two settings docks */
+    #createGrid.mode-admin>.rv-sdock{order:2;}
+    #createGrid.mode-admin>.rv-sdock-l{order:3;}
+  }
 
   /* ---- content container pulled up over the hero ---- */
   .wrap{max-width:1200px;margin:0 auto;padding:14px 22px 46px;position:relative;z-index:3;}
@@ -673,7 +721,7 @@
   .perms .pt span{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .perms .pk{flex:0 0 auto;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
     background:var(--panel);color:var(--accent);border:1px solid var(--line-2);}
-  .perms .permrow.on .pk{background:#fff;color:var(--accent-dim);border-color:transparent;box-shadow:0 2px 6px rgba(70,140,50,.16);}
+  .perms .permrow.on .pk{background:#fff;color:var(--accent-dim);border-color:transparent;box-shadow:0 2px 6px rgba(11,122,65,.16);}
   html[data-theme="dark"] .perms .permrow.on .pk{background:var(--panel);}
   .perms .pk svg{width:19px;height:19px;}
 
@@ -712,8 +760,8 @@
     align-items:center;justify-content:center;gap:12px;color:var(--muted);
     background:linear-gradient(155deg,var(--accent-soft),color-mix(in srgb,var(--accent) 8%,var(--panel)));}
   .pv-play{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.92);
-    color:var(--accent-dim);box-shadow:0 8px 22px rgba(60,120,40,.22);}
-  html[data-theme="dark"] .pv-play{background:rgba(20,32,18,.9);}
+    color:var(--accent-dim);box-shadow:0 8px 22px rgba(9,105,55,.22);}
+  html[data-theme="dark"] .pv-play{background:rgba(16,32,23,.9);}
   .pv-play svg{width:24px;height:24px;margin-inline-start:3px;}
   .pv-cap{font-size:12.5px;color:var(--muted);}
   .rvside .pvthumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:8px;}
@@ -740,9 +788,17 @@
     .rvf-msg .ta{min-height:96px;}
     .rvform{padding:20px 18px;}
   }
-  @media (max-width:440px){
-    .rv-seg{width:100%;max-width:340px;}
-    .rv-segbtn{flex:1;justify-content:center;padding:0 12px;font-size:15px;}
+  /* compact the hero corner buttons before they can crowd the title */
+  @media (max-width:560px){
+    .rv-hero-back,.rv-cover-btn{padding:0;width:38px;justify-content:center;}
+    .rv-hero-back span,.rv-cover-btn span{display:none;}
+    .rv-hero-back svg,.rv-cover-btn svg{width:17px;height:17px;}
+  }
+  @media (max-width:520px){
+    .rv-seg{width:100%;max-width:100%;}
+    .rv-segbtn{flex:1;min-width:0;justify-content:center;padding:0 6px;font-size:13px;gap:5px;white-space:nowrap;}
+    .rv-segbtn svg{width:16px;height:16px;}
+    .rv-segbtn .count{min-width:18px;height:18px;font-size:11px;}
   }
 </style>
 <style>
@@ -818,7 +874,7 @@
   .review-detail .vswitch .vlbl{font-size:14px;color:var(--muted);font-weight:600;}
   .review-detail .vbtn{height:36px;padding:0 16px;border-radius:11px;font-family:var(--sans);font-size:14px;font-weight:600;}
   .review-detail .vbtn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dim);font-weight:700;
-    box-shadow:0 2px 8px rgba(70,140,50,.14);}
+    box-shadow:0 2px 8px rgba(11,122,65,.14);}
 
   /* ---- status banner ---- */
   .review-detail #decisionBox{margin:0 0 24px;}
@@ -848,7 +904,7 @@
   .review-detail .icard .ith{height:154px;position:relative;background:var(--panel-2);}
   .review-detail .icard .ith-badge{position:absolute;top:10px;inset-inline-start:10px;width:30px;height:30px;border-radius:9px;z-index:2;
     background:rgba(255,255,255,.92);color:var(--accent-dim);display:grid;place-items:center;box-shadow:0 2px 7px rgba(20,24,44,.16);}
-  html[data-theme="dark"] .review-detail .icard .ith-badge{background:rgba(22,32,20,.9);color:var(--accent);}
+  html[data-theme="dark"] .review-detail .icard .ith-badge{background:rgba(18,32,24,.9);color:var(--accent);}
   .review-detail .icard .ith-badge svg{width:16px;height:16px;}
   .review-detail .icard .ith .cc{top:10px;inset-inline-end:10px;}
   .review-detail .icard .imeta{display:flex;align-items:center;gap:8px;padding:11px 12px;}
@@ -987,7 +1043,7 @@
   /* ===== Review Studio modal ===== */
   .studio{position:fixed;inset:0;z-index:230;display:none;}
   .studio.show{display:block;}
-  .studio-scrim{position:absolute;inset:0;background:rgba(10,14,10,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;transition:opacity .2s;}
+  .studio-scrim{position:absolute;inset:0;background:rgba(8,14,11,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;transition:opacity .2s;}
   .studio.show .studio-scrim{opacity:1;}
   .studio-box{position:absolute;top:50%;left:50%;width:min(1040px,calc(100vw - 28px));height:min(788px,calc(100vh - 32px));
     background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-lg);overflow:hidden;
@@ -1005,8 +1061,35 @@
   .studio-x:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft);}
   .studio-x svg{width:18px;height:18px;}
 
-  .studio-main{flex:1;min-height:0;display:grid;grid-template-columns:246px minmax(0,1fr);}
-  .studio-rail{overflow-y:auto;border-inline-end:1px solid var(--line-2);background:var(--panel-2);padding:8px 10px 16px;}
+  /* 3-column dashboard layout: advanced rail | content | approval rail (rails are integral columns, not floating) */
+  .studio-main{flex:1;min-height:0;position:relative;overflow:hidden;display:flex;}
+  .rs-draw{position:relative;flex:0 0 248px;z-index:6;display:flex;flex-direction:column;overflow:hidden;
+    background:var(--panel-2);border:0;border-radius:0;box-shadow:none;
+    transition:flex-basis .28s cubic-bezier(.4,0,.2,1),opacity .22s;}
+  .rs-draw-r{border-inline-end:1px solid var(--line);}   /* approval flow — leading column, divider toward centre */
+  .rs-draw-l{border-inline-start:1px solid var(--line);} /* advanced — trailing column, divider toward centre */
+  .studio-main:not(.rs-r-on) .rs-draw-r{flex-basis:0;border-inline-end-width:0;opacity:0;pointer-events:none;}
+  .studio-main:not(.rs-l-on) .rs-draw-l{flex-basis:0;border-inline-start-width:0;opacity:0;pointer-events:none;}
+  .rs-draw-hd{display:flex;align-items:center;gap:9px;padding:12px 12px 11px;border-bottom:1px solid var(--line-2);flex-shrink:0;}
+  .rs-draw-ic{width:28px;height:28px;flex-shrink:0;border-radius:9px;display:grid;place-items:center;color:var(--accent-dim);background:var(--accent-soft);}
+  .rs-draw-ic svg{width:15px;height:15px;}
+  .rs-draw-t{flex:1;min-width:0;font:800 12.5px var(--sans);color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:start;}
+  .rs-draw-x{width:28px;height:28px;flex-shrink:0;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .12s;}
+  .rs-draw-x:hover{color:var(--accent-dim);border-color:var(--accent);background:var(--accent-soft);}
+  .rs-draw-x svg{width:16px;height:16px;}
+  .rs-draw-body{flex:1;min-height:0;overflow-y:auto;padding:9px 10px 14px;}
+  /* edge pull-tabs shown only while the matching drawer is closed */
+  .rs-tab{position:absolute;top:50%;transform:translateY(-50%);z-index:7;display:none;place-items:center;
+    width:30px;height:66px;border:1px solid var(--line-2);background:var(--panel-2);color:var(--accent-dim);cursor:pointer;
+    box-shadow:0 8px 22px rgba(8,14,11,.16);transition:transform .15s,color .15s,border-color .15s;}
+  .rs-tab svg{width:18px;height:18px;}
+  .rs-tab-r{right:0;border-radius:12px 0 0 12px;border-right:none;}
+  .rs-tab-l{left:0;border-radius:0 12px 12px 0;border-left:none;}
+  .rs-tab:hover{color:var(--accent);border-color:var(--accent);}
+  .rs-tab-r:hover{transform:translateY(-50%) translateX(-2px);}
+  .rs-tab-l:hover{transform:translateY(-50%) translateX(2px);}
+  .studio-main:not(.rs-r-on) .rs-tab-r{display:grid;}
+  .studio-main:not(.rs-l-on) .rs-tab-l{display:grid;}
   .st-glabel{font:600 10.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:14px 10px 7px;}
   .st-nav{display:flex;align-items:center;gap:11px;width:100%;padding:10px 11px;border-radius:11px;border:none;background:transparent;color:var(--ink-2);cursor:pointer;font:600 13.5px var(--sans);text-align:start;margin-bottom:2px;transition:background .12s,color .12s;}
   .st-nav:hover{background:var(--panel);}
@@ -1015,7 +1098,8 @@
   .st-nav span{flex:1;min-width:0;}
   .st-nav .st-count{margin-inline-start:auto;flex:none;}
 
-  .studio-content{overflow-y:auto;padding:22px 26px 26px;}
+
+  .studio-content{position:relative;flex:1 1 auto;min-width:0;overflow-y:auto;padding:22px 26px 26px;}
   .st-sec{display:none;}
   .st-sec.on{display:block;animation:stFade .22s ease;}
   @keyframes stFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
@@ -1070,11 +1154,70 @@
   @media (max-width:720px){
     .studio-box{inset:0;width:100%;height:100%;max-width:none;border-radius:0;transform:none;}
     .studio.show .studio-box{transform:none;}
-    .studio-main{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);}
-    .studio-rail{display:flex;gap:6px;overflow-x:auto;border-inline-end:none;border-bottom:1px solid var(--line-2);padding:10px;}
-    .st-glabel{display:none;}
-    .st-nav{width:auto;white-space:nowrap;flex-shrink:0;margin-bottom:0;}
+    /* not enough room for 3 fixed columns — rails revert to floating overlay drawers that slide over the content */
+    .studio-content{position:absolute;inset:0;flex:none;padding:22px 26px 26px;}
+    .rs-draw{position:absolute;top:10px;bottom:10px;flex-basis:auto;width:min(300px,84vw);
+      border:1px solid var(--line-2);border-radius:16px;
+      box-shadow:0 20px 52px rgba(8,14,11,.22),0 3px 10px rgba(8,14,11,.10);
+      transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .22s;}
+    .rs-draw-r{right:10px;left:auto;} .rs-draw-l{left:10px;right:auto;}
+    .studio-main:not(.rs-r-on) .rs-draw-r{flex-basis:auto;transform:translateX(calc(100% + 24px));}
+    .studio-main:not(.rs-l-on) .rs-draw-l{flex-basis:auto;transform:translateX(calc(-100% - 24px));}
+    .st-nav{width:100%;}
     .st-nav .st-count{display:none;}
+  }
+
+  /* ===== docked approval settings (integral sidebar — replaces the floating modal) ===== */
+  .rv-sdock{flex-direction:column;position:sticky;top:16px;align-self:stretch;max-height:calc(100vh - 32px);
+    background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-sm);overflow:hidden;}
+  .rv-sdock-hd{display:flex;align-items:center;gap:11px;padding:13px 14px;border-bottom:1px solid var(--line-2);background:var(--panel-2);flex-shrink:0;}
+  .rv-sdock-ico{width:36px;height:36px;flex-shrink:0;border-radius:11px;display:grid;place-items:center;color:#fff;background:var(--grad-btn);box-shadow:0 6px 16px var(--grad-btn-glow);}
+  .rv-sdock-ico svg{width:19px;height:19px;}
+  .rv-sdock-tx{flex:1;min-width:0;}
+  .rv-sdock-tx h3{margin:0;font-size:14px;font-weight:800;letter-spacing:-.01em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rv-sdock-tx p{margin:2px 0 0;font-size:11px;color:var(--muted);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rv-sdock-collapse{width:30px;height:30px;flex-shrink:0;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .12s;}
+  .rv-sdock-collapse:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-soft);}
+  .rv-sdock-collapse svg{width:16px;height:16px;transition:transform .25s;}
+  .rv-sdock-body{flex:1;min-height:0;overflow-y:auto;padding:12px 12px 16px;}
+  .rv-sdock-ft{display:flex;align-items:center;gap:7px;padding:10px 14px;border-top:1px solid var(--line-2);background:var(--panel-2);font-size:11.5px;color:var(--faint);flex-shrink:0;}
+  .rv-sdock-ft svg{width:14px;height:14px;color:var(--success-dim);flex-shrink:0;}
+
+  /* nav list + the relocated content host live together so controls can render right under the active tab (accordion) */
+  .rv-sdock-body .st-nav::after{content:'';flex:none;width:7px;height:7px;margin-inline-start:auto;
+    border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);
+    opacity:.45;transition:transform .2s,opacity .2s;}
+  .rv-sdock-body .st-nav.on::after{transform:rotate(225deg);opacity:.85;}
+  .rv-sdock-body .st-glabel{margin:14px 4px 7px;}
+  .rv-sdock-body .st-glabel:first-child{margin-top:2px;}
+  .rv-sdock-body > #rsContent{position:static;flex:none;overflow:visible;padding:4px 2px 6px;}
+  .rv-sdock-body .st-sec-h{font-size:14.5px;}
+  .rv-sdock-body .st-sec-sub{font-size:12px;margin-bottom:14px;}
+  /* reflow the richer relocated blocks (watermark / brand / two-up rows) into the narrow column */
+  .rv-sdock-body .wm-grid2{grid-template-columns:1fr;}
+  .rv-sdock-body .st-row2{grid-template-columns:1fr;}
+  .rv-sdock-body .brand-inline{flex-wrap:wrap;}
+  .rv-sdock-body .st-mount .opt{margin-bottom:14px;}
+  .rv-sdock-body .rs-legend{grid-template-columns:1fr;}
+
+  /* collapsed: shrink to a slim rail, keep just the icon + expand affordance (scoped per-dock so collapsing one never hides the other) */
+  #createGrid.sdock-collapsed  #rvSDock  .rv-sdock-body,
+  #createGrid.sdock-collapsed  #rvSDock  .rv-sdock-ft,
+  #createGrid.sdockl-collapsed #rvSDockL .rv-sdock-body,
+  #createGrid.sdockl-collapsed #rvSDockL .rv-sdock-ft{display:none;}
+  #createGrid.sdock-collapsed  #rvSDock  .rv-sdock-tx,
+  #createGrid.sdockl-collapsed #rvSDockL .rv-sdock-tx{display:none;}
+  #createGrid.sdock-collapsed  #rvSDock  .rv-sdock-hd,
+  #createGrid.sdockl-collapsed #rvSDockL .rv-sdock-hd{flex-direction:column;gap:10px;padding:12px 0;justify-content:center;}
+  #createGrid.sdock-collapsed  #rvSDock  .rv-sdock-collapse svg,
+  #createGrid.sdockl-collapsed #rvSDockL .rv-sdock-collapse svg{transform:rotate(180deg);}
+
+  @media (max-width:1080px){
+    .rv-sdock{position:static;max-height:none;}
+    #createGrid.sdock-collapsed  #rvSDock  .rv-sdock-body,#createGrid.sdock-collapsed  #rvSDock  .rv-sdock-ft,
+    #createGrid.sdockl-collapsed #rvSDockL .rv-sdock-body,#createGrid.sdockl-collapsed #rvSDockL .rv-sdock-ft{display:block;}
+    #createGrid.sdock-collapsed  #rvSDock  .rv-sdock-tx,#createGrid.sdockl-collapsed #rvSDockL .rv-sdock-tx{display:block;}
+    #createGrid.sdock-collapsed  #rvSDock  .rv-sdock-hd,#createGrid.sdockl-collapsed #rvSDockL .rv-sdock-hd{flex-direction:row;padding:13px 14px;}
   }
 </style>
 </head>
@@ -1097,13 +1240,32 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
           <span data-i18n="modeClient"></span>
         </button>
+        <button class="rv-segbtn rv-seg-list" id="tabManage" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+          <span data-i18n="tabManage"></span>
+          <span class="count" id="mgCount">0</span>
+        </button>
       </div>
-      <button class="rv-projlink" id="tabManage" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
-        <span data-i18n="tabManage"></span>
-        <span class="count" id="mgCount">0</span>
-      </button>
     </div>
+  </div>
+
+  <!-- top-right back button (mirrors the "received files" screen) -->
+  <button class="rv-hero-back" id="createBackBtn" type="button" data-i18n-al="back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    <span data-i18n="back"></span>
+  </button>
+
+  <!-- change the hero cover image (mirrors the "received files" cover mechanism) -->
+  <div class="rv-hero-cover" id="heroCover">
+    <button class="rv-cover-btn" id="coverBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <span data-i18n="coverChange"></span>
+    </button>
+    <button class="rv-cover-btn rv-cover-rm hidden" id="coverRmBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+      <span data-i18n="coverRemove"></span>
+    </button>
+    <input type="file" id="coverInput" accept="image/png,image/jpeg,image/webp" hidden>
   </div>
 </header>
 
@@ -1112,13 +1274,10 @@
   <!-- ============ CREATE ============ -->
   <div id="createView">
     <div class="grid mode-admin" id="createGrid">
-      <div class="col">
+      <div class="col rv-formcol">
         <div class="card rvform">
           <div class="rvf-hd">
             <h3 class="rvf-title" data-i18n="formTitle"></h3>
-            <button class="cl-gear" id="openStudio" type="button" data-i18n-al="studioOpenAria" aria-label="הגדרות אישור">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
-            </button>
           </div>
           <div class="rs-chips" id="rsChips"></div>
 
@@ -1293,7 +1452,7 @@
                 <button class="minibtn2 hidden" id="logoRmBtn" type="button" data-i18n="brRemove"></button>
                 <input type="file" id="logoInput" accept="image/*">
                 <span class="logoprev hidden" id="logoPrev"></span>
-                <span class="colorwrap"><input type="color" id="brColor" value="#57ab3f"></span>
+                <span class="colorwrap"><input type="color" id="brColor" value="#0b7a41"></span>
               </div>
             </div>
           </div>
@@ -1309,7 +1468,7 @@
       </div>
 
       <!-- live preview of the client screen -->
-      <div class="col">
+      <div class="col rv-prevcol">
         <aside class="card rvside">
           <div class="rvside-top">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -1338,6 +1497,34 @@
           </div>
         </aside>
       </div>
+
+      <!-- ===== DOCKED APPROVAL SETTINGS (integral sidebar; the studio nav + panels are moved in here at init) ===== -->
+      <aside class="rv-sdock" id="rvSDock" data-i18n-al="rsTitle" aria-label="settings">
+        <header class="rv-sdock-hd">
+          <span class="rv-sdock-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-4"/></svg></span>
+          <div class="rv-sdock-tx"><h3 data-i18n="rsTitle"></h3><p data-i18n="rsSub"></p></div>
+          <button class="rv-sdock-collapse" id="rvSDockToggle" type="button" aria-expanded="true" data-i18n-al="rsSideToggle" aria-label="collapse">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </header>
+        <div class="rv-sdock-body" id="rvSDockBody">
+          <div class="st-glabel" data-i18n="rsGrpAccess"></div>
+        </div>
+        <footer class="rv-sdock-ft"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="rsAutosave"></span></footer>
+      </aside>
+
+      <!-- ===== LEFT DOCKED SETTINGS (integral sidebar; protection + presentation/tracking groups are moved in here at init) ===== -->
+      <aside class="rv-sdock rv-sdock-l" id="rvSDockL" data-i18n-al="rsTitleL" aria-label="settings">
+        <header class="rv-sdock-hd">
+          <span class="rv-sdock-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
+          <div class="rv-sdock-tx"><h3 data-i18n="rsTitleL"></h3><p data-i18n="rsSubL"></p></div>
+          <button class="rv-sdock-collapse" id="rvSDockLToggle" type="button" aria-expanded="true" data-i18n-al="rsSideToggle" aria-label="collapse">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+        </header>
+        <div class="rv-sdock-body" id="rvSDockBodyL"></div>
+        <footer class="rv-sdock-ft"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="rsAutosave"></span></footer>
+      </aside>
     </div>
 
     <!-- share result -->
@@ -1483,19 +1670,22 @@
       <button class="studio-x" id="rsClose" type="button" data-i18n-al="close" aria-label="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </header>
     <div class="studio-main">
-      <nav class="studio-rail" id="rsRail">
-        <div class="st-glabel" data-i18n="rsGrpAccess"></div>
-        <button class="st-nav on" type="button" data-sec="perms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg><span data-i18n="rsNavPerms"></span></button>
-        <button class="st-nav" type="button" data-sec="approval"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg><span data-i18n="rsNavApproval"></span></button>
-        <button class="st-nav" type="button" data-sec="changes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg><span data-i18n="rsNavChanges"></span></button>
-        <button class="st-nav" type="button" data-sec="annotate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span data-i18n="rsNavAnnotate"></span></button>
-        <div class="st-glabel" data-i18n="rsGrpProtect"></div>
-        <button class="st-nav" type="button" data-sec="security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="rsNavSecurity"></span></button>
-        <button class="st-nav" type="button" data-sec="notify"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span data-i18n="rsNavNotify"></span></button>
-        <div class="st-glabel" data-i18n="rsGrpPresent"></div>
-        <button class="st-nav" type="button" data-sec="branding"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C21.996 6.012 17.5 2 12 2Z"/></svg><span data-i18n="rsNavBranding"></span></button>
-        <button class="st-nav" type="button" data-sec="statuses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="4" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="20" y1="20" x2="20" y2="14"/></svg><span data-i18n="rsNavStatuses"></span></button>
+      <nav class="rs-draw rs-draw-r" id="rsRail" data-i18n-al="rsGrpAccess" aria-label="Approval flow">
+        <div class="rs-draw-hd">
+          <span class="rs-draw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-4"/></svg></span>
+          <span class="rs-draw-t" data-i18n="rsGrpAccess"></span>
+          <button class="rs-draw-x" id="rsRailClose" type="button" data-rs-draw="r" data-i18n-al="rsNavHide" aria-label="hide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+        <div class="rs-draw-body">
+          <button class="st-nav on" type="button" data-sec="perms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg><span data-i18n="rsNavPerms"></span></button>
+          <button class="st-nav" type="button" data-sec="approval"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg><span data-i18n="rsNavApproval"></span></button>
+          <button class="st-nav" type="button" data-sec="changes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg><span data-i18n="rsNavChanges"></span></button>
+          <button class="st-nav" type="button" data-sec="annotate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span data-i18n="rsNavAnnotate"></span></button>
+        </div>
       </nav>
+      <button class="rs-tab rs-tab-r" id="rsRailTab" type="button" data-rs-draw="r" data-i18n-al="rsGrpAccess" aria-label="Approval flow" title="">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
 
       <div class="studio-content" id="rsContent">
 
@@ -1649,6 +1839,25 @@
         </section>
 
       </div>
+
+      <aside class="rs-draw rs-draw-l" id="rsSide" data-i18n-al="rsSideTitle" aria-label="Advanced">
+        <div class="rs-draw-hd">
+          <span class="rs-draw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
+          <span class="rs-draw-t" data-i18n="rsSideTitle"></span>
+          <button class="rs-draw-x" id="rsSideClose" type="button" data-rs-draw="l" data-i18n-al="rsNavHide" aria-label="hide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        </div>
+        <div class="rs-draw-body">
+          <div class="st-glabel" data-i18n="rsGrpProtect"></div>
+          <button class="st-nav" type="button" data-sec="security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="rsNavSecurity"></span></button>
+          <button class="st-nav" type="button" data-sec="notify"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span data-i18n="rsNavNotify"></span></button>
+          <div class="st-glabel" data-i18n="rsGrpPresent"></div>
+          <button class="st-nav" type="button" data-sec="branding"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C21.996 6.012 17.5 2 12 2Z"/></svg><span data-i18n="rsNavBranding"></span></button>
+          <button class="st-nav" type="button" data-sec="statuses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="4" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="20" y1="20" x2="20" y2="14"/></svg><span data-i18n="rsNavStatuses"></span></button>
+        </div>
+      </aside>
+      <button class="rs-tab rs-tab-l" id="rsSideTab" type="button" data-rs-draw="l" data-i18n-al="rsSideTitle" aria-label="Advanced" title="">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
     </div>
     <footer class="studio-ft">
       <span class="studio-ft-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="rsAutosave"></span></span>
@@ -1741,6 +1950,7 @@
       confTitleDel:'מחיקת הפרויקט', confDel:'למחוק את הפרויקט? כל החומרים וההערות יימחקו לצמיתות.', confCancel:'ביטול',
       copiedShort:'הקישור הועתק ✓', closedToast:'הפרויקט נסגר', reopenedToast:'הפרויקט נפתח מחדש', delToast:'הפרויקט נמחק', verAddedToast:v=>`נוספה גרסה ${v}`,
       back:'חזרה',
+      coverChange:'החלפת תמונה', coverRemove:'הסרת התמונה', coverErr:'לא הצלחנו לטעון את התמונה. בחרו קובץ תמונה עד 8MB.',
       dItems:'חומרים', dFeedback:'הערות ופידבק', dNoComments:'עדיין אין הערות מהלקוח.',
       decApprovedT:'הפרויקט אושר', decApprovedS:(who,d)=>`${who} · ${d}`,
       decChangesT:'הלקוח ביקש תיקונים', decRejectedT:'הלקוח דחה את הפרויקט', decChangesS:(who,d)=>`${who} · ${d}`,
@@ -1809,6 +2019,7 @@
       confTitleDel:'Delete project', confDel:'Delete this project? All materials and comments will be permanently removed.', confCancel:'Cancel',
       copiedShort:'Link copied ✓', closedToast:'Project closed', reopenedToast:'Project reopened', delToast:'Project deleted', verAddedToast:v=>`Version ${v} added`,
       back:'Back',
+      coverChange:'Change cover', coverRemove:'Remove cover', coverErr:'Could not load the image. Choose an image up to 8MB.',
       dItems:'Materials', dFeedback:'Feedback', dNoComments:'No feedback from the client yet.',
       decApprovedT:'Project approved', decApprovedS:(who,d)=>`${who} · ${d}`,
       decChangesT:'Client requested changes', decChangesS:(who,d)=>`${who} · ${d}`, decRejectedT:'Client rejected the project',
@@ -1877,6 +2088,7 @@
       confTitleDel:'Удалить проект', confDel:'Удалить проект? Все материалы и комментарии будут удалены безвозвратно.', confCancel:'Отмена',
       copiedShort:'Ссылка скопирована ✓', closedToast:'Проект закрыт', reopenedToast:'Проект открыт снова', delToast:'Проект удалён', verAddedToast:v=>`Версия ${v} добавлена`,
       back:'Назад',
+      coverChange:'Сменить обложку', coverRemove:'Убрать обложку', coverErr:'Не удалось загрузить изображение. Выберите файл до 8 МБ.',
       dItems:'Материалы', dFeedback:'Обратная связь', dNoComments:'Пока нет комментариев от клиента.',
       decApprovedT:'Проект одобрен', decApprovedS:(who,d)=>`${who} · ${d}`,
       decChangesT:'Клиент запросил правки', decRejectedT:'Клиент отклонил проект', decChangesS:(who,d)=>`${who} · ${d}`,
@@ -1934,6 +2146,7 @@
     rsNavPerms:'הרשאות הלקוח', rsNavApproval:'אישור ותהליך', rsNavChanges:'בקשות תיקון',
     rsNavAnnotate:'הערות וסימון', rsNavSecurity:'אבטחה', rsNavNotify:'התראות',
     rsNavBranding:'מיתוג', rsNavStatuses:'סטטוסים והתקדמות',
+    rsSideTitle:'הגדרות מתקדמות', rsSideToggle:'הצג או הסתר הגדרות מתקדמות', rsNavHide:'הסתר תפריט',
     rsPermsH:'מה הלקוח יכול לעשות', rsPermsSub:'בחרו אילו פעולות זמינות ללקוח בקישור.',
     rsPmView:'צפייה בקבצים', rsPmViewD:'תמיד פעיל — בלי זה אין מה לאשר',
     rsPmDownload:'הורדת קבצים', rsPmDownloadD:'הורדת החומרים הסופיים',
@@ -2002,6 +2215,7 @@
     rsNavPerms:'Client permissions', rsNavApproval:'Approval & flow', rsNavChanges:'Change requests',
     rsNavAnnotate:'Comments & markup', rsNavSecurity:'Security', rsNavNotify:'Notifications',
     rsNavBranding:'Branding', rsNavStatuses:'Statuses & progress',
+    rsSideTitle:'Advanced', rsSideToggle:'Toggle advanced settings', rsNavHide:'Hide menu',
     rsPermsH:'What the client can do', rsPermsSub:'Choose which actions are available on the link.',
     rsPmView:'View files', rsPmViewD:'Always on — nothing to approve without it',
     rsPmDownload:'Download files', rsPmDownloadD:'Download the final materials',
@@ -2064,6 +2278,10 @@
   };
   Object.assign(I18N.en, RS_EN);
   Object.assign(I18N.ru, RS_EN);
+  // left settings dock header (protection + presentation/tracking groups)
+  Object.assign(I18N.he,{ rsTitleL:'הגנה, מיתוג ומעקב', rsSubL:'אבטחה, התראות, מיתוג וסטטוס הפרויקט.' });
+  Object.assign(I18N.en,{ rsTitleL:'Protection & tracking', rsSubL:'Security, alerts, branding & statuses.' });
+  Object.assign(I18N.ru,{ rsTitleL:'Protection & tracking', rsSubL:'Security, alerts, branding & statuses.' });
   // owner-side feedback chips for client annotations / priority / extras
   Object.assign(I18N.he,{ fcPrioLow:'עדיפות נמוכה', fcPrioMedium:'עדיפות בינונית', fcPrioHigh:'עדיפות גבוהה', fcAnno:'סימון על התמונה', fcLink:'קישור', fcVoice:'הקלטה קולית' });
   const RS_FEED_EN={ fcPrioLow:'Low priority', fcPrioMedium:'Medium priority', fcPrioHigh:'High priority', fcAnno:'Image mark', fcLink:'Link', fcVoice:'Voice note' };
@@ -2074,7 +2292,7 @@
   let viewMode='admin'; // 'admin' = edit form · 'client' = live client preview
   let newItems=[];            // {id,file,name,ext,kind,size}
   let uid=1;
-  let brand={ name:'', tagline:'', logo:'', bg:'', color:'#57ab3f' };
+  let brand={ name:'', tagline:'', logo:'', bg:'', color:'#0b7a41' };
   // preview-watermark settings (applied only to the client PREVIEW; originals kept clean)
   let wm=(window.KolkliWatermark && KolkliWatermark.defaults()) || {on:false,visual:{on:true},audio:{on:true}};
   let lastToken=null;         // project just created (for share panel)
@@ -2138,6 +2356,7 @@
     el('projectView').classList.toggle('hidden', v!=='project');
     el('tabManage').classList.toggle('on', v==='manage' || v==='project');
     document.body.classList.toggle('review-detail', v==='project');
+    document.body.classList.toggle('review-create', v==='create');
     if(v!=='project') closeCardMenu();
     if(v==='manage') renderManage();
     applyMode();
@@ -2171,7 +2390,7 @@
   function loadBrandUI(){
     brand=RV.loadBrand();
     el('brName').value=brand.name||'';
-    el('brColor').value=/^#[0-9a-f]{6}$/i.test(brand.color||'')? brand.color : '#57ab3f';
+    el('brColor').value=/^#[0-9a-f]{6}$/i.test(brand.color||'')? brand.color : '#0b7a41';
     setLogoPreview(brand.logo||'');
   }
   function setLogoPreview(dataUrl){
@@ -2180,7 +2399,7 @@
   }
   function collectBrand(){
     brand.name=el('brName').value.trim();
-    brand.color=el('brColor').value||'#57ab3f';
+    brand.color=el('brColor').value||'#0b7a41';
     RV.saveBrand(brand);
     return { name:brand.name, tagline:brand.tagline||'', logo:brand.logo||'', bg:brand.bg||'', color:brand.color };
   }
@@ -2353,7 +2572,7 @@
   }
   function renderPreview(){
     // branded mock hero
-    const nm=el('brName').value.trim(), color=el('brColor').value||'#57ab3f', logo=brand.logo||'';
+    const nm=el('brName').value.trim(), color=el('brColor').value||'#0b7a41', logo=brand.logo||'';
     const hero=el('pvHero');
     hero.classList.toggle('br', !!(logo||nm));
     hero.style.background = (logo||nm)? `linear-gradient(120deg,${color},${shade(color,.18)})` : '';
@@ -2412,7 +2631,7 @@
   }
   function rsGet(o,path){ return path.split('.').reduce((a,k)=> (a==null? undefined : a[k]), o); }
   function rsSet(o,path,v){ const ks=path.split('.'); let a=o; for(let i=0;i<ks.length-1;i++){ if(a[ks[i]]==null||typeof a[ks[i]]!=='object') a[ks[i]]={}; a=a[ks[i]]; } a[ks[ks.length-1]]=v; }
-  function rsInput(path){ return document.querySelector('#reviewStudio [data-rs="'+path+'"]'); }
+  function rsInput(path){ return document.querySelector('#rsContent [data-rs="'+path+'"]'); }
   function rsChecked(path){ const i=rsInput(path); return i? !!i.checked : false; }
 
   // relocate the existing inline blocks into their studio panels (once)
@@ -2429,7 +2648,7 @@
 
   function collectReviewSettings(){
     const s=defaultReviewSettings();
-    document.querySelectorAll('#reviewStudio [data-rs]').forEach(inp=>{
+    document.querySelectorAll('#rsContent [data-rs]').forEach(inp=>{
       const path=inp.getAttribute('data-rs'); let v;
       if(inp.type==='checkbox') v=inp.checked;
       else if(inp.type==='number') v=Math.max(0,parseInt(inp.value,10)||0);
@@ -2447,7 +2666,7 @@
   }
   function applyReviewSettings(s){
     if(!s) return;
-    document.querySelectorAll('#reviewStudio [data-rs]').forEach(inp=>{
+    document.querySelectorAll('#rsContent [data-rs]').forEach(inp=>{
       const v=rsGet(s,inp.getAttribute('data-rs')); if(v===undefined||v===null) return;
       if(inp.type==='checkbox') inp.checked=!!v; else inp.value=v;
     });
@@ -2455,7 +2674,7 @@
     rsSyncSegs(); rsSyncDeps();
   }
   function rsSyncSegs(){
-    document.querySelectorAll('#reviewStudio [data-seg]').forEach(btn=>{
+    document.querySelectorAll('#rsContent [data-seg]').forEach(btn=>{
       const hidden=rsInput(btn.getAttribute('data-seg'));
       btn.classList.toggle('on', !!hidden && hidden.value===btn.getAttribute('data-val'));
     });
@@ -2475,26 +2694,54 @@
     rsDep('approval.allowChangeAfter', !rsChecked('approval.lockAfterDecision'));
   }
 
-  function openStudio(){
-    rsMountInline();
-    if(typeof renderWmUI==='function') renderWmUI();
-    el('reviewStudio').classList.add('show');
-    document.body.style.overflow='hidden';
-    el('openStudio').classList.add('seen'); RV.lsSet('rv_studio_seen','1');
-    rsSyncDeps();
+  // Relocate the studio's section nav + content host from the (now unused) modal shell into the
+  // docked sidebar, once. Every listener bound to the moved nodes survives the move.
+  let rsDocked=false;
+  function dockReviewStudio(){
+    if(rsDocked) return;
+    const navHost=el('rvSDockBody'), navHostL=el('rvSDockBodyL'), content=el('rsContent');
+    if(!navHost||!navHostL||!content) return;
+    const railBody=document.querySelector('#rsRail .rs-draw-body');
+    const sideBody=document.querySelector('#rsSide .rs-draw-body');
+    if(railBody){ while(railBody.firstChild) navHost.appendChild(railBody.firstChild); }   // approval-flow group → right dock
+    if(sideBody){ while(sideBody.firstChild) navHostL.appendChild(sideBody.firstChild); }  // protection + presentation groups → left dock (brings their own labels)
+    navHost.appendChild(content);   // content host starts in the right dock; showStudioSection repositions it under the active tab (either dock)
+    rsDocked=true;
   }
-  function closeStudio(){ el('reviewStudio').classList.remove('show'); document.body.style.overflow=''; }
-  function showStudioSection(id){
-    document.querySelectorAll('#reviewStudio .st-nav').forEach(b=>b.classList.toggle('on', b.getAttribute('data-sec')===id));
-    document.querySelectorAll('#reviewStudio .st-sec').forEach(s=>s.classList.toggle('on', s.getAttribute('data-sec')===id));
-    const c=el('rsContent'); if(c) c.scrollTop=0;
+  function setDockCollapsed(on,persist){
+    const g=el('createGrid'); if(g) g.classList.toggle('sdock-collapsed', !!on);
+    const b=el('rvSDockToggle'); if(b) b.setAttribute('aria-expanded', on?'false':'true');
+    if(persist) RV.lsSet('rv_studio_dock_collapsed', on?'1':'0');
+  }
+  function toggleDockCollapsed(){ const g=el('createGrid'); setDockCollapsed(!(g&&g.classList.contains('sdock-collapsed')), true); }
+  function setDockLCollapsed(on,persist){
+    const g=el('createGrid'); if(g) g.classList.toggle('sdockl-collapsed', !!on);
+    const b=el('rvSDockLToggle'); if(b) b.setAttribute('aria-expanded', on?'false':'true');
+    if(persist) RV.lsSet('rv_studio_dockl_collapsed', on?'1':'0');
+  }
+  function toggleDockLCollapsed(){ const g=el('createGrid'); setDockLCollapsed(!(g&&g.classList.contains('sdockl-collapsed')), true); }
+  // the section nav now lives across BOTH side docks; treat them as one logical nav
+  function rsNavHosts(){ return [el('rvSDockBody'), el('rvSDockBodyL')].filter(Boolean); }
+  function rsAllNav(){ const out=[]; rsNavHosts().forEach(h=>out.push(...h.querySelectorAll('.st-nav'))); return out; }
+  function rsActiveNav(){ return rsAllNav().find(b=>b.classList.contains('on'))||null; }
+  function showStudioSection(id, allowToggle){
+    const content=el('rsContent'); const nav=rsAllNav(); if(!content||!nav.length) return;
+    const cur=rsActiveNav();
+    // accordion toggle: a click on the already-open section collapses it (so every header can be seen);
+    // programmatic calls (init) force-open instead of toggling.
+    const target=(allowToggle && cur && cur.getAttribute('data-sec')===id) ? null : id;
+    nav.forEach(b=>b.classList.toggle('on', b.getAttribute('data-sec')===target));
+    document.querySelectorAll('#rsContent .st-sec').forEach(s=>s.classList.toggle('on', s.getAttribute('data-sec')===target));
+    const active=rsActiveNav();
+    if(active){ content.style.display=''; active.insertAdjacentElement('afterend', content); } // controls render under the open tab, in whichever dock holds it
+    else { content.style.display='none'; (el('rvSDockBody')||el('rvSDockBodyL')).appendChild(content); } // fully collapsed
   }
 
   function buildStatusLegend(){
     const box=el('rsLegend'); if(!box) return;
     const items=[['#e0a020','rsLgPending'],['#3b82f6','rsLgViewed'],['#6366f1','rsLgComment'],['#e0803a','rsLgChanges'],
-      ['#8b5cf6','rsLgProgress'],['#0ea5e9','rsLgNewVer'],['#f59e0b','rsLgAwaiting'],['#3d9e46','rsLgApproved'],
-      ['#e5484d','rsLgRejected'],['#7a8a7a','rsLgClosed']];
+      ['#8b5cf6','rsLgProgress'],['#0ea5e9','rsLgNewVer'],['#f59e0b','rsLgAwaiting'],['#0f9a4d','rsLgApproved'],
+      ['#e5484d','rsLgRejected'],['#758a80','rsLgClosed']];
     box.innerHTML=items.map(([c,k])=>`<span class="rs-lg" style="color:${c}"><span class="dot"></span><span style="color:var(--ink-2)">${(t[k]||k)}</span></span>`).join('');
   }
 
@@ -3092,6 +3339,40 @@
   el('emptyNewBtn').addEventListener('click',()=>{ resetCreate(); viewMode='admin'; setView('create'); });
   el('toManageBtn').addEventListener('click',()=>setView('manage'));
   el('backBtn').addEventListener('click',()=>setView('manage'));
+  el('createBackBtn').addEventListener('click',()=>setView('manage'));
+
+  // ---------- hero cover image ----------
+  // Owner-scoped cover for the create-screen hero. When set it replaces the
+  // default hero art; the original file is never touched (see request/received).
+  function applyCover(){
+    const cover=RV.loadCover();
+    const bg=document.querySelector('.rv-hero-bg');
+    if(bg) bg.style.backgroundImage = cover ? 'url("'+cover+'")' : "url('assets/hero-bg.jpg')";
+    const rm=el('coverRmBtn'); if(rm) rm.classList.toggle('hidden', !cover);
+  }
+  function readCoverFile(file){
+    if(!file) return;
+    if(!/^image\//.test(file.type) || file.size>8*1024*1024){ alert(t.coverErr); return; }
+    const reader=new FileReader();
+    reader.onload=function(){
+      const img=new Image();
+      img.onload=function(){
+        // downscale wide covers so the data URL stays localStorage-friendly
+        const maxW=1600, scale=Math.min(1, maxW/(img.width||maxW));
+        const w=Math.max(1,Math.round((img.width||maxW)*scale)), h=Math.max(1,Math.round((img.height||1)*scale));
+        let out;
+        try{ const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); out=c.toDataURL('image/jpeg',0.85); }
+        catch(_){ out=reader.result; }
+        RV.saveCover(out); applyCover();
+      };
+      img.onerror=function(){ RV.saveCover(reader.result); applyCover(); };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  el('coverBtn').addEventListener('click',()=>el('coverInput').click());
+  el('coverInput').addEventListener('change',()=>{ readCoverFile(el('coverInput').files[0]); el('coverInput').value=''; });
+  el('coverRmBtn').addEventListener('click',()=>{ RV.saveCover(''); applyCover(); });
 
   // materials uploader
   const drop=el('drop'), input=el('fileInput'), folderInput=el('folderInput');
@@ -3106,20 +3387,19 @@
   el('mlist').addEventListener('click',e=>{ const b=e.target.closest('[data-rm]'); if(b) removeItem(b.getAttribute('data-rm')); });
 
   // perms + preview inputs
-  // ---------- Review Studio wiring ----------
-  el('openStudio').addEventListener('click', openStudio);
-  el('rsClose').addEventListener('click', closeStudio);
-  el('rsDone').addEventListener('click', closeStudio);
-  el('rsScrim').addEventListener('click', closeStudio);
-  el('rsRail').addEventListener('click', e=>{ const b=e.target.closest('[data-sec]'); if(b) showStudioSection(b.getAttribute('data-sec')); });
+  // ---------- Review Studio wiring (docked sidebar) ----------
+  const rsNavClick = e=>{ const b=e.target.closest('[data-sec]'); if(b) showStudioSection(b.getAttribute('data-sec'), true); };
+  if(el('rvSDockBody')) el('rvSDockBody').addEventListener('click', rsNavClick);
+  if(el('rvSDockBodyL')) el('rvSDockBodyL').addEventListener('click', rsNavClick);
+  if(el('rvSDockToggle')) el('rvSDockToggle').addEventListener('click', toggleDockCollapsed);
+  if(el('rvSDockLToggle')) el('rvSDockLToggle').addEventListener('click', toggleDockLCollapsed);
   el('rsContent').addEventListener('click', e=>{
     const seg=e.target.closest('[data-seg]'); if(!seg) return;
     const hidden=rsInput(seg.getAttribute('data-seg')); if(hidden) hidden.value=seg.getAttribute('data-val');
     onStudioChange();
   });
-  el('reviewStudio').addEventListener('change', onStudioChange);
-  el('reviewStudio').addEventListener('input', onStudioChange);
-  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && el('reviewStudio').classList.contains('show')) closeStudio(); });
+  el('rsContent').addEventListener('change', onStudioChange);
+  el('rsContent').addEventListener('input', onStudioChange);
   ['fName','fMessage'].forEach(id=>el(id).addEventListener('input',renderPreview));
   el('brName').addEventListener('input',()=>{ brand.name=el('brName').value.trim(); RV.saveBrand(brand); renderPreview(); });
   el('brColor').addEventListener('input',()=>{ brand.color=el('brColor').value; RV.saveBrand(brand); renderPreview(); });
@@ -3222,12 +3502,16 @@
   // ---------- init ----------
   applyTheme(ls('theme')||'light');
   loadBrandUI();
+  applyCover();
   loadWmPrefs();
-  // Review Studio: relocate inline blocks into the gear, hydrate saved settings, seed defaults
+  // Review Studio: relocate inline blocks into their sections, dock the sidebar, hydrate saved settings
   rsMountInline();
+  dockReviewStudio();
+  setDockCollapsed(ls('rv_studio_dock_collapsed')==='1', false);
+  setDockLCollapsed(ls('rv_studio_dockl_collapsed')==='1', false);
   const savedRS=loadReviewPrefs(); reviewSettings = savedRS ? Object.assign(defaultReviewSettings(), savedRS) : defaultReviewSettings();
   applyReviewSettings(reviewSettings);
-  if(ls('rv_studio_seen')) el('openStudio').classList.add('seen');
+  showStudioSection('perms');
   applyLang(RV.detectLang());
   renderMaterials(); renderWmUI(); renderPreview(); updateChips(); updateCount();
   requestNotifyPerm();

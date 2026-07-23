@@ -80,7 +80,7 @@
     var min = Math.min(W, H);
     if (o.type === 'text') {
       var font = Math.max(8, min * (o.size || 6) / 100);
-      ctx.font = font + "px 'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif";
+      ctx.font = font + "px 'Overpass','Rubik',system-ui,'Segoe UI',sans-serif";
       var m = ctx.measureText(o.text || '');
       var w = Math.max(1, m.width);
       var asc = (m.actualBoundingBoxAscent || font * 0.72), desc = (m.actualBoundingBoxDescent || font * 0.28);

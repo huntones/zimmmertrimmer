@@ -224,7 +224,7 @@
   //  use. Sits in the bottom-start corner, opposite the a11y button.
   // ============================================================
   var CSS = `
-  #cc-root{ font-family:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif; }
+  #cc-root{ font-family:'Overpass','Rubik',system-ui,'Segoe UI',sans-serif; }
   #cc-root *{ box-sizing:border-box; }
 
   /* ----- First-visit banner (bottom-start card) ----- */

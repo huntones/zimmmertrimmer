@@ -32,7 +32,7 @@
     --tile-doc:linear-gradient(150deg,#7b34ff,#3f85ff);
     --float-shadow:0 22px 44px -16px rgba(40,28,90,0.42);
     --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
-    --sans:'Space Grotesk','Rubik',system-ui,'Segoe UI',sans-serif;
+    --sans:'Overpass','Rubik',system-ui,'Segoe UI',sans-serif;
   }
   html[data-theme="dark"] {
     --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
@@ -357,10 +357,28 @@
     --shadow-sm:0 10px 28px rgba(35,43,90,.06);
     --float-shadow:0 28px 44px -16px rgba(62,47,139,.42);
   }
-  html[data-theme="dark"]{--bg:#f5f7ff;--panel:#ffffff;--panel-2:#f8f9ff;--line:#e8ebfa;--line-2:#eef1fb;
-    --ink:#080f2e;--ink-2:#111836;--muted:#737f9f;--faint:#98a2bd;--accent:#6c41ff;--accent-dim:#5932e6;
-    --accent-soft:#f0ebff;--success:#62ce6e;--success-dim:#4fbd5b;--success-soft:#ebfaee;--info:#3f7fff;
-    --info-dim:#356ceb;--info-soft:#edf4ff;--danger:#ed5aa8;--danger-soft:#fff0f8;}
+  /* Dark palette for the redesigned landing token set (was a light-value stub
+     that disabled dark mode on the home page). Full override so the home page's
+     bespoke :root is governed by one authoritative dark block; brand pink danger
+     kept, just brightened for contrast on the dark canvas. */
+  html[data-theme="dark"]{
+    --bg:#0d0f14; --panel:#161a22; --panel-2:#1d222c; --line:#2a303c; --line-2:#232833;
+    --ink:#eef1f6; --ink-2:#dfe4ee; --muted:#96a0b6; --faint:#6b7280;
+    --accent:#a06bff; --accent-dim:#7c3aed; --accent-ink:#ffffff; --accent-soft:#241a3a;
+    --success:#37c26a; --success-dim:#2fae5e; --success-soft:#132a1c;
+    --info:#5b95f8; --info-dim:#4f8ef7; --info-soft:#182338;
+    --danger:#ff7ac4; --danger-soft:#2a1721;
+    --warm-soft:#2c2718; --warm-line:#5a4d24; --ok:#4ec98a; --warn:#e8b84b; --err:#ff6b6b;
+    --grad:linear-gradient(100deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-h:linear-gradient(100deg,#9a63ff 0%,#6aa2ff 100%);
+    --grad-soft:linear-gradient(120deg,#1c1633,#11242a);
+    --grad-shadow:rgba(77,123,255,0.42);
+    --grad-btn:linear-gradient(135deg,#8f52ff 0%,#5a97ff 100%);
+    --grad-btn-glow:rgba(77,123,255,0.45);
+    --shadow:0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+    --float-shadow:0 22px 44px -16px rgba(0,0,0,0.6);}
   body{background:
     radial-gradient(70% 46% at 50% 21%,rgba(255,255,255,.98),rgba(244,247,255,.72) 54%,rgba(229,233,255,.64) 100%),
     linear-gradient(180deg,#f8f9ff 0%,#eef1ff 100%);color:var(--ink);}
@@ -517,6 +535,40 @@
   .ti-y{background:var(--warm-soft);} .ti-t{background:#dff3ef;} .ti-p{background:#fceef4;}
   @media (max-width:860px){ .toolsgrid{grid-template-columns:repeat(2,1fr);} }
   @media (max-width:560px){ .toolsgrid{grid-template-columns:1fr;} .tabs{gap:6px;} .tab{padding:8px 15px;font-size:13px;} }
+
+  /* ---------- dark-mode fixes for the redesigned landing ----------
+     The redesign (hero, popular-tools, trustbar, all-tools tabs) hardcodes
+     several light-only colours a token swap can't reach; recolour them here. */
+  html[data-theme="dark"] body{background:
+    radial-gradient(70% 46% at 50% 21%,rgba(28,32,46,.9),rgba(15,17,24,.86) 54%,rgba(11,12,18,.94) 100%),
+    linear-gradient(180deg,#0e1016 0%,#0a0c11 100%);color:var(--ink);}
+  html[data-theme="dark"] body::before{background:
+    radial-gradient(46% 34% at 16% 40%,rgba(120,116,255,.16),transparent 70%),
+    radial-gradient(40% 35% at 87% 30%,rgba(120,116,255,.13),transparent 72%),
+    radial-gradient(42% 30% at 77% 80%,rgba(96,108,255,.12),transparent 70%);}
+  html[data-theme="dark"] h1.big{color:#f2f5ff;}
+  html[data-theme="dark"] .sub{color:#aab3cc;}
+  html[data-theme="dark"] .hfeat b{color:#aab3cc;}
+  html[data-theme="dark"] .ghost.lg{background:rgba(255,255,255,.06);border-color:#39414f;color:#eef1f6;}
+  html[data-theme="dark"] .tsec-h{color:#eef1f6;}
+  html[data-theme="dark"] .toolcard{background:rgba(28,33,44,.72);border-color:rgba(255,255,255,.07);
+    box-shadow:0 18px 35px rgba(0,0,0,.42);}
+  html[data-theme="dark"] .toolcard h3{color:#eef1f6;}
+  html[data-theme="dark"] .toolcard p{color:#9aa1b5;}
+  html[data-theme="dark"] .trustbar{background:rgba(28,33,44,.62);border-color:rgba(255,255,255,.07);
+    box-shadow:0 16px 34px rgba(0,0,0,.4);}
+  html[data-theme="dark"] .tstat{border-left-color:rgba(255,255,255,.08);border-top-color:rgba(255,255,255,.08);}
+  html[data-theme="dark"] .tstat:first-child{border-left:none;}
+  html[data-theme="dark"] .tstat b{color:#eef1f6;}
+  html[data-theme="dark"] .tstat small{color:#9aa1b5;}
+  /* .tab.on was background:var(--ink);color:#fff → in dark that's white-on-near-white. */
+  html[data-theme="dark"] .tab.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+  html[data-theme="dark"] .ti-t{background:#123028;} html[data-theme="dark"] .ti-p{background:#301823;}
+  /* the redesign forces a solid-white sticky header — flip it to a dark panel */
+  html[data-theme="dark"] #site-header .sh-nav,
+  html[data-theme="dark"] #site-header .sh-nav.scrolled{background:#0f1219!important;border-bottom-color:#232833!important;}
+  /* dim the bright photographic hero art so it reads on the dark canvas */
+  html[data-theme="dark"] .topbg{filter:brightness(.6) saturate(1.05);opacity:.9;}
 </style>
 <link rel="stylesheet" href="./header.css">
 </head>

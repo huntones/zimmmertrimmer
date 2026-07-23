@@ -2,3 +2,12 @@
 server.log
 __pycache__/
 *.pyc
+
+# KOLKLI SEND backend (server/)
+server/node_modules/
+server/.env
+server/.storage/
+server/.pgdata/
+server/.pgdata-test/
+server/coverage/
+npm-debug.log*

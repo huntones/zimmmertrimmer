@@ -110,6 +110,7 @@
 /redirect-generator.html  /redirect-generator  301
 /remove-bg.html  /remove-bg  301
 /request.html  /request  301
+/request-studio.html  /request-studio  301
 /resize-image.html  /resize-image  301
 /restore-image.html  /restore-image  301
 /review.html  /review  301
@@ -118,8 +119,10 @@
 /security.html  /security  301
 /select.html  /select  301
 /send.html  /send  301
+/send-landing.html  /send-landing  301
 /sent-files-card.html  /sent-files-card  301
 /sent-package-card.html  /sent-package-card  301
+/share-dialog.html  /share-dialog  301
 /share-link-card.html  /share-link-card  301
 /sidebar.html  /sidebar  301
 /spreadsheet-convert.html  /spreadsheet-convert  301
@@ -130,6 +133,7 @@
 /tools/index.html  /tools/  301
 /trim-silence.html  /trim-silence  301
 /unit-converter.html  /unit-converter  301
+/upload-dropzone.html  /upload-dropzone  301
 /upload.html  /upload  301
 /url-encode.html  /url-encode  301
 /utm-builder.html  /utm-builder  301
@@ -241,6 +245,7 @@
 /redirect-generator  /redirect-generator.html  200
 /remove-bg  /remove-bg.html  200
 /request  /request.html  200
+/request-studio  /request-studio.html  200
 /resize-image  /resize-image.html  200
 /restore-image  /restore-image.html  200
 /review  /review.html  200
@@ -249,8 +254,10 @@
 /security  /security.html  200
 /select  /select.html  200
 /send  /send.html  200
+/send-landing  /send-landing.html  200
 /sent-files-card  /sent-files-card.html  200
 /sent-package-card  /sent-package-card.html  200
+/share-dialog  /share-dialog.html  200
 /share-link-card  /share-link-card.html  200
 /sidebar  /sidebar.html  200
 /spreadsheet-convert  /spreadsheet-convert.html  200
@@ -261,6 +268,7 @@
 /tools/  /tools/index.html  200
 /trim-silence  /trim-silence.html  200
 /unit-converter  /unit-converter.html  200
+/upload-dropzone  /upload-dropzone.html  200
 /upload  /upload.html  200
 /url-encode  /url-encode.html  200
 /utm-builder  /utm-builder.html  200
